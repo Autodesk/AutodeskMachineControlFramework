@@ -80,6 +80,8 @@ public:
 
 	IXMLDocumentNode * GetRootNode() override;
 
+    std::string SaveToString(const bool bAddLineBreaks) override;
+
 };
 
 } // namespace Impl

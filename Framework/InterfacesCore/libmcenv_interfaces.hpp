@@ -1387,6 +1387,13 @@ public:
 	*/
 	virtual IXMLDocumentNode * GetRootNode() = 0;
 
+	/**
+	* IXMLDocument::SaveToString - Saves the XML document into a string.
+	* @param[in] bAddLineBreaks - If true, line breaks and indentation will be added to the output string.
+	* @return String with the XML Content.
+	*/
+	virtual std::string SaveToString(const bool bAddLineBreaks) = 0;
+
 };
 
 typedef IBaseSharedPtr<IXMLDocument> PIXMLDocument;

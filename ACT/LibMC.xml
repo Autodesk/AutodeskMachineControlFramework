@@ -479,15 +479,19 @@
 		<error name="INVALIDBUTTONNAME" code="447" description="Invalid button name" />		
 		
 		<error name="RESOURCEENTRYISNOUTF8STRING" code="448" description="Resource entry is no UTF8 string" />
-		<error name="AMBIGUOUSDRIVERCONFIGURATION" code="449" description="Ambiguous driver configuration" />		
-		
+		<error name="AMBIGUOUSDRIVERCONFIGURATION" code="449" description="Ambiguous driver configuration" />				
 		<error name="COULDNOTCREATEDRIVER" code="450" description="Could not create driver" />		
 		<error name="EMPTYGROUPNAMEBUTPARAMETERGIVEN" code="451" description="Empty group name but parameter given" />
-
 		<error name="INVALIDDEFAULTXMLNAMESPACE" code="452" description="invalid default xml namespace name." />		
-		<error name="INVALIDXMLROOTNODENAME" code="453" description="invalid xml root node name." />		
+		<error name="INVALIDXMLROOTNODENAME" code="453" description="invalid xml root node name." />				
+		<error name="COULDNOTPARSEXMLSTRING" code="454" description="could not parse XML String." />		
+		<error name="COULDNOTPARSEXMLDATA" code="455" description="could not parse XML Data." />		
+		<error name="XMLDOESNOTCONTAINROOTNODE" code="456" description="XML does not contain root node." />		
+		<error name="XMLCONTAINSAMBIGOUSROOTNODES" code="457" description="XML contains ambiguous root nodes." />		
+		<error name="XMLDOESNOTCONTAINNAMESPACE" code="458" description="XML does not contain namespace." />		
+		<error name="INVALIDXMLDATA" code="459" description="invalid XML Data." />		
+		<error name="INVALIDXMLROOTNODEINSTANCE" code="460" description="invalid XML root node instance." />		
 		
-		  
 	</errors>
 	
 	

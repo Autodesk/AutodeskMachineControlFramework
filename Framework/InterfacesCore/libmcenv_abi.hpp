@@ -1566,6 +1566,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_registernamespace(LibMCEnv
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_getrootnode(LibMCEnv_XMLDocument pXMLDocument, LibMCEnv_XMLDocumentNode * pRootNode);
 
+/**
+* Saves the XML document into a string.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] bAddLineBreaks - If true, line breaks and indentation will be added to the output string.
+* @param[in] nXMLStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pXMLStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pXMLStringBuffer -  buffer of String with the XML Content., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_savetostring(LibMCEnv_XMLDocument pXMLDocument, bool bAddLineBreaks, const LibMCEnv_uint32 nXMLStringBufferSize, LibMCEnv_uint32* pXMLStringNeededChars, char * pXMLStringBuffer);
+
 /*************************************************************************************************************************
  Class definition for TCPIPPacket
 **************************************************************************************************************************/

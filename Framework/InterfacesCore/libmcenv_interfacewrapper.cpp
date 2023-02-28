@@ -4600,6 +4600,54 @@ LibMCEnvResult libmcenv_xmldocument_getrootnode(LibMCEnv_XMLDocument pXMLDocumen
 	}
 }
 
+LibMCEnvResult libmcenv_xmldocument_savetostring(LibMCEnv_XMLDocument pXMLDocument, bool bAddLineBreaks, const LibMCEnv_uint32 nXMLStringBufferSize, LibMCEnv_uint32* pXMLStringNeededChars, char * pXMLStringBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocument;
+
+	try {
+		if ( (!pXMLStringBuffer) && !(pXMLStringNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sXMLString("");
+		IXMLDocument* pIXMLDocument = dynamic_cast<IXMLDocument*>(pIBaseClass);
+		if (!pIXMLDocument)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pXMLStringBuffer == nullptr);
+		if (isCacheCall) {
+			sXMLString = pIXMLDocument->SaveToString(bAddLineBreaks);
+
+			pIXMLDocument->_setCache (new ParameterCache_1<std::string> (sXMLString));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIXMLDocument->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sXMLString);
+			pIXMLDocument->_setCache (nullptr);
+		}
+		
+		if (pXMLStringNeededChars)
+			*pXMLStringNeededChars = (LibMCEnv_uint32) (sXMLString.size()+1);
+		if (pXMLStringBuffer) {
+			if (sXMLString.size() >= nXMLStringBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iXMLString = 0; iXMLString < sXMLString.size(); iXMLString++)
+				pXMLStringBuffer[iXMLString] = sXMLString[iXMLString];
+			pXMLStringBuffer[sXMLString.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for TCPIPPacket
@@ -10576,6 +10624,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_xmldocument_registernamespace;
 	if (sProcName == "libmcenv_xmldocument_getrootnode") 
 		*ppProcAddress = (void*) &libmcenv_xmldocument_getrootnode;
+	if (sProcName == "libmcenv_xmldocument_savetostring") 
+		*ppProcAddress = (void*) &libmcenv_xmldocument_savetostring;
 	if (sProcName == "libmcenv_tcpippacket_isempty") 
 		*ppProcAddress = (void*) &libmcenv_tcpippacket_isempty;
 	if (sProcName == "libmcenv_tcpippacket_getsize") 

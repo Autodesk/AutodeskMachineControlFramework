@@ -30,7 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_xmldocument.hpp"
+#include "amc_xmldocumentnode.hpp"
+
 #include "libmc_exceptiontypes.hpp"
+#include <sstream>
 
 using namespace AMC;
 
@@ -52,33 +55,75 @@ void CXMLDocumentInstance::createEmptyDocument(const std::string& sRootNodeName,
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLROOTNODENAME, sRootNodeName);
 
 	m_Document = pugi::xml_document();
-	auto rootNode = m_Document.root();
-	rootNode.set_name(sRootNodeName.c_str());
+	pugi::xml_node rootNode = m_Document.append_child(sRootNodeName.c_str());
 
 	auto xmlNSAttribute = rootNode.append_attribute("xmlns");
 	xmlNSAttribute.set_value(sDefaultNamespace.c_str());
 
+	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, rootNode);
+
+
 	m_sDefaultNamespace = sDefaultNamespace;
 }
 
+void CXMLDocumentInstance::extractDocumentNamespaces()
+{
+	auto children = m_Document.children();
+	if (children.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_XMLDOESNOTCONTAINROOTNODE);
+
+	pugi::xml_node rootNode;
+	size_t nChildCount = 0;
+	for (auto child : children) {
+		rootNode = child;
+		nChildCount++;
+	}
+
+	if (nChildCount > 1)
+		throw ELibMCInterfaceException(LIBMC_ERROR_XMLCONTAINSAMBIGOUSROOTNODES);
+
+	pugi::xml_attribute xmlnsAttrib = rootNode.attribute("xmlns");
+	m_sDefaultNamespace = xmlnsAttrib.as_string();
+	if (m_sDefaultNamespace.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE);
+
+	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, rootNode);
+}
+
+
 void CXMLDocumentInstance::parseXMLString(const std::string& sXMLString)
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	m_Document = pugi::xml_document();
+
+	pugi::xml_parse_result result = m_Document.load_string(sXMLString.c_str(), pugi::parse_minimal | pugi::parse_escapes | pugi::parse_eol );
+	if (!result)
+		throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSEXMLSTRING);
+
+	extractDocumentNamespaces();	 
 }
 
 void CXMLDocumentInstance::parseXMLData(uint64_t nDataSize, const uint8_t* pData)
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	if ((pData == nullptr) || (nDataSize == 0))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLDATA);
+
+	m_Document = pugi::xml_document();
+
+	pugi::xml_parse_result result = m_Document.load_buffer(pData, nDataSize, pugi::parse_minimal | pugi::parse_escapes | pugi::parse_eol);
+	if (!result)
+		throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSEXMLDATA);
+
+	extractDocumentNamespaces();
 }
 
 std::string CXMLDocumentInstance::GetDefaultNamespace()
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	return m_sDefaultNamespace;
 }
 
 uint64_t CXMLDocumentInstance::GetNamespaceCount()
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	return 1;
 }
 
 void CXMLDocumentInstance::GetNamespace(const uint64_t nIndex, std::string& sNamespace, std::string& sNamespacePrefix)
@@ -103,6 +148,33 @@ void CXMLDocumentInstance::RegisterNamespace(const std::string& sNamespace, cons
 
 PXMLDocumentNodeInstance CXMLDocumentInstance::GetRootNode()
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	if (m_pRootNodeInstance.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLROOTNODEINSTANCE);
+
+	return m_pRootNodeInstance;
+}
+
+struct pugi_xml_string_writer : pugi::xml_writer
+{
+	std::stringstream m_Stream;
+
+	virtual void write(const void* data, size_t size)
+	{
+		m_Stream.write (static_cast<const char*>(data), size);
+	}
+};
+
+std::string CXMLDocumentInstance::SaveToString(const bool bAddLineBreaks)
+{
+	pugi_xml_string_writer xmlWriter;
+	uint32_t nFormat;
+	if (bAddLineBreaks)
+		nFormat = pugi::format_indent;
+	else
+		nFormat = pugi::format_raw;
+
+	m_Document.save(xmlWriter, "  ", nFormat, pugi::encoding_utf8);
+
+	return xmlWriter.m_Stream.str();
 }
 

@@ -46,8 +46,11 @@ namespace AMC {
 	private:
 
 		pugi::xml_document m_Document;
+		PXMLDocumentNodeInstance m_pRootNodeInstance;
 
 		std::string m_sDefaultNamespace;
+
+		void extractDocumentNamespaces();
 
 	public:
 
@@ -74,6 +77,8 @@ namespace AMC {
 		void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
 
 		PXMLDocumentNodeInstance GetRootNode();
+
+		std::string SaveToString(const bool bAddLineBreaks);
 
 	};
 

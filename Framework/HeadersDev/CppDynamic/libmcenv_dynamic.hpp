@@ -1028,6 +1028,7 @@ public:
 	inline void GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix);
 	inline void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
 	inline PXMLDocumentNode GetRootNode();
+	inline std::string SaveToString(const bool bAddLineBreaks);
 };
 	
 /*************************************************************************************************************************
@@ -1607,6 +1608,7 @@ public:
 		pWrapperTable->m_XMLDocument_GetNamespacePrefix = nullptr;
 		pWrapperTable->m_XMLDocument_RegisterNamespace = nullptr;
 		pWrapperTable->m_XMLDocument_GetRootNode = nullptr;
+		pWrapperTable->m_XMLDocument_SaveToString = nullptr;
 		pWrapperTable->m_TCPIPPacket_IsEmpty = nullptr;
 		pWrapperTable->m_TCPIPPacket_GetSize = nullptr;
 		pWrapperTable->m_TCPIPPacket_GetData = nullptr;
@@ -3116,6 +3118,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocument_GetRootNode == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_SaveToString = (PLibMCEnvXMLDocument_SaveToStringPtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_savetostring");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_SaveToString = (PLibMCEnvXMLDocument_SaveToStringPtr) dlsym(hLibrary, "libmcenv_xmldocument_savetostring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_SaveToString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5347,6 +5358,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocument_getrootnode", (void**)&(pWrapperTable->m_XMLDocument_GetRootNode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_GetRootNode == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_savetostring", (void**)&(pWrapperTable->m_XMLDocument_SaveToString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_SaveToString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_tcpippacket_isempty", (void**)&(pWrapperTable->m_TCPIPPacket_IsEmpty));
@@ -8030,6 +8045,22 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hRootNode);
+	}
+	
+	/**
+	* CXMLDocument::SaveToString - Saves the XML document into a string.
+	* @param[in] bAddLineBreaks - If true, line breaks and indentation will be added to the output string.
+	* @return String with the XML Content.
+	*/
+	std::string CXMLDocument::SaveToString(const bool bAddLineBreaks)
+	{
+		LibMCEnv_uint32 bytesNeededXMLString = 0;
+		LibMCEnv_uint32 bytesWrittenXMLString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_SaveToString(m_pHandle, bAddLineBreaks, 0, &bytesNeededXMLString, nullptr));
+		std::vector<char> bufferXMLString(bytesNeededXMLString);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_SaveToString(m_pHandle, bAddLineBreaks, bytesNeededXMLString, &bytesWrittenXMLString, &bufferXMLString[0]));
+		
+		return std::string(&bufferXMLString[0]);
 	}
 	
 	/**

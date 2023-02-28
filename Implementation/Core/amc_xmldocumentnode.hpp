@@ -35,18 +35,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <memory>
 
+#include "PugiXML/pugixml.hpp"
+
 namespace AMC {
+
+	class CXMLDocumentInstance;
 
 	class CXMLDocumentNodeInstance {
 	private:
 
+		CXMLDocumentInstance* m_pDocument;
+		pugi::xml_node m_XMLNode;
+
 	public:
 
-		CXMLDocumentNodeInstance();
+		CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, pugi::xml_node xmlNode);
 		
 		virtual ~CXMLDocumentNodeInstance();
 
 		static bool checkXMLNamespaceName(const std::string& sNodeName);
+
 		static bool checkXMLNodeName(const std::string & sNodeName);
 
 	};

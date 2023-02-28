@@ -478,6 +478,13 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN 451 /** Empty group name but parameter given */
 #define LIBMC_ERROR_INVALIDDEFAULTXMLNAMESPACE 452 /** invalid default xml namespace name. */
 #define LIBMC_ERROR_INVALIDXMLROOTNODENAME 453 /** invalid xml root node name. */
+#define LIBMC_ERROR_COULDNOTPARSEXMLSTRING 454 /** could not parse XML String. */
+#define LIBMC_ERROR_COULDNOTPARSEXMLDATA 455 /** could not parse XML Data. */
+#define LIBMC_ERROR_XMLDOESNOTCONTAINROOTNODE 456 /** XML does not contain root node. */
+#define LIBMC_ERROR_XMLCONTAINSAMBIGOUSROOTNODES 457 /** XML contains ambiguous root nodes. */
+#define LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE 458 /** XML does not contain namespace. */
+#define LIBMC_ERROR_INVALIDXMLDATA 459 /** invalid XML Data. */
+#define LIBMC_ERROR_INVALIDXMLROOTNODEINSTANCE 460 /** invalid XML root node instance. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -868,6 +875,13 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN: return "Empty group name but parameter given";
     case LIBMC_ERROR_INVALIDDEFAULTXMLNAMESPACE: return "invalid default xml namespace name.";
     case LIBMC_ERROR_INVALIDXMLROOTNODENAME: return "invalid xml root node name.";
+    case LIBMC_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML String.";
+    case LIBMC_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML Data.";
+    case LIBMC_ERROR_XMLDOESNOTCONTAINROOTNODE: return "XML does not contain root node.";
+    case LIBMC_ERROR_XMLCONTAINSAMBIGOUSROOTNODES: return "XML contains ambiguous root nodes.";
+    case LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE: return "XML does not contain namespace.";
+    case LIBMC_ERROR_INVALIDXMLDATA: return "invalid XML Data.";
+    case LIBMC_ERROR_INVALIDXMLROOTNODEINSTANCE: return "invalid XML root node instance.";
     default: return "unknown error";
   }
 }

@@ -93,3 +93,7 @@ IXMLDocumentNode * CXMLDocument::GetRootNode()
     return new CXMLDocumentNode(m_pXMLDocument->GetRootNode());
 }
 
+std::string CXMLDocument::SaveToString(const bool bAddLineBreaks)
+{
+    return m_pXMLDocument->SaveToString(bAddLineBreaks);
+}

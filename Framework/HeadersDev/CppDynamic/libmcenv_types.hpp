@@ -96,94 +96,94 @@ typedef void * LibMCEnv_pvoid;
 **************************************************************************************************************************/
 
 #define LIBMCENV_SUCCESS 0
-#define LIBMCENV_ERROR_NOTIMPLEMENTED 1 /** functionality not implemented */
-#define LIBMCENV_ERROR_INVALIDPARAM 2 /** an invalid parameter was passed */
-#define LIBMCENV_ERROR_INVALIDCAST 3 /** a type cast failed */
-#define LIBMCENV_ERROR_BUFFERTOOSMALL 4 /** a provided buffer is too small */
-#define LIBMCENV_ERROR_GENERICEXCEPTION 5 /** a generic exception occurred */
-#define LIBMCENV_ERROR_COULDNOTLOADLIBRARY 6 /** the library could not be loaded */
-#define LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT 7 /** a required exported symbol could not be found in the library */
-#define LIBMCENV_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
-#define LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND 9 /** Parameter group not found */
-#define LIBMCENV_ERROR_PARAMETERNOTFOUND 10 /** Parameter not found */
-#define LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON 11 /** Could not find signal definition */
-#define LIBMCENV_ERROR_COULDNOTTRIGGERSIGNAL 12 /** Could not trigger signal */
-#define LIBMCENV_ERROR_SIGNALNOTFOUND 13 /** Signal not found */
-#define LIBMCENV_ERROR_TERMINATED 14 /** operation has been terminated. */
-#define LIBMCENV_ERROR_SIGNALHASTRIGGEREDTWICE 15 /** signal has been triggered twice. */
-#define LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED 16 /** signal has not been triggered. */
-#define LIBMCENV_ERROR_DRIVERISNOTINITIALISING 17 /** driver is not in initialisation mode. */
-#define LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND 18 /** resource entry not found. */
-#define LIBMCENV_ERROR_INTERNALERROR 19 /** internal error. */
-#define LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME 20 /** invalid character in filename. */
-#define LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED 21 /** working directory has been cleaned. */
-#define LIBMCENV_ERROR_INVALIDITERATOR 22 /** invalid iterator. */
-#define LIBMCENV_ERROR_FORMVALUENOTFOUND 23 /** Form value not found. */
-#define LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE 24 /** Invalid double form value. */
-#define LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE 25 /** Invalid integer form value. */
-#define LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES 26 /** Could not access client variables. */
-#define LIBMCENV_ERROR_INVALIDPIXELCOUNT 27 /** Invalid pixel count. */
-#define LIBMCENV_ERROR_INVALIDDPIVALUE 28 /** Invalid dpi value. */
-#define LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE 29 /** Could not compress PNG image. */
-#define LIBMCENV_ERROR_COULDNOTSTOREPNGIMAGE 30 /** Could not store PNG image. */
-#define LIBMCENV_ERROR_EMPTYPNGIMAGEDATA 31 /** Empty PNG image data. */
-#define LIBMCENV_ERROR_INVALIDXCOORDINATE 32 /** Invalid X coordinate. */
-#define LIBMCENV_ERROR_INVALIDYCOORDINATE 33 /** Invalid Y coordinate. */
-#define LIBMCENV_ERROR_INVALIDXCOORDINATERANGE 34 /** Invalid X coordinate range. */
-#define LIBMCENV_ERROR_INVALIDYCOORDINATERANGE 35 /** Invalid Y coordinate range. */
-#define LIBMCENV_ERROR_INVALIDPIXELDATACOUNT 36 /** Invalid pixel data count. */
-#define LIBMCENV_ERROR_INVALIDIMAGEBUFFER 37 /** Invalid image buffer. */
-#define LIBMCENV_ERROR_INVALIDPIXELFORMAT 38 /** Invalid pixel format. */
-#define LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME 39 /** Invalid test output name. */
-#define LIBMCENV_ERROR_TOOLPATHNOTLOADED 40 /** Toolpath has not been loaded. */
-#define LIBMCENV_ERROR_INVALIDLAYERINDEX 41 /** Invalid layer index. */
-#define LIBMCENV_ERROR_INVALIDHATCHCOUNT 42 /** Invalid hatch count. */
-#define LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH 43 /** Segment is not of type hatch. */
-#define LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS 44 /** Temp file extension exceeds 64 characters. */
-#define LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS 45 /** Temp file extension contains invalid characters. */
-#define LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME 46 /** Could not generate temp file name. */
-#define LIBMCENV_ERROR_EMPTYTCPIPPACKET 47 /** Empty TCP/IP Packet. */
-#define LIBMCENV_ERROR_COULDNOTGETADDRESSINFO 48 /** Could not get address info. */
-#define LIBMCENV_ERROR_COULDNOTCREATESOCKET 49 /** Could not create socket. */
-#define LIBMCENV_ERROR_COULDNOTCONNECT 50 /** Could not connect. */
-#define LIBMCENV_ERROR_SENDERROR 51 /** Send error. */
-#define LIBMCENV_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM 52 /** Receive count exceeds maximum. */
-#define LIBMCENV_ERROR_CONNECTIONCLOSED 53 /** Connection closed. */
-#define LIBMCENV_ERROR_RECEIVEERROR 54 /** Receive error. */
-#define LIBMCENV_ERROR_SENDCOUNTEXCEEDSMAXIMUM 55 /** Send count exceeds maximum. */
-#define LIBMCENV_ERROR_SOCKETNOTCONNECTED 56 /** Socket not connected. */
-#define LIBMCENV_ERROR_INVALIDSENDBUFFER 57 /** Invalid send buffer. */
-#define LIBMCENV_ERROR_INVALIDMODBUSTCPPAYLOADSIZE 58 /** Invalid modbus TCP payload size */
-#define LIBMCENV_ERROR_INVALIDMODBUSTCPREQUEST 59 /** Invalid modbus TCP request */
-#define LIBMCENV_ERROR_INSUFFICIENTMODBUSTCPRESPONSEHEADER 60 /** Insufficient modbus tcp response header */
-#define LIBMCENV_ERROR_MODBUSTCPRESPONSEOVERFLOW 61 /** modbus tcp response overflow */
-#define LIBMCENV_ERROR_INVALIDMODBUSTCPTRANSACTIONIDRESPONSE 62 /** invalid modbus tcp transaction ID response */
-#define LIBMCENV_ERROR_INVALIDMODBUSTCPPROTOCOLIDRESPONSE 63 /** invalid modbus tcp protocol ID response */
-#define LIBMCENV_ERROR_INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE 64 /** invalid modbus tcp unit identifier response */
-#define LIBMCENV_ERROR_MODBUSTCPRESPONSELENGTHMISMATCH 65 /** modbus tcp response length mismatch */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSBITCOUNT 66 /** modbus TCP Invalid coils status bit count. */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSE 67 /** modbus TCP Invalid coils status response. */
-#define LIBMCENV_ERROR_MODBUSTCPCOILSTATUSRESPONSEEMPTY 68 /** modbus TCP coils status response empty. */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE 69 /** modbus TCP invalid coil status response size. */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSBITCOUNT 70 /** modbus TCP invalid input status bit count. */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSE 71 /** modbus TCP invalid input status response. */
-#define LIBMCENV_ERROR_MODBUSTCPINPUTSTATUSRESPONSEEMPTY 72 /** modbus TCP input status response empty. */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE 73 /** modbus TCP invalid input status response size. */
-#define LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT 74 /** invalid modbus tcp coil count. */
-#define LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT 75 /** invalid modbus tcp register count. */
-#define LIBMCENV_ERROR_INVALIDMODBUSIOINDEX 76 /** invalid modbus IO index. */
-#define LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY 77 /** modbus io status empty. */
-#define LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX 78 /** invalid modbus register index. */
-#define LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY 79 /** modbus register status empty. */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSE 80 /** modbus TCP invalid input registers response */
-#define LIBMCENV_ERROR_MODBUSTCPINPUTREGISTERSRESPONSEEMPTY 81 /** modbus TCP input registers response empty */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE 83 /** modbus TCP invalid input registers response size */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE 84 /** modbus TCP invalid holding registers response */
-#define LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY 85 /** modbus TCP holding registers response empty */
-#define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE 86 /** modbus TCP invalid holding registers response size */
-#define LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE 87 /** signal UUID not active. */
-#define LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING 88 /** could not parse XML string. */
-#define LIBMCENV_ERROR_COULDNOTPARSEXMLDATA 89 /** could not parse XML data. */
+#define LIBMCENV_ERROR_NOTIMPLEMENTED 10001 /** functionality not implemented */
+#define LIBMCENV_ERROR_INVALIDPARAM 10002 /** an invalid parameter was passed */
+#define LIBMCENV_ERROR_INVALIDCAST 10003 /** a type cast failed */
+#define LIBMCENV_ERROR_BUFFERTOOSMALL 10004 /** a provided buffer is too small */
+#define LIBMCENV_ERROR_GENERICEXCEPTION 10005 /** a generic exception occurred */
+#define LIBMCENV_ERROR_COULDNOTLOADLIBRARY 10006 /** the library could not be loaded */
+#define LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT 10007 /** a required exported symbol could not be found in the library */
+#define LIBMCENV_ERROR_INCOMPATIBLEBINARYVERSION 10008 /** the version of the binary interface does not match the bindings interface */
+#define LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND 10009 /** Parameter group not found */
+#define LIBMCENV_ERROR_PARAMETERNOTFOUND 10010 /** Parameter not found */
+#define LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON 10011 /** Could not find signal definition */
+#define LIBMCENV_ERROR_COULDNOTTRIGGERSIGNAL 10012 /** Could not trigger signal */
+#define LIBMCENV_ERROR_SIGNALNOTFOUND 10013 /** Signal not found */
+#define LIBMCENV_ERROR_TERMINATED 10014 /** operation has been terminated. */
+#define LIBMCENV_ERROR_SIGNALHASTRIGGEREDTWICE 10015 /** signal has been triggered twice. */
+#define LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED 10016 /** signal has not been triggered. */
+#define LIBMCENV_ERROR_DRIVERISNOTINITIALISING 10017 /** driver is not in initialisation mode. */
+#define LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND 10018 /** resource entry not found. */
+#define LIBMCENV_ERROR_INTERNALERROR 10019 /** internal error. */
+#define LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME 10020 /** invalid character in filename. */
+#define LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED 10021 /** working directory has been cleaned. */
+#define LIBMCENV_ERROR_INVALIDITERATOR 10022 /** invalid iterator. */
+#define LIBMCENV_ERROR_FORMVALUENOTFOUND 10023 /** Form value not found. */
+#define LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE 10024 /** Invalid double form value. */
+#define LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE 10025 /** Invalid integer form value. */
+#define LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES 10026 /** Could not access client variables. */
+#define LIBMCENV_ERROR_INVALIDPIXELCOUNT 10027 /** Invalid pixel count. */
+#define LIBMCENV_ERROR_INVALIDDPIVALUE 10028 /** Invalid dpi value. */
+#define LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE 10029 /** Could not compress PNG image. */
+#define LIBMCENV_ERROR_COULDNOTSTOREPNGIMAGE 10030 /** Could not store PNG image. */
+#define LIBMCENV_ERROR_EMPTYPNGIMAGEDATA 10031 /** Empty PNG image data. */
+#define LIBMCENV_ERROR_INVALIDXCOORDINATE 10032 /** Invalid X coordinate. */
+#define LIBMCENV_ERROR_INVALIDYCOORDINATE 10033 /** Invalid Y coordinate. */
+#define LIBMCENV_ERROR_INVALIDXCOORDINATERANGE 10034 /** Invalid X coordinate range. */
+#define LIBMCENV_ERROR_INVALIDYCOORDINATERANGE 10035 /** Invalid Y coordinate range. */
+#define LIBMCENV_ERROR_INVALIDPIXELDATACOUNT 10036 /** Invalid pixel data count. */
+#define LIBMCENV_ERROR_INVALIDIMAGEBUFFER 10037 /** Invalid image buffer. */
+#define LIBMCENV_ERROR_INVALIDPIXELFORMAT 10038 /** Invalid pixel format. */
+#define LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME 10039 /** Invalid test output name. */
+#define LIBMCENV_ERROR_TOOLPATHNOTLOADED 10040 /** Toolpath has not been loaded. */
+#define LIBMCENV_ERROR_INVALIDLAYERINDEX 10041 /** Invalid layer index. */
+#define LIBMCENV_ERROR_INVALIDHATCHCOUNT 10042 /** Invalid hatch count. */
+#define LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH 10043 /** Segment is not of type hatch. */
+#define LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS 10044 /** Temp file extension exceeds 64 characters. */
+#define LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS 10045 /** Temp file extension contains invalid characters. */
+#define LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME 10046 /** Could not generate temp file name. */
+#define LIBMCENV_ERROR_EMPTYTCPIPPACKET 10047 /** Empty TCP/IP Packet. */
+#define LIBMCENV_ERROR_COULDNOTGETADDRESSINFO 10048 /** Could not get address info. */
+#define LIBMCENV_ERROR_COULDNOTCREATESOCKET 10049 /** Could not create socket. */
+#define LIBMCENV_ERROR_COULDNOTCONNECT 10050 /** Could not connect. */
+#define LIBMCENV_ERROR_SENDERROR 10051 /** Send error. */
+#define LIBMCENV_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM 10052 /** Receive count exceeds maximum. */
+#define LIBMCENV_ERROR_CONNECTIONCLOSED 10053 /** Connection closed. */
+#define LIBMCENV_ERROR_RECEIVEERROR 10054 /** Receive error. */
+#define LIBMCENV_ERROR_SENDCOUNTEXCEEDSMAXIMUM 10055 /** Send count exceeds maximum. */
+#define LIBMCENV_ERROR_SOCKETNOTCONNECTED 10056 /** Socket not connected. */
+#define LIBMCENV_ERROR_INVALIDSENDBUFFER 10057 /** Invalid send buffer. */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPPAYLOADSIZE 10058 /** Invalid modbus TCP payload size */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPREQUEST 10059 /** Invalid modbus TCP request */
+#define LIBMCENV_ERROR_INSUFFICIENTMODBUSTCPRESPONSEHEADER 10060 /** Insufficient modbus tcp response header */
+#define LIBMCENV_ERROR_MODBUSTCPRESPONSEOVERFLOW 10061 /** modbus tcp response overflow */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPTRANSACTIONIDRESPONSE 10062 /** invalid modbus tcp transaction ID response */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPPROTOCOLIDRESPONSE 10063 /** invalid modbus tcp protocol ID response */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE 10064 /** invalid modbus tcp unit identifier response */
+#define LIBMCENV_ERROR_MODBUSTCPRESPONSELENGTHMISMATCH 10065 /** modbus tcp response length mismatch */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSBITCOUNT 10066 /** modbus TCP Invalid coils status bit count. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSE 10067 /** modbus TCP Invalid coils status response. */
+#define LIBMCENV_ERROR_MODBUSTCPCOILSTATUSRESPONSEEMPTY 10068 /** modbus TCP coils status response empty. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE 10069 /** modbus TCP invalid coil status response size. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSBITCOUNT 10070 /** modbus TCP invalid input status bit count. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSE 10071 /** modbus TCP invalid input status response. */
+#define LIBMCENV_ERROR_MODBUSTCPINPUTSTATUSRESPONSEEMPTY 10072 /** modbus TCP input status response empty. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE 10073 /** modbus TCP invalid input status response size. */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT 10074 /** invalid modbus tcp coil count. */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT 10075 /** invalid modbus tcp register count. */
+#define LIBMCENV_ERROR_INVALIDMODBUSIOINDEX 10076 /** invalid modbus IO index. */
+#define LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY 10077 /** modbus io status empty. */
+#define LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX 10078 /** invalid modbus register index. */
+#define LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY 10079 /** modbus register status empty. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSE 10080 /** modbus TCP invalid input registers response */
+#define LIBMCENV_ERROR_MODBUSTCPINPUTREGISTERSRESPONSEEMPTY 10081 /** modbus TCP input registers response empty */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE 10083 /** modbus TCP invalid input registers response size */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE 10084 /** modbus TCP invalid holding registers response */
+#define LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY 10085 /** modbus TCP holding registers response empty */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE 10086 /** modbus TCP invalid holding registers response size */
+#define LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE 10087 /** signal UUID not active. */
+#define LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING 10088 /** could not parse XML string. */
+#define LIBMCENV_ERROR_COULDNOTPARSEXMLDATA 10089 /** could not parse XML data. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv

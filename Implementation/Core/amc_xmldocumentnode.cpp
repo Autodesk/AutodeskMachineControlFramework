@@ -28,13 +28,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #include "amc_xmldocumentnode.hpp"
+#include "amc_xmldocument.hpp"
+
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
-CXMLDocumentNodeInstance::CXMLDocumentNodeInstance()
+CXMLDocumentNodeInstance::CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, pugi::xml_node xmlNode)
+	: m_pDocument (pDocument), m_XMLNode (xmlNode)
 {
+	if (pDocument == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
 

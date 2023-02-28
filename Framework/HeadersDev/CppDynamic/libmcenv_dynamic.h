@@ -1553,6 +1553,18 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocument_RegisterNamespacePtr) (LibMCEnv_XM
 */
 typedef LibMCEnvResult (*PLibMCEnvXMLDocument_GetRootNodePtr) (LibMCEnv_XMLDocument pXMLDocument, LibMCEnv_XMLDocumentNode * pRootNode);
 
+/**
+* Saves the XML document into a string.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] bAddLineBreaks - If true, line breaks and indentation will be added to the output string.
+* @param[in] nXMLStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pXMLStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pXMLStringBuffer -  buffer of String with the XML Content., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocument_SaveToStringPtr) (LibMCEnv_XMLDocument pXMLDocument, bool bAddLineBreaks, const LibMCEnv_uint32 nXMLStringBufferSize, LibMCEnv_uint32* pXMLStringNeededChars, char * pXMLStringBuffer);
+
 /*************************************************************************************************************************
  Class definition for TCPIPPacket
 **************************************************************************************************************************/
@@ -3657,6 +3669,7 @@ typedef struct {
 	PLibMCEnvXMLDocument_GetNamespacePrefixPtr m_XMLDocument_GetNamespacePrefix;
 	PLibMCEnvXMLDocument_RegisterNamespacePtr m_XMLDocument_RegisterNamespace;
 	PLibMCEnvXMLDocument_GetRootNodePtr m_XMLDocument_GetRootNode;
+	PLibMCEnvXMLDocument_SaveToStringPtr m_XMLDocument_SaveToString;
 	PLibMCEnvTCPIPPacket_IsEmptyPtr m_TCPIPPacket_IsEmpty;
 	PLibMCEnvTCPIPPacket_GetSizePtr m_TCPIPPacket_GetSize;
 	PLibMCEnvTCPIPPacket_GetDataPtr m_TCPIPPacket_GetData;
