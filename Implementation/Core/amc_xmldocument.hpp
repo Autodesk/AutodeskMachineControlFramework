@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <memory>
+#include <map>
+#include <vector>
 
 #include "amc_xmldocumentnode.hpp"
 
@@ -50,7 +52,12 @@ namespace AMC {
 
 		std::string m_sDefaultNamespace;
 
+		std::vector<std::string> m_Namespaces;
+		std::map<std::string, std::string> m_PrefixToNamespaceMap;
+		std::map<std::string, std::string> m_NamespaceToPrefixMap;
+
 		void extractDocumentNamespaces();
+		void registerNamespaceEx(const std::string& sNamespace, const std::string & sPrefix);
 
 	public:
 
@@ -72,7 +79,7 @@ namespace AMC {
 
 		bool HasNamespace(const std::string & sNamespace);
 
-		void GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix);
+		std::string GetNamespacePrefix(const std::string & sNamespace);
 
 		void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
 

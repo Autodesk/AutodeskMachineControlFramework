@@ -78,9 +78,9 @@ bool CXMLDocument::HasNamespace(const std::string & sNamespace)
     return m_pXMLDocument->HasNamespace(sNamespace);
 }
 
-void CXMLDocument::GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix)
+std::string CXMLDocument::GetNamespacePrefix(const std::string & sNamespace)
 {
-    return m_pXMLDocument->GetNamespacePrefix(sNamespace, sNamespacePrefix);
+    return m_pXMLDocument->GetNamespacePrefix(sNamespace);
 }
 
 void CXMLDocument::RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix)

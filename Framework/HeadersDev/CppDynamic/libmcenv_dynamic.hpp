@@ -1025,7 +1025,7 @@ public:
 	inline LibMCEnv_uint64 GetNamespaceCount();
 	inline void GetNamespace(const LibMCEnv_uint64 nIndex, std::string & sNamespace, std::string & sNamespacePrefix);
 	inline bool HasNamespace(const std::string & sNamespace);
-	inline void GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix);
+	inline std::string GetNamespacePrefix(const std::string & sNamespace);
 	inline void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
 	inline PXMLDocumentNode GetRootNode();
 	inline std::string SaveToString(const bool bAddLineBreaks);
@@ -8010,16 +8010,17 @@ public:
 	/**
 	* CXMLDocument::GetNamespacePrefix - Returns a name space of the document. Will fail if namespace is not registered.
 	* @param[in] sNamespace - name space of the document.
-	* @param[out] sNamespacePrefix - name space prefix of the document. Empty for root namespace.
+	* @return name space prefix of the document. Empty for root namespace.
 	*/
-	void CXMLDocument::GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix)
+	std::string CXMLDocument::GetNamespacePrefix(const std::string & sNamespace)
 	{
 		LibMCEnv_uint32 bytesNeededNamespacePrefix = 0;
 		LibMCEnv_uint32 bytesWrittenNamespacePrefix = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetNamespacePrefix(m_pHandle, sNamespace.c_str(), 0, &bytesNeededNamespacePrefix, nullptr));
 		std::vector<char> bufferNamespacePrefix(bytesNeededNamespacePrefix);
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetNamespacePrefix(m_pHandle, sNamespace.c_str(), bytesNeededNamespacePrefix, &bytesWrittenNamespacePrefix, &bufferNamespacePrefix[0]));
-		sNamespacePrefix = std::string(&bufferNamespacePrefix[0]);
+		
+		return std::string(&bufferNamespacePrefix[0]);
 	}
 	
 	/**

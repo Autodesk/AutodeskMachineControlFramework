@@ -56,3 +56,8 @@ bool CXMLDocumentNodeInstance::checkXMLNodeName(const std::string& sNodeName)
 {
 	return true;
 }
+
+bool CXMLDocumentNodeInstance::checkXMLNamespacePrefixName(const std::string& sNodeName)
+{
+	return true;
+}

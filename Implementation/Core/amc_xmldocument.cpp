@@ -62,8 +62,9 @@ void CXMLDocumentInstance::createEmptyDocument(const std::string& sRootNodeName,
 
 	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, rootNode);
 
-
 	m_sDefaultNamespace = sDefaultNamespace;
+
+	registerNamespaceEx(m_sDefaultNamespace, "");
 }
 
 void CXMLDocumentInstance::extractDocumentNamespaces()
@@ -88,6 +89,22 @@ void CXMLDocumentInstance::extractDocumentNamespaces()
 		throw ELibMCInterfaceException(LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE);
 
 	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, rootNode);
+}
+
+void CXMLDocumentInstance::registerNamespaceEx(const std::string& sNamespace, const std::string& sPrefix)
+{
+	auto iPrefixIter = m_PrefixToNamespaceMap.find(sPrefix);
+	auto iNamespaceIter = m_NamespaceToPrefixMap.find(sNamespace);
+
+	if (iPrefixIter != m_PrefixToNamespaceMap.end ())
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACEPREFIXALREADYREGISTERED, sPrefix);
+	if (iNamespaceIter != m_NamespaceToPrefixMap.end())
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACEALREADYREGISTERED, sNamespace);
+
+	m_Namespaces.push_back(sNamespace);
+	m_NamespaceToPrefixMap.insert(std::make_pair (sNamespace, sPrefix));
+	m_PrefixToNamespaceMap.insert(std::make_pair (sPrefix, sNamespace));
+
 }
 
 
@@ -123,27 +140,44 @@ std::string CXMLDocumentInstance::GetDefaultNamespace()
 
 uint64_t CXMLDocumentInstance::GetNamespaceCount()
 {
-	return 1;
+	return m_Namespaces.size ();
 }
 
 void CXMLDocumentInstance::GetNamespace(const uint64_t nIndex, std::string& sNamespace, std::string& sNamespacePrefix)
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	if (nIndex >= m_Namespaces.size ())
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACEINDEX, std::to_string (nIndex));
+
+	sNamespace = m_Namespaces.at(nIndex);
+	sNamespacePrefix = GetNamespacePrefix(sNamespace);
+
 }
 
 bool CXMLDocumentInstance::HasNamespace(const std::string& sNamespace)
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	auto iNamespaceIter = m_NamespaceToPrefixMap.find(sNamespace);
+	return (iNamespaceIter != m_NamespaceToPrefixMap.end());
+		
 }
 
-void CXMLDocumentInstance::GetNamespacePrefix(const std::string& sNamespace, std::string& sNamespacePrefix)
+std::string CXMLDocumentInstance::GetNamespacePrefix(const std::string& sNamespace)
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	auto iNamespaceIter = m_NamespaceToPrefixMap.find(sNamespace);
+	if (iNamespaceIter == m_NamespaceToPrefixMap.end())
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACENOTFOUND, sNamespace);
+
+	return iNamespaceIter->second;
 }
 
 void CXMLDocumentInstance::RegisterNamespace(const std::string& sNamespace, const std::string& sNamespacePrefix)
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	if (!CXMLDocumentNodeInstance::checkXMLNamespaceName(sNamespace))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACENAME, sNamespace);
+
+	if (!CXMLDocumentNodeInstance::checkXMLNamespacePrefixName(sNamespacePrefix))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACEPREFIX, sNamespacePrefix);
+
+	registerNamespaceEx(sNamespace, sNamespacePrefix);
 }
 
 PXMLDocumentNodeInstance CXMLDocumentInstance::GetRootNode()

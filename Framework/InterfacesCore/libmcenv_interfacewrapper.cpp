@@ -4508,7 +4508,7 @@ LibMCEnvResult libmcenv_xmldocument_getnamespaceprefix(LibMCEnv_XMLDocument pXML
 		
 		bool isCacheCall = (pNamespacePrefixBuffer == nullptr);
 		if (isCacheCall) {
-			pIXMLDocument->GetNamespacePrefix(sNamespace, sNamespacePrefix);
+			sNamespacePrefix = pIXMLDocument->GetNamespacePrefix(sNamespace);
 
 			pIXMLDocument->_setCache (new ParameterCache_1<std::string> (sNamespacePrefix));
 		}

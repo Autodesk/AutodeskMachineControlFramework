@@ -485,6 +485,12 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE 458 /** XML does not contain namespace. */
 #define LIBMC_ERROR_INVALIDXMLDATA 459 /** invalid XML Data. */
 #define LIBMC_ERROR_INVALIDXMLROOTNODEINSTANCE 460 /** invalid XML root node instance. */
+#define LIBMC_ERROR_XMLNAMESPACEPREFIXALREADYREGISTERED 461 /** XML namespace prefix already registered. */
+#define LIBMC_ERROR_XMLNAMESPACEALREADYREGISTERED 462 /** XML namespace already registered. */
+#define LIBMC_ERROR_XMLNAMESPACENOTFOUND 463 /** XML namespace not found. */
+#define LIBMC_ERROR_INVALIDNAMESPACENAME 464 /** Invalid namespace name. */
+#define LIBMC_ERROR_INVALIDNAMESPACEPREFIX 465 /** Invalid namespace prefix. */
+#define LIBMC_ERROR_INVALIDNAMESPACEINDEX 466 /** Invalid namespace index. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -882,6 +888,12 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE: return "XML does not contain namespace.";
     case LIBMC_ERROR_INVALIDXMLDATA: return "invalid XML Data.";
     case LIBMC_ERROR_INVALIDXMLROOTNODEINSTANCE: return "invalid XML root node instance.";
+    case LIBMC_ERROR_XMLNAMESPACEPREFIXALREADYREGISTERED: return "XML namespace prefix already registered.";
+    case LIBMC_ERROR_XMLNAMESPACEALREADYREGISTERED: return "XML namespace already registered.";
+    case LIBMC_ERROR_XMLNAMESPACENOTFOUND: return "XML namespace not found.";
+    case LIBMC_ERROR_INVALIDNAMESPACENAME: return "Invalid namespace name.";
+    case LIBMC_ERROR_INVALIDNAMESPACEPREFIX: return "Invalid namespace prefix.";
+    case LIBMC_ERROR_INVALIDNAMESPACEINDEX: return "Invalid namespace index.";
     default: return "unknown error";
   }
 }

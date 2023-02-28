@@ -55,6 +55,8 @@ namespace AMC {
 
 		static bool checkXMLNamespaceName(const std::string& sNodeName);
 
+		static bool checkXMLNamespacePrefixName(const std::string& sNodeName);
+
 		static bool checkXMLNodeName(const std::string & sNodeName);
 
 	};

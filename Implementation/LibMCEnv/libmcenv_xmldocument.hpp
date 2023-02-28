@@ -74,7 +74,7 @@ public:
 
 	bool HasNamespace(const std::string & sNamespace) override;
 
-	void GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix) override;
+	std::string GetNamespacePrefix(const std::string & sNamespace) override;
 
 	void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix) override;
 

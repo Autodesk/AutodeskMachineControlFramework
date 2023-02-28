@@ -127,6 +127,7 @@
 		<error name="SIGNALUUIDNOTACTIVE" code="10087" description="signal UUID not active." />		
 		<error name="COULDNOTPARSEXMLSTRING" code="10088" description="could not parse XML string." />		
 		<error name="COULDNOTPARSEXMLDATA" code="10089" description="could not parse XML data." />		
+		
 					
 							
 	</errors>
@@ -931,7 +932,7 @@
 
 		<method name="GetNamespacePrefix" description="Returns a name space of the document. Will fail if namespace is not registered.">
 			<param name="Namespace" type="string" pass="in" description="name space of the document." />
-			<param name="NamespacePrefix" type="string" pass="out" description="name space prefix of the document. Empty for root namespace." />
+			<param name="NamespacePrefix" type="string" pass="return" description="name space prefix of the document. Empty for root namespace." />
 		</method>	
 
 		<method name="RegisterNamespace" description="Registers a custom namespace prefix. Given Namespace MUST NOT have been in use before calling this function.">

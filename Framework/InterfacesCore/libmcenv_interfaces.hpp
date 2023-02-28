@@ -1370,9 +1370,9 @@ public:
 	/**
 	* IXMLDocument::GetNamespacePrefix - Returns a name space of the document. Will fail if namespace is not registered.
 	* @param[in] sNamespace - name space of the document.
-	* @param[out] sNamespacePrefix - name space prefix of the document. Empty for root namespace.
+	* @return name space prefix of the document. Empty for root namespace.
 	*/
-	virtual void GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix) = 0;
+	virtual std::string GetNamespacePrefix(const std::string & sNamespace) = 0;
 
 	/**
 	* IXMLDocument::RegisterNamespace - Registers a custom namespace prefix. Given Namespace MUST NOT have been in use before calling this function.
