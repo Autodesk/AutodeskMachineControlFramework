@@ -71,6 +71,10 @@ class CWorkingFileExecution;
 class CWorkingFile;
 class CWorkingFileIterator;
 class CWorkingDirectory;
+class CXMLDocumentAttribute;
+class CXMLDocumentNode;
+class CXMLDocumentNodes;
+class CXMLDocument;
 class CTCPIPPacket;
 class CTCPIPConnection;
 class CModbusTCPDigitalIOStatus;
@@ -99,6 +103,10 @@ typedef CWorkingFileExecution CLibMCEnvWorkingFileExecution;
 typedef CWorkingFile CLibMCEnvWorkingFile;
 typedef CWorkingFileIterator CLibMCEnvWorkingFileIterator;
 typedef CWorkingDirectory CLibMCEnvWorkingDirectory;
+typedef CXMLDocumentAttribute CLibMCEnvXMLDocumentAttribute;
+typedef CXMLDocumentNode CLibMCEnvXMLDocumentNode;
+typedef CXMLDocumentNodes CLibMCEnvXMLDocumentNodes;
+typedef CXMLDocument CLibMCEnvXMLDocument;
 typedef CTCPIPPacket CLibMCEnvTCPIPPacket;
 typedef CTCPIPConnection CLibMCEnvTCPIPConnection;
 typedef CModbusTCPDigitalIOStatus CLibMCEnvModbusTCPDigitalIOStatus;
@@ -127,6 +135,10 @@ typedef std::shared_ptr<CWorkingFileExecution> PWorkingFileExecution;
 typedef std::shared_ptr<CWorkingFile> PWorkingFile;
 typedef std::shared_ptr<CWorkingFileIterator> PWorkingFileIterator;
 typedef std::shared_ptr<CWorkingDirectory> PWorkingDirectory;
+typedef std::shared_ptr<CXMLDocumentAttribute> PXMLDocumentAttribute;
+typedef std::shared_ptr<CXMLDocumentNode> PXMLDocumentNode;
+typedef std::shared_ptr<CXMLDocumentNodes> PXMLDocumentNodes;
+typedef std::shared_ptr<CXMLDocument> PXMLDocument;
 typedef std::shared_ptr<CTCPIPPacket> PTCPIPPacket;
 typedef std::shared_ptr<CTCPIPConnection> PTCPIPConnection;
 typedef std::shared_ptr<CModbusTCPDigitalIOStatus> PModbusTCPDigitalIOStatus;
@@ -155,6 +167,10 @@ typedef PWorkingFileExecution PLibMCEnvWorkingFileExecution;
 typedef PWorkingFile PLibMCEnvWorkingFile;
 typedef PWorkingFileIterator PLibMCEnvWorkingFileIterator;
 typedef PWorkingDirectory PLibMCEnvWorkingDirectory;
+typedef PXMLDocumentAttribute PLibMCEnvXMLDocumentAttribute;
+typedef PXMLDocumentNode PLibMCEnvXMLDocumentNode;
+typedef PXMLDocumentNodes PLibMCEnvXMLDocumentNodes;
+typedef PXMLDocument PLibMCEnvXMLDocument;
 typedef PTCPIPPacket PLibMCEnvTCPIPPacket;
 typedef PTCPIPConnection PLibMCEnvTCPIPConnection;
 typedef PModbusTCPDigitalIOStatus PLibMCEnvModbusTCPDigitalIOStatus;
@@ -330,6 +346,9 @@ public:
 			case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE: return "MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE";
 			case LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY: return "MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY";
 			case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE: return "MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE";
+			case LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE: return "SIGNALUUIDNOTACTIVE";
+			case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "COULDNOTPARSEXMLSTRING";
+			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "COULDNOTPARSEXMLDATA";
 		}
 		return "UNKNOWN";
 	}
@@ -423,6 +442,9 @@ public:
 			case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE: return "modbus TCP invalid holding registers response";
 			case LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY: return "modbus TCP holding registers response empty";
 			case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE: return "modbus TCP invalid holding registers response size";
+			case LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE: return "signal UUID not active.";
+			case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML string.";
+			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
 		}
 		return "unknown error";
 	}
@@ -551,6 +573,10 @@ private:
 	friend class CWorkingFile;
 	friend class CWorkingFileIterator;
 	friend class CWorkingDirectory;
+	friend class CXMLDocumentAttribute;
+	friend class CXMLDocumentNode;
+	friend class CXMLDocumentNodes;
+	friend class CXMLDocument;
 	friend class CTCPIPPacket;
 	friend class CTCPIPConnection;
 	friend class CModbusTCPDigitalIOStatus;
@@ -893,6 +919,118 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CXMLDocumentAttribute 
+**************************************************************************************************************************/
+class CXMLDocumentAttribute : public CBase {
+public:
+	
+	/**
+	* CXMLDocumentAttribute::CXMLDocumentAttribute - Constructor for XMLDocumentAttribute class.
+	*/
+	CXMLDocumentAttribute(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetValue();
+	inline bool IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
+	inline LibMCEnv_int64 GetIntegerValue(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
+	inline bool IsValidDouble(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline LibMCEnv_double GetDoubleValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool IsValidBool();
+	inline LibMCEnv_double GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline void SetValue(const std::string & sValue);
+	inline void SetIntegerValue(const LibMCEnv_int64 nValue);
+	inline void SetDoubleValue(const LibMCEnv_double dValue);
+	inline void SetBoolValue(const bool bValue);
+	inline void Remove();
+};
+	
+/*************************************************************************************************************************
+ Class CXMLDocumentNode 
+**************************************************************************************************************************/
+class CXMLDocumentNode : public CBase {
+public:
+	
+	/**
+	* CXMLDocumentNode::CXMLDocumentNode - Constructor for XMLDocumentNode class.
+	*/
+	CXMLDocumentNode(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetNameSpace();
+	inline LibMCEnv_uint64 GetAttributeCount();
+	inline PXMLDocumentAttribute GetAttribute(const LibMCEnv_uint64 nIndex);
+	inline bool HasAttribute(const std::string & sName);
+	inline PXMLDocumentAttribute FindAttribute(const std::string & sName, const bool bMustExist);
+	inline void RemoveAttribute(const std::string & sName);
+	inline void AddAttribute(const std::string & sName, const std::string & sNameSpace, const std::string & sValue);
+	inline void AddIntegerAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_int64 nValue);
+	inline void AddDoubleAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_double dValue);
+	inline void AddBoolAttribute(const std::string & sName, const std::string & sNameSpace, const bool bValue);
+	inline PXMLDocumentNodes GetChildren();
+	inline LibMCEnv_uint64 CountChildrenByName(const std::string & sName);
+	inline PXMLDocumentNodes GetChildrenByName(const std::string & sName);
+	inline bool HasChild(const std::string & sName);
+	inline bool HasUniqueChild(const std::string & sName);
+	inline PXMLDocumentNode FindChild(const std::string & sName, const bool bMustExist);
+	inline PXMLDocumentNode AddChild(const std::string & sName, const std::string & sNameSpace);
+	inline void RemoveChild(classParam<CXMLDocumentNode> pChildInstance);
+	inline void RemoveChildrenWithName(const std::string & sName);
+	inline void Remove();
+};
+	
+/*************************************************************************************************************************
+ Class CXMLDocumentNodes 
+**************************************************************************************************************************/
+class CXMLDocumentNodes : public CBase {
+public:
+	
+	/**
+	* CXMLDocumentNodes::CXMLDocumentNodes - Constructor for XMLDocumentNodes class.
+	*/
+	CXMLDocumentNodes(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 GetNodeCount();
+	inline PXMLDocumentNode GetNode(const LibMCEnv_uint64 nIndex);
+	inline LibMCEnv_uint64 CountNodesByName(const std::string & sName);
+	inline PXMLDocumentNodes GetNodesByName(const std::string & sName);
+	inline bool HasNode(const std::string & sName);
+	inline bool HasUniqueNode(const std::string & sName);
+	inline PXMLDocumentNode FindNode(const std::string & sName, const bool bMustExist);
+};
+	
+/*************************************************************************************************************************
+ Class CXMLDocument 
+**************************************************************************************************************************/
+class CXMLDocument : public CBase {
+public:
+	
+	/**
+	* CXMLDocument::CXMLDocument - Constructor for XMLDocument class.
+	*/
+	CXMLDocument(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetDefaultNamespace();
+	inline LibMCEnv_uint64 GetNamespaceCount();
+	inline void GetNamespace(const LibMCEnv_uint64 nIndex, std::string & sNamespace, std::string & sNamespacePrefix);
+	inline bool HasNamespace(const std::string & sNamespace);
+	inline void GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix);
+	inline void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
+	inline PXMLDocumentNode GetRootNode();
+};
+	
+/*************************************************************************************************************************
  Class CTCPIPPacket 
 **************************************************************************************************************************/
 class CTCPIPPacket : public CBase {
@@ -1049,6 +1187,9 @@ public:
 	inline PWorkingDirectory CreateWorkingDirectory();
 	inline PTCPIPConnection CreateTCPIPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS);
 	inline PModbusTCPConnection CreateModbusTCPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS);
+	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
+	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
+	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
 	inline bool DriverHasResourceData(const std::string & sIdentifier);
 	inline bool MachineHasResourceData(const std::string & sIdentifier);
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
@@ -1123,6 +1264,7 @@ public:
 	inline void SignalHandled();
 	inline std::string GetName();
 	inline std::string GetSignalID();
+	inline std::string GetSignalUUID();
 	inline std::string GetStateMachine();
 	inline std::string GetString(const std::string & sName);
 	inline std::string GetUUID(const std::string & sName);
@@ -1153,6 +1295,8 @@ public:
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
+	inline PSignalHandler GetUnhandledSignal(const std::string & sSignalTypeName);
+	inline PSignalHandler GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
@@ -1182,6 +1326,9 @@ public:
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline PTestEnvironment GetTestEnvironment();
+	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
+	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
+	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -1232,6 +1379,9 @@ public:
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline PTestEnvironment GetTestEnvironment();
+	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
+	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
+	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
 };
 	
 	/**
@@ -1409,6 +1559,54 @@ public:
 		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetName = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_IsValidDouble = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetDoubleValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_IsValidBool = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetBoolValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_SetValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_SetBoolValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_Remove = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetName = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetNameSpace = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_HasAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_FindAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_RemoveAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_AddAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_AddIntegerAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_AddDoubleAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_AddBoolAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetChildren = nullptr;
+		pWrapperTable->m_XMLDocumentNode_CountChildrenByName = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetChildrenByName = nullptr;
+		pWrapperTable->m_XMLDocumentNode_HasChild = nullptr;
+		pWrapperTable->m_XMLDocumentNode_HasUniqueChild = nullptr;
+		pWrapperTable->m_XMLDocumentNode_FindChild = nullptr;
+		pWrapperTable->m_XMLDocumentNode_AddChild = nullptr;
+		pWrapperTable->m_XMLDocumentNode_RemoveChild = nullptr;
+		pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName = nullptr;
+		pWrapperTable->m_XMLDocumentNode_Remove = nullptr;
+		pWrapperTable->m_XMLDocumentNodes_GetNodeCount = nullptr;
+		pWrapperTable->m_XMLDocumentNodes_GetNode = nullptr;
+		pWrapperTable->m_XMLDocumentNodes_CountNodesByName = nullptr;
+		pWrapperTable->m_XMLDocumentNodes_GetNodesByName = nullptr;
+		pWrapperTable->m_XMLDocumentNodes_HasNode = nullptr;
+		pWrapperTable->m_XMLDocumentNodes_HasUniqueNode = nullptr;
+		pWrapperTable->m_XMLDocumentNodes_FindNode = nullptr;
+		pWrapperTable->m_XMLDocument_GetDefaultNamespace = nullptr;
+		pWrapperTable->m_XMLDocument_GetNamespaceCount = nullptr;
+		pWrapperTable->m_XMLDocument_GetNamespace = nullptr;
+		pWrapperTable->m_XMLDocument_HasNamespace = nullptr;
+		pWrapperTable->m_XMLDocument_GetNamespacePrefix = nullptr;
+		pWrapperTable->m_XMLDocument_RegisterNamespace = nullptr;
+		pWrapperTable->m_XMLDocument_GetRootNode = nullptr;
 		pWrapperTable->m_TCPIPPacket_IsEmpty = nullptr;
 		pWrapperTable->m_TCPIPPacket_GetSize = nullptr;
 		pWrapperTable->m_TCPIPPacket_GetData = nullptr;
@@ -1456,6 +1654,9 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateXMLDocument = nullptr;
+		pWrapperTable->m_DriverEnvironment_ParseXMLString = nullptr;
+		pWrapperTable->m_DriverEnvironment_ParseXMLData = nullptr;
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
@@ -1498,6 +1699,7 @@ public:
 		pWrapperTable->m_SignalHandler_SignalHandled = nullptr;
 		pWrapperTable->m_SignalHandler_GetName = nullptr;
 		pWrapperTable->m_SignalHandler_GetSignalID = nullptr;
+		pWrapperTable->m_SignalHandler_GetSignalUUID = nullptr;
 		pWrapperTable->m_SignalHandler_GetStateMachine = nullptr;
 		pWrapperTable->m_SignalHandler_GetString = nullptr;
 		pWrapperTable->m_SignalHandler_GetUUID = nullptr;
@@ -1512,6 +1714,8 @@ public:
 		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBuildJob = nullptr;
@@ -1541,6 +1745,9 @@ public:
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
+		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
+		pWrapperTable->m_StateEnvironment_ParseXMLData = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -1575,6 +1782,9 @@ public:
 		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetTestEnvironment = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateXMLDocument = nullptr;
+		pWrapperTable->m_UIEnvironment_ParseXMLString = nullptr;
+		pWrapperTable->m_UIEnvironment_ParseXMLData = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -2477,6 +2687,438 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetName = (PLibMCEnvXMLDocumentAttribute_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getname");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetName = (PLibMCEnvXMLDocumentAttribute_GetNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetValue = (PLibMCEnvXMLDocumentAttribute_GetValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetValue = (PLibMCEnvXMLDocumentAttribute_GetValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = (PLibMCEnvXMLDocumentAttribute_IsValidIntegerPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_isvalidinteger");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = (PLibMCEnvXMLDocumentAttribute_IsValidIntegerPtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_isvalidinteger");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_IsValidInteger == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue = (PLibMCEnvXMLDocumentAttribute_GetIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue = (PLibMCEnvXMLDocumentAttribute_GetIntegerValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidDouble = (PLibMCEnvXMLDocumentAttribute_IsValidDoublePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_isvaliddouble");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidDouble = (PLibMCEnvXMLDocumentAttribute_IsValidDoublePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_isvaliddouble");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_IsValidDouble == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetDoubleValue = (PLibMCEnvXMLDocumentAttribute_GetDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getdoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetDoubleValue = (PLibMCEnvXMLDocumentAttribute_GetDoubleValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getdoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidBool = (PLibMCEnvXMLDocumentAttribute_IsValidBoolPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_isvalidbool");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidBool = (PLibMCEnvXMLDocumentAttribute_IsValidBoolPtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_isvalidbool");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_IsValidBool == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetBoolValue = (PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetBoolValue = (PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetValue = (PLibMCEnvXMLDocumentAttribute_SetValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_setvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetValue = (PLibMCEnvXMLDocumentAttribute_SetValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_setvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_SetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue = (PLibMCEnvXMLDocumentAttribute_SetIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_setintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue = (PLibMCEnvXMLDocumentAttribute_SetIntegerValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_setintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue = (PLibMCEnvXMLDocumentAttribute_SetDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_setdoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue = (PLibMCEnvXMLDocumentAttribute_SetDoubleValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_setdoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetBoolValue = (PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_setboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetBoolValue = (PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_setboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_SetBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_Remove = (PLibMCEnvXMLDocumentAttribute_RemovePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_remove");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_Remove = (PLibMCEnvXMLDocumentAttribute_RemovePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_remove");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_Remove == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetName = (PLibMCEnvXMLDocumentNode_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getname");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetName = (PLibMCEnvXMLDocumentNode_GetNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetNameSpace = (PLibMCEnvXMLDocumentNode_GetNameSpacePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getnamespace");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetNameSpace = (PLibMCEnvXMLDocumentNode_GetNameSpacePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getnamespace");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetNameSpace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = (PLibMCEnvXMLDocumentNode_GetAttributeCountPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributecount");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = (PLibMCEnvXMLDocumentNode_GetAttributeCountPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttribute = (PLibMCEnvXMLDocumentNode_GetAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttribute = (PLibMCEnvXMLDocumentNode_GetAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_HasAttribute = (PLibMCEnvXMLDocumentNode_HasAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_hasattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_HasAttribute = (PLibMCEnvXMLDocumentNode_HasAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_hasattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_HasAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_FindAttribute = (PLibMCEnvXMLDocumentNode_FindAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_findattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_FindAttribute = (PLibMCEnvXMLDocumentNode_FindAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_findattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_FindAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveAttribute = (PLibMCEnvXMLDocumentNode_RemoveAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_removeattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveAttribute = (PLibMCEnvXMLDocumentNode_RemoveAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_removeattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_RemoveAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddAttribute = (PLibMCEnvXMLDocumentNode_AddAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_addattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddAttribute = (PLibMCEnvXMLDocumentNode_AddAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_addattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_AddAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddIntegerAttribute = (PLibMCEnvXMLDocumentNode_AddIntegerAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_addintegerattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddIntegerAttribute = (PLibMCEnvXMLDocumentNode_AddIntegerAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_addintegerattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_AddIntegerAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddDoubleAttribute = (PLibMCEnvXMLDocumentNode_AddDoubleAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_adddoubleattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddDoubleAttribute = (PLibMCEnvXMLDocumentNode_AddDoubleAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_adddoubleattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_AddDoubleAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddBoolAttribute = (PLibMCEnvXMLDocumentNode_AddBoolAttributePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_addboolattribute");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddBoolAttribute = (PLibMCEnvXMLDocumentNode_AddBoolAttributePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_addboolattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_AddBoolAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetChildren = (PLibMCEnvXMLDocumentNode_GetChildrenPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getchildren");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetChildren = (PLibMCEnvXMLDocumentNode_GetChildrenPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getchildren");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetChildren == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_CountChildrenByName = (PLibMCEnvXMLDocumentNode_CountChildrenByNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_countchildrenbyname");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_CountChildrenByName = (PLibMCEnvXMLDocumentNode_CountChildrenByNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_countchildrenbyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_CountChildrenByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetChildrenByName = (PLibMCEnvXMLDocumentNode_GetChildrenByNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getchildrenbyname");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetChildrenByName = (PLibMCEnvXMLDocumentNode_GetChildrenByNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getchildrenbyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetChildrenByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_HasChild = (PLibMCEnvXMLDocumentNode_HasChildPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_haschild");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_HasChild = (PLibMCEnvXMLDocumentNode_HasChildPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_haschild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_HasChild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_HasUniqueChild = (PLibMCEnvXMLDocumentNode_HasUniqueChildPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_hasuniquechild");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_HasUniqueChild = (PLibMCEnvXMLDocumentNode_HasUniqueChildPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_hasuniquechild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_HasUniqueChild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_FindChild = (PLibMCEnvXMLDocumentNode_FindChildPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_findchild");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_FindChild = (PLibMCEnvXMLDocumentNode_FindChildPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_findchild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_FindChild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddChild = (PLibMCEnvXMLDocumentNode_AddChildPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_addchild");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddChild = (PLibMCEnvXMLDocumentNode_AddChildPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_addchild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_AddChild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveChild = (PLibMCEnvXMLDocumentNode_RemoveChildPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_removechild");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveChild = (PLibMCEnvXMLDocumentNode_RemoveChildPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_removechild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_RemoveChild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName = (PLibMCEnvXMLDocumentNode_RemoveChildrenWithNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_removechildrenwithname");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName = (PLibMCEnvXMLDocumentNode_RemoveChildrenWithNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_removechildrenwithname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_Remove = (PLibMCEnvXMLDocumentNode_RemovePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_remove");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_Remove = (PLibMCEnvXMLDocumentNode_RemovePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_remove");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_Remove == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNodes_GetNodeCount = (PLibMCEnvXMLDocumentNodes_GetNodeCountPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnodes_getnodecount");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNodes_GetNodeCount = (PLibMCEnvXMLDocumentNodes_GetNodeCountPtr) dlsym(hLibrary, "libmcenv_xmldocumentnodes_getnodecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNodes_GetNodeCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNodes_GetNode = (PLibMCEnvXMLDocumentNodes_GetNodePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnodes_getnode");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNodes_GetNode = (PLibMCEnvXMLDocumentNodes_GetNodePtr) dlsym(hLibrary, "libmcenv_xmldocumentnodes_getnode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNodes_GetNode == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNodes_CountNodesByName = (PLibMCEnvXMLDocumentNodes_CountNodesByNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnodes_countnodesbyname");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNodes_CountNodesByName = (PLibMCEnvXMLDocumentNodes_CountNodesByNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentnodes_countnodesbyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNodes_CountNodesByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNodes_GetNodesByName = (PLibMCEnvXMLDocumentNodes_GetNodesByNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnodes_getnodesbyname");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNodes_GetNodesByName = (PLibMCEnvXMLDocumentNodes_GetNodesByNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentnodes_getnodesbyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNodes_GetNodesByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNodes_HasNode = (PLibMCEnvXMLDocumentNodes_HasNodePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnodes_hasnode");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNodes_HasNode = (PLibMCEnvXMLDocumentNodes_HasNodePtr) dlsym(hLibrary, "libmcenv_xmldocumentnodes_hasnode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNodes_HasNode == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNodes_HasUniqueNode = (PLibMCEnvXMLDocumentNodes_HasUniqueNodePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnodes_hasuniquenode");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNodes_HasUniqueNode = (PLibMCEnvXMLDocumentNodes_HasUniqueNodePtr) dlsym(hLibrary, "libmcenv_xmldocumentnodes_hasuniquenode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNodes_HasUniqueNode == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNodes_FindNode = (PLibMCEnvXMLDocumentNodes_FindNodePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnodes_findnode");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNodes_FindNode = (PLibMCEnvXMLDocumentNodes_FindNodePtr) dlsym(hLibrary, "libmcenv_xmldocumentnodes_findnode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNodes_FindNode == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_GetDefaultNamespace = (PLibMCEnvXMLDocument_GetDefaultNamespacePtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_getdefaultnamespace");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_GetDefaultNamespace = (PLibMCEnvXMLDocument_GetDefaultNamespacePtr) dlsym(hLibrary, "libmcenv_xmldocument_getdefaultnamespace");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_GetDefaultNamespace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_GetNamespaceCount = (PLibMCEnvXMLDocument_GetNamespaceCountPtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_getnamespacecount");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_GetNamespaceCount = (PLibMCEnvXMLDocument_GetNamespaceCountPtr) dlsym(hLibrary, "libmcenv_xmldocument_getnamespacecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_GetNamespaceCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_GetNamespace = (PLibMCEnvXMLDocument_GetNamespacePtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_getnamespace");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_GetNamespace = (PLibMCEnvXMLDocument_GetNamespacePtr) dlsym(hLibrary, "libmcenv_xmldocument_getnamespace");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_GetNamespace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_HasNamespace = (PLibMCEnvXMLDocument_HasNamespacePtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_hasnamespace");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_HasNamespace = (PLibMCEnvXMLDocument_HasNamespacePtr) dlsym(hLibrary, "libmcenv_xmldocument_hasnamespace");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_HasNamespace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_GetNamespacePrefix = (PLibMCEnvXMLDocument_GetNamespacePrefixPtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_getnamespaceprefix");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_GetNamespacePrefix = (PLibMCEnvXMLDocument_GetNamespacePrefixPtr) dlsym(hLibrary, "libmcenv_xmldocument_getnamespaceprefix");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_GetNamespacePrefix == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_RegisterNamespace = (PLibMCEnvXMLDocument_RegisterNamespacePtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_registernamespace");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_RegisterNamespace = (PLibMCEnvXMLDocument_RegisterNamespacePtr) dlsym(hLibrary, "libmcenv_xmldocument_registernamespace");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_RegisterNamespace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_GetRootNode = (PLibMCEnvXMLDocument_GetRootNodePtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_getrootnode");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_GetRootNode = (PLibMCEnvXMLDocument_GetRootNodePtr) dlsym(hLibrary, "libmcenv_xmldocument_getrootnode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_GetRootNode == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_TCPIPPacket_IsEmpty = (PLibMCEnvTCPIPPacket_IsEmptyPtr) GetProcAddress(hLibrary, "libmcenv_tcpippacket_isempty");
 		#else // _WIN32
 		pWrapperTable->m_TCPIPPacket_IsEmpty = (PLibMCEnvTCPIPPacket_IsEmptyPtr) dlsym(hLibrary, "libmcenv_tcpippacket_isempty");
@@ -2900,6 +3542,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateXMLDocument = (PLibMCEnvDriverEnvironment_CreateXMLDocumentPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createxmldocument");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateXMLDocument = (PLibMCEnvDriverEnvironment_CreateXMLDocumentPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createxmldocument");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateXMLDocument == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_ParseXMLString = (PLibMCEnvDriverEnvironment_ParseXMLStringPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_parsexmlstring");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_ParseXMLString = (PLibMCEnvDriverEnvironment_ParseXMLStringPtr) dlsym(hLibrary, "libmcenv_driverenvironment_parsexmlstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_ParseXMLString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_ParseXMLData = (PLibMCEnvDriverEnvironment_ParseXMLDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_parsexmldata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_ParseXMLData = (PLibMCEnvDriverEnvironment_ParseXMLDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_parsexmldata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_ParseXMLData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
@@ -3278,6 +3947,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_SignalHandler_GetSignalUUID = (PLibMCEnvSignalHandler_GetSignalUUIDPtr) GetProcAddress(hLibrary, "libmcenv_signalhandler_getsignaluuid");
+		#else // _WIN32
+		pWrapperTable->m_SignalHandler_GetSignalUUID = (PLibMCEnvSignalHandler_GetSignalUUIDPtr) dlsym(hLibrary, "libmcenv_signalhandler_getsignaluuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SignalHandler_GetSignalUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalHandler_GetStateMachine = (PLibMCEnvSignalHandler_GetStateMachinePtr) GetProcAddress(hLibrary, "libmcenv_signalhandler_getstatemachine");
 		#else // _WIN32
 		pWrapperTable->m_SignalHandler_GetStateMachine = (PLibMCEnvSignalHandler_GetStateMachinePtr) dlsym(hLibrary, "libmcenv_signalhandler_getstatemachine");
@@ -3401,6 +4079,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_WaitForSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = (PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getunhandledsignal");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = (PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getunhandledsignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = (PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getunhandledsignalbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = (PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getunhandledsignalbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3662,6 +4358,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_GetTestEnvironment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateXMLDocument = (PLibMCEnvStateEnvironment_CreateXMLDocumentPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createxmldocument");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateXMLDocument = (PLibMCEnvStateEnvironment_CreateXMLDocumentPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createxmldocument");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateXMLDocument == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_ParseXMLString = (PLibMCEnvStateEnvironment_ParseXMLStringPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_parsexmlstring");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_ParseXMLString = (PLibMCEnvStateEnvironment_ParseXMLStringPtr) dlsym(hLibrary, "libmcenv_stateenvironment_parsexmlstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_ParseXMLString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_ParseXMLData = (PLibMCEnvStateEnvironment_ParseXMLDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_parsexmldata");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_ParseXMLData = (PLibMCEnvStateEnvironment_ParseXMLDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_parsexmldata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3968,6 +4691,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_GetTestEnvironment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateXMLDocument = (PLibMCEnvUIEnvironment_CreateXMLDocumentPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createxmldocument");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateXMLDocument = (PLibMCEnvUIEnvironment_CreateXMLDocumentPtr) dlsym(hLibrary, "libmcenv_uienvironment_createxmldocument");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateXMLDocument == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ParseXMLString = (PLibMCEnvUIEnvironment_ParseXMLStringPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_parsexmlstring");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ParseXMLString = (PLibMCEnvUIEnvironment_ParseXMLStringPtr) dlsym(hLibrary, "libmcenv_uienvironment_parsexmlstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ParseXMLString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ParseXMLData = (PLibMCEnvUIEnvironment_ParseXMLDataPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_parsexmldata");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ParseXMLData = (PLibMCEnvUIEnvironment_ParseXMLDataPtr) dlsym(hLibrary, "libmcenv_uienvironment_parsexmldata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ParseXMLData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4407,6 +5157,198 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveAllFiles == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getname", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_isvalidinteger", (void**)&(pWrapperTable->m_XMLDocumentAttribute_IsValidInteger));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_IsValidInteger == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getintegervalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_isvaliddouble", (void**)&(pWrapperTable->m_XMLDocumentAttribute_IsValidDouble));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_IsValidDouble == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getdoublevalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_isvalidbool", (void**)&(pWrapperTable->m_XMLDocumentAttribute_IsValidBool));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_IsValidBool == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getboolvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setintegervalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setdoublevalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setboolvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_remove", (void**)&(pWrapperTable->m_XMLDocumentAttribute_Remove));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_Remove == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getname", (void**)&(pWrapperTable->m_XMLDocumentNode_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getnamespace", (void**)&(pWrapperTable->m_XMLDocumentNode_GetNameSpace));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetNameSpace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributecount", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_hasattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_HasAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_HasAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_findattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_FindAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_FindAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removeattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_RemoveAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_AddAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addintegerattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_AddIntegerAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddIntegerAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_adddoubleattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_AddDoubleAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddDoubleAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addboolattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_AddBoolAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddBoolAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getchildren", (void**)&(pWrapperTable->m_XMLDocumentNode_GetChildren));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetChildren == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_countchildrenbyname", (void**)&(pWrapperTable->m_XMLDocumentNode_CountChildrenByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_CountChildrenByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getchildrenbyname", (void**)&(pWrapperTable->m_XMLDocumentNode_GetChildrenByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetChildrenByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_haschild", (void**)&(pWrapperTable->m_XMLDocumentNode_HasChild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_HasChild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_hasuniquechild", (void**)&(pWrapperTable->m_XMLDocumentNode_HasUniqueChild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_HasUniqueChild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_findchild", (void**)&(pWrapperTable->m_XMLDocumentNode_FindChild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_FindChild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addchild", (void**)&(pWrapperTable->m_XMLDocumentNode_AddChild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddChild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removechild", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveChild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_RemoveChild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removechildrenwithname", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_remove", (void**)&(pWrapperTable->m_XMLDocumentNode_Remove));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_Remove == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_getnodecount", (void**)&(pWrapperTable->m_XMLDocumentNodes_GetNodeCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNodes_GetNodeCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_getnode", (void**)&(pWrapperTable->m_XMLDocumentNodes_GetNode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNodes_GetNode == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_countnodesbyname", (void**)&(pWrapperTable->m_XMLDocumentNodes_CountNodesByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNodes_CountNodesByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_getnodesbyname", (void**)&(pWrapperTable->m_XMLDocumentNodes_GetNodesByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNodes_GetNodesByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_hasnode", (void**)&(pWrapperTable->m_XMLDocumentNodes_HasNode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNodes_HasNode == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_hasuniquenode", (void**)&(pWrapperTable->m_XMLDocumentNodes_HasUniqueNode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNodes_HasUniqueNode == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_findnode", (void**)&(pWrapperTable->m_XMLDocumentNodes_FindNode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNodes_FindNode == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_getdefaultnamespace", (void**)&(pWrapperTable->m_XMLDocument_GetDefaultNamespace));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_GetDefaultNamespace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_getnamespacecount", (void**)&(pWrapperTable->m_XMLDocument_GetNamespaceCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_GetNamespaceCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_getnamespace", (void**)&(pWrapperTable->m_XMLDocument_GetNamespace));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_GetNamespace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_hasnamespace", (void**)&(pWrapperTable->m_XMLDocument_HasNamespace));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_HasNamespace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_getnamespaceprefix", (void**)&(pWrapperTable->m_XMLDocument_GetNamespacePrefix));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_GetNamespacePrefix == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_registernamespace", (void**)&(pWrapperTable->m_XMLDocument_RegisterNamespace));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_RegisterNamespace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_getrootnode", (void**)&(pWrapperTable->m_XMLDocument_GetRootNode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_GetRootNode == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_tcpippacket_isempty", (void**)&(pWrapperTable->m_TCPIPPacket_IsEmpty));
 		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPPacket_IsEmpty == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4595,6 +5537,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createxmldocument", (void**)&(pWrapperTable->m_DriverEnvironment_CreateXMLDocument));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateXMLDocument == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_parsexmlstring", (void**)&(pWrapperTable->m_DriverEnvironment_ParseXMLString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_ParseXMLString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_parsexmldata", (void**)&(pWrapperTable->m_DriverEnvironment_ParseXMLData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_ParseXMLData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_driverhasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_DriverHasResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_DriverHasResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4763,6 +5717,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_GetSignalID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_signalhandler_getsignaluuid", (void**)&(pWrapperTable->m_SignalHandler_GetSignalUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_GetSignalUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signalhandler_getstatemachine", (void**)&(pWrapperTable->m_SignalHandler_GetStateMachine));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_GetStateMachine == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4817,6 +5775,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_waitforsignal", (void**)&(pWrapperTable->m_StateEnvironment_WaitForSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_WaitForSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignal", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignalbyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getdriverlibrary", (void**)&(pWrapperTable->m_StateEnvironment_GetDriverLibrary));
@@ -4933,6 +5899,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_gettestenvironment", (void**)&(pWrapperTable->m_StateEnvironment_GetTestEnvironment));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetTestEnvironment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createxmldocument", (void**)&(pWrapperTable->m_StateEnvironment_CreateXMLDocument));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateXMLDocument == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_parsexmlstring", (void**)&(pWrapperTable->m_StateEnvironment_ParseXMLString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ParseXMLString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_parsexmldata", (void**)&(pWrapperTable->m_StateEnvironment_ParseXMLData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
@@ -5069,6 +6047,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_gettestenvironment", (void**)&(pWrapperTable->m_UIEnvironment_GetTestEnvironment));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetTestEnvironment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createxmldocument", (void**)&(pWrapperTable->m_UIEnvironment_CreateXMLDocument));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateXMLDocument == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_parsexmlstring", (void**)&(pWrapperTable->m_UIEnvironment_ParseXMLString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ParseXMLString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_parsexmldata", (void**)&(pWrapperTable->m_UIEnvironment_ParseXMLData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ParseXMLData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -6396,6 +7386,653 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CXMLDocumentAttribute
+	 */
+	
+	/**
+	* CXMLDocumentAttribute::GetName - Retrieves name of the attribute.
+	* @return returns the name of the attribute.
+	*/
+	std::string CXMLDocumentAttribute::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CXMLDocumentAttribute::GetValue - Retrieves value of the attribute as string.
+	* @return returns the value of the attribute.
+	*/
+	std::string CXMLDocumentAttribute::GetValue()
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetValue(m_pHandle, 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetValue(m_pHandle, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CXMLDocumentAttribute::IsValidInteger - Checks if the value is a valid integer in the given range.
+	* @param[in] nMinValue - Minimum allowed value
+	* @param[in] nMaxValue - Maximum allowed value
+	* @return returns if the value is a valid integer.
+	*/
+	bool CXMLDocumentAttribute::IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
+	{
+		bool resultIsValid = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_IsValidInteger(m_pHandle, nMinValue, nMaxValue, &resultIsValid));
+		
+		return resultIsValid;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::GetIntegerValue - Returns the value as integer. Fails if the value is not a valid integer in the given range.
+	* @param[in] nMinValue - Minimum allowed value
+	* @param[in] nMaxValue - Maximum allowed value
+	* @return returns the value.
+	*/
+	LibMCEnv_int64 CXMLDocumentAttribute::GetIntegerValue(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetIntegerValue(m_pHandle, nMinValue, nMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::IsValidDouble - Checks if the value is a valid double in the given range.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return returns if the value is a valid double.
+	*/
+	bool CXMLDocumentAttribute::IsValidDouble(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		bool resultIsValid = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_IsValidDouble(m_pHandle, dMinValue, dMaxValue, &resultIsValid));
+		
+		return resultIsValid;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::GetDoubleValue - Returns the value as double. Fails if the value is not a valid double in the given range.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return returns the value .
+	*/
+	LibMCEnv_double CXMLDocumentAttribute::GetDoubleValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetDoubleValue(m_pHandle, dMinValue, dMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::IsValidBool - Checks if the value is a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
+	* @return returns if the value is a valid bool.
+	*/
+	bool CXMLDocumentAttribute::IsValidBool()
+	{
+		bool resultIsValid = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_IsValidBool(m_pHandle, &resultIsValid));
+		
+		return resultIsValid;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::GetBoolValue - Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return returns the value .
+	*/
+	LibMCEnv_double CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetBoolValue(m_pHandle, dMinValue, dMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::SetValue - Sets the value of the attribute as string.
+	* @param[in] sValue - new value of the attribute.
+	*/
+	void CXMLDocumentAttribute::SetValue(const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetValue(m_pHandle, sValue.c_str()));
+	}
+	
+	/**
+	* CXMLDocumentAttribute::SetIntegerValue - Sets the value of the attribute as integer.
+	* @param[in] nValue - new value of the attribute.
+	*/
+	void CXMLDocumentAttribute::SetIntegerValue(const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetIntegerValue(m_pHandle, nValue));
+	}
+	
+	/**
+	* CXMLDocumentAttribute::SetDoubleValue - Sets the value of the attribute as double.
+	* @param[in] dValue - new value of the attribute.
+	*/
+	void CXMLDocumentAttribute::SetDoubleValue(const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetDoubleValue(m_pHandle, dValue));
+	}
+	
+	/**
+	* CXMLDocumentAttribute::SetBoolValue - Sets the value of the attribute as bool.
+	* @param[in] bValue - new value of the attribute.
+	*/
+	void CXMLDocumentAttribute::SetBoolValue(const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetBoolValue(m_pHandle, bValue));
+	}
+	
+	/**
+	* CXMLDocumentAttribute::Remove - Removes the attribute from its parent node. All subsequent calls to the class will fail.
+	*/
+	void CXMLDocumentAttribute::Remove()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_Remove(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CXMLDocumentNode
+	 */
+	
+	/**
+	* CXMLDocumentNode::GetName - Retrieves name of the node.
+	* @return returns the name of the node.
+	*/
+	std::string CXMLDocumentNode::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetNameSpace - Retrieves namespace of the node.
+	* @return returns the namespace of the node.
+	*/
+	std::string CXMLDocumentNode::GetNameSpace()
+	{
+		LibMCEnv_uint32 bytesNeededNameSpace = 0;
+		LibMCEnv_uint32 bytesWrittenNameSpace = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetNameSpace(m_pHandle, 0, &bytesNeededNameSpace, nullptr));
+		std::vector<char> bufferNameSpace(bytesNeededNameSpace);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetNameSpace(m_pHandle, bytesNeededNameSpace, &bytesWrittenNameSpace, &bufferNameSpace[0]));
+		
+		return std::string(&bufferNameSpace[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeCount - Returns number of attributes.
+	* @return returns the number of attributes.
+	*/
+	LibMCEnv_uint64 CXMLDocumentNode::GetAttributeCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttribute - Returns attribute instance. Fails if Index is out of range.
+	* @param[in] nIndex - Index of the attribute to return (0-based).
+	* @return XML Document attribute.
+	*/
+	PXMLDocumentAttribute CXMLDocumentNode::GetAttribute(const LibMCEnv_uint64 nIndex)
+	{
+		LibMCEnvHandle hAttributeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttribute(m_pHandle, nIndex, &hAttributeInstance));
+		
+		if (!hAttributeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentAttribute>(m_pWrapper, hAttributeInstance);
+	}
+	
+	/**
+	* CXMLDocumentNode::HasAttribute - Returns if attribute of a specific name exists.
+	* @param[in] sName - Name of the attribute.
+	* @return Returns if the attribute exists.
+	*/
+	bool CXMLDocumentNode::HasAttribute(const std::string & sName)
+	{
+		bool resultAttributeExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasAttribute(m_pHandle, sName.c_str(), &resultAttributeExists));
+		
+		return resultAttributeExists;
+	}
+	
+	/**
+	* CXMLDocumentNode::FindAttribute - Returns attribute instance of a specific name. 
+	* @param[in] sName - Name of the attribute.
+	* @param[in] bMustExist - If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist.
+	* @return XML Document attribute.
+	*/
+	PXMLDocumentAttribute CXMLDocumentNode::FindAttribute(const std::string & sName, const bool bMustExist)
+	{
+		LibMCEnvHandle hAttributeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_FindAttribute(m_pHandle, sName.c_str(), bMustExist, &hAttributeInstance));
+		
+		if (hAttributeInstance) {
+			return std::make_shared<CXMLDocumentAttribute>(m_pWrapper, hAttributeInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CXMLDocumentNode::RemoveAttribute - Removes the attribute with a specific name. Does nothing if attribute does not exist.
+	* @param[in] sName - Name of the attribute.
+	*/
+	void CXMLDocumentNode::RemoveAttribute(const std::string & sName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveAttribute(m_pHandle, sName.c_str()));
+	}
+	
+	/**
+	* CXMLDocumentNode::AddAttribute - Adds an attribute with a specific name and string value. Fails if attribute already exists.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sValue - Value of the attribute.
+	*/
+	void CXMLDocumentNode::AddAttribute(const std::string & sName, const std::string & sNameSpace, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CXMLDocumentNode::AddIntegerAttribute - Adds an attribute with a specific name and integer value. Fails if attribute already exists.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] nValue - Value of the attribute.
+	*/
+	void CXMLDocumentNode::AddIntegerAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddIntegerAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), nValue));
+	}
+	
+	/**
+	* CXMLDocumentNode::AddDoubleAttribute - Adds an attribute with a specific name and double value. Fails if attribute already exists.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] dValue - Value of the attribute.
+	*/
+	void CXMLDocumentNode::AddDoubleAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddDoubleAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), dValue));
+	}
+	
+	/**
+	* CXMLDocumentNode::AddBoolAttribute - Adds an attribute with a specific name and bool value. Fails if attribute already exists.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] bValue - Value of the attribute.
+	*/
+	void CXMLDocumentNode::AddBoolAttribute(const std::string & sName, const std::string & sNameSpace, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddBoolAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), bValue));
+	}
+	
+	/**
+	* CXMLDocumentNode::GetChildren - Returns all the child nodes of the XML Node.
+	* @return returns the list of child nodes.
+	*/
+	PXMLDocumentNodes CXMLDocumentNode::GetChildren()
+	{
+		LibMCEnvHandle hChildNodes = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetChildren(m_pHandle, &hChildNodes));
+		
+		if (!hChildNodes) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNodes>(m_pWrapper, hChildNodes);
+	}
+	
+	/**
+	* CXMLDocumentNode::CountChildrenByName - Returns how many children of the XML Node have a specific name.
+	* @param[in] sName - Name of the node.
+	* @return returns the number children with the specified name.
+	*/
+	LibMCEnv_uint64 CXMLDocumentNode::CountChildrenByName(const std::string & sName)
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_CountChildrenByName(m_pHandle, sName.c_str(), &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetChildrenByName - Returns all the child nodes of the XML Node with a specific name.
+	* @param[in] sName - Name of the child.
+	* @return returns the list of child nodes.
+	*/
+	PXMLDocumentNodes CXMLDocumentNode::GetChildrenByName(const std::string & sName)
+	{
+		LibMCEnvHandle hChildNodes = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetChildrenByName(m_pHandle, sName.c_str(), &hChildNodes));
+		
+		if (!hChildNodes) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNodes>(m_pWrapper, hChildNodes);
+	}
+	
+	/**
+	* CXMLDocumentNode::HasChild - Returns if a child with a specific name exist.
+	* @param[in] sName - Name of the child.
+	* @return returns if a child with a specific name exists.
+	*/
+	bool CXMLDocumentNode::HasChild(const std::string & sName)
+	{
+		bool resultChildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasChild(m_pHandle, sName.c_str(), &resultChildExists));
+		
+		return resultChildExists;
+	}
+	
+	/**
+	* CXMLDocumentNode::HasUniqueChild - Returns if a child with a specific name exist once and only once.
+	* @param[in] sName - Name of the child.
+	* @return returns if a child with a specific name exists once and only once.
+	*/
+	bool CXMLDocumentNode::HasUniqueChild(const std::string & sName)
+	{
+		bool resultChildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasUniqueChild(m_pHandle, sName.c_str(), &resultChildExists));
+		
+		return resultChildExists;
+	}
+	
+	/**
+	* CXMLDocumentNode::FindChild - Returns child with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sName - Name of the child.
+	* @param[in] bMustExist - If true, the call fails if child does not exist. If falls, the call will return null if the child does not exist.
+	* @return returns child instance or null.
+	*/
+	PXMLDocumentNode CXMLDocumentNode::FindChild(const std::string & sName, const bool bMustExist)
+	{
+		LibMCEnvHandle hChildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_FindChild(m_pHandle, sName.c_str(), bMustExist, &hChildInstance));
+		
+		if (hChildInstance) {
+			return std::make_shared<CXMLDocumentNode>(m_pWrapper, hChildInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CXMLDocumentNode::AddChild - Adds a new child with a specific name.
+	* @param[in] sName - Name of the child.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @return returns child instance.
+	*/
+	PXMLDocumentNode CXMLDocumentNode::AddChild(const std::string & sName, const std::string & sNameSpace)
+	{
+		LibMCEnvHandle hChildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddChild(m_pHandle, sName.c_str(), sNameSpace.c_str(), &hChildInstance));
+		
+		if (!hChildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hChildInstance);
+	}
+	
+	/**
+	* CXMLDocumentNode::RemoveChild - Removes a child with a specific name. All subsequent calls to the child will fail after the call.
+	* @param[in] pChildInstance - child instance to remove. Fails if given instance is not a child of the node.
+	*/
+	void CXMLDocumentNode::RemoveChild(classParam<CXMLDocumentNode> pChildInstance)
+	{
+		LibMCEnvHandle hChildInstance = pChildInstance.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveChild(m_pHandle, hChildInstance));
+	}
+	
+	/**
+	* CXMLDocumentNode::RemoveChildrenWithName - Removes all children with a specific name. Does nothing if no child with the name exists. . All subsequent calls to the deleted children will fail after the call.
+	* @param[in] sName - Name of the children.
+	*/
+	void CXMLDocumentNode::RemoveChildrenWithName(const std::string & sName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveChildrenWithName(m_pHandle, sName.c_str()));
+	}
+	
+	/**
+	* CXMLDocumentNode::Remove - Removes the node from its parent. The root node of the document can not be removed.
+	*/
+	void CXMLDocumentNode::Remove()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_Remove(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CXMLDocumentNodes
+	 */
+	
+	/**
+	* CXMLDocumentNodes::GetNodeCount - Returns number of nodes.
+	* @return returns the number of nodes in the list.
+	*/
+	LibMCEnv_uint64 CXMLDocumentNodes::GetNodeCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_GetNodeCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CXMLDocumentNodes::GetNode - Returns node instance. Fails if Index is out of range.
+	* @param[in] nIndex - Index of the node to return (0-based).
+	* @return XML Node node.
+	*/
+	PXMLDocumentNode CXMLDocumentNodes::GetNode(const LibMCEnv_uint64 nIndex)
+	{
+		LibMCEnvHandle hNodeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_GetNode(m_pHandle, nIndex, &hNodeInstance));
+		
+		if (!hNodeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hNodeInstance);
+	}
+	
+	/**
+	* CXMLDocumentNodes::CountNodesByName - Returns how many nodes of the XML Node have a specific name.
+	* @param[in] sName - Name of the node.
+	* @return returns the number of nodes with the specified name.
+	*/
+	LibMCEnv_uint64 CXMLDocumentNodes::CountNodesByName(const std::string & sName)
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_CountNodesByName(m_pHandle, sName.c_str(), &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CXMLDocumentNodes::GetNodesByName - Returns all the nodes nodes of the XML Node with a specific name.
+	* @param[in] sName - Name of the node.
+	* @return returns the list of node nodes.
+	*/
+	PXMLDocumentNodes CXMLDocumentNodes::GetNodesByName(const std::string & sName)
+	{
+		LibMCEnvHandle hNodes = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_GetNodesByName(m_pHandle, sName.c_str(), &hNodes));
+		
+		if (!hNodes) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNodes>(m_pWrapper, hNodes);
+	}
+	
+	/**
+	* CXMLDocumentNodes::HasNode - Returns if a node with a specific name exist.
+	* @param[in] sName - Name of the node.
+	* @return returns if a node with a specific name exists.
+	*/
+	bool CXMLDocumentNodes::HasNode(const std::string & sName)
+	{
+		bool resultNodeExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_HasNode(m_pHandle, sName.c_str(), &resultNodeExists));
+		
+		return resultNodeExists;
+	}
+	
+	/**
+	* CXMLDocumentNodes::HasUniqueNode - Returns if a node with a specific name exist once and only once.
+	* @param[in] sName - Name of the node.
+	* @return returns if a node with a specific name exists once and only once.
+	*/
+	bool CXMLDocumentNodes::HasUniqueNode(const std::string & sName)
+	{
+		bool resultNodeExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_HasUniqueNode(m_pHandle, sName.c_str(), &resultNodeExists));
+		
+		return resultNodeExists;
+	}
+	
+	/**
+	* CXMLDocumentNodes::FindNode - Returns node with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sName - Name of the node.
+	* @param[in] bMustExist - If true, the call fails if node does not exist. If falls, the call will return null if the node does not exist.
+	* @return returns node instance.
+	*/
+	PXMLDocumentNode CXMLDocumentNodes::FindNode(const std::string & sName, const bool bMustExist)
+	{
+		LibMCEnvHandle hNodeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_FindNode(m_pHandle, sName.c_str(), bMustExist, &hNodeInstance));
+		
+		if (hNodeInstance) {
+			return std::make_shared<CXMLDocumentNode>(m_pWrapper, hNodeInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	 * Method definitions for class CXMLDocument
+	 */
+	
+	/**
+	* CXMLDocument::GetDefaultNamespace - Returns default name space of the document.
+	* @return name space of the document.
+	*/
+	std::string CXMLDocument::GetDefaultNamespace()
+	{
+		LibMCEnv_uint32 bytesNeededNamespace = 0;
+		LibMCEnv_uint32 bytesWrittenNamespace = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetDefaultNamespace(m_pHandle, 0, &bytesNeededNamespace, nullptr));
+		std::vector<char> bufferNamespace(bytesNeededNamespace);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetDefaultNamespace(m_pHandle, bytesNeededNamespace, &bytesWrittenNamespace, &bufferNamespace[0]));
+		
+		return std::string(&bufferNamespace[0]);
+	}
+	
+	/**
+	* CXMLDocument::GetNamespaceCount - Returns the used number of name spaces of the document.
+	* @return number of registered name spaces of the document.
+	*/
+	LibMCEnv_uint64 CXMLDocument::GetNamespaceCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetNamespaceCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CXMLDocument::GetNamespace - Returns a name space of the document. Will fail if index is invalid.
+	* @param[in] nIndex - index of name space. 0-based.
+	* @param[out] sNamespace - name space of the document.
+	* @param[out] sNamespacePrefix - name space prefix of the document. Empty for root namespace.
+	*/
+	void CXMLDocument::GetNamespace(const LibMCEnv_uint64 nIndex, std::string & sNamespace, std::string & sNamespacePrefix)
+	{
+		LibMCEnv_uint32 bytesNeededNamespace = 0;
+		LibMCEnv_uint32 bytesWrittenNamespace = 0;
+		LibMCEnv_uint32 bytesNeededNamespacePrefix = 0;
+		LibMCEnv_uint32 bytesWrittenNamespacePrefix = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetNamespace(m_pHandle, nIndex, 0, &bytesNeededNamespace, nullptr, 0, &bytesNeededNamespacePrefix, nullptr));
+		std::vector<char> bufferNamespace(bytesNeededNamespace);
+		std::vector<char> bufferNamespacePrefix(bytesNeededNamespacePrefix);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetNamespace(m_pHandle, nIndex, bytesNeededNamespace, &bytesWrittenNamespace, &bufferNamespace[0], bytesNeededNamespacePrefix, &bytesWrittenNamespacePrefix, &bufferNamespacePrefix[0]));
+		sNamespace = std::string(&bufferNamespace[0]);
+		sNamespacePrefix = std::string(&bufferNamespacePrefix[0]);
+	}
+	
+	/**
+	* CXMLDocument::HasNamespace - Returns if the document has a namespace.
+	* @param[in] sNamespace - Name space name.
+	* @return name space has been registered.
+	*/
+	bool CXMLDocument::HasNamespace(const std::string & sNamespace)
+	{
+		bool resultNameSpaceIsRegistered = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_HasNamespace(m_pHandle, sNamespace.c_str(), &resultNameSpaceIsRegistered));
+		
+		return resultNameSpaceIsRegistered;
+	}
+	
+	/**
+	* CXMLDocument::GetNamespacePrefix - Returns a name space of the document. Will fail if namespace is not registered.
+	* @param[in] sNamespace - name space of the document.
+	* @param[out] sNamespacePrefix - name space prefix of the document. Empty for root namespace.
+	*/
+	void CXMLDocument::GetNamespacePrefix(const std::string & sNamespace, std::string & sNamespacePrefix)
+	{
+		LibMCEnv_uint32 bytesNeededNamespacePrefix = 0;
+		LibMCEnv_uint32 bytesWrittenNamespacePrefix = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetNamespacePrefix(m_pHandle, sNamespace.c_str(), 0, &bytesNeededNamespacePrefix, nullptr));
+		std::vector<char> bufferNamespacePrefix(bytesNeededNamespacePrefix);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetNamespacePrefix(m_pHandle, sNamespace.c_str(), bytesNeededNamespacePrefix, &bytesWrittenNamespacePrefix, &bufferNamespacePrefix[0]));
+		sNamespacePrefix = std::string(&bufferNamespacePrefix[0]);
+	}
+	
+	/**
+	* CXMLDocument::RegisterNamespace - Registers a custom namespace prefix. Given Namespace MUST NOT have been in use before calling this function.
+	* @param[in] sNamespace - name space to register
+	* @param[in] sNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+	*/
+	void CXMLDocument::RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_RegisterNamespace(m_pHandle, sNamespace.c_str(), sNamespacePrefix.c_str()));
+	}
+	
+	/**
+	* CXMLDocument::GetRootNode - Returns root node of the document.
+	* @return Root node of the document.
+	*/
+	PXMLDocumentNode CXMLDocument::GetRootNode()
+	{
+		LibMCEnvHandle hRootNode = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_GetRootNode(m_pHandle, &hRootNode));
+		
+		if (!hRootNode) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hRootNode);
+	}
+	
+	/**
 	 * Method definitions for class CTCPIPPacket
 	 */
 	
@@ -7005,6 +8642,55 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateXMLDocument - creates an empty XML Document.
+	* @param[in] sRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+	* @param[in] sDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CDriverEnvironment::CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateXMLDocument(m_pHandle, sRootNodeName.c_str(), sDefaultNamespace.c_str(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CDriverEnvironment::ParseXMLString - parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+	* @param[in] sXMLString - XML String.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CDriverEnvironment::ParseXMLString(const std::string & sXMLString)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_ParseXMLString(m_pHandle, sXMLString.c_str(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CDriverEnvironment::ParseXMLData - parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+	* @param[in] XMLDataBuffer - XML Binary data.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CDriverEnvironment::ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_ParseXMLData(m_pHandle, (LibMCEnv_uint64)XMLDataBuffer.size(), XMLDataBuffer.data(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
 	* CDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -7509,7 +9195,7 @@ public:
 	}
 	
 	/**
-	* CSignalHandler::GetSignalID - Returns the signal id.
+	* CSignalHandler::GetSignalID - Returns the signal id. Depreciated.
 	* @return Signal Identifier
 	*/
 	std::string CSignalHandler::GetSignalID()
@@ -7521,6 +9207,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_SignalHandler_GetSignalID(m_pHandle, bytesNeededSignalID, &bytesWrittenSignalID, &bufferSignalID[0]));
 		
 		return std::string(&bufferSignalID[0]);
+	}
+	
+	/**
+	* CSignalHandler::GetSignalUUID - Returns the signal uuid. Identical to GetSignalID.
+	* @return Signal Identifier
+	*/
+	std::string CSignalHandler::GetSignalUUID()
+	{
+		LibMCEnv_uint32 bytesNeededSignalUUID = 0;
+		LibMCEnv_uint32 bytesWrittenSignalUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SignalHandler_GetSignalUUID(m_pHandle, 0, &bytesNeededSignalUUID, nullptr));
+		std::vector<char> bufferSignalUUID(bytesNeededSignalUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_SignalHandler_GetSignalUUID(m_pHandle, bytesNeededSignalUUID, &bytesWrittenSignalUUID, &bufferSignalUUID[0]));
+		
+		return std::string(&bufferSignalUUID[0]);
 	}
 	
 	/**
@@ -7697,7 +9398,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::WaitForSignal - waits for a signal.
+	* CStateEnvironment::WaitForSignal - Waits for a signal for a certain amount of time.
 	* @param[in] sSignalName - Name Of Signal
 	* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
 	* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
@@ -7715,6 +9416,41 @@ public:
 		}
 		
 		return resultSuccess;
+	}
+	
+	/**
+	* CStateEnvironment::GetUnhandledSignal - Retrieves an unhandled signal By signal type name.
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Signal object. If no signal has been found the signal handler object will be null.
+	*/
+	PSignalHandler CStateEnvironment::GetUnhandledSignal(const std::string & sSignalTypeName)
+	{
+		LibMCEnvHandle hHandlerInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUnhandledSignal(m_pHandle, sSignalTypeName.c_str(), &hHandlerInstance));
+		
+		if (hHandlerInstance) {
+			return std::make_shared<CSignalHandler>(m_pWrapper, hHandlerInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CStateEnvironment::GetUnhandledSignalByUUID - retrieves an unhandled signal from the current state machine by UUID.
+	* @param[in] sUUID - Name
+	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
+	* @return Signal handler instance. Returns null, if signal does not exist.
+	*/
+	PSignalHandler CStateEnvironment::GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist)
+	{
+		LibMCEnvHandle hHandler = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUnhandledSignalByUUID(m_pHandle, sUUID.c_str(), bMustExist, &hHandler));
+		
+		if (hHandler) {
+			return std::make_shared<CSignalHandler>(m_pWrapper, hHandler);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**
@@ -7825,7 +9561,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::StoreSignal - stores a signal handler in the current state machine
+	* CStateEnvironment::StoreSignal - DEPRECIATED: stores a signal handler in the current state machine
 	* @param[in] sName - Name
 	* @param[in] pHandler - Signal handler to store.
 	*/
@@ -7836,7 +9572,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::RetrieveSignal - retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
+	* CStateEnvironment::RetrieveSignal - DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
 	* @param[in] sName - Name
 	* @return Signal handler instance.
 	*/
@@ -7852,7 +9588,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::ClearStoredValue - deletes a value from the data store.
+	* CStateEnvironment::ClearStoredValue - DEPRECIATED: deletes a value from the data store.
 	* @param[in] sName - Name
 	*/
 	void CStateEnvironment::ClearStoredValue(const std::string & sName)
@@ -8085,6 +9821,55 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CTestEnvironment>(m_pWrapper, hTestEnvironment);
+	}
+	
+	/**
+	* CStateEnvironment::CreateXMLDocument - creates an empty XML Document.
+	* @param[in] sRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+	* @param[in] sDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CStateEnvironment::CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateXMLDocument(m_pHandle, sRootNodeName.c_str(), sDefaultNamespace.c_str(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CStateEnvironment::ParseXMLString - parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+	* @param[in] sXMLString - XML String.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CStateEnvironment::ParseXMLString(const std::string & sXMLString)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ParseXMLString(m_pHandle, sXMLString.c_str(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CStateEnvironment::ParseXMLData - parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+	* @param[in] XMLDataBuffer - XML Binary data.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CStateEnvironment::ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ParseXMLData(m_pHandle, (LibMCEnv_uint64)XMLDataBuffer.size(), XMLDataBuffer.data(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
 	}
 	
 	/**
@@ -8542,6 +10327,55 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CTestEnvironment>(m_pWrapper, hTestEnvironment);
+	}
+	
+	/**
+	* CUIEnvironment::CreateXMLDocument - creates an empty XML Document.
+	* @param[in] sRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+	* @param[in] sDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CUIEnvironment::CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateXMLDocument(m_pHandle, sRootNodeName.c_str(), sDefaultNamespace.c_str(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CUIEnvironment::ParseXMLString - parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+	* @param[in] sXMLString - XML String.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CUIEnvironment::ParseXMLString(const std::string & sXMLString)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ParseXMLString(m_pHandle, sXMLString.c_str(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CUIEnvironment::ParseXMLData - parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+	* @param[in] XMLDataBuffer - XML Binary data.
+	* @return XML Document Instance.
+	*/
+	PXMLDocument CUIEnvironment::ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer)
+	{
+		LibMCEnvHandle hXMLDocument = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ParseXMLData(m_pHandle, (LibMCEnv_uint64)XMLDataBuffer.size(), XMLDataBuffer.data(), &hXMLDocument));
+		
+		if (!hXMLDocument) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
 	}
 
 } // namespace LibMCEnv

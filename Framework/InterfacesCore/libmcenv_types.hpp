@@ -181,6 +181,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE 84 /** modbus TCP invalid holding registers response */
 #define LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY 85 /** modbus TCP holding registers response empty */
 #define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE 86 /** modbus TCP invalid holding registers response size */
+#define LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE 87 /** signal UUID not active. */
+#define LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING 88 /** could not parse XML string. */
+#define LIBMCENV_ERROR_COULDNOTPARSEXMLDATA 89 /** could not parse XML data. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -274,6 +277,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE: return "modbus TCP invalid holding registers response";
     case LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY: return "modbus TCP holding registers response empty";
     case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE: return "modbus TCP invalid holding registers response size";
+    case LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE: return "signal UUID not active.";
+    case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML string.";
+    case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
     default: return "unknown error";
   }
 }
@@ -294,6 +300,10 @@ typedef LibMCEnvHandle LibMCEnv_WorkingFileExecution;
 typedef LibMCEnvHandle LibMCEnv_WorkingFile;
 typedef LibMCEnvHandle LibMCEnv_WorkingFileIterator;
 typedef LibMCEnvHandle LibMCEnv_WorkingDirectory;
+typedef LibMCEnvHandle LibMCEnv_XMLDocumentAttribute;
+typedef LibMCEnvHandle LibMCEnv_XMLDocumentNode;
+typedef LibMCEnvHandle LibMCEnv_XMLDocumentNodes;
+typedef LibMCEnvHandle LibMCEnv_XMLDocument;
 typedef LibMCEnvHandle LibMCEnv_TCPIPPacket;
 typedef LibMCEnvHandle LibMCEnv_TCPIPConnection;
 typedef LibMCEnvHandle LibMCEnv_ModbusTCPDigitalIOStatus;

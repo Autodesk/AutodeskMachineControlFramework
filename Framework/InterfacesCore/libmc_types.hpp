@@ -476,6 +476,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION 449 /** Ambiguous driver configuration */
 #define LIBMC_ERROR_COULDNOTCREATEDRIVER 450 /** Could not create driver */
 #define LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN 451 /** Empty group name but parameter given */
+#define LIBMC_ERROR_INVALIDDEFAULTXMLNAMESPACE 452 /** invalid default xml namespace name. */
+#define LIBMC_ERROR_INVALIDXMLROOTNODENAME 453 /** invalid xml root node name. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -864,6 +866,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION: return "Ambiguous driver configuration";
     case LIBMC_ERROR_COULDNOTCREATEDRIVER: return "Could not create driver";
     case LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN: return "Empty group name but parameter given";
+    case LIBMC_ERROR_INVALIDDEFAULTXMLNAMESPACE: return "invalid default xml namespace name.";
+    case LIBMC_ERROR_INVALIDXMLROOTNODENAME: return "invalid xml root node name.";
     default: return "unknown error";
   }
 }

@@ -78,6 +78,8 @@ public:
 
 	std::string GetSignalID() override;
 
+	std::string GetSignalUUID() override;
+
 	std::string GetStateMachine() override;
 
 	std::string GetString(const std::string & sName) override;

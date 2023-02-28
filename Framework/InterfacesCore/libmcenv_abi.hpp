@@ -1063,6 +1063,510 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrievemanagedfiles(
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
+ Class definition for XMLDocumentAttribute
+**************************************************************************************************************************/
+
+/**
+* Retrieves name of the attribute.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of returns the name of the attribute., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getname(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Retrieves value of the attribute as string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of returns the value of the attribute., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Checks if the value is a valid integer in the given range.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nMinValue - Minimum allowed value
+* @param[in] nMaxValue - Maximum allowed value
+* @param[out] pIsValid - returns if the value is a valid integer.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_isvalidinteger(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, bool * pIsValid);
+
+/**
+* Returns the value as integer. Fails if the value is not a valid integer in the given range.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nMinValue - Minimum allowed value
+* @param[in] nMaxValue - Maximum allowed value
+* @param[out] pValue - returns the value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getintegervalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 * pValue);
+
+/**
+* Checks if the value is a valid double in the given range.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] dMinValue - Minimum allowed value
+* @param[in] dMaxValue - Maximum allowed value
+* @param[out] pIsValid - returns if the value is a valid double.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_isvaliddouble(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, bool * pIsValid);
+
+/**
+* Returns the value as double. Fails if the value is not a valid double in the given range.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] dMinValue - Minimum allowed value
+* @param[in] dMaxValue - Maximum allowed value
+* @param[out] pValue - returns the value .
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getdoublevalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+
+/**
+* Checks if the value is a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[out] pIsValid - returns if the value is a valid bool.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_isvalidbool(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, bool * pIsValid);
+
+/**
+* Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] dMinValue - Minimum allowed value
+* @param[in] dMaxValue - Maximum allowed value
+* @param[out] pValue - returns the value .
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+
+/**
+* Sets the value of the attribute as string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] pValue - new value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_setvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const char * pValue);
+
+/**
+* Sets the value of the attribute as integer.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nValue - new value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_setintegervalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_int64 nValue);
+
+/**
+* Sets the value of the attribute as double.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] dValue - new value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_setdoublevalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dValue);
+
+/**
+* Sets the value of the attribute as bool.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] bValue - new value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_setboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, bool bValue);
+
+/**
+* Removes the attribute from its parent node. All subsequent calls to the class will fail.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_remove(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute);
+
+/*************************************************************************************************************************
+ Class definition for XMLDocumentNode
+**************************************************************************************************************************/
+
+/**
+* Retrieves name of the node.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of returns the name of the node., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Retrieves namespace of the node.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] nNameSpaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameSpaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameSpaceBuffer -  buffer of returns the namespace of the node., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getnamespace(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const LibMCEnv_uint32 nNameSpaceBufferSize, LibMCEnv_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer);
+
+/**
+* Returns number of attributes.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[out] pCount - returns the number of attributes.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributecount(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns attribute instance. Fails if Index is out of range.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] nIndex - Index of the attribute to return (0-based).
+* @param[out] pAttributeInstance - XML Document attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_uint64 nIndex, LibMCEnv_XMLDocumentAttribute * pAttributeInstance);
+
+/**
+* Returns if attribute of a specific name exists.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the attribute.
+* @param[out] pAttributeExists - Returns if the attribute exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pAttributeExists);
+
+/**
+* Returns attribute instance of a specific name. 
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the attribute.
+* @param[in] bMustExist - If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist.
+* @param[out] pAttributeInstance - XML Document attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentAttribute * pAttributeInstance);
+
+/**
+* Removes the attribute with a specific name. Does nothing if attribute does not exist.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removeattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName);
+
+/**
+* Adds an attribute with a specific name and string value. Fails if attribute already exists.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the attribute.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] pValue - Value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, const char * pValue);
+
+/**
+* Adds an attribute with a specific name and integer value. Fails if attribute already exists.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the attribute.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] nValue - Value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addintegerattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_int64 nValue);
+
+/**
+* Adds an attribute with a specific name and double value. Fails if attribute already exists.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the attribute.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] dValue - Value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_adddoubleattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_double dValue);
+
+/**
+* Adds an attribute with a specific name and bool value. Fails if attribute already exists.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the attribute.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] bValue - Value of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addboolattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, bool bValue);
+
+/**
+* Returns all the child nodes of the XML Node.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[out] pChildNodes - returns the list of child nodes.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getchildren(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_XMLDocumentNodes * pChildNodes);
+
+/**
+* Returns how many children of the XML Node have a specific name.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the node.
+* @param[out] pCount - returns the number children with the specified name.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_countchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns all the child nodes of the XML Node with a specific name.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the child.
+* @param[out] pChildNodes - returns the list of child nodes.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, LibMCEnv_XMLDocumentNodes * pChildNodes);
+
+/**
+* Returns if a child with a specific name exist.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the child.
+* @param[out] pChildExists - returns if a child with a specific name exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_haschild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pChildExists);
+
+/**
+* Returns if a child with a specific name exist once and only once.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the child.
+* @param[out] pChildExists - returns if a child with a specific name exists once and only once.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasuniquechild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pChildExists);
+
+/**
+* Returns child with a specific name. Throws an error if name does not exist once and only once.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the child.
+* @param[in] bMustExist - If true, the call fails if child does not exist. If falls, the call will return null if the child does not exist.
+* @param[out] pChildInstance - returns child instance or null.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pChildInstance);
+
+/**
+* Adds a new child with a specific name.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the child.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[out] pChildInstance - returns child instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_XMLDocumentNode * pChildInstance);
+
+/**
+* Removes a child with a specific name. All subsequent calls to the child will fail after the call.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pChildInstance - child instance to remove. Fails if given instance is not a child of the node.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removechild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_XMLDocumentNode pChildInstance);
+
+/**
+* Removes all children with a specific name. Does nothing if no child with the name exists. . All subsequent calls to the deleted children will fail after the call.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pName - Name of the children.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removechildrenwithname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName);
+
+/**
+* Removes the node from its parent. The root node of the document can not be removed.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_remove(LibMCEnv_XMLDocumentNode pXMLDocumentNode);
+
+/*************************************************************************************************************************
+ Class definition for XMLDocumentNodes
+**************************************************************************************************************************/
+
+/**
+* Returns number of nodes.
+*
+* @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[out] pCount - returns the number of nodes in the list.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_getnodecount(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns node instance. Fails if Index is out of range.
+*
+* @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] nIndex - Index of the node to return (0-based).
+* @param[out] pNodeInstance - XML Node node.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_getnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, LibMCEnv_uint64 nIndex, LibMCEnv_XMLDocumentNode * pNodeInstance);
+
+/**
+* Returns how many nodes of the XML Node have a specific name.
+*
+* @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pName - Name of the node.
+* @param[out] pCount - returns the number of nodes with the specified name.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_countnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns all the nodes nodes of the XML Node with a specific name.
+*
+* @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pName - Name of the node.
+* @param[out] pNodes - returns the list of node nodes.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_getnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, LibMCEnv_XMLDocumentNodes * pNodes);
+
+/**
+* Returns if a node with a specific name exist.
+*
+* @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pName - Name of the node.
+* @param[out] pNodeExists - returns if a node with a specific name exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_hasnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool * pNodeExists);
+
+/**
+* Returns if a node with a specific name exist once and only once.
+*
+* @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pName - Name of the node.
+* @param[out] pNodeExists - returns if a node with a specific name exists once and only once.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_hasuniquenode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool * pNodeExists);
+
+/**
+* Returns node with a specific name. Throws an error if name does not exist once and only once.
+*
+* @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pName - Name of the node.
+* @param[in] bMustExist - If true, the call fails if node does not exist. If falls, the call will return null if the node does not exist.
+* @param[out] pNodeInstance - returns node instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_findnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pNodeInstance);
+
+/*************************************************************************************************************************
+ Class definition for XMLDocument
+**************************************************************************************************************************/
+
+/**
+* Returns default name space of the document.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] nNamespaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespaceBuffer -  buffer of name space of the document., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_getdefaultnamespace(LibMCEnv_XMLDocument pXMLDocument, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer);
+
+/**
+* Returns the used number of name spaces of the document.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[out] pCount - number of registered name spaces of the document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_getnamespacecount(LibMCEnv_XMLDocument pXMLDocument, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns a name space of the document. Will fail if index is invalid.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] nIndex - index of name space. 0-based.
+* @param[in] nNamespaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespaceBuffer -  buffer of name space of the document., may be NULL
+* @param[in] nNamespacePrefixBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespacePrefixNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespacePrefixBuffer -  buffer of name space prefix of the document. Empty for root namespace., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_getnamespace(LibMCEnv_XMLDocument pXMLDocument, LibMCEnv_uint64 nIndex, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer, const LibMCEnv_uint32 nNamespacePrefixBufferSize, LibMCEnv_uint32* pNamespacePrefixNeededChars, char * pNamespacePrefixBuffer);
+
+/**
+* Returns if the document has a namespace.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] pNamespace - Name space name.
+* @param[out] pNameSpaceIsRegistered - name space has been registered.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_hasnamespace(LibMCEnv_XMLDocument pXMLDocument, const char * pNamespace, bool * pNameSpaceIsRegistered);
+
+/**
+* Returns a name space of the document. Will fail if namespace is not registered.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] pNamespace - name space of the document.
+* @param[in] nNamespacePrefixBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespacePrefixNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespacePrefixBuffer -  buffer of name space prefix of the document. Empty for root namespace., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_getnamespaceprefix(LibMCEnv_XMLDocument pXMLDocument, const char * pNamespace, const LibMCEnv_uint32 nNamespacePrefixBufferSize, LibMCEnv_uint32* pNamespacePrefixNeededChars, char * pNamespacePrefixBuffer);
+
+/**
+* Registers a custom namespace prefix. Given Namespace MUST NOT have been in use before calling this function.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] pNamespace - name space to register
+* @param[in] pNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_registernamespace(LibMCEnv_XMLDocument pXMLDocument, const char * pNamespace, const char * pNamespacePrefix);
+
+/**
+* Returns root node of the document.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[out] pRootNode - Root node of the document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_getrootnode(LibMCEnv_XMLDocument pXMLDocument, LibMCEnv_XMLDocumentNode * pRootNode);
+
+/*************************************************************************************************************************
  Class definition for TCPIPPacket
 **************************************************************************************************************************/
 
@@ -1553,6 +2057,38 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createtcpipconnectio
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createmodbustcpconnection(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIPAddress, LibMCEnv_uint32 nPort, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_ModbusTCPConnection * pConnectionInstance);
 
 /**
+* creates an empty XML Document.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+* @param[in] pDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createxmldocument(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pRootNodeName, const char * pDefaultNamespace, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pXMLString - XML String.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_parsexmlstring(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pXMLString, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nXMLDataBufferSize - Number of elements in buffer
+* @param[in] pXMLDataBuffer - uint8 buffer of XML Binary data.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_parsexmldata(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
 * retrieves if attached driver has data with the given identifier.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -1987,7 +2523,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_signalhandled(LibMCEnv_S
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getname(LibMCEnv_SignalHandler pSignalHandler, const LibMCEnv_uint32 nSignalNameBufferSize, LibMCEnv_uint32* pSignalNameNeededChars, char * pSignalNameBuffer);
 
 /**
-* Returns the signal id.
+* Returns the signal id. Depreciated.
 *
 * @param[in] pSignalHandler - SignalHandler instance.
 * @param[in] nSignalIDBufferSize - size of the buffer (including trailing 0)
@@ -1996,6 +2532,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getname(LibMCEnv_SignalH
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getsignalid(LibMCEnv_SignalHandler pSignalHandler, const LibMCEnv_uint32 nSignalIDBufferSize, LibMCEnv_uint32* pSignalIDNeededChars, char * pSignalIDBuffer);
+
+/**
+* Returns the signal uuid. Identical to GetSignalID.
+*
+* @param[in] pSignalHandler - SignalHandler instance.
+* @param[in] nSignalUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSignalUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSignalUUIDBuffer -  buffer of Signal Identifier, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getsignaluuid(LibMCEnv_SignalHandler pSignalHandler, const LibMCEnv_uint32 nSignalUUIDBufferSize, LibMCEnv_uint32* pSignalUUIDNeededChars, char * pSignalUUIDBuffer);
 
 /**
 * Returns the signal state machine instance.
@@ -2140,7 +2687,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getmachinestate(LibMC
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_preparesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance);
 
 /**
-* waits for a signal.
+* Waits for a signal for a certain amount of time.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pSignalName - Name Of Signal
@@ -2150,6 +2697,27 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_preparesignal(LibMCEn
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_waitforsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalName, LibMCEnv_uint32 nTimeOut, LibMCEnv_SignalHandler * pHandlerInstance, bool * pSuccess);
+
+/**
+* Retrieves an unhandled signal By signal type name.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pSignalTypeName - Name Of Signal to be returned
+* @param[out] pHandlerInstance - Signal object. If no signal has been found the signal handler object will be null.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getunhandledsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, LibMCEnv_SignalHandler * pHandlerInstance);
+
+/**
+* retrieves an unhandled signal from the current state machine by UUID.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUUID - Name
+* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
+* @param[out] pHandler - Signal handler instance. Returns null, if signal does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getunhandledsignalbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_SignalHandler * pHandler);
 
 /**
 * Returns the driver type and library lookup for a specific registered driver.
@@ -2247,7 +2815,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_sleep(LibMCEnv_StateE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkfortermination(LibMCEnv_StateEnvironment pStateEnvironment, bool * pShallTerminate);
 
 /**
-* stores a signal handler in the current state machine
+* DEPRECIATED: stores a signal handler in the current state machine
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pName - Name
@@ -2257,7 +2825,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkfortermination(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler pHandler);
 
 /**
-* retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
+* DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pName - Name
@@ -2267,7 +2835,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storesignal(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler * pHandler);
 
 /**
-* deletes a value from the data store.
+* DEPRECIATED: deletes a value from the data store.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pName - Name
@@ -2458,6 +3026,38 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilli
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_gettestenvironment(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment);
+
+/**
+* creates an empty XML Document.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+* @param[in] pDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createxmldocument(LibMCEnv_StateEnvironment pStateEnvironment, const char * pRootNodeName, const char * pDefaultNamespace, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pXMLString - XML String.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_parsexmlstring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pXMLString, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] nXMLDataBufferSize - Number of elements in buffer
+* @param[in] pXMLDataBuffer - uint8 buffer of XML Binary data.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_parsexmldata(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /*************************************************************************************************************************
  Class definition for UIEnvironment
@@ -2839,6 +3439,38 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getglobaltimerinmillisec
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_gettestenvironment(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment);
+
+/**
+* creates an empty XML Document.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+* @param[in] pDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createxmldocument(LibMCEnv_UIEnvironment pUIEnvironment, const char * pRootNodeName, const char * pDefaultNamespace, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pXMLString - XML String.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmlstring(LibMCEnv_UIEnvironment pUIEnvironment, const char * pXMLString, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nXMLDataBufferSize - Number of elements in buffer
+* @param[in] pXMLDataBuffer - uint8 buffer of XML Binary data.
+* @param[out] pXMLDocument - XML Document Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmldata(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /*************************************************************************************************************************
  Global functions

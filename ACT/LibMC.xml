@@ -483,6 +483,9 @@
 		
 		<error name="COULDNOTCREATEDRIVER" code="450" description="Could not create driver" />		
 		<error name="EMPTYGROUPNAMEBUTPARAMETERGIVEN" code="451" description="Empty group name but parameter given" />
+
+		<error name="INVALIDDEFAULTXMLNAMESPACE" code="452" description="invalid default xml namespace name." />		
+		<error name="INVALIDXMLROOTNODENAME" code="453" description="invalid xml root node name." />		
 		
 		  
 	</errors>
