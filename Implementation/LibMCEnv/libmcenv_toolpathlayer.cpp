@@ -217,8 +217,16 @@ std::string CToolpathLayer::getValueNameByType(const LibMCEnv::eToolpathProfileV
 
 LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType)
 {	
-	std::string sValueName = getValueNameByType(eValueType);	
+	// Legacy behaviour: Fall back to Laser Speed if no jump speed is available.
+	if (eValueType == LibMCEnv::eToolpathProfileValueType::JumpSpeed) {
+		auto pProfile = m_pToolpathLayerData->getSegmentProfile(nIndex);
+		if (!pProfile->hasValue("", "jumpspeed"))
+			return GetSegmentProfileTypedValue (nIndex, LibMCEnv::eToolpathProfileValueType::Speed);
+	}
+
+	std::string sValueName = getValueNameByType(eValueType);
 	return GetSegmentProfileDoubleValue(nIndex, "", sValueName);
+
 }
 
 LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue)
