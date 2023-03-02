@@ -540,20 +540,106 @@ public:
 	virtual std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
-	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* IToolpathLayer::SegmentProfileHasValue - Retrieves an assigned profile custom value.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Returns true if value exist.
+	*/
+	virtual bool SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value. Fails if value does not exist.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName) = 0;
+	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
 
 	/**
-	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* IToolpathLayer::GetSegmentProfileValueDef - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] sDefaultValue - Default value if value does not exist.
+	* @return String Value.
+	*/
+	virtual std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileDoubleValue - Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Double Value.
+	*/
+	virtual LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileDoubleValueDef - Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] dDefaultValue - Default value if value does not exist.
+	* @return Double Value.
+	*/
+	virtual LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileIntegerValue - Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Integer Value.
+	*/
+	virtual LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileIntegerValueDef - Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] nDefaultValue - Default value if value does not exist.
+	* @return Integer Value.
+	*/
+	virtual LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileBoolValue - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Boolean Value.
+	*/
+	virtual bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileBoolValueDef - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] bDefaultValue - Default value if value does not exist.
+	* @return Boolean Value.
+	*/
+	virtual bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
 	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileTypedValueDef - Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
+	* @param[in] dDefaultValue - Default value if value does not exist.
+	* @return Double Value
+	*/
+	virtual LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.

@@ -222,6 +222,10 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY: return "INVALIDSCANNERDELAY";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK: return "INVALIDSCANLABSDK";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY: return "INVALIDOIESIGNALBUFFERARRAY";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG: return "INVALIDSKYWRITINGTIMELAG";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT: return "INVALIDSKYWRITINGLASERONSHIFT";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV: return "INVALIDSKYWRITINGNPREV";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST: return "INVALIDSKYWRITINGNPOST";
 		}
 		return "UNKNOWN";
 	}
@@ -274,6 +278,10 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY: return "Invalid scanner delay.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK: return "Invalid SCANLAB SDK.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY: return "Invalid OIE Signal buffer array.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG: return "Invalid Skywriting Timelag.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT: return "Invalid Skywriting Laser On Shift.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV: return "Invalid Skywriting N Prev.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST: return "Invalid Skywriting N Post.";
 		}
 		return "unknown error";
 	}
@@ -532,6 +540,10 @@ public:
 	inline void DisableOIE();
 	inline void StartOIEMeasurement();
 	inline void StopOIEMeasurement();
+	inline void DisableSkyWriting();
+	inline void EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
+	inline void EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
+	inline void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit);
 };
 	
 /*************************************************************************************************************************
@@ -769,6 +781,10 @@ public:
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
 		pWrapperTable->m_RTCContext_StopOIEMeasurement = nullptr;
+		pWrapperTable->m_RTCContext_DisableSkyWriting = nullptr;
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = nullptr;
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode2 = nullptr;
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode3 = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1217,6 +1233,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_StopOIEMeasurement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableSkyWriting = (PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disableskywriting");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableSkyWriting = (PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disableskywriting");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableSkyWriting == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode1");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode1");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableSkyWritingMode1 == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode2 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode2");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode2 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode2");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableSkyWritingMode2 == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode3 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode3");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode3 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode3");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableSkyWritingMode3 == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1676,6 +1728,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_stopoiemeasurement", (void**)&(pWrapperTable->m_RTCContext_StopOIEMeasurement));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StopOIEMeasurement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableskywriting", (void**)&(pWrapperTable->m_RTCContext_DisableSkyWriting));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableSkyWriting == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableskywritingmode1", (void**)&(pWrapperTable->m_RTCContext_EnableSkyWritingMode1));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableSkyWritingMode1 == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableskywritingmode2", (void**)&(pWrapperTable->m_RTCContext_EnableSkyWritingMode2));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableSkyWritingMode2 == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableskywritingmode3", (void**)&(pWrapperTable->m_RTCContext_EnableSkyWritingMode3));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableSkyWritingMode3 == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -2261,6 +2329,51 @@ public:
 	void CRTCContext::StopOIEMeasurement()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_StopOIEMeasurement(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DisableSkyWriting - Disable skywriting.
+	*/
+	void CRTCContext::DisableSkyWriting()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableSkyWriting(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::EnableSkyWritingMode1 - Enables skywriting on the list in mode 1. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	*/
+	void CRTCContext::EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableSkyWritingMode1(m_pHandle, dTimelag, nLaserOnShift, nNPrev, nNPost));
+	}
+	
+	/**
+	* CRTCContext::EnableSkyWritingMode2 - Enables skywriting on the list in mode 2. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	*/
+	void CRTCContext::EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableSkyWritingMode2(m_pHandle, dTimelag, nLaserOnShift, nNPrev, nNPost));
+	}
+	
+	/**
+	* CRTCContext::EnableSkyWritingMode3 - Enables skywriting on the list in mode 3. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	* @param[in] dLimit - Skywriting Angle limit
+	*/
+	void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableSkyWritingMode3(m_pHandle, dTimelag, nLaserOnShift, nNPrev, nNPost, dLimit));
 	}
 	
 	/**

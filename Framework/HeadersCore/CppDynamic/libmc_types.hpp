@@ -491,6 +491,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDNAMESPACENAME 464 /** Invalid namespace name. */
 #define LIBMC_ERROR_INVALIDNAMESPACEPREFIX 465 /** Invalid namespace prefix. */
 #define LIBMC_ERROR_INVALIDNAMESPACEINDEX 466 /** Invalid namespace index. */
+#define LIBMC_ERROR_INVALIDATTRIBUTEINDEX 467 /** Invalid attribute index. */
+#define LIBMC_ERROR_PROFILEVALUENOTFOUND 468 /** Profile value not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -894,6 +896,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDNAMESPACENAME: return "Invalid namespace name.";
     case LIBMC_ERROR_INVALIDNAMESPACEPREFIX: return "Invalid namespace prefix.";
     case LIBMC_ERROR_INVALIDNAMESPACEINDEX: return "Invalid namespace index.";
+    case LIBMC_ERROR_INVALIDATTRIBUTEINDEX: return "Invalid attribute index.";
+    case LIBMC_ERROR_PROFILEVALUENOTFOUND: return "Profile value not found.";
     default: return "unknown error";
   }
 }

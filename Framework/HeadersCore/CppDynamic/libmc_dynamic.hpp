@@ -561,6 +561,8 @@ public:
 			case LIBMC_ERROR_INVALIDNAMESPACENAME: return "INVALIDNAMESPACENAME";
 			case LIBMC_ERROR_INVALIDNAMESPACEPREFIX: return "INVALIDNAMESPACEPREFIX";
 			case LIBMC_ERROR_INVALIDNAMESPACEINDEX: return "INVALIDNAMESPACEINDEX";
+			case LIBMC_ERROR_INVALIDATTRIBUTEINDEX: return "INVALIDATTRIBUTEINDEX";
+			case LIBMC_ERROR_PROFILEVALUENOTFOUND: return "PROFILEVALUENOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -964,6 +966,8 @@ public:
 			case LIBMC_ERROR_INVALIDNAMESPACENAME: return "Invalid namespace name.";
 			case LIBMC_ERROR_INVALIDNAMESPACEPREFIX: return "Invalid namespace prefix.";
 			case LIBMC_ERROR_INVALIDNAMESPACEINDEX: return "Invalid namespace index.";
+			case LIBMC_ERROR_INVALIDATTRIBUTEINDEX: return "Invalid attribute index.";
+			case LIBMC_ERROR_PROFILEVALUENOTFOUND: return "Profile value not found.";
 		}
 		return "unknown error";
 	}

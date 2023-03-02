@@ -58,26 +58,9 @@ namespace Impl {
 class CXMLDocumentNodes : public virtual IXMLDocumentNodes, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
 protected:
 
-	/**
-	* Put protected members here.
-	*/
-
 public:
-
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
 
 	LibMCEnv_uint64 GetNodeCount() override;
 

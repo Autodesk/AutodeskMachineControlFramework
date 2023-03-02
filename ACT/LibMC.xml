@@ -497,6 +497,10 @@
 		<error name="INVALIDNAMESPACENAME" code="464" description="Invalid namespace name." />				
 		<error name="INVALIDNAMESPACEPREFIX" code="465" description="Invalid namespace prefix." />
 		<error name="INVALIDNAMESPACEINDEX" code="466" description="Invalid namespace index." />
+		<error name="INVALIDATTRIBUTEINDEX" code="467" description="Invalid attribute index." />
+		<error name="PROFILEVALUENOTFOUND" code="468" description="Profile value not found." />
+
+		
 				
 	</errors>
 	

@@ -86,8 +86,10 @@
 		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />
 		
 		<error name="INVALIDOIESIGNALBUFFERARRAY" code="1035" description="Invalid OIE Signal buffer array." />
-		
-		
+		<error name="INVALIDSKYWRITINGTIMELAG" code="1036" description="Invalid Skywriting Timelag." />
+		<error name="INVALIDSKYWRITINGLASERONSHIFT" code="1037" description="Invalid Skywriting Laser On Shift." />
+		<error name="INVALIDSKYWRITINGNPREV" code="1038" description="Invalid Skywriting N Prev." />
+		<error name="INVALIDSKYWRITINGNPOST" code="1039" description="Invalid Skywriting N Post." />
 		
 		
 	</errors>
@@ -365,6 +367,31 @@ Custom implementation
 		</method>
 
 		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
+		</method>
+		
+		<method name="DisableSkyWriting" description="Disable skywriting.">
+		</method>
+
+		<method name="EnableSkyWritingMode1" description="Enables skywriting on the list in mode 1. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+		</method>
+
+		<method name="EnableSkyWritingMode2" description="Enables skywriting on the list in mode 2. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+		</method>
+
+		<method name="EnableSkyWritingMode3" description="Enables skywriting on the list in mode 3. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
 		</method>
 		
 	</class>

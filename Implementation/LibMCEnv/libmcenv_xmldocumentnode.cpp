@@ -46,7 +46,7 @@ using namespace LibMCEnv::Impl;
 CXMLDocumentNode::CXMLDocumentNode(AMC::PXMLDocumentNodeInstance pXMLDocumentNode)
 	: m_pXMLDocumentNode (pXMLDocumentNode)
 {
-	if (pXMLDocumentNode.get())
+	if (pXMLDocumentNode.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
@@ -59,17 +59,17 @@ CXMLDocumentNode::~CXMLDocumentNode()
 
 std::string CXMLDocumentNode::GetName()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pXMLDocumentNode->GetName();
 }
 
 std::string CXMLDocumentNode::GetNameSpace()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pXMLDocumentNode->GetNameSpace();
 }
 
 LibMCEnv_uint64 CXMLDocumentNode::GetAttributeCount()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pXMLDocumentNode->GetAttributeCount();
 }
 
 IXMLDocumentAttribute * CXMLDocumentNode::GetAttribute(const LibMCEnv_uint64 nIndex)
@@ -79,7 +79,7 @@ IXMLDocumentAttribute * CXMLDocumentNode::GetAttribute(const LibMCEnv_uint64 nIn
 
 bool CXMLDocumentNode::HasAttribute(const std::string & sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pXMLDocumentNode->HasAttribute(sName);
 }
 
 IXMLDocumentAttribute * CXMLDocumentNode::FindAttribute(const std::string & sName, const bool bMustExist)
@@ -89,27 +89,27 @@ IXMLDocumentAttribute * CXMLDocumentNode::FindAttribute(const std::string & sNam
 
 void CXMLDocumentNode::RemoveAttribute(const std::string & sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pXMLDocumentNode->RemoveAttribute(sName);
 }
 
 void CXMLDocumentNode::AddAttribute(const std::string & sName, const std::string & sNameSpace, const std::string & sValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pXMLDocumentNode->AddAttribute(sName, sNameSpace, sValue);
 }
 
 void CXMLDocumentNode::AddIntegerAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_int64 nValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pXMLDocumentNode->AddIntegerAttribute(sName, sNameSpace, nValue);
 }
 
 void CXMLDocumentNode::AddDoubleAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_double dValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pXMLDocumentNode->AddDoubleAttribute(sName, sNameSpace, dValue);
 }
 
 void CXMLDocumentNode::AddBoolAttribute(const std::string & sName, const std::string & sNameSpace, const bool bValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pXMLDocumentNode->AddBoolAttribute(sName, sNameSpace, bValue);
 }
 
 IXMLDocumentNodes * CXMLDocumentNode::GetChildren()
@@ -119,7 +119,7 @@ IXMLDocumentNodes * CXMLDocumentNode::GetChildren()
 
 LibMCEnv_uint64 CXMLDocumentNode::CountChildrenByName(const std::string & sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pXMLDocumentNode->CountChildrenByName(sName);
 }
 
 IXMLDocumentNodes * CXMLDocumentNode::GetChildrenByName(const std::string & sName)
@@ -129,22 +129,22 @@ IXMLDocumentNodes * CXMLDocumentNode::GetChildrenByName(const std::string & sNam
 
 bool CXMLDocumentNode::HasChild(const std::string & sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pXMLDocumentNode->HasChild(sName);
 }
 
 bool CXMLDocumentNode::HasUniqueChild(const std::string & sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pXMLDocumentNode->HasUniqueChild(sName);
 }
 
 IXMLDocumentNode * CXMLDocumentNode::FindChild(const std::string & sName, const bool bMustExist)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return new CXMLDocumentNode(m_pXMLDocumentNode->FindChild (sName, bMustExist));
 }
 
 IXMLDocumentNode * CXMLDocumentNode::AddChild(const std::string & sName, const std::string & sNameSpace)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return new CXMLDocumentNode(m_pXMLDocumentNode->AddChild(sName, sNameSpace));
 }
 
 void CXMLDocumentNode::RemoveChild(IXMLDocumentNode* pChildInstance)
@@ -154,11 +154,11 @@ void CXMLDocumentNode::RemoveChild(IXMLDocumentNode* pChildInstance)
 
 void CXMLDocumentNode::RemoveChildrenWithName(const std::string & sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pXMLDocumentNode->RemoveChildrenWithName(sName);
 }
 
 void CXMLDocumentNode::Remove()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pXMLDocumentNode->Remove();
 }
 

@@ -349,6 +349,7 @@ public:
 			case LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE: return "SIGNALUUIDNOTACTIVE";
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "COULDNOTPARSEXMLSTRING";
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "COULDNOTPARSEXMLDATA";
+			case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "INVALIDPROFILEVALUETYPE";
 		}
 		return "UNKNOWN";
 	}
@@ -445,6 +446,7 @@ public:
 			case LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE: return "signal UUID not active.";
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML string.";
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
+			case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type.";
 		}
 		return "unknown error";
 	}
@@ -759,8 +761,17 @@ public:
 	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
 	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
-	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName);
+	inline bool SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue);
+	inline LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue);
+	inline LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue);
+	inline bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue);
 	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
+	inline LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue);
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer);
@@ -1499,8 +1510,17 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = nullptr;
+		pWrapperTable->m_ToolpathLayer_SegmentProfileHasValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValue = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValueDef = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValue = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValueDef = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValue = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValueDef = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValue = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValueDef = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = nullptr;
@@ -2140,6 +2160,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentProfileHasValue = (PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_segmentprofilehasvalue");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentProfileHasValue = (PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_segmentprofilehasvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_SegmentProfileHasValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValue = (PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofilevalue");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValue = (PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofilevalue");
@@ -2149,12 +2178,84 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileValueDefPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofilevaluedef");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileValueDefPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofilevaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValue = (PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiledoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValue = (PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValuePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiledoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValueDefPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiledoublevaluedef");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValueDefPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiledoublevaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValue = (PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValue = (PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValuePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValueDefPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileintegervaluedef");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValueDefPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileintegervaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValue = (PLibMCEnvToolpathLayer_GetSegmentProfileBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValue = (PLibMCEnvToolpathLayer_GetSegmentProfileBoolValuePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileBoolValueDefPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileboolvaluedef");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileBoolValueDefPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileboolvaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue = (PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiletypedvalue");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue = (PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiletypedvalue");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileTypedValueDefPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiletypedvaluedef");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef = (PLibMCEnvToolpathLayer_GetSegmentProfileTypedValueDefPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofiletypedvaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4924,12 +5025,48 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_segmentprofilehasvalue", (void**)&(pWrapperTable->m_ToolpathLayer_SegmentProfileHasValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_SegmentProfileHasValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofilevalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileValue));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofilevaluedef", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofiledoublevalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofiledoublevaluedef", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileDoubleValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofileintegervalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofileintegervaluedef", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileIntegerValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofileboolvalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofileboolvaluedef", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileBoolValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofiletypedvalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofiletypedvaluedef", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpartuuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID));
@@ -6529,24 +6666,152 @@ public:
 	}
 	
 	/**
-	* CToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* CToolpathLayer::SegmentProfileHasValue - Retrieves an assigned profile custom value.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Returns true if value exist.
+	*/
+	bool CToolpathLayer::SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	{
+		bool resultHasValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentProfileHasValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultHasValue));
+		
+		return resultHasValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value. Fails if value does not exist.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName)
+	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sValueName.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
-	* CToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* CToolpathLayer::GetSegmentProfileValueDef - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] sDefaultValue - Default value if value does not exist.
+	* @return String Value.
+	*/
+	std::string CToolpathLayer::GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileDoubleValue - Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Double Value.
+	*/
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileDoubleValueDef - Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] dDefaultValue - Default value if value does not exist.
+	* @return Double Value.
+	*/
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), dDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileIntegerValue - Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Integer Value.
+	*/
+	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileIntegerValueDef - Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] nDefaultValue - Default value if value does not exist.
+	* @return Integer Value.
+	*/
+	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), nDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileBoolValue - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Boolean Value.
+	*/
+	bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileBoolValueDef - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] bDefaultValue - Default value if value does not exist.
+	* @return Boolean Value.
+	*/
+	bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), bDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
@@ -6555,6 +6820,21 @@ public:
 	{
 		LibMCEnv_double resultValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, nIndex, eValueType, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentProfileTypedValueDef - Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
+	* @param[in] dDefaultValue - Default value if value does not exist.
+	* @return Double Value
+	*/
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValueDef(m_pHandle, nIndex, eValueType, dDefaultValue, &resultValue));
 		
 		return resultValue;
 	}

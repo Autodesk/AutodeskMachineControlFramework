@@ -61,3 +61,114 @@ bool CXMLDocumentNodeInstance::checkXMLNamespacePrefixName(const std::string& sN
 {
 	return true;
 }
+
+std::string CXMLDocumentNodeInstance::GetName()
+{
+	std::string sName = m_XMLNode.name ();
+	return sName;
+}
+
+std::string CXMLDocumentNodeInstance::GetNameSpace()
+{
+	return "";
+}
+
+uint64_t CXMLDocumentNodeInstance::GetAttributeCount()
+{
+	uint64_t nCount = 0;
+	auto attributes = m_XMLNode.attributes();
+	for (auto attribute : attributes)
+		nCount++;
+	return nCount;
+}
+
+std::string CXMLDocumentNodeInstance::GetAttributeName(const uint64_t nIndex)
+{
+	uint64_t nCount = 0;
+	auto attributes = m_XMLNode.attributes();
+	for (auto attribute : attributes)
+	{
+		if (nIndex == nCount)
+			return attribute.name();
+	}
+
+	throw ELibMCCustomException(LIBMC_ERROR_INVALIDATTRIBUTEINDEX, std::to_string (nIndex));
+
+}
+
+bool CXMLDocumentNodeInstance::HasAttribute(const std::string& sName)
+{
+	auto attribute = m_XMLNode.attribute(sName.c_str());
+	return !attribute.empty();
+}
+
+void CXMLDocumentNodeInstance::RemoveAttribute(const std::string& sName)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+void CXMLDocumentNodeInstance::AddAttribute(const std::string& sName, const std::string& sNameSpace, const std::string& sValue)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+void CXMLDocumentNodeInstance::AddIntegerAttribute(const std::string& sName, const std::string& sNameSpace, const int64_t nValue)
+{
+	AddAttribute(sName, sNameSpace, std::to_string(nValue));
+
+}
+
+void CXMLDocumentNodeInstance::AddDoubleAttribute(const std::string& sName, const std::string& sNameSpace, const double dValue)
+{
+	AddAttribute(sName, sNameSpace, std::to_string(dValue));
+}
+
+void CXMLDocumentNodeInstance::AddBoolAttribute(const std::string& sName, const std::string& sNameSpace, const bool bValue)
+{
+	if (bValue)
+		AddAttribute(sName, sNameSpace, "true");
+	else
+		AddAttribute(sName, sNameSpace, "false");
+
+}
+
+uint64_t CXMLDocumentNodeInstance::CountChildrenByName(const std::string& sName)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+bool CXMLDocumentNodeInstance::HasChild(const std::string& sName)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+bool CXMLDocumentNodeInstance::HasUniqueChild(const std::string& sName)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+PXMLDocumentNodeInstance CXMLDocumentNodeInstance::FindChild(const std::string& sName, const bool bMustExist)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(const std::string& sName, const std::string& sNameSpace)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+void CXMLDocumentNodeInstance::RemoveChild(CXMLDocumentNodeInstance* pChildInstance)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+void CXMLDocumentNodeInstance::RemoveChildrenWithName(const std::string& sName)
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+
+void CXMLDocumentNodeInstance::Remove()
+{
+	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+}
+

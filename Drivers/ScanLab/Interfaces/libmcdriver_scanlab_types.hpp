@@ -140,6 +140,10 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY 1033 /** Invalid scanner delay. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK 1034 /** Invalid SCANLAB SDK. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY 1035 /** Invalid OIE Signal buffer array. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG 1036 /** Invalid Skywriting Timelag. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT 1037 /** Invalid Skywriting Laser On Shift. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV 1038 /** Invalid Skywriting N Prev. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST 1039 /** Invalid Skywriting N Post. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -192,6 +196,10 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY: return "Invalid scanner delay.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK: return "Invalid SCANLAB SDK.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY: return "Invalid OIE Signal buffer array.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG: return "Invalid Skywriting Timelag.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT: return "Invalid Skywriting Laser On Shift.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV: return "Invalid Skywriting N Prev.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST: return "Invalid Skywriting N Post.";
     default: return "unknown error";
   }
 }

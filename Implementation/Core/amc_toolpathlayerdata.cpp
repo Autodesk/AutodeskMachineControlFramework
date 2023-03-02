@@ -34,6 +34,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+	CToolpathLayerProfile::CToolpathLayerProfile(const std::string& sUUID)
+		: m_sUUID (sUUID)
+	{
+
+	}
+
+	CToolpathLayerProfile::~CToolpathLayerProfile()
+	{
+
+	}
+
+	std::string CToolpathLayerProfile::getUUID()
+	{
+		return m_sUUID;
+	}
+
+	void CToolpathLayerProfile::addValue(const std::string& sNameSpace, const std::string& sValueName, const std::string& sValue)
+	{
+		m_ProfileValues.insert(std::make_pair(std::make_pair(sNameSpace, sValueName), sValue));
+	}
+
+	bool CToolpathLayerProfile::hasValue(const std::string& sNameSpace, const std::string& sValueName)
+	{
+		auto iIter = m_ProfileValues.find(std::make_pair(sNameSpace, sValueName));
+		return (iIter != m_ProfileValues.end());
+	}
+
+	std::string CToolpathLayerProfile::getValue(const std::string& sNameSpace, const std::string& sValueName)
+	{
+		auto iIter = m_ProfileValues.find(std::make_pair(sNameSpace, sValueName));
+		if (iIter == m_ProfileValues.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PROFILEVALUENOTFOUND, sNameSpace + "/" + sValueName);
+
+		return iIter->second;
+	}
+
+	std::string CToolpathLayerProfile::getValueDef(const std::string& sNameSpace, const std::string& sValueName, const std::string& sDefaultValue)
+	{
+		auto iIter = m_ProfileValues.find(std::make_pair(sNameSpace, sValueName));
+		if (iIter == m_ProfileValues.end())
+			return sDefaultValue;
+
+		return iIter->second;
+
+	}
+
+
+
 	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName)
 		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName)
 	{
@@ -78,7 +126,7 @@ namespace AMC {
 
 			if (pSegment->m_PointCount > 0) {
 
-				if (pSegment->m_PointStartIndex + pSegment->m_PointCount > m_Points.size())
+				if ((size_t) pSegment->m_PointStartIndex + pSegment->m_PointCount > m_Points.size())
 					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPOINTCOUNT, m_sDebugName);
 
 				auto pSrcPoint = &PointData[0];
@@ -265,7 +313,7 @@ namespace AMC {
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartID);
 	}
 
-	sToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
+	PToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
@@ -291,28 +339,27 @@ namespace AMC {
 		auto iIter = m_ProfileMap.find(sProfileUUID);
 		if (iIter == m_ProfileMap.end()) {
 
-			auto pProfile = pToolpath->GetProfileUUID(sProfileUUID);
-			sToolpathLayerProfile sProfile;
+			auto p3MFProfile = pToolpath->GetProfileUUID(sProfileUUID);
+			PToolpathLayerProfile pLayerProfile = std::make_shared<CToolpathLayerProfile> (sProfileUUID);
 
-			sProfile.m_dLaserSpeed = pProfile->GetParameterDoubleValue("", "laserspeed");
-			sProfile.m_dLaserPower = pProfile->GetParameterDoubleValueDef("", "laserpower", 0.0);
-			sProfile.m_dLaserFocus = pProfile->GetParameterDoubleValueDef("", "laserfocus", 0.0);
-			sProfile.m_dJumpSpeed = pProfile->GetParameterDoubleValueDef("", "jumpspeed", sProfile.m_dLaserSpeed);
-			sProfile.m_dExtrusionFactor = pProfile->GetParameterDoubleValueDef("", "extrusionfactor", 0.0);
-			sProfile.m_dStartDelay = pProfile->GetParameterDoubleValueDef("", "startdelay", 0.0);
-			sProfile.m_dEndDelay = pProfile->GetParameterDoubleValueDef("", "enddelay", 0.0);
-			sProfile.m_dPolyDelay = pProfile->GetParameterDoubleValueDef("", "polydelay", 0.0);
-			sProfile.m_dJumpDelay = pProfile->GetParameterDoubleValueDef("", "jumpdelay", 0.0);
-			sProfile.m_dLaserOnDelay = pProfile->GetParameterDoubleValueDef("", "laserondelay", 0.0);
-			sProfile.m_dLaserOffDelay = pProfile->GetParameterDoubleValueDef("", "laseroffdelay", 0.0);
+			uint32_t nParameterCount = p3MFProfile->GetParameterCount();
+			for (uint32_t nParameterIndex = 0; nParameterIndex < nParameterCount; nParameterIndex++) {
+				std::string sParameterName = p3MFProfile->GetParameterName(nParameterIndex);
+				std::string sParameterNamespace = p3MFProfile->GetParameterNameSpace(nParameterIndex);
+				std::string sParameterValue = p3MFProfile->GetParameterValue(sParameterNamespace, sParameterName);
 
-			m_ProfileMap.insert(std::make_pair (sProfileUUID, sProfile));
+				pLayerProfile->addValue(sParameterNamespace, sParameterName, sParameterValue);
+			}
+
+
+
+			m_ProfileMap.insert(std::make_pair (sProfileUUID, pLayerProfile));
 		}
 
 	}
 
 
-	sToolpathLayerProfile CToolpathLayerData::retrieveProfileData(const std::string& sProfileUUID)
+	PToolpathLayerProfile CToolpathLayerData::retrieveProfileData(const std::string& sProfileUUID)
 	{
 		auto iIter = m_ProfileMap.find(sProfileUUID);
 		if (iIter == m_ProfileMap.end())

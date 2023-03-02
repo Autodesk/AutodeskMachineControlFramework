@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	class CXMLDocumentInstance;
+	class CXMLDocumentNodeInstance;
+
+	typedef std::shared_ptr<CXMLDocumentNodeInstance> PXMLDocumentNodeInstance;
 
 	class CXMLDocumentNodeInstance {
 	private:
@@ -59,9 +62,44 @@ namespace AMC {
 
 		static bool checkXMLNodeName(const std::string & sNodeName);
 
+		std::string GetName();
+
+		std::string GetNameSpace();
+
+		uint64_t GetAttributeCount();
+
+		std::string GetAttributeName(const uint64_t nIndex);
+
+		bool HasAttribute(const std::string& sName);
+
+		void RemoveAttribute(const std::string& sName);
+
+		void AddAttribute(const std::string& sName, const std::string& sNameSpace, const std::string& sValue);
+
+		void AddIntegerAttribute(const std::string& sName, const std::string& sNameSpace, const int64_t nValue);
+
+		void AddDoubleAttribute(const std::string& sName, const std::string& sNameSpace, const double dValue);
+
+		void AddBoolAttribute(const std::string& sName, const std::string& sNameSpace, const bool bValue);
+
+		uint64_t CountChildrenByName(const std::string& sName);
+
+		bool HasChild(const std::string& sName);
+
+		bool HasUniqueChild(const std::string& sName);
+
+		PXMLDocumentNodeInstance FindChild(const std::string& sName, const bool bMustExist);
+
+		PXMLDocumentNodeInstance AddChild(const std::string& sName, const std::string& sNameSpace);
+
+		void RemoveChild(CXMLDocumentNodeInstance * pChildInstance);
+
+		void RemoveChildrenWithName(const std::string& sName);
+
+		void Remove();
+
 	};
 
-	typedef std::shared_ptr<CXMLDocumentNodeInstance> PXMLDocumentNodeInstance;
 	
 
 

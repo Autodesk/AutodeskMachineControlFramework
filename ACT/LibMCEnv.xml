@@ -127,6 +127,8 @@
 		<error name="SIGNALUUIDNOTACTIVE" code="10087" description="signal UUID not active." />		
 		<error name="COULDNOTPARSEXMLSTRING" code="10088" description="could not parse XML string." />		
 		<error name="COULDNOTPARSEXMLDATA" code="10089" description="could not parse XML data." />		
+		<error name="INVALIDPROFILEVALUETYPE" code="10090" description="Invalid profile value type." />		
+		
 		
 					
 							
@@ -382,18 +384,88 @@
 			<param name="ProfileUUID" type="string" pass="return" description="Segment Profile UUID" />
 		</method>
 
-		<method name="GetSegmentProfileValue" description="Retrieves an assigned profile custom value.">
+		<method name="SegmentProfileHasValue" description="Retrieves an assigned profile custom value.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="HasValue" type="bool" pass="return" description="Returns true if value exist." />
+		</method>
+
+		<method name="GetSegmentProfileValue" description="Retrieves an assigned profile custom value. Fails if value does not exist.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="Value" type="string" pass="return" description="String Value." />
 		</method>
 
-		<method name="GetSegmentProfileTypedValue" description="Retrieves an assigned profile value of a standard type.">
+		<method name="GetSegmentProfileValueDef" description="Retrieves an assigned profile custom value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="DefaultValue" type="string" pass="in" description="Default value if value does not exist." />
+			<param name="Value" type="string" pass="return" description="String Value." />
+		</method>
+
+
+		<method name="GetSegmentProfileDoubleValue" description="Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="Value" type="double" pass="return" description="Double Value." />
+		</method>
+
+		<method name="GetSegmentProfileDoubleValueDef" description="Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value if value does not exist." />
+			<param name="Value" type="double" pass="return" description="Double Value." />
+		</method>
+
+		<method name="GetSegmentProfileIntegerValue" description="Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="Value" type="int64" pass="return" description="Integer Value." />
+		</method>
+
+		<method name="GetSegmentProfileIntegerValueDef" description="Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="DefaultValue" type="int64" pass="in" description="Default value if value does not exist." />
+			<param name="Value" type="int64" pass="return" description="Integer Value." />
+		</method>
+
+
+		<method name="GetSegmentProfileBoolValue" description="Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="Value" type="bool" pass="return" description="Boolean Value." />
+		</method>
+
+		<method name="GetSegmentProfileBoolValueDef" description="Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="DefaultValue" type="bool" pass="in" description="Default value if value does not exist." />
+			<param name="Value" type="bool" pass="return" description="Boolean Value." />
+		</method>
+
+		<method name="GetSegmentProfileTypedValue" description="Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
 			<param name="Value" type="double" pass="return" description="Double Value" />
 		</method>
 
+		<method name="GetSegmentProfileTypedValueDef" description="Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value if value does not exist." />
+			<param name="Value" type="double" pass="return" description="Double Value" />
+		</method>
+		
 		<method name="GetSegmentPartUUID" description="Retrieves the assigned segment part uuid.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />

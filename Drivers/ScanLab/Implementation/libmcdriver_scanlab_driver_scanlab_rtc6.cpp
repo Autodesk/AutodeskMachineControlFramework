@@ -318,6 +318,36 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
                 float fPowerInPercent = (fPowerInWatts * 100.f) / m_fMaxLaserPowerInWatts;
                 float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
 
+                int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
+
+                if (nSkywritingMode != 0) {
+                    double dSkywritingTimeLag = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "timelag");
+                    int64_t nSkywritingLaserOnShift = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "laseronshift");
+                    int64_t nSkywritingPrev = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "nprev");
+                    int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
+                    
+                    double dSkywritingLimit = 0.0;
+                    if (nSkywritingMode == 3) {
+                        dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
+                    }
+
+
+                    switch (nSkywritingMode) {
+                    case 1:
+                        m_pRTCContext->EnableSkyWritingMode1 (dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+                        break;
+                    case 2:
+                        m_pRTCContext->EnableSkyWritingMode2 (dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+                        break;
+                    case 3:
+                        m_pRTCContext->EnableSkyWritingMode3(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
+                        break;
+                    default:
+                        m_pRTCContext->DisableSkyWriting ();
+                    }
+
+                }
+
                 std::vector<LibMCEnv::sPosition2D> Points;
                 pLayer->GetSegmentPointData(nSegmentIndex, Points);
 

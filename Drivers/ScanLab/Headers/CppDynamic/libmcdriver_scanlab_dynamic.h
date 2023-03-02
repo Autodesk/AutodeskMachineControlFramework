@@ -486,6 +486,51 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StartOIEMeasu
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
+/**
+* Disable skywriting.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables skywriting on the list in mode 1. See Scanlab RTC Documentation for details.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTimelag - Skywriting Timelag
+* @param[in] nLaserOnShift - Skywriting Laser On Shift
+* @param[in] nNPrev - Duration of pre-motion in ticks
+* @param[in] nNPost - Duration of post-motion in ticks. 
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost);
+
+/**
+* Enables skywriting on the list in mode 2. See Scanlab RTC Documentation for details.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTimelag - Skywriting Timelag
+* @param[in] nLaserOnShift - Skywriting Laser On Shift
+* @param[in] nNPrev - Duration of pre-motion in ticks
+* @param[in] nNPost - Duration of post-motion in ticks. 
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost);
+
+/**
+* Enables skywriting on the list in mode 3. See Scanlab RTC Documentation for details.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTimelag - Skywriting Timelag
+* @param[in] nLaserOnShift - Skywriting Laser On Shift
+* @param[in] nNPrev - Duration of pre-motion in ticks
+* @param[in] nNPost - Duration of post-motion in ticks. 
+* @param[in] dLimit - Skywriting Angle limit
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -873,6 +918,10 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;
 	PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr m_RTCContext_StopOIEMeasurement;
+	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;
+	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
+	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr m_RTCContext_EnableSkyWritingMode2;
+	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr m_RTCContext_EnableSkyWritingMode3;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;

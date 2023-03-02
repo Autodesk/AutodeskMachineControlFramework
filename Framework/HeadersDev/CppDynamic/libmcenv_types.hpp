@@ -184,6 +184,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE 10087 /** signal UUID not active. */
 #define LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING 10088 /** could not parse XML string. */
 #define LIBMCENV_ERROR_COULDNOTPARSEXMLDATA 10089 /** could not parse XML data. */
+#define LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE 10090 /** Invalid profile value type. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -280,6 +281,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE: return "signal UUID not active.";
     case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML string.";
     case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
+    case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type.";
     default: return "unknown error";
   }
 }
