@@ -32,13 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_xmldocument.hpp"
 
 #include "libmc_exceptiontypes.hpp"
+#include "PugiXML/pugixml.hpp"
 
 using namespace AMC;
 
-CXMLDocumentNodeInstance::CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, pugi::xml_node xmlNode)
-	: m_pDocument (pDocument), m_XMLNode (xmlNode)
+CXMLDocumentNodeInstance::CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, CXMLDocumentNodeInstance* pParentNode, PXMLDocumentNameSpace pNameSpace, const std::string& sNodeName)
+	: m_pDocument (pDocument), m_sNodeName(sNodeName), m_pParentNode (pParentNode), m_pNameSpace (pNameSpace)
 {
 	if (pDocument == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (!checkXMLNodeName (sNodeName)) 
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLNODENAME, sNodeName);
+	if (pNameSpace.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
@@ -47,114 +52,212 @@ CXMLDocumentNodeInstance::~CXMLDocumentNodeInstance()
 {
 }
 
-bool CXMLDocumentNodeInstance::checkXMLNamespaceName(const std::string& sNodeName)
-{
-	return true;
-}
-
 bool CXMLDocumentNodeInstance::checkXMLNodeName(const std::string& sNodeName)
 {
 	return true;
 }
 
-bool CXMLDocumentNodeInstance::checkXMLNamespacePrefixName(const std::string& sNodeName)
+void CXMLDocumentNodeInstance::extractFromPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode)
 {
-	return true;
+
 }
+
+void CXMLDocumentNodeInstance::storeToPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode)
+{
+
+}
+
+CXMLDocumentInstance* CXMLDocumentNodeInstance::getDocument()
+{
+	return m_pDocument;
+}
+
+
+std::vector<PXMLDocumentNodeInstance> CXMLDocumentNodeInstance::getChildren()
+{
+	return m_Children;
+}
+
 
 std::string CXMLDocumentNodeInstance::GetName()
 {
-	std::string sName = m_XMLNode.name ();
-	return sName;
+	return m_sNodeName;
 }
 
-std::string CXMLDocumentNodeInstance::GetNameSpace()
+PXMLDocumentNameSpace CXMLDocumentNodeInstance::GetNameSpace()
 {
-	return "";
+	return m_pNameSpace;
 }
 
 uint64_t CXMLDocumentNodeInstance::GetAttributeCount()
+{	
+	return m_Attributes.size ();
+}
+
+bool CXMLDocumentNodeInstance::HasAttribute(CXMLDocumentNameSpace* pNameSpace, const std::string& sName)
 {
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto iIter = m_AttributeMap.find(std::make_pair(pNameSpace, sName));
+	return iIter != m_AttributeMap.end();
+}
+
+void CXMLDocumentNodeInstance::RemoveAttribute(CXMLDocumentNameSpace* pNameSpace, const std::string& sName)
+{
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto iIter = m_AttributeMap.find(std::make_pair(pNameSpace, sName));
+	if (iIter != m_AttributeMap.end()) {
+		std::remove_if(m_Attributes.begin(), m_Attributes.end(), [this, pNameSpace, sName](PXMLDocumentAttributeInstance pAttribute) {
+			return (pAttribute->getNameSpace().get() == pNameSpace) && (pAttribute->getAttributeName () == sName);
+		});
+
+		m_AttributeMap.erase(std::make_pair(pNameSpace, sName));
+	}
+
+}
+
+void CXMLDocumentNodeInstance::RemoveAttributeByIndex(uint64_t nIndex)
+{
+	if (nIndex >= m_Attributes.size ())
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDATTRIBUTEINDEX, std::to_string(nIndex));
+
+	auto pAttribute = m_Attributes.at(nIndex);
+	m_Attributes.erase(m_Attributes.begin () + nIndex);
+	m_AttributeMap.erase(std::make_pair(pAttribute->getNameSpace ().get(), pAttribute->getAttributeName ()));
+
+}
+
+
+PXMLDocumentAttributeInstance CXMLDocumentNodeInstance::GetAttribute(uint64_t nIndex)
+{
+	if (nIndex >= m_Attributes.size())
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDATTRIBUTEINDEX, std::to_string(nIndex));
+
+	return m_Attributes.at(nIndex);
+
+}
+
+PXMLDocumentAttributeInstance CXMLDocumentNodeInstance::FindAttribute(CXMLDocumentNameSpace* pNameSpace, const std::string& sName, const bool bMustExist)
+{
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto iIter = m_AttributeMap.find(std::make_pair(pNameSpace, sName));
+	if (iIter != m_AttributeMap.end()) {
+		return iIter->second;
+	}
+	else {
+		if (bMustExist) 
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDATTRIBUTE, sName);
+
+		return nullptr;
+
+	}
+
+}
+
+PXMLDocumentAttributeInstance CXMLDocumentNodeInstance::AddAttribute(PXMLDocumentNameSpace pNameSpace, const std::string& sName, const std::string& sValue)
+{
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto iIter = m_AttributeMap.find(std::make_pair(pNameSpace.get(), sName));
+	if (iIter != m_AttributeMap.end()) 
+		throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEATTRIBUTE, sName);
+
+	auto pAttribute = std::make_shared<CXMLDocumentAttributeInstance>(m_pDocument, this, pNameSpace, sName);
+	pAttribute->setValue(sValue);
+
+	return pAttribute;
+}
+
+uint64_t CXMLDocumentNodeInstance::CountChildrenByName(CXMLDocumentNameSpace* pNameSpace, const std::string& sName)
+{
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
 	uint64_t nCount = 0;
-	auto attributes = m_XMLNode.attributes();
-	for (auto attribute : attributes)
-		nCount++;
+	for (auto child : m_Children) {
+		if ((child->GetNameSpace ().get() == pNameSpace) && (child->GetName() == sName))
+			nCount++;
+	}
+
 	return nCount;
 }
 
-std::string CXMLDocumentNodeInstance::GetAttributeName(const uint64_t nIndex)
+bool CXMLDocumentNodeInstance::HasChild(CXMLDocumentNameSpace* pNameSpace, const std::string& sName)
 {
-	uint64_t nCount = 0;
-	auto attributes = m_XMLNode.attributes();
-	for (auto attribute : attributes)
-	{
-		if (nIndex == nCount)
-			return attribute.name();
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto iIter = m_ChildMapCounter.find(std::make_pair (pNameSpace, sName));
+	return (iIter != m_ChildMapCounter.end());
+}
+
+bool CXMLDocumentNodeInstance::HasUniqueChild(CXMLDocumentNameSpace* pNameSpace, const std::string& sName)
+{
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto iIter = m_ChildMapCounter.find(std::make_pair(pNameSpace, sName));
+	if (iIter != m_ChildMapCounter.end()) {
+		return (iIter->second == 1);
+	}
+	else {
+		return false;
 	}
 
-	throw ELibMCCustomException(LIBMC_ERROR_INVALIDATTRIBUTEINDEX, std::to_string (nIndex));
-
 }
 
-bool CXMLDocumentNodeInstance::HasAttribute(const std::string& sName)
+PXMLDocumentNodeInstance CXMLDocumentNodeInstance::FindChild(CXMLDocumentNameSpace* pNameSpace, const std::string& sName, const bool bMustExist)
 {
-	auto attribute = m_XMLNode.attribute(sName.c_str());
-	return !attribute.empty();
+	if (pNameSpace == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto iIter = m_ChildMapCounter.find(std::make_pair(pNameSpace, sName));
+	if (iIter != m_ChildMapCounter.end()) {
+		if (iIter->second == 1)
+		{
+			auto iChildIter = m_ChildMap.find(std::make_pair(pNameSpace, sName));
+			if (iChildIter == m_ChildMap.end ())
+				throw ELibMCCustomException(LIBMC_ERROR_INTERNALNODEERROR, sName);
+
+			return iChildIter->second;
+
+		}
+	}
+
+	if (bMustExist)
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNODECHILDNOTFOUND, sName);
+
+	return nullptr;
 }
 
-void CXMLDocumentNodeInstance::RemoveAttribute(const std::string& sName)
+PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(PXMLDocumentNameSpace pNameSpace, const std::string& sName)
 {
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
-}
+	if (pNameSpace.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-void CXMLDocumentNodeInstance::AddAttribute(const std::string& sName, const std::string& sNameSpace, const std::string& sValue)
-{
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
-}
+	auto pNode = std::make_shared<CXMLDocumentNodeInstance>(m_pDocument, this, pNameSpace, sName);
 
-void CXMLDocumentNodeInstance::AddIntegerAttribute(const std::string& sName, const std::string& sNameSpace, const int64_t nValue)
-{
-	AddAttribute(sName, sNameSpace, std::to_string(nValue));
+	auto mapKey = std::make_pair(pNameSpace.get(), sName);
 
-}
+	m_Children.push_back(pNode);
+	m_ChildMap.insert(std::make_pair (mapKey, pNode));
 
-void CXMLDocumentNodeInstance::AddDoubleAttribute(const std::string& sName, const std::string& sNameSpace, const double dValue)
-{
-	AddAttribute(sName, sNameSpace, std::to_string(dValue));
-}
-
-void CXMLDocumentNodeInstance::AddBoolAttribute(const std::string& sName, const std::string& sNameSpace, const bool bValue)
-{
-	if (bValue)
-		AddAttribute(sName, sNameSpace, "true");
+	auto iChildIter = m_ChildMapCounter.find(mapKey);
+	if (iChildIter != m_ChildMapCounter.end()) {
+		iChildIter->second++;
+	}
 	else
-		AddAttribute(sName, sNameSpace, "false");
+	{
+		m_ChildMapCounter.insert(std::make_pair (mapKey, 1));
+	}
 
-}
-
-uint64_t CXMLDocumentNodeInstance::CountChildrenByName(const std::string& sName)
-{
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
-}
-
-bool CXMLDocumentNodeInstance::HasChild(const std::string& sName)
-{
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
-}
-
-bool CXMLDocumentNodeInstance::HasUniqueChild(const std::string& sName)
-{
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
-}
-
-PXMLDocumentNodeInstance CXMLDocumentNodeInstance::FindChild(const std::string& sName, const bool bMustExist)
-{
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
-}
-
-PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(const std::string& sName, const std::string& sNameSpace)
-{
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	return pNode;
 }
 
 void CXMLDocumentNodeInstance::RemoveChild(CXMLDocumentNodeInstance* pChildInstance)
@@ -162,12 +265,7 @@ void CXMLDocumentNodeInstance::RemoveChild(CXMLDocumentNodeInstance* pChildInsta
 	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
 }
 
-void CXMLDocumentNodeInstance::RemoveChildrenWithName(const std::string& sName)
-{
-	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
-}
-
-void CXMLDocumentNodeInstance::Remove()
+void CXMLDocumentNodeInstance::RemoveChildrenWithName(CXMLDocumentNameSpace* pNameSpace, const std::string& sName)
 {
 	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
 }

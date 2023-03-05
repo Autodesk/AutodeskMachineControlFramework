@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CXMLDocumentNodes
 #endif
 
 // Include custom headers here.
-
+#include "amc_xmldocument.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -57,24 +57,36 @@ namespace Impl {
 
 class CXMLDocumentNodes : public virtual IXMLDocumentNodes, public virtual CBase {
 private:
+    AMC::PXMLDocumentInstance m_pDocument;
 
-protected:
+    std::vector<AMC::PXMLDocumentNodeInstance> m_Nodes;
+    std::map<std::pair <AMC::CXMLDocumentNameSpace*, std::string>, AMC::PXMLDocumentNodeInstance> m_NodeMap;
+    std::map<std::pair <AMC::CXMLDocumentNameSpace*, std::string>, uint64_t> m_NodeMapCounter;
+
 
 public:
+
+    CXMLDocumentNodes(AMC::PXMLDocumentInstance pDocument);
+
+    virtual ~CXMLDocumentNodes();
+
+    void addNode(AMC::PXMLDocumentNodeInstance pNode);
+
+    AMC::PXMLDocumentInstance getDocument ();
 
 	LibMCEnv_uint64 GetNodeCount() override;
 
 	IXMLDocumentNode * GetNode(const LibMCEnv_uint64 nIndex) override;
 
-	LibMCEnv_uint64 CountNodesByName(const std::string & sName) override;
+	LibMCEnv_uint64 CountNodesByName(const std::string& sNameSpace, const std::string& sName) override;
 
-	IXMLDocumentNodes * GetNodesByName(const std::string & sName) override;
+	IXMLDocumentNodes* GetNodesByName(const std::string& sNameSpace, const std::string& sName) override;
 
-	bool HasNode(const std::string & sName) override;
+	bool HasNode(const std::string& sNameSpace, const std::string& sName) override;
 
-	bool HasUniqueNode(const std::string & sName) override;
+	bool HasUniqueNode(const std::string& sNameSpace, const std::string& sName) override;
 
-	IXMLDocumentNode * FindNode(const std::string & sName, const bool bMustExist) override;
+	IXMLDocumentNode* FindNode(const std::string& sNameSpace, const std::string& sName, const bool bMustExist) override;
 
 };
 

@@ -31,9 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_xmldocument.hpp"
 #include "amc_xmldocumentnode.hpp"
+#include "amc_xmldocumentnamespace.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 #include <sstream>
+
+#include "PugiXML/pugixml.hpp"
 
 using namespace AMC;
 
@@ -49,27 +52,22 @@ CXMLDocumentInstance::~CXMLDocumentInstance()
 
 void CXMLDocumentInstance::createEmptyDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace)
 {
-	if (!CXMLDocumentNodeInstance::checkXMLNamespaceName(sDefaultNamespace))
+	if (!CXMLDocumentNameSpace::checkXMLNameSpaceName(sDefaultNamespace))
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDDEFAULTXMLNAMESPACE, sDefaultNamespace);
 	if (!CXMLDocumentNodeInstance::checkXMLNodeName (sRootNodeName))
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLROOTNODENAME, sRootNodeName);
 
-	m_Document = pugi::xml_document();
-	pugi::xml_node rootNode = m_Document.append_child(sRootNodeName.c_str());
+	m_pDefaultNameSpace = registerNamespaceEx(sDefaultNamespace, "");
+	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, nullptr, m_pDefaultNameSpace, sRootNodeName);
 
-	auto xmlNSAttribute = rootNode.append_attribute("xmlns");
-	xmlNSAttribute.set_value(sDefaultNamespace.c_str());
-
-	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, rootNode);
-
-	m_sDefaultNamespace = sDefaultNamespace;
-
-	registerNamespaceEx(m_sDefaultNamespace, "");
 }
 
-void CXMLDocumentInstance::extractDocumentNamespaces()
+void CXMLDocumentInstance::extractPugiDocument(std::shared_ptr<pugi::xml_document> pXMLDocument)
 {
-	auto children = m_Document.children();
+	if (pXMLDocument.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto children = pXMLDocument->children();
 	if (children.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_XMLDOESNOTCONTAINROOTNODE);
 
@@ -84,39 +82,46 @@ void CXMLDocumentInstance::extractDocumentNamespaces()
 		throw ELibMCInterfaceException(LIBMC_ERROR_XMLCONTAINSAMBIGOUSROOTNODES);
 
 	pugi::xml_attribute xmlnsAttrib = rootNode.attribute("xmlns");
-	m_sDefaultNamespace = xmlnsAttrib.as_string();
-	if (m_sDefaultNamespace.empty())
+	std::string sDefaultNamespace = xmlnsAttrib.as_string();
+	if (sDefaultNamespace.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE);
 
-	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, rootNode);
+	m_pDefaultNameSpace = registerNamespaceEx(sDefaultNamespace, "");
+	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, nullptr, m_pDefaultNameSpace, rootNode.name ());
+
+	m_pRootNodeInstance->extractFromPugiNode (pXMLDocument.get(), &rootNode);
 }
 
-void CXMLDocumentInstance::registerNamespaceEx(const std::string& sNamespace, const std::string& sPrefix)
+PXMLDocumentNameSpace CXMLDocumentInstance::registerNamespaceEx(const std::string& sNamespace, const std::string& sPrefix)
 {
 	auto iPrefixIter = m_PrefixToNamespaceMap.find(sPrefix);
-	auto iNamespaceIter = m_NamespaceToPrefixMap.find(sNamespace);
+	auto iNamespaceIter = m_NamespaceMap.find(sNamespace);
 
 	if (iPrefixIter != m_PrefixToNamespaceMap.end ())
 		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACEPREFIXALREADYREGISTERED, sPrefix);
-	if (iNamespaceIter != m_NamespaceToPrefixMap.end())
+	if (iNamespaceIter != m_NamespaceMap.end())
 		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACEALREADYREGISTERED, sNamespace);
 
-	m_Namespaces.push_back(sNamespace);
-	m_NamespaceToPrefixMap.insert(std::make_pair (sNamespace, sPrefix));
-	m_PrefixToNamespaceMap.insert(std::make_pair (sPrefix, sNamespace));
+	auto pNameSpace = std::make_shared<CXMLDocumentNameSpace>(sNamespace, sPrefix);
+
+	m_Namespaces.push_back(pNameSpace);
+	m_NamespaceMap.insert(std::make_pair (sNamespace, pNameSpace));
+	m_PrefixToNamespaceMap.insert(std::make_pair (sPrefix, pNameSpace));
+
+	return pNameSpace;
 
 }
 
 
 void CXMLDocumentInstance::parseXMLString(const std::string& sXMLString)
 {
-	m_Document = pugi::xml_document();
+	auto pDocument = std::make_shared<pugi::xml_document> ();
 
-	pugi::xml_parse_result result = m_Document.load_string(sXMLString.c_str(), pugi::parse_minimal | pugi::parse_escapes | pugi::parse_eol );
+	pugi::xml_parse_result result = pDocument->load_string(sXMLString.c_str(), pugi::parse_minimal | pugi::parse_escapes | pugi::parse_eol );
 	if (!result)
 		throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSEXMLSTRING);
 
-	extractDocumentNamespaces();	 
+	extractPugiDocument(pDocument);
 }
 
 void CXMLDocumentInstance::parseXMLData(uint64_t nDataSize, const uint8_t* pData)
@@ -124,18 +129,18 @@ void CXMLDocumentInstance::parseXMLData(uint64_t nDataSize, const uint8_t* pData
 	if ((pData == nullptr) || (nDataSize == 0))
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLDATA);
 
-	m_Document = pugi::xml_document();
+	auto pDocument = std::make_shared<pugi::xml_document>();
 
-	pugi::xml_parse_result result = m_Document.load_buffer(pData, nDataSize, pugi::parse_minimal | pugi::parse_escapes | pugi::parse_eol);
+	pugi::xml_parse_result result = pDocument->load_buffer(pData, nDataSize, pugi::parse_minimal | pugi::parse_escapes | pugi::parse_eol);
 	if (!result)
 		throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSEXMLDATA);
 
-	extractDocumentNamespaces();
+	extractPugiDocument(pDocument);
 }
 
 std::string CXMLDocumentInstance::GetDefaultNamespace()
 {
-	return m_sDefaultNamespace;
+	return m_pDefaultNameSpace->getNameSpace ();
 }
 
 uint64_t CXMLDocumentInstance::GetNamespaceCount()
@@ -148,33 +153,50 @@ void CXMLDocumentInstance::GetNamespace(const uint64_t nIndex, std::string& sNam
 	if (nIndex >= m_Namespaces.size ())
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACEINDEX, std::to_string (nIndex));
 
-	sNamespace = m_Namespaces.at(nIndex);
-	sNamespacePrefix = GetNamespacePrefix(sNamespace);
+	auto pNameSpace = m_Namespaces.at(nIndex);
+	sNamespace = pNameSpace->getNameSpace();
+	sNamespacePrefix = pNameSpace->getPrefix ();
 
 }
 
 bool CXMLDocumentInstance::HasNamespace(const std::string& sNamespace)
 {
-	auto iNamespaceIter = m_NamespaceToPrefixMap.find(sNamespace);
-	return (iNamespaceIter != m_NamespaceToPrefixMap.end());
+	auto iNamespaceIter = m_NamespaceMap.find(sNamespace);
+	return (iNamespaceIter != m_NamespaceMap.end());
 		
 }
 
+PXMLDocumentNameSpace CXMLDocumentInstance::FindNamespace(const std::string& sNamespace, bool bMustExist)
+{
+	auto iNamespaceIter = m_NamespaceMap.find(sNamespace);
+	if (iNamespaceIter != m_NamespaceMap.end()) {
+		return iNamespaceIter->second;
+	}
+	else {
+		if (bMustExist)
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE, sNamespace);
+
+		return nullptr;
+	}
+
+}
+
+
 std::string CXMLDocumentInstance::GetNamespacePrefix(const std::string& sNamespace)
 {
-	auto iNamespaceIter = m_NamespaceToPrefixMap.find(sNamespace);
-	if (iNamespaceIter == m_NamespaceToPrefixMap.end())
+	auto iNamespaceIter = m_NamespaceMap.find(sNamespace);
+	if (iNamespaceIter == m_NamespaceMap.end())
 		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACENOTFOUND, sNamespace);
 
-	return iNamespaceIter->second;
+	return iNamespaceIter->second->getPrefix ();
 }
 
 void CXMLDocumentInstance::RegisterNamespace(const std::string& sNamespace, const std::string& sNamespacePrefix)
 {
-	if (!CXMLDocumentNodeInstance::checkXMLNamespaceName(sNamespace))
+	if (!CXMLDocumentNameSpace::checkXMLNameSpaceName(sNamespace))
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACENAME, sNamespace);
 
-	if (!CXMLDocumentNodeInstance::checkXMLNamespacePrefixName(sNamespacePrefix))
+	if (!CXMLDocumentNameSpace::checkXMLNameSpacePrefixName(sNamespacePrefix))
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACEPREFIX, sNamespacePrefix);
 
 	registerNamespaceEx(sNamespace, sNamespacePrefix);
@@ -207,7 +229,12 @@ std::string CXMLDocumentInstance::SaveToString(const bool bAddLineBreaks)
 	else
 		nFormat = pugi::format_raw;
 
-	m_Document.save(xmlWriter, "  ", nFormat, pugi::encoding_utf8);
+	auto pDocument = std::make_shared<pugi::xml_document>();
+
+	auto rootNode = pDocument->append_child (m_pRootNodeInstance->GetName().c_str ());
+	m_pRootNodeInstance->storeToPugiNode(pDocument.get(), &rootNode);
+
+	pDocument->save(xmlWriter, "  ", nFormat, pugi::encoding_utf8);
 
 	return xmlWriter.m_Stream.str();
 }

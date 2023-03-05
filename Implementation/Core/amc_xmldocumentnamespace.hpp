@@ -29,69 +29,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_XMLDOCUMENT
-#define __AMC_XMLDOCUMENT
+#ifndef __AMC_XMLDOCUMENTNAMESPACE
+#define __AMC_XMLDOCUMENTNAMESPACE
 
 #include <string>
 #include <memory>
-#include <map>
-#include <vector>
 
-#include "amc_xmldocumentnode.hpp"
 
 namespace AMC {
-
-
-	class CXMLDocumentInstance {
+	
+	class CXMLDocumentNameSpace {
 	private:
 
-		PXMLDocumentNodeInstance m_pRootNodeInstance;
-		PXMLDocumentNameSpace m_pDefaultNameSpace;
-
-		std::vector<PXMLDocumentNameSpace> m_Namespaces;
-		std::map<std::string, PXMLDocumentNameSpace> m_NamespaceMap;
-		std::map<std::string, PXMLDocumentNameSpace> m_PrefixToNamespaceMap;
-
-		PXMLDocumentNameSpace registerNamespaceEx(const std::string& sNamespace, const std::string & sPrefix);
-
-		void extractPugiDocument(std::shared_ptr<pugi::xml_document> pXMLDocument);
+		std::string m_sNameSpace;
+		std::string m_sPrefix;
 
 	public:
 
-		CXMLDocumentInstance();
+		CXMLDocumentNameSpace(const std::string & sNameSpace, const std::string & sPrefix);
 		
-		virtual ~CXMLDocumentInstance();
+		virtual ~CXMLDocumentNameSpace();
+		
+		std::string getNameSpace ();
 
-		void createEmptyDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace);
+		std::string getPrefix ();
 
-		void parseXMLString(const std::string & sXMLString);
+		static bool checkXMLNameSpaceName(const std::string& sNodeName);
 
-		void parseXMLData(uint64_t nDataSize, const uint8_t * pData);
-
-		std::string GetDefaultNamespace();
-
-		uint64_t GetNamespaceCount();
-
-		void GetNamespace(const uint64_t nIndex, std::string & sNamespace, std::string & sNamespacePrefix);
-
-		bool HasNamespace(const std::string & sNamespace);
-
-		PXMLDocumentNameSpace FindNamespace(const std::string& sNamespace, bool bMustExist);
-
-		std::string GetNamespacePrefix(const std::string & sNamespace);
-
-		void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
-
-		PXMLDocumentNodeInstance GetRootNode();
-
-		std::string SaveToString(const bool bAddLineBreaks);
+		static bool checkXMLNameSpacePrefixName(const std::string& sPrefix);
 
 	};
 
-	typedef std::shared_ptr<CXMLDocumentInstance> PXMLDocumentInstance;
+	
+	typedef std::shared_ptr<CXMLDocumentNameSpace> PXMLDocumentNameSpace;
 	
 }
 
 
-#endif //__AMC_XMLDOCUMENT
+#endif //__AMC_XMLDOCUMENTNAMESPACE
 

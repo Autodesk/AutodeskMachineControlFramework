@@ -1113,6 +1113,12 @@ typedef IBaseSharedPtr<IWorkingDirectory> PIWorkingDirectory;
 class IXMLDocumentAttribute : public virtual IBase {
 public:
 	/**
+	* IXMLDocumentAttribute::GetNameSpace - Retrieves namespace of the attribute.
+	* @return returns the namespace of the attribute.
+	*/
+	virtual std::string GetNameSpace() = 0;
+
+	/**
 	* IXMLDocumentAttribute::GetName - Retrieves name of the attribute.
 	* @return returns the name of the attribute.
 	*/
@@ -1237,56 +1243,65 @@ public:
 
 	/**
 	* IXMLDocumentNode::HasAttribute - Returns if attribute of a specific name exists.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 	* @param[in] sName - Name of the attribute.
 	* @return Returns if the attribute exists.
 	*/
-	virtual bool HasAttribute(const std::string & sName) = 0;
+	virtual bool HasAttribute(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNode::FindAttribute - Returns attribute instance of a specific name. 
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 	* @param[in] sName - Name of the attribute.
 	* @param[in] bMustExist - If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist.
 	* @return XML Document attribute.
 	*/
-	virtual IXMLDocumentAttribute * FindAttribute(const std::string & sName, const bool bMustExist) = 0;
+	virtual IXMLDocumentAttribute * FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
 
 	/**
 	* IXMLDocumentNode::RemoveAttribute - Removes the attribute with a specific name. Does nothing if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 	* @param[in] sName - Name of the attribute.
 	*/
-	virtual void RemoveAttribute(const std::string & sName) = 0;
+	virtual void RemoveAttribute(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::RemoveAttributeByIndex - Removes the attribute with a specific index. Does nothing if attribute does not exist.
+	* @param[in] nIndex - Index of the attribute to remove (0-based).
+	*/
+	virtual void RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex) = 0;
 
 	/**
 	* IXMLDocumentNode::AddAttribute - Adds an attribute with a specific name and string value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the attribute.
-	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sValue - Value of the attribute.
 	*/
-	virtual void AddAttribute(const std::string & sName, const std::string & sNameSpace, const std::string & sValue) = 0;
+	virtual void AddAttribute(const std::string & sNameSpace, const std::string & sName, const std::string & sValue) = 0;
 
 	/**
 	* IXMLDocumentNode::AddIntegerAttribute - Adds an attribute with a specific name and integer value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the attribute.
-	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] nValue - Value of the attribute.
 	*/
-	virtual void AddIntegerAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_int64 nValue) = 0;
+	virtual void AddIntegerAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nValue) = 0;
 
 	/**
 	* IXMLDocumentNode::AddDoubleAttribute - Adds an attribute with a specific name and double value. Fails if attribute already exists.
-	* @param[in] sName - Name of the attribute.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
 	* @param[in] dValue - Value of the attribute.
 	*/
-	virtual void AddDoubleAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_double dValue) = 0;
+	virtual void AddDoubleAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dValue) = 0;
 
 	/**
 	* IXMLDocumentNode::AddBoolAttribute - Adds an attribute with a specific name and bool value. Fails if attribute already exists.
-	* @param[in] sName - Name of the attribute.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
 	* @param[in] bValue - Value of the attribute.
 	*/
-	virtual void AddBoolAttribute(const std::string & sName, const std::string & sNameSpace, const bool bValue) = 0;
+	virtual void AddBoolAttribute(const std::string & sNameSpace, const std::string & sName, const bool bValue) = 0;
 
 	/**
 	* IXMLDocumentNode::GetChildren - Returns all the child nodes of the XML Node.
@@ -1296,47 +1311,52 @@ public:
 
 	/**
 	* IXMLDocumentNode::CountChildrenByName - Returns how many children of the XML Node have a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns the number children with the specified name.
 	*/
-	virtual LibMCEnv_uint64 CountChildrenByName(const std::string & sName) = 0;
+	virtual LibMCEnv_uint64 CountChildrenByName(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNode::GetChildrenByName - Returns all the child nodes of the XML Node with a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns the list of child nodes.
 	*/
-	virtual IXMLDocumentNodes * GetChildrenByName(const std::string & sName) = 0;
+	virtual IXMLDocumentNodes * GetChildrenByName(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNode::HasChild - Returns if a child with a specific name exist.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns if a child with a specific name exists.
 	*/
-	virtual bool HasChild(const std::string & sName) = 0;
+	virtual bool HasChild(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNode::HasUniqueChild - Returns if a child with a specific name exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns if a child with a specific name exists once and only once.
 	*/
-	virtual bool HasUniqueChild(const std::string & sName) = 0;
+	virtual bool HasUniqueChild(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNode::FindChild - Returns child with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @param[in] bMustExist - If true, the call fails if child does not exist. If falls, the call will return null if the child does not exist.
 	* @return returns child instance or null.
 	*/
-	virtual IXMLDocumentNode * FindChild(const std::string & sName, const bool bMustExist) = 0;
+	virtual IXMLDocumentNode * FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
 
 	/**
 	* IXMLDocumentNode::AddChild - Adds a new child with a specific name.
-	* @param[in] sName - Name of the child.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
 	* @return returns child instance.
 	*/
-	virtual IXMLDocumentNode * AddChild(const std::string & sName, const std::string & sNameSpace) = 0;
+	virtual IXMLDocumentNode * AddChild(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNode::RemoveChild - Removes a child with a specific name. All subsequent calls to the child will fail after the call.
@@ -1346,9 +1366,10 @@ public:
 
 	/**
 	* IXMLDocumentNode::RemoveChildrenWithName - Removes all children with a specific name. Does nothing if no child with the name exists. . All subsequent calls to the deleted children will fail after the call.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the children.
 	*/
-	virtual void RemoveChildrenWithName(const std::string & sName) = 0;
+	virtual void RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNode::Remove - Removes the node from its parent. The root node of the document can not be removed.
@@ -1381,39 +1402,44 @@ public:
 
 	/**
 	* IXMLDocumentNodes::CountNodesByName - Returns how many nodes of the XML Node have a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns the number of nodes with the specified name.
 	*/
-	virtual LibMCEnv_uint64 CountNodesByName(const std::string & sName) = 0;
+	virtual LibMCEnv_uint64 CountNodesByName(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNodes::GetNodesByName - Returns all the nodes nodes of the XML Node with a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns the list of node nodes.
 	*/
-	virtual IXMLDocumentNodes * GetNodesByName(const std::string & sName) = 0;
+	virtual IXMLDocumentNodes * GetNodesByName(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNodes::HasNode - Returns if a node with a specific name exist.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns if a node with a specific name exists.
 	*/
-	virtual bool HasNode(const std::string & sName) = 0;
+	virtual bool HasNode(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNodes::HasUniqueNode - Returns if a node with a specific name exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns if a node with a specific name exists once and only once.
 	*/
-	virtual bool HasUniqueNode(const std::string & sName) = 0;
+	virtual bool HasUniqueNode(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IXMLDocumentNodes::FindNode - Returns node with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @param[in] bMustExist - If true, the call fails if node does not exist. If falls, the call will return null if the node does not exist.
 	* @return returns node instance.
 	*/
-	virtual IXMLDocumentNode * FindNode(const std::string & sName, const bool bMustExist) = 0;
+	virtual IXMLDocumentNode * FindNode(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
 
 };
 

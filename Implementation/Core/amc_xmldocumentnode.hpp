@@ -34,13 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <memory>
+#include <vector>
+#include <map>
 
-#include "PugiXML/pugixml.hpp"
+#include "amc_xmldocumentattribute.hpp"
+
+namespace pugi {
+	class xml_document;
+	class xml_node;
+}
 
 namespace AMC {
 
 	class CXMLDocumentInstance;
 	class CXMLDocumentNodeInstance;
+	class CXMLDocumentNameSpace;
 
 	typedef std::shared_ptr<CXMLDocumentNodeInstance> PXMLDocumentNodeInstance;
 
@@ -48,55 +56,64 @@ namespace AMC {
 	private:
 
 		CXMLDocumentInstance* m_pDocument;
-		pugi::xml_node m_XMLNode;
+		CXMLDocumentNodeInstance* m_pParentNode;
+		std::string m_sNodeName;
+		PXMLDocumentNameSpace m_pNameSpace;
+
+		std::vector<PXMLDocumentAttributeInstance> m_Attributes;
+		std::map<std::pair <CXMLDocumentNameSpace *, std::string>, PXMLDocumentAttributeInstance> m_AttributeMap;
+
+		std::vector<PXMLDocumentNodeInstance> m_Children;
+		std::map<std::pair <CXMLDocumentNameSpace*, std::string>, PXMLDocumentNodeInstance> m_ChildMap;
+		std::map<std::pair <CXMLDocumentNameSpace*, std::string>, uint64_t> m_ChildMapCounter;
 
 	public:
 
-		CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, pugi::xml_node xmlNode);
+		CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, CXMLDocumentNodeInstance * pParentNode, PXMLDocumentNameSpace pNameSpace, const std::string& sNodeName);
 		
 		virtual ~CXMLDocumentNodeInstance();
 
-		static bool checkXMLNamespaceName(const std::string& sNodeName);
+		void extractFromPugiNode (pugi::xml_document * pXMLDocument, pugi::xml_node * pXMLNode);
 
-		static bool checkXMLNamespacePrefixName(const std::string& sNodeName);
+		void storeToPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode);
+
+		CXMLDocumentInstance* getDocument();
+
+		std::vector<PXMLDocumentNodeInstance> getChildren ();
 
 		static bool checkXMLNodeName(const std::string & sNodeName);
 
 		std::string GetName();
 
-		std::string GetNameSpace();
+		PXMLDocumentNameSpace GetNameSpace();
 
 		uint64_t GetAttributeCount();
 
-		std::string GetAttributeName(const uint64_t nIndex);
+		bool HasAttribute(CXMLDocumentNameSpace * pNameSpace, const std::string& sName);
 
-		bool HasAttribute(const std::string& sName);
+		void RemoveAttribute(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
 
-		void RemoveAttribute(const std::string& sName);
+		void RemoveAttributeByIndex(uint64_t nIndex);
 
-		void AddAttribute(const std::string& sName, const std::string& sNameSpace, const std::string& sValue);
+		PXMLDocumentAttributeInstance GetAttribute(uint64_t nIndex);
 
-		void AddIntegerAttribute(const std::string& sName, const std::string& sNameSpace, const int64_t nValue);
+		PXMLDocumentAttributeInstance FindAttribute(CXMLDocumentNameSpace* pNameSpace, const std::string& sName, const bool bMustExist);
 
-		void AddDoubleAttribute(const std::string& sName, const std::string& sNameSpace, const double dValue);
+		PXMLDocumentAttributeInstance AddAttribute(PXMLDocumentNameSpace pNameSpace, const std::string& sName, const std::string& sValue);
 
-		void AddBoolAttribute(const std::string& sName, const std::string& sNameSpace, const bool bValue);
+		uint64_t CountChildrenByName(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
 
-		uint64_t CountChildrenByName(const std::string& sName);
+		bool HasChild(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
 
-		bool HasChild(const std::string& sName);
+		bool HasUniqueChild(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
 
-		bool HasUniqueChild(const std::string& sName);
+		PXMLDocumentNodeInstance FindChild(CXMLDocumentNameSpace* pNameSpace, const std::string& sName, const bool bMustExist);
 
-		PXMLDocumentNodeInstance FindChild(const std::string& sName, const bool bMustExist);
-
-		PXMLDocumentNodeInstance AddChild(const std::string& sName, const std::string& sNameSpace);
+		PXMLDocumentNodeInstance AddChild(PXMLDocumentNameSpace pNameSpace, const std::string& sName);
 
 		void RemoveChild(CXMLDocumentNodeInstance * pChildInstance);
 
-		void RemoveChildrenWithName(const std::string& sName);
-
-		void Remove();
+		void RemoveChildrenWithName(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
 
 	};
 

@@ -90,7 +90,7 @@ void CXMLDocument::RegisterNamespace(const std::string & sNamespace, const std::
 
 IXMLDocumentNode * CXMLDocument::GetRootNode()
 {
-    return new CXMLDocumentNode(m_pXMLDocument->GetRootNode());
+    return new CXMLDocumentNode(m_pXMLDocument, m_pXMLDocument->GetRootNode());
 }
 
 std::string CXMLDocument::SaveToString(const bool bAddLineBreaks)

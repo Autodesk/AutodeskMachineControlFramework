@@ -59,10 +59,11 @@ namespace Impl {
 class CXMLDocumentNode : public virtual IXMLDocumentNode, public virtual CBase {
 private:
 	AMC::PXMLDocumentNodeInstance m_pXMLDocumentNode;
+	AMC::PXMLDocumentInstance m_pXMLDocument;
 
 
 public:
-	CXMLDocumentNode(AMC::PXMLDocumentNodeInstance pXMLDocumentNode);
+	CXMLDocumentNode(AMC::PXMLDocumentInstance pXMLDocument, AMC::PXMLDocumentNodeInstance pXMLDocumentNode);
 
 	~CXMLDocumentNode();
 
@@ -72,39 +73,41 @@ public:
 
 	LibMCEnv_uint64 GetAttributeCount() override;
 
-	IXMLDocumentAttribute * GetAttribute(const LibMCEnv_uint64 nIndex) override;
+	IXMLDocumentAttribute* GetAttribute(const LibMCEnv_uint64 nIndex) override;
 
-	bool HasAttribute(const std::string & sName) override;
+	bool HasAttribute(const std::string& sNameSpace, const std::string& sName) override;
 
-	IXMLDocumentAttribute * FindAttribute(const std::string & sName, const bool bMustExist) override;
+	IXMLDocumentAttribute* FindAttribute(const std::string& sNameSpace, const std::string& sName, const bool bMustExist) override;
+	
+	void RemoveAttribute(const std::string& sNameSpace, const std::string& sName) override;
 
-	void RemoveAttribute(const std::string & sName) override;
+	void RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex) override;
 
-	void AddAttribute(const std::string & sName, const std::string & sNameSpace, const std::string & sValue) override;
+	void AddAttribute(const std::string& sNameSpace, const std::string& sName, const std::string& sValue) override;
 
-	void AddIntegerAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_int64 nValue) override;
+	void AddIntegerAttribute(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_int64 nValue) override;
 
-	void AddDoubleAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_double dValue) override;
+	void AddDoubleAttribute(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_double dValue) override;
 
-	void AddBoolAttribute(const std::string & sName, const std::string & sNameSpace, const bool bValue) override;
+	void AddBoolAttribute(const std::string& sNameSpace, const std::string& sName, const bool bValue) override;
 
-	IXMLDocumentNodes * GetChildren() override;
+	IXMLDocumentNodes* GetChildren() override;
+	
+	LibMCEnv_uint64 CountChildrenByName(const std::string& sNameSpace, const std::string& sName) override;
 
-	LibMCEnv_uint64 CountChildrenByName(const std::string & sName) override;
+	IXMLDocumentNodes* GetChildrenByName(const std::string& sNameSpace, const std::string& sName) override;
 
-	IXMLDocumentNodes * GetChildrenByName(const std::string & sName) override;
+	bool HasChild(const std::string& sNameSpace, const std::string& sName) override;
 
-	bool HasChild(const std::string & sName) override;
+	bool HasUniqueChild(const std::string& sNameSpace, const std::string& sName) override;
 
-	bool HasUniqueChild(const std::string & sName) override;
-
-	IXMLDocumentNode * FindChild(const std::string & sName, const bool bMustExist) override;
-
-	IXMLDocumentNode * AddChild(const std::string & sName, const std::string & sNameSpace) override;
+	IXMLDocumentNode* FindChild(const std::string& sNameSpace, const std::string& sName, const bool bMustExist) override;
+	
+	IXMLDocumentNode* AddChild(const std::string& sNameSpace, const std::string& sName) override;
 
 	void RemoveChild(IXMLDocumentNode* pChildInstance) override;
 
-	void RemoveChildrenWithName(const std::string & sName) override;
+	void RemoveChildrenWithName(const std::string& sNameSpace, const std::string& sName) override;
 
 	void Remove() override;
 

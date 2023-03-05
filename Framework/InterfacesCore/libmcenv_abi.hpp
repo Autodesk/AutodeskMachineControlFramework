@@ -1182,6 +1182,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibM
 **************************************************************************************************************************/
 
 /**
+* Retrieves namespace of the attribute.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nNameSpaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameSpaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameSpaceBuffer -  buffer of returns the namespace of the attribute., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getnamespace(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nNameSpaceBufferSize, LibMCEnv_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer);
+
+/**
 * Retrieves name of the attribute.
 *
 * @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
@@ -1360,75 +1371,87 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattribute(LibMCEnv_
 * Returns if attribute of a specific name exists.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 * @param[in] pName - Name of the attribute.
 * @param[out] pAttributeExists - Returns if the attribute exists.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pAttributeExists);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pAttributeExists);
 
 /**
 * Returns attribute instance of a specific name. 
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 * @param[in] pName - Name of the attribute.
 * @param[in] bMustExist - If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist.
 * @param[out] pAttributeInstance - XML Document attribute.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentAttribute * pAttributeInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentAttribute * pAttributeInstance);
 
 /**
 * Removes the attribute with a specific name. Does nothing if attribute does not exist.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 * @param[in] pName - Name of the attribute.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removeattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removeattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName);
+
+/**
+* Removes the attribute with a specific index. Does nothing if attribute does not exist.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] nIndex - Index of the attribute to remove (0-based).
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removeattributebyindex(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_uint64 nIndex);
 
 /**
 * Adds an attribute with a specific name and string value. Fails if attribute already exists.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the attribute.
-* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pValue - Value of the attribute.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, const char * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pValue);
 
 /**
 * Adds an attribute with a specific name and integer value. Fails if attribute already exists.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the attribute.
-* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] nValue - Value of the attribute.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addintegerattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_int64 nValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addintegerattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_int64 nValue);
 
 /**
 * Adds an attribute with a specific name and double value. Fails if attribute already exists.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
-* @param[in] pName - Name of the attribute.
 * @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] pName - Name of the attribute.
 * @param[in] dValue - Value of the attribute.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_adddoubleattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_double dValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_adddoubleattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_double dValue);
 
 /**
 * Adds an attribute with a specific name and bool value. Fails if attribute already exists.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
-* @param[in] pName - Name of the attribute.
 * @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] pName - Name of the attribute.
 * @param[in] bValue - Value of the attribute.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addboolattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, bool bValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addboolattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bValue);
 
 /**
 * Returns all the child nodes of the XML Node.
@@ -1443,63 +1466,68 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getchildren(LibMCEnv_X
 * Returns how many children of the XML Node have a specific name.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the node.
 * @param[out] pCount - returns the number children with the specified name.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_countchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, LibMCEnv_uint64 * pCount);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_countchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_uint64 * pCount);
 
 /**
 * Returns all the child nodes of the XML Node with a specific name.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the child.
 * @param[out] pChildNodes - returns the list of child nodes.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, LibMCEnv_XMLDocumentNodes * pChildNodes);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_XMLDocumentNodes * pChildNodes);
 
 /**
 * Returns if a child with a specific name exist.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the child.
 * @param[out] pChildExists - returns if a child with a specific name exists.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_haschild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pChildExists);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_haschild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pChildExists);
 
 /**
 * Returns if a child with a specific name exist once and only once.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the child.
 * @param[out] pChildExists - returns if a child with a specific name exists once and only once.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasuniquechild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pChildExists);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasuniquechild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pChildExists);
 
 /**
 * Returns child with a specific name. Throws an error if name does not exist once and only once.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the child.
 * @param[in] bMustExist - If true, the call fails if child does not exist. If falls, the call will return null if the child does not exist.
 * @param[out] pChildInstance - returns child instance or null.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pChildInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pChildInstance);
 
 /**
 * Adds a new child with a specific name.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
-* @param[in] pName - Name of the child.
 * @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] pName - Name of the child.
 * @param[out] pChildInstance - returns child instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_XMLDocumentNode * pChildInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_XMLDocumentNode * pChildInstance);
 
 /**
 * Removes a child with a specific name. All subsequent calls to the child will fail after the call.
@@ -1514,10 +1542,11 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removechild(LibMCEnv_X
 * Removes all children with a specific name. Does nothing if no child with the name exists. . All subsequent calls to the deleted children will fail after the call.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the children.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removechildrenwithname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removechildrenwithname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName);
 
 /**
 * Removes the node from its parent. The root node of the document can not be removed.
@@ -1554,52 +1583,57 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_getnode(LibMCEnv_XMLD
 * Returns how many nodes of the XML Node have a specific name.
 *
 * @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the node.
 * @param[out] pCount - returns the number of nodes with the specified name.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_countnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, LibMCEnv_uint64 * pCount);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_countnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, LibMCEnv_uint64 * pCount);
 
 /**
 * Returns all the nodes nodes of the XML Node with a specific name.
 *
 * @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the node.
 * @param[out] pNodes - returns the list of node nodes.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_getnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, LibMCEnv_XMLDocumentNodes * pNodes);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_getnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, LibMCEnv_XMLDocumentNodes * pNodes);
 
 /**
 * Returns if a node with a specific name exist.
 *
 * @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the node.
 * @param[out] pNodeExists - returns if a node with a specific name exists.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_hasnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool * pNodeExists);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_hasnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, bool * pNodeExists);
 
 /**
 * Returns if a node with a specific name exist once and only once.
 *
 * @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the node.
 * @param[out] pNodeExists - returns if a node with a specific name exists once and only once.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_hasuniquenode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool * pNodeExists);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_hasuniquenode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, bool * pNodeExists);
 
 /**
 * Returns node with a specific name. Throws an error if name does not exist once and only once.
 *
 * @param[in] pXMLDocumentNodes - XMLDocumentNodes instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 * @param[in] pName - Name of the node.
 * @param[in] bMustExist - If true, the call fails if node does not exist. If falls, the call will return null if the node does not exist.
 * @param[out] pNodeInstance - returns node instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_findnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pNodeInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnodes_findnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pNodeInstance);
 
 /*************************************************************************************************************************
  Class definition for XMLDocument

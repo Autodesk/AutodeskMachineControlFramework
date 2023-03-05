@@ -3397,6 +3397,54 @@ LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibMCEnv_WorkingDirect
 /*************************************************************************************************************************
  Class implementation for XMLDocumentAttribute
 **************************************************************************************************************************/
+LibMCEnvResult libmcenv_xmldocumentattribute_getnamespace(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nNameSpaceBufferSize, LibMCEnv_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocumentAttribute;
+
+	try {
+		if ( (!pNameSpaceBuffer) && !(pNameSpaceNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace("");
+		IXMLDocumentAttribute* pIXMLDocumentAttribute = dynamic_cast<IXMLDocumentAttribute*>(pIBaseClass);
+		if (!pIXMLDocumentAttribute)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameSpaceBuffer == nullptr);
+		if (isCacheCall) {
+			sNameSpace = pIXMLDocumentAttribute->GetNameSpace();
+
+			pIXMLDocumentAttribute->_setCache (new ParameterCache_1<std::string> (sNameSpace));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIXMLDocumentAttribute->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sNameSpace);
+			pIXMLDocumentAttribute->_setCache (nullptr);
+		}
+		
+		if (pNameSpaceNeededChars)
+			*pNameSpaceNeededChars = (LibMCEnv_uint32) (sNameSpace.size()+1);
+		if (pNameSpaceBuffer) {
+			if (sNameSpace.size() >= nNameSpaceBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iNameSpace = 0; iNameSpace < sNameSpace.size(); iNameSpace++)
+				pNameSpaceBuffer[iNameSpace] = sNameSpace[iNameSpace];
+			pNameSpaceBuffer[sNameSpace.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_xmldocumentattribute_getname(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentAttribute;
@@ -3926,21 +3974,24 @@ LibMCEnvResult libmcenv_xmldocumentnode_getattribute(LibMCEnv_XMLDocumentNode pX
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_hasattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pAttributeExists)
+LibMCEnvResult libmcenv_xmldocumentnode_hasattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pAttributeExists)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pAttributeExists == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pAttributeExists = pIXMLDocumentNode->HasAttribute(sName);
+		*pAttributeExists = pIXMLDocumentNode->HasAttribute(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -3955,22 +4006,25 @@ LibMCEnvResult libmcenv_xmldocumentnode_hasattribute(LibMCEnv_XMLDocumentNode pX
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_findattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentAttribute * pAttributeInstance)
+LibMCEnvResult libmcenv_xmldocumentnode_findattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentAttribute * pAttributeInstance)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pAttributeInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IBase* pBaseAttributeInstance(nullptr);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseAttributeInstance = pIXMLDocumentNode->FindAttribute(sName, bMustExist);
+		pBaseAttributeInstance = pIXMLDocumentNode->FindAttribute(sNameSpace, sName, bMustExist);
 
 		*pAttributeInstance = (IBase*)(pBaseAttributeInstance);
 		return LIBMCENV_SUCCESS;
@@ -3986,19 +4040,22 @@ LibMCEnvResult libmcenv_xmldocumentnode_findattribute(LibMCEnv_XMLDocumentNode p
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_removeattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName)
+LibMCEnvResult libmcenv_xmldocumentnode_removeattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIXMLDocumentNode->RemoveAttribute(sName);
+		pIXMLDocumentNode->RemoveAttribute(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4013,25 +4070,49 @@ LibMCEnvResult libmcenv_xmldocumentnode_removeattribute(LibMCEnv_XMLDocumentNode
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_addattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, const char * pValue)
+LibMCEnvResult libmcenv_xmldocumentnode_removeattributebyindex(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_uint64 nIndex)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
+		if (!pIXMLDocumentNode)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIXMLDocumentNode->RemoveAttributeByIndex(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_xmldocumentnode_addattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
+
+	try {
 		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pValue == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sName(pName);
 		std::string sNameSpace(pNameSpace);
+		std::string sName(pName);
 		std::string sValue(pValue);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIXMLDocumentNode->AddAttribute(sName, sNameSpace, sValue);
+		pIXMLDocumentNode->AddAttribute(sNameSpace, sName, sValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4046,22 +4127,22 @@ LibMCEnvResult libmcenv_xmldocumentnode_addattribute(LibMCEnv_XMLDocumentNode pX
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_addintegerattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_int64 nValue)
+LibMCEnvResult libmcenv_xmldocumentnode_addintegerattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_int64 nValue)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNameSpace == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sName(pName);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sNameSpace(pNameSpace);
+		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIXMLDocumentNode->AddIntegerAttribute(sName, sNameSpace, nValue);
+		pIXMLDocumentNode->AddIntegerAttribute(sNameSpace, sName, nValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4076,22 +4157,22 @@ LibMCEnvResult libmcenv_xmldocumentnode_addintegerattribute(LibMCEnv_XMLDocument
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_adddoubleattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_double dValue)
+LibMCEnvResult libmcenv_xmldocumentnode_adddoubleattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_double dValue)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNameSpace == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sName(pName);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sNameSpace(pNameSpace);
+		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIXMLDocumentNode->AddDoubleAttribute(sName, sNameSpace, dValue);
+		pIXMLDocumentNode->AddDoubleAttribute(sNameSpace, sName, dValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4106,22 +4187,22 @@ LibMCEnvResult libmcenv_xmldocumentnode_adddoubleattribute(LibMCEnv_XMLDocumentN
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_addboolattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, bool bValue)
+LibMCEnvResult libmcenv_xmldocumentnode_addboolattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bValue)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNameSpace == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sName(pName);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sNameSpace(pNameSpace);
+		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIXMLDocumentNode->AddBoolAttribute(sName, sNameSpace, bValue);
+		pIXMLDocumentNode->AddBoolAttribute(sNameSpace, sName, bValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4164,21 +4245,24 @@ LibMCEnvResult libmcenv_xmldocumentnode_getchildren(LibMCEnv_XMLDocumentNode pXM
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_countchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, LibMCEnv_uint64 * pCount)
+LibMCEnvResult libmcenv_xmldocumentnode_countchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_uint64 * pCount)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pCount == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pCount = pIXMLDocumentNode->CountChildrenByName(sName);
+		*pCount = pIXMLDocumentNode->CountChildrenByName(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4193,22 +4277,25 @@ LibMCEnvResult libmcenv_xmldocumentnode_countchildrenbyname(LibMCEnv_XMLDocument
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_getchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, LibMCEnv_XMLDocumentNodes * pChildNodes)
+LibMCEnvResult libmcenv_xmldocumentnode_getchildrenbyname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_XMLDocumentNodes * pChildNodes)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pChildNodes == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IBase* pBaseChildNodes(nullptr);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseChildNodes = pIXMLDocumentNode->GetChildrenByName(sName);
+		pBaseChildNodes = pIXMLDocumentNode->GetChildrenByName(sNameSpace, sName);
 
 		*pChildNodes = (IBase*)(pBaseChildNodes);
 		return LIBMCENV_SUCCESS;
@@ -4224,21 +4311,24 @@ LibMCEnvResult libmcenv_xmldocumentnode_getchildrenbyname(LibMCEnv_XMLDocumentNo
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_haschild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pChildExists)
+LibMCEnvResult libmcenv_xmldocumentnode_haschild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pChildExists)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pChildExists == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pChildExists = pIXMLDocumentNode->HasChild(sName);
+		*pChildExists = pIXMLDocumentNode->HasChild(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4253,21 +4343,24 @@ LibMCEnvResult libmcenv_xmldocumentnode_haschild(LibMCEnv_XMLDocumentNode pXMLDo
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_hasuniquechild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool * pChildExists)
+LibMCEnvResult libmcenv_xmldocumentnode_hasuniquechild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pChildExists)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pChildExists == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pChildExists = pIXMLDocumentNode->HasUniqueChild(sName);
+		*pChildExists = pIXMLDocumentNode->HasUniqueChild(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4282,22 +4375,25 @@ LibMCEnvResult libmcenv_xmldocumentnode_hasuniquechild(LibMCEnv_XMLDocumentNode 
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pChildInstance)
+LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pChildInstance)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pChildInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IBase* pBaseChildInstance(nullptr);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseChildInstance = pIXMLDocumentNode->FindChild(sName, bMustExist);
+		pBaseChildInstance = pIXMLDocumentNode->FindChild(sNameSpace, sName, bMustExist);
 
 		*pChildInstance = (IBase*)(pBaseChildInstance);
 		return LIBMCENV_SUCCESS;
@@ -4313,25 +4409,25 @@ LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XMLDocumentNode pXMLD
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_addchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName, const char * pNameSpace, LibMCEnv_XMLDocumentNode * pChildInstance)
+LibMCEnvResult libmcenv_xmldocumentnode_addchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_XMLDocumentNode * pChildInstance)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pChildInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sName(pName);
 		std::string sNameSpace(pNameSpace);
+		std::string sName(pName);
 		IBase* pBaseChildInstance(nullptr);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseChildInstance = pIXMLDocumentNode->AddChild(sName, sNameSpace);
+		pBaseChildInstance = pIXMLDocumentNode->AddChild(sNameSpace, sName);
 
 		*pChildInstance = (IBase*)(pBaseChildInstance);
 		return LIBMCENV_SUCCESS;
@@ -4376,19 +4472,22 @@ LibMCEnvResult libmcenv_xmldocumentnode_removechild(LibMCEnv_XMLDocumentNode pXM
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnode_removechildrenwithname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pName)
+LibMCEnvResult libmcenv_xmldocumentnode_removechildrenwithname(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
 		if (!pIXMLDocumentNode)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIXMLDocumentNode->RemoveChildrenWithName(sName);
+		pIXMLDocumentNode->RemoveChildrenWithName(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4485,21 +4584,24 @@ LibMCEnvResult libmcenv_xmldocumentnodes_getnode(LibMCEnv_XMLDocumentNodes pXMLD
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnodes_countnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, LibMCEnv_uint64 * pCount)
+LibMCEnvResult libmcenv_xmldocumentnodes_countnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, LibMCEnv_uint64 * pCount)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNodes;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pCount == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNodes* pIXMLDocumentNodes = dynamic_cast<IXMLDocumentNodes*>(pIBaseClass);
 		if (!pIXMLDocumentNodes)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pCount = pIXMLDocumentNodes->CountNodesByName(sName);
+		*pCount = pIXMLDocumentNodes->CountNodesByName(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4514,22 +4616,25 @@ LibMCEnvResult libmcenv_xmldocumentnodes_countnodesbyname(LibMCEnv_XMLDocumentNo
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnodes_getnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, LibMCEnv_XMLDocumentNodes * pNodes)
+LibMCEnvResult libmcenv_xmldocumentnodes_getnodesbyname(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, LibMCEnv_XMLDocumentNodes * pNodes)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNodes;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNodes == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IBase* pBaseNodes(nullptr);
 		IXMLDocumentNodes* pIXMLDocumentNodes = dynamic_cast<IXMLDocumentNodes*>(pIBaseClass);
 		if (!pIXMLDocumentNodes)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseNodes = pIXMLDocumentNodes->GetNodesByName(sName);
+		pBaseNodes = pIXMLDocumentNodes->GetNodesByName(sNameSpace, sName);
 
 		*pNodes = (IBase*)(pBaseNodes);
 		return LIBMCENV_SUCCESS;
@@ -4545,21 +4650,24 @@ LibMCEnvResult libmcenv_xmldocumentnodes_getnodesbyname(LibMCEnv_XMLDocumentNode
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnodes_hasnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool * pNodeExists)
+LibMCEnvResult libmcenv_xmldocumentnodes_hasnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, bool * pNodeExists)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNodes;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNodeExists == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNodes* pIXMLDocumentNodes = dynamic_cast<IXMLDocumentNodes*>(pIBaseClass);
 		if (!pIXMLDocumentNodes)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pNodeExists = pIXMLDocumentNodes->HasNode(sName);
+		*pNodeExists = pIXMLDocumentNodes->HasNode(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4574,21 +4682,24 @@ LibMCEnvResult libmcenv_xmldocumentnodes_hasnode(LibMCEnv_XMLDocumentNodes pXMLD
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnodes_hasuniquenode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool * pNodeExists)
+LibMCEnvResult libmcenv_xmldocumentnodes_hasuniquenode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, bool * pNodeExists)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNodes;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNodeExists == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IXMLDocumentNodes* pIXMLDocumentNodes = dynamic_cast<IXMLDocumentNodes*>(pIBaseClass);
 		if (!pIXMLDocumentNodes)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pNodeExists = pIXMLDocumentNodes->HasUniqueNode(sName);
+		*pNodeExists = pIXMLDocumentNodes->HasUniqueNode(sNameSpace, sName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4603,22 +4714,25 @@ LibMCEnvResult libmcenv_xmldocumentnodes_hasuniquenode(LibMCEnv_XMLDocumentNodes
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentnodes_findnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pNodeInstance)
+LibMCEnvResult libmcenv_xmldocumentnodes_findnode(LibMCEnv_XMLDocumentNodes pXMLDocumentNodes, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pNodeInstance)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNodes;
 
 	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pNodeInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
 		std::string sName(pName);
 		IBase* pBaseNodeInstance(nullptr);
 		IXMLDocumentNodes* pIXMLDocumentNodes = dynamic_cast<IXMLDocumentNodes*>(pIBaseClass);
 		if (!pIXMLDocumentNodes)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseNodeInstance = pIXMLDocumentNodes->FindNode(sName, bMustExist);
+		pBaseNodeInstance = pIXMLDocumentNodes->FindNode(sNameSpace, sName, bMustExist);
 
 		*pNodeInstance = (IBase*)(pBaseNodeInstance);
 		return LIBMCENV_SUCCESS;
@@ -10856,6 +10970,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrievemanagedfiles;
 	if (sProcName == "libmcenv_workingdirectory_retrieveallfiles") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrieveallfiles;
+	if (sProcName == "libmcenv_xmldocumentattribute_getnamespace") 
+		*ppProcAddress = (void*) &libmcenv_xmldocumentattribute_getnamespace;
 	if (sProcName == "libmcenv_xmldocumentattribute_getname") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentattribute_getname;
 	if (sProcName == "libmcenv_xmldocumentattribute_getvalue") 
@@ -10896,6 +11012,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_findattribute;
 	if (sProcName == "libmcenv_xmldocumentnode_removeattribute") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_removeattribute;
+	if (sProcName == "libmcenv_xmldocumentnode_removeattributebyindex") 
+		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_removeattributebyindex;
 	if (sProcName == "libmcenv_xmldocumentnode_addattribute") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_addattribute;
 	if (sProcName == "libmcenv_xmldocumentnode_addintegerattribute") 

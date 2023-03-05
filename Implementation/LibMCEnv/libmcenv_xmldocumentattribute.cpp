@@ -35,7 +35,7 @@ Abstract: This is a stub class definition of CXMLDocumentAttribute
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include "libmc_exceptiontypes.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -43,14 +43,32 @@ using namespace LibMCEnv::Impl;
  Class definition of CXMLDocumentAttribute 
 **************************************************************************************************************************/
 
+CXMLDocumentAttribute::CXMLDocumentAttribute(AMC::PXMLDocumentAttributeInstance pAttributeInstance)
+	: m_pAttributeInstance (pAttributeInstance)
+{
+	if (pAttributeInstance.get() != nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+}
+
+CXMLDocumentAttribute::~CXMLDocumentAttribute()
+{
+
+}
+
+std::string CXMLDocumentAttribute::GetNameSpace()
+{
+	return m_pAttributeInstance->getNameSpace()->getNameSpace();
+}
+
+
 std::string CXMLDocumentAttribute::GetName()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pAttributeInstance->getAttributeName();
 }
 
 std::string CXMLDocumentAttribute::GetValue()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pAttributeInstance->getValue();
 }
 
 bool CXMLDocumentAttribute::IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)

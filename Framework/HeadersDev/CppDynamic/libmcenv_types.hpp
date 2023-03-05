@@ -185,6 +185,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING 10088 /** could not parse XML string. */
 #define LIBMCENV_ERROR_COULDNOTPARSEXMLDATA 10089 /** could not parse XML data. */
 #define LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE 10090 /** Invalid profile value type. */
+#define LIBMCENV_ERROR_XMLDOCUMENTMISMATCH 10091 /** XML Document mismatch. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -282,6 +283,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML string.";
     case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
     case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type.";
+    case LIBMCENV_ERROR_XMLDOCUMENTMISMATCH: return "XML Document mismatch.";
     default: return "unknown error";
   }
 }

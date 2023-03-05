@@ -128,10 +128,9 @@
 		<error name="COULDNOTPARSEXMLSTRING" code="10088" description="could not parse XML string." />		
 		<error name="COULDNOTPARSEXMLDATA" code="10089" description="could not parse XML data." />		
 		<error name="INVALIDPROFILEVALUETYPE" code="10090" description="Invalid profile value type." />		
+		<error name="XMLDOCUMENTMISMATCH" code="10091" description="XML Document mismatch." />				
 		
-		
-					
-							
+									
 	</errors>
 
 
@@ -766,6 +765,10 @@
 	
 	<class name="XMLDocumentAttribute" parent="Base" description="An XML document attribute.">
 
+		<method name="GetNameSpace" description="Retrieves namespace of the attribute.">
+			<param name="NameSpace" type="string" pass="return" description="returns the namespace of the attribute." />
+		</method>
+
 		<method name="GetName" description="Retrieves name of the attribute.">
 			<param name="Name" type="string" pass="return" description="returns the name of the attribute." />
 		</method>
@@ -851,41 +854,48 @@
 		</method>
 
 		<method name="HasAttribute" description="Returns if attribute of a specific name exists.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="AttributeExists" type="bool" pass="return" description="Returns if the attribute exists." />
 		</method>
 
 		<method name="FindAttribute" description="Returns attribute instance of a specific name. ">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist." />			
 			<param name="AttributeInstance" type="optionalclass" class="XMLDocumentAttribute" pass="return" description="XML Document attribute." />
 		</method>
 
 		<method name="RemoveAttribute" description="Removes the attribute with a specific name. Does nothing if attribute does not exist.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 		</method>
 
+		<method name="RemoveAttributeByIndex" description="Removes the attribute with a specific index. Does nothing if attribute does not exist.">
+			<param name="Index" type="uint64" pass="in" description="Index of the attribute to remove (0-based)." />
+		</method>
+
 		<method name="AddAttribute" description="Adds an attribute with a specific name and string value. Fails if attribute already exists.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
-			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Value" type="string" pass="in" description="Value of the attribute." />
 		</method>
 
 		<method name="AddIntegerAttribute" description="Adds an attribute with a specific name and integer value. Fails if attribute already exists.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
-			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Value" type="int64" pass="in" description="Value of the attribute." />
 		</method>
 
 		<method name="AddDoubleAttribute" description="Adds an attribute with a specific name and double value. Fails if attribute already exists.">
-			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="Value" type="double" pass="in" description="Value of the attribute." />
 		</method>
 
 		<method name="AddBoolAttribute" description="Adds an attribute with a specific name and bool value. Fails if attribute already exists.">
-			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="Value" type="bool" pass="in" description="Value of the attribute." />
 		</method>
 
@@ -894,34 +904,39 @@
 		</method>
 
 		<method name="CountChildrenByName" description="Returns how many children of the XML Node have a specific name.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the node." />
 			<param name="Count" type="uint64" pass="return" description="returns the number children with the specified name." />
 		</method>
 				
 		<method name="GetChildrenByName" description="Returns all the child nodes of the XML Node with a specific name.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the child." />
 			<param name="ChildNodes" type="class" class="XMLDocumentNodes" pass="return" description="returns the list of child nodes." />
 		</method>
 
 		<method name="HasChild" description="Returns if a child with a specific name exist.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the child." />
 			<param name="ChildExists" type="bool" pass="return" description="returns if a child with a specific name exists." />
 		</method>
 
 		<method name="HasUniqueChild" description="Returns if a child with a specific name exist once and only once.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the child." />
 			<param name="ChildExists" type="bool" pass="return" description="returns if a child with a specific name exists once and only once." />
 		</method>
 
 		<method name="FindChild" description="Returns child with a specific name. Throws an error if name does not exist once and only once.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the child." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if child does not exist. If falls, the call will return null if the child does not exist." />			
 			<param name="ChildInstance" type="optionalclass" class="XMLDocumentNode" pass="return" description="returns child instance or null." />
 		</method>
 		
 		<method name="AddChild" description="Adds a new child with a specific name.">
-			<param name="Name" type="string" pass="in" description="Name of the child." />
 			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
+			<param name="Name" type="string" pass="in" description="Name of the child." />
 			<param name="ChildInstance" type="class" class="XMLDocumentNode" pass="return" description="returns child instance." />
 		</method>
 
@@ -930,6 +945,7 @@
 		</method>
 
 		<method name="RemoveChildrenWithName" description="Removes all children with a specific name. Does nothing if no child with the name exists. . All subsequent calls to the deleted children will fail after the call.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the children." />
 		</method>
 
@@ -952,26 +968,31 @@
 		</method>
 
 		<method name="CountNodesByName" description="Returns how many nodes of the XML Node have a specific name.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the node." />
 			<param name="Count" type="uint64" pass="return" description="returns the number of nodes with the specified name." />
 		</method>
 
 		<method name="GetNodesByName" description="Returns all the nodes nodes of the XML Node with a specific name.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the node." />
 			<param name="Nodes" type="class" class="XMLDocumentNodes" pass="return" description="returns the list of node nodes." />
 		</method>
 				
 		<method name="HasNode" description="Returns if a node with a specific name exist.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the node." />
 			<param name="NodeExists" type="bool" pass="return" description="returns if a node with a specific name exists." />
 		</method>
 
 		<method name="HasUniqueNode" description="Returns if a node with a specific name exist once and only once.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the node." />
 			<param name="NodeExists" type="bool" pass="return" description="returns if a node with a specific name exists once and only once." />
 		</method>
 
 		<method name="FindNode" description="Returns node with a specific name. Throws an error if name does not exist once and only once.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the node." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if node does not exist. If falls, the call will return null if the node does not exist." />			
 			<param name="NodeInstance" type="optionalclass" class="XMLDocumentNode" pass="return" description="returns node instance." />

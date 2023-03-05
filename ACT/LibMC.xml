@@ -499,9 +499,17 @@
 		<error name="INVALIDNAMESPACEINDEX" code="466" description="Invalid namespace index." />
 		<error name="INVALIDATTRIBUTEINDEX" code="467" description="Invalid attribute index." />
 		<error name="PROFILEVALUENOTFOUND" code="468" description="Profile value not found." />
-
-		
-				
+		<error name="INVALIDXMLNODENAME" code="469" description="Invalid xml node name." />		
+		<error name="INVALIDXMLNAMESPACE" code="470" description="Invalid xml namespace." />
+		<error name="COULDNOTFINDATTRIBUTE" code="471" description="Could not find attribute." />
+		<error name="DUPLICATEATTRIBUTE" code="472" description="Duplicate attribute." />
+		<error name="INTERNALATTRIBUTEERROR" code="473" description="Internal attribute error." />
+		<error name="XMLNODECHILDNOTFOUND" code="474" description="XML node child not found." />
+		<error name="INVALIDXMLNODEINDEX" code="475" description="Invalid XML Node index." />				
+		<error name="INTERNALNODEERROR" code="476" description="Internal node error." />				
+		<error name="XMLNODENOTFOUNDINLIST" code="477" description="XML node not found in list." />				
+		<error name="COULDNOTFINDXMLNAMESPACE" code="478" description="Could not find XML Namespace" />				
+						
 	</errors>
 	
 	

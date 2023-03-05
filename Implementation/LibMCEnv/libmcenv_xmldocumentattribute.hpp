@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CXMLDocumentAttribute
 #endif
 
 // Include custom headers here.
-
+#include "amc_xmldocumentattribute.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -58,26 +58,15 @@ namespace Impl {
 class CXMLDocumentAttribute : public virtual IXMLDocumentAttribute, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	AMC::PXMLDocumentAttributeInstance m_pAttributeInstance;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CXMLDocumentAttribute(AMC::PXMLDocumentAttributeInstance pAttributeInstance);
 
+	virtual ~CXMLDocumentAttribute();
 
-	/**
-	* Public member functions to implement.
-	*/
+	std::string GetNameSpace() override;
 
 	std::string GetName() override;
 

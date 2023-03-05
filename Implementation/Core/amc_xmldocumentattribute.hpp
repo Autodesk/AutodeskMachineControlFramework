@@ -29,69 +29,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_XMLDOCUMENT
-#define __AMC_XMLDOCUMENT
+#ifndef __AMC_XMLDOCUMENTATTRIBUTE
+#define __AMC_XMLDOCUMENTATTRIBUTE
 
 #include <string>
 #include <memory>
-#include <map>
-#include <vector>
+#include "amc_xmldocumentnamespace.hpp"
 
-#include "amc_xmldocumentnode.hpp"
 
 namespace AMC {
 
+	class CXMLDocumentInstance;
+	class CXMLDocumentNodeInstance;
 
-	class CXMLDocumentInstance {
+	class CXMLDocumentAttributeInstance {
 	private:
 
-		PXMLDocumentNodeInstance m_pRootNodeInstance;
-		PXMLDocumentNameSpace m_pDefaultNameSpace;
-
-		std::vector<PXMLDocumentNameSpace> m_Namespaces;
-		std::map<std::string, PXMLDocumentNameSpace> m_NamespaceMap;
-		std::map<std::string, PXMLDocumentNameSpace> m_PrefixToNamespaceMap;
-
-		PXMLDocumentNameSpace registerNamespaceEx(const std::string& sNamespace, const std::string & sPrefix);
-
-		void extractPugiDocument(std::shared_ptr<pugi::xml_document> pXMLDocument);
+		CXMLDocumentInstance* m_pDocument;
+		CXMLDocumentNodeInstance* m_pNode;
+		std::string m_sAttributeName;		
+		std::string m_sValue;
+		PXMLDocumentNameSpace m_pNameSpace;
 
 	public:
 
-		CXMLDocumentInstance();
+		CXMLDocumentAttributeInstance(CXMLDocumentInstance* pDocument, CXMLDocumentNodeInstance * pNode, PXMLDocumentNameSpace pNameSpace, const std::string & sAttributeName);
 		
-		virtual ~CXMLDocumentInstance();
+		virtual ~CXMLDocumentAttributeInstance();
 
-		void createEmptyDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace);
+		std::string getAttributeName ();
 
-		void parseXMLString(const std::string & sXMLString);
+		PXMLDocumentNameSpace getNameSpace ();
 
-		void parseXMLData(uint64_t nDataSize, const uint8_t * pData);
-
-		std::string GetDefaultNamespace();
-
-		uint64_t GetNamespaceCount();
-
-		void GetNamespace(const uint64_t nIndex, std::string & sNamespace, std::string & sNamespacePrefix);
-
-		bool HasNamespace(const std::string & sNamespace);
-
-		PXMLDocumentNameSpace FindNamespace(const std::string& sNamespace, bool bMustExist);
-
-		std::string GetNamespacePrefix(const std::string & sNamespace);
-
-		void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
-
-		PXMLDocumentNodeInstance GetRootNode();
-
-		std::string SaveToString(const bool bAddLineBreaks);
+		std::string getValue ();
+		
+		void setValue (const std::string & sValue);
 
 	};
 
-	typedef std::shared_ptr<CXMLDocumentInstance> PXMLDocumentInstance;
+	
+	typedef std::shared_ptr<CXMLDocumentAttributeInstance> PXMLDocumentAttributeInstance;
 	
 }
 
 
-#endif //__AMC_XMLDOCUMENT
+#endif //__AMC_XMLDOCUMENTATTRIBUTE
 

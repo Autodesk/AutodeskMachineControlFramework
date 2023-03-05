@@ -493,6 +493,16 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDNAMESPACEINDEX 466 /** Invalid namespace index. */
 #define LIBMC_ERROR_INVALIDATTRIBUTEINDEX 467 /** Invalid attribute index. */
 #define LIBMC_ERROR_PROFILEVALUENOTFOUND 468 /** Profile value not found. */
+#define LIBMC_ERROR_INVALIDXMLNODENAME 469 /** Invalid xml node name. */
+#define LIBMC_ERROR_INVALIDXMLNAMESPACE 470 /** Invalid xml namespace. */
+#define LIBMC_ERROR_COULDNOTFINDATTRIBUTE 471 /** Could not find attribute. */
+#define LIBMC_ERROR_DUPLICATEATTRIBUTE 472 /** Duplicate attribute. */
+#define LIBMC_ERROR_INTERNALATTRIBUTEERROR 473 /** Internal attribute error. */
+#define LIBMC_ERROR_XMLNODECHILDNOTFOUND 474 /** XML node child not found. */
+#define LIBMC_ERROR_INVALIDXMLNODEINDEX 475 /** Invalid XML Node index. */
+#define LIBMC_ERROR_INTERNALNODEERROR 476 /** Internal node error. */
+#define LIBMC_ERROR_XMLNODENOTFOUNDINLIST 477 /** XML node not found in list. */
+#define LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE 478 /** Could not find XML Namespace */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -898,6 +908,16 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDNAMESPACEINDEX: return "Invalid namespace index.";
     case LIBMC_ERROR_INVALIDATTRIBUTEINDEX: return "Invalid attribute index.";
     case LIBMC_ERROR_PROFILEVALUENOTFOUND: return "Profile value not found.";
+    case LIBMC_ERROR_INVALIDXMLNODENAME: return "Invalid xml node name.";
+    case LIBMC_ERROR_INVALIDXMLNAMESPACE: return "Invalid xml namespace.";
+    case LIBMC_ERROR_COULDNOTFINDATTRIBUTE: return "Could not find attribute.";
+    case LIBMC_ERROR_DUPLICATEATTRIBUTE: return "Duplicate attribute.";
+    case LIBMC_ERROR_INTERNALATTRIBUTEERROR: return "Internal attribute error.";
+    case LIBMC_ERROR_XMLNODECHILDNOTFOUND: return "XML node child not found.";
+    case LIBMC_ERROR_INVALIDXMLNODEINDEX: return "Invalid XML Node index.";
+    case LIBMC_ERROR_INTERNALNODEERROR: return "Internal node error.";
+    case LIBMC_ERROR_XMLNODENOTFOUNDINLIST: return "XML node not found in list.";
+    case LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE: return "Could not find XML Namespace";
     default: return "unknown error";
   }
 }

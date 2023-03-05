@@ -350,6 +350,7 @@ public:
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "COULDNOTPARSEXMLSTRING";
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "COULDNOTPARSEXMLDATA";
 			case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "INVALIDPROFILEVALUETYPE";
+			case LIBMCENV_ERROR_XMLDOCUMENTMISMATCH: return "XMLDOCUMENTMISMATCH";
 		}
 		return "UNKNOWN";
 	}
@@ -447,6 +448,7 @@ public:
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML string.";
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
 			case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type.";
+			case LIBMCENV_ERROR_XMLDOCUMENTMISMATCH: return "XML Document mismatch.";
 		}
 		return "unknown error";
 	}
@@ -943,6 +945,7 @@ public:
 	{
 	}
 	
+	inline std::string GetNameSpace();
 	inline std::string GetName();
 	inline std::string GetValue();
 	inline bool IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
@@ -976,22 +979,23 @@ public:
 	inline std::string GetNameSpace();
 	inline LibMCEnv_uint64 GetAttributeCount();
 	inline PXMLDocumentAttribute GetAttribute(const LibMCEnv_uint64 nIndex);
-	inline bool HasAttribute(const std::string & sName);
-	inline PXMLDocumentAttribute FindAttribute(const std::string & sName, const bool bMustExist);
-	inline void RemoveAttribute(const std::string & sName);
-	inline void AddAttribute(const std::string & sName, const std::string & sNameSpace, const std::string & sValue);
-	inline void AddIntegerAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_int64 nValue);
-	inline void AddDoubleAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_double dValue);
-	inline void AddBoolAttribute(const std::string & sName, const std::string & sNameSpace, const bool bValue);
+	inline bool HasAttribute(const std::string & sNameSpace, const std::string & sName);
+	inline PXMLDocumentAttribute FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist);
+	inline void RemoveAttribute(const std::string & sNameSpace, const std::string & sName);
+	inline void RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex);
+	inline void AddAttribute(const std::string & sNameSpace, const std::string & sName, const std::string & sValue);
+	inline void AddIntegerAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nValue);
+	inline void AddDoubleAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dValue);
+	inline void AddBoolAttribute(const std::string & sNameSpace, const std::string & sName, const bool bValue);
 	inline PXMLDocumentNodes GetChildren();
-	inline LibMCEnv_uint64 CountChildrenByName(const std::string & sName);
-	inline PXMLDocumentNodes GetChildrenByName(const std::string & sName);
-	inline bool HasChild(const std::string & sName);
-	inline bool HasUniqueChild(const std::string & sName);
-	inline PXMLDocumentNode FindChild(const std::string & sName, const bool bMustExist);
-	inline PXMLDocumentNode AddChild(const std::string & sName, const std::string & sNameSpace);
+	inline LibMCEnv_uint64 CountChildrenByName(const std::string & sNameSpace, const std::string & sName);
+	inline PXMLDocumentNodes GetChildrenByName(const std::string & sNameSpace, const std::string & sName);
+	inline bool HasChild(const std::string & sNameSpace, const std::string & sName);
+	inline bool HasUniqueChild(const std::string & sNameSpace, const std::string & sName);
+	inline PXMLDocumentNode FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist);
+	inline PXMLDocumentNode AddChild(const std::string & sNameSpace, const std::string & sName);
 	inline void RemoveChild(classParam<CXMLDocumentNode> pChildInstance);
-	inline void RemoveChildrenWithName(const std::string & sName);
+	inline void RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName);
 	inline void Remove();
 };
 	
@@ -1011,11 +1015,11 @@ public:
 	
 	inline LibMCEnv_uint64 GetNodeCount();
 	inline PXMLDocumentNode GetNode(const LibMCEnv_uint64 nIndex);
-	inline LibMCEnv_uint64 CountNodesByName(const std::string & sName);
-	inline PXMLDocumentNodes GetNodesByName(const std::string & sName);
-	inline bool HasNode(const std::string & sName);
-	inline bool HasUniqueNode(const std::string & sName);
-	inline PXMLDocumentNode FindNode(const std::string & sName, const bool bMustExist);
+	inline LibMCEnv_uint64 CountNodesByName(const std::string & sNameSpace, const std::string & sName);
+	inline PXMLDocumentNodes GetNodesByName(const std::string & sNameSpace, const std::string & sName);
+	inline bool HasNode(const std::string & sNameSpace, const std::string & sName);
+	inline bool HasUniqueNode(const std::string & sNameSpace, const std::string & sName);
+	inline PXMLDocumentNode FindNode(const std::string & sNameSpace, const std::string & sName, const bool bMustExist);
 };
 	
 /*************************************************************************************************************************
@@ -1580,6 +1584,7 @@ public:
 		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetNameSpace = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetName = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = nullptr;
@@ -1600,6 +1605,7 @@ public:
 		pWrapperTable->m_XMLDocumentNode_HasAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_FindAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex = nullptr;
 		pWrapperTable->m_XMLDocumentNode_AddAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_AddIntegerAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_AddDoubleAttribute = nullptr;
@@ -2790,6 +2796,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetNameSpace = (PLibMCEnvXMLDocumentAttribute_GetNameSpacePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getnamespace");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetNameSpace = (PLibMCEnvXMLDocumentAttribute_GetNameSpacePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getnamespace");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetNameSpace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_XMLDocumentAttribute_GetName = (PLibMCEnvXMLDocumentAttribute_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getname");
 		#else // _WIN32
 		pWrapperTable->m_XMLDocumentAttribute_GetName = (PLibMCEnvXMLDocumentAttribute_GetNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getname");
@@ -2967,6 +2982,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentNode_RemoveAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex = (PLibMCEnvXMLDocumentNode_RemoveAttributeByIndexPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_removeattributebyindex");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex = (PLibMCEnvXMLDocumentNode_RemoveAttributeByIndexPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_removeattributebyindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5305,6 +5329,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveAllFiles == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getnamespace", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetNameSpace));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetNameSpace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getname", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5383,6 +5411,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removeattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveAttribute));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_RemoveAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removeattributebyindex", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_AddAttribute));
@@ -7685,6 +7717,21 @@ public:
 	 */
 	
 	/**
+	* CXMLDocumentAttribute::GetNameSpace - Retrieves namespace of the attribute.
+	* @return returns the namespace of the attribute.
+	*/
+	std::string CXMLDocumentAttribute::GetNameSpace()
+	{
+		LibMCEnv_uint32 bytesNeededNameSpace = 0;
+		LibMCEnv_uint32 bytesWrittenNameSpace = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetNameSpace(m_pHandle, 0, &bytesNeededNameSpace, nullptr));
+		std::vector<char> bufferNameSpace(bytesNeededNameSpace);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetNameSpace(m_pHandle, bytesNeededNameSpace, &bytesWrittenNameSpace, &bufferNameSpace[0]));
+		
+		return std::string(&bufferNameSpace[0]);
+	}
+	
+	/**
 	* CXMLDocumentAttribute::GetName - Retrieves name of the attribute.
 	* @return returns the name of the attribute.
 	*/
@@ -7904,27 +7951,29 @@ public:
 	
 	/**
 	* CXMLDocumentNode::HasAttribute - Returns if attribute of a specific name exists.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 	* @param[in] sName - Name of the attribute.
 	* @return Returns if the attribute exists.
 	*/
-	bool CXMLDocumentNode::HasAttribute(const std::string & sName)
+	bool CXMLDocumentNode::HasAttribute(const std::string & sNameSpace, const std::string & sName)
 	{
 		bool resultAttributeExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasAttribute(m_pHandle, sName.c_str(), &resultAttributeExists));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasAttribute(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultAttributeExists));
 		
 		return resultAttributeExists;
 	}
 	
 	/**
 	* CXMLDocumentNode::FindAttribute - Returns attribute instance of a specific name. 
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 	* @param[in] sName - Name of the attribute.
 	* @param[in] bMustExist - If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist.
 	* @return XML Document attribute.
 	*/
-	PXMLDocumentAttribute CXMLDocumentNode::FindAttribute(const std::string & sName, const bool bMustExist)
+	PXMLDocumentAttribute CXMLDocumentNode::FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist)
 	{
 		LibMCEnvHandle hAttributeInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_FindAttribute(m_pHandle, sName.c_str(), bMustExist, &hAttributeInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_FindAttribute(m_pHandle, sNameSpace.c_str(), sName.c_str(), bMustExist, &hAttributeInstance));
 		
 		if (hAttributeInstance) {
 			return std::make_shared<CXMLDocumentAttribute>(m_pWrapper, hAttributeInstance);
@@ -7935,55 +7984,65 @@ public:
 	
 	/**
 	* CXMLDocumentNode::RemoveAttribute - Removes the attribute with a specific name. Does nothing if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
 	* @param[in] sName - Name of the attribute.
 	*/
-	void CXMLDocumentNode::RemoveAttribute(const std::string & sName)
+	void CXMLDocumentNode::RemoveAttribute(const std::string & sNameSpace, const std::string & sName)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveAttribute(m_pHandle, sName.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveAttribute(m_pHandle, sNameSpace.c_str(), sName.c_str()));
+	}
+	
+	/**
+	* CXMLDocumentNode::RemoveAttributeByIndex - Removes the attribute with a specific index. Does nothing if attribute does not exist.
+	* @param[in] nIndex - Index of the attribute to remove (0-based).
+	*/
+	void CXMLDocumentNode::RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveAttributeByIndex(m_pHandle, nIndex));
 	}
 	
 	/**
 	* CXMLDocumentNode::AddAttribute - Adds an attribute with a specific name and string value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the attribute.
-	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sValue - Value of the attribute.
 	*/
-	void CXMLDocumentNode::AddAttribute(const std::string & sName, const std::string & sNameSpace, const std::string & sValue)
+	void CXMLDocumentNode::AddAttribute(const std::string & sNameSpace, const std::string & sName, const std::string & sValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddAttribute(m_pHandle, sNameSpace.c_str(), sName.c_str(), sValue.c_str()));
 	}
 	
 	/**
 	* CXMLDocumentNode::AddIntegerAttribute - Adds an attribute with a specific name and integer value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the attribute.
-	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] nValue - Value of the attribute.
 	*/
-	void CXMLDocumentNode::AddIntegerAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_int64 nValue)
+	void CXMLDocumentNode::AddIntegerAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddIntegerAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), nValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddIntegerAttribute(m_pHandle, sNameSpace.c_str(), sName.c_str(), nValue));
 	}
 	
 	/**
 	* CXMLDocumentNode::AddDoubleAttribute - Adds an attribute with a specific name and double value. Fails if attribute already exists.
-	* @param[in] sName - Name of the attribute.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
 	* @param[in] dValue - Value of the attribute.
 	*/
-	void CXMLDocumentNode::AddDoubleAttribute(const std::string & sName, const std::string & sNameSpace, const LibMCEnv_double dValue)
+	void CXMLDocumentNode::AddDoubleAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddDoubleAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), dValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddDoubleAttribute(m_pHandle, sNameSpace.c_str(), sName.c_str(), dValue));
 	}
 	
 	/**
 	* CXMLDocumentNode::AddBoolAttribute - Adds an attribute with a specific name and bool value. Fails if attribute already exists.
-	* @param[in] sName - Name of the attribute.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
 	* @param[in] bValue - Value of the attribute.
 	*/
-	void CXMLDocumentNode::AddBoolAttribute(const std::string & sName, const std::string & sNameSpace, const bool bValue)
+	void CXMLDocumentNode::AddBoolAttribute(const std::string & sNameSpace, const std::string & sName, const bool bValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddBoolAttribute(m_pHandle, sName.c_str(), sNameSpace.c_str(), bValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddBoolAttribute(m_pHandle, sNameSpace.c_str(), sName.c_str(), bValue));
 	}
 	
 	/**
@@ -8003,26 +8062,28 @@ public:
 	
 	/**
 	* CXMLDocumentNode::CountChildrenByName - Returns how many children of the XML Node have a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns the number children with the specified name.
 	*/
-	LibMCEnv_uint64 CXMLDocumentNode::CountChildrenByName(const std::string & sName)
+	LibMCEnv_uint64 CXMLDocumentNode::CountChildrenByName(const std::string & sNameSpace, const std::string & sName)
 	{
 		LibMCEnv_uint64 resultCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_CountChildrenByName(m_pHandle, sName.c_str(), &resultCount));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_CountChildrenByName(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultCount));
 		
 		return resultCount;
 	}
 	
 	/**
 	* CXMLDocumentNode::GetChildrenByName - Returns all the child nodes of the XML Node with a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns the list of child nodes.
 	*/
-	PXMLDocumentNodes CXMLDocumentNode::GetChildrenByName(const std::string & sName)
+	PXMLDocumentNodes CXMLDocumentNode::GetChildrenByName(const std::string & sNameSpace, const std::string & sName)
 	{
 		LibMCEnvHandle hChildNodes = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetChildrenByName(m_pHandle, sName.c_str(), &hChildNodes));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetChildrenByName(m_pHandle, sNameSpace.c_str(), sName.c_str(), &hChildNodes));
 		
 		if (!hChildNodes) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -8032,40 +8093,43 @@ public:
 	
 	/**
 	* CXMLDocumentNode::HasChild - Returns if a child with a specific name exist.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns if a child with a specific name exists.
 	*/
-	bool CXMLDocumentNode::HasChild(const std::string & sName)
+	bool CXMLDocumentNode::HasChild(const std::string & sNameSpace, const std::string & sName)
 	{
 		bool resultChildExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasChild(m_pHandle, sName.c_str(), &resultChildExists));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasChild(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultChildExists));
 		
 		return resultChildExists;
 	}
 	
 	/**
 	* CXMLDocumentNode::HasUniqueChild - Returns if a child with a specific name exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns if a child with a specific name exists once and only once.
 	*/
-	bool CXMLDocumentNode::HasUniqueChild(const std::string & sName)
+	bool CXMLDocumentNode::HasUniqueChild(const std::string & sNameSpace, const std::string & sName)
 	{
 		bool resultChildExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasUniqueChild(m_pHandle, sName.c_str(), &resultChildExists));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_HasUniqueChild(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultChildExists));
 		
 		return resultChildExists;
 	}
 	
 	/**
 	* CXMLDocumentNode::FindChild - Returns child with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @param[in] bMustExist - If true, the call fails if child does not exist. If falls, the call will return null if the child does not exist.
 	* @return returns child instance or null.
 	*/
-	PXMLDocumentNode CXMLDocumentNode::FindChild(const std::string & sName, const bool bMustExist)
+	PXMLDocumentNode CXMLDocumentNode::FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist)
 	{
 		LibMCEnvHandle hChildInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_FindChild(m_pHandle, sName.c_str(), bMustExist, &hChildInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_FindChild(m_pHandle, sNameSpace.c_str(), sName.c_str(), bMustExist, &hChildInstance));
 		
 		if (hChildInstance) {
 			return std::make_shared<CXMLDocumentNode>(m_pWrapper, hChildInstance);
@@ -8076,14 +8140,14 @@ public:
 	
 	/**
 	* CXMLDocumentNode::AddChild - Adds a new child with a specific name.
-	* @param[in] sName - Name of the child.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
 	* @return returns child instance.
 	*/
-	PXMLDocumentNode CXMLDocumentNode::AddChild(const std::string & sName, const std::string & sNameSpace)
+	PXMLDocumentNode CXMLDocumentNode::AddChild(const std::string & sNameSpace, const std::string & sName)
 	{
 		LibMCEnvHandle hChildInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddChild(m_pHandle, sName.c_str(), sNameSpace.c_str(), &hChildInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddChild(m_pHandle, sNameSpace.c_str(), sName.c_str(), &hChildInstance));
 		
 		if (!hChildInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -8103,11 +8167,12 @@ public:
 	
 	/**
 	* CXMLDocumentNode::RemoveChildrenWithName - Removes all children with a specific name. Does nothing if no child with the name exists. . All subsequent calls to the deleted children will fail after the call.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the children.
 	*/
-	void CXMLDocumentNode::RemoveChildrenWithName(const std::string & sName)
+	void CXMLDocumentNode::RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveChildrenWithName(m_pHandle, sName.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_RemoveChildrenWithName(m_pHandle, sNameSpace.c_str(), sName.c_str()));
 	}
 	
 	/**
@@ -8152,26 +8217,28 @@ public:
 	
 	/**
 	* CXMLDocumentNodes::CountNodesByName - Returns how many nodes of the XML Node have a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns the number of nodes with the specified name.
 	*/
-	LibMCEnv_uint64 CXMLDocumentNodes::CountNodesByName(const std::string & sName)
+	LibMCEnv_uint64 CXMLDocumentNodes::CountNodesByName(const std::string & sNameSpace, const std::string & sName)
 	{
 		LibMCEnv_uint64 resultCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_CountNodesByName(m_pHandle, sName.c_str(), &resultCount));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_CountNodesByName(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultCount));
 		
 		return resultCount;
 	}
 	
 	/**
 	* CXMLDocumentNodes::GetNodesByName - Returns all the nodes nodes of the XML Node with a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns the list of node nodes.
 	*/
-	PXMLDocumentNodes CXMLDocumentNodes::GetNodesByName(const std::string & sName)
+	PXMLDocumentNodes CXMLDocumentNodes::GetNodesByName(const std::string & sNameSpace, const std::string & sName)
 	{
 		LibMCEnvHandle hNodes = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_GetNodesByName(m_pHandle, sName.c_str(), &hNodes));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_GetNodesByName(m_pHandle, sNameSpace.c_str(), sName.c_str(), &hNodes));
 		
 		if (!hNodes) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -8181,40 +8248,43 @@ public:
 	
 	/**
 	* CXMLDocumentNodes::HasNode - Returns if a node with a specific name exist.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns if a node with a specific name exists.
 	*/
-	bool CXMLDocumentNodes::HasNode(const std::string & sName)
+	bool CXMLDocumentNodes::HasNode(const std::string & sNameSpace, const std::string & sName)
 	{
 		bool resultNodeExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_HasNode(m_pHandle, sName.c_str(), &resultNodeExists));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_HasNode(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultNodeExists));
 		
 		return resultNodeExists;
 	}
 	
 	/**
 	* CXMLDocumentNodes::HasUniqueNode - Returns if a node with a specific name exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @return returns if a node with a specific name exists once and only once.
 	*/
-	bool CXMLDocumentNodes::HasUniqueNode(const std::string & sName)
+	bool CXMLDocumentNodes::HasUniqueNode(const std::string & sNameSpace, const std::string & sName)
 	{
 		bool resultNodeExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_HasUniqueNode(m_pHandle, sName.c_str(), &resultNodeExists));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_HasUniqueNode(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultNodeExists));
 		
 		return resultNodeExists;
 	}
 	
 	/**
 	* CXMLDocumentNodes::FindNode - Returns node with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the node.
 	* @param[in] bMustExist - If true, the call fails if node does not exist. If falls, the call will return null if the node does not exist.
 	* @return returns node instance.
 	*/
-	PXMLDocumentNode CXMLDocumentNodes::FindNode(const std::string & sName, const bool bMustExist)
+	PXMLDocumentNode CXMLDocumentNodes::FindNode(const std::string & sNameSpace, const std::string & sName, const bool bMustExist)
 	{
 		LibMCEnvHandle hNodeInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_FindNode(m_pHandle, sName.c_str(), bMustExist, &hNodeInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNodes_FindNode(m_pHandle, sNameSpace.c_str(), sName.c_str(), bMustExist, &hNodeInstance));
 		
 		if (hNodeInstance) {
 			return std::make_shared<CXMLDocumentNode>(m_pWrapper, hNodeInstance);
