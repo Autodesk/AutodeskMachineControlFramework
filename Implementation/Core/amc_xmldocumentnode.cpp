@@ -112,7 +112,8 @@ void CXMLDocumentNodeInstance::RemoveAttribute(CXMLDocumentNameSpace* pNameSpace
 
 	auto iIter = m_AttributeMap.find(std::make_pair(pNameSpace, sName));
 	if (iIter != m_AttributeMap.end()) {
-		std::remove_if(m_Attributes.begin(), m_Attributes.end(), [this, pNameSpace, sName](PXMLDocumentAttributeInstance pAttribute) {
+		std::vector<PXMLDocumentAttributeInstance>::iterator lastElement;
+		lastElement = std::remove_if(m_Attributes.begin(), m_Attributes.end(), [this, pNameSpace, sName](PXMLDocumentAttributeInstance pAttribute) {
 			return (pAttribute->getNameSpace().get() == pNameSpace) && (pAttribute->getAttributeName () == sName);
 		});
 
