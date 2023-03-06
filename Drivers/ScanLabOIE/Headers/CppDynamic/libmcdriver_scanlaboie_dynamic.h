@@ -618,6 +618,15 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_LoadReco
 **************************************************************************************************************************/
 
 /**
+* Returns the type of the device driver.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[out] pDeviceDriverType - Type of device driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType * pDeviceDriverType);
+
+/**
 * Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
 *
 * @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
@@ -628,6 +637,16 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_LoadReco
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pLibSSLResourceName, const char * pLibCryptoResourceName, const char * pQT5CoreResourceName, const char * pQT5NetworkResourceName);
+
+/**
+* Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pOIECalibrationLibraryResourceName - Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform.
+* @param[in] pRTCStreamParserResourceName - Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pOIECalibrationLibraryResourceName, const char * pRTCStreamParserResourceName);
 
 /**
 * Initializes the ScanLab OIE SDK.
@@ -838,7 +857,9 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_RetrieveCurrentRecordingPtr m_OIEDevice_RetrieveCurrentRecording;
 	PLibMCDriver_ScanLabOIEOIEDevice_ClearCurrentRecordingPtr m_OIEDevice_ClearCurrentRecording;
 	PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr m_OIEDevice_LoadRecordingFromBuild;
+	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr m_Driver_ScanLab_OIE_GetDriverType;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr m_Driver_ScanLab_OIE_SetDependencyResourceNames;
+	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr m_Driver_ScanLab_OIE_SetOIE3ResourceNames;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_InitializeSDKPtr m_Driver_ScanLab_OIE_InitializeSDK;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_InitializeCustomSDKPtr m_Driver_ScanLab_OIE_InitializeCustomSDK;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_AddDevicePtr m_Driver_ScanLab_OIE_AddDevice;

@@ -49,6 +49,7 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 	m_dZCorrectionFactor(10000.0),
 	m_LaserPort(eLaserPort::Port12BitAnalog1), 
 	m_pDriverEnvironment (pDriverEnvironment),
+	m_OIEOperationMode (LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized),
 	m_bIsNetwork (bIsNetwork)
 {
 	if (pScanLabSDK.get() == nullptr)
@@ -541,8 +542,22 @@ void CRTCContext::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialT
 	dMultiplier = dRetrievedMultiplier;
 }
 
-void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer)
+void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode)
 {
+
+	switch (eOperationMode) {
+		case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion2:
+			m_OIEOperationMode = LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion2;
+			break;
+
+		case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
+			m_OIEOperationMode = LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility;
+			break;
+
+		default:
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE);
+	}
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	// Configure Scanhead backchannels
@@ -585,6 +600,9 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 
 void CRTCContext::EnableOIE()
 {
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED);
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, 1);
@@ -597,6 +615,9 @@ void CRTCContext::EnableOIE()
 
 void CRTCContext::DisableOIE()
 {
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED);
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 20, 21, 1, 2);
@@ -612,6 +633,9 @@ void CRTCContext::DisableOIE()
 
 void CRTCContext::StartOIEMeasurement()
 {
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED);
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size());
@@ -620,7 +644,18 @@ void CRTCContext::StartOIEMeasurement()
 	m_pScanLabSDK->n_list_nop(m_CardNo);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, 257 /*1UL | (1UL << 8)*/);
+	switch (m_OIEOperationMode) {
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion2:
+		// Bit 8 triggers OIE Measurement Start
+		m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, 1UL | (1UL << 8));
+		break;
+
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
+		// Bit 4 triggers OIE Measurement Start
+		m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, 1UL | (1UL << 4));
+		break;
+	}
+	
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size() + 2);
@@ -636,6 +671,9 @@ void CRTCContext::StartOIEMeasurement()
 
 void CRTCContext::StopOIEMeasurement()
 {
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED);
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size() + 2);
@@ -652,6 +690,20 @@ void CRTCContext::StopOIEMeasurement()
 
 	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size() + 2);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+void CRTCContext::StartOIEPIDControl()
+{
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED);
+
+}
+
+void CRTCContext::StopOIEPIDControl()
+{
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED);
+
 }
 
 
@@ -692,6 +744,8 @@ void CRTCContext::EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimela
 
 void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
 {
+
+	//std::cout << "Enabling Skywriting mode 3: timelag " << dTimelag << " laseronshift " << nLaserOnShift << " nprev " << nNPrev << " npost " << nNPost << " limit " << dLimit << std::endl;
 	if (dTimelag < 0.0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG);
 	if ((nLaserOnShift < (int64_t)INT32_MIN) || (nLaserOnShift > (int64_t)INT32_MAX))

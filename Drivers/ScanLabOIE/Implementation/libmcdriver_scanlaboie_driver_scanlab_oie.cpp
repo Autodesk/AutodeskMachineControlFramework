@@ -46,11 +46,12 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
  Class definition of CDriver_ScanLab_OIE 
 **************************************************************************************************************************/
 
-CDriver_ScanLab_OIE::CDriver_ScanLab_OIE(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+CDriver_ScanLab_OIE::CDriver_ScanLab_OIE(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType eDeviceDriverType)
 	: m_pDriverEnvironment (pDriverEnvironment), 
 	  m_sDriverName(sName), 
 	  bSimulationMode (false),
-	  m_pInstance (nullptr)
+	  m_pInstance (nullptr),
+	  m_DeviceDriverType (eDeviceDriverType)
 {
 	if (sName.empty ())
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERNAME);
@@ -59,8 +60,18 @@ CDriver_ScanLab_OIE::CDriver_ScanLab_OIE(const std::string& sName, LibMCEnv::PDr
 
 	m_sLibSSLResourceName = "libssl-1_1-x64";
 	m_sLibCryptoResourceName = "libcrypto-1_1-x64";
-	m_sQT5CoreResourceName = "qt5core";
-	m_sQT5NetworkResourceName = "qt5network";
+
+#ifdef _WIN32
+	m_sQT5CoreResourceName = "qt5core_win64";
+	m_sQT5NetworkResourceName = "qt5network_win64";
+	m_sOIECalibrationLibraryResourceName = "oiecalibrationlibrary_win64";
+	m_sRTCStreamParserResourceName = "oiestreamparser_win64";
+#else
+	m_sQT5CoreResourceName = "qt5core_linux4";
+	m_sQT5NetworkResourceName = "qt5network_linux64";
+	m_sOIECalibrationLibraryResourceName = "oiecalibrationlibrary_linux64";
+	m_sRTCStreamParserResourceName = "oiestreamparser_linux64";
+#endif
 }
 
 CDriver_ScanLab_OIE::~CDriver_ScanLab_OIE()
@@ -82,15 +93,14 @@ std::string CDriver_ScanLab_OIE::GetName()
 	return m_sDriverName;
 }
 
-std::string CDriver_ScanLab_OIE::getTypeString()
+
+
+LibMCDriver_ScanLabOIE::eOIEDeviceDriverType CDriver_ScanLab_OIE::GetDriverType()
 {
-	return "scanlab-oie2";
+	return m_DeviceDriverType;
 }
 
-std::string CDriver_ScanLab_OIE::GetType()
-{
-	return getTypeString ();
-}
+
 
 void CDriver_ScanLab_OIE::GetVersion(LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nMicro, std::string& sBuild)
 {
@@ -129,8 +139,20 @@ void CDriver_ScanLab_OIE::SetDependencyResourceNames(const std::string & sLibSSL
 
 }
 
+void CDriver_ScanLab_OIE::SetOIE3ResourceNames(const std::string& sOIECalibrationLibraryResourceName, const std::string& sRTCStreamParserResourceName)
+{
+	if (sOIECalibrationLibraryResourceName.empty())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESOURCENAME);
+	if (sRTCStreamParserResourceName.empty())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESOURCENAME);
 
-void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuffer)
+	m_sOIECalibrationLibraryResourceName = sOIECalibrationLibraryResourceName;
+	m_sRTCStreamParserResourceName = sRTCStreamParserResourceName;
+
+}
+
+
+void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuffer, bool bForVersion3)
 {
 	if (m_pOIESDK.get() != nullptr)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_SDKALREADYINITIALIZED);
@@ -147,6 +169,8 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		std::string sLibCryptoFileNameOnDisk;
 		std::string sLibQT5CoreFileNameOnDisk;
 		std::string sLibQT5NetworkFileNameOnDisk;
+		std::string sOIECalibrationLibraryFileNameOnDisk;
+		std::string sRTCStreamParserFileNameOnDisk;
 #ifdef _WIN32
 		sFileName = "liboie.dll";		
 		sLibQT5CoreFileNameOnDisk = "Qt5Core.dll";
@@ -156,10 +180,22 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 			// 32 bit system
 			sLibSSLFileNameOnDisk = "libssl-1_1.dll";
 			sLibCryptoFileNameOnDisk = "libcrypto-1_1.dll";
+
+			if (bForVersion3) {
+				sOIECalibrationLibraryFileNameOnDisk = "CalibrationLibrary32.dll";
+				sRTCStreamParserFileNameOnDisk = "RTCStreamParser.dll";
+			}
+
 		}
 		else {
 			sLibSSLFileNameOnDisk = "libssl-1_1-x64.dll";
 			sLibCryptoFileNameOnDisk = "libcrypto-1_1-x64.dll";
+
+			if (bForVersion3) {
+				sOIECalibrationLibraryFileNameOnDisk = "CalibrationLibrary64.dll";
+				sRTCStreamParserFileNameOnDisk = "RTCStreamParser_x64.dll";
+			}
+
 		}
 
 #else
@@ -168,7 +204,11 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		sLibCryptoFileNameOnDisk = "libcrypto-1_1-x64.so";
 		sLibQT5CoreFileNameOnDisk = "Qt5Core.so";
 		sLibQT5NetworkFileNameOnDisk = "Qt5Network.so";
+		sOIECalibrationLibraryFileNameOnDisk = "CalibrationLibrary64.so";
+		sRTCStreamParserFileNameOnDisk = "RTCStreamParser_x64.so";
+
 #endif
+
 
 		m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
 
@@ -222,6 +262,32 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE);
 		m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData(sLibQT5NetworkFileNameOnDisk, Qt5NetworkBuffer);
 
+		if (!sOIECalibrationLibraryFileNameOnDisk.empty()) {
+			std::vector<uint8_t> CalibrationLibraryBuffer;
+			if (m_pDriverEnvironment->MachineHasResourceData(m_sOIECalibrationLibraryResourceName)) {
+				m_pDriverEnvironment->RetrieveMachineResourceData(m_sOIECalibrationLibraryResourceName, CalibrationLibraryBuffer);
+			}
+			else {
+				m_pDriverEnvironment->RetrieveDriverResourceData(m_sOIECalibrationLibraryResourceName, CalibrationLibraryBuffer);
+			}
+			if (CalibrationLibraryBuffer.size() == 0)
+				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER);
+			m_pOIECalibrationLibraryResourceFile = m_pWorkingDirectory->StoreCustomData(sOIECalibrationLibraryFileNameOnDisk, CalibrationLibraryBuffer);
+		}
+
+		if (!sRTCStreamParserFileNameOnDisk.empty()) {
+			std::vector<uint8_t> RTCStreamParserBuffer;
+			if (m_pDriverEnvironment->MachineHasResourceData(m_sRTCStreamParserResourceName)) {
+				m_pDriverEnvironment->RetrieveMachineResourceData(m_sRTCStreamParserResourceName, RTCStreamParserBuffer);
+			}
+			else {
+				m_pDriverEnvironment->RetrieveDriverResourceData(m_sRTCStreamParserResourceName, RTCStreamParserBuffer);
+			}
+			if (RTCStreamParserBuffer.size() == 0)
+				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER);
+			m_pRTCStreamParserResourceFile = m_pWorkingDirectory->StoreCustomData(sRTCStreamParserFileNameOnDisk, RTCStreamParserBuffer);
+		}
+
 		m_pOIESDK = std::make_shared<CScanLabOIESDK>(m_pSDKLibraryFile->GetAbsoluteFileName(), m_pWorkingDirectory->GetAbsoluteFilePath ());
 
 		m_pOIESDK->initDLL();
@@ -259,7 +325,7 @@ void CDriver_ScanLab_OIE::InitializeSDK(const std::string & sOIEResourceName)
 		m_pDriverEnvironment->RetrieveDriverResourceData(sOIEResourceName, SDKBuffer);			
 	}
 
-	initializeSDKEx (SDKBuffer);
+	initializeSDKEx (SDKBuffer, (m_DeviceDriverType == eOIEDeviceDriverType::OIEVersion3) || (m_DeviceDriverType == eOIEDeviceDriverType::OIEVersion3Compatibility));
 
 }
 
@@ -274,7 +340,7 @@ void CDriver_ScanLab_OIE::InitializeCustomSDK(const LibMCDriver_ScanLabOIE_uint6
 	for (size_t nIndex = 0; nIndex < nOIEDLLBufferSize; nIndex++)
 		SDKBuffer[nIndex] = pOIEDLLBuffer[nIndex];
 
-	initializeSDKEx(SDKBuffer);
+	initializeSDKEx(SDKBuffer, (m_DeviceDriverType == eOIEDeviceDriverType::OIEVersion3) || (m_DeviceDriverType == eOIEDeviceDriverType::OIEVersion3Compatibility));
 
 }
 
@@ -345,6 +411,9 @@ void CDriver_ScanLab_OIE::releaseInstance()
 	m_pLibCryptoResourceFile = nullptr;
 	m_pQT5CoreResourceFile = nullptr;
 	m_pQT5NetworkResourceFile = nullptr;
+	m_pOIECalibrationLibraryResourceFile = nullptr;
+	m_pRTCStreamParserResourceFile = nullptr;
+
 }
 
 
@@ -357,3 +426,70 @@ IDeviceConfiguration* CDriver_ScanLab_OIE::ParseDeviceConfiguration(const std::s
 
 }
 
+
+CDriver_ScanLab_OIE2::CDriver_ScanLab_OIE2(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: CDriver_ScanLab_OIE (sName, pDriverEnvironment, eOIEDeviceDriverType::OIEVersion2)
+{
+
+}
+
+CDriver_ScanLab_OIE2::~CDriver_ScanLab_OIE2()
+{
+
+}
+
+std::string CDriver_ScanLab_OIE2::getTypeString()
+{
+	return "scanlab-oie2";
+}
+
+std::string CDriver_ScanLab_OIE2::GetType()
+{
+	return getTypeString();
+}
+
+
+
+CDriver_ScanLab_OIE3::CDriver_ScanLab_OIE3(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: CDriver_ScanLab_OIE(sName, pDriverEnvironment, eOIEDeviceDriverType::OIEVersion3)
+{
+
+}
+
+CDriver_ScanLab_OIE3::~CDriver_ScanLab_OIE3()
+{
+
+}
+
+std::string CDriver_ScanLab_OIE3::getTypeString()
+{
+	return "scanlab-oie3";
+}
+
+std::string CDriver_ScanLab_OIE3::GetType()
+{
+	return getTypeString();
+}
+
+
+
+CDriver_ScanLab_OIE3Compat::CDriver_ScanLab_OIE3Compat(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: CDriver_ScanLab_OIE(sName, pDriverEnvironment, eOIEDeviceDriverType::OIEVersion3Compatibility)
+{
+
+}
+
+CDriver_ScanLab_OIE3Compat::~CDriver_ScanLab_OIE3Compat()
+{
+
+}
+
+std::string CDriver_ScanLab_OIE3Compat::getTypeString()
+{
+	return "scanlab-oie3compat";
+}
+
+std::string CDriver_ScanLab_OIE3Compat::GetType()
+{
+	return getTypeString();
+}

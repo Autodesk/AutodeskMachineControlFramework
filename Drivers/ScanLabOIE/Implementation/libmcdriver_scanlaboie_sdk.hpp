@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
+#define OIE_TRIGGERCHANNELIDENTIFIER_FREEVARIABLE0 39
+#define OIE_TRIGGERCHANNELIDENTIFIER_FREEVARIABLE1 40
 
 namespace LibMCDriver_ScanLabOIE {
 	namespace Impl {
@@ -62,12 +64,7 @@ namespace LibMCDriver_ScanLabOIE {
 			uint32_t m_nPatchVersion;
 		} oie_appinfo;
 
-		typedef struct _oie_pkt {
-			uint32_t pktNr; 
-			uint32_t id; 
-			uint8_t flags; 
-			const void* data;
-		} oie_pkt;
+		typedef void * oie_pkt;
 
 		typedef struct _oie_signalinfo {
 			uint32_t nr;
@@ -118,10 +115,12 @@ namespace LibMCDriver_ScanLabOIE {
 
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_type) (const char * pDeviceConfigPath, int32_t * pRTCType);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_signals) (const char* pDeviceConfigPath, uint32_t* pSignalBuffer, uint32_t * pSignalBufferSize);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_signal_ids) (const char* pDeviceConfigPath, uint32_t* pSignalBuffer, uint32_t* pSignalBufferSize);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_sensor_signals) (const char* pDeviceConfigPath, uint32_t* pSignalBuffer, uint32_t* pSignalBufferSize);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_additional_app_data_signals) (const char* pDeviceConfigPath, oie_signalinfo* pSignalInfoBuffer, uint32_t* pSignalBufferSize);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_measurement_tag_usage) (const char* pDeviceConfigPath, uint32_t* mtagUsage);
 
+		
 
 		class CScanLabOIESDK_DLLDirectoryCache {
 		private:
@@ -184,6 +183,7 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_pkt_get_xy oie_pkt_get_xy = nullptr;
 			PScanLabOIEPtr_oie_get_rtc_type oie_get_rtc_type = nullptr;
 			PScanLabOIEPtr_oie_get_rtc_signals oie_get_rtc_signals = nullptr;
+			PScanLabOIEPtr_oie_get_rtc_signal_ids oie_get_rtc_signal_ids = nullptr;
 			PScanLabOIEPtr_oie_get_sensor_signals oie_get_sensor_signals = nullptr;
 			PScanLabOIEPtr_oie_get_additional_app_data_signals oie_get_additional_app_data_signals = nullptr;
 			PScanLabOIEPtr_oie_get_measurement_tag_usage oie_get_measurement_tag_usage = nullptr;

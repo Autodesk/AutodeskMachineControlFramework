@@ -91,6 +91,10 @@
 		<error name="INVALIDSKYWRITINGNPREV" code="1038" description="Invalid Skywriting N Prev." />
 		<error name="INVALIDSKYWRITINGNPOST" code="1039" description="Invalid Skywriting N Post." />
 		
+		<error name="OIEHASNOTBEENINITIALIZED" code="1040" description="OIE has not been initialized." />
+		<error name="UNSUPPORTEDOIEOPERATIONMODE" code="1041" description="Unsupported OIE Operation Mode." />
+		
+		
 		
 	</errors>
 
@@ -110,6 +114,14 @@
 	   <option name="Port16bitDigital" value="2" />
 	   <option name="Port12BitAnalog1" value="3" />
 	   <option name="Port12BitAnalog2" value="4" />
+	</enum>
+
+
+	<enum name="OIEOperationMode">
+	   <option name="OIENotInitialized" value="0" />
+	   <option name="OIEVersion2" value="1" />
+	   <option name="OIEVersion3Compatibility" value="2" />
+	   <option name="OIEVersion3" value="3" />
 	</enum>
 
 	<struct name="Point2D">
@@ -355,6 +367,7 @@ Custom implementation
 		
 		<method name="InitializeForOIE" description="Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.">
 			<param name="SignalChannels" type="basicarray" class="uint32" pass="in" description="Array of signal channels. MUST NOT be empty" />
+			<param name="OperationMode" type="enum" class="OIEOperationMode" pass="in" description="OIE Operation Mode" />			
 		</method>
 				
 		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">

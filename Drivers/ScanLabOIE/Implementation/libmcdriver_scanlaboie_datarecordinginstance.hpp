@@ -109,8 +109,8 @@ private:
     uint32_t m_nBufferSizeInRecords;
     size_t m_nValueCountPerBuffer;
     
-    int32_t* getRTCData (uint32_t nRecordIndex);
-    int32_t* getSensorData(uint32_t nRecordIndex);
+    int32_t* getRTCData (size_t nRecordIndex);
+    int32_t* getSensorData(size_t nRecordIndex);
 
 public:
 
@@ -134,9 +134,9 @@ public:
 
     uint32_t getBufferSizeInRecords ();
 
-    void copyRTCSignals (uint32_t nRecordIndex, int32_t * pRTCSignalBuffer, size_t nRTCSignalBufferSize);
+    void copyRTCSignals (size_t nRecordIndex, int32_t * pRTCSignalBuffer, size_t nRTCSignalBufferSize);
 
-    void copySensorSignals(uint32_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
+    void copySensorSignals(size_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
 
     void copyXCoordinates(double * pCoordinateBuffer, size_t nCoordinateBufferSize);
 

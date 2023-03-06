@@ -149,6 +149,7 @@ public:
 
 		pStateEnvironment->LogMessage("Loading SDK...");
 		pOIEDriver->SetDependencyResourceNames("libssl-1_1-x64", "libcrypto-1_1-x64", "qt5core-x64", "qt5network-x64");
+		pOIEDriver->SetOIE3ResourceNames("oiecalibrationlibrary64", "rtcstreamparser64");
 		pOIEDriver->InitializeSDK("liboie-x64");
 
 		pStateEnvironment->LogMessage("Loading OIE Device Config...");
@@ -166,6 +167,9 @@ public:
 		default:
 			throw std::runtime_error("Unknown RTC Card");
 		}
+
+		std::cout << "RTC Signal Count: " << pDeviceConfigurationInstance->GetRTCSignalCount() << std::endl;
+		std::cout << "Sensor Signal Count: " << pDeviceConfigurationInstance->GetSensorSignalCount() << std::endl;
 
 		std::vector<uint32_t> signals;
 		pDeviceConfigurationInstance->GetRTCSignalIDs(signals);
@@ -210,8 +214,8 @@ public:
 
 		pStateEnvironment->LogMessage("Initializing for OIE..");
 		auto pRTCContext = pRTC6Driver->GetContext();
-		pRTCContext->InitializeForOIE(signals);
-
+		pRTCContext->InitializeForOIE(signals, LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility);
+		
 
 		pStateEnvironment->LogMessage("Adding Device...");
 		auto pDevice = pOIEDriver->AddDevice("oie1", sOIEIPAddress, 21072, 200000);
@@ -222,6 +226,12 @@ public:
 
 		pStateEnvironment->LogMessage("Connecting..");
 		pDevice->Connect("sluser", "sluser");
+
+		std::vector<uint8_t> AppPackageBuffer;
+		pStateEnvironment->LoadResourceData("aib-3.0.0", AppPackageBuffer);
+
+		//pStateEnvironment->LogMessage("Installing App");
+		//pDevice->InstallApp(AppPackageBuffer);
 
 		uint32_t appCount = pDevice->GetAppCount();
 		pStateEnvironment->LogMessage("Found " + std::to_string (appCount) + " apps...");
@@ -301,8 +311,10 @@ public:
 		std::vector<double> XArrayBuffer;
 		std::vector<double> YArrayBuffer;
 		std::vector<int32_t> SignalsBuffer;
+		std::vector<uint32_t> PacketNumbersBuffer;
 		pRecording->GetAllCoordinates(XArrayBuffer, YArrayBuffer);
 		pRecording->GetAllSensorSignals(0, SignalsBuffer);
+		pRecording->GetAllPacketNumbers(PacketNumbersBuffer);
 
 		size_t nRecordCount = pRecording->GetRecordCount();
 
@@ -312,6 +324,8 @@ public:
 			throw std::runtime_error("retrieved invalid recording y coord data");
 		if (SignalsBuffer.size() != nRecordCount)
 			throw std::runtime_error("retrieved invalid recording signal data");
+		if (PacketNumbersBuffer.size() != nRecordCount)
+			throw std::runtime_error("retrieved invalid packet numbers data");
 
 		std::ofstream fStream;
 		fStream.open("debug.csv");
@@ -321,7 +335,7 @@ public:
 		fStream << "packet number, X, Y, Sensor Value" << std::endl;
 
 		for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
-			fStream << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer[nRecordIndex] << std::endl;
+			fStream << PacketNumbersBuffer[nRecordIndex] << ", " << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer[nRecordIndex] << std::endl;
 		}
 
 		pStateEnvironment->LogMessage("Waiting..");

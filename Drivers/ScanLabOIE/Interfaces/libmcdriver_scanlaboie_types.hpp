@@ -146,6 +146,9 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP 1039 /** Could not stop app. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX 1040 /** Invalid sensor index. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX 1041 /** Invalid RTC index. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER 1042 /** Could not store OIE Calibration library buffer. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER 1043 /** Could not store RTC Stream parser buffer. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS 1044 /** Could not get RTC Signal IDs. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -204,6 +207,9 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP: return "Could not stop app.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX: return "Invalid sensor index.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX: return "Invalid RTC index.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER: return "Could not store OIE Calibration library buffer.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER: return "Could not store RTC Stream parser buffer.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS: return "Could not get RTC Signal IDs.";
     default: return "unknown error";
   }
 }
@@ -231,9 +237,17 @@ namespace LibMCDriver_ScanLabOIE {
     RTC6 = 2
   };
   
+  enum class eOIEDeviceDriverType : LibMCDriver_ScanLabOIE_int32 {
+    Unknown = 0,
+    OIEVersion2 = 1,
+    OIEVersion3Compatibility = 2,
+    OIEVersion3 = 3
+  };
+  
 } // namespace LibMCDriver_ScanLabOIE;
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_ScanLabOIE::eRTCDeviceType eLibMCDriver_ScanLabOIERTCDeviceType;
+typedef LibMCDriver_ScanLabOIE::eOIEDeviceDriverType eLibMCDriver_ScanLabOIEOIEDeviceDriverType;
 
 #endif // __LIBMCDRIVER_SCANLABOIE_TYPES_HEADER_CPP

@@ -683,6 +683,12 @@ typedef IBaseSharedPtr<IOIEDevice> PIOIEDevice;
 class IDriver_ScanLab_OIE : public virtual IDriver {
 public:
 	/**
+	* IDriver_ScanLab_OIE::GetDriverType - Returns the type of the device driver.
+	* @return Type of device driver.
+	*/
+	virtual LibMCDriver_ScanLabOIE::eOIEDeviceDriverType GetDriverType() = 0;
+
+	/**
 	* IDriver_ScanLab_OIE::SetDependencyResourceNames - Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
 	* @param[in] sLibSSLResourceName - Resource name of LibSSL DLL. Default is libssl_win64 or libssl_linux64, depending on platform.
 	* @param[in] sLibCryptoResourceName - Resource name of LibCrypto DLL. Default is libcrypto_win64 or libcrypto_linux64, depending on platform.
@@ -690,6 +696,13 @@ public:
 	* @param[in] sQT5NetworkResourceName - Resource name of Qt5Network DLL. Default is qt5network_win64 or qt5network_linux64, depending on platform.
 	*/
 	virtual void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::SetOIE3ResourceNames - Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.
+	* @param[in] sOIECalibrationLibraryResourceName - Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform.
+	* @param[in] sRTCStreamParserResourceName - Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform.
+	*/
+	virtual void SetOIE3ResourceNames(const std::string & sOIECalibrationLibraryResourceName, const std::string & sRTCStreamParserResourceName) = 0;
 
 	/**
 	* IDriver_ScanLab_OIE::InitializeSDK - Initializes the ScanLab OIE SDK.

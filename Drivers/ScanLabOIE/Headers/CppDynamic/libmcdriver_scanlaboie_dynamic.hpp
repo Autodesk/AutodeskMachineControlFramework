@@ -228,6 +228,9 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP: return "COULDNOTSTOPAPP";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX: return "INVALIDSENSORINDEX";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX: return "INVALIDRTCINDEX";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER: return "COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER: return "COULDNOTSTORERTCSTREAMPARSERBUFFER";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS: return "COULDNOTGETRTCSIGNALIDS";
 		}
 		return "UNKNOWN";
 	}
@@ -286,6 +289,9 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP: return "Could not stop app.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX: return "Invalid sensor index.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX: return "Invalid RTC index.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER: return "Could not store OIE Calibration library buffer.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER: return "Could not store RTC Stream parser buffer.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS: return "Could not get RTC Signal IDs.";
 		}
 		return "unknown error";
 	}
@@ -604,7 +610,9 @@ public:
 	{
 	}
 	
+	inline eOIEDeviceDriverType GetDriverType();
 	inline void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName);
+	inline void SetOIE3ResourceNames(const std::string & sOIECalibrationLibraryResourceName, const std::string & sRTCStreamParserResourceName);
 	inline void InitializeSDK(const std::string & sOIEResourceName);
 	inline void InitializeCustomSDK(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & OIEDLLBuffer);
 	inline POIEDevice AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut);
@@ -790,7 +798,9 @@ public:
 		pWrapperTable->m_OIEDevice_RetrieveCurrentRecording = nullptr;
 		pWrapperTable->m_OIEDevice_ClearCurrentRecording = nullptr;
 		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeCustomSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_AddDevice = nullptr;
@@ -1334,12 +1344,30 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setoie3resourcenames");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setoie3resourcenames");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1705,8 +1733,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_LoadRecordingFromBuild == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_setoie3resourcenames", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_initializesdk", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK));
@@ -2452,6 +2488,18 @@ public:
 	 */
 	
 	/**
+	* CDriver_ScanLab_OIE::GetDriverType - Returns the type of the device driver.
+	* @return Type of device driver.
+	*/
+	eOIEDeviceDriverType CDriver_ScanLab_OIE::GetDriverType()
+	{
+		eOIEDeviceDriverType resultDeviceDriverType = (eOIEDeviceDriverType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_GetDriverType(m_pHandle, &resultDeviceDriverType));
+		
+		return resultDeviceDriverType;
+	}
+	
+	/**
 	* CDriver_ScanLab_OIE::SetDependencyResourceNames - Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
 	* @param[in] sLibSSLResourceName - Resource name of LibSSL DLL. Default is libssl_win64 or libssl_linux64, depending on platform.
 	* @param[in] sLibCryptoResourceName - Resource name of LibCrypto DLL. Default is libcrypto_win64 or libcrypto_linux64, depending on platform.
@@ -2461,6 +2509,16 @@ public:
 	void CDriver_ScanLab_OIE::SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_SetDependencyResourceNames(m_pHandle, sLibSSLResourceName.c_str(), sLibCryptoResourceName.c_str(), sQT5CoreResourceName.c_str(), sQT5NetworkResourceName.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab_OIE::SetOIE3ResourceNames - Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.
+	* @param[in] sOIECalibrationLibraryResourceName - Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform.
+	* @param[in] sRTCStreamParserResourceName - Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform.
+	*/
+	void CDriver_ScanLab_OIE::SetOIE3ResourceNames(const std::string & sOIECalibrationLibraryResourceName, const std::string & sRTCStreamParserResourceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_SetOIE3ResourceNames(m_pHandle, sOIECalibrationLibraryResourceName.c_str(), sRTCStreamParserResourceName.c_str()));
 	}
 	
 	/**

@@ -41,6 +41,7 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
 #define DATARECORDING_MINBUFFERSIZEINRECORDS 256
 #define DATARECORDING_MAXBUFFERSIZEINRECORDS (1024 * 1024)
 
+
 #include <iostream>
 #include <cstring>
 
@@ -216,20 +217,20 @@ PDataRecordingInstance CDataRecordingInstance::createEmptyDuplicate()
     return std::make_shared<CDataRecordingInstance>(m_nValuesPerRecord, m_nRTCValuesPerRecord, m_nBufferSizeInRecords);
 }
 
-int32_t* CDataRecordingInstance::getRTCData(uint32_t nRecordIndex)
+int32_t* CDataRecordingInstance::getRTCData(size_t nRecordIndex)
 {
     auto pRecord = m_Entries.getData(nRecordIndex);
     return &pRecord->m_pData[0];
 }
 
-int32_t* CDataRecordingInstance::getSensorData(uint32_t nRecordIndex)
+int32_t* CDataRecordingInstance::getSensorData(size_t nRecordIndex)
 {
     auto pRecord = m_Entries.getData(nRecordIndex);
     return &pRecord->m_pData[m_nRTCValuesPerRecord];
 }
 
 
-void CDataRecordingInstance::copyRTCSignals(uint32_t nRecordIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize)
+void CDataRecordingInstance::copyRTCSignals(size_t nRecordIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize)
 {
     uint32_t nRTCValuesPerRecord = getRTCValuesPerRecord();
     int32_t* pRTCData = getRTCData(nRecordIndex);
@@ -243,7 +244,7 @@ void CDataRecordingInstance::copyRTCSignals(uint32_t nRecordIndex, int32_t* pRTC
 }
 
 
-void CDataRecordingInstance::copySensorSignals(uint32_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize)
+void CDataRecordingInstance::copySensorSignals(size_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize)
 {
     uint32_t nSensorValuesPerRecord = getSensorValuesPerRecord();
     int32_t* pSensorData = getSensorData(nRecordIndex);

@@ -46,6 +46,8 @@ protected:
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
+	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
+
 	void writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower);
 
 public:
@@ -114,7 +116,7 @@ public:
 
 	void GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier) override;
 
-	void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer) override;
+	void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode) override;
 
 	void EnableOIE() override;
 
@@ -123,6 +125,10 @@ public:
 	void StartOIEMeasurement() override;
 
 	void StopOIEMeasurement() override;
+
+	void StartOIEPIDControl();
+
+	void StopOIEPIDControl();
 
 	void DisableSkyWriting() override;
 

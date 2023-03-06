@@ -692,8 +692,9 @@ public:
 	* IRTCContext::InitializeForOIE - Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.
 	* @param[in] nSignalChannelsBufferSize - Number of elements in buffer
 	* @param[in] pSignalChannelsBuffer - Array of signal channels. MUST NOT be empty
+	* @param[in] eOperationMode - OIE Operation Mode
 	*/
-	virtual void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer) = 0;
+	virtual void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode) = 0;
 
 	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.

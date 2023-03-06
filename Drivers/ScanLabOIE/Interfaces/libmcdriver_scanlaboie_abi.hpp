@@ -631,6 +631,15 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 **************************************************************************************************************************/
 
 /**
+* Returns the type of the device driver.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[out] pDeviceDriverType - Type of device driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType * pDeviceDriverType);
+
+/**
 * Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
 *
 * @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
@@ -641,6 +650,16 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pLibSSLResourceName, const char * pLibCryptoResourceName, const char * pQT5CoreResourceName, const char * pQT5NetworkResourceName);
+
+/**
+* Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pOIECalibrationLibraryResourceName - Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform.
+* @param[in] pRTCStreamParserResourceName - Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_setoie3resourcenames(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pOIECalibrationLibraryResourceName, const char * pRTCStreamParserResourceName);
 
 /**
 * Initializes the ScanLab OIE SDK.

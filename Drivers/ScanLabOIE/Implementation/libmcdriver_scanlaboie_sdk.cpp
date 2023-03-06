@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define OIE_ERRORMESSAGE_BUFFERSIZE 1024
 
+
 #include <vector>
 #include <iostream>
 
@@ -47,20 +48,24 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
 #define SCANLABOIE_MAXDLLNAMELENGTH 1024 * 1024
 
 #ifdef _WIN32
-void* _loadScanLabOIEAddress(HMODULE hLibrary, const char* pSymbolName) {
+void* _loadScanLabOIEAddress(HMODULE hLibrary, const char* pSymbolName, bool bMustExist = true) {
 	void* pFuncPtr = (void*)GetProcAddress(hLibrary, pSymbolName);
-	if (pFuncPtr == nullptr)
-		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string(pSymbolName));
+	if (bMustExist) {
+		if (pFuncPtr == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string(pSymbolName));
+	}
 
 	return pFuncPtr;
 }
 #else
-void* _loadScanLabOIEAddress(void* hLibrary, const char* pSymbolName) {
+void* _loadScanLabOIEAddress(void* hLibrary, const char* pSymbolName, bool bMustExist = true) {
 
 	void* pFuncPtr = (void*)dlsym(hLibrary, pSymbolName);
 	dlerror();
-	if (pFuncPtr == nullptr)
-		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string(pSymbolName));
+	if (bMustExist) {
+		if (pFuncPtr == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string(pSymbolName));
+	}
 
 	return pFuncPtr;
 }
@@ -178,7 +183,9 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 	this->oie_pkt_get_xy = (PScanLabOIEPtr_oie_pkt_get_xy)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_xy");
 
 	this->oie_get_rtc_type = (PScanLabOIEPtr_oie_get_rtc_type)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_type");
-	this->oie_get_rtc_signals = (PScanLabOIEPtr_oie_get_rtc_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_signals");
+	this->oie_get_rtc_signals = (PScanLabOIEPtr_oie_get_rtc_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_signals", false);
+	this->oie_get_rtc_signal_ids = (PScanLabOIEPtr_oie_get_rtc_signal_ids)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_signal_ids", false);	
+
 	this->oie_get_sensor_signals = (PScanLabOIEPtr_oie_get_sensor_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_sensor_signals");
 	this->oie_get_additional_app_data_signals = (PScanLabOIEPtr_oie_get_additional_app_data_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_additional_app_data_signals");
 	this->oie_get_measurement_tag_usage = (PScanLabOIEPtr_oie_get_measurement_tag_usage)_loadScanLabOIEAddress(hLibrary, "oie_get_measurement_tag_usage");
@@ -276,6 +283,7 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	this->oie_pkt_get_xy = nullptr;
 	this->oie_get_rtc_type = nullptr;
 	this->oie_get_rtc_signals = nullptr;
+	this->oie_get_rtc_signal_ids = nullptr;
 	this->oie_get_sensor_signals = nullptr;
 	this->oie_get_additional_app_data_signals = nullptr;
 	this->oie_get_measurement_tag_usage = nullptr;

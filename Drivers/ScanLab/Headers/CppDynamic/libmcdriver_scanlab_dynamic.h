@@ -450,9 +450,10 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCommunicat
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] nSignalChannelsBufferSize - Number of elements in buffer
 * @param[in] pSignalChannelsBuffer - uint32 buffer of Array of signal channels. MUST NOT be empty
+* @param[in] eOperationMode - OIE Operation Mode
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_InitializeForOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_InitializeForOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, LibMCDriver_ScanLab::eOIEOperationMode eOperationMode);
 
 /**
 * Writes an OIE enabling command block to the open list.

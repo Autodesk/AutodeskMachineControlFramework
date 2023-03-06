@@ -594,7 +594,10 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY));
 				}
 
-				m_pCurrentDataRecording->startRecord(pkt->pktNr, dX, dY);
+				// First uint32 of packet is packed number
+				uint32_t* pPacketNumber = (uint32_t*)pkt;
+
+				m_pCurrentDataRecording->startRecord(*pPacketNumber, dX, dY);
 
 				//std::cout << "Packet Np: " << pkt->pktNr << " X: " << dX << " Y: " << dY << std::endl;
 				uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);

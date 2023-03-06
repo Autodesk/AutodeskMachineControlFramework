@@ -144,6 +144,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT 1037 /** Invalid Skywriting Laser On Shift. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV 1038 /** Invalid Skywriting N Prev. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST 1039 /** Invalid Skywriting N Post. */
+#define LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED 1040 /** OIE has not been initialized. */
+#define LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE 1041 /** Unsupported OIE Operation Mode. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -200,6 +202,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT: return "Invalid Skywriting Laser On Shift.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV: return "Invalid Skywriting N Prev.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST: return "Invalid Skywriting N Post.";
+    case LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED: return "OIE has not been initialized.";
+    case LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE: return "Unsupported OIE Operation Mode.";
     default: return "unknown error";
   }
 }
@@ -238,6 +242,13 @@ namespace LibMCDriver_ScanLab {
     Port12BitAnalog2 = 4
   };
   
+  enum class eOIEOperationMode : LibMCDriver_ScanLab_int32 {
+    OIENotInitialized = 0,
+    OIEVersion2 = 1,
+    OIEVersion3Compatibility = 2,
+    OIEVersion3 = 3
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -263,6 +274,7 @@ namespace LibMCDriver_ScanLab {
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_ScanLab::eLaserMode eLibMCDriver_ScanLabLaserMode;
 typedef LibMCDriver_ScanLab::eLaserPort eLibMCDriver_ScanLabLaserPort;
+typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;
 

@@ -226,6 +226,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT: return "INVALIDSKYWRITINGLASERONSHIFT";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV: return "INVALIDSKYWRITINGNPREV";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST: return "INVALIDSKYWRITINGNPOST";
+			case LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED: return "OIEHASNOTBEENINITIALIZED";
+			case LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE: return "UNSUPPORTEDOIEOPERATIONMODE";
 		}
 		return "UNKNOWN";
 	}
@@ -282,6 +284,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT: return "Invalid Skywriting Laser On Shift.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV: return "Invalid Skywriting N Prev.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST: return "Invalid Skywriting N Post.";
+			case LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED: return "OIE has not been initialized.";
+			case LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE: return "Unsupported OIE Operation Mode.";
 		}
 		return "unknown error";
 	}
@@ -535,7 +539,7 @@ public:
 	inline void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
-	inline void InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer);
+	inline void InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode);
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline void StartOIEMeasurement();
@@ -2293,10 +2297,11 @@ public:
 	/**
 	* CRTCContext::InitializeForOIE - Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.
 	* @param[in] SignalChannelsBuffer - Array of signal channels. MUST NOT be empty
+	* @param[in] eOperationMode - OIE Operation Mode
 	*/
-	void CRTCContext::InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer)
+	void CRTCContext::InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_InitializeForOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)SignalChannelsBuffer.size(), SignalChannelsBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_InitializeForOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)SignalChannelsBuffer.size(), SignalChannelsBuffer.data(), eOperationMode));
 	}
 	
 	/**

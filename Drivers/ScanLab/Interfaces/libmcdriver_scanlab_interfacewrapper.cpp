@@ -1101,7 +1101,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getcommunicationtimeout
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_initializeforoie(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_initializeforoie(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, eLibMCDriver_ScanLabOIEOperationMode eOperationMode)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -1112,7 +1112,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_initializeforoie(LibMCD
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->InitializeForOIE(nSignalChannelsBufferSize, pSignalChannelsBuffer);
+		pIRTCContext->InitializeForOIE(nSignalChannelsBufferSize, pSignalChannelsBuffer, eOperationMode);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
