@@ -83,16 +83,15 @@
 		<error name="INVALIDMAXLASERPOWER" code="1031" description="Invalid max laser power." />
 		<error name="INVALIDLASERDELAY" code="1032" description="Invalid laser delay." />
 		<error name="INVALIDSCANNERDELAY" code="1033" description="Invalid scanner delay." />
-		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />
-		
+		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />		
 		<error name="INVALIDOIESIGNALBUFFERARRAY" code="1035" description="Invalid OIE Signal buffer array." />
 		<error name="INVALIDSKYWRITINGTIMELAG" code="1036" description="Invalid Skywriting Timelag." />
 		<error name="INVALIDSKYWRITINGLASERONSHIFT" code="1037" description="Invalid Skywriting Laser On Shift." />
 		<error name="INVALIDSKYWRITINGNPREV" code="1038" description="Invalid Skywriting N Prev." />
-		<error name="INVALIDSKYWRITINGNPOST" code="1039" description="Invalid Skywriting N Post." />
-		
+		<error name="INVALIDSKYWRITINGNPOST" code="1039" description="Invalid Skywriting N Post." />		
 		<error name="OIEHASNOTBEENINITIALIZED" code="1040" description="OIE has not been initialized." />
-		<error name="UNSUPPORTEDOIEOPERATIONMODE" code="1041" description="Unsupported OIE Operation Mode." />
+		<error name="UNSUPPORTEDOIEOPERATIONMODE" code="1041" description="Unsupported OIE Operation Mode." />		
+		
 		
 		
 		

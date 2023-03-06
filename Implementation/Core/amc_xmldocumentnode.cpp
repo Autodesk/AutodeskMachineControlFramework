@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_exceptiontypes.hpp"
 #include "PugiXML/pugixml.hpp"
 
+#include <algorithm>
+
 using namespace AMC;
 
 CXMLDocumentNodeInstance::CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, CXMLDocumentNodeInstance* pParentNode, PXMLDocumentNameSpace pNameSpace, const std::string& sNodeName)
