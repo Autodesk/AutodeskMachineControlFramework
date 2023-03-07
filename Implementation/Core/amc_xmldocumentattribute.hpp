@@ -65,6 +65,10 @@ namespace AMC {
 		
 		void setValue (const std::string & sValue);
 
+		std::string getPrefixedName();
+
+		CXMLDocumentNodeInstance* getNode ();
+
 	};
 
 	

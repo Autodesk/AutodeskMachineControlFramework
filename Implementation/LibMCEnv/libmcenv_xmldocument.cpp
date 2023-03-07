@@ -60,7 +60,7 @@ CXMLDocument::~CXMLDocument()
 
 std::string CXMLDocument::GetDefaultNamespace()
 {
-    return m_pXMLDocument->GetDefaultNamespace();
+    return m_pXMLDocument->GetDefaultNamespace()->getNameSpaceName();
 }
 
 LibMCEnv_uint64 CXMLDocument::GetNamespaceCount()

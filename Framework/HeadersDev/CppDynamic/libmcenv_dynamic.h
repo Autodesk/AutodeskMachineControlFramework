@@ -1263,7 +1263,7 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_IsValidBoolPtr) (LibMCEnv
 * @param[out] pValue - returns the value .
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, bool * pValue);
 
 /**
 * Sets the value of the attribute as string.

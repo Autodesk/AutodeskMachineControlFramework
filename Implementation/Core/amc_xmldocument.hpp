@@ -68,7 +68,7 @@ namespace AMC {
 
 		void parseXMLData(uint64_t nDataSize, const uint8_t * pData);
 
-		std::string GetDefaultNamespace();
+		PXMLDocumentNameSpace GetDefaultNamespace();
 
 		uint64_t GetNamespaceCount();
 

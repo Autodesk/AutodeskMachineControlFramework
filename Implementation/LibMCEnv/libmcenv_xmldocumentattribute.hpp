@@ -82,7 +82,7 @@ public:
 
 	bool IsValidBool() override;
 
-	LibMCEnv_double GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) override;
+	bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) override;
 
 	void SetValue(const std::string & sValue) override;
 

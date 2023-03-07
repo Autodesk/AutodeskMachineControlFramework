@@ -1276,7 +1276,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_isvalidbool(LibMC
 * @param[out] pValue - returns the value .
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, bool * pValue);
 
 /**
 * Sets the value of the attribute as string.

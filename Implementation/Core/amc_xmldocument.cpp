@@ -138,9 +138,9 @@ void CXMLDocumentInstance::parseXMLData(uint64_t nDataSize, const uint8_t* pData
 	extractPugiDocument(pDocument);
 }
 
-std::string CXMLDocumentInstance::GetDefaultNamespace()
+PXMLDocumentNameSpace CXMLDocumentInstance::GetDefaultNamespace()
 {
-	return m_pDefaultNameSpace->getNameSpace ();
+	return m_pDefaultNameSpace;
 }
 
 uint64_t CXMLDocumentInstance::GetNamespaceCount()
@@ -154,7 +154,7 @@ void CXMLDocumentInstance::GetNamespace(const uint64_t nIndex, std::string& sNam
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACEINDEX, std::to_string (nIndex));
 
 	auto pNameSpace = m_Namespaces.at(nIndex);
-	sNamespace = pNameSpace->getNameSpace();
+	sNamespace = pNameSpace->getNameSpaceName();
 	sNamespacePrefix = pNameSpace->getPrefix ();
 
 }
@@ -168,6 +168,9 @@ bool CXMLDocumentInstance::HasNamespace(const std::string& sNamespace)
 
 PXMLDocumentNameSpace CXMLDocumentInstance::FindNamespace(const std::string& sNamespace, bool bMustExist)
 {
+	if (sNamespace.empty())
+		return m_pDefaultNameSpace;
+
 	auto iNamespaceIter = m_NamespaceMap.find(sNamespace);
 	if (iNamespaceIter != m_NamespaceMap.end()) {
 		return iNamespaceIter->second;

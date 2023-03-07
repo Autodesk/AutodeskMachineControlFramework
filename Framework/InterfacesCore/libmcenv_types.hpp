@@ -186,6 +186,10 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COULDNOTPARSEXMLDATA 10089 /** could not parse XML data. */
 #define LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE 10090 /** Invalid profile value type. */
 #define LIBMCENV_ERROR_XMLDOCUMENTMISMATCH 10091 /** XML Document mismatch. */
+#define LIBMCENV_ERROR_INVALIDINTEGERVALUEATTRIBUTE 10092 /** Invalid integer value attribute. */
+#define LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE 10093 /** Integer value attribute out of range. */
+#define LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE 10094 /** Invalid double value attribute. */
+#define LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE 10095 /** Double value attribute out of range. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -284,6 +288,10 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
     case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type.";
     case LIBMCENV_ERROR_XMLDOCUMENTMISMATCH: return "XML Document mismatch.";
+    case LIBMCENV_ERROR_INVALIDINTEGERVALUEATTRIBUTE: return "Invalid integer value attribute.";
+    case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "Integer value attribute out of range.";
+    case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "Invalid double value attribute.";
+    case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "Double value attribute out of range.";
     default: return "unknown error";
   }
 }

@@ -33,9 +33,12 @@ Abstract: This is a stub class definition of CXMLDocumentAttribute
 
 #include "libmcenv_xmldocumentattribute.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "amc_xmldocumentnode.hpp"
 
 // Include custom headers here.
 #include "libmc_exceptiontypes.hpp"
+
+#include "common_utils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -46,7 +49,7 @@ using namespace LibMCEnv::Impl;
 CXMLDocumentAttribute::CXMLDocumentAttribute(AMC::PXMLDocumentAttributeInstance pAttributeInstance)
 	: m_pAttributeInstance (pAttributeInstance)
 {
-	if (pAttributeInstance.get() != nullptr)
+	if (pAttributeInstance.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 
@@ -57,7 +60,7 @@ CXMLDocumentAttribute::~CXMLDocumentAttribute()
 
 std::string CXMLDocumentAttribute::GetNameSpace()
 {
-	return m_pAttributeInstance->getNameSpace()->getNameSpace();
+	return m_pAttributeInstance->getNameSpace()->getNameSpaceName();
 }
 
 
@@ -73,56 +76,112 @@ std::string CXMLDocumentAttribute::GetValue()
 
 bool CXMLDocumentAttribute::IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sValue = m_pAttributeInstance->getValue();
+	try {
+		int64_t nValue = std::stoll (sValue);
+
+		return (nValue >= nMinValue) && (nValue <= nMaxValue);
+	}
+	catch (...) {
+		throw ELibMCCustomException(LIBMCENV_ERROR_INVALIDINTEGERVALUEATTRIBUTE, sValue);
+	}
 }
 
 LibMCEnv_int64 CXMLDocumentAttribute::GetIntegerValue(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sValue = m_pAttributeInstance->getValue();
+	try {
+		int64_t nValue = std::stoll(sValue);
+
+		if ((nValue < nMinValue) && (nValue > nMaxValue))
+			throw ELibMCCustomException(LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE, sValue);
+
+		return nValue;
+
+	}
+	catch (...) {
+		throw ELibMCCustomException(LIBMCENV_ERROR_INVALIDINTEGERVALUEATTRIBUTE, sValue);
+	}
 }
 
 bool CXMLDocumentAttribute::IsValidDouble(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sValue = m_pAttributeInstance->getValue();
+	try {
+		double dValue = std::stod(sValue);
+
+		return (dValue >= dMinValue) && (dValue <= dMaxValue);
+	}
+	catch (...) {
+		throw ELibMCCustomException(LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE, sValue);
+	}
 }
 
 LibMCEnv_double CXMLDocumentAttribute::GetDoubleValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sValue = m_pAttributeInstance->getValue();
+	try {
+		double dValue = std::stod(sValue);
+
+		if ((dValue < dMinValue) && (dValue > dMaxValue))
+			throw ELibMCCustomException(LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE, sValue);
+
+		return dValue;
+
+	}
+	catch (...) {
+		throw ELibMCCustomException(LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE, sValue);
+	}
 }
 
 bool CXMLDocumentAttribute::IsValidBool()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sValue = AMCCommon::CUtils::toLowerString (AMCCommon::CUtils::trimString ( m_pAttributeInstance->getValue()));
+	if ((sValue == "true") || (sValue == "false"))
+		return true;
+		
+	return IsValidInteger(INT64_MIN, INT64_MAX);
 }
 
-LibMCEnv_double CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+bool CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sValue = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(m_pAttributeInstance->getValue()));
+	if (sValue == "true")
+		return true;
+	if (sValue == "false")
+		return false;
+
+	return (GetIntegerValue(INT64_MIN, INT64_MAX) != 0);
 }
 
 void CXMLDocumentAttribute::SetValue(const std::string & sValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pAttributeInstance->setValue (sValue);
 }
 
 void CXMLDocumentAttribute::SetIntegerValue(const LibMCEnv_int64 nValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pAttributeInstance->setValue(std::to_string (nValue));
 }
 
 void CXMLDocumentAttribute::SetDoubleValue(const LibMCEnv_double dValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pAttributeInstance->setValue(std::to_string(dValue));
 }
 
 void CXMLDocumentAttribute::SetBoolValue(const bool bValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (bValue)
+		m_pAttributeInstance->setValue("true");
+	else
+		m_pAttributeInstance->setValue("false");
 }
 
 void CXMLDocumentAttribute::Remove()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (m_pAttributeInstance.get() != nullptr) {
+		auto pInstance = m_pAttributeInstance;
+		pInstance->getNode()->RemoveAttribute(pInstance->getNameSpace().get(), pInstance->getAttributeName());
+	}
 }
 

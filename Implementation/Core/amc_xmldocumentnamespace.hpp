@@ -41,7 +41,7 @@ namespace AMC {
 	class CXMLDocumentNameSpace {
 	private:
 
-		std::string m_sNameSpace;
+		std::string m_sNameSpaceName;
 		std::string m_sPrefix;
 
 	public:
@@ -50,7 +50,7 @@ namespace AMC {
 		
 		virtual ~CXMLDocumentNameSpace();
 		
-		std::string getNameSpace ();
+		std::string getNameSpaceName ();
 
 		std::string getPrefix ();
 

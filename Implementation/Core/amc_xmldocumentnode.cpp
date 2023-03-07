@@ -61,12 +61,50 @@ bool CXMLDocumentNodeInstance::checkXMLNodeName(const std::string& sNodeName)
 
 void CXMLDocumentNodeInstance::extractFromPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode)
 {
+	if (pXMLDocument == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pXMLNode == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto pDefaultNameSpace = m_pDocument->GetDefaultNamespace();
+
+	auto attributes = pXMLNode->attributes();
+	for (auto attribute : attributes) {
+		AddAttribute (pDefaultNameSpace, attribute.name (), attribute.as_string ());
+	}
+
+	auto children = pXMLNode->children();
+	for (auto child : children) {
+		auto pChildNode = std::make_shared<CXMLDocumentNodeInstance> (m_pDocument, this, pDefaultNameSpace, child.name ());
+
+		addChildEx(pChildNode);
+
+		pChildNode->extractFromPugiNode(pXMLDocument, &child);
+	}
 
 }
 
 void CXMLDocumentNodeInstance::storeToPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode)
 {
+	if (pXMLDocument == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pXMLNode == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+	for (auto pAttribute : m_Attributes) {
+		std::string sAttributeName = pAttribute->getPrefixedName();
+		std::string sAttributeValue = pAttribute->getValue();
+
+		auto attribute = pXMLNode->append_attribute(sAttributeName.c_str());
+		attribute.set_value(sAttributeValue.c_str());
+	}
+
+	for (auto pChild : m_Children) {
+		std::string sChildName = pChild->getPrefixedName();
+
+		auto child = pXMLNode->append_child(sChildName.c_str());
+		pChild->storeToPugiNode(pXMLDocument, &child);
+	}
 }
 
 CXMLDocumentInstance* CXMLDocumentNodeInstance::getDocument()
@@ -167,12 +205,16 @@ PXMLDocumentAttributeInstance CXMLDocumentNodeInstance::AddAttribute(PXMLDocumen
 	if (pNameSpace == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto iIter = m_AttributeMap.find(std::make_pair(pNameSpace.get(), sName));
+	auto mapKey = std::make_pair(pNameSpace.get(), sName);
+	auto iIter = m_AttributeMap.find(mapKey);
 	if (iIter != m_AttributeMap.end()) 
 		throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEATTRIBUTE, sName);
 
 	auto pAttribute = std::make_shared<CXMLDocumentAttributeInstance>(m_pDocument, this, pNameSpace, sName);
 	pAttribute->setValue(sValue);
+
+	m_AttributeMap.insert(std::make_pair(mapKey, pAttribute));
+	m_Attributes.push_back(pAttribute);
 
 	return pAttribute;
 }
@@ -246,7 +288,18 @@ PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(PXMLDocumentNameSpac
 
 	auto pNode = std::make_shared<CXMLDocumentNodeInstance>(m_pDocument, this, pNameSpace, sName);
 
-	auto mapKey = std::make_pair(pNameSpace.get(), sName);
+	addChildEx(pNode);
+
+	return pNode;
+}
+
+void CXMLDocumentNodeInstance::addChildEx (PXMLDocumentNodeInstance pNode)
+{
+
+	if (pNode.get () == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto mapKey = std::make_pair(pNode->GetNameSpace().get(), pNode->GetName());
 
 	m_Children.push_back(pNode);
 	m_ChildMap.insert(std::make_pair (mapKey, pNode));
@@ -260,8 +313,8 @@ PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(PXMLDocumentNameSpac
 		m_ChildMapCounter.insert(std::make_pair (mapKey, 1));
 	}
 
-	return pNode;
 }
+
 
 void CXMLDocumentNodeInstance::RemoveChild(CXMLDocumentNodeInstance* pChildInstance)
 {
@@ -273,3 +326,17 @@ void CXMLDocumentNodeInstance::RemoveChildrenWithName(CXMLDocumentNameSpace* pNa
 	throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
 }
 
+std::string CXMLDocumentNodeInstance::getPrefixedName()
+{
+	std::string sNameSpacePrefix = m_pNameSpace->getPrefix();
+	if (!sNameSpacePrefix.empty())
+		return sNameSpacePrefix + ":" + m_sNodeName;
+	else
+		return m_sNodeName;
+}
+
+bool CXMLDocumentNodeInstance::compareName(const std::string& sNameSpace, const std::string& sName)
+{
+	auto pNameSpace = m_pDocument->FindNamespace(sNameSpace, true);
+	return ((pNameSpace.get() == m_pNameSpace.get()) && (m_sNodeName == sName));
+}

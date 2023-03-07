@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 CXMLDocumentNameSpace::CXMLDocumentNameSpace(const std::string& sNameSpace, const std::string& sPrefix)
-	: m_sNameSpace (sNameSpace), m_sPrefix (sPrefix)
+	: m_sNameSpaceName (sNameSpace), m_sPrefix (sPrefix)
 {
 
 }
@@ -46,9 +46,9 @@ CXMLDocumentNameSpace::~CXMLDocumentNameSpace()
 
 }
 
-std::string CXMLDocumentNameSpace::getNameSpace()
+std::string CXMLDocumentNameSpace::getNameSpaceName()
 {
-	return m_sNameSpace;
+	return m_sNameSpaceName;
 }
 
 std::string CXMLDocumentNameSpace::getPrefix()

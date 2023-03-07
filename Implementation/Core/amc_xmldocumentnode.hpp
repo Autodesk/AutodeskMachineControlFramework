@@ -67,6 +67,8 @@ namespace AMC {
 		std::map<std::pair <CXMLDocumentNameSpace*, std::string>, PXMLDocumentNodeInstance> m_ChildMap;
 		std::map<std::pair <CXMLDocumentNameSpace*, std::string>, uint64_t> m_ChildMapCounter;
 
+		void addChildEx(PXMLDocumentNodeInstance pNode);
+
 	public:
 
 		CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, CXMLDocumentNodeInstance * pParentNode, PXMLDocumentNameSpace pNameSpace, const std::string& sNodeName);
@@ -84,6 +86,10 @@ namespace AMC {
 		static bool checkXMLNodeName(const std::string & sNodeName);
 
 		std::string GetName();
+
+		std::string getPrefixedName();
+
+		bool compareName(const std::string& sNameSpace, const std::string& sName);
 
 		PXMLDocumentNameSpace GetNameSpace();
 
@@ -114,6 +120,7 @@ namespace AMC {
 		void RemoveChild(CXMLDocumentNodeInstance * pChildInstance);
 
 		void RemoveChildrenWithName(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
+
 
 	};
 

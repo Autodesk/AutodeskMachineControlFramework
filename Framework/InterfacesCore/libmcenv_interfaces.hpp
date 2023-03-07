@@ -1174,7 +1174,7 @@ public:
 	* @param[in] dMaxValue - Maximum allowed value
 	* @return returns the value .
 	*/
-	virtual LibMCEnv_double GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+	virtual bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
 
 	/**
 	* IXMLDocumentAttribute::SetValue - Sets the value of the attribute as string.

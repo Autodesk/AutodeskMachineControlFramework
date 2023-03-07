@@ -351,6 +351,10 @@ public:
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "COULDNOTPARSEXMLDATA";
 			case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "INVALIDPROFILEVALUETYPE";
 			case LIBMCENV_ERROR_XMLDOCUMENTMISMATCH: return "XMLDOCUMENTMISMATCH";
+			case LIBMCENV_ERROR_INVALIDINTEGERVALUEATTRIBUTE: return "INVALIDINTEGERVALUEATTRIBUTE";
+			case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "INTEGERVALUEATTRIBUTEOUTOFRANGE";
+			case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "INVALIDDOUBLEVALUEATTRIBUTE";
+			case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "DOUBLEVALUEATTRIBUTEOUTOFRANGE";
 		}
 		return "UNKNOWN";
 	}
@@ -449,6 +453,10 @@ public:
 			case LIBMCENV_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML data.";
 			case LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type.";
 			case LIBMCENV_ERROR_XMLDOCUMENTMISMATCH: return "XML Document mismatch.";
+			case LIBMCENV_ERROR_INVALIDINTEGERVALUEATTRIBUTE: return "Invalid integer value attribute.";
+			case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "Integer value attribute out of range.";
+			case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "Invalid double value attribute.";
+			case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "Double value attribute out of range.";
 		}
 		return "unknown error";
 	}
@@ -953,7 +961,7 @@ public:
 	inline bool IsValidDouble(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline LibMCEnv_double GetDoubleValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline bool IsValidBool();
-	inline LibMCEnv_double GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline void SetValue(const std::string & sValue);
 	inline void SetIntegerValue(const LibMCEnv_int64 nValue);
 	inline void SetDoubleValue(const LibMCEnv_double dValue);
@@ -7835,9 +7843,9 @@ public:
 	* @param[in] dMaxValue - Maximum allowed value
 	* @return returns the value .
 	*/
-	LibMCEnv_double CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	bool CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
 	{
-		LibMCEnv_double resultValue = 0;
+		bool resultValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetBoolValue(m_pHandle, dMinValue, dMaxValue, &resultValue));
 		
 		return resultValue;

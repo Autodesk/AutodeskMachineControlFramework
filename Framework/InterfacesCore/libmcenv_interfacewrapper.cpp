@@ -3671,7 +3671,7 @@ LibMCEnvResult libmcenv_xmldocumentattribute_isvalidbool(LibMCEnv_XMLDocumentAtt
 	}
 }
 
-LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue)
+LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, bool * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentAttribute;
 

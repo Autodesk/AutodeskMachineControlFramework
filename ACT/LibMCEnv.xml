@@ -129,7 +129,10 @@
 		<error name="COULDNOTPARSEXMLDATA" code="10089" description="could not parse XML data." />		
 		<error name="INVALIDPROFILEVALUETYPE" code="10090" description="Invalid profile value type." />		
 		<error name="XMLDOCUMENTMISMATCH" code="10091" description="XML Document mismatch." />				
-		
+		<error name="INVALIDINTEGERVALUEATTRIBUTE" code="10092" description="Invalid integer value attribute." />				
+		<error name="INTEGERVALUEATTRIBUTEOUTOFRANGE" code="10093" description="Integer value attribute out of range." />				
+		<error name="INVALIDDOUBLEVALUEATTRIBUTE" code="10094" description="Invalid double value attribute." />				
+		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />				
 									
 	</errors>
 
@@ -809,7 +812,7 @@
 		<method name="GetBoolValue" description="Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.">
 			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
 			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
-			<param name="Value" type="double" pass="return" description="returns the value ." />
+			<param name="Value" type="bool" pass="return" description="returns the value ." />
 		</method>
 
 		<method name="SetValue" description="Sets the value of the attribute as string.">

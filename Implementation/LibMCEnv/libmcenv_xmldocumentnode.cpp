@@ -69,7 +69,7 @@ std::string CXMLDocumentNode::GetName()
 
 std::string CXMLDocumentNode::GetNameSpace()
 {
-	return m_pXMLDocumentNode->GetNameSpace()->getNameSpace ();
+	return m_pXMLDocumentNode->GetNameSpace()->getNameSpaceName ();
 }
 
 LibMCEnv_uint64 CXMLDocumentNode::GetAttributeCount()
@@ -92,7 +92,11 @@ bool CXMLDocumentNode::HasAttribute(const std::string& sNameSpace, const std::st
 IXMLDocumentAttribute* CXMLDocumentNode::FindAttribute(const std::string& sNameSpace, const std::string& sName, const bool bMustExist)
 {
     auto pNameSpace = m_pXMLDocument->FindNamespace(sNameSpace, true);
-    return new CXMLDocumentAttribute(m_pXMLDocumentNode->FindAttribute(pNameSpace.get(), sName, bMustExist));
+    auto pAttribute = m_pXMLDocumentNode->FindAttribute(pNameSpace.get(), sName, bMustExist);
+    if (pAttribute.get() != nullptr)
+        return new CXMLDocumentAttribute (pAttribute);
+
+    return nullptr;
 }
 
 void CXMLDocumentNode::RemoveAttribute(const std::string& sNameSpace, const std::string& sName)
@@ -147,12 +151,30 @@ IXMLDocumentNodes* CXMLDocumentNode::GetChildren()
 
 LibMCEnv_uint64 CXMLDocumentNode::CountChildrenByName(const std::string& sNameSpace, const std::string& sName)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    uint64_t nCount = 0;
+    auto children = m_pXMLDocumentNode->getChildren();
+
+    for (auto child : children) {
+        if (child->compareName(sNameSpace, sName))
+            nCount++;
+    }
+
+    return nCount;
+
 }
 
 IXMLDocumentNodes* CXMLDocumentNode::GetChildrenByName(const std::string& sNameSpace, const std::string& sName)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto resultNodes = std::make_unique<CXMLDocumentNodes>(m_pXMLDocument);
+
+    auto children = m_pXMLDocumentNode->getChildren();
+
+    for (auto child : children) {
+        if (child->compareName(sNameSpace, sName))
+            resultNodes->addNode(child);
+    }
+
+    return resultNodes.release();
 }
 
 bool CXMLDocumentNode::HasChild(const std::string& sNameSpace, const std::string& sName)
