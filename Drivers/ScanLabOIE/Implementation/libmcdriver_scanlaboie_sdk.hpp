@@ -81,7 +81,8 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef oie_instance(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_create) ();
 		typedef void(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_destroy) (oie_instance pInstance);
 		typedef char *(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_error) (oie_error nError, char * pBuffer, int32_t nLen);
-		typedef oie_device(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_add_device) (oie_instance pInstance);
+		typedef oie_device(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_add_device_VERSION2) (oie_instance pInstance);
+		typedef oie_device(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_add_device_VERSION3) (oie_instance pInstance, const char * pDeviceConfigFileName);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_remove_device) (oie_instance pInstance, oie_device pDevice);
 		typedef uint32_t(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_device_id) (oie_device pDevice);
 		typedef void(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_reply_timeout) (oie_device pDevice, int32_t nTimeOutInMs);
@@ -141,6 +142,8 @@ namespace LibMCDriver_ScanLabOIE {
 		private:
 			std::wstring m_sDLLDirectoryW;
 
+			LibMCDriver_ScanLabOIE::eOIEDeviceDriverType m_deviceDriverType;
+
 			bool m_bIsInitialized;
 
 			void* m_LibraryHandle;
@@ -151,7 +154,8 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_create oie_create = nullptr;
 			PScanLabOIEPtr_oie_destroy oie_destroy = nullptr;
 			PScanLabOIEPtr_oie_get_error oie_get_error = nullptr;
-			PScanLabOIEPtr_oie_add_device oie_add_device = nullptr;
+			PScanLabOIEPtr_oie_add_device_VERSION2 oie_add_device_VERSION2 = nullptr;
+			PScanLabOIEPtr_oie_add_device_VERSION3 oie_add_device_VERSION3 = nullptr;
 			PScanLabOIEPtr_oie_remove_device oie_remove_device = nullptr;
 			PScanLabOIEPtr_oie_get_device_id oie_get_device_id = nullptr;
 			PScanLabOIEPtr_oie_set_reply_timeout oie_set_reply_timeout = nullptr;
@@ -188,13 +192,17 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_get_additional_app_data_signals oie_get_additional_app_data_signals = nullptr;
 			PScanLabOIEPtr_oie_get_measurement_tag_usage oie_get_measurement_tag_usage = nullptr;
 
-			CScanLabOIESDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);
+			CScanLabOIESDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType deviceDriverType);
 			~CScanLabOIESDK();
 
 			void initDLL();
 			void checkError(uint32_t nSDKError);
 
 			PScanLabOIESDK_DLLDirectoryCache cacheDllDirectory ();
+
+			LibMCDriver_ScanLabOIE::eOIEDeviceDriverType getDeviceDriverType ();
+
+			std::string getVersionString();
 
 		};
 

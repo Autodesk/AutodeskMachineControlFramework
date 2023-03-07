@@ -149,6 +149,10 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER 1042 /** Could not store OIE Calibration library buffer. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER 1043 /** Could not store RTC Stream parser buffer. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS 1044 /** Could not get RTC Signal IDs. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTCREATEDEVICECONFIGURATION 1045 /** Could not create device configuration. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION 1046 /** Unsupported OIE SDK Version. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION 1047 /** Invalid device configuration. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION 1048 /** OIE SDK Library returns invalid version. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -210,6 +214,10 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER: return "Could not store OIE Calibration library buffer.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER: return "Could not store RTC Stream parser buffer.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS: return "Could not get RTC Signal IDs.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTCREATEDEVICECONFIGURATION: return "Could not create device configuration.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION: return "Unsupported OIE SDK Version.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION: return "Invalid device configuration.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION: return "OIE SDK Library returns invalid version.";
     default: return "unknown error";
   }
 }

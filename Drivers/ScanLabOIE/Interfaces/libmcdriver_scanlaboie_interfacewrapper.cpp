@@ -1286,33 +1286,7 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getappinfo(LibMCDr
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pOIEDevice;
-
-	try {
-		if ( (!pCorrectionDataBuffer) && (nCorrectionDataBufferSize>0))
-			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
-		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
-		if (!pIOIEDevice)
-			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
-		
-		pIOIEDevice->SetRTCCorrectionData(nCorrectionDataBufferSize, pCorrectionDataBuffer);
-
-		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyname(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyname(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName)
 {
 	IBase* pIBaseClass = (IBase *)pOIEDevice;
 
@@ -1320,16 +1294,11 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyname(Lib
 		if (pName == nullptr)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		std::string sName(pName);
-		IBase* pIBaseClassDeviceConfig = (IBase *)pDeviceConfig;
-		IDeviceConfiguration* pIDeviceConfig = dynamic_cast<IDeviceConfiguration*>(pIBaseClassDeviceConfig);
-		if (!pIDeviceConfig)
-			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
-		
 		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
 		if (!pIOIEDevice)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		pIOIEDevice->StartAppByName(sName, pIDeviceConfig);
+		pIOIEDevice->StartAppByName(sName);
 
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
 	}
@@ -1344,21 +1313,16 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyname(Lib
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyindex(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyindex(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex)
 {
 	IBase* pIBaseClass = (IBase *)pOIEDevice;
 
 	try {
-		IBase* pIBaseClassDeviceConfig = (IBase *)pDeviceConfig;
-		IDeviceConfiguration* pIDeviceConfig = dynamic_cast<IDeviceConfiguration*>(pIBaseClassDeviceConfig);
-		if (!pIDeviceConfig)
-			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
-		
 		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
 		if (!pIOIEDevice)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		pIOIEDevice->StartAppByIndex(nIndex, pIDeviceConfig);
+		pIOIEDevice->StartAppByIndex(nIndex);
 
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
 	}
@@ -1373,7 +1337,7 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyindex(Li
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbymajorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbymajorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion)
 {
 	IBase* pIBaseClass = (IBase *)pOIEDevice;
 
@@ -1381,16 +1345,11 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbymajorver
 		if (pName == nullptr)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		std::string sName(pName);
-		IBase* pIBaseClassDeviceConfig = (IBase *)pDeviceConfig;
-		IDeviceConfiguration* pIDeviceConfig = dynamic_cast<IDeviceConfiguration*>(pIBaseClassDeviceConfig);
-		if (!pIDeviceConfig)
-			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
-		
 		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
 		if (!pIOIEDevice)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		pIOIEDevice->StartAppByMajorVersion(sName, nMajorVersion, pIDeviceConfig);
+		pIOIEDevice->StartAppByMajorVersion(sName, nMajorVersion);
 
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
 	}
@@ -1405,7 +1364,7 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbymajorver
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyminorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyminorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion)
 {
 	IBase* pIBaseClass = (IBase *)pOIEDevice;
 
@@ -1413,16 +1372,11 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyminorver
 		if (pName == nullptr)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		std::string sName(pName);
-		IBase* pIBaseClassDeviceConfig = (IBase *)pDeviceConfig;
-		IDeviceConfiguration* pIDeviceConfig = dynamic_cast<IDeviceConfiguration*>(pIBaseClassDeviceConfig);
-		if (!pIDeviceConfig)
-			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
-		
 		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
 		if (!pIOIEDevice)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		pIOIEDevice->StartAppByMinorVersion(sName, nMajorVersion, nMinorVersion, pIDeviceConfig);
+		pIOIEDevice->StartAppByMinorVersion(sName, nMajorVersion, nMinorVersion);
 
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
 	}
@@ -1909,7 +1863,7 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_initializ
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_adddevice(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName, const char * pHostName, LibMCDriver_ScanLabOIE_uint32 nPort, LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut, LibMCDriver_ScanLabOIE_OIEDevice * pDeviceInstance)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_adddevice(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName, const char * pHostName, LibMCDriver_ScanLabOIE_uint32 nPort, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig, LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer, LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut, LibMCDriver_ScanLabOIE_OIEDevice * pDeviceInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_OIE;
 
@@ -1918,16 +1872,23 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_adddevice
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		if (pHostName == nullptr)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if ( (!pCorrectionDataBuffer) && (nCorrectionDataBufferSize>0))
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		if (pDeviceInstance == nullptr)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sHostName(pHostName);
+		IBase* pIBaseClassDeviceConfig = (IBase *)pDeviceConfig;
+		IDeviceConfiguration* pIDeviceConfig = dynamic_cast<IDeviceConfiguration*>(pIBaseClassDeviceConfig);
+		if (!pIDeviceConfig)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
 		IBase* pBaseDeviceInstance(nullptr);
 		IDriver_ScanLab_OIE* pIDriver_ScanLab_OIE = dynamic_cast<IDriver_ScanLab_OIE*>(pIBaseClass);
 		if (!pIDriver_ScanLab_OIE)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		pBaseDeviceInstance = pIDriver_ScanLab_OIE->AddDevice(sName, sHostName, nPort, nResponseTimeOut);
+		pBaseDeviceInstance = pIDriver_ScanLab_OIE->AddDevice(sName, sHostName, nPort, pIDeviceConfig, nCorrectionDataBufferSize, pCorrectionDataBuffer, nResponseTimeOut);
 
 		*pDeviceInstance = (IBase*)(pBaseDeviceInstance);
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
@@ -2179,8 +2140,6 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_getappversion;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_getappinfo") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_getappinfo;
-	if (sProcName == "libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata") 
-		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_startappbyname") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_startappbyname;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_startappbyindex") 

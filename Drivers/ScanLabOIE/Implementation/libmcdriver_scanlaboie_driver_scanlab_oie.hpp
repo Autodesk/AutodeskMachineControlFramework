@@ -119,7 +119,7 @@ public:
 
 	void InitializeCustomSDK(const LibMCDriver_ScanLabOIE_uint64 nOIEDLLBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pOIEDLLBuffer) override;
 
-	IOIEDevice* AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) override;
+	IOIEDevice* AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, IDeviceConfiguration* pDeviceConfig, const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8* pCorrectionDataBuffer, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) override;
 
 	bool HasDevice(const std::string& sName) override;
 

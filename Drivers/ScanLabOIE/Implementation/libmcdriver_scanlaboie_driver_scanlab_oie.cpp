@@ -288,7 +288,7 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 			m_pRTCStreamParserResourceFile = m_pWorkingDirectory->StoreCustomData(sRTCStreamParserFileNameOnDisk, RTCStreamParserBuffer);
 		}
 
-		m_pOIESDK = std::make_shared<CScanLabOIESDK>(m_pSDKLibraryFile->GetAbsoluteFileName(), m_pWorkingDirectory->GetAbsoluteFilePath ());
+		m_pOIESDK = std::make_shared<CScanLabOIESDK>(m_pSDKLibraryFile->GetAbsoluteFileName(), m_pWorkingDirectory->GetAbsoluteFilePath (), m_DeviceDriverType);
 
 		m_pOIESDK->initDLL();
 
@@ -344,7 +344,7 @@ void CDriver_ScanLab_OIE::InitializeCustomSDK(const LibMCDriver_ScanLabOIE_uint6
 
 }
 
-IOIEDevice* CDriver_ScanLab_OIE::AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
+IOIEDevice* CDriver_ScanLab_OIE::AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, IDeviceConfiguration* pDeviceConfig, const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8* pCorrectionDataBuffer, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
 {
 	if ((m_pInstance == nullptr) || (m_pOIESDK.get() == nullptr))
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED);
@@ -352,11 +352,23 @@ IOIEDevice* CDriver_ScanLab_OIE::AddDevice(const std::string& sName, const std::
 	if (sName.empty ())
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME);
 
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION);
+
 	auto iIter = m_Devices.find(sName);
 	if (iIter != m_Devices.end ())
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING, "device is already existing: " + sName);
 
-	auto pDeviceInstance = std::make_shared<COIEDeviceInstance>(m_pOIESDK, m_pInstance, sName, sHostName, nPort, nResponseTimeOut, m_pWorkingDirectory);
+	std::vector<uint8_t> correctionData;
+
+	if (nCorrectionDataBufferSize > 0) {
+		correctionData.resize(nCorrectionDataBufferSize);
+		for (size_t nIndex = 0; nIndex < nCorrectionDataBufferSize; nIndex++) {
+			correctionData.at(nIndex) = pCorrectionDataBuffer[nIndex];
+		}
+	}
+
+	auto pDeviceInstance = std::make_shared<COIEDeviceInstance>(m_pOIESDK, m_pInstance, sName, sHostName, nPort, nResponseTimeOut, pDeviceConfig, correctionData,  m_pWorkingDirectory);
 	m_Devices.insert(std::make_pair(sName, pDeviceInstance));
 
 	return new COIEDevice(pDeviceInstance);

@@ -214,12 +214,32 @@ public:
 
 		pStateEnvironment->LogMessage("Initializing for OIE..");
 		auto pRTCContext = pRTC6Driver->GetContext();
-		pRTCContext->InitializeForOIE(signals, LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility);
+
+		switch (pOIEDriver->GetDriverType()) {
+		case LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion2:
+
+			pStateEnvironment->LogMessage("Initializing RTC Context for SDK Version 2...");
+			pRTCContext->InitializeForOIE(signals, LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion2);
+			break;
+
+		case LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3Compatibility:
+			pStateEnvironment->LogMessage("Initializing RTC Context for SDK Version 3 (compatibilty mode)...");
+			pRTCContext->InitializeForOIE(signals, LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility);
+			break;
+
+		case LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3:
+			pStateEnvironment->LogMessage("Initializing RTC Context for SDK Version 3...");
+			pRTCContext->InitializeForOIE(signals, LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3);
+			break;
+
+		default:
+			throw std::runtime_error("unsupported OIE SDK Version");
+
+		}
 		
 
 		pStateEnvironment->LogMessage("Adding Device...");
-		auto pDevice = pOIEDriver->AddDevice("oie1", sOIEIPAddress, 21072, 200000);
-		pDevice->SetRTCCorrectionData(CorrectionFileBuffer);
+		auto pDevice = pOIEDriver->AddDevice("oie1", sOIEIPAddress, 21072, pDeviceConfigurationInstance, CorrectionFileBuffer, 200000);
 
 		pStateEnvironment->LogMessage("  Device Name: " + pDevice->GetDeviceName ());
 		pStateEnvironment->LogMessage("  Device ID: " + std::to_string(pDevice->GetDeviceID()));
@@ -227,8 +247,8 @@ public:
 		pStateEnvironment->LogMessage("Connecting..");
 		pDevice->Connect("sluser", "sluser");
 
-		std::vector<uint8_t> AppPackageBuffer;
-		pStateEnvironment->LoadResourceData("aib-3.0.0", AppPackageBuffer);
+		//std::vector<uint8_t> AppPackageBuffer;
+		//pStateEnvironment->LoadResourceData("aib-3.0.0", AppPackageBuffer);
 
 		//pStateEnvironment->LogMessage("Installing App");
 		//pDevice->InstallApp(AppPackageBuffer);
@@ -248,7 +268,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByMinorVersion("AIB", 2, 0, pDeviceConfigurationInstance);
+		pDevice->StartAppByMinorVersion("AIB", 2, 0);
 
 		pStateEnvironment->LogMessage("Waiting..");
 
