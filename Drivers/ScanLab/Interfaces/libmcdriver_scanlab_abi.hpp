@@ -251,6 +251,28 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setstandbyinmicroseconds(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dHalfPeriod, LibMCDriver_ScanLab_double dPulseLength);
 
 /**
+* Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nIPAddressBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIPAddressNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIPAddressBuffer -  buffer of IP Address Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getipaddress(LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint32 nIPAddressBufferSize, LibMCDriver_ScanLab_uint32* pIPAddressNeededChars, char * pIPAddressBuffer);
+
+/**
+* Returns the Netmask of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nNetmaskBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNetmaskNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNetmaskBuffer -  buffer of Netmask Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getnetmask(LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint32 nNetmaskBufferSize, LibMCDriver_ScanLab_uint32* pNetmaskNeededChars, char * pNetmaskBuffer);
+
+/**
 * Returns serial number of card
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -685,6 +707,15 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, bool * pSimulationModeEnabled);
 
 /**
+* Returns if the driver is initalized.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[out] pIsInitialized - Flag if driver is initialized.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_isinitialized(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, bool * pIsInitialized);
+
+/**
 * Initializes the RTC6 Scanner Driver.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
@@ -695,6 +726,37 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_initialise(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber);
+
+/**
+* Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nIPAddressBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIPAddressNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIPAddressBuffer -  buffer of IP Address Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getipaddress(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const LibMCDriver_ScanLab_uint32 nIPAddressBufferSize, LibMCDriver_ScanLab_uint32* pIPAddressNeededChars, char * pIPAddressBuffer);
+
+/**
+* Returns the Netmask of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nNetmaskBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNetmaskNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNetmaskBuffer -  buffer of Netmask Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getnetmask(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const LibMCDriver_ScanLab_uint32 nNetmaskBufferSize, LibMCDriver_ScanLab_uint32* pNetmaskNeededChars, char * pNetmaskBuffer);
+
+/**
+* Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[out] pSerialNumber - Serial Number of card.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getserialnumber(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 * pSerialNumber);
 
 /**
 * Returns the RTC Context Instance. Fails if it card has not been initialised.
@@ -814,6 +876,222 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
+/*************************************************************************************************************************
+ Class definition for Driver_ScanLab_RTC6xN
+**************************************************************************************************************************/
+
+/**
+* Turns the driver into a simulation mode.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_settosimulationmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN);
+
+/**
+* Returns if the driver is in simulation mode.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[out] pSimulationModeEnabled - Flag if driver is in simulation mode.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_issimulationmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, bool * pSimulationModeEnabled);
+
+/**
+* Returns if all the scanners of the driver are initalized.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[out] pIsInitialized - Flag if driver is initialized.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_isinitialized(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, bool * pIsInitialized);
+
+/**
+* Returns if number of scanners.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[out] pNumberOfScanners - Number of scanners supported by this driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getscannercount(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 * pNumberOfScanners);
+
+/**
+* Initializes one of the RTC6 Scanner Drivers.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] pIP - IP Network Address. Empty string for local card.
+* @param[in] pNetmask - IP Netmask Address. Empty string for local card.
+* @param[in] nTimeout - Time out in microseconds.
+* @param[in] nSerialNumber - Desired Serial Number of card.
+* @param[in] nLaserIndex - Associated Laser Index from the toolpath data. 1-based, MUST NOT be 0. Each Scanner MUST own a unique laser index.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_initialisescanner(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber, LibMCDriver_ScanLab_uint32 nLaserIndex);
+
+/**
+* Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] nIPAddressBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIPAddressNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIPAddressBuffer -  buffer of IP Address Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getipaddress(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nIPAddressBufferSize, LibMCDriver_ScanLab_uint32* pIPAddressNeededChars, char * pIPAddressBuffer);
+
+/**
+* Returns the Netmask of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] nNetmaskBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNetmaskNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNetmaskBuffer -  buffer of Netmask Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getnetmask(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nNetmaskBufferSize, LibMCDriver_ScanLab_uint32* pNetmaskNeededChars, char * pNetmaskBuffer);
+
+/**
+* Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[out] pSerialNumber - Serial Number of card.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getserialnumber(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_uint32 * pSerialNumber);
+
+/**
+* Returns associated Laser Index from the toolpath data.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[out] pLaserIndex - Associated Laser Index from the toolpath data.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getlaserindex(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_uint32 * pLaserIndex);
+
+/**
+* Returns the RTC Context Instance. Fails if it card has not been initialised.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[out] pContextInstance - RTC Context Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getcontext(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_RTCContext * pContextInstance);
+
+/**
+* Loads the firmware from the driver resources.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] pFirmwareResource - resource name of the firmware program file.
+* @param[in] pFPGAResource - resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryResource - resource name of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_loadfirmware(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
+
+/**
+* Loads the firmware from custom resources.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
+* @param[in] nFPGADataBufferSize - Number of elements in buffer
+* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
+* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_loadcustomfirmware(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer);
+
+/**
+* Sets the correction file stream.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+* @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
+* @param[in] nTableNumber - Correction table index of card (1..8)
+* @param[in] nDimension - Is it a 2D or 3D correction file.
+* @param[in] nTableNumberHeadA - Table number of Head A.
+* @param[in] nTableNumberHeadB - Table number of Head B.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setcorrectionfile(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension, LibMCDriver_ScanLab_uint32 nTableNumberHeadA, LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
+
+/**
+* Configures the laser mode.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] eLaserMode - Laser Mode Enum
+* @param[in] eLaserPort - Laser Port Enum
+* @param[in] dMaxLaserPower - Maximum laser power.
+* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+* @param[in] bOutputSynchronizationActive - Output synchronization active
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_configurelasermode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
+
+/**
+* Configures the default laser and scanner delays.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
+* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds
+* @param[in] dMarkDelay - Mark delay in microseconds (will be rounded to a multiple of 10)
+* @param[in] dJumpDelay - Jump delay in microseconds (will be rounded to a multiple of 10)
+* @param[in] dPolygonDelay - Polygon delay in microseconds (will be rounded to a multiple of 10)
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_configuredelays(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double dLaserOnDelay, LibMCDriver_ScanLab_double dLaserOffDelay, LibMCDriver_ScanLab_double dMarkDelay, LibMCDriver_ScanLab_double dJumpDelay, LibMCDriver_ScanLab_double dPolygonDelay);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn. Laser Indices are automatically assigned.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists);
+
+/**
+* Set RTC Ethernet communication timeouts
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] dInitialTimeout - Initial timeout in ms
+* @param[in] dMaxTimeout - Max timeout in ms
+* @param[in] dMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier);
+
+/**
+* Get RTC Ethernet communication timeouts
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[out] pInitialTimeout - Initial timeout in ms
+* @param[out] pMaxTimeout - Max timeout in ms
+* @param[out] pMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
 
 /*************************************************************************************************************************
  Global functions

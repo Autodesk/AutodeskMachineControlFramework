@@ -252,6 +252,14 @@ Custom implementation
 			<param name="PulseLength" type="double" pass="in" description="Pulse Length in microseconds" />
 		</method>
 
+		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
+		</method>		
+
+		<method name="GetNetmask" description="Returns the Netmask of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="Netmask" type="string" pass="return" description="Netmask Value." />
+		</method>		
+
 		<method name="GetSerialNumber" description="Returns serial number of card">
 			<param name="SerialNumber" type="uint32" pass="return" description="Returns serial number of board." />
 		</method>
@@ -484,12 +492,28 @@ Custom implementation
 			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
 		</method>		
 
+		<method name="IsInitialized" description="Returns if the driver is initalized.">		
+			<param name="IsInitialized" type="bool" pass="return" description="Flag if driver is initialized." />
+		</method>		
+
 		<method name="Initialise" description="Initializes the RTC6 Scanner Driver.">
 			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
 			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
 			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
 			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
 		</method>
+
+		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
+		</method>		
+
+		<method name="GetNetmask" description="Returns the Netmask of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="Netmask" type="string" pass="return" description="Netmask Value." />
+		</method>		
+
+		<method name="GetSerialNumber" description="Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="SerialNumber" type="uint32" pass="return" description="Serial Number of card." />
+		</method>		
 
 		<method name="GetContext" description="Returns the RTC Context Instance. Fails if it card has not been initialised.">
 			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
@@ -562,6 +586,126 @@ Custom implementation
 
 
 
+
+	<class name="Driver_ScanLab_RTC6xN" parent="Driver_ScanLab" description="A LaserScanner Driver for multiple synchronized ScanLAB RTC6 cards.">
+
+		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
+		</method>
+		
+		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
+			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
+		</method>		
+
+		<method name="IsInitialized" description="Returns if all the scanners of the driver are initalized.">		
+			<param name="IsInitialized" type="bool" pass="return" description="Flag if driver is initialized." />
+		</method>		
+
+		<method name="GetScannerCount" description="Returns if number of scanners.">		
+			<param name="NumberOfScanners" type="uint32" pass="return" description="Number of scanners supported by this driver." />
+		</method>		
+
+		<method name="InitialiseScanner" description="Initializes one of the RTC6 Scanner Drivers.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
+			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
+			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
+			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
+			<param name="LaserIndex" type="uint32" pass="in" description="Associated Laser Index from the toolpath data. 1-based, MUST NOT be 0. Each Scanner MUST own a unique laser index." />
+		</method>
+
+		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
+		</method>		
+
+		<method name="GetNetmask" description="Returns the Netmask of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="Netmask" type="string" pass="return" description="Netmask Value." />
+		</method>		
+
+		<method name="GetSerialNumber" description="Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="SerialNumber" type="uint32" pass="return" description="Serial Number of card." />
+		</method>		
+		
+		<method name="GetLaserIndex" description="Returns associated Laser Index from the toolpath data.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="LaserIndex" type="uint32" pass="return" description="Associated Laser Index from the toolpath data." />
+		</method>		
+
+		<method name="GetContext" description="Returns the RTC Context Instance. Fails if it card has not been initialised.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
+		</method>
+				
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
+		</method>		
+		
+		<method name="SetCorrectionFile" description="Sets the correction file stream.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
+			<param name="TableNumber" type="uint32" pass="in" description="Correction table index of card (1..8)" />
+			<param name="Dimension" type="uint32" pass="in" description="Is it a 2D or 3D correction file." />
+			<param name="TableNumberHeadA" type="uint32" pass="in" description="Table number of Head A." />
+			<param name="TableNumberHeadB" type="uint32" pass="in" description="Table number of Head B." />
+		</method>		
+
+		<method name="ConfigureLaserMode" description="Configures the laser mode.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="LaserMode" type="enum" class="LaserMode" pass="in" description="Laser Mode Enum" />
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser Port Enum" />
+			<param name="MaxLaserPower" type="double" pass="in" description="Maximum laser power." />
+			<param name="FinishLaserPulseAfterOn" type="bool" pass="in" description="Finish laser pulse after LaserOn" />
+			<param name="PhaseShiftOfLaserSignal" type="bool" pass="in" description="180 degree phase shift of Laser signal" />
+			<param name="LaserOnSignalLowActive" type="bool" pass="in" description="Set Laser On Signal Low Active" />
+			<param name="LaserHalfSignalsLowActive" type="bool" pass="in" description="Set Laser Half Signal Low Active" />
+			<param name="SetDigitalInOneHighActive" type="bool" pass="in" description="Set Digital In 1 high Active" />
+			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
+		</method>
+
+		<method name="ConfigureDelays" description="Configures the default laser and scanner delays.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="LaserOnDelay" type="double" pass="in" description="Laser On Delay in Microseconds" />
+			<param name="LaserOffDelay" type="double" pass="in" description="Laser Off Delay in Microseconds" />
+			<param name="MarkDelay" type="double" pass="in" description="Mark delay in microseconds (will be rounded to a multiple of 10)" />
+			<param name="JumpDelay" type="double" pass="in" description="Jump delay in microseconds (will be rounded to a multiple of 10)" />
+			<param name="PolygonDelay" type="double" pass="in" description="Polygon delay in microseconds (will be rounded to a multiple of 10)" />		
+		</method>
+
+
+		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn. Laser Indices are automatically assigned.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card." />
+		</method>
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
+						
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+						
+
+	</class>
 
 
 <!--

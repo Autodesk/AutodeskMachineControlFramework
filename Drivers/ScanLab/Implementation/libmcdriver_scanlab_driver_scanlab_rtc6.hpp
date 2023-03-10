@@ -152,9 +152,17 @@ public:
 
 	void SetToSimulationMode() override;
 
+	bool IsInitialized() override;
+
 	bool IsSimulationMode() override;
 
 	void Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) override;
+
+	std::string GetIPAddress() override;
+
+	std::string GetNetmask() override;
+
+	LibMCDriver_ScanLab_uint32 GetSerialNumber() override;
 
 	IRTCContext* GetContext() override;
 

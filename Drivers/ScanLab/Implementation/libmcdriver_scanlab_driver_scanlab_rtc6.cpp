@@ -50,6 +50,7 @@ CDriver_ScanLab_RTC6::CDriver_ScanLab_RTC6(const std::string& sName, const std::
 
 void CDriver_ScanLab_RTC6::Configure(const std::string& sConfigurationString)
 {
+    m_pDriverEnvironment->RegisterIntegerParameter("serialnumber", "Serial Number", 0);
     m_pDriverEnvironment->RegisterBoolParameter("position_x_ok", "Scan Position X is ok", false);
     m_pDriverEnvironment->RegisterBoolParameter("position_y_ok", "Scan Position Y is ok", false);
     m_pDriverEnvironment->RegisterBoolParameter("temperature_ok", "Scan Head Temperature is ok", false);
@@ -99,6 +100,12 @@ void CDriver_ScanLab_RTC6::SetToSimulationMode()
     m_SimulationMode = true;
 }
 
+
+bool CDriver_ScanLab_RTC6::IsInitialized()
+{
+    return (m_pRTCContext.get() != nullptr);
+}
+
 bool CDriver_ScanLab_RTC6::IsSimulationMode()
 {
     return m_SimulationMode;
@@ -113,6 +120,7 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
         m_pDriverEnvironment->SetIntegerParameter("dll_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("hex_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("bios_version", 1);
+        m_pDriverEnvironment->SetIntegerParameter("serialnumber", 123456);
 
 
     } else {
@@ -129,7 +137,12 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
         }
         else {
             m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
-            m_pRTCContext = act_managed_ptr<IRTCContext>(m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber));
+            auto pContext = m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber);
+            m_pRTCContext = act_managed_ptr<IRTCContext>(pContext);
+            
+            auto pContextInstance = dynamic_cast<CRTCContext*> (pContext);
+            if (pContextInstance != nullptr)
+                pContextInstance->setIPAddress(sIP, sNetmask);
         }
 
         uint32_t nRTCVersion = 0;
@@ -143,9 +156,36 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
         m_pDriverEnvironment->SetIntegerParameter("dll_version", nDLLVersion);
         m_pDriverEnvironment->SetIntegerParameter("hex_version", nHEXVersion);
         m_pDriverEnvironment->SetIntegerParameter("bios_version", nBIOSVersion);
-    } 
+        m_pDriverEnvironment->SetIntegerParameter("serialnumber", m_pRTCContext->GetSerialNumber ());
+    }
 
 }
+
+std::string CDriver_ScanLab_RTC6::GetIPAddress()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    return m_pRTCContext->GetIPAddress();
+
+}
+
+std::string CDriver_ScanLab_RTC6::GetNetmask()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    return m_pRTCContext->GetNetmask();
+}
+
+LibMCDriver_ScanLab_uint32 CDriver_ScanLab_RTC6::GetSerialNumber()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    return m_pRTCContext->GetSerialNumber();
+}
+
 
 
 IRTCContext* CDriver_ScanLab_RTC6::GetContext()

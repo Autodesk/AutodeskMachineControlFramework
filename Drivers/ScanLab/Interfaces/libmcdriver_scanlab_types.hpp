@@ -218,6 +218,7 @@ typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCContext;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCSelector;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab_RTC6;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN;
 
 namespace LibMCDriver_ScanLab {
 

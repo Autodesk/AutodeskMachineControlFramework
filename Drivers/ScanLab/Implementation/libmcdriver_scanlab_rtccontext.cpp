@@ -61,6 +61,7 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 
 	m_pScanLabSDK->n_reset_error(m_CardNo, 0xffffffff);
 
+
 }
 
 CRTCContext::~CRTCContext()
@@ -69,6 +70,23 @@ CRTCContext::~CRTCContext()
 		m_pScanLabSDK->release_rtc(m_CardNo);
 		m_CardNo = 0;
 	}
+}
+
+
+std::string CRTCContext::GetIPAddress()
+{
+	return m_sIPAddress;
+}
+
+std::string CRTCContext::GetNetmask()
+{
+	return m_sNetmask;
+}
+
+void CRTCContext::setIPAddress(const std::string& sIPAddress, const std::string& sNetmask)
+{
+	m_sIPAddress = sIPAddress;
+	m_sNetmask = sNetmask;
 }
 
 

@@ -44,6 +44,9 @@ protected:
 	bool m_bIsNetwork;
 	std::vector<uint32_t> m_MCBSPSignalChannels;
 
+	std::string m_sIPAddress;
+	std::string m_sNetmask;
+
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
@@ -55,6 +58,12 @@ public:
 	CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	~CRTCContext();
+
+	std::string GetIPAddress();
+
+	std::string GetNetmask();
+
+	void setIPAddress(const std::string & sIPAddress, const std::string & sNetmask);
 
 	void LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer);
 
