@@ -125,6 +125,10 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 
 	buildDeviceConfig(pDeviceConfiguration, correctionFileData);
 
+	m_nRTCSignalCount = pDeviceConfiguration->GetRTCSignalCount (); 
+	m_nSensorSignalCount = pDeviceConfiguration->GetSensorSignalCount();
+
+
 	if (m_pConfigurationFile == nullptr)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTCREATEDEVICECONFIGURATION);
 	std::string sConfigurationFileName = m_pConfigurationFile->GetAbsoluteFileName();
@@ -222,8 +226,7 @@ void COIEDeviceInstance::buildDeviceConfig(IDeviceConfiguration* pDeviceConfigur
 
 
 
-	auto pDeviceConfigFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ini", sFilteredDeviceConfigStream.str());
-	std::string sDeviceConfigFileName = pDeviceConfigFile->GetAbsoluteFileName();
+	m_pConfigurationFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ini", sFilteredDeviceConfigStream.str());
 
 }
 
