@@ -890,13 +890,27 @@ public:
 	virtual bool IsInitialized() = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::Initialise - Initializes the RTC6 Scanner Driver.
+	* IDriver_ScanLab_RTC6::Initialise - Manually initializes the RTC6 Scanner Driver.
 	* @param[in] sIP - IP Network Address. Empty string for local card.
 	* @param[in] sNetmask - IP Netmask Address. Empty string for local card.
 	* @param[in] nTimeout - Time out in microseconds.
 	* @param[in] nSerialNumber - Desired Serial Number of card.
 	*/
 	virtual void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::InitialiseFromConfiguration - Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.
+	* @param[in] sPresetName - Name of the configuration preset.
+	*/
+	virtual void InitialiseFromConfiguration(const std::string & sPresetName) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::GetIPAddress - Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
@@ -983,6 +997,25 @@ public:
 	virtual void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) = 0;
 
 	/**
+	* IDriver_ScanLab_RTC6::SetStartList - Opens the list to write.
+	* @param[in] nListIndex - Index of List (1 or 2).
+	* @param[in] nPosition - Relative Position in List.
+	*/
+	virtual void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::SetEndOfList - Closes the currently open list.
+	*/
+	virtual void SetEndOfList() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::ExecuteList - Executes the list.
+	* @param[in] nListIndex - Index of List (1 or 2).
+	* @param[in] nPosition - Relative Position in List.
+	*/
+	virtual void ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) = 0;
+
+	/**
 	* IDriver_ScanLab_RTC6::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
@@ -990,12 +1023,11 @@ public:
 	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
-	* @param[in] dInitialTimeout - Initial timeout in ms
-	* @param[in] dMaxTimeout - Max timeout in ms
-	* @param[in] dMultiplier - Multiplier
+	* IDriver_ScanLab_RTC6::AddLayerToCurrentList - Adds a current layer of the given build stream to the open list. Fails if no list is open.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
 	*/
-	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
+	virtual void AddLayerToCurrentList(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
@@ -1049,6 +1081,13 @@ public:
 	* @param[in] nLaserIndex - Associated Laser Index from the toolpath data. 1-based, MUST NOT be 0. Each Scanner MUST own a unique laser index.
 	*/
 	virtual void InitialiseScanner(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber, const LibMCDriver_ScanLab_uint32 nLaserIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::InitialiseScannerFromConfiguration - Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] sPresetName - Name of the configuration preset.
+	*/
+	virtual void InitialiseScannerFromConfiguration(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sPresetName) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6xN::GetIPAddress - Returns the IP Address of the RTC Card. Fails if driver has not been initialized.

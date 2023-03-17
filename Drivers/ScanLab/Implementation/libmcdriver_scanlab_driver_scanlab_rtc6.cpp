@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdriver_scanlab_driver_scanlab_rtc6.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
+#include "libmcdriver_scanlab_configurationpreset.hpp"
 
 #include <cmath>
 
@@ -160,6 +161,32 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
     }
 
 }
+
+
+void CDriver_ScanLab_RTC6::InitialiseFromConfiguration(const std::string& sPresetName)
+{
+    PDriver_ScanLab_RTC6ConfigurationPreset pPreset = findPresetByName (sPresetName, true);
+
+    Initialise(pPreset->getIP (), pPreset->getNetmask (), pPreset->getTimeout (), pPreset->getSerialNumber ());
+
+    SetCommunicationTimeouts(pPreset->getInitialTimeout(), pPreset->getMaxTimeout(), pPreset->getMultiplier());
+
+    LoadFirmware(pPreset->getFirmwareResourceName(), pPreset->getFPGAResourceName(), pPreset->getAuxiliaryResourceName());
+
+    std::vector<uint8_t> CorrectionBuffer;
+    m_pDriverEnvironment->RetrieveMachineResourceData(pPreset->getCorrectionResourceName(), CorrectionBuffer);
+
+    if (CorrectionBuffer.size() == 0)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCCORRECTIONDATA);
+
+    SetCorrectionFile(CorrectionBuffer.size(), CorrectionBuffer.data(), pPreset->getCorrectionTableNumber(), pPreset->getCorrectionDimension(), pPreset->getCorrectionTableNumberHeadA(), pPreset->getCorrectionTableNumberHeadB());
+
+    ConfigureDelays(pPreset->getLaserOnDelay(), pPreset->getLaserOffDelay(), pPreset->getMarkDelay(), pPreset->getJumpDelay(), pPreset->getPolygonDelay());
+
+    ConfigureLaserMode(pPreset->getLaserMode(), pPreset->getLaserPort(), pPreset->getMaxLaserPower(), pPreset->getFinishLaserPulseAfterOn(), pPreset->getPhaseShiftOfLaserSignal(), pPreset->getLaserOnSignalLowActive(), pPreset->getLaserHalfSignalsLowActive(), pPreset->getSetDigitalInOneHighActive(), pPreset->getOutputSynchronizationActive()); 
+
+}
+
 
 std::string CDriver_ScanLab_RTC6::GetIPAddress()
 {
@@ -325,23 +352,19 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
 }
 
 
-void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
+void CDriver_ScanLab_RTC6::AddLayerToCurrentList(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
 {
     if (!m_SimulationMode) {
-
 
         if (m_pRTCContext.get() == nullptr)
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
         if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
 
-
         auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
         auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
         double dUnits = pToolpathAccessor->GetUnits();
-
-        internalBegin();
 
         uint32_t nSegmentCount = pLayer->GetSegmentCount();
         for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -365,7 +388,7 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
                     int64_t nSkywritingLaserOnShift = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "laseronshift");
                     int64_t nSkywritingPrev = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "nprev");
                     int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
-                    
+
                     double dSkywritingLimit = 0.0;
                     if (nSkywritingMode == 3) {
                         dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
@@ -374,16 +397,16 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
                     switch (nSkywritingMode) {
                     case 1:
-                        m_pRTCContext->EnableSkyWritingMode1 (dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+                        m_pRTCContext->EnableSkyWritingMode1(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
                         break;
                     case 2:
-                        m_pRTCContext->EnableSkyWritingMode2 (dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+                        m_pRTCContext->EnableSkyWritingMode2(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
                         break;
                     case 3:
                         m_pRTCContext->EnableSkyWritingMode3(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
                         break;
                     default:
-                        m_pRTCContext->DisableSkyWriting ();
+                        m_pRTCContext->DisableSkyWriting();
                     }
 
                 }
@@ -441,7 +464,28 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         }
 
-        internalExecute();
+
+    }
+}
+
+
+void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
+{
+    if (!m_SimulationMode) {
+
+
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+        if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
+
+        SetStartList(1, 0);
+
+        AddLayerToCurrentList(sStreamUUID, nLayerIndex);
+
+        SetEndOfList();
+        
+        ExecuteList(1, 0);
 
 
     }
@@ -449,23 +493,34 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 }
 
 
-void CDriver_ScanLab_RTC6::internalBegin()
+void CDriver_ScanLab_RTC6::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
 {
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-    m_pRTCContext->SetStartList(1, 0);
+    m_pRTCContext->SetStartList(nListIndex, nPosition);
 
 }
 
 
-void CDriver_ScanLab_RTC6::internalExecute()
+
+void CDriver_ScanLab_RTC6::SetEndOfList()
 {
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
     m_pRTCContext->SetEndOfList();
-    m_pRTCContext->ExecuteList(1, 0);
+
+}
+
+void CDriver_ScanLab_RTC6::ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
+{
+
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    m_pRTCContext->ExecuteList(nListIndex, nPosition);
+
 
     auto pDriverUpdateInstance = m_pDriverEnvironment->CreateStatusUpdateSession();
 
@@ -473,12 +528,11 @@ void CDriver_ScanLab_RTC6::internalExecute()
     uint32_t Pos = 0;
 
     while (Busy) {
-        m_pRTCContext->GetStatus (Busy, Pos);
+        m_pRTCContext->GetStatus(Busy, Pos);
         pDriverUpdateInstance->Sleep(10);
 
         updateCardStatus(pDriverUpdateInstance);
     }
-
 }
 
 void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
@@ -551,5 +605,20 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
     }
 
 }
+
+PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(const std::string& sPresetName, bool bMustExist)
+{
+    auto iIterator = m_ConfigurationPresets.find(sPresetName);
+    if (iIterator != m_ConfigurationPresets.end()) {
+        return iIterator->second;
+    }
+    else {
+        if (bMustExist)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND, sPresetName);
+
+        return nullptr;
+    }
+}
+
 
 

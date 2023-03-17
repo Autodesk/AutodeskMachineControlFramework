@@ -16,6 +16,7 @@ Abstract: This is the class declaration of CDriver_ScanLab_RTC6
 #include "libmcdriver_scanlab_driver_scanlab.hpp"
 #include "libmcdriver_scanlab_rtccontext.hpp"
 #include "libmcdriver_scanlab_rtcselector.hpp"
+#include "libmcdriver_scanlab_configurationpreset.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_driver.hpp"
@@ -25,7 +26,7 @@ Abstract: This is the class declaration of CDriver_ScanLab_RTC6
 #endif
 
 // Include custom headers here.
-
+#include <map>
 
 namespace LibMCDriver_ScanLab {
 namespace Impl {
@@ -129,10 +130,11 @@ private:
 	act_managed_ptr<IRTCSelector> m_pRTCSelector;
 	act_managed_ptr<IRTCContext> m_pRTCContext;
 
-	void internalBegin();
-	void internalExecute();
+	std::map<std::string, PDriver_ScanLab_RTC6ConfigurationPreset> m_ConfigurationPresets;
 
 	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
+
+	
 
 protected:
 
@@ -158,6 +160,8 @@ public:
 
 	void Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) override;
 
+	void InitialiseFromConfiguration(const std::string& sPresetName) override;
+
 	std::string GetIPAddress() override;
 
 	std::string GetNetmask() override;
@@ -180,9 +184,19 @@ public:
 
 	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) override;
 
+	void AddLayerToCurrentList(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) override;
+
 	void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) override;
 
 	void GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier) override;
+
+	PDriver_ScanLab_RTC6ConfigurationPreset findPresetByName(const std::string & sPresetName, bool bMustExist);
+
+	void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) override;
+
+	void SetEndOfList() override;
+
+	void ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) override;
 
 
 };

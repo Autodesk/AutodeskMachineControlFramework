@@ -669,10 +669,6 @@ void CRTCContext::StartOIEMeasurement()
 		break;
 
 	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
-		// Bit 8 triggers OIE Measurement Start
-		m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, 1UL | (1UL << 8));
-		break;
-
 	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3:
 		// Bit 4 triggers OIE Measurement Start
 		m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, 1UL | (1UL << 4));

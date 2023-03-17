@@ -703,7 +703,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSi
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsInitializedPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, bool * pIsInitialized);
 
 /**
-* Initializes the RTC6 Scanner Driver.
+* Manually initializes the RTC6 Scanner Driver.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] pIP - IP Network Address. Empty string for local card.
@@ -713,6 +713,26 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsIn
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber);
+
+/**
+* Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] pPresetName - Name of the configuration preset.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialiseFromConfigurationPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pPresetName);
+
+/**
+* Set RTC Ethernet communication timeouts
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] dInitialTimeout - Initial timeout in ms
+* @param[in] dMaxTimeout - Max timeout in ms
+* @param[in] dMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier);
 
 /**
 * Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
@@ -833,6 +853,34 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Conf
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureDelaysPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double dLaserOnDelay, LibMCDriver_ScanLab_double dLaserOffDelay, LibMCDriver_ScanLab_double dMarkDelay, LibMCDriver_ScanLab_double dJumpDelay, LibMCDriver_ScanLab_double dPolygonDelay);
 
 /**
+* Opens the list to write.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nListIndex - Index of List (1 or 2).
+* @param[in] nPosition - Relative Position in List.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStartListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition);
+
+/**
+* Closes the currently open list.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetEndOfListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
+
+/**
+* Executes the list.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nListIndex - Index of List (1 or 2).
+* @param[in] nPosition - Relative Position in List.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ExecuteListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition);
+
+/**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
@@ -843,15 +891,14 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Conf
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
 
 /**
-* Set RTC Ethernet communication timeouts
+* Adds a current layer of the given build stream to the open list. Fails if no list is open.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @param[in] dInitialTimeout - Initial timeout in ms
-* @param[in] dMaxTimeout - Max timeout in ms
-* @param[in] dMultiplier - Multiplier
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_AddLayerToCurrentListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
 
 /**
 * Get RTC Ethernet communication timeouts
@@ -916,6 +963,16 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Ge
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_InitialiseScannerPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber, LibMCDriver_ScanLab_uint32 nLaserIndex);
+
+/**
+* Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] pPresetName - Name of the configuration preset.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_InitialiseScannerFromConfigurationPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, const char * pPresetName);
 
 /**
 * Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
@@ -1218,6 +1275,8 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr m_Driver_ScanLab_RTC6_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsInitializedPtr m_Driver_ScanLab_RTC6_IsInitialized;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr m_Driver_ScanLab_RTC6_Initialise;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialiseFromConfigurationPtr m_Driver_ScanLab_RTC6_InitialiseFromConfiguration;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_SetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetIPAddressPtr m_Driver_ScanLab_RTC6_GetIPAddress;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetNetmaskPtr m_Driver_ScanLab_RTC6_GetNetmask;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetSerialNumberPtr m_Driver_ScanLab_RTC6_GetSerialNumber;
@@ -1228,14 +1287,18 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCorrectionFilePtr m_Driver_ScanLab_RTC6_SetCorrectionFile;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureLaserModePtr m_Driver_ScanLab_RTC6_ConfigureLaserMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureDelaysPtr m_Driver_ScanLab_RTC6_ConfigureDelays;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStartListPtr m_Driver_ScanLab_RTC6_SetStartList;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetEndOfListPtr m_Driver_ScanLab_RTC6_SetEndOfList;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ExecuteListPtr m_Driver_ScanLab_RTC6_ExecuteList;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr m_Driver_ScanLab_RTC6_DrawLayer;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_SetCommunicationTimeouts;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_AddLayerToCurrentListPtr m_Driver_ScanLab_RTC6_AddLayerToCurrentList;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_GetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetToSimulationModePtr m_Driver_ScanLab_RTC6xN_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsSimulationModePtr m_Driver_ScanLab_RTC6xN_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsInitializedPtr m_Driver_ScanLab_RTC6xN_IsInitialized;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetScannerCountPtr m_Driver_ScanLab_RTC6xN_GetScannerCount;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_InitialiseScannerPtr m_Driver_ScanLab_RTC6xN_InitialiseScanner;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_InitialiseScannerFromConfigurationPtr m_Driver_ScanLab_RTC6xN_InitialiseScannerFromConfiguration;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetIPAddressPtr m_Driver_ScanLab_RTC6xN_GetIPAddress;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetNetmaskPtr m_Driver_ScanLab_RTC6xN_GetNetmask;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetSerialNumberPtr m_Driver_ScanLab_RTC6xN_GetSerialNumber;

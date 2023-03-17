@@ -91,9 +91,8 @@
 		<error name="INVALIDSKYWRITINGNPOST" code="1039" description="Invalid Skywriting N Post." />		
 		<error name="OIEHASNOTBEENINITIALIZED" code="1040" description="OIE has not been initialized." />
 		<error name="UNSUPPORTEDOIEOPERATIONMODE" code="1041" description="Unsupported OIE Operation Mode." />		
-		
-		
-		
+		<error name="INVALIDRTCCORRECTIONDATA" code="1042" description="Invalid RTC Correction data." />		
+		<error name="CONFIGURATIONPRESETNOTFOUND" code="1043" description="Configuration preset not found." />				
 		
 	</errors>
 
@@ -496,12 +495,22 @@ Custom implementation
 			<param name="IsInitialized" type="bool" pass="return" description="Flag if driver is initialized." />
 		</method>		
 
-		<method name="Initialise" description="Initializes the RTC6 Scanner Driver.">
+		<method name="Initialise" description="Manually initializes the RTC6 Scanner Driver.">
 			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
 			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
 			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
 			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
 		</method>
+
+		<method name="InitialiseFromConfiguration" description="Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.">
+			<param name="PresetName" type="string" pass="in" description="Name of the configuration preset." />
+		</method>
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
 
 		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
 			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
@@ -564,17 +573,30 @@ Custom implementation
 		</method>
 
 
+		<method name="SetStartList" description="Opens the list to write.">
+			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
+			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
+		</method>
+
+		<method name="SetEndOfList" description="Closes the currently open list.">
+		</method>
+		
+		<method name="ExecuteList" description="Executes the list.">
+			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
+			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
+		</method>
+
+
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 		</method>
-
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
-			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
-			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
-			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
-		</method>		
 						
+		<method name="AddLayerToCurrentList" description="Adds a current layer of the given build stream to the open list. Fails if no list is open.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+
 		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
@@ -611,6 +633,11 @@ Custom implementation
 			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
 			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
 			<param name="LaserIndex" type="uint32" pass="in" description="Associated Laser Index from the toolpath data. 1-based, MUST NOT be 0. Each Scanner MUST own a unique laser index." />
+		</method>
+
+		<method name="InitialiseScannerFromConfiguration" description="Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="PresetName" type="string" pass="in" description="Name of the configuration preset." />
 		</method>
 
 		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
