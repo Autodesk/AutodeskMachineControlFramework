@@ -268,7 +268,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByMinorVersion("AIB", 2, 0);
+		pDevice->StartAppByMinorVersion("AIB", 3, 0);
 
 		pStateEnvironment->LogMessage("Waiting..");
 
@@ -281,83 +281,93 @@ public:
 		pStateEnvironment->LogMessage("  Running app: " + sName + " (" + std::to_string(nMajor) + "." + std::to_string(nMinor) + "." + std::to_string(nPatch) + ")");
 
 
+		{
 
-		pStateEnvironment->LogMessage("Running OIE Test..");
-
-
-		pRTCContext->SetStartList(1, 0);
-		pRTCContext->EnableOIE();
-		pRTCContext->StartOIEMeasurement();
-
-		std::vector<LibMCDriver_ScanLab::sPoint2D> ContourPoints;
-		//ContourPoints.resize(1000);
-		for (int32_t nIndex = 0; nIndex < 1000; nIndex++) {
-			float T = (float)(nIndex - 500) / 500.0f * 3.14159f;
-			float dX = nIndex * 0.05f;
-			float dY = sin(T) * 20.0f;
-			ContourPoints.push_back(LibMCDriver_ScanLab::sPoint2D{ dX, dY });
-
-			//std::cout << "Point X: " << dX << " " << dY << std::endl;
-		}
-
-		std::cout << "How many points? " << ContourPoints.size() << std::endl;
+			pStateEnvironment->LogMessage("Running OIE Test..");
 
 
-		pRTCContext->DrawPolyline(ContourPoints, 10.0, 100.0, 1.0, 0.0);
+			pRTCContext->SetStartList(1, 0);
+			pRTCContext->EnableOIE();
+			pRTCContext->StartOIEMeasurement();
 
-		pRTCContext->StopOIEMeasurement();
-		pRTCContext->DisableOIE();
+			std::vector<LibMCDriver_ScanLab::sPoint2D> ContourPoints;
+			//ContourPoints.resize(1000);
+			for (int32_t nIndex = 0; nIndex < 1000; nIndex++) {
+				float T = (float)(nIndex - 500) / 500.0f * 3.14159f;
+				float dX = nIndex * 0.05f;
+				float dY = sin(T) * 20.0f;
+				ContourPoints.push_back(LibMCDriver_ScanLab::sPoint2D{ dX, dY });
 
-		pRTCContext->SetEndOfList();
-		pRTCContext->ExecuteList(1, 0);
+				//std::cout << "Point X: " << dX << " " << dY << std::endl;
+			}
 
-		//pRTC6Driver->OIETest();
+			std::cout << "How many points? " << ContourPoints.size() << std::endl;
 
-		bool bBusy = true;
-		while (bBusy) {
-			uint32_t nPosition = 0;
-			pRTCContext->GetStatus (bBusy, nPosition);
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			pRTCContext->DrawPolyline(ContourPoints, 10.0, 100.0, 1.0, 0.0);
 
-			std::cout << "List Position: " << nPosition << std::endl;
+			pRTCContext->StopOIEMeasurement();
+			pRTCContext->DisableOIE();
+
+			pRTCContext->SetEndOfList();
+			pRTCContext->ExecuteList(1, 0);
+
+			//pRTC6Driver->OIETest();
+
+			bool bBusy = true;
+			while (bBusy) {
+				uint32_t nPosition = 0;
+				pRTCContext->GetStatus(bBusy, nPosition);
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+				std::cout << "List Position: " << nPosition << std::endl;
+
+			}
+
+			auto pRecording = pDevice->RetrieveCurrentRecording();
+			pStateEnvironment->LogMessage("Storing as debug CSV..");
+			std::vector<double> XArrayBuffer;
+			std::vector<double> YArrayBuffer;
+			std::vector<int32_t> SignalsBuffer1;
+			std::vector<uint32_t> PacketNumbersBuffer;
+			std::vector<int32_t> SignalsBuffer2;
+			pRecording->GetAllCoordinates(XArrayBuffer, YArrayBuffer);
+			pRecording->GetAllSensorSignals(0, SignalsBuffer1);
+			pRecording->GetAllSensorSignals(1, SignalsBuffer2);
+			pRecording->GetAllPacketNumbers(PacketNumbersBuffer);
+
+			size_t nRecordCount = pRecording->GetRecordCount();
+
+			if (XArrayBuffer.size() != nRecordCount)
+				throw std::runtime_error("retrieved invalid recording x coord data");
+			if (YArrayBuffer.size() != nRecordCount)
+				throw std::runtime_error("retrieved invalid recording y coord data");
+			if (SignalsBuffer1.size() != nRecordCount)
+				throw std::runtime_error("retrieved invalid recording signal data");
+			if (SignalsBuffer2.size() != nRecordCount)
+				throw std::runtime_error("retrieved invalid recording signal data");
+			if (PacketNumbersBuffer.size() != nRecordCount)
+				throw std::runtime_error("retrieved invalid packet numbers data");
+
+			std::ofstream fStream;
+			fStream.open("debug.csv");
+			if (!fStream.is_open())
+				throw std::runtime_error("could not write file");
+
+			fStream << "packet number, X, Y, Sensor Value 1, Sensor Value 2" << std::endl;
+
+			for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+				fStream << PacketNumbersBuffer[nRecordIndex] << ", " << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer1[nRecordIndex] << ", " << SignalsBuffer2[nRecordIndex] << std::endl;
+			}
+
+			pStateEnvironment->LogMessage("Waiting..");
+
+			pStateEnvironment->LogMessage("Done..");
 
 		}
 
 		pDevice->StopApp();
-
-		auto pRecording = pDevice->RetrieveCurrentRecording();
-		pStateEnvironment->LogMessage("Storing as debug CSV..");
-		std::vector<double> XArrayBuffer;
-		std::vector<double> YArrayBuffer;
-		std::vector<int32_t> SignalsBuffer;
-		std::vector<uint32_t> PacketNumbersBuffer;
-		pRecording->GetAllCoordinates(XArrayBuffer, YArrayBuffer);
-		pRecording->GetAllSensorSignals(0, SignalsBuffer);
-		pRecording->GetAllPacketNumbers(PacketNumbersBuffer);
-
-		size_t nRecordCount = pRecording->GetRecordCount();
-
-		if (XArrayBuffer.size () != nRecordCount)
-			throw std::runtime_error("retrieved invalid recording x coord data");
-		if (YArrayBuffer.size() != nRecordCount)
-			throw std::runtime_error("retrieved invalid recording y coord data");
-		if (SignalsBuffer.size() != nRecordCount)
-			throw std::runtime_error("retrieved invalid recording signal data");
-		if (PacketNumbersBuffer.size() != nRecordCount)
-			throw std::runtime_error("retrieved invalid packet numbers data");
-
-		std::ofstream fStream;
-		fStream.open("debug.csv");
-		if (!fStream.is_open())
-			throw std::runtime_error("could not write file");
-
-		fStream << "packet number, X, Y, Sensor Value" << std::endl;
-
-		for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
-			fStream << PacketNumbersBuffer[nRecordIndex] << ", " << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer[nRecordIndex] << std::endl;
-		}
-
 		pStateEnvironment->LogMessage("Waiting..");
 
 		pStateEnvironment->LogMessage("Disconnecting Device");
