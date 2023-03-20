@@ -223,20 +223,28 @@ LibMCDriver_ScanLab_uint32 CDriver_ScanLab_RTC6::GetSerialNumber()
 
 IRTCContext* CDriver_ScanLab_RTC6::GetContext()
 {
+    // Attention, Caller MUST reduce Reference count with the result
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-    return m_pRTCContext.get();
+    auto pContext = m_pRTCContext.get();
+    pContext->IncRefCount();
+
+    return pContext;
 }
 
 IRTCSelector* CDriver_ScanLab_RTC6::GetSelector()
 {
+    // Attention, Caller MUST reduce Reference count with the result
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
     if (m_pRTCSelector.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-    return m_pRTCSelector.get();
+    auto pSelector = m_pRTCSelector.get();
+    pSelector->IncRefCount();
+
+    return pSelector;
 }
 
 
