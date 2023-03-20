@@ -49,6 +49,12 @@ CDriver_ScanLab_RTC6::CDriver_ScanLab_RTC6(const std::string& sName, const std::
 {
 }
 
+
+CDriver_ScanLab_RTC6::~CDriver_ScanLab_RTC6 ()
+{
+
+}
+
 void CDriver_ScanLab_RTC6::Configure(const std::string& sConfigurationString)
 {
     m_pDriverEnvironment->RegisterIntegerParameter("serialnumber", "Serial Number", 0);

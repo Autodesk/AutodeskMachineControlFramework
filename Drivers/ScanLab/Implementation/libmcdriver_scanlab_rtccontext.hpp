@@ -46,6 +46,7 @@ protected:
 
 	std::string m_sIPAddress;
 	std::string m_sNetmask;
+	uint32_t m_nLaserIndex;
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
@@ -64,6 +65,8 @@ public:
 	std::string GetNetmask();
 
 	void setIPAddress(const std::string & sIPAddress, const std::string & sNetmask);
+
+	void setLaserIndex (const uint32_t nLaserIndex);
 
 	void LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer);
 
@@ -88,6 +91,9 @@ public:
 	void SetStandbyInMicroSeconds(const LibMCDriver_ScanLab_double dHalfPeriod, const LibMCDriver_ScanLab_double dPulseLength) override;
 
 	LibMCDriver_ScanLab_uint32 GetSerialNumber() override;
+
+	LibMCDriver_ScanLab_uint32 GetLaserIndex() override;
+
 
 	void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) override;
 

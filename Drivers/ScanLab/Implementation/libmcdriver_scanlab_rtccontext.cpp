@@ -47,6 +47,7 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 	m_CardNo (nCardNo), 
 	m_dCorrectionFactor(10000.0), 
 	m_dZCorrectionFactor(10000.0),
+	m_nLaserIndex (0),
 	m_LaserPort(eLaserPort::Port12BitAnalog1), 
 	m_pDriverEnvironment (pDriverEnvironment),
 	m_OIEOperationMode (LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized),
@@ -89,6 +90,10 @@ void CRTCContext::setIPAddress(const std::string& sIPAddress, const std::string&
 	m_sNetmask = sNetmask;
 }
 
+void CRTCContext::setLaserIndex(const uint32_t nLaserIndex)
+{
+	m_nLaserIndex = nLaserIndex;
+}
 
 
 void CRTCContext::LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer)
@@ -264,6 +269,11 @@ LibMCDriver_ScanLab_uint32 CRTCContext::GetSerialNumber()
 {
 	uint32_t serialNo = m_pScanLabSDK->n_get_serial_number(m_CardNo);
 	return serialNo;
+}
+
+LibMCDriver_ScanLab_uint32 CRTCContext::GetLaserIndex()
+{
+	return m_nLaserIndex;
 }
 
 void CRTCContext::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)

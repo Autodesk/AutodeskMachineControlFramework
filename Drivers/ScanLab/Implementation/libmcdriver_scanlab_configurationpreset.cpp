@@ -56,7 +56,8 @@ using namespace LibMCDriver_ScanLab::Impl;
     CDriver_ScanLab_RTC6ConfigurationPreset::CDriver_ScanLab_RTC6ConfigurationPreset()
         : m_nTimeout (0), m_nSerialNumber (0), m_dInitialTimeout (0.0), m_dMaxTimeout (0.0), m_dMultiplier (0.0),
          m_LaserMode (LibMCDriver_ScanLab::eLaserMode::CO2), m_LaserPort (LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1),
-         m_nCorrectionTableNumber (0), m_nCorrectionDimension (0), m_nCorrectionTableNumberHeadA (0), m_nCorrectionTableNumberHeadB (0)
+         m_nCorrectionTableNumber (0), m_nCorrectionDimension (0), m_nCorrectionTableNumberHeadA (0), m_nCorrectionTableNumberHeadB (0),
+        m_nLaserIndex (0)
     {
 
     }
@@ -217,5 +218,11 @@ using namespace LibMCDriver_ScanLab::Impl;
     {
         return m_dPolygonDelay;
     }
+
+    uint32_t CDriver_ScanLab_RTC6ConfigurationPreset::getLaserIndex()
+    {
+        return m_nLaserIndex;
+    }
+
 
 

@@ -234,6 +234,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE: return "UNSUPPORTEDOIEOPERATIONMODE";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCCORRECTIONDATA: return "INVALIDRTCCORRECTIONDATA";
 			case LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND: return "CONFIGURATIONPRESETNOTFOUND";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT: return "INVALIDSCANNERCOUNT";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX: return "INVALIDSCANNERINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -294,6 +296,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE: return "Unsupported OIE Operation Mode.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCCORRECTIONDATA: return "Invalid RTC Correction data.";
 			case LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND: return "Configuration preset not found.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT: return "Invalid scanner count.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX: return "Invalid scanner index.";
 		}
 		return "unknown error";
 	}
@@ -532,6 +536,7 @@ public:
 	inline std::string GetIPAddress();
 	inline std::string GetNetmask();
 	inline LibMCDriver_ScanLab_uint32 GetSerialNumber();
+	inline LibMCDriver_ScanLab_uint32 GetLaserIndex();
 	inline void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
 	inline void SetEndOfList();
 	inline void ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
@@ -659,6 +664,7 @@ public:
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
 	inline bool IsInitialized();
+	inline bool ScannerIsInitialized(const LibMCDriver_ScanLab_uint32 nScannerIndex);
 	inline LibMCDriver_ScanLab_uint32 GetScannerCount();
 	inline void InitialiseScanner(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber, const LibMCDriver_ScanLab_uint32 nLaserIndex);
 	inline void InitialiseScannerFromConfiguration(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sPresetName);
@@ -819,6 +825,7 @@ public:
 		pWrapperTable->m_RTCContext_GetIPAddress = nullptr;
 		pWrapperTable->m_RTCContext_GetNetmask = nullptr;
 		pWrapperTable->m_RTCContext_GetSerialNumber = nullptr;
+		pWrapperTable->m_RTCContext_GetLaserIndex = nullptr;
 		pWrapperTable->m_RTCContext_SetStartList = nullptr;
 		pWrapperTable->m_RTCContext_SetEndOfList = nullptr;
 		pWrapperTable->m_RTCContext_ExecuteList = nullptr;
@@ -882,6 +889,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_IsInitialized = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_ScannerIsInitialized = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetScannerCount = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_InitialiseScanner = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_InitialiseScannerFromConfiguration = nullptr;
@@ -1133,6 +1141,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_GetSerialNumber == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetLaserIndex = (PLibMCDriver_ScanLabRTCContext_GetLaserIndexPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserindex");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetLaserIndex = (PLibMCDriver_ScanLabRTCContext_GetLaserIndexPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetLaserIndex == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1703,6 +1720,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_ScannerIsInitialized = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ScannerIsInitializedPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_scannerisinitialized");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_ScannerIsInitialized = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ScannerIsInitializedPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_scannerisinitialized");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_ScannerIsInitialized == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetScannerCount = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetScannerCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getscannercount");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetScannerCount = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetScannerCountPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getscannercount");
@@ -2005,6 +2031,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetSerialNumber == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getlaserindex", (void**)&(pWrapperTable->m_RTCContext_GetLaserIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserIndex == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setstartlist", (void**)&(pWrapperTable->m_RTCContext_SetStartList));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetStartList == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2255,6 +2285,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_isinitialized", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_IsInitialized));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_IsInitialized == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_scannerisinitialized", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_ScannerIsInitialized));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_ScannerIsInitialized == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getscannercount", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetScannerCount));
@@ -2595,6 +2629,18 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetSerialNumber(m_pHandle, &resultSerialNumber));
 		
 		return resultSerialNumber;
+	}
+	
+	/**
+	* CRTCContext::GetLaserIndex - Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.
+	* @return Returns laser index of board.
+	*/
+	LibMCDriver_ScanLab_uint32 CRTCContext::GetLaserIndex()
+	{
+		LibMCDriver_ScanLab_uint32 resultLaserIndex = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserIndex(m_pHandle, &resultLaserIndex));
+		
+		return resultLaserIndex;
 	}
 	
 	/**
@@ -3341,6 +3387,19 @@ public:
 	{
 		bool resultIsInitialized = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_IsInitialized(m_pHandle, &resultIsInitialized));
+		
+		return resultIsInitialized;
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::ScannerIsInitialized - Returns if a specific scanners of the driver are initalized.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return Flag if scanner is initialized.
+	*/
+	bool CDriver_ScanLab_RTC6xN::ScannerIsInitialized(const LibMCDriver_ScanLab_uint32 nScannerIndex)
+	{
+		bool resultIsInitialized = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_ScannerIsInitialized(m_pHandle, nScannerIndex, &resultIsInitialized));
 		
 		return resultIsInitialized;
 	}

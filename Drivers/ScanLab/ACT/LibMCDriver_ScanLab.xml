@@ -93,6 +93,8 @@
 		<error name="UNSUPPORTEDOIEOPERATIONMODE" code="1041" description="Unsupported OIE Operation Mode." />		
 		<error name="INVALIDRTCCORRECTIONDATA" code="1042" description="Invalid RTC Correction data." />		
 		<error name="CONFIGURATIONPRESETNOTFOUND" code="1043" description="Configuration preset not found." />				
+		<error name="INVALIDSCANNERCOUNT" code="1044" description="Invalid scanner count." />
+		<error name="INVALIDSCANNERINDEX" code="1045" description="Invalid scanner index." />			
 		
 	</errors>
 
@@ -263,6 +265,10 @@ Custom implementation
 			<param name="SerialNumber" type="uint32" pass="return" description="Returns serial number of board." />
 		</method>
 		
+		<method name="GetLaserIndex" description="Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.">
+			<param name="LaserIndex" type="uint32" pass="return" description="Returns laser index of board." />
+		</method>
+
 		<method name="SetStartList" description="Opens the list to write">
 			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
 			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
@@ -620,6 +626,11 @@ Custom implementation
 
 		<method name="IsInitialized" description="Returns if all the scanners of the driver are initalized.">		
 			<param name="IsInitialized" type="bool" pass="return" description="Flag if driver is initialized." />
+		</method>		
+
+		<method name="ScannerIsInitialized" description="Returns if a specific scanners of the driver are initalized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="IsInitialized" type="bool" pass="return" description="Flag if scanner is initialized." />
 		</method>		
 
 		<method name="GetScannerCount" description="Returns if number of scanners.">		

@@ -269,6 +269,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetNetmaskPtr
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetSerialNumberPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pSerialNumber);
 
 /**
+* Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pLaserIndex - Returns laser index of board.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserIndexPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pLaserIndex);
+
+/**
 * Opens the list to write
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -942,6 +951,16 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Is
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsInitializedPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, bool * pIsInitialized);
 
 /**
+* Returns if a specific scanners of the driver are initalized.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[out] pIsInitialized - Flag if scanner is initialized.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ScannerIsInitializedPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, bool * pIsInitialized);
+
+/**
 * Returns if number of scanners.
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
@@ -1233,6 +1252,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_GetIPAddressPtr m_RTCContext_GetIPAddress;
 	PLibMCDriver_ScanLabRTCContext_GetNetmaskPtr m_RTCContext_GetNetmask;
 	PLibMCDriver_ScanLabRTCContext_GetSerialNumberPtr m_RTCContext_GetSerialNumber;
+	PLibMCDriver_ScanLabRTCContext_GetLaserIndexPtr m_RTCContext_GetLaserIndex;
 	PLibMCDriver_ScanLabRTCContext_SetStartListPtr m_RTCContext_SetStartList;
 	PLibMCDriver_ScanLabRTCContext_SetEndOfListPtr m_RTCContext_SetEndOfList;
 	PLibMCDriver_ScanLabRTCContext_ExecuteListPtr m_RTCContext_ExecuteList;
@@ -1296,6 +1316,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetToSimulationModePtr m_Driver_ScanLab_RTC6xN_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsSimulationModePtr m_Driver_ScanLab_RTC6xN_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsInitializedPtr m_Driver_ScanLab_RTC6xN_IsInitialized;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ScannerIsInitializedPtr m_Driver_ScanLab_RTC6xN_ScannerIsInitialized;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetScannerCountPtr m_Driver_ScanLab_RTC6xN_GetScannerCount;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_InitialiseScannerPtr m_Driver_ScanLab_RTC6xN_InitialiseScanner;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_InitialiseScannerFromConfigurationPtr m_Driver_ScanLab_RTC6xN_InitialiseScannerFromConfiguration;

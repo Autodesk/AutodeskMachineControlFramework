@@ -148,6 +148,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE 1041 /** Unsupported OIE Operation Mode. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCCORRECTIONDATA 1042 /** Invalid RTC Correction data. */
 #define LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND 1043 /** Configuration preset not found. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT 1044 /** Invalid scanner count. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX 1045 /** Invalid scanner index. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -208,6 +210,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE: return "Unsupported OIE Operation Mode.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCCORRECTIONDATA: return "Invalid RTC Correction data.";
     case LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND: return "Configuration preset not found.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT: return "Invalid scanner count.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX: return "Invalid scanner index.";
     default: return "unknown error";
   }
 }

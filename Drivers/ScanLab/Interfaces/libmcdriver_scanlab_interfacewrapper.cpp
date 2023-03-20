@@ -711,6 +711,32 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getserialnumber(LibMCDr
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserindex(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pLaserIndex)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pLaserIndex == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pLaserIndex = pIRTCContext->GetLaserIndex();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setstartlist(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -2444,6 +2470,32 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_isinitialize
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_scannerisinitialized(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, bool * pIsInitialized)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
+
+	try {
+		if (pIsInitialized == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab_RTC6xN* pIDriver_ScanLab_RTC6xN = dynamic_cast<IDriver_ScanLab_RTC6xN*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6xN)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pIsInitialized = pIDriver_ScanLab_RTC6xN->ScannerIsInitialized(nScannerIndex);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getscannercount(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 * pNumberOfScanners)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
@@ -2976,6 +3028,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getnetmask;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_getserialnumber") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getserialnumber;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getlaserindex") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getlaserindex;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setstartlist") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setstartlist;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setendoflist") 
@@ -3102,6 +3156,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_issimulationmode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_isinitialized") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_isinitialized;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_scannerisinitialized") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_scannerisinitialized;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getscannercount") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getscannercount;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_initialisescanner") 

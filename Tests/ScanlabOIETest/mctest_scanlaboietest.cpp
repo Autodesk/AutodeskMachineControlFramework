@@ -331,10 +331,10 @@ public:
 			std::vector<double> YArrayBuffer;
 			std::vector<int32_t> SignalsBuffer1;
 			std::vector<uint32_t> PacketNumbersBuffer;
-			std::vector<int32_t> SignalsBuffer2;
+			//std::vector<int32_t> SignalsBuffer2;
 			pRecording->GetAllCoordinates(XArrayBuffer, YArrayBuffer);
 			pRecording->GetAllSensorSignals(0, SignalsBuffer1);
-			pRecording->GetAllSensorSignals(1, SignalsBuffer2);
+			//pRecording->GetAllSensorSignals(1, SignalsBuffer2);
 			pRecording->GetAllPacketNumbers(PacketNumbersBuffer);
 
 			size_t nRecordCount = pRecording->GetRecordCount();
@@ -345,8 +345,8 @@ public:
 				throw std::runtime_error("retrieved invalid recording y coord data");
 			if (SignalsBuffer1.size() != nRecordCount)
 				throw std::runtime_error("retrieved invalid recording signal data");
-			if (SignalsBuffer2.size() != nRecordCount)
-				throw std::runtime_error("retrieved invalid recording signal data");
+			//if (SignalsBuffer2.size() != nRecordCount)
+				//throw std::runtime_error("retrieved invalid recording signal data");
 			if (PacketNumbersBuffer.size() != nRecordCount)
 				throw std::runtime_error("retrieved invalid packet numbers data");
 
@@ -358,7 +358,7 @@ public:
 			fStream << "packet number, X, Y, Sensor Value 1, Sensor Value 2" << std::endl;
 
 			for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
-				fStream << PacketNumbersBuffer[nRecordIndex] << ", " << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer1[nRecordIndex] << ", " << SignalsBuffer2[nRecordIndex] << std::endl;
+				fStream << PacketNumbersBuffer[nRecordIndex] << ", " << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer1[nRecordIndex] << ", " << std::endl;
 			}
 
 			pStateEnvironment->LogMessage("Waiting..");

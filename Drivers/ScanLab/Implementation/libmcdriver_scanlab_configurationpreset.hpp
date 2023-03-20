@@ -58,6 +58,8 @@ namespace Impl {
         double m_dJumpDelay;
         double m_dPolygonDelay;
 
+        uint32_t m_nLaserIndex;
+
     public:
 
         CDriver_ScanLab_RTC6ConfigurationPreset();
@@ -102,6 +104,7 @@ namespace Impl {
         double getJumpDelay();
         double getPolygonDelay();
 
+        uint32_t getLaserIndex ();
     };
 
     typedef std::shared_ptr<CDriver_ScanLab_RTC6ConfigurationPreset> PDriver_ScanLab_RTC6ConfigurationPreset;

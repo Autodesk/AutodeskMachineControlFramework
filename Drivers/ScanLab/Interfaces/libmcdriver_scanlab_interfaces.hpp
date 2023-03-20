@@ -558,6 +558,12 @@ public:
 	virtual LibMCDriver_ScanLab_uint32 GetSerialNumber() = 0;
 
 	/**
+	* IRTCContext::GetLaserIndex - Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.
+	* @return Returns laser index of board.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetLaserIndex() = 0;
+
+	/**
 	* IRTCContext::SetStartList - Opens the list to write
 	* @param[in] nListIndex - Index of List (1 or 2).
 	* @param[in] nPosition - Relative Position in List.
@@ -1064,6 +1070,13 @@ public:
 	* @return Flag if driver is initialized.
 	*/
 	virtual bool IsInitialized() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::ScannerIsInitialized - Returns if a specific scanners of the driver are initalized.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return Flag if scanner is initialized.
+	*/
+	virtual bool ScannerIsInitialized(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6xN::GetScannerCount - Returns if number of scanners.
