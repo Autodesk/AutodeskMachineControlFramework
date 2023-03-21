@@ -73,13 +73,16 @@ private:
 
 	act_managed_ptr<IRTCSelector> m_pRTCSelector;
 	
-	std::map<uint32_t, act_managed_ptr<IRTCContext>> m_pScannerContexts;
+	std::map<uint32_t, act_managed_ptr<IRTCContext>> m_ScannerContexts;
+	std::map<uint32_t, act_managed_ptr<IRTCContext>> m_LaserIndexMapping;
 
 	std::map<std::string, PDriver_ScanLab_RTC6ConfigurationPreset> m_ConfigurationPresets;
 
 	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
-	act_managed_ptr<IRTCContext> getRTCContext(uint32_t nScannerIndex);
+	act_managed_ptr<IRTCContext> getRTCContextForScannerIndex(uint32_t nScannerIndex, bool bFailIfNotExisting);
+
+	act_managed_ptr<IRTCContext> getRTCContextForLaserIndex(uint32_t nLaserIndex, bool bFailIfNotExisting);
 
 public:
 
@@ -119,6 +122,8 @@ public:
 	LibMCDriver_ScanLab_uint32 GetSerialNumber(const LibMCDriver_ScanLab_uint32 nScannerIndex) override;
 
 	LibMCDriver_ScanLab_uint32 GetLaserIndex(const LibMCDriver_ScanLab_uint32 nScannerIndex) override;
+
+	IRTCSelector* GetSelector() override;
 
 	IRTCContext * GetContext(const LibMCDriver_ScanLab_uint32 nScannerIndex) override;
 

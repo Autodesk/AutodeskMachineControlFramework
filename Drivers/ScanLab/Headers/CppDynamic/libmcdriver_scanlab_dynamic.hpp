@@ -236,6 +236,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND: return "CONFIGURATIONPRESETNOTFOUND";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT: return "INVALIDSCANNERCOUNT";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX: return "INVALIDSCANNERINDEX";
+			case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER: return "LASERINDEXHASNOASSIGNEDSCANNER";
+			case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXNOTFOUND: return "LASERINDEXNOTFOUND";
+			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX: return "DUPLICATELASERINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -298,6 +301,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND: return "Configuration preset not found.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT: return "Invalid scanner count.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX: return "Invalid scanner index.";
+			case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER: return "Laser index has no assigned scanner.";
+			case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXNOTFOUND: return "Laser index not found.";
+			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX: return "Duplicate laser index.";
 		}
 		return "unknown error";
 	}
@@ -639,11 +645,9 @@ public:
 	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 	inline void ConfigureLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
 	inline void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay);
-	inline void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
-	inline void SetEndOfList();
-	inline void ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
+	inline void SetOIERecordingMode(const eOIERecordingMode eRecordingMode);
+	inline eOIERecordingMode GetOIERecordingMode();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
-	inline void AddLayerToCurrentList(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 };
 	
@@ -672,6 +676,7 @@ public:
 	inline std::string GetNetmask(const LibMCDriver_ScanLab_uint32 nScannerIndex);
 	inline LibMCDriver_ScanLab_uint32 GetSerialNumber(const LibMCDriver_ScanLab_uint32 nScannerIndex);
 	inline LibMCDriver_ScanLab_uint32 GetLaserIndex(const LibMCDriver_ScanLab_uint32 nScannerIndex);
+	inline PRTCSelector GetSelector();
 	inline PRTCContext GetContext(const LibMCDriver_ScanLab_uint32 nScannerIndex);
 	inline void LoadFirmware(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
 	inline void LoadCustomFirmware(const LibMCDriver_ScanLab_uint32 nScannerIndex, const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer);
@@ -880,11 +885,9 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetCorrectionFile = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureLaserMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureDelays = nullptr;
-		pWrapperTable->m_Driver_ScanLab_RTC6_SetStartList = nullptr;
-		pWrapperTable->m_Driver_ScanLab_RTC6_SetEndOfList = nullptr;
-		pWrapperTable->m_Driver_ScanLab_RTC6_ExecuteList = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetOIERecordingMode = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = nullptr;
-		pWrapperTable->m_Driver_ScanLab_RTC6_AddLayerToCurrentList = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_IsSimulationMode = nullptr;
@@ -897,6 +900,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetNetmask = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetSerialNumber = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetLaserIndex = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetSelector = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetContext = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_LoadFirmware = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_LoadCustomFirmware = nullptr;
@@ -1639,30 +1643,21 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_SetStartList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStartListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist");
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetOIERecordingModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setoierecordingmode");
 		#else // _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_SetStartList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStartListPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist");
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetOIERecordingModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setoierecordingmode");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_ScanLab_RTC6_SetStartList == nullptr)
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_SetOIERecordingMode == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_SetEndOfList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetEndOfListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setendoflist");
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetOIERecordingModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getoierecordingmode");
 		#else // _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_SetEndOfList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetEndOfListPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setendoflist");
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetOIERecordingModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getoierecordingmode");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_ScanLab_RTC6_SetEndOfList == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_ExecuteList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ExecuteListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_executelist");
-		#else // _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_ExecuteList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ExecuteListPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_executelist");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_ScanLab_RTC6_ExecuteList == nullptr)
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1672,15 +1667,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_AddLayerToCurrentList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_AddLayerToCurrentListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_addlayertocurrentlist");
-		#else // _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6_AddLayerToCurrentList = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_AddLayerToCurrentListPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_addlayertocurrentlist");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_ScanLab_RTC6_AddLayerToCurrentList == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1789,6 +1775,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetLaserIndex == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetSelector = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetSelectorPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getselector");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetSelector = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetSelectorPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getselector");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetSelector == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2251,24 +2246,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureDelays == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetStartList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_SetStartList == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_setoierecordingmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetOIERecordingMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_SetOIERecordingMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_setendoflist", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetEndOfList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_SetEndOfList == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_executelist", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_ExecuteList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_ExecuteList == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getoierecordingmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_addlayertocurrentlist", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_AddLayerToCurrentList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_AddLayerToCurrentList == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts));
@@ -2317,6 +2304,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getlaserindex", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetLaserIndex));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetLaserIndex == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getselector", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetSelector));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetSelector == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getcontext", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetContext));
@@ -3297,31 +3288,24 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::SetStartList - Opens the list to write.
-	* @param[in] nListIndex - Index of List (1 or 2).
-	* @param[in] nPosition - Relative Position in List.
+	* CDriver_ScanLab_RTC6::SetOIERecordingMode - Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+	* @param[in] eRecordingMode - Recording mode enum
 	*/
-	void CDriver_ScanLab_RTC6::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
+	void CDriver_ScanLab_RTC6::SetOIERecordingMode(const eOIERecordingMode eRecordingMode)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_SetStartList(m_pHandle, nListIndex, nPosition));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_SetOIERecordingMode(m_pHandle, eRecordingMode));
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::SetEndOfList - Closes the currently open list.
+	* CDriver_ScanLab_RTC6::GetOIERecordingMode - Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+	* @return Recording mode enum
 	*/
-	void CDriver_ScanLab_RTC6::SetEndOfList()
+	eOIERecordingMode CDriver_ScanLab_RTC6::GetOIERecordingMode()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_SetEndOfList(m_pHandle));
-	}
-	
-	/**
-	* CDriver_ScanLab_RTC6::ExecuteList - Executes the list.
-	* @param[in] nListIndex - Index of List (1 or 2).
-	* @param[in] nPosition - Relative Position in List.
-	*/
-	void CDriver_ScanLab_RTC6::ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_ExecuteList(m_pHandle, nListIndex, nPosition));
+		eOIERecordingMode resultRecordingMode = (eOIERecordingMode) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_GetOIERecordingMode(m_pHandle, &resultRecordingMode));
+		
+		return resultRecordingMode;
 	}
 	
 	/**
@@ -3332,16 +3316,6 @@ public:
 	void CDriver_ScanLab_RTC6::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_DrawLayer(m_pHandle, sStreamUUID.c_str(), nLayerIndex));
-	}
-	
-	/**
-	* CDriver_ScanLab_RTC6::AddLayerToCurrentList - Adds a current layer of the given build stream to the open list. Fails if no list is open.
-	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
-	* @param[in] nLayerIndex - Layer index of the build file.
-	*/
-	void CDriver_ScanLab_RTC6::AddLayerToCurrentList(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_AddLayerToCurrentList(m_pHandle, sStreamUUID.c_str(), nLayerIndex));
 	}
 	
 	/**
@@ -3499,6 +3473,21 @@ public:
 	}
 	
 	/**
+	* CDriver_ScanLab_RTC6xN::GetSelector - Returns the RTC Selector Instance. Fails if it card has not been initialised.
+	* @return RTC Selector Instance.
+	*/
+	PRTCSelector CDriver_ScanLab_RTC6xN::GetSelector()
+	{
+		LibMCDriver_ScanLabHandle hSelectorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_GetSelector(m_pHandle, &hSelectorInstance));
+		
+		if (!hSelectorInstance) {
+			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CRTCSelector>(m_pWrapper, hSelectorInstance);
+	}
+	
+	/**
 	* CDriver_ScanLab_RTC6xN::GetContext - Returns the RTC Context Instance. Fails if it card has not been initialised.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @return RTC Context Instance.
@@ -3585,7 +3574,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn. Laser Indices are automatically assigned.
+	* CDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
 	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.

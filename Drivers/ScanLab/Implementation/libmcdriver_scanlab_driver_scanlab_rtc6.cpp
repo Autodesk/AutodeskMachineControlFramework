@@ -35,8 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 // Include custom headers here.
-#define RTC6_MIN_MAXLASERPOWER 10.0f
-#define RTC6_MAX_MAXLASERPOWER 10000.0f
+
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -45,7 +44,8 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab_RTC6::CDriver_ScanLab_RTC6(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f), m_SimulationMode (false)
+	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f), m_SimulationMode (false),
+    m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled)
 {
 }
 
@@ -227,10 +227,9 @@ IRTCContext* CDriver_ScanLab_RTC6::GetContext()
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-    auto pContext = m_pRTCContext.get();
-    pContext->IncRefCount();
+    m_pRTCContext->IncRefCount();
 
-    return pContext;
+    return m_pRTCContext.get();
 }
 
 IRTCSelector* CDriver_ScanLab_RTC6::GetSelector()
@@ -241,10 +240,9 @@ IRTCSelector* CDriver_ScanLab_RTC6::GetSelector()
     if (m_pRTCSelector.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-    auto pSelector = m_pRTCSelector.get();
-    pSelector->IncRefCount();
+    m_pRTCSelector->IncRefCount();
 
-    return pSelector;
+    return m_pRTCSelector.get();
 }
 
 
@@ -287,6 +285,9 @@ void CDriver_ScanLab_RTC6::LoadFirmware(const std::string& sFirmwareResource, co
 void CDriver_ScanLab_RTC6::LoadCustomFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer)
 {
     if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
         m_pRTCContext->LoadFirmware(nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer);
     }
 }
@@ -335,15 +336,15 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
         if (m_pRTCContext.get() == nullptr)
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-        if ((dLaserOnDelay < 0.0) || (dLaserOnDelay > 10000000.0))
+        if ((dLaserOnDelay < RTC6_MIN_DELAY) || (dLaserOnDelay > RTC6_MAX_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
-        if ((dLaserOffDelay < 0.0) || (dLaserOffDelay > 10000000.0))
+        if ((dLaserOffDelay < RTC6_MIN_DELAY) || (dLaserOffDelay > RTC6_MAX_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
-        if ((dMarkDelay < 0.0) || (dMarkDelay > 10000000.0))
+        if ((dMarkDelay < RTC6_MIN_DELAY) || (dMarkDelay > RTC6_MAX_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
-        if ((dJumpDelay < 0.0) || (dJumpDelay > 10000000.0))
+        if ((dJumpDelay < RTC6_MIN_DELAY) || (dJumpDelay > RTC6_MAX_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
-        if ((dPolygonDelay < 0.0) || (dPolygonDelay > 10000000.0))
+        if ((dPolygonDelay < RTC6_MIN_DELAY) || (dPolygonDelay > RTC6_MAX_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
 
 
@@ -366,7 +367,18 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
 }
 
 
-void CDriver_ScanLab_RTC6::AddLayerToCurrentList(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
+void CDriver_ScanLab_RTC6::SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode)
+{
+    m_OIERecordingMode = eRecordingMode;
+}
+
+LibMCDriver_ScanLab::eOIERecordingMode CDriver_ScanLab_RTC6::GetOIERecordingMode()
+{
+    return m_OIERecordingMode;
+}
+
+
+void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
 {
     if (!m_SimulationMode) {
 
@@ -374,6 +386,14 @@ void CDriver_ScanLab_RTC6::AddLayerToCurrentList(const std::string& sStreamUUID,
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
         if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
+
+        m_pRTCContext->SetStartList(1, 0);
+
+        if (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement)
+            m_pRTCContext->EnableOIE();
+
+        if ((m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEStartMeasurement)) 
+            m_pRTCContext->StartOIEMeasurement();
 
         auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
         auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
@@ -479,75 +499,34 @@ void CDriver_ScanLab_RTC6::AddLayerToCurrentList(const std::string& sStreamUUID,
         }
 
 
+        if ((m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEStartMeasurement))
+            m_pRTCContext->StopOIEMeasurement();
+
+        if (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement)
+            m_pRTCContext->DisableOIE();
+
+        m_pRTCContext->SetEndOfList();
+
+        m_pRTCContext->ExecuteList(1, 0);
+
+        auto pDriverUpdateInstance = m_pDriverEnvironment->CreateStatusUpdateSession();
+
+        bool Busy = true;
+        uint32_t Pos = 0;
+
+        while (Busy) {
+            m_pRTCContext->GetStatus(Busy, Pos);
+            pDriverUpdateInstance->Sleep(10);
+
+            updateCardStatus(pDriverUpdateInstance);
+        }
+
     }
 }
 
 
-void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
-{
-    if (!m_SimulationMode) {
 
 
-        if (m_pRTCContext.get() == nullptr)
-            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-        if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
-            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
-
-        SetStartList(1, 0);
-
-        AddLayerToCurrentList(sStreamUUID, nLayerIndex);
-
-        SetEndOfList();
-        
-        ExecuteList(1, 0);
-
-
-    }
-
-}
-
-
-void CDriver_ScanLab_RTC6::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
-{
-    if (m_pRTCContext.get() == nullptr)
-        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-
-    m_pRTCContext->SetStartList(nListIndex, nPosition);
-
-}
-
-
-
-void CDriver_ScanLab_RTC6::SetEndOfList()
-{
-    if (m_pRTCContext.get() == nullptr)
-        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-
-    m_pRTCContext->SetEndOfList();
-
-}
-
-void CDriver_ScanLab_RTC6::ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
-{
-
-    if (m_pRTCContext.get() == nullptr)
-        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-
-    m_pRTCContext->ExecuteList(nListIndex, nPosition);
-
-
-    auto pDriverUpdateInstance = m_pDriverEnvironment->CreateStatusUpdateSession();
-
-    bool Busy = true;
-    uint32_t Pos = 0;
-
-    while (Busy) {
-        m_pRTCContext->GetStatus(Busy, Pos);
-        pDriverUpdateInstance->Sleep(10);
-
-        updateCardStatus(pDriverUpdateInstance);
-    }
-}
 
 void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {

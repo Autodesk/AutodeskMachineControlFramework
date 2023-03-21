@@ -2234,7 +2234,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_configuredelay
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_setoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, eLibMCDriver_ScanLabOIERecordingMode eRecordingMode)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
 
@@ -2243,7 +2243,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist(L
 		if (!pIDriver_ScanLab_RTC6)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIDriver_ScanLab_RTC6->SetStartList(nListIndex, nPosition);
+		pIDriver_ScanLab_RTC6->SetOIERecordingMode(eRecordingMode);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -2258,40 +2258,18 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist(L
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_setendoflist(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, eLibMCDriver_ScanLabOIERecordingMode * pRecordingMode)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
 
 	try {
+		if (pRecordingMode == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
 		if (!pIDriver_ScanLab_RTC6)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIDriver_ScanLab_RTC6->SetEndOfList();
-
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_executelist(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
-
-	try {
-		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
-		if (!pIDriver_ScanLab_RTC6)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		pIDriver_ScanLab_RTC6->ExecuteList(nListIndex, nPosition);
+		*pRecordingMode = pIDriver_ScanLab_RTC6->GetOIERecordingMode();
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -2319,33 +2297,6 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer(LibM
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		pIDriver_ScanLab_RTC6->DrawLayer(sStreamUUID, nLayerIndex);
-
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_addlayertocurrentlist(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
-
-	try {
-		if (pStreamUUID == nullptr)
-			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		std::string sStreamUUID(pStreamUUID);
-		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
-		if (!pIDriver_ScanLab_RTC6)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		pIDriver_ScanLab_RTC6->AddLayerToCurrentList(sStreamUUID, nLayerIndex);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -2714,6 +2665,34 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getlaserinde
 		
 		*pLaserIndex = pIDriver_ScanLab_RTC6xN->GetLaserIndex(nScannerIndex);
 
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getselector(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_RTCSelector * pSelectorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
+
+	try {
+		if (pSelectorInstance == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IBase* pBaseSelectorInstance(nullptr);
+		IDriver_ScanLab_RTC6xN* pIDriver_ScanLab_RTC6xN = dynamic_cast<IDriver_ScanLab_RTC6xN*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6xN)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pBaseSelectorInstance = pIDriver_ScanLab_RTC6xN->GetSelector();
+
+		*pSelectorInstance = (IBase*)(pBaseSelectorInstance);
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
@@ -3138,16 +3117,12 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_configurelasermode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_configuredelays") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_configuredelays;
-	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_setstartlist;
-	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_setendoflist") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_setendoflist;
-	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_executelist") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_executelist;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_setoierecordingmode") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_setoierecordingmode;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_getoierecordingmode") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_getoierecordingmode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer;
-	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_addlayertocurrentlist") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_addlayertocurrentlist;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_settosimulationmode") 
@@ -3172,6 +3147,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getserialnumber;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getlaserindex") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getlaserindex;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getselector") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getselector;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getcontext") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getcontext;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_loadfirmware") 

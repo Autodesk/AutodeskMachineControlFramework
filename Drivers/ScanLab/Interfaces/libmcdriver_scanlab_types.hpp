@@ -150,6 +150,9 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND 1043 /** Configuration preset not found. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT 1044 /** Invalid scanner count. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX 1045 /** Invalid scanner index. */
+#define LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER 1046 /** Laser index has no assigned scanner. */
+#define LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXNOTFOUND 1047 /** Laser index not found. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX 1048 /** Duplicate laser index. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -212,6 +215,9 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND: return "Configuration preset not found.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT: return "Invalid scanner count.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX: return "Invalid scanner index.";
+    case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER: return "Laser index has no assigned scanner.";
+    case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXNOTFOUND: return "Laser index not found.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX: return "Duplicate laser index.";
     default: return "unknown error";
   }
 }
@@ -258,6 +264,12 @@ namespace LibMCDriver_ScanLab {
     OIEVersion3 = 3
   };
   
+  enum class eOIERecordingMode : LibMCDriver_ScanLab_int32 {
+    OIERecordingDisabled = 0,
+    OIEStartMeasurement = 1,
+    OIEEnableAndStartMeasurement = 2
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -284,6 +296,7 @@ namespace LibMCDriver_ScanLab {
 typedef LibMCDriver_ScanLab::eLaserMode eLibMCDriver_ScanLabLaserMode;
 typedef LibMCDriver_ScanLab::eLaserPort eLibMCDriver_ScanLabLaserPort;
 typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationMode;
+typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;
 

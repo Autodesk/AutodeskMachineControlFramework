@@ -1003,23 +1003,16 @@ public:
 	virtual void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::SetStartList - Opens the list to write.
-	* @param[in] nListIndex - Index of List (1 or 2).
-	* @param[in] nPosition - Relative Position in List.
+	* IDriver_ScanLab_RTC6::SetOIERecordingMode - Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+	* @param[in] eRecordingMode - Recording mode enum
 	*/
-	virtual void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) = 0;
+	virtual void SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::SetEndOfList - Closes the currently open list.
+	* IDriver_ScanLab_RTC6::GetOIERecordingMode - Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+	* @return Recording mode enum
 	*/
-	virtual void SetEndOfList() = 0;
-
-	/**
-	* IDriver_ScanLab_RTC6::ExecuteList - Executes the list.
-	* @param[in] nListIndex - Index of List (1 or 2).
-	* @param[in] nPosition - Relative Position in List.
-	*/
-	virtual void ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) = 0;
+	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
@@ -1027,13 +1020,6 @@ public:
 	* @param[in] nLayerIndex - Layer index of the build file.
 	*/
 	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
-
-	/**
-	* IDriver_ScanLab_RTC6::AddLayerToCurrentList - Adds a current layer of the given build stream to the open list. Fails if no list is open.
-	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
-	* @param[in] nLayerIndex - Layer index of the build file.
-	*/
-	virtual void AddLayerToCurrentList(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
@@ -1131,6 +1117,12 @@ public:
 	virtual LibMCDriver_ScanLab_uint32 GetLaserIndex(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
 
 	/**
+	* IDriver_ScanLab_RTC6xN::GetSelector - Returns the RTC Selector Instance. Fails if it card has not been initialised.
+	* @return RTC Selector Instance.
+	*/
+	virtual IRTCSelector * GetSelector() = 0;
+
+	/**
 	* IDriver_ScanLab_RTC6xN::GetContext - Returns the RTC Context Instance. Fails if it card has not been initialised.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @return RTC Context Instance.
@@ -1197,7 +1189,7 @@ public:
 	virtual void ConfigureDelays(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn. Laser Indices are automatically assigned.
+	* IDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
 	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.

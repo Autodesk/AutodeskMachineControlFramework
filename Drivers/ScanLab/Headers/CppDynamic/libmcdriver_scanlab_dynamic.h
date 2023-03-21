@@ -862,32 +862,22 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Conf
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureDelaysPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double dLaserOnDelay, LibMCDriver_ScanLab_double dLaserOffDelay, LibMCDriver_ScanLab_double dMarkDelay, LibMCDriver_ScanLab_double dJumpDelay, LibMCDriver_ScanLab_double dPolygonDelay);
 
 /**
-* Opens the list to write.
+* Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @param[in] nListIndex - Index of List (1 or 2).
-* @param[in] nPosition - Relative Position in List.
+* @param[in] eRecordingMode - Recording mode enum
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStartListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetOIERecordingModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode);
 
 /**
-* Closes the currently open list.
+* Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[out] pRecordingMode - Recording mode enum
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetEndOfListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
-
-/**
-* Executes the list.
-*
-* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @param[in] nListIndex - Index of List (1 or 2).
-* @param[in] nPosition - Relative Position in List.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ExecuteListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetOIERecordingModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
 
 /**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
@@ -898,16 +888,6 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Exec
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
-
-/**
-* Adds a current layer of the given build stream to the open list. Fails if no list is open.
-*
-* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
-* @param[in] nLayerIndex - Layer index of the build file.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_AddLayerToCurrentListPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
 
 /**
 * Get RTC Ethernet communication timeouts
@@ -1038,6 +1018,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Ge
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetLaserIndexPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_uint32 * pLaserIndex);
 
 /**
+* Returns the RTC Selector Instance. Fails if it card has not been initialised.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[out] pSelectorInstance - RTC Selector Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetSelectorPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_RTCSelector * pSelectorInstance);
+
+/**
 * Returns the RTC Context Instance. Fails if it card has not been initialised.
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
@@ -1122,7 +1111,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Co
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureDelaysPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double dLaserOnDelay, LibMCDriver_ScanLab_double dLaserOffDelay, LibMCDriver_ScanLab_double dMarkDelay, LibMCDriver_ScanLab_double dJumpDelay, LibMCDriver_ScanLab_double dPolygonDelay);
 
 /**
-* Draws a layer of a build stream. Blocks until the layer is drawn. Laser Indices are automatically assigned.
+* Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
 * @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
@@ -1307,11 +1296,9 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCorrectionFilePtr m_Driver_ScanLab_RTC6_SetCorrectionFile;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureLaserModePtr m_Driver_ScanLab_RTC6_ConfigureLaserMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureDelaysPtr m_Driver_ScanLab_RTC6_ConfigureDelays;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStartListPtr m_Driver_ScanLab_RTC6_SetStartList;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetEndOfListPtr m_Driver_ScanLab_RTC6_SetEndOfList;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ExecuteListPtr m_Driver_ScanLab_RTC6_ExecuteList;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetOIERecordingModePtr m_Driver_ScanLab_RTC6_SetOIERecordingMode;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetOIERecordingModePtr m_Driver_ScanLab_RTC6_GetOIERecordingMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr m_Driver_ScanLab_RTC6_DrawLayer;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_AddLayerToCurrentListPtr m_Driver_ScanLab_RTC6_AddLayerToCurrentList;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_GetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetToSimulationModePtr m_Driver_ScanLab_RTC6xN_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsSimulationModePtr m_Driver_ScanLab_RTC6xN_IsSimulationMode;
@@ -1324,6 +1311,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetNetmaskPtr m_Driver_ScanLab_RTC6xN_GetNetmask;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetSerialNumberPtr m_Driver_ScanLab_RTC6xN_GetSerialNumber;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetLaserIndexPtr m_Driver_ScanLab_RTC6xN_GetLaserIndex;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetSelectorPtr m_Driver_ScanLab_RTC6xN_GetSelector;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetContextPtr m_Driver_ScanLab_RTC6xN_GetContext;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_LoadFirmwarePtr m_Driver_ScanLab_RTC6xN_LoadFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_LoadCustomFirmwarePtr m_Driver_ScanLab_RTC6xN_LoadCustomFirmware;

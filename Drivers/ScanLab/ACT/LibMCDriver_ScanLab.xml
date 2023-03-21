@@ -95,6 +95,9 @@
 		<error name="CONFIGURATIONPRESETNOTFOUND" code="1043" description="Configuration preset not found." />				
 		<error name="INVALIDSCANNERCOUNT" code="1044" description="Invalid scanner count." />
 		<error name="INVALIDSCANNERINDEX" code="1045" description="Invalid scanner index." />			
+		<error name="LASERINDEXHASNOASSIGNEDSCANNER" code="1046" description="Laser index has no assigned scanner." />			
+		<error name="LASERINDEXNOTFOUND" code="1047" description="Laser index not found." />			
+		<error name="DUPLICATELASERINDEX" code="1048" description="Duplicate laser index." />			
 		
 	</errors>
 
@@ -123,6 +126,13 @@
 	   <option name="OIEVersion3Compatibility" value="2" />
 	   <option name="OIEVersion3" value="3" />
 	</enum>
+	
+	
+	<enum name="OIERecordingMode">
+	   <option name="OIERecordingDisabled" value="0" />
+	   <option name="OIEStartMeasurement" value="1" />
+	   <option name="OIEEnableAndStartMeasurement" value="2" />
+	</enum>	
 
 	<struct name="Point2D">
 		<member name="X" type="single" />
@@ -579,30 +589,19 @@ Custom implementation
 		</method>
 
 
-		<method name="SetStartList" description="Opens the list to write.">
-			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
-			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
+		<method name="SetOIERecordingMode" description="Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="in" description="Recording mode enum" />
 		</method>
 
-		<method name="SetEndOfList" description="Closes the currently open list.">
+		<method name="GetOIERecordingMode" description="Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="return" description="Recording mode enum" />
 		</method>
-		
-		<method name="ExecuteList" description="Executes the list.">
-			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
-			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
-		</method>
-
 
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 		</method>
 						
-		<method name="AddLayerToCurrentList" description="Adds a current layer of the given build stream to the open list. Fails if no list is open.">
-			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
-			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
-		</method>
-
 		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
@@ -671,6 +670,10 @@ Custom implementation
 			<param name="LaserIndex" type="uint32" pass="return" description="Associated Laser Index from the toolpath data." />
 		</method>		
 
+		<method name="GetSelector" description="Returns the RTC Selector Instance. Fails if it card has not been initialised.">
+			<param name="SelectorInstance" type="class" class="RTCSelector" pass="return" description="RTC Selector Instance." />
+		</method>
+
 		<method name="GetContext" description="Returns the RTC Context Instance. Fails if it card has not been initialised.">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
@@ -721,8 +724,7 @@ Custom implementation
 			<param name="PolygonDelay" type="double" pass="in" description="Polygon delay in microseconds (will be rounded to a multiple of 10)" />		
 		</method>
 
-
-		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn. Laser Indices are automatically assigned.">
+		<method name="DrawLayer" description="Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if ">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card." />
