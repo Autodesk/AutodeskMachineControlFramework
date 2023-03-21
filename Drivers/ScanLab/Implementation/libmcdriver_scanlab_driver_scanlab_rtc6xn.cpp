@@ -45,7 +45,8 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab_RTC6xN::CDriver_ScanLab_RTC6xN(const std::string& sName, const std::string& sType, uint32_t nScannerCount, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: CDriver_ScanLab(pDriverEnvironment), m_sName(sName), m_sType(sType), m_fMaxLaserPowerInWatts(0.0f), m_SimulationMode(false), m_nScannerCount(nScannerCount)
+	: CDriver_ScanLab(pDriverEnvironment), m_sName(sName), m_sType(sType), m_fMaxLaserPowerInWatts(0.0f), m_SimulationMode(false), m_nScannerCount(nScannerCount),
+		m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled)
 {
 	if ((nScannerCount < RTC6_MINLASERCOUNT) || (nScannerCount > RTC6_MAXLASERCOUNT))
 		throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT);
@@ -390,6 +391,17 @@ void CDriver_ScanLab_RTC6xN::ConfigureDelays(const LibMCDriver_ScanLab_uint32 nS
 	}
 }
 
+void CDriver_ScanLab_RTC6xN::SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode)
+{
+	m_OIERecordingMode = eRecordingMode;
+}
+
+LibMCDriver_ScanLab::eOIERecordingMode CDriver_ScanLab_RTC6xN::GetOIERecordingMode()
+{
+	return m_OIERecordingMode;
+}
+
+
 void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists)
 {
 	if (!m_SimulationMode) {
@@ -400,6 +412,12 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 		for (uint32_t nScannerIndex = 1; nScannerIndex <= m_nScannerCount; nScannerIndex++) {
 			auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, true);
 			pRTCContext->SetStartList(1, 0);
+
+			if (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement)
+				pRTCContext->EnableOIE();
+
+			if ((m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEStartMeasurement))
+				pRTCContext->StartOIEMeasurement();
 		}
 
 		auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
@@ -524,6 +542,13 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 
 		for (uint32_t nScannerIndex = 1; nScannerIndex <= m_nScannerCount; nScannerIndex++) {
 			auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, true);
+
+			if ((m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEStartMeasurement))
+				pRTCContext->StopOIEMeasurement();
+
+			if (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement)
+				pRTCContext->DisableOIE();
+
 			pRTCContext->SetEndOfList();
 			pRTCContext->ExecuteList(1, 0);
 		}

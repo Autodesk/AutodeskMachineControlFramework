@@ -588,7 +588,6 @@ Custom implementation
 			<param name="PolygonDelay" type="double" pass="in" description="Polygon delay in microseconds (will be rounded to a multiple of 10)" />		
 		</method>
 
-
 		<method name="SetOIERecordingMode" description="Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.">
 			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="in" description="Recording mode enum" />
 		</method>
@@ -722,6 +721,14 @@ Custom implementation
 			<param name="MarkDelay" type="double" pass="in" description="Mark delay in microseconds (will be rounded to a multiple of 10)" />
 			<param name="JumpDelay" type="double" pass="in" description="Jump delay in microseconds (will be rounded to a multiple of 10)" />
 			<param name="PolygonDelay" type="double" pass="in" description="Polygon delay in microseconds (will be rounded to a multiple of 10)" />		
+		</method>
+
+		<method name="SetOIERecordingMode" description="Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="in" description="Recording mode enum" />
+		</method>
+
+		<method name="GetOIERecordingMode" description="Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="return" description="Recording mode enum" />
 		</method>
 
 		<method name="DrawLayer" description="Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if ">

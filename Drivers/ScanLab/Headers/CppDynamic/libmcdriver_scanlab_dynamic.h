@@ -1111,6 +1111,24 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Co
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureDelaysPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double dLaserOnDelay, LibMCDriver_ScanLab_double dLaserOffDelay, LibMCDriver_ScanLab_double dMarkDelay, LibMCDriver_ScanLab_double dJumpDelay, LibMCDriver_ScanLab_double dPolygonDelay);
 
 /**
+* Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] eRecordingMode - Recording mode enum
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetOIERecordingModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode);
+
+/**
+* Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[out] pRecordingMode - Recording mode enum
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
+
+/**
 * Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
@@ -1318,6 +1336,8 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCorrectionFilePtr m_Driver_ScanLab_RTC6xN_SetCorrectionFile;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureLaserModePtr m_Driver_ScanLab_RTC6xN_ConfigureLaserMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureDelaysPtr m_Driver_ScanLab_RTC6xN_ConfigureDelays;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetOIERecordingModePtr m_Driver_ScanLab_RTC6xN_SetOIERecordingMode;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr m_Driver_ScanLab_RTC6xN_GetOIERecordingMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DrawLayerPtr m_Driver_ScanLab_RTC6xN_DrawLayer;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts;

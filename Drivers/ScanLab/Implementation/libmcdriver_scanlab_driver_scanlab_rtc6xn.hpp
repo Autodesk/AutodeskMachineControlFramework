@@ -78,6 +78,8 @@ private:
 
 	std::map<std::string, PDriver_ScanLab_RTC6ConfigurationPreset> m_ConfigurationPresets;
 
+	LibMCDriver_ScanLab::eOIERecordingMode m_OIERecordingMode;
+
 	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
 	act_managed_ptr<IRTCContext> getRTCContextForScannerIndex(uint32_t nScannerIndex, bool bFailIfNotExisting);
@@ -136,6 +138,10 @@ public:
 	void ConfigureLaserMode(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) override;
 
 	void ConfigureDelays(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) override;
+
+	void SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode) override;
+
+	LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() override;
 
 	void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists) override;
 

@@ -2871,6 +2871,56 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_configuredel
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, eLibMCDriver_ScanLabOIERecordingMode eRecordingMode)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
+
+	try {
+		IDriver_ScanLab_RTC6xN* pIDriver_ScanLab_RTC6xN = dynamic_cast<IDriver_ScanLab_RTC6xN*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6xN)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC6xN->SetOIERecordingMode(eRecordingMode);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, eLibMCDriver_ScanLabOIERecordingMode * pRecordingMode)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
+
+	try {
+		if (pRecordingMode == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab_RTC6xN* pIDriver_ScanLab_RTC6xN = dynamic_cast<IDriver_ScanLab_RTC6xN*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6xN)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pRecordingMode = pIDriver_ScanLab_RTC6xN->GetOIERecordingMode();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
@@ -3161,6 +3211,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_configurelasermode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_configuredelays") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_configuredelays;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts") 

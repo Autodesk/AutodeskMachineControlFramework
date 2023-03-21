@@ -683,6 +683,8 @@ public:
 	inline void SetCorrectionFile(const LibMCDriver_ScanLab_uint32 nScannerIndex, const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 	inline void ConfigureLaserMode(const LibMCDriver_ScanLab_uint32 nScannerIndex, const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
 	inline void ConfigureDelays(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay);
+	inline void SetOIERecordingMode(const eOIERecordingMode eRecordingMode);
+	inline eOIERecordingMode GetOIERecordingMode();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
@@ -907,6 +909,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCorrectionFile = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_ConfigureLaserMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_ConfigureDelays = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetOIERecordingMode = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts = nullptr;
@@ -1841,6 +1845,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetOIERecordingModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetOIERecordingModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetOIERecordingMode == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DrawLayerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DrawLayerPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer");
@@ -2332,6 +2354,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_configuredelays", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_ConfigureDelays));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_ConfigureDelays == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_SetOIERecordingMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetOIERecordingMode == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer));
@@ -3571,6 +3601,27 @@ public:
 	void CDriver_ScanLab_RTC6xN::ConfigureDelays(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_ConfigureDelays(m_pHandle, nScannerIndex, dLaserOnDelay, dLaserOffDelay, dMarkDelay, dJumpDelay, dPolygonDelay));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::SetOIERecordingMode - Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+	* @param[in] eRecordingMode - Recording mode enum
+	*/
+	void CDriver_ScanLab_RTC6xN::SetOIERecordingMode(const eOIERecordingMode eRecordingMode)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_SetOIERecordingMode(m_pHandle, eRecordingMode));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::GetOIERecordingMode - Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+	* @return Recording mode enum
+	*/
+	eOIERecordingMode CDriver_ScanLab_RTC6xN::GetOIERecordingMode()
+	{
+		eOIERecordingMode resultRecordingMode = (eOIERecordingMode) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_GetOIERecordingMode(m_pHandle, &resultRecordingMode));
+		
+		return resultRecordingMode;
 	}
 	
 	/**

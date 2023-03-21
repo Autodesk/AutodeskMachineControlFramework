@@ -1189,6 +1189,18 @@ public:
 	virtual void ConfigureDelays(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) = 0;
 
 	/**
+	* IDriver_ScanLab_RTC6xN::SetOIERecordingMode - Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+	* @param[in] eRecordingMode - Recording mode enum
+	*/
+	virtual void SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetOIERecordingMode - Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+	* @return Recording mode enum
+	*/
+	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
+
+	/**
 	* IDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.

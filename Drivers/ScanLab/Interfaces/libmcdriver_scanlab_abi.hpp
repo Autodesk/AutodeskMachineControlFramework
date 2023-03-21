@@ -1124,6 +1124,24 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_configuredelays(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double dLaserOnDelay, LibMCDriver_ScanLab_double dLaserOffDelay, LibMCDriver_ScanLab_double dMarkDelay, LibMCDriver_ScanLab_double dJumpDelay, LibMCDriver_ScanLab_double dPolygonDelay);
 
 /**
+* Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] eRecordingMode - Recording mode enum
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode);
+
+/**
+* Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[out] pRecordingMode - Recording mode enum
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
+
+/**
 * Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
