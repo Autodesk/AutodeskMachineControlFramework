@@ -53,6 +53,9 @@ Abstract: This is the class declaration of CDriver_ScanLab
 #define RTC6_MIN_DELAY -1000000.0f
 #define RTC6_MAX_DELAY 1000000.0f
 
+#define SCANLAB_CONFIGURATIONSCHEMA "http://schemas.autodesk.com/amc/scanlab/2023/03"
+#define SCANLAB_MAX_VERSIONVALUE 1024
+
 namespace LibMCDriver_ScanLab {
 namespace Impl {
 

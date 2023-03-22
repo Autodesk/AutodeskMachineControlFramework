@@ -98,7 +98,9 @@
 		<error name="LASERINDEXHASNOASSIGNEDSCANNER" code="1046" description="Laser index has no assigned scanner." />			
 		<error name="LASERINDEXNOTFOUND" code="1047" description="Laser index not found." />			
 		<error name="DUPLICATELASERINDEX" code="1048" description="Duplicate laser index." />			
-		
+		<error name="INVALIDCONFIGURATIONSCHEMA" code="1049" description="Invalid configuration schema." />
+		<error name="NOVERSIONDEFINITION" code="1050" description="No version definition." />			
+						
 	</errors>
 
 

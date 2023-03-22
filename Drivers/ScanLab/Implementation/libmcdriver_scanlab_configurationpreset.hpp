@@ -62,7 +62,7 @@ namespace Impl {
 
     public:
 
-        CDriver_ScanLab_RTC6ConfigurationPreset();
+        CDriver_ScanLab_RTC6ConfigurationPreset(LibMCEnv::PXMLDocumentNode pPresetNode);
 
         virtual ~CDriver_ScanLab_RTC6ConfigurationPreset();
 

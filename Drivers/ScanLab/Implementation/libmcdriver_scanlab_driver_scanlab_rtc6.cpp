@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 
-
 using namespace LibMCDriver_ScanLab::Impl;
 
 /*************************************************************************************************************************
@@ -57,6 +56,35 @@ CDriver_ScanLab_RTC6::~CDriver_ScanLab_RTC6 ()
 
 void CDriver_ScanLab_RTC6::Configure(const std::string& sConfigurationString)
 {
+
+    if (!sConfigurationString.empty()) {
+        auto pXMLDocument = m_pDriverEnvironment->ParseXMLString(sConfigurationString);
+
+        std::string sXMLNs = pXMLDocument->GetDefaultNamespace();
+        if (sXMLNs != SCANLAB_CONFIGURATIONSCHEMA)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCONFIGURATIONSCHEMA);
+
+        auto pConfigurationNode = pXMLDocument->GetRootNode();
+
+        auto pPresetsNode = pConfigurationNode->FindChild("", "presets", false);
+
+        auto pPresetNodes = pPresetsNode->GetChildrenByName ("", "preset");
+        size_t nPresetCount = pPresetNodes->GetNodeCount();
+
+        for (size_t nIndex = 0; nIndex < nPresetCount; nIndex++) {
+
+            auto pPresetNode = pPresetNodes->GetNode(nIndex);
+
+            auto pConfigurationPreset = std::make_shared<CDriver_ScanLab_RTC6ConfigurationPreset>(pPresetNode);
+
+        }
+
+
+
+
+
+    }
+
     m_pDriverEnvironment->RegisterIntegerParameter("serialnumber", "Serial Number", 0);
     m_pDriverEnvironment->RegisterBoolParameter("position_x_ok", "Scan Position X is ok", false);
     m_pDriverEnvironment->RegisterBoolParameter("position_y_ok", "Scan Position Y is ok", false);

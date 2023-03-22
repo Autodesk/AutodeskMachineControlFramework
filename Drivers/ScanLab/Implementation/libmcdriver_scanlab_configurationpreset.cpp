@@ -38,27 +38,30 @@ using namespace LibMCDriver_ScanLab::Impl;
 
 
 
-    double m_dMaxLaserPower;
-    bool m_bFinishLaserPulseAfterOn;
-    bool m_bPhaseShiftOfLaserSignal;
-    bool m_bLaserOnSignalLowActive;
-    bool m_bLaserHalfSignalsLowActive;
-    bool m_bSetDigitalInOneHighActive;
-    bool m_bOutputSynchronizationActive;
-
-    double m_dLaserOnDelay;
-    double m_dLaserOffDelay;
-    double m_dMarkDelay;
-    double m_dJumpDelay;
-    double m_dPolygonDelay;
-
-
-    CDriver_ScanLab_RTC6ConfigurationPreset::CDriver_ScanLab_RTC6ConfigurationPreset()
+    CDriver_ScanLab_RTC6ConfigurationPreset::CDriver_ScanLab_RTC6ConfigurationPreset(LibMCEnv::PXMLDocumentNode pPresetNode)
         : m_nTimeout (0), m_nSerialNumber (0), m_dInitialTimeout (0.0), m_dMaxTimeout (0.0), m_dMultiplier (0.0),
          m_LaserMode (LibMCDriver_ScanLab::eLaserMode::CO2), m_LaserPort (LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1),
          m_nCorrectionTableNumber (0), m_nCorrectionDimension (0), m_nCorrectionTableNumberHeadA (0), m_nCorrectionTableNumberHeadB (0),
+        m_dMaxLaserPower (400.0),
+        m_bFinishLaserPulseAfterOn (false),
+        m_bPhaseShiftOfLaserSignal (false),
+        m_bLaserOnSignalLowActive(false),
+        m_bLaserHalfSignalsLowActive(false),
+        m_bSetDigitalInOneHighActive(false),
+        m_bOutputSynchronizationActive(false),
+        m_dLaserOnDelay (0.0),
+        m_dLaserOffDelay (0.0),
+        m_dMarkDelay (0.0),
+        m_dJumpDelay (0.0),
+        m_dPolygonDelay (0.0),
         m_nLaserIndex (0)
+
+
     {
+        if (pPresetNode.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+
 
     }
 
