@@ -155,9 +155,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX 1048 /** Duplicate laser index. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCONFIGURATIONSCHEMA 1049 /** Invalid configuration schema. */
 #define LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION 1050 /** No version definition. */
-#define LIBMCDRIVER_SCANLAB_ERROR_NOMAJORVERSION 1051 /** No major version. */
-#define LIBMCDRIVER_SCANLAB_ERROR_NOMINORVERSION 1052 /** No minor version. */
-#define LIBMCDRIVER_SCANLAB_ERROR_NOPATCHVERSION 1053 /** No patch version. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME 1051 /** Duplicate configuration preset name. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -225,9 +223,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX: return "Duplicate laser index.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCONFIGURATIONSCHEMA: return "Invalid configuration schema.";
     case LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION: return "No version definition.";
-    case LIBMCDRIVER_SCANLAB_ERROR_NOMAJORVERSION: return "No major version.";
-    case LIBMCDRIVER_SCANLAB_ERROR_NOMINORVERSION: return "No minor version.";
-    case LIBMCDRIVER_SCANLAB_ERROR_NOPATCHVERSION: return "No patch version.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
     default: return "unknown error";
   }
 }

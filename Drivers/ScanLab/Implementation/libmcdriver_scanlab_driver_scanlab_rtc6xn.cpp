@@ -61,6 +61,39 @@ CDriver_ScanLab_RTC6xN::~CDriver_ScanLab_RTC6xN()
 
 void CDriver_ScanLab_RTC6xN::Configure(const std::string& sConfigurationString)
 {
+
+	if (!sConfigurationString.empty()) {
+		auto pXMLDocument = m_pDriverEnvironment->ParseXMLString(sConfigurationString);
+
+		std::string sXMLNs = pXMLDocument->GetDefaultNamespace();
+		if (sXMLNs != SCANLAB_CONFIGURATIONSCHEMA)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCONFIGURATIONSCHEMA);
+
+		auto pConfigurationNode = pXMLDocument->GetRootNode();
+
+		auto pPresetsNode = pConfigurationNode->FindChild("", "presets", false);
+
+		auto pPresetNodes = pPresetsNode->GetChildrenByName("", "preset");
+		size_t nPresetCount = pPresetNodes->GetNodeCount();
+
+		for (size_t nIndex = 0; nIndex < nPresetCount; nIndex++) {
+
+			auto pPresetNode = pPresetNodes->GetNode(nIndex);
+
+			auto pConfigurationPreset = std::make_shared<CDriver_ScanLab_RTC6ConfigurationPreset>(pPresetNode);
+
+			std::string sName = pConfigurationPreset->getName();
+			auto iIter = m_ConfigurationPresets.find(sName);
+
+			if (iIter != m_ConfigurationPresets.end())
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME, "duplicate configuration preset name: " + sName);
+
+			m_ConfigurationPresets.insert(std::make_pair(sName, pConfigurationPreset));
+
+		}
+
+	}
+
 	for (uint32_t nIndex = 1; nIndex <= m_nScannerCount; nIndex++) {
 
 		std::string sPrefix = "scanner" + std::to_string(nIndex) + "_";

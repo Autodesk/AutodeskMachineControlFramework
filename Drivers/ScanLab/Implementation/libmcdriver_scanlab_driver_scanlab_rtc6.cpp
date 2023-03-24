@@ -77,11 +77,15 @@ void CDriver_ScanLab_RTC6::Configure(const std::string& sConfigurationString)
 
             auto pConfigurationPreset = std::make_shared<CDriver_ScanLab_RTC6ConfigurationPreset>(pPresetNode);
 
+            std::string sName = pConfigurationPreset->getName();
+            auto iIter = m_ConfigurationPresets.find(sName);
+
+            if (iIter != m_ConfigurationPresets.end ())
+                throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME, "duplicate configuration preset name: " + sName);
+
+            m_ConfigurationPresets.insert(std::make_pair (sName, pConfigurationPreset));
+
         }
-
-
-
-
 
     }
 

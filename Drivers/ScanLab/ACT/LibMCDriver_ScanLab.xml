@@ -100,6 +100,8 @@
 		<error name="DUPLICATELASERINDEX" code="1048" description="Duplicate laser index." />			
 		<error name="INVALIDCONFIGURATIONSCHEMA" code="1049" description="Invalid configuration schema." />
 		<error name="NOVERSIONDEFINITION" code="1050" description="No version definition." />			
+		<error name="DUPLICATECONFIGURATIONPRESETNAME" code="1051" description="Duplicate configuration preset name." />			
+		
 						
 	</errors>
 
