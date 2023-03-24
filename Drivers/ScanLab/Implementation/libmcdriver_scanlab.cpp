@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
 #include "libmcdriver_scanlab_driver_scanlab_rtc6.hpp"
+#include "libmcdriver_scanlab_driver_scanlab_rtc6xn.hpp"
 
 using namespace LibMCDriver_ScanLab;
 using namespace LibMCDriver_ScanLab::Impl;
@@ -70,6 +71,10 @@ IDriver* CWrapper::CreateDriver(const std::string& sName, const std::string& sTy
 {
 	if (sType == "scanlab-rtc6")
 		return new CDriver_ScanLab_RTC6(sName, sType, pDriverEnvironment);
+
+	for (uint32_t nLaserCount = 1; nLaserCount <= 64; nLaserCount++)
+		if (sType == "scanlab-rtc6x" + std::to_string (nLaserCount))
+			return new CDriver_ScanLab_RTC6xN(sName, sType, nLaserCount, pDriverEnvironment);
 
 	return nullptr;
 }
