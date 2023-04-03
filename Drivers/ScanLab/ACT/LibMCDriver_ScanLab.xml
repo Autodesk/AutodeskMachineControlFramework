@@ -133,9 +133,11 @@
 	
 	
 	<enum name="OIERecordingMode">
-	   <option name="OIERecordingDisabled" value="0" />
-	   <option name="OIEStartMeasurement" value="1" />
-	   <option name="OIEEnableAndStartMeasurement" value="2" />
+	   <option name="OIERecordingDisabled" value="0" description="OIE shall not record anything." />
+	   <option name="OIEContinuousMeasurement" value="1" description="OIE shall continuously record, even if the laser is off. OIE must be enabled before drawing a layer." />
+	   <option name="OIEEnableAndContinuousMeasurement" value="2" description="OIE shall continuously record, even if the laser is off. OIE will be specifically enabled for the layer." />
+	   <option name="OIELaserActiveMeasurement" value="3" description="OIE shall record when the laser is on. OIE must be enabled before drawing a layer." />
+	   <option name="OIEEnableAndLaserActiveMeasurement" value="4" description="OIE shall record when the laser is on. OIE will be specifically enabled for the layer." />
 	</enum>	
 
 	<struct name="Point2D">
@@ -326,12 +328,30 @@ Custom implementation
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 		
+		<method name="DrawPolylineOIE" description="Writes a polyline into the open list with OIE Enabled.">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+			<param name="MeasurementPerContourOnly" type="bool" pass="in" description="OIE Measurement is only performed when the contours are drawn. Jumps are omitted." />
+		</method>
+
 		<method name="DrawHatches" description="Writes a list of hatches into the open list">
 			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+		</method>
+
+		<method name="DrawHatchesOIE" description="Writes a list of hatches into the open list with OIE Enabled.">
+			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+			<param name="MeasurementPerHatchOnly" type="bool" pass="in" description="OIE Measurement is only performed when the hatches are drawn. Jumps are omitted." />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">

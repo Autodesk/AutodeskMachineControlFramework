@@ -622,6 +622,18 @@ public:
 	virtual void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
+	* IRTCContext::DrawPolylineOIE - Writes a polyline into the open list with OIE Enabled.
+	* @param[in] nPointsBufferSize - Number of elements in buffer
+	* @param[in] pPointsBuffer - Points of polyline to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] bMeasurementPerContourOnly - OIE Measurement is only performed when the contours are drawn. Jumps are omitted.
+	*/
+	virtual void DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerContourOnly) = 0;
+
+	/**
 	* IRTCContext::DrawHatches - Writes a list of hatches into the open list
 	* @param[in] nHatchesBufferSize - Number of elements in buffer
 	* @param[in] pHatchesBuffer - Hatches to draw.
@@ -631,6 +643,18 @@ public:
 	* @param[in] fZValue - Focus Z Value
 	*/
 	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
+
+	/**
+	* IRTCContext::DrawHatchesOIE - Writes a list of hatches into the open list with OIE Enabled.
+	* @param[in] nHatchesBufferSize - Number of elements in buffer
+	* @param[in] pHatchesBuffer - Hatches to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] bMeasurementPerHatchOnly - OIE Measurement is only performed when the hatches are drawn. Jumps are omitted.
+	*/
+	virtual void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerHatchOnly) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
@@ -941,6 +965,12 @@ public:
 	* @return RTC Context Instance.
 	*/
 	virtual IRTCContext * GetContext() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::SetStefanSailerSpecialParameter - Secret function.
+	* @param[in] nCodeABCD - TestCode.
+	*/
+	virtual void SetStefanSailerSpecialParameter(const LibMCDriver_ScanLab_uint32 nCodeABCD) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::GetSelector - Returns the RTC Selector Instance. Fails if it card has not been initialised.

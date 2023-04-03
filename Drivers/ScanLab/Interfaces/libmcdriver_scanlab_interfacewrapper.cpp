@@ -931,6 +931,32 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawpolyline(LibMCDrive
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawpolylineoie(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const sLibMCDriver_ScanLabPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue, bool bMeasurementPerContourOnly)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if ( (!pPointsBuffer) && (nPointsBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->DrawPolylineOIE(nPointsBufferSize, pPointsBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue, bMeasurementPerContourOnly);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatches(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const sLibMCDriver_ScanLabHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -943,6 +969,32 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatches(LibMCDriver
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		pIRTCContext->DrawHatches(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatchesoie(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const sLibMCDriver_ScanLabHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue, bool bMeasurementPerHatchOnly)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if ( (!pHatchesBuffer) && (nHatchesBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->DrawHatchesOIE(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue, bMeasurementPerHatchOnly);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -2069,6 +2121,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getcontext(Lib
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_setstefansailerspecialparameter(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nCodeABCD)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
+
+	try {
+		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC6->SetStefanSailerSpecialParameter(nCodeABCD);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getselector(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_RTCSelector * pSelectorInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
@@ -3075,8 +3151,12 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlaserdelaysinbits;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_drawpolyline") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_drawpolyline;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_drawpolylineoie") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_drawpolylineoie;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_drawhatches") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_drawhatches;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_drawhatchesoie") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_drawhatchesoie;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addcustomdelay") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addcustomdelay;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_getcorrectionfactor") 
@@ -3155,6 +3235,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_getserialnumber;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_getcontext") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_getcontext;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_setstefansailerspecialparameter") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_setstefansailerspecialparameter;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_getselector") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_getselector;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_loadfirmware") 

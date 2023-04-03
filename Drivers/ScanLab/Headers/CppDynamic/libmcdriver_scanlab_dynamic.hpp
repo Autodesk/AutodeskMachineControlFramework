@@ -557,7 +557,9 @@ public:
 	inline void SetLaserDelaysInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay);
 	inline void SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOnDelay, const LibMCDriver_ScanLab_uint32 nLaserOffDelay);
 	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerContourOnly);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerHatchOnly);
 	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
@@ -645,6 +647,7 @@ public:
 	inline std::string GetNetmask();
 	inline LibMCDriver_ScanLab_uint32 GetSerialNumber();
 	inline PRTCContext GetContext();
+	inline void SetStefanSailerSpecialParameter(const LibMCDriver_ScanLab_uint32 nCodeABCD);
 	inline PRTCSelector GetSelector();
 	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
 	inline void LoadCustomFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer);
@@ -847,7 +850,9 @@ public:
 		pWrapperTable->m_RTCContext_SetLaserDelaysInMicroseconds = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserDelaysInBits = nullptr;
 		pWrapperTable->m_RTCContext_DrawPolyline = nullptr;
+		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
+		pWrapperTable->m_RTCContext_DrawHatchesOIE = nullptr;
 		pWrapperTable->m_RTCContext_AddCustomDelay = nullptr;
 		pWrapperTable->m_RTCContext_GetCorrectionFactor = nullptr;
 		pWrapperTable->m_RTCContext_GetStatus = nullptr;
@@ -887,6 +892,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetNetmask = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetSerialNumber = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetContext = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetStefanSailerSpecialParameter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetSelector = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_LoadFirmware = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_LoadCustomFirmware = nullptr;
@@ -1239,12 +1245,30 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DrawPolylineOIE = (PLibMCDriver_ScanLabRTCContext_DrawPolylineOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_drawpolylineoie");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DrawPolylineOIE = (PLibMCDriver_ScanLabRTCContext_DrawPolylineOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_drawpolylineoie");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DrawPolylineOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_DrawHatches = (PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_drawhatches");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_DrawHatches = (PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_drawhatches");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_DrawHatches == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DrawHatchesOIE = (PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_drawhatchesoie");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DrawHatchesOIE = (PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_drawhatchesoie");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DrawHatchesOIE == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1596,6 +1620,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetContext == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetStefanSailerSpecialParameter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStefanSailerSpecialParameterPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setstefansailerspecialparameter");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetStefanSailerSpecialParameter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetStefanSailerSpecialParameterPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setstefansailerspecialparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_SetStefanSailerSpecialParameter == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2090,8 +2123,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawPolyline == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_drawpolylineoie", (void**)&(pWrapperTable->m_RTCContext_DrawPolylineOIE));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawPolylineOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_drawhatches", (void**)&(pWrapperTable->m_RTCContext_DrawHatches));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawHatches == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_drawhatchesoie", (void**)&(pWrapperTable->m_RTCContext_DrawHatchesOIE));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawHatchesOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addcustomdelay", (void**)&(pWrapperTable->m_RTCContext_AddCustomDelay));
@@ -2248,6 +2289,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getcontext", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetContext));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetContext == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_setstefansailerspecialparameter", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetStefanSailerSpecialParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_SetStefanSailerSpecialParameter == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getselector", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetSelector));
@@ -2752,6 +2797,20 @@ public:
 	}
 	
 	/**
+	* CRTCContext::DrawPolylineOIE - Writes a polyline into the open list with OIE Enabled.
+	* @param[in] PointsBuffer - Points of polyline to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] bMeasurementPerContourOnly - OIE Measurement is only performed when the contours are drawn. Jumps are omitted.
+	*/
+	void CRTCContext::DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerContourOnly)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawPolylineOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)PointsBuffer.size(), PointsBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue, bMeasurementPerContourOnly));
+	}
+	
+	/**
 	* CRTCContext::DrawHatches - Writes a list of hatches into the open list
 	* @param[in] HatchesBuffer - Hatches to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
@@ -2762,6 +2821,20 @@ public:
 	void CRTCContext::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
+	}
+	
+	/**
+	* CRTCContext::DrawHatchesOIE - Writes a list of hatches into the open list with OIE Enabled.
+	* @param[in] HatchesBuffer - Hatches to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] bMeasurementPerHatchOnly - OIE Measurement is only performed when the hatches are drawn. Jumps are omitted.
+	*/
+	void CRTCContext::DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerHatchOnly)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatchesOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue, bMeasurementPerHatchOnly));
 	}
 	
 	/**
@@ -3241,6 +3314,15 @@ public:
 			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CRTCContext>(m_pWrapper, hContextInstance);
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::SetStefanSailerSpecialParameter - Secret function.
+	* @param[in] nCodeABCD - TestCode.
+	*/
+	void CDriver_ScanLab_RTC6::SetStefanSailerSpecialParameter(const LibMCDriver_ScanLab_uint32 nCodeABCD)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_SetStefanSailerSpecialParameter(m_pHandle, nCodeABCD));
 	}
 	
 	/**

@@ -421,11 +421,22 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         m_pRTCContext->SetStartList(1, 0);
 
-        if (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement)
-            m_pRTCContext->EnableOIE();
+        bool bEnableOIEMeasurementPerHatch = (m_OIERecordingMode == eOIERecordingMode::OIELaserActiveMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndLaserActiveMeasurement);
 
-        if ((m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEStartMeasurement)) 
+        switch (m_OIERecordingMode) {
+        case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
+        case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
+            m_pRTCContext->EnableOIE();
+            break;
+        }
+
+        switch (m_OIERecordingMode) {
+        case eOIERecordingMode::OIEContinuousMeasurement:
+        case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
             m_pRTCContext->StartOIEMeasurement();
+            break;
+        }
+  
 
         auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
         auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
@@ -497,7 +508,7 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
                         pContourPoint->m_Y = (float)(Points[nPointIndex].m_Coordinates[1] * dUnits);
                     }
 
-                    m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus);
+                    m_pRTCContext->DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
 
                     break;
                 }
@@ -519,7 +530,7 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
                         pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
                     }
 
-                    m_pRTCContext->DrawHatches(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus);
+                    m_pRTCContext->DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
 
                     break;
                 }
@@ -531,11 +542,14 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
         }
 
 
-        if ((m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEStartMeasurement))
+        if ((m_OIERecordingMode != eOIERecordingMode::OIERecordingDisabled))
             m_pRTCContext->StopOIEMeasurement();
 
-        if (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndStartMeasurement)
+        switch (m_OIERecordingMode) {
+        case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
+        case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
             m_pRTCContext->DisableOIE();
+        }
 
         m_pRTCContext->SetEndOfList();
 

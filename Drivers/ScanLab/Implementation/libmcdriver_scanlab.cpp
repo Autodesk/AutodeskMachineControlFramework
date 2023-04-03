@@ -72,9 +72,14 @@ IDriver* CWrapper::CreateDriver(const std::string& sName, const std::string& sTy
 	if (sType == "scanlab-rtc6")
 		return new CDriver_ScanLab_RTC6(sName, sType, pDriverEnvironment);
 
-	for (uint32_t nLaserCount = 1; nLaserCount <= 64; nLaserCount++)
-		if (sType == "scanlab-rtc6x" + std::to_string (nLaserCount))
+	if (sType.length() > 13) {
+		if (sType.substr(0, 13) == "scanlab-rtc6x") {
+
+			uint32_t nLaserCount = std::stoul(sType.substr(13));
+
 			return new CDriver_ScanLab_RTC6xN(sName, sType, nLaserCount, pDriverEnvironment);
+		}
+	}
 
 	return nullptr;
 }

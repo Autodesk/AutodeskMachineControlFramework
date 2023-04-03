@@ -396,8 +396,14 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 
 }
 
-void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
+
+void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D* pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
+}
+
+void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D* pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerContourOnly) 
+{
+
 	if (!pPointsBuffer)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
@@ -418,6 +424,10 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 
 	int intX = (int)dX;
 	int intY = (int)dY;
+
+	if (bMeasurementPerContourOnly)
+		StopOIEMeasurement();
+
 	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -425,17 +435,24 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 		dX = round(pPoint->m_X * m_dCorrectionFactor);
 		dY = round(pPoint->m_Y * m_dCorrectionFactor);
 		pPoint++;
-		// TODO: Brennt die maschine ab?
 
 		intX = (int)dX;
 		intY = (int)dY;
+
+		if (bMeasurementPerContourOnly)
+			StartOIEMeasurement();
+
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	}
+
+	if (bMeasurementPerContourOnly)
+		StopOIEMeasurement();
+
 }
 
-void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
+void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D* pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerHatchOnly) 
 {
 	if (!pHatchesBuffer)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -455,17 +472,21 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 	for (uint64_t index = 0; index < nHatchesBufferSize; index++) {
 		double dX = round(pHatch->m_X1 * m_dCorrectionFactor);
 		double dY = round(pHatch->m_Y1 * m_dCorrectionFactor);
-		// TODO: Brennt die maschine ab?
+	
+		if (bMeasurementPerHatchOnly)
+			StopOIEMeasurement();
 
 		int intX = (int)dX;
 		int intY = (int)dY;
 		m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+		if (bMeasurementPerHatchOnly)
+			StartOIEMeasurement();
+
 		dX = round(pHatch->m_X2 * m_dCorrectionFactor);
 		dY = round(pHatch->m_Y2 * m_dCorrectionFactor);
-		// TODO: Brennt die maschine ab?
-
+		
 		intX = (int)dX;
 		intY = (int)dY;
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
@@ -473,7 +494,17 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 
 		pHatch++;
 	}
+
+	if (bMeasurementPerHatchOnly)
+		StopOIEMeasurement();
+
 }
+
+void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D* pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
+{
+	DrawHatchesOIE(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue, false);
+}
+
 
 void CRTCContext::AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay)
 {

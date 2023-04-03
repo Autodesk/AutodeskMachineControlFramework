@@ -271,9 +271,11 @@ namespace LibMCDriver_ScanLab {
   };
   
   enum class eOIERecordingMode : LibMCDriver_ScanLab_int32 {
-    OIERecordingDisabled = 0,
-    OIEStartMeasurement = 1,
-    OIEEnableAndStartMeasurement = 2
+    OIERecordingDisabled = 0, /** OIE shall not record anything. */
+    OIEContinuousMeasurement = 1, /** OIE shall continuously record, even if the laser is off. OIE must be enabled before drawing a layer. */
+    OIEEnableAndContinuousMeasurement = 2, /** OIE shall continuously record, even if the laser is off. OIE will be specifically enabled for the layer. */
+    OIELaserActiveMeasurement = 3, /** OIE shall record when the laser is on. OIE must be enabled before drawing a layer. */
+    OIEEnableAndLaserActiveMeasurement = 4 /** OIE shall record when the laser is on. OIE will be specifically enabled for the layer. */
   };
   
   /*************************************************************************************************************************
