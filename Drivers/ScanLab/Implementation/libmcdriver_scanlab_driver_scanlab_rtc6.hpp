@@ -118,7 +118,6 @@ public:
 
 	PDriver_ScanLab_RTC6ConfigurationPreset findPresetByName(const std::string & sPresetName, bool bMustExist);
 
-
 };
 
 } // namespace Impl

@@ -645,6 +645,8 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
 
 }
 
+
+
 PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(const std::string& sPresetName, bool bMustExist)
 {
     auto iIterator = m_ConfigurationPresets.find(sPresetName);

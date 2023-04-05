@@ -117,6 +117,8 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_mcbsp_init_spi) (uint32_t nCardNo, uint32_t nClockLevel, uint32_t nClockDelay);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mcbsp_out_ptr) (uint32_t nCardNo, uint32_t nNumber, void* pSignalPtr);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_multi_mcbsp_in) (uint32_t nCardNo, uint32_t nCtrl, uint32_t nP, uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_multi_mcbsp_in_list) (uint32_t nCardNo, uint32_t nCtrl, uint32_t nP, uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_power) (uint32_t nCardNo, uint32_t nPort, uint32_t nPower);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_nop) (uint32_t nCardNo);
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_free_variable_list) (uint32_t nCardNo, uint32_t nVarNo, uint32_t nValue);
@@ -279,6 +281,8 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_micro_vector_rel n_micro_vector_rel = nullptr;
 			PScanLabPtr_n_get_error n_get_error = nullptr;
 			PScanLabPtr_n_reset_error n_reset_error = nullptr;
+			PScanLabPtr_n_set_multi_mcbsp_in_list n_set_multi_mcbsp_in_list = nullptr;
+			PScanLabPtr_n_set_laser_power n_set_laser_power = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

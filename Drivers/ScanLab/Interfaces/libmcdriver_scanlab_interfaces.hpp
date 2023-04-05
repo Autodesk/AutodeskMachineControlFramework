@@ -629,9 +629,9 @@ public:
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
-	* @param[in] bMeasurementPerContourOnly - OIE Measurement is only performed when the contours are drawn. Jumps are omitted.
+	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
 	*/
-	virtual void DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerContourOnly) = 0;
+	virtual void DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex) = 0;
 
 	/**
 	* IRTCContext::DrawHatches - Writes a list of hatches into the open list
@@ -652,9 +652,9 @@ public:
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
-	* @param[in] bMeasurementPerHatchOnly - OIE Measurement is only performed when the hatches are drawn. Jumps are omitted.
+	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
 	*/
-	virtual void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const bool bMeasurementPerHatchOnly) = 0;
+	virtual void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
@@ -758,6 +758,12 @@ public:
 	* IRTCContext::StopOIEMeasurement - Writes an OIE measurement start command block to the open list.
 	*/
 	virtual void StopOIEMeasurement() = 0;
+
+	/**
+	* IRTCContext::SetOIEPIDMode - Sets OIE PID Index.
+	* @param[in] nOIEPIDIndex - OIE PID Index. MUST be between 0 and 63. 0 means PID disabled.
+	*/
+	virtual void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) = 0;
 
 	/**
 	* IRTCContext::DisableSkyWriting - Disable skywriting.
@@ -965,12 +971,6 @@ public:
 	* @return RTC Context Instance.
 	*/
 	virtual IRTCContext * GetContext() = 0;
-
-	/**
-	* IDriver_ScanLab_RTC6::SetStefanSailerSpecialParameter - Secret function.
-	* @param[in] nCodeABCD - TestCode.
-	*/
-	virtual void SetStefanSailerSpecialParameter(const LibMCDriver_ScanLab_uint32 nCodeABCD) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::GetSelector - Returns the RTC Selector Instance. Fails if it card has not been initialised.

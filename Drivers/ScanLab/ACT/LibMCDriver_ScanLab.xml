@@ -100,8 +100,8 @@
 		<error name="DUPLICATELASERINDEX" code="1048" description="Duplicate laser index." />			
 		<error name="INVALIDCONFIGURATIONSCHEMA" code="1049" description="Invalid configuration schema." />
 		<error name="NOVERSIONDEFINITION" code="1050" description="No version definition." />			
-		<error name="DUPLICATECONFIGURATIONPRESETNAME" code="1051" description="Duplicate configuration preset name." />			
-		
+		<error name="DUPLICATECONFIGURATIONPRESETNAME" code="1051" description="Duplicate configuration preset name." />					
+		<error name="OIEPIDVARIABLEOUTOFBOUNDS" code="1052" description="OIE PID Variable out of bounds." />		
 						
 	</errors>
 
@@ -334,7 +334,7 @@ Custom implementation
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
-			<param name="MeasurementPerContourOnly" type="bool" pass="in" description="OIE Measurement is only performed when the contours are drawn. Jumps are omitted." />
+			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
 		</method>
 
 		<method name="DrawHatches" description="Writes a list of hatches into the open list">
@@ -351,7 +351,7 @@ Custom implementation
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
-			<param name="MeasurementPerHatchOnly" type="bool" pass="in" description="OIE Measurement is only performed when the hatches are drawn. Jumps are omitted." />
+			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
@@ -428,6 +428,10 @@ Custom implementation
 		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
 		</method>
 		
+		<method name="SetOIEPIDMode" description="Sets OIE PID Index.">
+			<param name="OIEPIDIndex" type="uint32" pass="in" description="OIE PID Index. MUST be between 0 and 63. 0 means PID disabled." />
+		</method>
+
 		<method name="DisableSkyWriting" description="Disable skywriting.">
 		</method>
 
@@ -452,6 +456,7 @@ Custom implementation
 			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
 			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
 		</method>
+		
 		
 	</class>
 
@@ -500,6 +505,7 @@ Custom implementation
 			<param name="Instance" type="class" class="RTCContext" pass="return" description="New Context# instance" />
 		</method>
 				
+
 
 	
 	</class>
@@ -631,7 +637,7 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 						
-
+		
 	</class>
 
 
