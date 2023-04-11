@@ -71,6 +71,14 @@
 								
 					</v-container>		
 				</template>
+				
+				<template v-for="uiCustomPage in Application.AppContent.CustomPages">
+					<v-container :key="uiCustomPage.name" v-if="appIsReady && (Application.AppState.activePage == uiCustomPage.name)" style="width:100%; height:100%; display:block;">
+										
+						<CustomPage_Example v-if="(uiCustomPage.component == 'Example')" :CustomPage="uiCustomPage" :Application="Application" />
+								
+					</v-container>		
+				</template>
 			</v-card>
 		</div>
 		
@@ -91,7 +99,7 @@
 		  <v-card-text>
 			<div style="overflow:auto">
 			
-			<template v-for="uiModule in uiDialog.modules">
+				<template v-for="uiModule in uiDialog.modules">
 					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
@@ -151,7 +159,9 @@
 	import Module_Graphic from "./AMCModule_Graphic.vue";
 	import Module_LayerView from "./AMCModule_LayerView.vue";
 	import Module_Logs from "./AMCModule_Logs.vue";
-	
+
+	import CustomPage_Example from "./CustomPage_Example.vue";
+
 	export default {
 
 		created() {
@@ -289,7 +299,8 @@
 			Module_GLScene,
 			Module_Graphic,
 			Module_Grid,
-			Module_LayerView
+			Module_LayerView,
+			CustomPage_Example
 		},	
 
 		methods: {

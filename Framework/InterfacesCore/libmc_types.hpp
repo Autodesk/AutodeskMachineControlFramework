@@ -503,6 +503,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INTERNALNODEERROR 476 /** Internal node error. */
 #define LIBMC_ERROR_XMLNODENOTFOUNDINLIST 477 /** XML node not found in list. */
 #define LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE 478 /** Could not find XML Namespace */
+#define LIBMC_ERROR_INVALIDCOMPONENTNAME 489 /** invalid component name. */
+#define LIBMC_ERROR_MISSINGCOMPONENTNAME 490 /** missing component name. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -918,6 +920,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INTERNALNODEERROR: return "Internal node error.";
     case LIBMC_ERROR_XMLNODENOTFOUNDINLIST: return "XML node not found in list.";
     case LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE: return "Could not find XML Namespace";
+    case LIBMC_ERROR_INVALIDCOMPONENTNAME: return "invalid component name.";
+    case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "missing component name.";
     default: return "unknown error";
   }
 }

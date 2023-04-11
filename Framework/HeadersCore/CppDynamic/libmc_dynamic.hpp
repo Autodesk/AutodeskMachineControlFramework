@@ -573,6 +573,8 @@ public:
 			case LIBMC_ERROR_INTERNALNODEERROR: return "INTERNALNODEERROR";
 			case LIBMC_ERROR_XMLNODENOTFOUNDINLIST: return "XMLNODENOTFOUNDINLIST";
 			case LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE: return "COULDNOTFINDXMLNAMESPACE";
+			case LIBMC_ERROR_INVALIDCOMPONENTNAME: return "INVALIDCOMPONENTNAME";
+			case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "MISSINGCOMPONENTNAME";
 		}
 		return "UNKNOWN";
 	}
@@ -988,6 +990,8 @@ public:
 			case LIBMC_ERROR_INTERNALNODEERROR: return "Internal node error.";
 			case LIBMC_ERROR_XMLNODENOTFOUNDINLIST: return "XML node not found in list.";
 			case LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE: return "Could not find XML Namespace";
+			case LIBMC_ERROR_INVALIDCOMPONENTNAME: return "invalid component name.";
+			case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "missing component name.";
 		}
 		return "unknown error";
 	}

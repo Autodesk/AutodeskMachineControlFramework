@@ -509,7 +509,10 @@
 		<error name="INTERNALNODEERROR" code="476" description="Internal node error." />				
 		<error name="XMLNODENOTFOUNDINLIST" code="477" description="XML node not found in list." />				
 		<error name="COULDNOTFINDXMLNAMESPACE" code="478" description="Could not find XML Namespace" />				
-						
+		<error name="INVALIDCOMPONENTNAME" code="489" description="invalid component name." />
+		<error name="MISSINGCOMPONENTNAME" code="490" description="missing component name." />
+		
+
 	</errors>
 	
 	

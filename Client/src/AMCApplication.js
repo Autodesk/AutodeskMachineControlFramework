@@ -44,6 +44,7 @@ import AMCApplicationModule_Logs from "./AMCModule_Logs.js"
 import AMCApplicationModule_LayerView from "./AMCModule_LayerView.js"
 
 import AMCApplicationPage from "./AMCPage.js"
+import AMCApplicationCustomPage from "./AMCCustomPage.js"
 import AMCApplicationDialog from "./AMCDialog.js"
 import AMCUpload from "./AMCImplementation_Upload.js"
 
@@ -86,8 +87,10 @@ export default class AMCApplication extends Common.AMCObject {
             MenuItems: [],
             ToolbarItems: [],
             Pages: [],
+            CustomPages: [],
             Dialogs: [],
             PageMap: new Map(),
+            CustomPageMap: new Map(),
             DialogMap: new Map(),
 			ModuleMap: new Map(),
 			ItemMap: new Map(),			
@@ -307,8 +310,10 @@ export default class AMCApplication extends Common.AMCObject {
         .then(resultJSON => {
 			
 			this.AppContent.Pages = [];
+			this.AppContent.CustomPages = [];
 			this.AppContent.Dialogs = [];
 			this.AppContent.PageMap.clear ();
+			this.AppContent.CustomPageMap.clear ();
 			this.AppContent.DialogMap.clear ();
 			this.AppContent.ModuleMap.clear ();
 			this.AppContent.ItemMap.clear ();
@@ -321,8 +326,21 @@ export default class AMCApplication extends Common.AMCObject {
 				let page = new AMCApplicationPage (this, pageJSON);
 				this.AppContent.Pages.push (page);
                 this.AppContent.PageMap.set(page.name, page);
-
             }
+
+			if (resultJSON.data.custompages) {
+				for (let customPageJSON of resultJSON.data.custompages) {
+					
+					let custompage = new AMCApplicationCustomPage (this, customPageJSON);
+					
+					//alert (custompage.component);
+					
+					this.AppContent.CustomPages.push (custompage);
+					this.AppContent.CustomPageMap.set(custompage.name, custompage);
+
+				}
+			}
+
 
             for (let dialogJSON of resultJSON.data.dialogs) {
 				let dialog = new AMCApplicationDialog (this, dialogJSON);

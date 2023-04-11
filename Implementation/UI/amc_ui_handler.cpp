@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
+#include "amc_ui_custompage.hpp"
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
 #include "amc_parameterhandler.hpp"
@@ -158,12 +159,20 @@ void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string
 
 PUIPage CUIHandler::findPage(const std::string& sName)
 {
-    auto iter = m_Pages.find(sName);
+    PUIPage pResult;
 
-    if (iter == m_Pages.end())
+    auto iPageIter = m_Pages.find(sName);
+    if (iPageIter != m_Pages.end())
+        pResult = iPageIter->second;
+
+    auto iCustomPageIter = m_CustomPages.find(sName);
+    if (iCustomPageIter != m_CustomPages.end())
+        pResult = iCustomPageIter->second;
+
+    if (pResult.get () == nullptr)
         throw ELibMCCustomException(LIBMC_ERROR_PAGENOTFOUND, sName);
 
-    return iter->second;
+    return pResult;
 }
 
 
@@ -251,6 +260,21 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClien
     }
     writer.addArray(AMC_API_KEY_UI_PAGES, pages);
 
+    CJSONWriterArray custompages(writer);
+    for (auto iter : m_CustomPages) {
+        CJSONWriterObject custompage(writer);
+        custompage.addString(AMC_API_KEY_UI_PAGENAME, iter.second->getName());
+        custompage.addString(AMC_API_KEY_UI_COMPONENTNAME, iter.second->getComponentName());
+
+        CJSONWriterArray modules(writer);
+        iter.second->writeModulesToJSON(writer, modules, pClientVariableHandler);
+
+        custompage.addArray(AMC_API_KEY_UI_MODULES, modules);
+
+        custompages.addObject(custompage);
+    }
+    writer.addArray(AMC_API_KEY_UI_CUSTOMPAGES, custompages);
+
 
     CJSONWriterArray dialogs(writer);
     for (auto iter : m_Dialogs) {
@@ -274,9 +298,13 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
     if (sName.empty ())
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPAGENAME);
 
-    auto iIterator = m_Pages.find (sName);
-    if (iIterator != m_Pages.end())
-        throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPAGE);
+    auto iPageIterator = m_Pages.find(sName);
+    if (iPageIterator != m_Pages.end())
+        throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPAGE, sName);
+
+    auto iCustomPageIterator = m_CustomPages.find(sName);
+    if (iCustomPageIterator != m_CustomPages.end())
+        throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPAGE, sName);
 
     auto pPage = std::make_shared<CUIPage> (sName, this);
     m_Pages.insert (std::make_pair (sName, pPage));
@@ -284,6 +312,25 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
     return pPage;
 }
 
+PUICustomPage CUIHandler::addCustomPage_Unsafe(const std::string& sName, const std::string& sComponentName)
+{
+    if (sName.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPAGENAME);
+
+    auto iPageIterator = m_Pages.find(sName);
+    if (iPageIterator != m_Pages.end())
+        throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPAGE, sName);
+
+    auto iCustomPageIterator = m_CustomPages.find(sName);
+    if (iCustomPageIterator != m_CustomPages.end())
+        throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPAGE, sName);
+
+    auto pPage = std::make_shared<CUICustomPage>(sName, sComponentName, this);
+    m_CustomPages.insert(std::make_pair(sName, pPage));
+
+    return pPage;
+
+}
 
 PUIDialog CUIHandler::addDialog_Unsafe(const std::string& sName, const std::string& sTitle)
 {
@@ -457,6 +504,39 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
     }
 
 
+    auto custompageNodes = xmlNode.children("custompage");
+    for (pugi::xml_node custompageNode : custompageNodes) {
+
+        auto pageNameAttrib = custompageNode.attribute("name");
+        if (pageNameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPAGENAME);
+        std::string sPageName(pageNameAttrib.as_string());
+
+        auto componentNameAttrib = custompageNode.attribute("component");
+        if (componentNameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOMPONENTNAME);
+        std::string sComponentName(componentNameAttrib.as_string());
+        
+
+        auto pPage = addCustomPage_Unsafe(sPageName, sComponentName);
+
+        auto modulesNode = custompageNode.child("modules");
+        if (!modulesNode.empty()) {
+
+            auto modulesChildren = modulesNode.children();
+            for (pugi::xml_node moduleChild : modulesChildren) {
+
+                auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger);
+                auto pModule = CUIModuleFactory::createModule(moduleChild, sPageName, pModuleEnvironment);
+                pPage->addModule(pModule);
+
+            }
+
+        }
+
+    }
+
+
     auto dialogNodes = xmlNode.children("dialog");
     for (pugi::xml_node dialogNode : dialogNodes) {
 
@@ -541,6 +621,8 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
     // Update all cross-references!
     for (auto pPage : m_Pages)
         pPage.second->configurePostLoading();
+    for (auto pCustomPage : m_CustomPages)
+        pCustomPage.second->configurePostLoading();
     for (auto pDialog : m_Dialogs)
         pDialog.second->configurePostLoading();
 
@@ -550,6 +632,12 @@ PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
 {
     for (auto pPage : m_Pages) {
         auto pModuleItem = pPage.second->findModuleItemByUUID(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pModuleItem;
+    }
+
+    for (auto pCustomPage : m_CustomPages) {
+        auto pModuleItem = pCustomPage.second->findModuleItemByUUID(sUUID);
         if (pModuleItem.get() != nullptr)
             return pModuleItem;
     }
@@ -570,6 +658,12 @@ PUIPage CUIHandler::findPageOfModuleItem(const std::string& sUUID)
         auto pModuleItem = pPage.second->findModuleItemByUUID(sUUID);
         if (pModuleItem.get() != nullptr)
             return pPage.second;
+    }
+
+    for (auto pCustomPage : m_Pages) {
+        auto pModuleItem = pCustomPage.second->findModuleItemByUUID(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pCustomPage.second;
     }
 
     for (auto pDialog : m_Dialogs) {
@@ -629,6 +723,10 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
     LibMCAssertNotNull(pClientVariableHandler);
     for (auto pPage : m_Pages) {
         pPage.second->populateClientVariables(pClientVariableHandler);
+    }
+
+    for (auto pCustomPage : m_CustomPages) {
+        pCustomPage.second->populateClientVariables(pClientVariableHandler);
     }
 
     for (auto pDialog : m_Dialogs) {
