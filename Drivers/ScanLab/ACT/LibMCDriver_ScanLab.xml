@@ -316,8 +316,8 @@ Custom implementation
 		</method>
 
 		<method name="SetLaserDelaysInBits" description="Sets the laser delays (on the list)">
-			<param name="LaserOnDelay" type="uint32" pass="in" description="LaserOn delay in bits (1/64th microseconds)" />
-			<param name="LaserOffDelay" type="uint32" pass="in" description="LaserOff delay in bits (1/64th microseconds)" />
+			<param name="LaserOnDelay" type="int32" pass="in" description="LaserOn delay in bits (1/64th microseconds)" />
+			<param name="LaserOffDelay" type="int32" pass="in" description="LaserOff delay in bits (1/64th microseconds)" />
 		</method>
 		
 		<method name="DrawPolyline" description="Writes a polyline into the open list">

@@ -368,15 +368,15 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
         if (m_pRTCContext.get() == nullptr)
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-        if ((dLaserOnDelay < RTC6_MIN_DELAY) || (dLaserOnDelay > RTC6_MAX_DELAY))
+        if ((dLaserOnDelay < RTC6_MIN_LASER_DELAY) || (dLaserOnDelay > RTC6_MAX_LASER_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
-        if ((dLaserOffDelay < RTC6_MIN_DELAY) || (dLaserOffDelay > RTC6_MAX_DELAY))
+        if ((dLaserOffDelay < RTC6_MIN_LASER_DELAY) || (dLaserOffDelay > RTC6_MAX_LASER_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
-        if ((dMarkDelay < RTC6_MIN_DELAY) || (dMarkDelay > RTC6_MAX_DELAY))
+        if ((dMarkDelay < RTC6_MIN_MARK_DELAY) || (dMarkDelay > RTC6_MAX_MARK_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
-        if ((dJumpDelay < RTC6_MIN_DELAY) || (dJumpDelay > RTC6_MAX_DELAY))
+        if ((dJumpDelay < RTC6_MIN_JUMP_DELAY) || (dJumpDelay > RTC6_MAX_JUMP_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
-        if ((dPolygonDelay < RTC6_MIN_DELAY) || (dPolygonDelay > RTC6_MAX_DELAY))
+        if ((dPolygonDelay < RTC6_MIN_POLYGON_DELAY) || (dPolygonDelay > RTC6_MAX_POLYGON_DELAY))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
 
 
@@ -384,12 +384,12 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
         int nIntJumpDelay = ((int)round(dJumpDelay / 10.0)) * 10;
         int nIntPolygonDelay = ((int)round(dPolygonDelay / 10.0)) * 10;
 
-        if (nIntMarkDelay < 10)
-            nIntMarkDelay = 10;
-        if (nIntJumpDelay < 10)
-            nIntJumpDelay = 10;
-        if (nIntPolygonDelay < 10)
-            nIntPolygonDelay = 10;
+        if (nIntMarkDelay < 0)
+            nIntMarkDelay = 0;
+        if (nIntJumpDelay < 0)
+            nIntJumpDelay = 0;
+        if (nIntPolygonDelay < 0)
+            nIntPolygonDelay = 0;
 
         m_pRTCContext->SetLaserDelaysInMicroseconds(dLaserOnDelay, dLaserOffDelay);
         m_pRTCContext->SetDelays(nIntMarkDelay, nIntJumpDelay, nIntPolygonDelay);

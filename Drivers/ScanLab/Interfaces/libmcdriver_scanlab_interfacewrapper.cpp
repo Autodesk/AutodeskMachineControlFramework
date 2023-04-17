@@ -881,7 +881,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserdelaysinmicrose
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserdelaysinbits(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nLaserOnDelay, LibMCDriver_ScanLab_uint32 nLaserOffDelay)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserdelaysinbits(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nLaserOnDelay, LibMCDriver_ScanLab_int32 nLaserOffDelay)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 

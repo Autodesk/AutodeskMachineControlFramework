@@ -608,7 +608,7 @@ public:
 	* @param[in] nLaserOnDelay - LaserOn delay in bits (1/64th microseconds)
 	* @param[in] nLaserOffDelay - LaserOff delay in bits (1/64th microseconds)
 	*/
-	virtual void SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOnDelay, const LibMCDriver_ScanLab_uint32 nLaserOffDelay) = 0;
+	virtual void SetLaserDelaysInBits(const LibMCDriver_ScanLab_int32 nLaserOnDelay, const LibMCDriver_ScanLab_int32 nLaserOffDelay) = 0;
 
 	/**
 	* IRTCContext::DrawPolyline - Writes a polyline into the open list
