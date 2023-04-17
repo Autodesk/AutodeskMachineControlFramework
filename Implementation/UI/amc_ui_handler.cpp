@@ -41,7 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_page.hpp"
 #include "amc_ui_custompage.hpp"
 #include "amc_ui_dialog.hpp"
+#include "amc_ui_module.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
+#include "amc_ui_module_custom.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_ui_expression.hpp"
 
@@ -519,6 +521,10 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         
 
         auto pPage = addCustomPage_Unsafe(sPageName, sComponentName);
+
+        auto pCustomModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger);
+        auto pCustomModule = std::make_shared<CUIModule_Custom>(custompageNode, sPageName, pCustomModuleEnvironment);
+        pPage->addModule(pCustomModule);
 
         auto modulesNode = custompageNode.child("modules");
         if (!modulesNode.empty()) {

@@ -505,6 +505,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE 478 /** Could not find XML Namespace */
 #define LIBMC_ERROR_INVALIDCOMPONENTNAME 489 /** invalid component name. */
 #define LIBMC_ERROR_MISSINGCOMPONENTNAME 490 /** missing component name. */
+#define LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING 491 /** custom page property name missing. */
+#define LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING 492 /** custom page property type missing. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -922,6 +924,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE: return "Could not find XML Namespace";
     case LIBMC_ERROR_INVALIDCOMPONENTNAME: return "invalid component name.";
     case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "missing component name.";
+    case LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING: return "custom page property name missing.";
+    case LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING: return "custom page property type missing.";
     default: return "unknown error";
   }
 }

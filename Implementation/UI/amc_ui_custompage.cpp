@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
+#include "amc_ui_module_custom.hpp"
+
 
 using namespace AMC;
 
@@ -57,3 +59,5 @@ std::string CUICustomPage::getComponentName()
 {
 	return m_sComponentName;
 }
+
+
