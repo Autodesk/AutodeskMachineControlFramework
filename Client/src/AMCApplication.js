@@ -42,6 +42,7 @@ import AMCApplicationModule_Grid from "./AMCModule_Grid.js"
 import AMCApplicationModule_Tabs from "./AMCModule_Tabs.js"
 import AMCApplicationModule_Logs from "./AMCModule_Logs.js"
 import AMCApplicationModule_LayerView from "./AMCModule_LayerView.js"
+import AMCApplicationModule_Custom from "./AMCModule_Custom.js"
 
 import AMCApplicationPage from "./AMCPage.js"
 import AMCApplicationCustomPage from "./AMCCustomPage.js"
@@ -283,6 +284,9 @@ export default class AMCApplication extends Common.AMCObject {
 
 		if (moduleDefinitionJSON.type === "layerview") 
 			return new AMCApplicationModule_LayerView (page, moduleDefinitionJSON);
+
+		if (moduleDefinitionJSON.type === "custom") 
+			return new AMCApplicationModule_Custom (page, moduleDefinitionJSON);
 		
 		return null;
 		

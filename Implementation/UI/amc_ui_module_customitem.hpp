@@ -46,7 +46,7 @@ namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
-	amcDeclareDependingClass(CUIModule_CustomItem, PUIModule_CustomItem);
+	amcDeclareDependingClass(CUIModuleCustomItem_Properties, PUIModuleCustomItem_Properties);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
@@ -55,7 +55,7 @@ namespace AMC {
 
 	
 
-	class CUIModuleCustomItem : public CUIModuleItem {
+	class CUIModuleCustomItem_Properties : public CUIModuleItem {
 	protected:		
 	
 		std::string m_sUUID;
@@ -65,9 +65,9 @@ namespace AMC {
 		
 	public:
 
-		CUIModuleCustomItem(const std::string & sUUID, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModuleCustomItem_Properties(const std::string & sUUID, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 		
-		virtual ~CUIModuleCustomItem();
+		virtual ~CUIModuleCustomItem_Properties();
 
 		virtual std::string getUUID () override;
 

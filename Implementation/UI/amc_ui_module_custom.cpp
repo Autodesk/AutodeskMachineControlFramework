@@ -54,15 +54,13 @@ CUIModule_Custom::CUIModule_Custom(pugi::xml_node& xmlNode, const std::string& s
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
-	if (getTypeFromXML(xmlNode) != getStaticType())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType());
 
 	if (sPath.empty())
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULEPATH, m_sName);
 
 	m_sModulePath = sPath + "." + m_sName;
 
-	m_pCustomItem = std::make_shared<CUIModuleCustomItem>(m_sUUID, m_sModulePath, pUIModuleEnvironment);
+	m_pCustomItem = std::make_shared<CUIModuleCustomItem_Properties>(m_sUUID, m_sModulePath, pUIModuleEnvironment);
 
 	pugi::xml_node propertiesNode = xmlNode.child("properties");
 	if (!propertiesNode.empty()) {
@@ -113,6 +111,14 @@ void CUIModule_Custom::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObj
 	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 
+	CJSONWriterArray itemsNode(writer);
+	CJSONWriterObject itemObject(writer);
+	itemObject.addString(AMC_API_KEY_UI_ITEMTYPE, "properties");
+	itemObject.addString(AMC_API_KEY_UI_ITEMUUID, m_pCustomItem->getUUID());
+	m_pCustomItem->addContentToJSON(writer, itemObject, pClientVariableHandler, 0);
+	itemsNode.addObject(itemObject);
+
+	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);
 
 }
 

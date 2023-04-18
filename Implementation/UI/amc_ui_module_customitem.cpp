@@ -47,30 +47,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModuleCustomItem::CUIModuleCustomItem(const std::string& sUUID, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModuleCustomItem_Properties::CUIModuleCustomItem_Properties(const std::string& sUUID, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 	: CUIModuleItem (sModulePath), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_pUIModuleEnvironment (pUIModuleEnvironment)
 {
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
 
 }
 
-CUIModuleCustomItem::~CUIModuleCustomItem()
+CUIModuleCustomItem_Properties::~CUIModuleCustomItem_Properties()
 {
 
 }
 
-std::string CUIModuleCustomItem::getUUID()
+std::string CUIModuleCustomItem_Properties::getUUID()
 {
 	return m_sUUID;
 }
 
 
-void CUIModuleCustomItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
+void CUIModuleCustomItem_Properties::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
+	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+
+	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
+
+	for (auto iIter : m_Properties) {
+		std::string sName = iIter.first;
+		if (iIter.second.needsSync())
+			pGroup->setParameterValueByName(sName, iIter.second.evaluateStringValue(pStateMachineData));
+
+		object.addString(sName, pGroup->getParameterValueByName (sName));
+	}
 
 }
 
-std::list <std::string> CUIModuleCustomItem::getReferenceUUIDs()
+std::list <std::string> CUIModuleCustomItem_Properties::getReferenceUUIDs()
 {
 	std::list <std::string> resultList;
 	resultList.push_back(m_sUUID);
@@ -79,7 +90,7 @@ std::list <std::string> CUIModuleCustomItem::getReferenceUUIDs()
 }
 
 
-void CUIModuleCustomItem::populateClientVariables(CParameterHandler* pParameterHandler)
+void CUIModuleCustomItem_Properties::populateClientVariables(CParameterHandler* pParameterHandler)
 {
 	LibMCAssertNotNull(pParameterHandler);
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
@@ -91,7 +102,7 @@ void CUIModuleCustomItem::populateClientVariables(CParameterHandler* pParameterH
 	
 }
 
-void CUIModuleCustomItem::registerProperty(const std::string& sName, const std::string& sTypeString, CUIExpression valueExpression)
+void CUIModuleCustomItem_Properties::registerProperty(const std::string& sName, const std::string& sTypeString, CUIExpression valueExpression)
 {
 	m_Properties.insert (std::make_pair (sName, valueExpression));
 }

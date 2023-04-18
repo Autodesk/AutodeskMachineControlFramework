@@ -50,7 +50,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModule_Custom, PUIModuleCustom);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
-	amcDeclareDependingClass(CUIModuleCustomItem, PUIModuleCustomItem);
+	amcDeclareDependingClass(CUIModuleCustomItem_Properties, PUIModuleCustomItem_Properties);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
@@ -62,7 +62,7 @@ namespace AMC {
 
 		std::string m_sModulePath;
 
-		PUIModuleCustomItem m_pCustomItem;
+		PUIModuleCustomItem_Properties m_pCustomItem;
 
 	public:
 

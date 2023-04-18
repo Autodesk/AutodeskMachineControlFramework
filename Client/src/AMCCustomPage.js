@@ -50,6 +50,7 @@ export default class AMCApplicationCustomPage extends AMCApplicationPage {
 		
 		this.modules = [];
 		this.moduleMap = new Map ();
+		this.customModule = null;
 					
 		for (let moduleDefinitionJSON of pageJSON.modules) {
 			
@@ -58,7 +59,11 @@ export default class AMCApplicationCustomPage extends AMCApplicationPage {
 			if (moduleInstance) {				
 				this.modules.push (moduleInstance);
 				this.moduleMap.set (moduleInstance.name, moduleInstance);
-				this.application.addModule (moduleInstance);				
+				this.application.addModule (moduleInstance);												
+				
+				if (moduleInstance.type == "custom")
+					this.customModule = moduleInstance;
+					
 			} else {
 				throw "Module type not found: " + moduleDefinitionJSON.type;
 			}
@@ -71,9 +76,37 @@ export default class AMCApplicationCustomPage extends AMCApplicationPage {
 	findModule (name)
 	{
 		Assert.IdentifierString (name);
-		return this.moduleMap.get (name);
+		if (this.moduleMap.has (name))
+			return this.moduleMap.get (name);
+		
+		return null;
 	}
 	
+	getProperty (name)
+	{
+		Assert.IdentifierString (name);
+		
+		return "";
+	}
+	
+	getPropertiesObject ()
+	{		
+		if (this.customModule) {
+			if (this.customModule.propertiesitem)
+				return this.customModule.propertiesitem;
+		}
+	
+		// Fallback: Return empty object
+		return {
+			values: { }
+		};
+	}
 
+	callEvent (eventName, parameters) 
+	{
+		Assert.IdentifierString (eventName);
+		Assert.IdentifierString (parameters);
+		
+	}
 
 }

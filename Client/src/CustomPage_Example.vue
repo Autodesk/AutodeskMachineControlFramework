@@ -1,8 +1,12 @@
 <template>
 
 	<div style="width:100%; height:100%; display:block;">
+		<div>
+			Test1234: {{ customProperties.values.dummycounter }}
+		</div>
+	
 		<Module_Content :module="uploadModule" :Application="Application" />
-		<Module_LayerView :module="previewModule" :Application="Application" />
+		<Module_LayerView :module="previewModule" :Application="Application" />		
 	</div>
 	
 </template>
@@ -24,18 +28,12 @@
 			
 			uploadModule: null,
 			previewModule: null,
-			myValue: 0.0
+			customProperties: null,
 			
 		}),
 		
 		methods: {
-		
-			/*onDataUpdate ()
-			{
-				this.myValue = this.CustomPage.getParameter("test12");	
-			
-			} */
-			   
+					   
 		},
 		
 		
@@ -43,15 +41,11 @@
 		
 			this.previewModule = this.CustomPage.findModule ("preview");
 			this.uploadModule = this.CustomPage.findModule ("upload");
+			this.customProperties = this.CustomPage.getPropertiesObject ();
 			
 		},
 		
 		mounted() {
-		
-			//Page.setOnDataUpdate (this.onDataUpdate);
-			
-			
-			
 			
 		}
 		
