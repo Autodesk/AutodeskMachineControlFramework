@@ -120,7 +120,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
+	err = addDirectory (zipWriter, DevPackageDir, "ClientSource/");
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if (systemprefix == "win64") {
 	
 		err = addFile (zipWriter, DevPackageDir + "buildresources.exe", "buildresources.exe");

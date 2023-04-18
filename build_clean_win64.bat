@@ -21,6 +21,7 @@ if not exist "%builddir%\DevPackage\Framework\HeadersDriver\CppDynamic" (mkdir "
 if not exist "%builddir%\DevPackage\Framework\InterfacesDev" (mkdir "%builddir%\DevPackage\Framework\InterfacesDev")
 if not exist "%builddir%\DevPackage\Framework\PluginCpp" (mkdir "%builddir%\DevPackage\Framework\PluginCpp")
 if not exist "%builddir%\DevPackage\Framework\Dist" (mkdir "%builddir%\DevPackage\Framework\Dist")
+if not exist "%builddir%\DevPackage\Framework\ClientSource" (mkdir "%builddir%\DevPackage\Framework\ClientSource")
 if not exist "%builddir%\Framework" (mkdir "%builddir%\Framework")
 if not exist "%builddir%\Framework\HeadersDev" (mkdir "%builddir%\Framework\HeadersDev")
 if not exist "%builddir%\Framework\HeadersDev\CppDynamic" (mkdir "%builddir%\Framework\HeadersDev\CppDynamic")
@@ -28,6 +29,7 @@ if not exist "%builddir%\Framework\HeadersDriver" (mkdir "%builddir%\Framework\H
 if not exist "%builddir%\Framework\HeadersDriver\CppDynamic" (mkdir "%builddir%\Framework\HeadersDriver\CppDynamic")
 if not exist "%builddir%\Framework\InterfacesDev" (mkdir "%builddir%\Framework\InterfacesDev")
 if not exist "%builddir%\Framework\PluginCpp" (mkdir "%builddir%\Framework\PluginCpp")
+if not exist "%builddir%\Framework\ClientSource" (mkdir "%builddir%\Framework\ClientSource")
 
 copy /y "%basepath%\Framework\PluginCpp\*.*" "%builddir%\Framework\PluginCpp"
 if "%ERRORLEVEL%" neq "0" (
@@ -100,6 +102,12 @@ call cmake --build . --config Release
 
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
+
+copy "%basepath%\Artifacts\clientdist\clientsourcepackage.zip" Framework\ClientSource\%GITHASH%_client_source.zip
+if "%ERRORLEVEL%" neq "0" (
+	goto ERROR
+)
+
 copy ..\githash.txt Framework\Dist\disthash.txt
 copy ..\Output\amc_win32.exe Framework\Dist\
 copy ..\Output\amc_server.exe Framework\Dist\
