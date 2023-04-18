@@ -42,7 +42,9 @@ cd ..\..\
 
 cd build_client\Client
 
-go run ..\..\BuildScripts\createClientDist.go dist ..\..\Artifacts\clientdist\clientpackage.zip
+go run ..\..\BuildScripts\createClientDist.go dist ..\..\Artifacts\clientdist\clientpackage.zip 
+
+go run ..\..\BuildScripts\createClientSource.go . ..\..\Artifacts\clientdist\clientsourcepackage.zip 
 
 if "%1" neq "NOPAUSE" (
 	pause
