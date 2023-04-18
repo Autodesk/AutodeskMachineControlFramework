@@ -1,4 +1,4 @@
-<!--
+/*++
 
 Copyright (C) 2020 Autodesk Inc.
 
@@ -26,60 +26,23 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-!-->
+*/
 
 
-<template>
+import Vue from 'vue';
+import Vuetify from 'vuetify/lib';
 
-	<div style="width:100%; height:100%; display:block;">
-		<div>
-			Test1234: {{ customProperties.values.dummycounter }}
-		</div>
-	
-		<Module_Content :module="uploadModule" :Application="Application" />
-		<Module_LayerView :module="previewModule" :Application="Application" />		
-	</div>
-	
-</template>
+Vue.use(Vuetify);
 
-<script>
-
-	import Module_Content from "./modules/AMCModule_Content.vue";
-	import Module_LayerView from "./modules/AMCModule_LayerView.vue";
-
-	export default {
-		props: ["Application", "CustomPage"],
-	  
-		components: {
-			Module_LayerView,
-			Module_Content
-		},
-		
-		data: () => ({				
-			
-			uploadModule: null,
-			previewModule: null,
-			customProperties: null,
-			
-		}),
-		
-		methods: {
-					   
-		},
-		
-		
-		created () {
-		
-			this.previewModule = this.CustomPage.findModule ("preview");
-			this.uploadModule = this.CustomPage.findModule ("upload");
-			this.customProperties = this.CustomPage.getPropertiesObject ();
-			
-		},
-		
-		mounted() {
-			
-		}
-		
-	};
-	
-</script>
+export default new Vuetify({
+  theme: {
+    themes: {
+      light: {
+        primary: '#808080',
+        secondary: '#1e1e1e',
+        accent: '#666666',
+        error: '#DD2222',
+      },
+    },
+  },	
+});

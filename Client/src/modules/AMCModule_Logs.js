@@ -29,17 +29,80 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 
-import * as Assert from "./AMCAsserts.js";
-import * as Common from "./AMCCommon.js"
+import * as Assert from "../common/AMCAsserts.js";
+import * as Common from "../common/AMCCommon.js"
+import { DateTime } from "luxon";
 
-export default class AMCApplicationModule_GLScene extends Common.AMCApplicationModule {
+class AMCApplicationModule_LogItem extends Common.AMCApplicationItem {
+	
+	constructor (moduleInstance, itemUUID) 
+	{
+		super (moduleInstance, itemUUID, "logitem");		
+		this.registerClass ("amcItem_LogItem");
+		this.stateid = 1;
+		
+		this.updateFromJSON ({});
+		
+		this.setRefreshFlag ();
+		
+	}
+		
+	
+	updateFromJSON (updateJSON)
+	{
+		if (updateJSON.logentries) {
+			for (let logentry of updateJSON.logentries) {
+				
+				let timeStampInput = logentry.timestamp.replace ("Z UTC", "").trim();
+				let timeStampObject = DateTime.fromISO(timeStampInput, {zone: 'utc'});
+				let timeStampStr = timeStampObject.toFormat('HH:mm:ss.SSS');
+				
+				this.moduleInstance.DisplayItems.unshift ({
+					logIndex: logentry.id,
+					logSubsystem: logentry.subsystem,
+					logTime: timeStampStr,
+					logText: logentry.message
+				});
+				
+				if (logentry.id >= this.stateid) {
+					this.stateid = logentry.id + 1;
+				}
+				
+			}
+		}
+	}
+	
+}
+
+
+export default class AMCApplicationModule_Logs extends Common.AMCApplicationModule {
 	
 	constructor (page, moduleJSON) 
 	{		
 		Assert.ObjectValue (moduleJSON);				
 		super (page, moduleJSON.uuid, moduleJSON.type, moduleJSON.name, moduleJSON.caption);		
-		this.registerClass ("amcModule_GLScene");
+		this.registerClass ("amcModule_Logs");
+		
+		this.currentReceiveIndex = 0;
+		
+		this.items = [];
 				
+		this.logItem = new AMCApplicationModule_LogItem (this, moduleJSON.uuid);
+		
+		this.items.push (this.logItem);
+		this.page.addItem (this.logItem);
+		
+		this.DisplayItems = [
+		];
+		
+						
 	}
 		
+		
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);
+		Assert.ArrayValue (updateJSON.entries);
+		
+	}
 }

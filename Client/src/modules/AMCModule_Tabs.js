@@ -29,81 +29,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 
-import * as Assert from "./AMCAsserts.js";
-import * as Common from "./AMCCommon.js"
+import * as Assert from "../common/AMCAsserts.js";
+import * as Common from "../common/AMCCommon.js"
 
 
-class AMCApplicationItem_LayerView_Platform extends Common.AMCApplicationItem {
-	
-	constructor (moduleInstance, itemJSON) 
-	{
-		Assert.ObjectValue (itemJSON);		
-		
-		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
-		this.registerClass ("amcItem_Platform");
-		
-		this.displayed_layer = 0;
-		this.displayed_build = Common.nullUUID ();
-		
-		this.updateFromJSON (itemJSON);
-		
-		this.setRefreshFlag ();
-											
-	}
-
-	updateFromJSON (updateJSON)
-	{
-		Assert.ObjectValue (updateJSON);		
-		
-		this.currentlayer = Assert.IntegerValue (updateJSON.currentlayer);
-		this.builduuid = Assert.OptionalUUIDValue (updateJSON.builduuid);
-		this.baseimageresource = Assert.OptionalUUIDValue (updateJSON.baseimageresource);
-		this.sizex = Assert.NumberValue (updateJSON.sizex);
-		this.sizey = Assert.NumberValue (updateJSON.sizey);
-		this.originx = Assert.NumberValue (updateJSON.originx);
-		this.originy = Assert.NumberValue (updateJSON.originy);
-		
-		this.moduleInstance.callDataHasChanged ();
-	}
-
-		
-}
-
-
-
-
-export default class AMCApplicationModule_LayerView extends Common.AMCApplicationModule {
+export default class AMCApplicationModule_Tabs extends Common.AMCApplicationModule {
 	
 	constructor (page, moduleJSON) 
 	{		
 		Assert.ObjectValue (moduleJSON);				
 		super (page, moduleJSON.uuid, moduleJSON.type, moduleJSON.name, moduleJSON.caption);		
-		this.registerClass ("amcModule_LayerView");
+		this.registerClass ("amcModule_Tabs");
 		
-		Assert.ArrayValue (moduleJSON.items);
-		this.items = [];
-		this.platform = null;
+		this.tabs = [];
 
-		for (let itemJSON of moduleJSON.items) {
+		Assert.ArrayValue (moduleJSON.tabs);
+		for (let tabJSON of moduleJSON.tabs) {
 			
-			let item = null;
+			let tab = this.page.application.createModuleInstance (this.page, tabJSON);
 			
-			if (itemJSON.type === "platform") {
-				item = new AMCApplicationItem_LayerView_Platform (this, itemJSON);
-				this.platform = item;
-			}
-			
-			if (item) {
-				this.items.push (item);
-				this.page.addItem (item);
+			if (tab) {				
+				this.tabs.push (tab);
+				this.page.application.addModule (tab);
 			} else {
-				throw "Item type not found: " + itemJSON.type;
+				throw "Module type not found: " + tabJSON.type;
 			}
-			
-		}			
-		
-		
+		}
+				
 	}
 		
 }
-

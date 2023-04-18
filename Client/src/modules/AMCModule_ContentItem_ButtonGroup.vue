@@ -28,58 +28,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 !-->
 
-
 <template>
 
-	<div style="width:100%; height:100%; display:block;">
-		<div>
-			Test1234: {{ customProperties.values.dummycounter }}
-		</div>
+<div v-if="(moduleitem.type=='buttongroup')" v-bind:style="moduleitem.cssstyle" > 
+	<template v-for="button in moduleitem.buttons">
 	
-		<Module_Content :module="uploadModule" :Application="Application" />
-		<Module_LayerView :module="previewModule" :Application="Application" />		
-	</div>
+		<span :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">	
+			<v-btn color="primary" class="ml-1 mr-1" v-bind:style="moduleitem.buttoncssstyle" :disabled="button.disabled" >
+				<v-icon v-if="button.icon">{{ button.icon }}</v-icon>
+				{{ button.caption }}
+			</v-btn>		
+				
+		</span>
+		
+		
 	
+	</template>
+	
+</div>
+
 </template>
 
 <script>
 
-	import Module_Content from "./modules/AMCModule_Content.vue";
-	import Module_LayerView from "./modules/AMCModule_LayerView.vue";
-
 	export default {
-		props: ["Application", "CustomPage"],
-	  
-		components: {
-			Module_LayerView,
-			Module_Content
-		},
-		
-		data: () => ({				
+	  props: ["Application", "moduleitem"],
+
+	  methods: {	
+		uiModuleButtonClick: function (button) {
+					
+			var formvalues = this.Application.assembleFormValues (button.eventformvalues);
 			
-			uploadModule: null,
-			previewModule: null,
-			customProperties: null,
+			if (button.event != "") {		
+				this.Application.triggerUIEvent (button.event, button.uuid, formvalues);
+			}
 			
-		}),
+			if (button.targetpage != "") {
+				this.Application.changePage (button.targetpage);
+			}
 		
-		methods: {
-					   
-		},
-		
-		
-		created () {
-		
-			this.previewModule = this.CustomPage.findModule ("preview");
-			this.uploadModule = this.CustomPage.findModule ("upload");
-			this.customProperties = this.CustomPage.getPropertiesObject ();
-			
-		},
-		
-		mounted() {
-			
 		}
-		
+	  },
+	  
+	  created () {
+	  	  
+	  }
+	  
 	};
 	
 </script>

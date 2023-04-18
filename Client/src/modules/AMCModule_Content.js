@@ -29,10 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 
-import * as Assert from "./AMCAsserts.js";
-import * as Common from "./AMCCommon.js"
+import * as Assert from "../common/AMCAsserts.js";
+import * as Common from "../common/AMCCommon.js"
 
-import AMCUploadState from "./AMCImplementation_UploadState.js"
+import AMCUploadState from "../common/AMCImplementation_UploadState.js"
 
 
 class AMCApplicationItem_Content_ParameterList extends Common.AMCApplicationItem {

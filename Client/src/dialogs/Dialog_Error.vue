@@ -28,58 +28,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 !-->
 
-
 <template>
-
-	<div style="width:100%; height:100%; display:block;">
-		<div>
-			Test1234: {{ customProperties.values.dummycounter }}
-		</div>
-	
-		<Module_Content :module="uploadModule" :Application="Application" />
-		<Module_LayerView :module="previewModule" :Application="Application" />		
-	</div>
-	
+        
+	 <v-row align="center" justify="center">
+		<v-col cols="12" sm="8" md="4">
+			<v-card class="elevation-12">
+				<v-toolbar color="primary" dark flat>
+					<v-toolbar-title>Fatal error</v-toolbar-title>
+				</v-toolbar>
+				<v-card-text>
+					Could not connect to server. Please try again later!
+					
+					{{ Application.AppState.currentError }}
+				</v-card-text>
+				<v-card-actions>
+					<v-spacer />
+					<v-btn color="primary" v-on:click="uiReloadPageClick">
+						<v-icon left>mdi-refresh</v-icon>Reload page
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-col>
+	</v-row>		
+			
 </template>
 
 <script>
 
-	import Module_Content from "./modules/AMCModule_Content.vue";
-	import Module_LayerView from "./modules/AMCModule_LayerView.vue";
+export default {  
 
-	export default {
-		props: ["Application", "CustomPage"],
-	  
-		components: {
-			Module_LayerView,
-			Module_Content
-		},
-		
-		data: () => ({				
-			
-			uploadModule: null,
-			previewModule: null,
-			customProperties: null,
-			
-		}),
-		
-		methods: {
-					   
-		},
-		
-		
-		created () {
-		
-			this.previewModule = this.CustomPage.findModule ("preview");
-			this.uploadModule = this.CustomPage.findModule ("upload");
-			this.customProperties = this.CustomPage.getPropertiesObject ();
-			
-		},
-		
-		mounted() {
-			
-		}
-		
-	};
+  props: ['Application'],
 	
+  methods: {
+
+	uiReloadPageClick: function () {
+		this.Application.performLogout ();
+		this.Application.setStatus ("initial");
+		this.Application.retrieveConfiguration ();
+	}
+  }
+};
 </script>

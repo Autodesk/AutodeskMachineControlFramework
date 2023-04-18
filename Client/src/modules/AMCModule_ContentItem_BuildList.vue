@@ -28,58 +28,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 !-->
 
-
 <template>
 
-	<div style="width:100%; height:100%; display:block;">
-		<div>
-			Test1234: {{ customProperties.values.dummycounter }}
-		</div>
-	
-		<Module_Content :module="uploadModule" :Application="Application" />
-		<Module_LayerView :module="previewModule" :Application="Application" />		
-	</div>
-	
+<div v-if="(moduleitem.type=='buildlist')">  	
+
+	<v-data-table
+		:headers="moduleitem.headers"
+		:items="moduleitem.entries"
+		:items-per-page="moduleitem.entriesperpage"
+		class="elevation-1"
+		disable-pagination
+		hide-default-footer
+		search 
+		width="100%"
+		loadingText="moduleitem.loadingtext"
+		@click:row="uiModuleBuildListClick"
+		>													
+										
+	</v-data-table>		
+
+</div>
+
 </template>
 
 <script>
 
-	import Module_Content from "./modules/AMCModule_Content.vue";
-	import Module_LayerView from "./modules/AMCModule_LayerView.vue";
-
 	export default {
-		props: ["Application", "CustomPage"],
+	  props: ["Application", "moduleitem"],
 	  
-		components: {
-			Module_LayerView,
-			Module_Content
+	  methods: {	
+	  
+		uiModuleBuildListClick: function (item) {
+			if (item) {
+				if (this.moduleitem.selectevent && this.moduleitem.selectionvalueuuid) {
+					var eventValues = {}
+					eventValues[this.moduleitem.selectionvalueuuid] = item.buildUUID;
+			
+					this.Application.triggerUIEvent (this.moduleitem.selectevent, this.moduleitem.uuid, eventValues);
+				}
+			}
 		},
-		
-		data: () => ({				
-			
-			uploadModule: null,
-			previewModule: null,
-			customProperties: null,
-			
-		}),
-		
-		methods: {
-					   
-		},
-		
-		
-		created () {
-		
-			this.previewModule = this.CustomPage.findModule ("preview");
-			this.uploadModule = this.CustomPage.findModule ("upload");
-			this.customProperties = this.CustomPage.getPropertiesObject ();
-			
-		},
-		
-		mounted() {
-			
-		}
-		
+				
+	  }
 	};
 	
 </script>

@@ -28,57 +28,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 !-->
 
-
 <template>
 
-	<div style="width:100%; height:100%; display:block;">
-		<div>
-			Test1234: {{ customProperties.values.dummycounter }}
-		</div>
-	
-		<Module_Content :module="uploadModule" :Application="Application" />
-		<Module_LayerView :module="previewModule" :Application="Application" />		
-	</div>
-	
+	<div v-if="(module.type == 'logs')" style="width:100%; height:100%; padding:10px;">
+
+		<v-data-table			
+			:headers="Headers"
+			:items="module.DisplayItems"
+			:items-per-page="25"
+			class="elevation-1"
+			dense
+			disable-sort
+			loadingText="Loading... Please wait"
+			loading="!logsAvailable"
+			style="margin-bottom:20px"
+		>
+		</v-data-table>
+
+	</div>	
+
 </template>
 
 <script>
 
-	import Module_Content from "./modules/AMCModule_Content.vue";
-	import Module_LayerView from "./modules/AMCModule_LayerView.vue";
-
 	export default {
-		props: ["Application", "CustomPage"],
+		props: ["Application", "module"],
 	  
 		components: {
-			Module_LayerView,
-			Module_Content
 		},
 		
-		data: () => ({				
+		data: () => ({
+			Headers: [
+				{ text: 'Time', value: 'logTime', width: "50pt", fixed: true },
+				{ text: 'Subsystem', value: 'logSubsystem', width: "50pt", fixed: true },
+				{ text: 'Text', value: 'logText' },
+			],
 			
-			uploadModule: null,
-			previewModule: null,
-			customProperties: null,
-			
-		}),
-		
-		methods: {
-					   
-		},
-		
-		
-		created () {
-		
-			this.previewModule = this.CustomPage.findModule ("preview");
-			this.uploadModule = this.CustomPage.findModule ("upload");
-			this.customProperties = this.CustomPage.getPropertiesObject ();
-			
-		},
-		
-		mounted() {
-			
-		}
+			logsAvailable: false,
+			tab: null
+		})
 		
 	};
 	

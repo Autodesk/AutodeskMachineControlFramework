@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 
-import * as Assert from "./AMCAsserts.js";
-import * as Common from "./AMCCommon.js"
+import * as Assert from "../common/AMCAsserts.js";
+import * as Common from "../common/AMCCommon.js"
 
 
 class AMCApplicationItem_Custom_Properties extends Common.AMCApplicationItem {

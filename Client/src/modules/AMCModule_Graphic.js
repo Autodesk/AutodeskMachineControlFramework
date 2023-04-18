@@ -29,80 +29,77 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 
-import * as Assert from "./AMCAsserts.js";
-import * as Common from "./AMCCommon.js"
-import { DateTime } from "luxon";
+import * as Assert from "../common/AMCAsserts.js";
+import * as Common from "../common/AMCCommon.js"
 
-class AMCApplicationModule_LogItem extends Common.AMCApplicationItem {
+
+class AMCApplicationItem_Graphic_SVGImage extends Common.AMCApplicationItem {
 	
-	constructor (moduleInstance, itemUUID) 
+	constructor (moduleInstance, itemJSON) 
 	{
-		super (moduleInstance, itemUUID, "logitem");		
-		this.registerClass ("amcItem_LogItem");
-		this.stateid = 1;
+		Assert.ObjectValue (itemJSON);		
 		
-		this.updateFromJSON ({});
+		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
+		this.registerClass ("amcItem_SVGImage");
 		
+		this.name = Assert.IdentifierString (itemJSON.name);		
+		this.imageuuid = Assert.OptionalUUIDValue (itemJSON.imageuuid);
+
+		this.updateFromJSON (itemJSON);
+				
 		this.setRefreshFlag ();
 		
 	}
 		
-	
 	updateFromJSON (updateJSON)
 	{
-		if (updateJSON.logentries) {
-			for (let logentry of updateJSON.logentries) {
-				
-				let timeStampInput = logentry.timestamp.replace ("Z UTC", "").trim();
-				let timeStampObject = DateTime.fromISO(timeStampInput, {zone: 'utc'});
-				let timeStampStr = timeStampObject.toFormat('HH:mm:ss.SSS');
-				
-				this.moduleInstance.DisplayItems.unshift ({
-					logIndex: logentry.id,
-					logSubsystem: logentry.subsystem,
-					logTime: timeStampStr,
-					logText: logentry.message
-				});
-				
-				if (logentry.id >= this.stateid) {
-					this.stateid = logentry.id + 1;
-				}
-				
-			}
-		}
-	}
-	
+		Assert.ObjectValue (updateJSON);		
+		
+		this.x = Assert.NumberValue (updateJSON.x);
+		this.y = Assert.NumberValue (updateJSON.y);
+		this.z = Assert.NumberValue (updateJSON.z);
+		this.scalex = Assert.NumberValue (updateJSON.scalex);
+		this.scaley = Assert.NumberValue (updateJSON.scaley);
+		this.angle = Assert.NumberValue (updateJSON.angle);
+		
+		this.moduleInstance.callDataHasChanged ();
+	}		
 }
 
 
-export default class AMCApplicationModule_Logs extends Common.AMCApplicationModule {
+export default class AMCApplicationModule_Graphic extends Common.AMCApplicationModule {
 	
 	constructor (page, moduleJSON) 
 	{		
 		Assert.ObjectValue (moduleJSON);				
 		super (page, moduleJSON.uuid, moduleJSON.type, moduleJSON.name, moduleJSON.caption);		
-		this.registerClass ("amcModule_Logs");
+		this.registerClass ("amcModule_Graphic");
 		
-		this.currentReceiveIndex = 0;
+		this.viewminx = Assert.NumberValue (moduleJSON.viewminx);
+		this.viewminy = Assert.NumberValue (moduleJSON.viewminy);
+		this.viewmaxx = Assert.NumberValue (moduleJSON.viewmaxx);
+		this.viewmaxy = Assert.NumberValue (moduleJSON.viewmaxy);
+		this.showgrid = Assert.BoolValue (moduleJSON.showgrid);
 		
+		Assert.ArrayValue (moduleJSON.items);
 		this.items = [];
+
+		for (let itemJSON of moduleJSON.items) {
+			
+			let item = null;
+			
+			if (itemJSON.type === "svgimage") 
+				item = new AMCApplicationItem_Graphic_SVGImage (this, itemJSON);
+			
+			if (item) {
+				this.items.push (item);
+				this.page.addItem (item);
+			} else {
+				throw "Item type not found: " + itemJSON.type;
+			}
+			
+		}			
 				
-		this.logItem = new AMCApplicationModule_LogItem (this, moduleJSON.uuid);
-		
-		this.items.push (this.logItem);
-		this.page.addItem (this.logItem);
-		
-		this.DisplayItems = [
-		];
-		
-						
 	}
 		
-		
-	updateFromJSON (updateJSON)
-	{
-		Assert.ObjectValue (updateJSON);
-		Assert.ArrayValue (updateJSON.entries);
-		
-	}
 }

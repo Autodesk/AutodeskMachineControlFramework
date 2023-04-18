@@ -35,19 +35,20 @@ import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
 import * as GitHash from "./AMCGitHash.js"
 
-import AMCApplicationModule_Content from "./AMCModule_Content.js"
-import AMCApplicationModule_GLScene from "./AMCModule_GLScene.js"
-import AMCApplicationModule_Graphic from "./AMCModule_Graphic.js"
-import AMCApplicationModule_Grid from "./AMCModule_Grid.js"
-import AMCApplicationModule_Tabs from "./AMCModule_Tabs.js"
-import AMCApplicationModule_Logs from "./AMCModule_Logs.js"
-import AMCApplicationModule_LayerView from "./AMCModule_LayerView.js"
-import AMCApplicationModule_Custom from "./AMCModule_Custom.js"
+import AMCApplicationModule_Content from "../modules/AMCModule_Content.js"
+import AMCApplicationModule_GLScene from "../modules/AMCModule_GLScene.js"
+import AMCApplicationModule_Graphic from "../modules/AMCModule_Graphic.js"
+import AMCApplicationModule_Grid from "../modules/AMCModule_Grid.js"
+import AMCApplicationModule_Tabs from "../modules/AMCModule_Tabs.js"
+import AMCApplicationModule_Logs from "../modules/AMCModule_Logs.js"
+import AMCApplicationModule_LayerView from "../modules/AMCModule_LayerView.js"
+import AMCApplicationModule_Custom from "../modules/AMCModule_Custom.js"
 
 import AMCApplicationPage from "./AMCPage.js"
 import AMCApplicationCustomPage from "./AMCCustomPage.js"
-import AMCApplicationDialog from "./AMCDialog.js"
 import AMCUpload from "./AMCImplementation_Upload.js"
+
+import AMCApplicationDialog from "./AMCDialog.js"
 
 export default class AMCApplication extends Common.AMCObject {
 
