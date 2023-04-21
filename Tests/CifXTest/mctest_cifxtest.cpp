@@ -97,8 +97,25 @@ public:
 
 		pStateEnvironment->LogMessage("Connecting to Siemens PLC");
 		pDriver->Connect();
-
 		pStateEnvironment->LogMessage("Connected!");
+
+		for (int index = 0; index < 100; index++) {
+			if (pDriver->ReadBoolValue("plc_alive")) {
+				pStateEnvironment->LogMessage("PLC is Alive: ON");
+				pDriver->WriteBoolValue("pc_alive", true, 1000);
+			} 
+			else {
+				pStateEnvironment->LogMessage("PLC is Alive: OFF");
+				pDriver->WriteBoolValue("pc_alive", false, 1000);
+			}
+
+			pStateEnvironment->Sleep(300);
+		}
+
+
+		pStateEnvironment->LogMessage("Disconnecting!");
+		pDriver->Disconnect();
+		pStateEnvironment->LogMessage("done!");
 
 		
 		pStateEnvironment->SetNextState("success");

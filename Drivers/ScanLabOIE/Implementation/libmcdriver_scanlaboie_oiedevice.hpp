@@ -81,6 +81,11 @@ class COIEDeviceInstance {
 protected:
 	PScanLabOIESDK m_pOIESDK;
 	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	LibMCEnv::PWorkingFile m_pCorrectionFile;
+	LibMCEnv::PWorkingFile m_pConfigurationFile;
+
+	uint32_t m_nRTCSignalCount;
+	uint32_t m_nSensorSignalCount;
 
 	oie_instance m_pInstance;
 	oie_device m_pDevice;
@@ -96,7 +101,6 @@ protected:
 	std::vector<POIEDeviceApp> m_AppList;
 
 	// RTC 6 Correction File Data
-	std::vector<uint8_t> m_RTC6CorrectionData;
 	bool m_bHasCorrectionData;
 
 	std::mutex m_RecordingMutex;
@@ -106,14 +110,16 @@ protected:
 
 	static std::string getNameFromAppInfo(const oie_appinfo& appInfo);
 
-	void startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
+	void startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion);
 	void uninstallAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion);
 
 	PDataRecordingInstance m_pCurrentDataRecording;
 
+	void buildDeviceConfig (IDeviceConfiguration* pDeviceConfiguration, std::vector<uint8_t> & correctionFileData);
+
 public:
 
-	COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string & sDeviceName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory);
+	COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string & sDeviceName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, IDeviceConfiguration* pDeviceConfiguration, std::vector<uint8_t>& correctionFileData, LibMCEnv::PWorkingDirectory pWorkingDirectory);
 
 	virtual ~COIEDeviceInstance();
 
@@ -145,13 +151,13 @@ public:
 
 	void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string& sName, LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nPatch);
 
-	void StartAppByName(const std::string& sName, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
+	void StartAppByName(const std::string& sName);
 
-	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
+	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex);
 
-	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
+	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion);
 
-	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
+	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
 
 	void StopApp();
 
@@ -172,8 +178,6 @@ public:
 	void onPacketEvent (oie_device device, const oie_pkt* pkt);
 
 	void onErrorEvent (oie_device device, oie_error error, int32_t value);
-
-	std::vector<uint8_t> & getRTC6CorrectionData ();
 
 	PDataRecordingInstance RetrieveCurrentRecording();
 
@@ -216,8 +220,6 @@ public:
 
 	void Disconnect() override;
 
-	void SetRTCCorrectionData(const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8* pCorrectionDataBuffer) override;
-
 	LibMCDriver_ScanLabOIE_uint32 GetAppCount() override;
 
 	std::string GetAppName(const LibMCDriver_ScanLabOIE_uint32 nIndex) override;
@@ -226,13 +228,13 @@ public:
 
 	void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch) override;
 
-	void StartAppByName(const std::string& sName, IDeviceConfiguration* pDeviceConfig) override;
+	void StartAppByName(const std::string& sName) override;
 
-	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, IDeviceConfiguration* pDeviceConfig) override;
+	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex) override;
 
-	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, IDeviceConfiguration* pDeviceConfig) override;
+	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion) override;
 
-	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, IDeviceConfiguration* pDeviceConfig) override;
+	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion) override;
 
 	void StopApp() override;
 

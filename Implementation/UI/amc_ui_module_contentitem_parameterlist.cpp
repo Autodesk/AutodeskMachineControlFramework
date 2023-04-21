@@ -48,8 +48,8 @@ using namespace AMC;
 
 
 
-CUIModule_ContentParameterListEntry::CUIModule_ContentParameterListEntry(const std::string& sStateMachine, const std::string& sParameterGroup, const std::string& sParameter)
-	: m_sStateMachine(sStateMachine), m_sParameterGroup(sParameterGroup), m_sParameter(sParameter)
+CUIModule_ContentParameterListEntry::CUIModule_ContentParameterListEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter)
+	: m_sInstance(sInstance), m_sParameterGroup(sParameterGroup), m_sParameter(sParameter)
 {
 
 }
@@ -59,9 +59,9 @@ CUIModule_ContentParameterListEntry::~CUIModule_ContentParameterListEntry()
 
 }
 
-std::string CUIModule_ContentParameterListEntry::getStateMachine()
+std::string CUIModule_ContentParameterListEntry::getInstance()
 {
-	return m_sStateMachine;
+	return m_sInstance;
 }
 
 std::string CUIModule_ContentParameterListEntry::getParameterGroup()
@@ -77,6 +77,11 @@ std::string CUIModule_ContentParameterListEntry::getParameter()
 bool CUIModule_ContentParameterListEntry::isFullGroup()
 {
 	return m_sParameter.empty ();
+}
+
+bool CUIModule_ContentParameterListEntry::isFullInstance()
+{
+	return m_sParameterGroup.empty();
 }
 
 
@@ -165,55 +170,74 @@ void CUIModule_ContentParameterList::addDefinitionToJSON(CJSONWriter& writer, CJ
 }
 
 
+void CUIModule_ContentParameterList::addParameterGroupToJSON(CJSONWriter& writer, PParameterGroup pParameterGroup, CJSONWriterArray& entryArray, bool fullGroup, const std::string& sParameterName, const std::string& sParameterHandlerDescription)
+{
+	std::string sGroupDescription = pParameterGroup->getDescription();
+
+	if (fullGroup) {
+
+		uint32_t nCount = pParameterGroup->getParameterCount();
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+
+			std::string sParameterName;
+			std::string sDescription;
+			std::string sDefaultValue;
+
+			pParameterGroup->getParameterInfo(nIndex, sParameterName, sDescription, sDefaultValue);
+			std::string sValue = pParameterGroup->getParameterValueByIndex(nIndex);
+
+			CJSONWriterObject entryObject(writer);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION, sDescription);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERVALUE, sValue);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUP, sGroupDescription);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSYSTEM, sParameterHandlerDescription);
+			entryArray.addObject(entryObject);
+
+		}
+	}
+	else {
+		std::string sDescription;
+		std::string sDefaultValue;
+		std::string sValue;
+
+		pParameterGroup->getParameterInfoByName(sParameterName, sDescription, sDefaultValue);
+		sValue = pParameterGroup->getParameterValueByName(sParameterName);
+
+		CJSONWriterObject entryObject(writer);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION, sDescription);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERVALUE, sValue);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUP, sGroupDescription);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSYSTEM, sParameterHandlerDescription);
+		entryArray.addObject(entryObject);
+
+	}
+
+}
+
+
 void CUIModule_ContentParameterList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 
 	CJSONWriterArray entryArray(writer);
 
 	for (auto entry : m_List) {
-		auto pParameterHandler = m_pStateMachineData->getParameterHandler(entry->getStateMachine ());
+		auto pParameterHandler = m_pStateMachineData->getParameterHandler(entry->getInstance ());
 		auto sParameterHandlerDescription = pParameterHandler->getDescription();
 
-		auto pParameterGroup = pParameterHandler->findGroup(entry->getParameterGroup(), true);
+		if (entry->isFullInstance()) {
 
-		std::string sGroupDescription = pParameterGroup->getDescription();
-
-		if (entry->isFullGroup()) {
-			
-			uint32_t nCount = pParameterGroup->getParameterCount();
-			for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
-
-				std::string sParameterName;
-				std::string sDescription;
-				std::string sDefaultValue;
-
-				pParameterGroup->getParameterInfo(nIndex, sParameterName, sDescription, sDefaultValue);
-				std::string sValue = pParameterGroup->getParameterValueByIndex (nIndex);
-
-				CJSONWriterObject entryObject(writer);
-				entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION, sDescription);
-				entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERVALUE, sValue);
-				entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUP, sGroupDescription);
-				entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSYSTEM, sParameterHandlerDescription);
-				entryArray.addObject(entryObject);
+			uint32_t nGroupCount = pParameterHandler->getGroupCount();
+			for (uint32_t nGroupIndex = 0; nGroupIndex < nGroupCount; nGroupIndex++) {
+				auto pParameterGroup = pParameterHandler->getGroup(nGroupIndex);
+				addParameterGroupToJSON(writer, pParameterGroup, entryArray, true, "", sParameterHandlerDescription);
 
 			}
+
 		}
 		else {
-			std::string sParameterName = entry->getParameter();
-			std::string sDescription;
-			std::string sDefaultValue;
-			std::string sValue;
 
-			pParameterGroup->getParameterInfoByName(sParameterName, sDescription, sDefaultValue);
-			sValue = pParameterGroup->getParameterValueByName(sParameterName);
-
-			CJSONWriterObject entryObject(writer);
-			entryObject.addString (AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION, sDescription);
-			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERVALUE, sValue);
-			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUP, sGroupDescription);
-			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSYSTEM, sParameterHandlerDescription);
-			entryArray.addObject(entryObject);
+			auto pParameterGroup = pParameterHandler->findGroup(entry->getParameterGroup(), true);
+			addParameterGroupToJSON(writer, pParameterGroup, entryArray, entry->isFullGroup(), entry->getParameter(), sParameterHandlerDescription);
 
 		}
 
@@ -225,12 +249,12 @@ void CUIModule_ContentParameterList::addContentToJSON(CJSONWriter& writer, CJSON
 }
 
 
-void CUIModule_ContentParameterList::addEntry(const std::string& sStateMachine, const std::string& sParameterGroup, const std::string& sParameter)
+void CUIModule_ContentParameterList::addEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter)
 {
 	if (m_List.size() >= AMC_CONTENT_MAXENTRYCOUNT)
 		throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYCONTENTPARAMETERS);
 
-	m_List.push_back (std::make_shared <CUIModule_ContentParameterListEntry> (sStateMachine, sParameterGroup, sParameter));
+	m_List.push_back (std::make_shared <CUIModule_ContentParameterListEntry> (sInstance, sParameterGroup, sParameter));
 }
 
 
@@ -254,21 +278,29 @@ void CUIModule_ContentParameterList::loadFromXML(const pugi::xml_node& xmlNode)
 	for (auto entryNode : entryNodes) {
 
 		auto stateMachineAttrib = entryNode.attribute("statemachine");
-		if (stateMachineAttrib.empty ())
+		std::string sInstanceName = stateMachineAttrib.as_string();
+		if (sInstanceName.empty ())
 			throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME);
-		std::string sStateMachineName = stateMachineAttrib.as_string();
 
 		auto groupAttrib = entryNode.attribute("group");
-		if (groupAttrib.empty())
-			throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCONTENTGROUPNAME);
 		std::string sGroupName = groupAttrib.as_string();
 
-		auto pStateMachineInstance = m_pStateMachineData->getParameterHandler(sStateMachineName);
-		pStateMachineInstance->findGroup(sGroupName, true);
+		auto pStateMachineInstance = m_pStateMachineData->getParameterHandler(sInstanceName);
 
 		// Parameter may be empty (then add full group)
 		auto parameterAttrib = entryNode.attribute("parameter");
-		addEntry(stateMachineAttrib.as_string(), groupAttrib.as_string(), parameterAttrib.as_string());
+		std::string sParameterName = parameterAttrib.as_string();
+
+		// Group may be empty (then add full instance)
+		if (!sGroupName.empty()) {
+			pStateMachineInstance->findGroup(sGroupName, true);
+		}
+		else {
+			if (!sParameterName.empty ())
+				throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN);
+		}
+
+		addEntry(sInstanceName, sGroupName, sParameterName);
 
 	}
 }

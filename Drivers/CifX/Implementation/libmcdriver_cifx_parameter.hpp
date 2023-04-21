@@ -71,6 +71,7 @@ namespace Impl {
 		std::string m_sDescription;
 		eDriver_CifXParameterType m_eType;
 		uint32_t m_nAddress;
+		bool m_bIsBigEndian;
 	public:
 		CDriver_CifXParameter(const std::string& sName, const std::string& sDescription, eDriver_CifXParameterType Type, const uint32_t nAddress);
 		virtual ~CDriver_CifXParameter();
@@ -96,6 +97,8 @@ namespace Impl {
 		void getValueRange(int64_t& nMinValue, int64_t& nMaxValue);
 
 		uint32_t getAddress();
+		bool isBigEndian();
+		void setIsBigEndian(bool bValue);
 
 		static void getValueRangeFromType(eDriver_CifXParameterType parameterType, int64_t& nMinValue, int64_t& nMaxValue);
 

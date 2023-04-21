@@ -73,9 +73,24 @@ CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::strin
         uint32_t nRTCSignalBufferSize = OIE_MAX_SIGNALCOUNT;
         uint32_t nSensorSignalBufferSize = OIE_MAX_SIGNALCOUNT;
 
-        m_pSDK->checkError(m_pSDK->oie_get_rtc_signals(sTempFileName.c_str(), buffer.data(), &nRTCSignalBufferSize));
-        for (uint32_t nIndex = 0; nIndex < nRTCSignalBufferSize; nIndex++)
-            m_RTCSignalIDs.push_back(buffer.at (nIndex));
+        if (m_pSDK->oie_get_rtc_signal_ids != nullptr) {
+
+            m_pSDK->checkError(m_pSDK->oie_get_rtc_signal_ids(sTempFileName.c_str(), buffer.data(), &nRTCSignalBufferSize));
+            for (uint32_t nIndex = 0; nIndex < nRTCSignalBufferSize; nIndex++)
+                m_RTCSignalIDs.push_back(buffer.at(nIndex));
+
+        }
+        else {
+
+            if (m_pSDK->oie_get_rtc_signals == nullptr)
+                throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS);
+
+            m_pSDK->checkError(m_pSDK->oie_get_rtc_signals(sTempFileName.c_str(), buffer.data(), &nRTCSignalBufferSize));
+            for (uint32_t nIndex = 0; nIndex < nRTCSignalBufferSize; nIndex++)
+                m_RTCSignalIDs.push_back(buffer.at(nIndex));
+
+        }
+
 
         m_pSDK->checkError(m_pSDK->oie_get_sensor_signals(sTempFileName.c_str(), buffer.data(), &nSensorSignalBufferSize));
         for (uint32_t nIndex = 0; nIndex < nSensorSignalBufferSize; nIndex++)
@@ -99,7 +114,13 @@ LibMCDriver_ScanLabOIE::eRTCDeviceType CDeviceConfiguration::GetDeviceType()
 
 LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetRTCSignalCount()
 {
-    return (uint32_t)m_RTCSignalIDs.size();
+    uint32_t nRTCSignalCount = 0;
+    for (auto nSignalID : m_RTCSignalIDs) {
+        if ((nSignalID != OIE_TRIGGERCHANNELIDENTIFIER_FREEVARIABLE0) && (nSignalID != OIE_TRIGGERCHANNELIDENTIFIER_FREEVARIABLE1))
+            nRTCSignalCount++;
+    }
+
+    return nRTCSignalCount;
 }
 
 LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetSensorSignalCount()

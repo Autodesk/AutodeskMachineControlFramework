@@ -1,3 +1,34 @@
+<!--
+
+Copyright (C) 2020 Autodesk Inc.
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+	* Redistributions of source code must retain the above copyright
+	  notice, this list of conditions and the following disclaimer.
+	* Redistributions in binary form must reproduce the above copyright
+	  notice, this list of conditions and the following disclaimer in the
+	  documentation and/or other materials provided with the distribution.
+	* Neither the name of the Autodesk Inc. nor the
+	  names of its contributors may be used to endorse or promote products
+	  derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+!-->
+
+
 <template>
 <v-app id="AMCApp" app>
     <v-navigation-drawer v-if="appIsReady" v-model="ShowDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app style="opacity:90%">
@@ -11,8 +42,8 @@
 							</v-list-item-avatar>
 				  
 							<v-list-item-content>
-							  <v-list-item-title v-html="item.caption"></v-list-item-title>
-							  <v-list-item-subtitle v-html="item.description"></v-list-item-subtitle>
+							  <v-list-item-title>{{ item.caption }}</v-list-item-title>
+							  <v-list-item-subtitle>{{ item.description }}</v-list-item-subtitle>
 							</v-list-item-content>
 						  </v-list-item>
 						  						  
@@ -71,6 +102,14 @@
 								
 					</v-container>		
 				</template>
+				
+				<template v-for="uiCustomPage in Application.AppContent.CustomPages">
+					<v-container :key="uiCustomPage.name" v-if="appIsReady && (Application.AppState.activePage == uiCustomPage.name)" style="width:100%; height:100%; display:block;">
+										
+						<CustomPage_Example v-if="(uiCustomPage.component == 'Example')" :CustomPage="uiCustomPage" :Application="Application" />
+								
+					</v-container>		
+				</template>
 			</v-card>
 		</div>
 		
@@ -91,7 +130,7 @@
 		  <v-card-text>
 			<div style="overflow:auto">
 			
-			<template v-for="uiModule in uiDialog.modules">
+				<template v-for="uiModule in uiDialog.modules">
 					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
@@ -139,19 +178,21 @@
 
 <script>
 
-	import AMCApplication from "./AMCApplication.js"
+	import AMCApplication from "./common/AMCApplication.js"
 	
-	import Dialog_Login from "./Dialog_Login.vue";
-	import Dialog_Error from "./Dialog_Error.vue";
+	import Dialog_Login from "./dialogs/Dialog_Login.vue";
+	import Dialog_Error from "./dialogs/Dialog_Error.vue";
 	
-	import Module_Content from "./AMCModule_Content.vue";
-	import Module_Tabs from "./AMCModule_Tabs.vue";
-	import Module_Grid from "./AMCModule_Grid.vue";
-	import Module_GLScene from "./AMCModule_GLScene.vue";
-	import Module_Graphic from "./AMCModule_Graphic.vue";
-	import Module_LayerView from "./AMCModule_LayerView.vue";
-	import Module_Logs from "./AMCModule_Logs.vue";
-	
+	import Module_Content from "./modules/AMCModule_Content.vue";
+	import Module_Tabs from "./modules/AMCModule_Tabs.vue";
+	import Module_Grid from "./modules/AMCModule_Grid.vue";
+	import Module_GLScene from "./modules/AMCModule_GLScene.vue";
+	import Module_Graphic from "./modules/AMCModule_Graphic.vue";
+	import Module_LayerView from "./modules/AMCModule_LayerView.vue";
+	import Module_Logs from "./modules/AMCModule_Logs.vue";
+
+	import CustomPage_Example from "./CustomPage_Example.vue";
+
 	export default {
 
 		created() {
@@ -289,7 +330,8 @@
 			Module_GLScene,
 			Module_Graphic,
 			Module_Grid,
-			Module_LayerView
+			Module_LayerView,
+			CustomPage_Example
 		},	
 
 		methods: {

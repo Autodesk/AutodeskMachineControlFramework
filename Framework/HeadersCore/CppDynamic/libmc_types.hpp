@@ -475,6 +475,38 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING 448 /** Resource entry is no UTF8 string */
 #define LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION 449 /** Ambiguous driver configuration */
 #define LIBMC_ERROR_COULDNOTCREATEDRIVER 450 /** Could not create driver */
+#define LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN 451 /** Empty group name but parameter given */
+#define LIBMC_ERROR_INVALIDDEFAULTXMLNAMESPACE 452 /** invalid default xml namespace name. */
+#define LIBMC_ERROR_INVALIDXMLROOTNODENAME 453 /** invalid xml root node name. */
+#define LIBMC_ERROR_COULDNOTPARSEXMLSTRING 454 /** could not parse XML String. */
+#define LIBMC_ERROR_COULDNOTPARSEXMLDATA 455 /** could not parse XML Data. */
+#define LIBMC_ERROR_XMLDOESNOTCONTAINROOTNODE 456 /** XML does not contain root node. */
+#define LIBMC_ERROR_XMLCONTAINSAMBIGOUSROOTNODES 457 /** XML contains ambiguous root nodes. */
+#define LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE 458 /** XML does not contain namespace. */
+#define LIBMC_ERROR_INVALIDXMLDATA 459 /** invalid XML Data. */
+#define LIBMC_ERROR_INVALIDXMLROOTNODEINSTANCE 460 /** invalid XML root node instance. */
+#define LIBMC_ERROR_XMLNAMESPACEPREFIXALREADYREGISTERED 461 /** XML namespace prefix already registered. */
+#define LIBMC_ERROR_XMLNAMESPACEALREADYREGISTERED 462 /** XML namespace already registered. */
+#define LIBMC_ERROR_XMLNAMESPACENOTFOUND 463 /** XML namespace not found. */
+#define LIBMC_ERROR_INVALIDNAMESPACENAME 464 /** Invalid namespace name. */
+#define LIBMC_ERROR_INVALIDNAMESPACEPREFIX 465 /** Invalid namespace prefix. */
+#define LIBMC_ERROR_INVALIDNAMESPACEINDEX 466 /** Invalid namespace index. */
+#define LIBMC_ERROR_INVALIDATTRIBUTEINDEX 467 /** Invalid attribute index. */
+#define LIBMC_ERROR_PROFILEVALUENOTFOUND 468 /** Profile value not found. */
+#define LIBMC_ERROR_INVALIDXMLNODENAME 469 /** Invalid xml node name. */
+#define LIBMC_ERROR_INVALIDXMLNAMESPACE 470 /** Invalid xml namespace. */
+#define LIBMC_ERROR_COULDNOTFINDATTRIBUTE 471 /** Could not find attribute. */
+#define LIBMC_ERROR_DUPLICATEATTRIBUTE 472 /** Duplicate attribute. */
+#define LIBMC_ERROR_INTERNALATTRIBUTEERROR 473 /** Internal attribute error. */
+#define LIBMC_ERROR_XMLNODECHILDNOTFOUND 474 /** XML node child not found. */
+#define LIBMC_ERROR_INVALIDXMLNODEINDEX 475 /** Invalid XML Node index. */
+#define LIBMC_ERROR_INTERNALNODEERROR 476 /** Internal node error. */
+#define LIBMC_ERROR_XMLNODENOTFOUNDINLIST 477 /** XML node not found in list. */
+#define LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE 478 /** Could not find XML Namespace */
+#define LIBMC_ERROR_INVALIDCOMPONENTNAME 489 /** invalid component name. */
+#define LIBMC_ERROR_MISSINGCOMPONENTNAME 490 /** missing component name. */
+#define LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING 491 /** custom page property name missing. */
+#define LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING 492 /** custom page property type missing. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -862,6 +894,38 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING: return "Resource entry is no UTF8 string";
     case LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION: return "Ambiguous driver configuration";
     case LIBMC_ERROR_COULDNOTCREATEDRIVER: return "Could not create driver";
+    case LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN: return "Empty group name but parameter given";
+    case LIBMC_ERROR_INVALIDDEFAULTXMLNAMESPACE: return "invalid default xml namespace name.";
+    case LIBMC_ERROR_INVALIDXMLROOTNODENAME: return "invalid xml root node name.";
+    case LIBMC_ERROR_COULDNOTPARSEXMLSTRING: return "could not parse XML String.";
+    case LIBMC_ERROR_COULDNOTPARSEXMLDATA: return "could not parse XML Data.";
+    case LIBMC_ERROR_XMLDOESNOTCONTAINROOTNODE: return "XML does not contain root node.";
+    case LIBMC_ERROR_XMLCONTAINSAMBIGOUSROOTNODES: return "XML contains ambiguous root nodes.";
+    case LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE: return "XML does not contain namespace.";
+    case LIBMC_ERROR_INVALIDXMLDATA: return "invalid XML Data.";
+    case LIBMC_ERROR_INVALIDXMLROOTNODEINSTANCE: return "invalid XML root node instance.";
+    case LIBMC_ERROR_XMLNAMESPACEPREFIXALREADYREGISTERED: return "XML namespace prefix already registered.";
+    case LIBMC_ERROR_XMLNAMESPACEALREADYREGISTERED: return "XML namespace already registered.";
+    case LIBMC_ERROR_XMLNAMESPACENOTFOUND: return "XML namespace not found.";
+    case LIBMC_ERROR_INVALIDNAMESPACENAME: return "Invalid namespace name.";
+    case LIBMC_ERROR_INVALIDNAMESPACEPREFIX: return "Invalid namespace prefix.";
+    case LIBMC_ERROR_INVALIDNAMESPACEINDEX: return "Invalid namespace index.";
+    case LIBMC_ERROR_INVALIDATTRIBUTEINDEX: return "Invalid attribute index.";
+    case LIBMC_ERROR_PROFILEVALUENOTFOUND: return "Profile value not found.";
+    case LIBMC_ERROR_INVALIDXMLNODENAME: return "Invalid xml node name.";
+    case LIBMC_ERROR_INVALIDXMLNAMESPACE: return "Invalid xml namespace.";
+    case LIBMC_ERROR_COULDNOTFINDATTRIBUTE: return "Could not find attribute.";
+    case LIBMC_ERROR_DUPLICATEATTRIBUTE: return "Duplicate attribute.";
+    case LIBMC_ERROR_INTERNALATTRIBUTEERROR: return "Internal attribute error.";
+    case LIBMC_ERROR_XMLNODECHILDNOTFOUND: return "XML node child not found.";
+    case LIBMC_ERROR_INVALIDXMLNODEINDEX: return "Invalid XML Node index.";
+    case LIBMC_ERROR_INTERNALNODEERROR: return "Internal node error.";
+    case LIBMC_ERROR_XMLNODENOTFOUNDINLIST: return "XML node not found in list.";
+    case LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE: return "Could not find XML Namespace";
+    case LIBMC_ERROR_INVALIDCOMPONENTNAME: return "invalid component name.";
+    case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "missing component name.";
+    case LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING: return "custom page property name missing.";
+    case LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING: return "custom page property type missing.";
     default: return "unknown error";
   }
 }

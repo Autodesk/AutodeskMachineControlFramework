@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define OIE_ERRORMESSAGE_BUFFERSIZE 1024
 
+
 #include <vector>
 #include <iostream>
 
@@ -88,8 +89,8 @@ CScanLabOIESDK_DLLDirectoryCache::~CScanLabOIESDK_DLLDirectoryCache()
 }
 
 
-CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirectoryUTF8)
-	: m_LibraryHandle (nullptr), m_bIsInitialized (false)
+CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirectoryUTF8, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType deviceDriverType)
+	: m_LibraryHandle (nullptr), m_bIsInitialized (false), m_deviceDriverType (deviceDriverType)
 {
 
 	resetFunctionPtrs();
@@ -141,14 +142,28 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 
 
 	this->oie_get_version = (PScanLabOIEPtr_oie_get_version)_loadScanLabOIEAddress(hLibrary, "oie_get_version");
+
+	uint32_t nMajorVersion = 0;
+	uint32_t nMinorVersion = 0;
+	uint32_t nPatchVersion = 0;
+	this->oie_get_version(&nMajorVersion, &nMinorVersion, &nPatchVersion);
+
+	if ((m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3) || (m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3Compatibility)) {
+		if  (nMajorVersion != 3)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION, "OIE SDK Library returns invalid version: " + getVersionString() + " instead of 3.x.x");
+	}
+	if (m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion2) {
+		if (nMajorVersion != 2)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION, "OIE SDK Library returns invalid version: " + getVersionString() + " instead of 2.x.x");
+	}
+
+
 	this->oie_create = (PScanLabOIEPtr_oie_create)_loadScanLabOIEAddress(hLibrary, "oie_create");
 	this->oie_destroy = (PScanLabOIEPtr_oie_destroy)_loadScanLabOIEAddress(hLibrary, "oie_destroy");
 	this->oie_get_error = (PScanLabOIEPtr_oie_get_error)_loadScanLabOIEAddress(hLibrary, "oie_get_error");
-	this->oie_add_device = (PScanLabOIEPtr_oie_add_device)_loadScanLabOIEAddress(hLibrary, "oie_add_device");
 	this->oie_remove_device = (PScanLabOIEPtr_oie_remove_device)_loadScanLabOIEAddress(hLibrary, "oie_remove_device");
 	this->oie_get_device_id = (PScanLabOIEPtr_oie_get_device_id)_loadScanLabOIEAddress(hLibrary, "oie_get_device_id");
 	this->oie_set_reply_timeout = (PScanLabOIEPtr_oie_set_reply_timeout)_loadScanLabOIEAddress(hLibrary, "oie_set_reply_timeout");
-	this->oie_add_device = (PScanLabOIEPtr_oie_add_device)_loadScanLabOIEAddress(hLibrary, "oie_add_device");
 	this->oie_connect = (PScanLabOIEPtr_oie_connect)_loadScanLabOIEAddress(hLibrary, "oie_connect");
 	this->oie_is_connected = (PScanLabOIEPtr_oie_is_connected)_loadScanLabOIEAddress(hLibrary, "oie_is_connected");
 	this->oie_disconnect = (PScanLabOIEPtr_oie_disconnect)_loadScanLabOIEAddress(hLibrary, "oie_disconnect");
@@ -178,10 +193,21 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 	this->oie_pkt_get_xy = (PScanLabOIEPtr_oie_pkt_get_xy)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_xy");
 
 	this->oie_get_rtc_type = (PScanLabOIEPtr_oie_get_rtc_type)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_type");
-	this->oie_get_rtc_signals = (PScanLabOIEPtr_oie_get_rtc_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_signals");
+
 	this->oie_get_sensor_signals = (PScanLabOIEPtr_oie_get_sensor_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_sensor_signals");
 	this->oie_get_additional_app_data_signals = (PScanLabOIEPtr_oie_get_additional_app_data_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_additional_app_data_signals");
 	this->oie_get_measurement_tag_usage = (PScanLabOIEPtr_oie_get_measurement_tag_usage)_loadScanLabOIEAddress(hLibrary, "oie_get_measurement_tag_usage");
+
+	// Interface has incompatible version signatures.
+	if ((m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3) || (m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3Compatibility)) {
+		this->oie_get_rtc_signal_ids = (PScanLabOIEPtr_oie_get_rtc_signal_ids)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_signal_ids");
+		this->oie_add_device_VERSION3 = (PScanLabOIEPtr_oie_add_device_VERSION3)_loadScanLabOIEAddress(hLibrary, "oie_add_device");
+	}
+	
+	if (m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion2) {
+		this->oie_get_rtc_signals = (PScanLabOIEPtr_oie_get_rtc_signal_ids)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_signals");
+		this->oie_add_device_VERSION2 = (PScanLabOIEPtr_oie_add_device_VERSION2)_loadScanLabOIEAddress(hLibrary, "oie_add_device");
+	}
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -243,11 +269,11 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	oie_create = nullptr;
 	oie_destroy = nullptr;
 	oie_get_error = nullptr;
-	oie_add_device = nullptr;
+	oie_add_device_VERSION2 = nullptr;
+	oie_add_device_VERSION3 = nullptr;
 	oie_remove_device = nullptr;
 	oie_get_device_id = nullptr;
 	oie_set_reply_timeout = nullptr;
-	oie_add_device = nullptr;
 	oie_connect = nullptr;
 	oie_is_connected = nullptr;
 	oie_disconnect = nullptr;
@@ -276,6 +302,7 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	this->oie_pkt_get_xy = nullptr;
 	this->oie_get_rtc_type = nullptr;
 	this->oie_get_rtc_signals = nullptr;
+	this->oie_get_rtc_signal_ids = nullptr;
 	this->oie_get_sensor_signals = nullptr;
 	this->oie_get_additional_app_data_signals = nullptr;
 	this->oie_get_measurement_tag_usage = nullptr;
@@ -295,3 +322,21 @@ PScanLabOIESDK_DLLDirectoryCache CScanLabOIESDK::cacheDllDirectory()
 
 }
 
+LibMCDriver_ScanLabOIE::eOIEDeviceDriverType CScanLabOIESDK::getDeviceDriverType()
+{
+	return m_deviceDriverType;
+}
+
+std::string CScanLabOIESDK::getVersionString()
+{
+	if (oie_get_version == nullptr)
+		throw std::runtime_error("OIE DLL not loaded");
+
+	uint32_t nMajorVersion = 0;
+	uint32_t nMinorVersion = 0;
+	uint32_t nPatchVersion = 0;
+	this->oie_get_version(&nMajorVersion, &nMinorVersion, &nPatchVersion);
+
+	return std::to_string(nMajorVersion) + "." + std::to_string(nMinorVersion) + "." + std::to_string(nPatchVersion);
+
+}

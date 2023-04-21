@@ -224,6 +224,17 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD: return "INVALIDRTCVALUESPERRECORD";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX: return "INVALIDRECORDINDEX";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX: return "INVALIDSIGNALINDEX";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTARTAPP: return "COULDNOTSTARTAPP";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP: return "COULDNOTSTOPAPP";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX: return "INVALIDSENSORINDEX";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX: return "INVALIDRTCINDEX";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER: return "COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER: return "COULDNOTSTORERTCSTREAMPARSERBUFFER";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS: return "COULDNOTGETRTCSIGNALIDS";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTCREATEDEVICECONFIGURATION: return "COULDNOTCREATEDEVICECONFIGURATION";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION: return "UNSUPPORTEDOIESDKVERSION";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION: return "INVALIDDEVICECONFIGURATION";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION: return "OIESDKLIBRARYRETURNSINVALIDVERSION";
 		}
 		return "UNKNOWN";
 	}
@@ -278,6 +289,17 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD: return "Invalid RTC values per record.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX: return "Invalid record index.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX: return "Invalid signal index.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTARTAPP: return "Could not start app.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP: return "Could not stop app.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX: return "Invalid sensor index.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX: return "Invalid RTC index.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER: return "Could not store OIE Calibration library buffer.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER: return "Could not store RTC Stream parser buffer.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTGETRTCSIGNALIDS: return "Could not get RTC Signal IDs.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTCREATEDEVICECONFIGURATION: return "Could not create device configuration.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION: return "Unsupported OIE SDK Version.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION: return "Invalid device configuration.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION: return "OIE SDK Library returns invalid version.";
 		}
 		return "unknown error";
 	}
@@ -525,7 +547,7 @@ public:
 	
 	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
 	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
-	inline LibMCDriver_ScanLabOIE_uint32 GetRecordCount();
+	inline LibMCDriver_ScanLabOIE_uint64 GetRecordCount();
 	inline void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY);
 	inline void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & RTCSignalsBuffer);
 	inline void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SensorSignalsBuffer);
@@ -564,11 +586,10 @@ public:
 	inline std::string GetAppName(const LibMCDriver_ScanLabOIE_uint32 nIndex);
 	inline void GetAppVersion(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
 	inline void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
-	inline void SetRTCCorrectionData(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & CorrectionDataBuffer);
-	inline void StartAppByName(const std::string & sName, classParam<CDeviceConfiguration> pDeviceConfig);
-	inline void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, classParam<CDeviceConfiguration> pDeviceConfig);
-	inline void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, classParam<CDeviceConfiguration> pDeviceConfig);
-	inline void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, classParam<CDeviceConfiguration> pDeviceConfig);
+	inline void StartAppByName(const std::string & sName);
+	inline void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex);
+	inline void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion);
+	inline void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
 	inline void StopApp();
 	inline bool AppIsRunning();
 	inline void GetRunningApp(std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
@@ -596,10 +617,12 @@ public:
 	{
 	}
 	
+	inline eOIEDeviceDriverType GetDriverType();
 	inline void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName);
+	inline void SetOIE3ResourceNames(const std::string & sOIECalibrationLibraryResourceName, const std::string & sRTCStreamParserResourceName);
 	inline void InitializeSDK(const std::string & sOIEResourceName);
 	inline void InitializeCustomSDK(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & OIEDLLBuffer);
-	inline POIEDevice AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut);
+	inline POIEDevice AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, classParam<CDeviceConfiguration> pDeviceConfig, const CInputVector<LibMCDriver_ScanLabOIE_uint8> & CorrectionDataBuffer, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut);
 	inline bool HasDevice(const std::string & sName);
 	inline POIEDevice FindDevice(const std::string & sName);
 	inline void RemoveDevice(classParam<COIEDevice> pDeviceInstance);
@@ -766,7 +789,6 @@ public:
 		pWrapperTable->m_OIEDevice_GetAppName = nullptr;
 		pWrapperTable->m_OIEDevice_GetAppVersion = nullptr;
 		pWrapperTable->m_OIEDevice_GetAppInfo = nullptr;
-		pWrapperTable->m_OIEDevice_SetRTCCorrectionData = nullptr;
 		pWrapperTable->m_OIEDevice_StartAppByName = nullptr;
 		pWrapperTable->m_OIEDevice_StartAppByIndex = nullptr;
 		pWrapperTable->m_OIEDevice_StartAppByMajorVersion = nullptr;
@@ -782,7 +804,9 @@ public:
 		pWrapperTable->m_OIEDevice_RetrieveCurrentRecording = nullptr;
 		pWrapperTable->m_OIEDevice_ClearCurrentRecording = nullptr;
 		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeCustomSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_AddDevice = nullptr;
@@ -1182,15 +1206,6 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_OIEDevice_SetRTCCorrectionData = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTCCorrectionDataPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata");
-		#else // _WIN32
-		pWrapperTable->m_OIEDevice_SetRTCCorrectionData = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTCCorrectionDataPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_OIEDevice_SetRTCCorrectionData == nullptr)
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_OIEDevice_StartAppByName = (PLibMCDriver_ScanLabOIEOIEDevice_StartAppByNamePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_startappbyname");
 		#else // _WIN32
 		pWrapperTable->m_OIEDevice_StartAppByName = (PLibMCDriver_ScanLabOIEOIEDevice_StartAppByNamePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_startappbyname");
@@ -1326,12 +1341,30 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setoie3resourcenames");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setoie3resourcenames");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1633,10 +1666,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetAppInfo == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata", (void**)&(pWrapperTable->m_OIEDevice_SetRTCCorrectionData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_SetRTCCorrectionData == nullptr) )
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_startappbyname", (void**)&(pWrapperTable->m_OIEDevice_StartAppByName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_StartAppByName == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1697,8 +1726,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_LoadRecordingFromBuild == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_setoie3resourcenames", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_initializesdk", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK));
@@ -1961,9 +1998,9 @@ public:
 	* CDataRecording::GetRecordCount - Returns the number of records in the recording.
 	* @return Number of records in the recording
 	*/
-	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRecordCount()
+	LibMCDriver_ScanLabOIE_uint64 CDataRecording::GetRecordCount()
 	{
-		LibMCDriver_ScanLabOIE_uint32 resultRecord = 0;
+		LibMCDriver_ScanLabOIE_uint64 resultRecord = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetRecordCount(m_pHandle, &resultRecord));
 		
 		return resultRecord;
@@ -2258,46 +2295,31 @@ public:
 	}
 	
 	/**
-	* COIEDevice::SetRTCCorrectionData - Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.
-	* @param[in] CorrectionDataBuffer - Patch version of the app.
-	*/
-	void COIEDevice::SetRTCCorrectionData(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & CorrectionDataBuffer)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_SetRTCCorrectionData(m_pHandle, (LibMCDriver_ScanLabOIE_uint64)CorrectionDataBuffer.size(), CorrectionDataBuffer.data()));
-	}
-	
-	/**
 	* COIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running. Starts recording of signals.
 	* @param[in] sName - Name of app to be started.
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByName(const std::string & sName, classParam<CDeviceConfiguration> pDeviceConfig)
+	void COIEDevice::StartAppByName(const std::string & sName)
 	{
-		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByName(m_pHandle, sName.c_str(), hDeviceConfig));
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByName(m_pHandle, sName.c_str()));
 	}
 	
 	/**
 	* COIEDevice::StartAppByIndex - Starts an app by its index. Fails if an app is already running.
 	* @param[in] nIndex - Index of App, 0-based
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, classParam<CDeviceConfiguration> pDeviceConfig)
+	void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex)
 	{
-		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByIndex(m_pHandle, nIndex, hDeviceConfig));
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByIndex(m_pHandle, nIndex));
 	}
 	
 	/**
 	* COIEDevice::StartAppByMajorVersion - Starts an app by its major version. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, classParam<CDeviceConfiguration> pDeviceConfig)
+	void COIEDevice::StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion)
 	{
-		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMajorVersion(m_pHandle, sName.c_str(), nMajorVersion, hDeviceConfig));
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMajorVersion(m_pHandle, sName.c_str(), nMajorVersion));
 	}
 	
 	/**
@@ -2305,12 +2327,10 @@ public:
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
 	* @param[in] nMinorVersion - Minor version of app to be started. Fails if app does not exist or only with wrong minor number.
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, classParam<CDeviceConfiguration> pDeviceConfig)
+	void COIEDevice::StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion)
 	{
-		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMinorVersion(m_pHandle, sName.c_str(), nMajorVersion, nMinorVersion, hDeviceConfig));
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMinorVersion(m_pHandle, sName.c_str(), nMajorVersion, nMinorVersion));
 	}
 	
 	/**
@@ -2444,6 +2464,18 @@ public:
 	 */
 	
 	/**
+	* CDriver_ScanLab_OIE::GetDriverType - Returns the type of the device driver.
+	* @return Type of device driver.
+	*/
+	eOIEDeviceDriverType CDriver_ScanLab_OIE::GetDriverType()
+	{
+		eOIEDeviceDriverType resultDeviceDriverType = (eOIEDeviceDriverType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_GetDriverType(m_pHandle, &resultDeviceDriverType));
+		
+		return resultDeviceDriverType;
+	}
+	
+	/**
 	* CDriver_ScanLab_OIE::SetDependencyResourceNames - Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
 	* @param[in] sLibSSLResourceName - Resource name of LibSSL DLL. Default is libssl_win64 or libssl_linux64, depending on platform.
 	* @param[in] sLibCryptoResourceName - Resource name of LibCrypto DLL. Default is libcrypto_win64 or libcrypto_linux64, depending on platform.
@@ -2453,6 +2485,16 @@ public:
 	void CDriver_ScanLab_OIE::SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_SetDependencyResourceNames(m_pHandle, sLibSSLResourceName.c_str(), sLibCryptoResourceName.c_str(), sQT5CoreResourceName.c_str(), sQT5NetworkResourceName.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab_OIE::SetOIE3ResourceNames - Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.
+	* @param[in] sOIECalibrationLibraryResourceName - Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform.
+	* @param[in] sRTCStreamParserResourceName - Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform.
+	*/
+	void CDriver_ScanLab_OIE::SetOIE3ResourceNames(const std::string & sOIECalibrationLibraryResourceName, const std::string & sRTCStreamParserResourceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_SetOIE3ResourceNames(m_pHandle, sOIECalibrationLibraryResourceName.c_str(), sRTCStreamParserResourceName.c_str()));
 	}
 	
 	/**
@@ -2478,13 +2520,16 @@ public:
 	* @param[in] sName - Name of the device. MUST be a unique string and not exist yet.
 	* @param[in] sHostName - Host name of device.
 	* @param[in] nPort - Port of device.
+	* @param[in] pDeviceConfig - Device configuration instance.
+	* @param[in] CorrectionDataBuffer - Patch version of the app.
 	* @param[in] nResponseTimeOut - Response timeout of device in ms.
 	* @return OIE Device Instance
 	*/
-	POIEDevice CDriver_ScanLab_OIE::AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
+	POIEDevice CDriver_ScanLab_OIE::AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, classParam<CDeviceConfiguration> pDeviceConfig, const CInputVector<LibMCDriver_ScanLabOIE_uint8> & CorrectionDataBuffer, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
 	{
+		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
 		LibMCDriver_ScanLabOIEHandle hDeviceInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_AddDevice(m_pHandle, sName.c_str(), sHostName.c_str(), nPort, nResponseTimeOut, &hDeviceInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_AddDevice(m_pHandle, sName.c_str(), sHostName.c_str(), nPort, hDeviceConfig, (LibMCDriver_ScanLabOIE_uint64)CorrectionDataBuffer.size(), CorrectionDataBuffer.data(), nResponseTimeOut, &hDeviceInstance));
 		
 		if (!hDeviceInstance) {
 			CheckError(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);

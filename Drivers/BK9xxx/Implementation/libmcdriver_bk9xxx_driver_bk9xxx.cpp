@@ -792,7 +792,7 @@ void CDriver_BK9xxx::SetDigitalOutput(const std::string& sVariableName, const bo
 	auto pIODefinition = iIter->second;
 	pIODefinition->setTargetValue(bValue);
 
-	if (nTimeOutInMs > 0) {
+	if ((!m_bIsInSimulationMode) && (nTimeOutInMs > 0)) {
 		// Block until timeout has passed or value has been written...
 		auto startTime = std::chrono::high_resolution_clock::now();
 		bool bFinished = false;
@@ -825,7 +825,7 @@ void CDriver_BK9xxx::SetAnalogOutputRaw(const std::string& sVariableName, const 
 	auto pIODefinition = iIter->second;
 	uint32_t nNewTargetValue = pIODefinition->setTargetRawValue(nValue);
 
-	if (nTimeOutInMs > 0) {
+	if ((!m_bIsInSimulationMode) && (nTimeOutInMs > 0)) {
 		// Block until timeout has passed or value has been written...
 		auto startTime = std::chrono::high_resolution_clock::now();
 		bool bFinished = false;

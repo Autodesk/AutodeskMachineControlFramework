@@ -67,6 +67,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
 	amcDeclareDependingClass(CUIPage, PUIPage);
+	amcDeclareDependingClass(CUICustomPage, PUICustomPage);
 	amcDeclareDependingClass(CUIDialog, PUIDialog);
 	amcDeclareDependingClass(CLogger, PLogger);
 	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
@@ -122,6 +123,7 @@ namespace AMC {
 		std::string m_ToolbarLogoResourceName;
 
 		std::map <std::string, PUIPage> m_Pages;
+		std::map <std::string, PUICustomPage> m_CustomPages;
 		std::map <std::string, PUIDialog> m_Dialogs;
 		
 		PResourcePackage m_pCoreResourcePackage; // Might be null!
@@ -134,6 +136,8 @@ namespace AMC {
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName);
 
 		PUIPage addPage_Unsafe (const std::string& sName);
+
+		PUICustomPage addCustomPage_Unsafe(const std::string& sName, const std::string& sComponentName);
 
 		PUIDialog addDialog_Unsafe(const std::string& sName, const std::string& sTitle);
 

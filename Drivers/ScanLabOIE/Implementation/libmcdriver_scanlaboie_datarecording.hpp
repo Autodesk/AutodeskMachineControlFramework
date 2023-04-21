@@ -69,7 +69,7 @@ public:
 
 	LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() override;
 
-	LibMCDriver_ScanLabOIE_uint32 GetRecordCount() override;
+	LibMCDriver_ScanLabOIE_uint64 GetRecordCount() override;
 
 	void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY) override;
 

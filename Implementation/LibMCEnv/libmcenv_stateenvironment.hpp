@@ -77,6 +77,10 @@ public:
 
 	bool WaitForSignal(const std::string& sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) override;
 
+	ISignalHandler* GetUnhandledSignal(const std::string& sSignalTypeName) override;
+
+	ISignalHandler* GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist) override;
+
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
 	void UnloadAllToolpathes() override;
@@ -136,6 +140,12 @@ public:
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
 	ITestEnvironment* GetTestEnvironment() override;
+
+	IXMLDocument* CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace) override;
+
+	IXMLDocument* ParseXMLString(const std::string& sXMLString) override;
+
+	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
 };
 

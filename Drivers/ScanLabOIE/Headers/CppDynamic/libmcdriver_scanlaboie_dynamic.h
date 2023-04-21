@@ -207,7 +207,7 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetS
 * @param[out] pRecord - Number of records in the recording
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetRecordCountPtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 * pRecord);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetRecordCountPtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint64 * pRecord);
 
 /**
 * Returns the information about a specific record.
@@ -453,34 +453,22 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_GetAppVe
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_GetAppInfoPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex, const LibMCDriver_ScanLabOIE_uint32 nNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pNameNeededChars, char * pNameBuffer, LibMCDriver_ScanLabOIE_uint32 * pMajor, LibMCDriver_ScanLabOIE_uint32 * pMinor, LibMCDriver_ScanLabOIE_uint32 * pPatch);
 
 /**
-* Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.
-*
-* @param[in] pOIEDevice - OIEDevice instance.
-* @param[in] nCorrectionDataBufferSize - Number of elements in buffer
-* @param[in] pCorrectionDataBuffer - uint8 buffer of Patch version of the app.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_SetRTCCorrectionDataPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer);
-
-/**
 * Starts an app by its name. Fails if an app is already running. Starts recording of signals.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[in] pName - Name of app to be started.
-* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByNamePtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByNamePtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName);
 
 /**
 * Starts an app by its index. Fails if an app is already running.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[in] nIndex - Index of App, 0-based
-* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByIndexPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByIndexPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex);
 
 /**
 * Starts an app by its major version. Fails if an app is already running.
@@ -488,10 +476,9 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartApp
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[in] pName - Name of app to be started.
 * @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
-* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByMajorVersionPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByMajorVersionPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion);
 
 /**
 * Starts an app by its major version. Fails if an app is already running.
@@ -500,10 +487,9 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartApp
 * @param[in] pName - Name of app to be started.
 * @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
 * @param[in] nMinorVersion - Minor version of app to be started. Fails if app does not exist or only with wrong minor number.
-* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByMinorVersionPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_StartAppByMinorVersionPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
 
 /**
 * Stops the currently running app. Does nothing if no app is running. Stops recording of signals.
@@ -618,6 +604,15 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_LoadReco
 **************************************************************************************************************************/
 
 /**
+* Returns the type of the device driver.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[out] pDeviceDriverType - Type of device driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType * pDeviceDriverType);
+
+/**
 * Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
 *
 * @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
@@ -628,6 +623,16 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_LoadReco
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pLibSSLResourceName, const char * pLibCryptoResourceName, const char * pQT5CoreResourceName, const char * pQT5NetworkResourceName);
+
+/**
+* Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pOIECalibrationLibraryResourceName - Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform.
+* @param[in] pRTCStreamParserResourceName - Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pOIECalibrationLibraryResourceName, const char * pRTCStreamParserResourceName);
 
 /**
 * Initializes the ScanLab OIE SDK.
@@ -655,11 +660,14 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE
 * @param[in] pName - Name of the device. MUST be a unique string and not exist yet.
 * @param[in] pHostName - Host name of device.
 * @param[in] nPort - Port of device.
+* @param[in] pDeviceConfig - Device configuration instance.
+* @param[in] nCorrectionDataBufferSize - Number of elements in buffer
+* @param[in] pCorrectionDataBuffer - uint8 buffer of Patch version of the app.
 * @param[in] nResponseTimeOut - Response timeout of device in ms.
 * @param[out] pDeviceInstance - OIE Device Instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_AddDevicePtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName, const char * pHostName, LibMCDriver_ScanLabOIE_uint32 nPort, LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut, LibMCDriver_ScanLabOIE_OIEDevice * pDeviceInstance);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_AddDevicePtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName, const char * pHostName, LibMCDriver_ScanLabOIE_uint32 nPort, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig, LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer, LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut, LibMCDriver_ScanLabOIE_OIEDevice * pDeviceInstance);
 
 /**
 * Checks a device with the given name has been previously added.
@@ -822,7 +830,6 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_GetAppNamePtr m_OIEDevice_GetAppName;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetAppVersionPtr m_OIEDevice_GetAppVersion;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetAppInfoPtr m_OIEDevice_GetAppInfo;
-	PLibMCDriver_ScanLabOIEOIEDevice_SetRTCCorrectionDataPtr m_OIEDevice_SetRTCCorrectionData;
 	PLibMCDriver_ScanLabOIEOIEDevice_StartAppByNamePtr m_OIEDevice_StartAppByName;
 	PLibMCDriver_ScanLabOIEOIEDevice_StartAppByIndexPtr m_OIEDevice_StartAppByIndex;
 	PLibMCDriver_ScanLabOIEOIEDevice_StartAppByMajorVersionPtr m_OIEDevice_StartAppByMajorVersion;
@@ -838,7 +845,9 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_RetrieveCurrentRecordingPtr m_OIEDevice_RetrieveCurrentRecording;
 	PLibMCDriver_ScanLabOIEOIEDevice_ClearCurrentRecordingPtr m_OIEDevice_ClearCurrentRecording;
 	PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr m_OIEDevice_LoadRecordingFromBuild;
+	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr m_Driver_ScanLab_OIE_GetDriverType;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr m_Driver_ScanLab_OIE_SetDependencyResourceNames;
+	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr m_Driver_ScanLab_OIE_SetOIE3ResourceNames;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_InitializeSDKPtr m_Driver_ScanLab_OIE_InitializeSDK;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_InitializeCustomSDKPtr m_Driver_ScanLab_OIE_InitializeCustomSDK;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_AddDevicePtr m_Driver_ScanLab_OIE_AddDevice;
