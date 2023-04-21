@@ -79,6 +79,16 @@ namespace AMC {
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
 		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger, getTestEnvironmentPath ());
 
+		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
+		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
+		pSystemInformationGroup->addNewStringParameter("githash", "Git Hash", getGitHash ());
+		pSystemInformationGroup->addNewStringParameter("clienthash", "Client Hash", getClientHash());
+		pSystemInformationGroup->addNewStringParameter("compile_time", "Compile time", std::string (__DATE__) + " " + std::string (__TIME__));
+		pSystemInformationGroup->addNewStringParameter("installation_uuid", "Installation", getInstallationUUID ());
+		pSystemParameterHandler->addGroup(pSystemInformationGroup);
+
+		m_pStateMachineData->registerParameterHandler("system", pSystemParameterHandler);
+
 	}
 
 	CSystemState::~CSystemState()

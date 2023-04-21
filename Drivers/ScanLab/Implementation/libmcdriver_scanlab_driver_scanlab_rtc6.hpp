@@ -16,6 +16,8 @@ Abstract: This is the class declaration of CDriver_ScanLab_RTC6
 #include "libmcdriver_scanlab_driver_scanlab.hpp"
 #include "libmcdriver_scanlab_rtccontext.hpp"
 #include "libmcdriver_scanlab_rtcselector.hpp"
+#include "libmcdriver_scanlab_configurationpreset.hpp"
+#include "libmcdriver_scanlab_managedptr.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_driver.hpp"
@@ -25,92 +27,11 @@ Abstract: This is the class declaration of CDriver_ScanLab_RTC6
 #endif
 
 // Include custom headers here.
-
+#include <map>
 
 namespace LibMCDriver_ScanLab {
 namespace Impl {
 
-
-	template<class T>
-	class act_managed_ptr
-	{
-	private:
-		T* ptr = nullptr;		
-
-	public:
-		act_managed_ptr() : ptr(nullptr)
-		{
-		}
-
-		act_managed_ptr(T* ptr) : ptr(ptr)
-		{
-			if (ptr != nullptr)
-				ptr->IncRefCount();
-		}
-
-		act_managed_ptr(const act_managed_ptr& obj) // copy constructor
-		{
-			this->ptr = obj.ptr; // share the underlying pointer
-			if (this->ptr != nullptr)
-				this->ptr->IncRefCount();
-
-		}
-
-		act_managed_ptr& operator=(const act_managed_ptr& obj) // copy assignment
-		{
-			__cleanup__(); // cleanup any existing data
-
-			// Assign incoming object's data to this object
-			this->ptr = obj.ptr; // share the underlying pointer
-			if (this->ptr != nullptr)
-				this->ptr->IncRefCount();
-		}
-
-		/*** Move Semantics ***/
-		act_managed_ptr(act_managed_ptr&& dyingObj) // move constructor
-		{
-			this->ptr = dyingObj.ptr; 
-			dyingObj.ptr = nullptr;
-		}
-
-		act_managed_ptr& operator=(act_managed_ptr&& dyingObj) // move assignment
-		{
-			__cleanup__(); // cleanup any existing data
-
-			this->ptr = dyingObj.ptr;
-			dyingObj.ptr = nullptr;
-
-			return *this;
-		}
-
-		T* get() const
-		{
-			return this->ptr;
-		}
-
-		T* operator->() const
-		{
-			return this->ptr;
-		}
-
-		T& operator*() const
-		{
-			return this->ptr;
-		}
-
-		~act_managed_ptr() // destructor
-		{
-			__cleanup__();
-		}
-
-	private:
-		void __cleanup__()
-		{
-			if (this->ptr != nullptr)
-				this->ptr->DecRefCount();
-			this->ptr = nullptr;
-		}
-	};
 
 /*************************************************************************************************************************
  Class declaration of CDriver_ScanLab_RTC6 
@@ -129,16 +50,21 @@ private:
 	act_managed_ptr<IRTCSelector> m_pRTCSelector;
 	act_managed_ptr<IRTCContext> m_pRTCContext;
 
-	void internalBegin();
-	void internalExecute();
+	LibMCDriver_ScanLab::eOIERecordingMode m_OIERecordingMode;
+
+	std::map<std::string, PDriver_ScanLab_RTC6ConfigurationPreset> m_ConfigurationPresets;
 
 	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
+
+	
 
 protected:
 
 public:
 
 	CDriver_ScanLab_RTC6(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	virtual ~CDriver_ScanLab_RTC6();
 
 	void Configure(const std::string& sConfigurationString) override;
 
@@ -152,9 +78,19 @@ public:
 
 	void SetToSimulationMode() override;
 
+	bool IsInitialized() override;
+
 	bool IsSimulationMode() override;
 
 	void Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) override;
+
+	void InitialiseFromConfiguration(const std::string& sPresetName) override;
+
+	std::string GetIPAddress() override;
+
+	std::string GetNetmask() override;
+
+	LibMCDriver_ScanLab_uint32 GetSerialNumber() override;
 
 	IRTCContext* GetContext() override;
 
@@ -170,12 +106,17 @@ public:
 
 	void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) override;
 
+	void SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode) override;
+
+	LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() override;
+
 	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) override;
 
 	void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) override;
 
 	void GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier) override;
 
+	PDriver_ScanLab_RTC6ConfigurationPreset findPresetByName(const std::string & sPresetName, bool bMustExist);
 
 };
 

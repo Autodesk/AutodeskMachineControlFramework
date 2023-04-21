@@ -210,6 +210,9 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_get_error = (PScanLabPtr_n_get_error)_loadScanLabAddress(hLibrary, "n_get_error");
 	this->n_reset_error = (PScanLabPtr_n_reset_error)_loadScanLabAddress(hLibrary, "n_reset_error");
 
+	this->n_set_multi_mcbsp_in_list = (PScanLabPtr_n_set_multi_mcbsp_in_list)_loadScanLabAddress(hLibrary, "n_set_multi_mcbsp_in_list");
+	this->n_set_laser_power = (PScanLabPtr_n_set_laser_power)_loadScanLabAddress(hLibrary, "n_set_laser_power");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -369,6 +372,10 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_micro_vector_rel = nullptr;
 	n_get_error = nullptr;
 	n_reset_error = nullptr;
+
+	n_set_multi_mcbsp_in_list = nullptr;
+	n_set_laser_power = nullptr;
+
 
 }
 

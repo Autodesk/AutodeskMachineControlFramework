@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 #include <mutex>
 #include <map>
+#include <vector>
 
 #include "lib3mf/lib3mf_dynamic.hpp"
 #include "libmcenv_types.hpp"
@@ -52,19 +53,25 @@ namespace AMC {
 		uint32_t m_PartID;
 	} sToolpathLayerSegment;
 
-	typedef struct _sToolpathLayerProfile {
-		double m_dLaserSpeed;
-		double m_dLaserPower;
-		double m_dLaserFocus;
-		double m_dJumpSpeed;
-		double m_dExtrusionFactor;
-		double m_dStartDelay;
-		double m_dEndDelay;
-		double m_dPolyDelay;
-		double m_dJumpDelay;
-		double m_dLaserOnDelay;
-		double m_dLaserOffDelay;
-	} sToolpathLayerProfile;
+	class CToolpathLayerProfile {
+		private:
+			std::string m_sUUID;
+			std::map<std::pair<std::string, std::string>, std::string> m_ProfileValues;
+
+		public:
+
+			CToolpathLayerProfile(const std::string & sUUID);
+			virtual ~CToolpathLayerProfile();
+
+			std::string getUUID();
+			void addValue(const std::string & sNameSpace, const std::string & sValueName, const std::string & sValue);
+
+			bool hasValue(const std::string& sNameSpace, const std::string& sValueName);
+			std::string getValue(const std::string& sNameSpace, const std::string& sValueName);
+			std::string getValueDef(const std::string& sNameSpace, const std::string& sValueName, const std::string & sDefaultValue);
+	};
+
+	typedef std::shared_ptr<CToolpathLayerProfile> PToolpathLayerProfile;
 
 
 	class CToolpathLayerData {
@@ -78,7 +85,7 @@ namespace AMC {
 
 		std::vector<std::string> m_UUIDs;
 		std::map<std::string, uint32_t> m_UUIDMap;
-		std::map<std::string, sToolpathLayerProfile> m_ProfileMap;
+		std::map<std::string, PToolpathLayerProfile> m_ProfileMap;
 
 		std::string m_sDebugName;
 
@@ -86,7 +93,7 @@ namespace AMC {
 		std::string getRegisteredUUID(const uint32_t nID);
 
 		void storeProfileData(Lib3MF::PToolpath pToolpath, const std::string& sProfileUUID);
-		sToolpathLayerProfile retrieveProfileData(const std::string& sProfileUUID);
+		PToolpathLayerProfile retrieveProfileData(const std::string& sProfileUUID);
 
 	public:
 
@@ -106,7 +113,7 @@ namespace AMC {
 
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
-		sToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
+		PToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
 
 		double getUnits();
 

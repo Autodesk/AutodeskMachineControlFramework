@@ -46,7 +46,7 @@ Abstract: This is a stub class definition of CChannelInformation
 using namespace LibMCDriver_CifX::Impl;
 
 
-PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node)
+PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node, bool defaultIsBigEndian)
 {
 	std::string sNodeName = node.name();
 
@@ -54,7 +54,7 @@ PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node)
 	auto bitAttrib = node.attribute("bit");
 	auto nameAttrib = node.attribute("name");
 	auto descriptionAttrib = node.attribute("description");
-	auto defaultAttrib = node.attribute("default");
+	auto endianessAttrib = node.attribute("endianess");
 
 	if (addressAttrib.empty())
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_MISSINGADDRESSATTRIBUTE);
@@ -70,22 +70,42 @@ PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node)
 	if (sName.empty())
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE);
 
-	if (sNodeName == "bool")
-		return std::make_shared<CDriver_CifXParameter_Bool>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_BOOL, nAddress, nBit);
-	if (sNodeName == "uint8")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT8, nAddress);
-	if (sNodeName == "uint16")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT16, nAddress);
-	if (sNodeName == "uint32")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT32, nAddress);
-	if (sNodeName == "int8")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT8, nAddress);
-	if (sNodeName == "int16")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT16, nAddress);
-	if (sNodeName == "int32")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT32, nAddress);
+	PDriver_CifXParameter pParameter;
 
-	return nullptr;
+	if (sNodeName == "bool")
+		pParameter = std::make_shared<CDriver_CifXParameter_Bool>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_BOOL, nAddress, nBit);
+	if (sNodeName == "uint8")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT8, nAddress);
+	if (sNodeName == "uint16")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT16, nAddress);
+	if (sNodeName == "uint32")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT32, nAddress);
+	if (sNodeName == "int8")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT8, nAddress);
+	if (sNodeName == "int16")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT16, nAddress);
+	if (sNodeName == "int32")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT32, nAddress);
+
+	if (pParameter.get () == nullptr)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAMETERTYPE, "invalid parameter type: " + sNodeName);
+
+	if (!endianessAttrib.empty()) {
+		std::string sEndianess = endianessAttrib.as_string();
+		if (sEndianess == "littleendian") {
+			pParameter->setIsBigEndian(false);
+		} 
+		else if (sEndianess == "bigendian") {
+			pParameter->setIsBigEndian(true);
+		}
+		else
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDENDIANESSATTRIBUTE, "invalid endianess attribute: " + sNodeName);
+	}
+	else {
+		pParameter->setIsBigEndian(defaultIsBigEndian);
+	}
+
+	return pParameter;
 
 }
 
@@ -107,7 +127,45 @@ void CDriver_CifXChannelBuffer::clear()
 {
 	for (auto& iIter : m_Data)
 		iIter = 0;
+} 
+
+void CDriver_CifXChannelBuffer::readEndianValue(uint32_t nAddress, uint32_t nSize, bool bIsBigEndian, CDriver_CifXChannelEndianValue& outputValue)
+{
+	if ((nSize == 0) || (nSize > 8))
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+	if (((size_t)nAddress + nSize) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	if (bIsBigEndian) {
+		for (uint32_t nIndex = 0; nIndex < nSize; nIndex++)
+			outputValue.at(nSize - 1 - nIndex) = m_Data.at((size_t)nAddress + nIndex);
+
+	}
+	else {
+		for (uint32_t nIndex = 0; nIndex < nSize; nIndex++)
+			outputValue.at(nIndex) = m_Data.at((size_t)nAddress + nIndex);
+	}
+
 }
+
+void CDriver_CifXChannelBuffer::writeEndianValue(uint32_t nAddress, uint32_t nSize, bool bIsBigEndian, uint8_t* pValue)
+{
+	if (((size_t)nAddress + nSize) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	if (bIsBigEndian) {
+		for (uint32_t nIndex = 0; nIndex < nSize; nIndex++)
+			m_Data.at((size_t)nAddress + nIndex) = pValue[nSize - 1 - nIndex];
+
+	}
+	else {
+		for (uint32_t nIndex = 0; nIndex < nSize; nIndex++)
+			m_Data.at((size_t)nAddress + nIndex) = pValue[nIndex];
+	}
+
+}
+
+
 
 
 uint8_t CDriver_CifXChannelBuffer::readUint8(uint32_t nAddress)
@@ -118,21 +176,21 @@ uint8_t CDriver_CifXChannelBuffer::readUint8(uint32_t nAddress)
 	return *((uint8_t*)&m_Data.at(nAddress));
 }
 
-uint16_t CDriver_CifXChannelBuffer::readUint16(uint32_t nAddress)
+uint16_t CDriver_CifXChannelBuffer::readUint16(uint32_t nAddress, bool bReadBigEndian)
 {
-	if (((size_t)nAddress + sizeof(uint16_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+	CDriver_CifXChannelEndianValue outputValue;
+	readEndianValue(nAddress, sizeof(uint16_t), bReadBigEndian, outputValue);
 
-	return *((uint16_t*)&m_Data.at(nAddress));
+	return *((uint16_t*)outputValue.data ());
 
 }
 
-uint32_t CDriver_CifXChannelBuffer::readUint32(uint32_t nAddress)
+uint32_t CDriver_CifXChannelBuffer::readUint32(uint32_t nAddress, bool bReadBigEndian)
 {
-	if (((size_t)nAddress + sizeof(uint32_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+	CDriver_CifXChannelEndianValue outputValue;
+	readEndianValue(nAddress, sizeof(uint32_t), bReadBigEndian, outputValue);
 
-	return *((uint32_t*)&m_Data.at(nAddress));
+	return *((uint32_t*)outputValue.data());
 
 }
 
@@ -145,21 +203,21 @@ int8_t CDriver_CifXChannelBuffer::readInt8(uint32_t nAddress)
 
 }
 
-int16_t CDriver_CifXChannelBuffer::readInt16(uint32_t nAddress)
+int16_t CDriver_CifXChannelBuffer::readInt16(uint32_t nAddress, bool bReadBigEndian)
 {
-	if (((size_t)nAddress + sizeof(int16_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+	CDriver_CifXChannelEndianValue outputValue;
+	readEndianValue(nAddress, sizeof(int16_t), bReadBigEndian, outputValue);
 
-	return *((int16_t*)&m_Data.at(nAddress));
+	return *((int16_t*)outputValue.data());
 
 }
 
-int32_t CDriver_CifXChannelBuffer::readInt32(uint32_t nAddress)
+int32_t CDriver_CifXChannelBuffer::readInt32(uint32_t nAddress, bool bReadBigEndian)
 {
-	if (((size_t)nAddress + sizeof(int32_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+	CDriver_CifXChannelEndianValue outputValue;
+	readEndianValue(nAddress, sizeof(int32_t), bReadBigEndian, outputValue);
 
-	return *((int32_t*)&m_Data.at(nAddress));
+	return *((int32_t*)outputValue.data());
 
 }
 
@@ -175,75 +233,57 @@ bool CDriver_CifXChannelBuffer::readBool(uint32_t nAddress, uint32_t nBit)
 	return ((nValue & (1UL << nBit)) != 0);
 }
 
-float CDriver_CifXChannelBuffer::readFloat(uint32_t nAddress)
+float CDriver_CifXChannelBuffer::readFloat(uint32_t nAddress, bool bReadBigEndian)
 {
-	if (((size_t)nAddress + sizeof(float)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+	CDriver_CifXChannelEndianValue outputValue;
+	readEndianValue(nAddress, sizeof(float), bReadBigEndian, outputValue);
 
-	return *((float*)&m_Data.at(nAddress));
+	return *((float*)outputValue.data());
 
 }
 
-double CDriver_CifXChannelBuffer::readDouble(uint32_t nAddress)
+double CDriver_CifXChannelBuffer::readDouble(uint32_t nAddress, bool bReadBigEndian)
 {
-	if (((size_t)nAddress + sizeof(double)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+	CDriver_CifXChannelEndianValue outputValue;
+	readEndianValue(nAddress, sizeof(double), bReadBigEndian, outputValue);
 
-	return *((double*)&m_Data.at(nAddress));
+	return *((double*)outputValue.data());
 
 }
 
 void CDriver_CifXChannelBuffer::writeUint8(uint32_t nAddress, uint8_t nValue)
 {
-	if (((size_t)nAddress + sizeof(uint8_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+	writeEndianValue(nAddress, sizeof(int8_t), false, (uint8_t*)&nValue);
 
-	*((uint8_t*)&m_Data.at(nAddress)) = nValue;
 
 }
 
-void CDriver_CifXChannelBuffer::writeUint16(uint32_t nAddress, uint16_t nValue)
+void CDriver_CifXChannelBuffer::writeUint16(uint32_t nAddress, uint16_t nValue, bool bWriteBigEndian)
 {
-	if (((size_t)nAddress + sizeof(uint16_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
-
-	*((uint16_t*)&m_Data.at(nAddress)) = nValue;
+	writeEndianValue(nAddress, sizeof(uint16_t), bWriteBigEndian, (uint8_t*)&nValue);
 
 }
 
-void CDriver_CifXChannelBuffer::writeUint32(uint32_t nAddress, uint32_t nValue)
+void CDriver_CifXChannelBuffer::writeUint32(uint32_t nAddress, uint32_t nValue, bool bWriteBigEndian)
 {
-	if (((size_t)nAddress + sizeof(uint32_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
-
-	*((uint32_t*)&m_Data.at(nAddress)) = nValue;
-
+	writeEndianValue(nAddress, sizeof(uint32_t), bWriteBigEndian, (uint8_t*)&nValue);
 }
 
 void CDriver_CifXChannelBuffer::writeInt8(uint32_t nAddress, int8_t nValue)
 {
-	if (((size_t)nAddress + sizeof(int8_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
-
-	*((int8_t*)&m_Data.at(nAddress)) = nValue;
+	writeEndianValue(nAddress, sizeof(int8_t), false, (uint8_t*)&nValue);
 
 }
 
-void CDriver_CifXChannelBuffer::writeInt16(uint32_t nAddress, int16_t nValue)
+void CDriver_CifXChannelBuffer::writeInt16(uint32_t nAddress, int16_t nValue, bool bWriteBigEndian)
 {
-	if (((size_t)nAddress + sizeof(int16_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
-
-	*((int16_t*)&m_Data.at(nAddress)) = nValue;
+	writeEndianValue(nAddress, sizeof(int16_t), bWriteBigEndian, (uint8_t*)&nValue);
 
 }
 
-void CDriver_CifXChannelBuffer::writeInt32(uint32_t nAddress, int32_t nValue)
+void CDriver_CifXChannelBuffer::writeInt32(uint32_t nAddress, int32_t nValue, bool bWriteBigEndian)
 {
-	if (((size_t)nAddress + sizeof(int32_t)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
-
-	*((int32_t*)&m_Data.at(nAddress)) = nValue;
+	writeEndianValue(nAddress, sizeof(int32_t), bWriteBigEndian, (uint8_t*)&nValue);
 
 }
 
@@ -254,25 +294,25 @@ void CDriver_CifXChannelBuffer::writeBool(uint32_t nAddress, uint32_t nBit, bool
 	if (nBit >= 8)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT);
 
-	*((int16_t*)&m_Data.at(nAddress)) |= (1UL << nBit);
+	if (bValue) {
+		m_Data.at(nAddress) |= (1UL << nBit);
+	}
+	else {
+		m_Data.at(nAddress) &= (0xff ^ (1UL << nBit));
+	}
+	
 
 }
 
-void CDriver_CifXChannelBuffer::writeFloat(uint32_t nAddress, float fValue)
+void CDriver_CifXChannelBuffer::writeFloat(uint32_t nAddress, float fValue, bool bWriteBigEndian)
 {
-	if (((size_t)nAddress + sizeof(float)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
-
-	*((float*)&m_Data.at(nAddress)) = fValue;
+	writeEndianValue(nAddress, sizeof(float), bWriteBigEndian, (uint8_t*)&fValue);
 
 }
 
-void CDriver_CifXChannelBuffer::writeDouble(uint32_t nAddress, double dValue)
+void CDriver_CifXChannelBuffer::writeDouble(uint32_t nAddress, double dValue, bool bWriteBigEndian)
 {
-	if (((size_t)nAddress + sizeof(double)) > m_Data.size())
-		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
-
-	*((double*)&m_Data.at(nAddress)) = dValue;
+	writeEndianValue(nAddress, sizeof(double), bWriteBigEndian, (uint8_t*)&dValue);
 
 }
 
@@ -380,11 +420,11 @@ void CDriver_CifXChannelThreadState::readInputParameter(CDriver_CifXParameter* p
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_UINT16:
-		pParameter->SetActualIntegerValue(m_InputBuffer.readUint16(nAddress));
+		pParameter->SetActualIntegerValue(m_InputBuffer.readUint16(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_UINT32:
-		pParameter->SetActualIntegerValue(m_InputBuffer.readUint32(nAddress));
+		pParameter->SetActualIntegerValue(m_InputBuffer.readUint32(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT8:
@@ -392,19 +432,19 @@ void CDriver_CifXChannelThreadState::readInputParameter(CDriver_CifXParameter* p
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT16:
-		pParameter->SetActualIntegerValue(m_InputBuffer.readInt16(nAddress));
+		pParameter->SetActualIntegerValue(m_InputBuffer.readInt16(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT32:
-		pParameter->SetActualIntegerValue(m_InputBuffer.readInt32(nAddress));
+		pParameter->SetActualIntegerValue(m_InputBuffer.readInt32(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_FLOAT:
-		pParameter->SetActualDoubleValue(m_InputBuffer.readFloat(nAddress));
+		pParameter->SetActualDoubleValue(m_InputBuffer.readFloat(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_DOUBLE:
-		pParameter->SetActualDoubleValue(m_InputBuffer.readDouble(nAddress));
+		pParameter->SetActualDoubleValue(m_InputBuffer.readDouble(nAddress, pParameter->isBigEndian()));
 		break;
 	}
 
@@ -432,11 +472,11 @@ void CDriver_CifXChannelThreadState::readOutputParameter(CDriver_CifXParameter* 
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_UINT16:
-		pParameter->SetActualIntegerValue(m_OutputBuffer.readUint16(nAddress));
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readUint16(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_UINT32:
-		pParameter->SetActualIntegerValue(m_OutputBuffer.readUint32(nAddress));
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readUint32(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT8:
@@ -444,19 +484,19 @@ void CDriver_CifXChannelThreadState::readOutputParameter(CDriver_CifXParameter* 
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT16:
-		pParameter->SetActualIntegerValue(m_OutputBuffer.readInt16(nAddress));
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readInt16(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT32:
-		pParameter->SetActualIntegerValue(m_OutputBuffer.readInt32(nAddress));
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readInt32(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_FLOAT:
-		pParameter->SetActualDoubleValue(m_OutputBuffer.readFloat(nAddress));
+		pParameter->SetActualDoubleValue(m_OutputBuffer.readFloat(nAddress, pParameter->isBigEndian()));
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_DOUBLE:
-		pParameter->SetActualDoubleValue(m_OutputBuffer.readDouble(nAddress));
+		pParameter->SetActualDoubleValue(m_OutputBuffer.readDouble(nAddress, pParameter->isBigEndian()));
 		break;
 	}
 
@@ -493,13 +533,13 @@ void CDriver_CifXChannelThreadState::writeOutputParameter(CDriver_CifXParameter*
 	case eDriver_CifXParameterType::CifXParameter_UINT16:
 		nValue = pParameter->GetTargetIntegerValue();
 		if ((nValue >= nMinValue) && (nValue <= nMaxValue))
-			m_OutputBuffer.writeUint16(nAddress, (uint16_t)nValue);
+			m_OutputBuffer.writeUint16(nAddress, (uint16_t)nValue, pParameter->isBigEndian());
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_UINT32:
 		nValue = pParameter->GetTargetIntegerValue();
 		if ((nValue >= nMinValue) && (nValue <= nMaxValue))
-			m_OutputBuffer.writeUint32(nAddress, (uint32_t)nValue);
+			m_OutputBuffer.writeUint32(nAddress, (uint32_t)nValue, pParameter->isBigEndian());
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT8:
@@ -511,23 +551,23 @@ void CDriver_CifXChannelThreadState::writeOutputParameter(CDriver_CifXParameter*
 	case eDriver_CifXParameterType::CifXParameter_INT16:
 		nValue = pParameter->GetTargetIntegerValue();
 		if ((nValue >= nMinValue) && (nValue <= nMaxValue))
-			m_OutputBuffer.writeInt16(nAddress, (int16_t)nValue);
+			m_OutputBuffer.writeInt16(nAddress, (int16_t)nValue, pParameter->isBigEndian());
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_INT32:
 		nValue = pParameter->GetTargetIntegerValue();
 		if ((nValue >= nMinValue) && (nValue <= nMaxValue))
-			m_OutputBuffer.writeInt32(nAddress, (int32_t)nValue);
+			m_OutputBuffer.writeInt32(nAddress, (int32_t)nValue, pParameter->isBigEndian());
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_FLOAT:
 		dValue = pParameter->GetTargetDoubleValue();
-		m_OutputBuffer.writeFloat(nAddress, (float)dValue);
+		m_OutputBuffer.writeFloat(nAddress, (float)dValue, pParameter->isBigEndian());
 		break;
 
 	case eDriver_CifXParameterType::CifXParameter_DOUBLE:
 		dValue = pParameter->GetTargetDoubleValue();
-		m_OutputBuffer.writeDouble(nAddress, dValue);
+		m_OutputBuffer.writeDouble(nAddress, dValue, pParameter->isBigEndian());
 		break;
 	}
 
@@ -541,6 +581,9 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 {
 	auto boardAttrib = channelNode.attribute("board");
 	auto channelIndexAttrib = channelNode.attribute("channelindex");
+	auto endianessAttrib = channelNode.attribute("defaultendianess");
+
+	bool defaultIsBigEndian = false;
 
 	m_sBoardName = boardAttrib.as_string();
 	if (m_sBoardName.empty())
@@ -551,6 +594,18 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 	int nChannelIndex = channelIndexAttrib.as_int(-1);
 	if (nChannelIndex < 0)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEXATTRIBUTE);
+
+	if (endianessAttrib.empty ())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_MISSINGCHANNELENDIANESSATTRIBUTE);
+	std::string sDefaultEndianess = endianessAttrib.as_string();
+	if (sDefaultEndianess == "littlendian") {
+		defaultIsBigEndian = false;
+	} else if (sDefaultEndianess == "bigendian") {
+		defaultIsBigEndian = true;
+	}
+		else throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELENDIANESSATTRIBUTE, "invalid channel endianess attribute: " + sDefaultEndianess);
+
+
 
 	m_nChannelIndex = (uint32_t)nChannelIndex;
 
@@ -584,7 +639,7 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 
 		auto ioNodes = inputIONode.children();
 		for (auto ioNode : ioNodes) {
-			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode);
+			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode, defaultIsBigEndian);
 			if (pParameter.get() != nullptr) {
 				m_Inputs.push_back(pParameter);
 				m_InputMap.insert(std::make_pair(pParameter->getName(), pParameter));
@@ -605,7 +660,7 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 
 		auto ioNodes = outputIONode.children();
 		for (auto ioNode : ioNodes) {
-			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode);
+			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode, defaultIsBigEndian);
 			if (pParameter.get() != nullptr) {
 				m_Outputs.push_back(pParameter);
 				m_OutputMap.insert(std::make_pair(pParameter->getName(), pParameter));
@@ -633,7 +688,7 @@ uint32_t CDriver_CifXChannel::getChannelIndex()
 
 void CDriver_CifXChannel::RegisterVariables(LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (pDriverEnvironment.get() == nullptr)
+	if (pDriverEnvironment.get() != nullptr)
 	{
 		for (auto pInputParameter : m_Inputs) {
 			switch (pInputParameter->getAbstractType()) {
@@ -766,6 +821,7 @@ void CDriver_CifXChannel::startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverH
 		try
 		{
 			while (!pThreadState->threadShallBeCanceled()) {
+
 				for (auto pOutput : pOutputs)
 					pThreadState->writeOutputParameter(pOutput.get());
 
@@ -774,10 +830,11 @@ void CDriver_CifXChannel::startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverH
 				for (auto pInput : pInputs)
 					pThreadState->readInputParameter(pInput.get());
 				for (auto pOutput : pOutputs)
-					pThreadState->readInputParameter(pOutput.get());
+					pThreadState->readOutputParameter(pOutput.get());
 
 				std::this_thread::sleep_for(std::chrono::milliseconds(nSyncDelay));
 			}
+
 		}
 		catch (ELibMCDriver_CifXInterfaceException& DriverException) {
 			std::cout << "Fatal Error: " << DriverException.what() << std::endl;

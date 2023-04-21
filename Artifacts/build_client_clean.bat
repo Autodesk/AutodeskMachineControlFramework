@@ -7,12 +7,16 @@ cd %basepath%
 mkdir ..\build_client\Client
 mkdir ..\build_client\Client\public
 mkdir ..\build_client\Client\src
-mkdir ..\build_client\Client\src\plugins
+mkdir ..\build_client\Client\src\common
+mkdir ..\build_client\Client\src\modules
+mkdir ..\build_client\Client\src\dialogs
 mkdir ..\build_client\Client\dist
 
 copy ..\Client\public\*.* ..\build_client\Client\public
 copy ..\Client\src\*.* ..\build_client\Client\src
-copy ..\Client\src\plugins\*.* ..\build_client\Client\src\plugins
+copy ..\Client\src\common\*.* ..\build_client\Client\src\common
+copy ..\Client\src\modules\*.* ..\build_client\Client\src\modules
+copy ..\Client\src\dialogs\*.* ..\build_client\Client\src\dialogs
 copy ..\Client\*.js ..\build_client\Client
 copy ..\Client\*.json ..\build_client\Client
 
@@ -38,7 +42,9 @@ cd ..\..\
 
 cd build_client\Client
 
-go run ..\..\BuildScripts\createClientDist.go dist ..\..\Artifacts\clientdist\clientpackage.zip
+go run ..\..\BuildScripts\createClientDist.go dist ..\..\Artifacts\clientdist\clientpackage.zip 
+
+go run ..\..\BuildScripts\createClientSource.go . ..\..\Artifacts\clientdist\clientsourcepackage.zip 
 
 if "%1" neq "NOPAUSE" (
 	pause

@@ -83,13 +83,26 @@
 		<error name="INVALIDMAXLASERPOWER" code="1031" description="Invalid max laser power." />
 		<error name="INVALIDLASERDELAY" code="1032" description="Invalid laser delay." />
 		<error name="INVALIDSCANNERDELAY" code="1033" description="Invalid scanner delay." />
-		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />
-		
+		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />		
 		<error name="INVALIDOIESIGNALBUFFERARRAY" code="1035" description="Invalid OIE Signal buffer array." />
-		
-		
-		
-		
+		<error name="INVALIDSKYWRITINGTIMELAG" code="1036" description="Invalid Skywriting Timelag." />
+		<error name="INVALIDSKYWRITINGLASERONSHIFT" code="1037" description="Invalid Skywriting Laser On Shift." />
+		<error name="INVALIDSKYWRITINGNPREV" code="1038" description="Invalid Skywriting N Prev." />
+		<error name="INVALIDSKYWRITINGNPOST" code="1039" description="Invalid Skywriting N Post." />		
+		<error name="OIEHASNOTBEENINITIALIZED" code="1040" description="OIE has not been initialized." />
+		<error name="UNSUPPORTEDOIEOPERATIONMODE" code="1041" description="Unsupported OIE Operation Mode." />		
+		<error name="INVALIDRTCCORRECTIONDATA" code="1042" description="Invalid RTC Correction data." />		
+		<error name="CONFIGURATIONPRESETNOTFOUND" code="1043" description="Configuration preset not found." />				
+		<error name="INVALIDSCANNERCOUNT" code="1044" description="Invalid scanner count." />
+		<error name="INVALIDSCANNERINDEX" code="1045" description="Invalid scanner index." />			
+		<error name="LASERINDEXHASNOASSIGNEDSCANNER" code="1046" description="Laser index has no assigned scanner." />			
+		<error name="LASERINDEXNOTFOUND" code="1047" description="Laser index not found." />			
+		<error name="DUPLICATELASERINDEX" code="1048" description="Duplicate laser index." />			
+		<error name="INVALIDCONFIGURATIONSCHEMA" code="1049" description="Invalid configuration schema." />
+		<error name="NOVERSIONDEFINITION" code="1050" description="No version definition." />			
+		<error name="DUPLICATECONFIGURATIONPRESETNAME" code="1051" description="Duplicate configuration preset name." />					
+		<error name="OIEPIDVARIABLEOUTOFBOUNDS" code="1052" description="OIE PID Variable out of bounds." />		
+						
 	</errors>
 
 
@@ -109,6 +122,23 @@
 	   <option name="Port12BitAnalog1" value="3" />
 	   <option name="Port12BitAnalog2" value="4" />
 	</enum>
+
+
+	<enum name="OIEOperationMode">
+	   <option name="OIENotInitialized" value="0" />
+	   <option name="OIEVersion2" value="1" />
+	   <option name="OIEVersion3Compatibility" value="2" />
+	   <option name="OIEVersion3" value="3" />
+	</enum>
+	
+	
+	<enum name="OIERecordingMode">
+	   <option name="OIERecordingDisabled" value="0" description="OIE shall not record anything." />
+	   <option name="OIEContinuousMeasurement" value="1" description="OIE shall continuously record, even if the laser is off. OIE must be enabled before drawing a layer." />
+	   <option name="OIEEnableAndContinuousMeasurement" value="2" description="OIE shall continuously record, even if the laser is off. OIE will be specifically enabled for the layer." />
+	   <option name="OIELaserActiveMeasurement" value="3" description="OIE shall record when the laser is on. OIE must be enabled before drawing a layer." />
+	   <option name="OIEEnableAndLaserActiveMeasurement" value="4" description="OIE shall record when the laser is on. OIE will be specifically enabled for the layer." />
+	</enum>	
 
 	<struct name="Point2D">
 		<member name="X" type="single" />
@@ -239,10 +269,22 @@ Custom implementation
 			<param name="PulseLength" type="double" pass="in" description="Pulse Length in microseconds" />
 		</method>
 
+		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
+		</method>		
+
+		<method name="GetNetmask" description="Returns the Netmask of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="Netmask" type="string" pass="return" description="Netmask Value." />
+		</method>		
+
 		<method name="GetSerialNumber" description="Returns serial number of card">
 			<param name="SerialNumber" type="uint32" pass="return" description="Returns serial number of board." />
 		</method>
 		
+		<method name="GetLaserIndex" description="Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.">
+			<param name="LaserIndex" type="uint32" pass="return" description="Returns laser index of board." />
+		</method>
+
 		<method name="SetStartList" description="Opens the list to write">
 			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
 			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
@@ -274,8 +316,8 @@ Custom implementation
 		</method>
 
 		<method name="SetLaserDelaysInBits" description="Sets the laser delays (on the list)">
-			<param name="LaserOnDelay" type="uint32" pass="in" description="LaserOn delay in bits (1/64th microseconds)" />
-			<param name="LaserOffDelay" type="uint32" pass="in" description="LaserOff delay in bits (1/64th microseconds)" />
+			<param name="LaserOnDelay" type="int32" pass="in" description="LaserOn delay in bits (1/64th microseconds)" />
+			<param name="LaserOffDelay" type="int32" pass="in" description="LaserOff delay in bits (1/64th microseconds)" />
 		</method>
 		
 		<method name="DrawPolyline" description="Writes a polyline into the open list">
@@ -286,12 +328,30 @@ Custom implementation
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 		
+		<method name="DrawPolylineOIE" description="Writes a polyline into the open list with OIE Enabled.">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
+		</method>
+
 		<method name="DrawHatches" description="Writes a list of hatches into the open list">
 			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+		</method>
+
+		<method name="DrawHatchesOIE" description="Writes a list of hatches into the open list with OIE Enabled.">
+			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
@@ -353,6 +413,7 @@ Custom implementation
 		
 		<method name="InitializeForOIE" description="Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.">
 			<param name="SignalChannels" type="basicarray" class="uint32" pass="in" description="Array of signal channels. MUST NOT be empty" />
+			<param name="OperationMode" type="enum" class="OIEOperationMode" pass="in" description="OIE Operation Mode" />			
 		</method>
 				
 		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
@@ -366,6 +427,36 @@ Custom implementation
 
 		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
 		</method>
+		
+		<method name="SetOIEPIDMode" description="Sets OIE PID Index.">
+			<param name="OIEPIDIndex" type="uint32" pass="in" description="OIE PID Index. MUST be between 0 and 63. 0 means PID disabled." />
+		</method>
+
+		<method name="DisableSkyWriting" description="Disable skywriting.">
+		</method>
+
+		<method name="EnableSkyWritingMode1" description="Enables skywriting on the list in mode 1. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+		</method>
+
+		<method name="EnableSkyWritingMode2" description="Enables skywriting on the list in mode 2. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+		</method>
+
+		<method name="EnableSkyWritingMode3" description="Enables skywriting on the list in mode 3. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
+		</method>
+		
 		
 	</class>
 
@@ -415,6 +506,7 @@ Custom implementation
 		</method>
 				
 
+
 	
 	</class>
 
@@ -445,12 +537,38 @@ Custom implementation
 			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
 		</method>		
 
-		<method name="Initialise" description="Initializes the RTC6 Scanner Driver.">
+		<method name="IsInitialized" description="Returns if the driver is initalized.">		
+			<param name="IsInitialized" type="bool" pass="return" description="Flag if driver is initialized." />
+		</method>		
+
+		<method name="Initialise" description="Manually initializes the RTC6 Scanner Driver.">
 			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
 			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
 			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
 			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
 		</method>
+
+		<method name="InitialiseFromConfiguration" description="Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.">
+			<param name="PresetName" type="string" pass="in" description="Name of the configuration preset." />
+		</method>
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
+
+		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
+		</method>		
+
+		<method name="GetNetmask" description="Returns the Netmask of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="Netmask" type="string" pass="return" description="Netmask Value." />
+		</method>		
+
+		<method name="GetSerialNumber" description="Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="SerialNumber" type="uint32" pass="return" description="Serial Number of card." />
+		</method>		
 
 		<method name="GetContext" description="Returns the RTC Context Instance. Fails if it card has not been initialised.">
 			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
@@ -500,17 +618,18 @@ Custom implementation
 			<param name="PolygonDelay" type="double" pass="in" description="Polygon delay in microseconds (will be rounded to a multiple of 10)" />		
 		</method>
 
+		<method name="SetOIERecordingMode" description="Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="in" description="Recording mode enum" />
+		</method>
+
+		<method name="GetOIERecordingMode" description="Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="return" description="Recording mode enum" />
+		</method>
 
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 		</method>
-
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
-			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
-			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
-			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
-		</method>		
 						
 		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
@@ -518,11 +637,152 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 						
-
+		
 	</class>
 
 
 
+
+	<class name="Driver_ScanLab_RTC6xN" parent="Driver_ScanLab" description="A LaserScanner Driver for multiple synchronized ScanLAB RTC6 cards.">
+
+		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
+		</method>
+		
+		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
+			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
+		</method>		
+
+		<method name="IsInitialized" description="Returns if all the scanners of the driver are initalized.">		
+			<param name="IsInitialized" type="bool" pass="return" description="Flag if driver is initialized." />
+		</method>		
+
+		<method name="ScannerIsInitialized" description="Returns if a specific scanners of the driver are initalized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="IsInitialized" type="bool" pass="return" description="Flag if scanner is initialized." />
+		</method>		
+
+		<method name="GetScannerCount" description="Returns if number of scanners.">		
+			<param name="NumberOfScanners" type="uint32" pass="return" description="Number of scanners supported by this driver." />
+		</method>		
+
+		<method name="InitialiseScanner" description="Initializes one of the RTC6 Scanner Drivers.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
+			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
+			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
+			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
+			<param name="LaserIndex" type="uint32" pass="in" description="Associated Laser Index from the toolpath data. 1-based, MUST NOT be 0. Each Scanner MUST own a unique laser index." />
+		</method>
+
+		<method name="InitialiseScannerFromConfiguration" description="Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="PresetName" type="string" pass="in" description="Name of the configuration preset." />
+		</method>
+
+		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
+		</method>		
+
+		<method name="GetNetmask" description="Returns the Netmask of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="Netmask" type="string" pass="return" description="Netmask Value." />
+		</method>		
+
+		<method name="GetSerialNumber" description="Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="SerialNumber" type="uint32" pass="return" description="Serial Number of card." />
+		</method>		
+		
+		<method name="GetLaserIndex" description="Returns associated Laser Index from the toolpath data.">		
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="LaserIndex" type="uint32" pass="return" description="Associated Laser Index from the toolpath data." />
+		</method>		
+
+		<method name="GetSelector" description="Returns the RTC Selector Instance. Fails if it card has not been initialised.">
+			<param name="SelectorInstance" type="class" class="RTCSelector" pass="return" description="RTC Selector Instance." />
+		</method>
+
+		<method name="GetContext" description="Returns the RTC Context Instance. Fails if it card has not been initialised.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
+		</method>
+				
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
+		</method>		
+		
+		<method name="SetCorrectionFile" description="Sets the correction file stream.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
+			<param name="TableNumber" type="uint32" pass="in" description="Correction table index of card (1..8)" />
+			<param name="Dimension" type="uint32" pass="in" description="Is it a 2D or 3D correction file." />
+			<param name="TableNumberHeadA" type="uint32" pass="in" description="Table number of Head A." />
+			<param name="TableNumberHeadB" type="uint32" pass="in" description="Table number of Head B." />
+		</method>		
+
+		<method name="ConfigureLaserMode" description="Configures the laser mode.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="LaserMode" type="enum" class="LaserMode" pass="in" description="Laser Mode Enum" />
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser Port Enum" />
+			<param name="MaxLaserPower" type="double" pass="in" description="Maximum laser power." />
+			<param name="FinishLaserPulseAfterOn" type="bool" pass="in" description="Finish laser pulse after LaserOn" />
+			<param name="PhaseShiftOfLaserSignal" type="bool" pass="in" description="180 degree phase shift of Laser signal" />
+			<param name="LaserOnSignalLowActive" type="bool" pass="in" description="Set Laser On Signal Low Active" />
+			<param name="LaserHalfSignalsLowActive" type="bool" pass="in" description="Set Laser Half Signal Low Active" />
+			<param name="SetDigitalInOneHighActive" type="bool" pass="in" description="Set Digital In 1 high Active" />
+			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
+		</method>
+
+		<method name="ConfigureDelays" description="Configures the default laser and scanner delays.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="LaserOnDelay" type="double" pass="in" description="Laser On Delay in Microseconds" />
+			<param name="LaserOffDelay" type="double" pass="in" description="Laser Off Delay in Microseconds" />
+			<param name="MarkDelay" type="double" pass="in" description="Mark delay in microseconds (will be rounded to a multiple of 10)" />
+			<param name="JumpDelay" type="double" pass="in" description="Jump delay in microseconds (will be rounded to a multiple of 10)" />
+			<param name="PolygonDelay" type="double" pass="in" description="Polygon delay in microseconds (will be rounded to a multiple of 10)" />		
+		</method>
+
+		<method name="SetOIERecordingMode" description="Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="in" description="Recording mode enum" />
+		</method>
+
+		<method name="GetOIERecordingMode" description="Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.">
+			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="return" description="Recording mode enum" />
+		</method>
+
+		<method name="DrawLayer" description="Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if ">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card." />
+		</method>
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
+						
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+						
+
+	</class>
 
 
 <!--

@@ -80,6 +80,11 @@ std::string CSignalHandler::GetSignalID()
 	return m_sSignalUUID;
 }
 
+std::string CSignalHandler::GetSignalUUID()
+{
+	return m_sSignalUUID;
+}
+
 std::string CSignalHandler::GetString(const std::string & sName)
 {
 	return m_pParameterGroup->getParameterValueByName(sName);

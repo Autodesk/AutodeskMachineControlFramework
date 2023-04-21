@@ -75,8 +75,14 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (sType == CDriver_ScanLab_OIE::getTypeString())
-		return new CDriver_ScanLab_OIE(sName, pDriverEnvironment);
+	if (sType == CDriver_ScanLab_OIE2::getTypeString())
+		return new CDriver_ScanLab_OIE2(sName, pDriverEnvironment);
+
+	if (sType == CDriver_ScanLab_OIE3::getTypeString())
+		return new CDriver_ScanLab_OIE3(sName, pDriverEnvironment);
+
+	if (sType == CDriver_ScanLab_OIE3Compat::getTypeString())
+		return new CDriver_ScanLab_OIE3Compat(sName, pDriverEnvironment);
 
 	return nullptr;
 }

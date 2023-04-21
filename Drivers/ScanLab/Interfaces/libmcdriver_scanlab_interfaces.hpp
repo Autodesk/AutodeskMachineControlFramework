@@ -61,6 +61,7 @@ class IRTCContext;
 class IRTCSelector;
 class IDriver_ScanLab;
 class IDriver_ScanLab_RTC6;
+class IDriver_ScanLab_RTC6xN;
 
 
 
@@ -539,10 +540,28 @@ public:
 	virtual void SetStandbyInMicroSeconds(const LibMCDriver_ScanLab_double dHalfPeriod, const LibMCDriver_ScanLab_double dPulseLength) = 0;
 
 	/**
+	* IRTCContext::GetIPAddress - Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
+	* @return IP Address Value.
+	*/
+	virtual std::string GetIPAddress() = 0;
+
+	/**
+	* IRTCContext::GetNetmask - Returns the Netmask of the RTC Card. Fails if driver has not been initialized.
+	* @return Netmask Value.
+	*/
+	virtual std::string GetNetmask() = 0;
+
+	/**
 	* IRTCContext::GetSerialNumber - Returns serial number of card
 	* @return Returns serial number of board.
 	*/
 	virtual LibMCDriver_ScanLab_uint32 GetSerialNumber() = 0;
+
+	/**
+	* IRTCContext::GetLaserIndex - Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.
+	* @return Returns laser index of board.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetLaserIndex() = 0;
 
 	/**
 	* IRTCContext::SetStartList - Opens the list to write
@@ -589,7 +608,7 @@ public:
 	* @param[in] nLaserOnDelay - LaserOn delay in bits (1/64th microseconds)
 	* @param[in] nLaserOffDelay - LaserOff delay in bits (1/64th microseconds)
 	*/
-	virtual void SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOnDelay, const LibMCDriver_ScanLab_uint32 nLaserOffDelay) = 0;
+	virtual void SetLaserDelaysInBits(const LibMCDriver_ScanLab_int32 nLaserOnDelay, const LibMCDriver_ScanLab_int32 nLaserOffDelay) = 0;
 
 	/**
 	* IRTCContext::DrawPolyline - Writes a polyline into the open list
@@ -603,6 +622,18 @@ public:
 	virtual void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
+	* IRTCContext::DrawPolylineOIE - Writes a polyline into the open list with OIE Enabled.
+	* @param[in] nPointsBufferSize - Number of elements in buffer
+	* @param[in] pPointsBuffer - Points of polyline to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
+	*/
+	virtual void DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex) = 0;
+
+	/**
 	* IRTCContext::DrawHatches - Writes a list of hatches into the open list
 	* @param[in] nHatchesBufferSize - Number of elements in buffer
 	* @param[in] pHatchesBuffer - Hatches to draw.
@@ -612,6 +643,18 @@ public:
 	* @param[in] fZValue - Focus Z Value
 	*/
 	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
+
+	/**
+	* IRTCContext::DrawHatchesOIE - Writes a list of hatches into the open list with OIE Enabled.
+	* @param[in] nHatchesBufferSize - Number of elements in buffer
+	* @param[in] pHatchesBuffer - Hatches to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
+	*/
+	virtual void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
@@ -692,8 +735,9 @@ public:
 	* IRTCContext::InitializeForOIE - Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.
 	* @param[in] nSignalChannelsBufferSize - Number of elements in buffer
 	* @param[in] pSignalChannelsBuffer - Array of signal channels. MUST NOT be empty
+	* @param[in] eOperationMode - OIE Operation Mode
 	*/
-	virtual void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer) = 0;
+	virtual void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode) = 0;
 
 	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
@@ -714,6 +758,45 @@ public:
 	* IRTCContext::StopOIEMeasurement - Writes an OIE measurement start command block to the open list.
 	*/
 	virtual void StopOIEMeasurement() = 0;
+
+	/**
+	* IRTCContext::SetOIEPIDMode - Sets OIE PID Index.
+	* @param[in] nOIEPIDIndex - OIE PID Index. MUST be between 0 and 63. 0 means PID disabled.
+	*/
+	virtual void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) = 0;
+
+	/**
+	* IRTCContext::DisableSkyWriting - Disable skywriting.
+	*/
+	virtual void DisableSkyWriting() = 0;
+
+	/**
+	* IRTCContext::EnableSkyWritingMode1 - Enables skywriting on the list in mode 1. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	*/
+	virtual void EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost) = 0;
+
+	/**
+	* IRTCContext::EnableSkyWritingMode2 - Enables skywriting on the list in mode 2. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	*/
+	virtual void EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost) = 0;
+
+	/**
+	* IRTCContext::EnableSkyWritingMode3 - Enables skywriting on the list in mode 3. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	* @param[in] dLimit - Skywriting Angle limit
+	*/
+	virtual void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit) = 0;
 
 };
 
@@ -837,13 +920,51 @@ public:
 	virtual bool IsSimulationMode() = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::Initialise - Initializes the RTC6 Scanner Driver.
+	* IDriver_ScanLab_RTC6::IsInitialized - Returns if the driver is initalized.
+	* @return Flag if driver is initialized.
+	*/
+	virtual bool IsInitialized() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::Initialise - Manually initializes the RTC6 Scanner Driver.
 	* @param[in] sIP - IP Network Address. Empty string for local card.
 	* @param[in] sNetmask - IP Netmask Address. Empty string for local card.
 	* @param[in] nTimeout - Time out in microseconds.
 	* @param[in] nSerialNumber - Desired Serial Number of card.
 	*/
 	virtual void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::InitialiseFromConfiguration - Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.
+	* @param[in] sPresetName - Name of the configuration preset.
+	*/
+	virtual void InitialiseFromConfiguration(const std::string & sPresetName) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::GetIPAddress - Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
+	* @return IP Address Value.
+	*/
+	virtual std::string GetIPAddress() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::GetNetmask - Returns the Netmask of the RTC Card. Fails if driver has not been initialized.
+	* @return Netmask Value.
+	*/
+	virtual std::string GetNetmask() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::GetSerialNumber - Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.
+	* @return Serial Number of card.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetSerialNumber() = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::GetContext - Returns the RTC Context Instance. Fails if it card has not been initialised.
@@ -912,19 +1033,23 @@ public:
 	virtual void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) = 0;
 
 	/**
+	* IDriver_ScanLab_RTC6::SetOIERecordingMode - Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+	* @param[in] eRecordingMode - Recording mode enum
+	*/
+	virtual void SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::GetOIERecordingMode - Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+	* @return Recording mode enum
+	*/
+	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
+
+	/**
 	* IDriver_ScanLab_RTC6::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
 	*/
 	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
-
-	/**
-	* IDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
-	* @param[in] dInitialTimeout - Initial timeout in ms
-	* @param[in] dMaxTimeout - Max timeout in ms
-	* @param[in] dMultiplier - Multiplier
-	*/
-	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
@@ -937,6 +1062,203 @@ public:
 };
 
 typedef IBaseSharedPtr<IDriver_ScanLab_RTC6> PIDriver_ScanLab_RTC6;
+
+
+/*************************************************************************************************************************
+ Class interface for Driver_ScanLab_RTC6xN 
+**************************************************************************************************************************/
+
+class IDriver_ScanLab_RTC6xN : public virtual IDriver_ScanLab {
+public:
+	/**
+	* IDriver_ScanLab_RTC6xN::SetToSimulationMode - Turns the driver into a simulation mode.
+	*/
+	virtual void SetToSimulationMode() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::IsSimulationMode - Returns if the driver is in simulation mode.
+	* @return Flag if driver is in simulation mode.
+	*/
+	virtual bool IsSimulationMode() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::IsInitialized - Returns if all the scanners of the driver are initalized.
+	* @return Flag if driver is initialized.
+	*/
+	virtual bool IsInitialized() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::ScannerIsInitialized - Returns if a specific scanners of the driver are initalized.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return Flag if scanner is initialized.
+	*/
+	virtual bool ScannerIsInitialized(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetScannerCount - Returns if number of scanners.
+	* @return Number of scanners supported by this driver.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetScannerCount() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::InitialiseScanner - Initializes one of the RTC6 Scanner Drivers.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] sIP - IP Network Address. Empty string for local card.
+	* @param[in] sNetmask - IP Netmask Address. Empty string for local card.
+	* @param[in] nTimeout - Time out in microseconds.
+	* @param[in] nSerialNumber - Desired Serial Number of card.
+	* @param[in] nLaserIndex - Associated Laser Index from the toolpath data. 1-based, MUST NOT be 0. Each Scanner MUST own a unique laser index.
+	*/
+	virtual void InitialiseScanner(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber, const LibMCDriver_ScanLab_uint32 nLaserIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::InitialiseScannerFromConfiguration - Initializes the RTC6 Scanner Driver from a configuration preset. Calls Initialise, LoadFirmware, SetCorrectionFile, ConfigureLaserMode and ConfigureDelays.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] sPresetName - Name of the configuration preset.
+	*/
+	virtual void InitialiseScannerFromConfiguration(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sPresetName) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetIPAddress - Returns the IP Address of the RTC Card. Fails if driver has not been initialized.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return IP Address Value.
+	*/
+	virtual std::string GetIPAddress(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetNetmask - Returns the Netmask of the RTC Card. Fails if driver has not been initialized.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return Netmask Value.
+	*/
+	virtual std::string GetNetmask(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetSerialNumber - Returns the Serial Number of the RTC Card. Fails if driver has not been initialized.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return Serial Number of card.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetSerialNumber(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetLaserIndex - Returns associated Laser Index from the toolpath data.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return Associated Laser Index from the toolpath data.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetLaserIndex(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetSelector - Returns the RTC Selector Instance. Fails if it card has not been initialised.
+	* @return RTC Selector Instance.
+	*/
+	virtual IRTCSelector * GetSelector() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetContext - Returns the RTC Context Instance. Fails if it card has not been initialised.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @return RTC Context Instance.
+	*/
+	virtual IRTCContext * GetContext(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::LoadFirmware - Loads the firmware from the driver resources.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	*/
+	virtual void LoadFirmware(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::LoadCustomFirmware - Loads the firmware from custom resources.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] nFPGADataBufferSize - Number of elements in buffer
+	* @param[in] pFPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+	* @param[in] pAuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	virtual void LoadCustomFirmware(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::SetCorrectionFile - Sets the correction file stream.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+	* @param[in] pCorrectionFileBuffer - binary data of the correction file.
+	* @param[in] nTableNumber - Correction table index of card (1..8)
+	* @param[in] nDimension - Is it a 2D or 3D correction file.
+	* @param[in] nTableNumberHeadA - Table number of Head A.
+	* @param[in] nTableNumberHeadB - Table number of Head B.
+	*/
+	virtual void SetCorrectionFile(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::ConfigureLaserMode - Configures the laser mode.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] eLaserMode - Laser Mode Enum
+	* @param[in] eLaserPort - Laser Port Enum
+	* @param[in] dMaxLaserPower - Maximum laser power.
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
+	*/
+	virtual void ConfigureLaserMode(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::ConfigureDelays - Configures the default laser and scanner delays.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
+	* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds
+	* @param[in] dMarkDelay - Mark delay in microseconds (will be rounded to a multiple of 10)
+	* @param[in] dJumpDelay - Jump delay in microseconds (will be rounded to a multiple of 10)
+	* @param[in] dPolygonDelay - Polygon delay in microseconds (will be rounded to a multiple of 10)
+	*/
+	virtual void ConfigureDelays(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::SetOIERecordingMode - Sets the recording mode for using the Open Interface extension. Will be taken into account by DrawLayer. Default is No Recording.
+	* @param[in] eRecordingMode - Recording mode enum
+	*/
+	virtual void SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetOIERecordingMode - Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.
+	* @return Recording mode enum
+	*/
+	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+	*/
+	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	virtual void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriver_ScanLab_RTC6xN> PIDriver_ScanLab_RTC6xN;
 
 
 /*************************************************************************************************************************

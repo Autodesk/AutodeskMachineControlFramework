@@ -33,6 +33,8 @@ Abstract: This is a stub class definition of CUIEnvironment
 
 #include "libmcenv_uienvironment.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_xmldocument.hpp"
+
 #include "amc_systemstate.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
@@ -381,3 +383,43 @@ ITestEnvironment* CUIEnvironment::GetTestEnvironment()
 {
     return new CTestEnvironment(m_sTestEnvironmentPath);
 }
+
+LibMCEnv::Impl::IXMLDocument* CUIEnvironment::CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace)
+{
+    auto pDocument = std::make_shared<AMC::CXMLDocumentInstance> ();
+
+    pDocument->createEmptyDocument(sRootNodeName, sDefaultNamespace);
+
+    return new CXMLDocument(pDocument);
+}
+
+LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLString(const std::string& sXMLString)
+{
+    auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+    try {
+        pDocument->parseXMLString(sXMLString);
+    } 
+    catch (std::exception& E) {
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING, "could not parse XML string: " + std::string (E.what()));
+    }
+
+    return new CXMLDocument(pDocument);
+
+}
+
+LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)
+{
+    auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+    try {
+        pDocument->parseXMLData(nXMLDataBufferSize, pXMLDataBuffer);
+    }
+    catch (std::exception& E) {
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTPARSEXMLDATA, "could not parse XML data: " + std::string(E.what()));
+    }
+
+    return new CXMLDocument(pDocument);
+
+}
+

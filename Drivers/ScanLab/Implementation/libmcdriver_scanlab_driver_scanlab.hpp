@@ -47,6 +47,22 @@ Abstract: This is the class declaration of CDriver_ScanLab
 // Include custom headers here.
 #include "libmcdriver_scanlab_sdk.hpp"
 
+#define RTC6_MIN_MAXLASERPOWER 10.0f
+#define RTC6_MAX_MAXLASERPOWER 10000.0f
+
+#define RTC6_MIN_LASER_DELAY -1000000.0f
+#define RTC6_MAX_LASER_DELAY 1000000.0f
+
+#define RTC6_MIN_MARK_DELAY 0.0
+#define RTC6_MAX_MARK_DELAY 1000000.0f
+#define RTC6_MIN_JUMP_DELAY 0.0
+#define RTC6_MAX_JUMP_DELAY 1000000.0f
+#define RTC6_MIN_POLYGON_DELAY 0.0
+#define RTC6_MAX_POLYGON_DELAY 1000000.0f
+
+#define SCANLAB_CONFIGURATIONSCHEMA "http://schemas.autodesk.com/amc/scanlab/2023/03"
+#define SCANLAB_MAX_VERSIONVALUE 1024
+
 namespace LibMCDriver_ScanLab {
 namespace Impl {
 

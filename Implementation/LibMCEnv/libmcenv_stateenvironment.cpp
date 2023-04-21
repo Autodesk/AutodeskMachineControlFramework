@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_build.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
+#include "libmcenv_xmldocument.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_ui_handler.hpp"
 #include "amc_statemachinedata.hpp"
+#include "amc_xmldocument.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -111,6 +113,34 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 	}
 
 	return false; 
+}
+
+ISignalHandler* CStateEnvironment::GetUnhandledSignal(const std::string& sSignalTypeName)
+{
+	std::string sCurrentSignalUUID;
+
+	if (m_pSystemState->stateSignalHandler()->checkSignal(m_sInstanceName, sSignalTypeName, sCurrentSignalUUID)) {
+		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sCurrentSignalUUID);
+	}
+
+	return nullptr;
+}
+
+ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist)
+{
+	std::string sNormalizedSignalUUID = AMCCommon::CUtils::normalizeUUIDString (sUUID);
+
+	if (m_pSystemState->stateSignalHandler()->checkSignalUUID(m_sInstanceName, sNormalizedSignalUUID)) {
+		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sNormalizedSignalUUID);
+	}
+	else {
+		if (bMustExist)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SIGNALUUIDNOTACTIVE, "signal uuid not active: " + sNormalizedSignalUUID);
+
+		return nullptr;
+	}
+
+
 }
 
 
@@ -395,4 +425,43 @@ LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
 ITestEnvironment* CStateEnvironment::GetTestEnvironment()
 {
 	return new CTestEnvironment(m_pSystemState->getTestEnvironmentPath ());
+}
+
+LibMCEnv::Impl::IXMLDocument* CStateEnvironment::CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace)
+{
+	auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+	pDocument->createEmptyDocument(sRootNodeName, sDefaultNamespace);
+
+	return new CXMLDocument(pDocument);
+}
+
+LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLString(const std::string& sXMLString)
+{
+	auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+	try {
+		pDocument->parseXMLString(sXMLString);
+	}
+	catch (std::exception& E) {
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING, "could not parse XML string: " + std::string(E.what()));
+	}
+
+	return new CXMLDocument(pDocument);
+
+}
+
+LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)
+{
+	auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+	try {
+		pDocument->parseXMLData(nXMLDataBufferSize, pXMLDataBuffer);
+	}
+	catch (std::exception& E) {
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTPARSEXMLDATA, "could not parse XML data: " + std::string(E.what()));
+	}
+
+	return new CXMLDocument(pDocument);
+
 }

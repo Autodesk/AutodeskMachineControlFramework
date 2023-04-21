@@ -66,6 +66,10 @@ class IWorkingFileExecution;
 class IWorkingFile;
 class IWorkingFileIterator;
 class IWorkingDirectory;
+class IXMLDocumentAttribute;
+class IXMLDocumentNode;
+class IXMLDocumentNodes;
+class IXMLDocument;
 class ITCPIPPacket;
 class ITCPIPConnection;
 class IModbusTCPDigitalIOStatus;
@@ -536,20 +540,106 @@ public:
 	virtual std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
-	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* IToolpathLayer::SegmentProfileHasValue - Retrieves an assigned profile custom value.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Returns true if value exist.
+	*/
+	virtual bool SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value. Fails if value does not exist.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName) = 0;
+	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
 
 	/**
-	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* IToolpathLayer::GetSegmentProfileValueDef - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] sDefaultValue - Default value if value does not exist.
+	* @return String Value.
+	*/
+	virtual std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileDoubleValue - Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Double Value.
+	*/
+	virtual LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileDoubleValueDef - Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] dDefaultValue - Default value if value does not exist.
+	* @return Double Value.
+	*/
+	virtual LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileIntegerValue - Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Integer Value.
+	*/
+	virtual LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileIntegerValueDef - Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] nDefaultValue - Default value if value does not exist.
+	* @return Integer Value.
+	*/
+	virtual LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileBoolValue - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @return Boolean Value.
+	*/
+	virtual bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileBoolValueDef - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sNamespace - Namespace to query for.
+	* @param[in] sValueName - Value Name to query for.
+	* @param[in] bDefaultValue - Default value if value does not exist.
+	* @return Boolean Value.
+	*/
+	virtual bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
 	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileTypedValueDef - Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
+	* @param[in] dDefaultValue - Default value if value does not exist.
+	* @return Double Value
+	*/
+	virtual LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.
@@ -1017,6 +1107,411 @@ typedef IBaseSharedPtr<IWorkingDirectory> PIWorkingDirectory;
 
 
 /*************************************************************************************************************************
+ Class interface for XMLDocumentAttribute 
+**************************************************************************************************************************/
+
+class IXMLDocumentAttribute : public virtual IBase {
+public:
+	/**
+	* IXMLDocumentAttribute::GetNameSpace - Retrieves namespace of the attribute.
+	* @return returns the namespace of the attribute.
+	*/
+	virtual std::string GetNameSpace() = 0;
+
+	/**
+	* IXMLDocumentAttribute::GetName - Retrieves name of the attribute.
+	* @return returns the name of the attribute.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IXMLDocumentAttribute::GetValue - Retrieves value of the attribute as string.
+	* @return returns the value of the attribute.
+	*/
+	virtual std::string GetValue() = 0;
+
+	/**
+	* IXMLDocumentAttribute::IsValidInteger - Checks if the value is a valid integer in the given range.
+	* @param[in] nMinValue - Minimum allowed value
+	* @param[in] nMaxValue - Maximum allowed value
+	* @return returns if the value is a valid integer.
+	*/
+	virtual bool IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::GetIntegerValue - Returns the value as integer. Fails if the value is not a valid integer in the given range.
+	* @param[in] nMinValue - Minimum allowed value
+	* @param[in] nMaxValue - Maximum allowed value
+	* @return returns the value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerValue(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::IsValidDouble - Checks if the value is a valid double in the given range.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return returns if the value is a valid double.
+	*/
+	virtual bool IsValidDouble(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::GetDoubleValue - Returns the value as double. Fails if the value is not a valid double in the given range.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return returns the value .
+	*/
+	virtual LibMCEnv_double GetDoubleValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::IsValidBool - Checks if the value is a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
+	* @return returns if the value is a valid bool.
+	*/
+	virtual bool IsValidBool() = 0;
+
+	/**
+	* IXMLDocumentAttribute::GetBoolValue - Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return returns the value .
+	*/
+	virtual bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::SetValue - Sets the value of the attribute as string.
+	* @param[in] sValue - new value of the attribute.
+	*/
+	virtual void SetValue(const std::string & sValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::SetIntegerValue - Sets the value of the attribute as integer.
+	* @param[in] nValue - new value of the attribute.
+	*/
+	virtual void SetIntegerValue(const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::SetDoubleValue - Sets the value of the attribute as double.
+	* @param[in] dValue - new value of the attribute.
+	*/
+	virtual void SetDoubleValue(const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::SetBoolValue - Sets the value of the attribute as bool.
+	* @param[in] bValue - new value of the attribute.
+	*/
+	virtual void SetBoolValue(const bool bValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::Remove - Removes the attribute from its parent node. All subsequent calls to the class will fail.
+	*/
+	virtual void Remove() = 0;
+
+};
+
+typedef IBaseSharedPtr<IXMLDocumentAttribute> PIXMLDocumentAttribute;
+
+
+/*************************************************************************************************************************
+ Class interface for XMLDocumentNode 
+**************************************************************************************************************************/
+
+class IXMLDocumentNode : public virtual IBase {
+public:
+	/**
+	* IXMLDocumentNode::GetName - Retrieves name of the node.
+	* @return returns the name of the node.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IXMLDocumentNode::GetNameSpace - Retrieves namespace of the node.
+	* @return returns the namespace of the node.
+	*/
+	virtual std::string GetNameSpace() = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeCount - Returns number of attributes.
+	* @return returns the number of attributes.
+	*/
+	virtual LibMCEnv_uint64 GetAttributeCount() = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttribute - Returns attribute instance. Fails if Index is out of range.
+	* @param[in] nIndex - Index of the attribute to return (0-based).
+	* @return XML Document attribute.
+	*/
+	virtual IXMLDocumentAttribute * GetAttribute(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IXMLDocumentNode::HasAttribute - Returns if attribute of a specific name exists.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Returns if the attribute exists.
+	*/
+	virtual bool HasAttribute(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::FindAttribute - Returns attribute instance of a specific name. 
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] bMustExist - If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist.
+	* @return XML Document attribute.
+	*/
+	virtual IXMLDocumentAttribute * FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
+
+	/**
+	* IXMLDocumentNode::RemoveAttribute - Removes the attribute with a specific name. Does nothing if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	*/
+	virtual void RemoveAttribute(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::RemoveAttributeByIndex - Removes the attribute with a specific index. Does nothing if attribute does not exist.
+	* @param[in] nIndex - Index of the attribute to remove (0-based).
+	*/
+	virtual void RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IXMLDocumentNode::AddAttribute - Adds an attribute with a specific name and string value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sValue - Value of the attribute.
+	*/
+	virtual void AddAttribute(const std::string & sNameSpace, const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* IXMLDocumentNode::AddIntegerAttribute - Adds an attribute with a specific name and integer value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the attribute. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nValue - Value of the attribute.
+	*/
+	virtual void AddIntegerAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IXMLDocumentNode::AddDoubleAttribute - Adds an attribute with a specific name and double value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dValue - Value of the attribute.
+	*/
+	virtual void AddDoubleAttribute(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IXMLDocumentNode::AddBoolAttribute - Adds an attribute with a specific name and bool value. Fails if attribute already exists.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] bValue - Value of the attribute.
+	*/
+	virtual void AddBoolAttribute(const std::string & sNameSpace, const std::string & sName, const bool bValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetChildren - Returns all the child nodes of the XML Node.
+	* @return returns the list of child nodes.
+	*/
+	virtual IXMLDocumentNodes * GetChildren() = 0;
+
+	/**
+	* IXMLDocumentNode::CountChildrenByName - Returns how many children of the XML Node have a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the node.
+	* @return returns the number children with the specified name.
+	*/
+	virtual LibMCEnv_uint64 CountChildrenByName(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::GetChildrenByName - Returns all the child nodes of the XML Node with a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @return returns the list of child nodes.
+	*/
+	virtual IXMLDocumentNodes * GetChildrenByName(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::HasChild - Returns if a child with a specific name exist.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @return returns if a child with a specific name exists.
+	*/
+	virtual bool HasChild(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::HasUniqueChild - Returns if a child with a specific name exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @return returns if a child with a specific name exists once and only once.
+	*/
+	virtual bool HasUniqueChild(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::FindChild - Returns child with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @param[in] bMustExist - If true, the call fails if child does not exist. If falls, the call will return null if the child does not exist.
+	* @return returns child instance or null.
+	*/
+	virtual IXMLDocumentNode * FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
+
+	/**
+	* IXMLDocumentNode::AddChild - Adds a new child with a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @return returns child instance.
+	*/
+	virtual IXMLDocumentNode * AddChild(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::RemoveChild - Removes a child with a specific name. All subsequent calls to the child will fail after the call.
+	* @param[in] pChildInstance - child instance to remove. Fails if given instance is not a child of the node.
+	*/
+	virtual void RemoveChild(IXMLDocumentNode* pChildInstance) = 0;
+
+	/**
+	* IXMLDocumentNode::RemoveChildrenWithName - Removes all children with a specific name. Does nothing if no child with the name exists. . All subsequent calls to the deleted children will fail after the call.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the children.
+	*/
+	virtual void RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::Remove - Removes the node from its parent. The root node of the document can not be removed.
+	*/
+	virtual void Remove() = 0;
+
+};
+
+typedef IBaseSharedPtr<IXMLDocumentNode> PIXMLDocumentNode;
+
+
+/*************************************************************************************************************************
+ Class interface for XMLDocumentNodes 
+**************************************************************************************************************************/
+
+class IXMLDocumentNodes : public virtual IBase {
+public:
+	/**
+	* IXMLDocumentNodes::GetNodeCount - Returns number of nodes.
+	* @return returns the number of nodes in the list.
+	*/
+	virtual LibMCEnv_uint64 GetNodeCount() = 0;
+
+	/**
+	* IXMLDocumentNodes::GetNode - Returns node instance. Fails if Index is out of range.
+	* @param[in] nIndex - Index of the node to return (0-based).
+	* @return XML Node node.
+	*/
+	virtual IXMLDocumentNode * GetNode(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IXMLDocumentNodes::CountNodesByName - Returns how many nodes of the XML Node have a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the node.
+	* @return returns the number of nodes with the specified name.
+	*/
+	virtual LibMCEnv_uint64 CountNodesByName(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNodes::GetNodesByName - Returns all the nodes nodes of the XML Node with a specific name.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the node.
+	* @return returns the list of node nodes.
+	*/
+	virtual IXMLDocumentNodes * GetNodesByName(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNodes::HasNode - Returns if a node with a specific name exist.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the node.
+	* @return returns if a node with a specific name exists.
+	*/
+	virtual bool HasNode(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNodes::HasUniqueNode - Returns if a node with a specific name exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the node.
+	* @return returns if a node with a specific name exists once and only once.
+	*/
+	virtual bool HasUniqueNode(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNodes::FindNode - Returns node with a specific name. Throws an error if name does not exist once and only once.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the node.
+	* @param[in] bMustExist - If true, the call fails if node does not exist. If falls, the call will return null if the node does not exist.
+	* @return returns node instance.
+	*/
+	virtual IXMLDocumentNode * FindNode(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
+
+};
+
+typedef IBaseSharedPtr<IXMLDocumentNodes> PIXMLDocumentNodes;
+
+
+/*************************************************************************************************************************
+ Class interface for XMLDocument 
+**************************************************************************************************************************/
+
+class IXMLDocument : public virtual IBase {
+public:
+	/**
+	* IXMLDocument::GetDefaultNamespace - Returns default name space of the document.
+	* @return name space of the document.
+	*/
+	virtual std::string GetDefaultNamespace() = 0;
+
+	/**
+	* IXMLDocument::GetNamespaceCount - Returns the used number of name spaces of the document.
+	* @return number of registered name spaces of the document.
+	*/
+	virtual LibMCEnv_uint64 GetNamespaceCount() = 0;
+
+	/**
+	* IXMLDocument::GetNamespace - Returns a name space of the document. Will fail if index is invalid.
+	* @param[in] nIndex - index of name space. 0-based.
+	* @param[out] sNamespace - name space of the document.
+	* @param[out] sNamespacePrefix - name space prefix of the document. Empty for root namespace.
+	*/
+	virtual void GetNamespace(const LibMCEnv_uint64 nIndex, std::string & sNamespace, std::string & sNamespacePrefix) = 0;
+
+	/**
+	* IXMLDocument::HasNamespace - Returns if the document has a namespace.
+	* @param[in] sNamespace - Name space name.
+	* @return name space has been registered.
+	*/
+	virtual bool HasNamespace(const std::string & sNamespace) = 0;
+
+	/**
+	* IXMLDocument::GetNamespacePrefix - Returns a name space of the document. Will fail if namespace is not registered.
+	* @param[in] sNamespace - name space of the document.
+	* @return name space prefix of the document. Empty for root namespace.
+	*/
+	virtual std::string GetNamespacePrefix(const std::string & sNamespace) = 0;
+
+	/**
+	* IXMLDocument::RegisterNamespace - Registers a custom namespace prefix. Given Namespace MUST NOT have been in use before calling this function.
+	* @param[in] sNamespace - name space to register
+	* @param[in] sNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+	*/
+	virtual void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix) = 0;
+
+	/**
+	* IXMLDocument::GetRootNode - Returns root node of the document.
+	* @return Root node of the document.
+	*/
+	virtual IXMLDocumentNode * GetRootNode() = 0;
+
+	/**
+	* IXMLDocument::SaveToString - Saves the XML document into a string.
+	* @param[in] bAddLineBreaks - If true, line breaks and indentation will be added to the output string.
+	* @return String with the XML Content.
+	*/
+	virtual std::string SaveToString(const bool bAddLineBreaks) = 0;
+
+};
+
+typedef IBaseSharedPtr<IXMLDocument> PIXMLDocument;
+
+
+/*************************************************************************************************************************
  Class interface for TCPIPPacket 
 **************************************************************************************************************************/
 
@@ -1406,6 +1901,29 @@ public:
 	virtual IModbusTCPConnection * CreateModbusTCPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS) = 0;
 
 	/**
+	* IDriverEnvironment::CreateXMLDocument - creates an empty XML Document.
+	* @param[in] sRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+	* @param[in] sDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace) = 0;
+
+	/**
+	* IDriverEnvironment::ParseXMLString - parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+	* @param[in] sXMLString - XML String.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * ParseXMLString(const std::string & sXMLString) = 0;
+
+	/**
+	* IDriverEnvironment::ParseXMLData - parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+	* @param[in] nXMLDataBufferSize - Number of elements in buffer
+	* @param[in] pXMLDataBuffer - XML Binary data.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
+
+	/**
 	* IDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -1721,10 +2239,16 @@ public:
 	virtual std::string GetName() = 0;
 
 	/**
-	* ISignalHandler::GetSignalID - Returns the signal id.
+	* ISignalHandler::GetSignalID - Returns the signal id. Depreciated.
 	* @return Signal Identifier
 	*/
 	virtual std::string GetSignalID() = 0;
+
+	/**
+	* ISignalHandler::GetSignalUUID - Returns the signal uuid. Identical to GetSignalID.
+	* @return Signal Identifier
+	*/
+	virtual std::string GetSignalUUID() = 0;
 
 	/**
 	* ISignalHandler::GetStateMachine - Returns the signal state machine instance.
@@ -1829,13 +2353,28 @@ public:
 	virtual ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
 
 	/**
-	* IStateEnvironment::WaitForSignal - waits for a signal.
+	* IStateEnvironment::WaitForSignal - Waits for a signal for a certain amount of time.
 	* @param[in] sSignalName - Name Of Signal
 	* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
 	* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
 	* @return Signal has been triggered
 	*/
 	virtual bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) = 0;
+
+	/**
+	* IStateEnvironment::GetUnhandledSignal - Retrieves an unhandled signal By signal type name.
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Signal object. If no signal has been found the signal handler object will be null.
+	*/
+	virtual ISignalHandler * GetUnhandledSignal(const std::string & sSignalTypeName) = 0;
+
+	/**
+	* IStateEnvironment::GetUnhandledSignalByUUID - retrieves an unhandled signal from the current state machine by UUID.
+	* @param[in] sUUID - Name
+	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
+	* @return Signal handler instance. Returns null, if signal does not exist.
+	*/
+	virtual ISignalHandler * GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist) = 0;
 
 	/**
 	* IStateEnvironment::GetDriverLibrary - Returns the driver type and library lookup for a specific registered driver.
@@ -1901,21 +2440,21 @@ public:
 	virtual bool CheckForTermination() = 0;
 
 	/**
-	* IStateEnvironment::StoreSignal - stores a signal handler in the current state machine
+	* IStateEnvironment::StoreSignal - DEPRECIATED: stores a signal handler in the current state machine
 	* @param[in] sName - Name
 	* @param[in] pHandler - Signal handler to store.
 	*/
 	virtual void StoreSignal(const std::string & sName, ISignalHandler* pHandler) = 0;
 
 	/**
-	* IStateEnvironment::RetrieveSignal - retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
+	* IStateEnvironment::RetrieveSignal - DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
 	* @param[in] sName - Name
 	* @return Signal handler instance.
 	*/
 	virtual ISignalHandler * RetrieveSignal(const std::string & sName) = 0;
 
 	/**
-	* IStateEnvironment::ClearStoredValue - deletes a value from the data store.
+	* IStateEnvironment::ClearStoredValue - DEPRECIATED: deletes a value from the data store.
 	* @param[in] sName - Name
 	*/
 	virtual void ClearStoredValue(const std::string & sName) = 0;
@@ -2049,6 +2588,29 @@ public:
 	* @return Test Environment Instance
 	*/
 	virtual ITestEnvironment * GetTestEnvironment() = 0;
+
+	/**
+	* IStateEnvironment::CreateXMLDocument - creates an empty XML Document.
+	* @param[in] sRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+	* @param[in] sDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace) = 0;
+
+	/**
+	* IStateEnvironment::ParseXMLString - parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+	* @param[in] sXMLString - XML String.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * ParseXMLString(const std::string & sXMLString) = 0;
+
+	/**
+	* IStateEnvironment::ParseXMLData - parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+	* @param[in] nXMLDataBufferSize - Number of elements in buffer
+	* @param[in] pXMLDataBuffer - XML Binary data.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 };
 
@@ -2319,6 +2881,29 @@ public:
 	* @return Test Environment Instance
 	*/
 	virtual ITestEnvironment * GetTestEnvironment() = 0;
+
+	/**
+	* IUIEnvironment::CreateXMLDocument - creates an empty XML Document.
+	* @param[in] sRootNodeName - Name of the root node. MUST be a valid XML Node Name string.
+	* @param[in] sDefaultNamespace - Default namespace of the document. MUST be a valid XML namespace string.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace) = 0;
+
+	/**
+	* IUIEnvironment::ParseXMLString - parses an XML String and returns an XML Document instance. Throws an error if XML is malformatted.
+	* @param[in] sXMLString - XML String.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * ParseXMLString(const std::string & sXMLString) = 0;
+
+	/**
+	* IUIEnvironment::ParseXMLData - parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.
+	* @param[in] nXMLDataBufferSize - Number of elements in buffer
+	* @param[in] pXMLDataBuffer - XML Binary data.
+	* @return XML Document Instance.
+	*/
+	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 };
 
