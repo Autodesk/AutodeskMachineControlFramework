@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <array>
 #include <map>
 #include <vector>
 
@@ -48,11 +49,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace LibMCDriver_CifX {
 namespace Impl {
 
-
+	typedef std::array<uint8_t, 8> CDriver_CifXChannelEndianValue;
 
 	class CDriver_CifXChannelBuffer {
 	private:
 		std::vector<uint8_t> m_Data;
+
+		void readEndianValue (uint32_t nAddress, uint32_t nSize, bool bIsBigEndian, CDriver_CifXChannelEndianValue& outputValue);
+		void writeEndianValue(uint32_t nAddress, uint32_t nSize, bool bIsBigEndian, uint8_t * pValue);
 
 	public:
 		CDriver_CifXChannelBuffer(uint32_t nSize);
@@ -61,24 +65,24 @@ namespace Impl {
 		void clear();
 
 		uint8_t readUint8(uint32_t nAddress);
-		uint16_t readUint16(uint32_t nAddress);
-		uint32_t readUint32(uint32_t nAddress);
+		uint16_t readUint16(uint32_t nAddress, bool bReadBigEndian);
+		uint32_t readUint32(uint32_t nAddress, bool bReadBigEndian);
 		int8_t readInt8(uint32_t nAddress);
-		int16_t readInt16(uint32_t nAddress);
-		int32_t readInt32(uint32_t nAddress);
+		int16_t readInt16(uint32_t nAddress, bool bReadBigEndian);
+		int32_t readInt32(uint32_t nAddress, bool bReadBigEndian);
 		bool readBool(uint32_t nAddress, uint32_t nBit);
-		float readFloat(uint32_t nAddress);
-		double readDouble(uint32_t nAddress);
+		float readFloat(uint32_t nAddress, bool bReadBigEndian);
+		double readDouble(uint32_t nAddress, bool bReadBigEndian);
 
 		void writeUint8(uint32_t nAddress, uint8_t nValue);
-		void writeUint16(uint32_t nAddress, uint16_t nValue);
-		void writeUint32(uint32_t nAddress, uint32_t nValue);
+		void writeUint16(uint32_t nAddress, uint16_t nValue, bool bWriteBigEndian);
+		void writeUint32(uint32_t nAddress, uint32_t nValue, bool bWriteBigEndian);
 		void writeInt8(uint32_t nAddress, int8_t nValue);
-		void writeInt16(uint32_t nAddress, int16_t nValue);
-		void writeInt32(uint32_t nAddress, int32_t nValue);
+		void writeInt16(uint32_t nAddress, int16_t nValue, bool bWriteBigEndian);
+		void writeInt32(uint32_t nAddress, int32_t nValue, bool bWriteBigEndian);
 		void writeBool(uint32_t nAddress, uint32_t nBit, bool bValue);
-		void writeFloat(uint32_t nAddress, float fValue);
-		void writeDouble(uint32_t nAddress, double dValue);
+		void writeFloat(uint32_t nAddress, float fValue, bool bWriteBigEndian);
+		void writeDouble(uint32_t nAddress, double dValue, bool bWriteBigEndian);
 
 		std::vector<uint8_t>& getBuffer();
 	};

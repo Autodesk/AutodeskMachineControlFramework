@@ -140,6 +140,23 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY 1033 /** Invalid scanner delay. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK 1034 /** Invalid SCANLAB SDK. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY 1035 /** Invalid OIE Signal buffer array. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG 1036 /** Invalid Skywriting Timelag. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT 1037 /** Invalid Skywriting Laser On Shift. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV 1038 /** Invalid Skywriting N Prev. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST 1039 /** Invalid Skywriting N Post. */
+#define LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED 1040 /** OIE has not been initialized. */
+#define LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE 1041 /** Unsupported OIE Operation Mode. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCCORRECTIONDATA 1042 /** Invalid RTC Correction data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND 1043 /** Configuration preset not found. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT 1044 /** Invalid scanner count. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX 1045 /** Invalid scanner index. */
+#define LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER 1046 /** Laser index has no assigned scanner. */
+#define LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXNOTFOUND 1047 /** Laser index not found. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX 1048 /** Duplicate laser index. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCONFIGURATIONSCHEMA 1049 /** Invalid configuration schema. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION 1050 /** No version definition. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME 1051 /** Duplicate configuration preset name. */
+#define LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS 1052 /** OIE PID Variable out of bounds. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -192,6 +209,23 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY: return "Invalid scanner delay.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK: return "Invalid SCANLAB SDK.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY: return "Invalid OIE Signal buffer array.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG: return "Invalid Skywriting Timelag.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT: return "Invalid Skywriting Laser On Shift.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV: return "Invalid Skywriting N Prev.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST: return "Invalid Skywriting N Post.";
+    case LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED: return "OIE has not been initialized.";
+    case LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE: return "Unsupported OIE Operation Mode.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCCORRECTIONDATA: return "Invalid RTC Correction data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_CONFIGURATIONPRESETNOTFOUND: return "Configuration preset not found.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT: return "Invalid scanner count.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX: return "Invalid scanner index.";
+    case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER: return "Laser index has no assigned scanner.";
+    case LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXNOTFOUND: return "Laser index not found.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERINDEX: return "Duplicate laser index.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCONFIGURATIONSCHEMA: return "Invalid configuration schema.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION: return "No version definition.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
+    case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIE PID Variable out of bounds.";
     default: return "unknown error";
   }
 }
@@ -206,6 +240,7 @@ typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCContext;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCSelector;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab_RTC6;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN;
 
 namespace LibMCDriver_ScanLab {
 
@@ -228,6 +263,21 @@ namespace LibMCDriver_ScanLab {
     Port16bitDigital = 2,
     Port12BitAnalog1 = 3,
     Port12BitAnalog2 = 4
+  };
+  
+  enum class eOIEOperationMode : LibMCDriver_ScanLab_int32 {
+    OIENotInitialized = 0,
+    OIEVersion2 = 1,
+    OIEVersion3Compatibility = 2,
+    OIEVersion3 = 3
+  };
+  
+  enum class eOIERecordingMode : LibMCDriver_ScanLab_int32 {
+    OIERecordingDisabled = 0, /** OIE shall not record anything. */
+    OIEContinuousMeasurement = 1, /** OIE shall continuously record, even if the laser is off. OIE must be enabled before drawing a layer. */
+    OIEEnableAndContinuousMeasurement = 2, /** OIE shall continuously record, even if the laser is off. OIE will be specifically enabled for the layer. */
+    OIELaserActiveMeasurement = 3, /** OIE shall record when the laser is on. OIE must be enabled before drawing a layer. */
+    OIEEnableAndLaserActiveMeasurement = 4 /** OIE shall record when the laser is on. OIE will be specifically enabled for the layer. */
   };
   
   /*************************************************************************************************************************
@@ -255,6 +305,8 @@ namespace LibMCDriver_ScanLab {
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_ScanLab::eLaserMode eLibMCDriver_ScanLabLaserMode;
 typedef LibMCDriver_ScanLab::eLaserPort eLibMCDriver_ScanLabLaserPort;
+typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationMode;
+typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;
 

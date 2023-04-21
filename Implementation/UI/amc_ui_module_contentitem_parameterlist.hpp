@@ -50,22 +50,24 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_ContentParameterList, PUIModule_ContentParameterList);
 	amcDeclareDependingClass(CUIModule_ContentParameterListEntry, PUIModule_ContentParameterListEntry);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
-	
+	amcDeclareDependingClass(CParameterGroup, PParameterGroup);
+
 	class CUIModule_ContentParameterListEntry {
 	private:
-		std::string m_sStateMachine;
+		std::string m_sInstance;
 		std::string m_sParameterGroup;
 		std::string m_sParameter;
 	public:
 
-		CUIModule_ContentParameterListEntry(const std::string & sStateMachine, const std::string & sParameterGroup, const std::string & sParameter);
+		CUIModule_ContentParameterListEntry(const std::string & sInstance, const std::string & sParameterGroup, const std::string & sParameter);
 		~CUIModule_ContentParameterListEntry();
 
-		std::string getStateMachine ();
+		std::string getInstance ();
 		std::string getParameterGroup ();
 		std::string getParameter ();
 
 		bool isFullGroup();
+		bool isFullInstance();
 
 	};
 
@@ -85,6 +87,8 @@ namespace AMC {
 
 		PStateMachineData m_pStateMachineData;
 
+		void addParameterGroupToJSON(CJSONWriter& writer, AMC::PParameterGroup pParameterGroup, CJSONWriterArray& entryArray, bool fullGroup, const std::string & sParameterName, const std::string & sParameterHandlerDescription);
+
 	public:
 
 		static PUIModule_ContentParameterList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
@@ -97,7 +101,7 @@ namespace AMC {
 
 		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
-		void addEntry(const std::string& sStateMachine, const std::string& sParameterGroup, const std::string& sParameter);
+		void addEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter);
 
 		uint32_t getEntryCount();
 

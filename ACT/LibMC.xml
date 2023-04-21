@@ -50,7 +50,7 @@
 	<importcomponent uri="LibMCData.xml" namespace="LibMCData"/>
 	
 	<errors>
-				<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
 		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
 		<error name="INVALIDCAST" code="3" description="a type cast failed" />
 		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
@@ -479,15 +479,43 @@
 		<error name="INVALIDBUTTONNAME" code="447" description="Invalid button name" />		
 		
 		<error name="RESOURCEENTRYISNOUTF8STRING" code="448" description="Resource entry is no UTF8 string" />
-		<error name="AMBIGUOUSDRIVERCONFIGURATION" code="449" description="Ambiguous driver configuration" />		
-		
+		<error name="AMBIGUOUSDRIVERCONFIGURATION" code="449" description="Ambiguous driver configuration" />				
 		<error name="COULDNOTCREATEDRIVER" code="450" description="Could not create driver" />		
+		<error name="EMPTYGROUPNAMEBUTPARAMETERGIVEN" code="451" description="Empty group name but parameter given" />
+		<error name="INVALIDDEFAULTXMLNAMESPACE" code="452" description="invalid default xml namespace name." />		
+		<error name="INVALIDXMLROOTNODENAME" code="453" description="invalid xml root node name." />				
+		<error name="COULDNOTPARSEXMLSTRING" code="454" description="could not parse XML String." />		
+		<error name="COULDNOTPARSEXMLDATA" code="455" description="could not parse XML Data." />		
+		<error name="XMLDOESNOTCONTAINROOTNODE" code="456" description="XML does not contain root node." />		
+		<error name="XMLCONTAINSAMBIGOUSROOTNODES" code="457" description="XML contains ambiguous root nodes." />		
+		<error name="XMLDOESNOTCONTAINNAMESPACE" code="458" description="XML does not contain namespace." />		
+		<error name="INVALIDXMLDATA" code="459" description="invalid XML Data." />		
+		<error name="INVALIDXMLROOTNODEINSTANCE" code="460" description="invalid XML root node instance." />		
+		<error name="XMLNAMESPACEPREFIXALREADYREGISTERED" code="461" description="XML namespace prefix already registered." />		
+		<error name="XMLNAMESPACEALREADYREGISTERED" code="462" description="XML namespace already registered." />		
+		<error name="XMLNAMESPACENOTFOUND" code="463" description="XML namespace not found." />				
+		<error name="INVALIDNAMESPACENAME" code="464" description="Invalid namespace name." />				
+		<error name="INVALIDNAMESPACEPREFIX" code="465" description="Invalid namespace prefix." />
+		<error name="INVALIDNAMESPACEINDEX" code="466" description="Invalid namespace index." />
+		<error name="INVALIDATTRIBUTEINDEX" code="467" description="Invalid attribute index." />
+		<error name="PROFILEVALUENOTFOUND" code="468" description="Profile value not found." />
+		<error name="INVALIDXMLNODENAME" code="469" description="Invalid xml node name." />		
+		<error name="INVALIDXMLNAMESPACE" code="470" description="Invalid xml namespace." />
+		<error name="COULDNOTFINDATTRIBUTE" code="471" description="Could not find attribute." />
+		<error name="DUPLICATEATTRIBUTE" code="472" description="Duplicate attribute." />
+		<error name="INTERNALATTRIBUTEERROR" code="473" description="Internal attribute error." />
+		<error name="XMLNODECHILDNOTFOUND" code="474" description="XML node child not found." />
+		<error name="INVALIDXMLNODEINDEX" code="475" description="Invalid XML Node index." />				
+		<error name="INTERNALNODEERROR" code="476" description="Internal node error." />				
+		<error name="XMLNODENOTFOUNDINLIST" code="477" description="XML node not found in list." />				
+		<error name="COULDNOTFINDXMLNAMESPACE" code="478" description="Could not find XML Namespace" />				
+		<error name="INVALIDCOMPONENTNAME" code="489" description="invalid component name." />
+		<error name="MISSINGCOMPONENTNAME" code="490" description="missing component name." />
+		<error name="CUSTOMPAGEPROPERTYNAMEMISSING" code="491" description="custom page property name missing." />
+		<error name="CUSTOMPAGEPROPERTYTYPEMISSING" code="492" description="custom page property type missing." />
 		
 		
-		
-		
-		
-		  
+
 	</errors>
 	
 	

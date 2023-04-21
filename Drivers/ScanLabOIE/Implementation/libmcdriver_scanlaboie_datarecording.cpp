@@ -65,7 +65,7 @@ LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetSensorSignalCount()
 	return m_pDataRecordingInstance->getSensorValuesPerRecord();
 }
 
-LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRecordCount()
+LibMCDriver_ScanLabOIE_uint64 CDataRecording::GetRecordCount()
 {
 	return m_pDataRecordingInstance->getRecordCount();
 }
@@ -143,12 +143,22 @@ void CDataRecording::GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNu
 
 void CDataRecording::GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (pSignalsNeededCount != nullptr)
+		*pSignalsNeededCount = nRecordCount;
+
+	if (pSignalsBuffer != nullptr)
+		m_pDataRecordingInstance->copyAllRTCSignalsByIndex(nRTCIndex, pSignalsBuffer, nSignalsBufferSize);
 }
 
 void CDataRecording::GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (pSignalsNeededCount != nullptr)
+		*pSignalsNeededCount = nRecordCount;
+
+	if (pSignalsBuffer != nullptr)
+		m_pDataRecordingInstance->copyAllSensorSignalsByIndex(nSignalIndex, pSignalsBuffer, nSignalsBufferSize);
 }
 
 std::string CDataRecording::StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild)

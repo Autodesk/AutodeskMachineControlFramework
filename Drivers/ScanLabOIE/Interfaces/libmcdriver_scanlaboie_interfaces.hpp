@@ -384,7 +384,7 @@ public:
 	* IDataRecording::GetRecordCount - Returns the number of records in the recording.
 	* @return Number of records in the recording
 	*/
-	virtual LibMCDriver_ScanLabOIE_uint32 GetRecordCount() = 0;
+	virtual LibMCDriver_ScanLabOIE_uint64 GetRecordCount() = 0;
 
 	/**
 	* IDataRecording::GetRecordInformation - Returns the information about a specific record.
@@ -561,42 +561,31 @@ public:
 	virtual void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch) = 0;
 
 	/**
-	* IOIEDevice::SetRTCCorrectionData - Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.
-	* @param[in] nCorrectionDataBufferSize - Number of elements in buffer
-	* @param[in] pCorrectionDataBuffer - Patch version of the app.
-	*/
-	virtual void SetRTCCorrectionData(const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer) = 0;
-
-	/**
 	* IOIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running. Starts recording of signals.
 	* @param[in] sName - Name of app to be started.
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByName(const std::string & sName, IDeviceConfiguration* pDeviceConfig) = 0;
+	virtual void StartAppByName(const std::string & sName) = 0;
 
 	/**
 	* IOIEDevice::StartAppByIndex - Starts an app by its index. Fails if an app is already running.
 	* @param[in] nIndex - Index of App, 0-based
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, IDeviceConfiguration* pDeviceConfig) = 0;
+	virtual void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex) = 0;
 
 	/**
 	* IOIEDevice::StartAppByMajorVersion - Starts an app by its major version. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, IDeviceConfiguration* pDeviceConfig) = 0;
+	virtual void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion) = 0;
 
 	/**
 	* IOIEDevice::StartAppByMinorVersion - Starts an app by its major version. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
 	* @param[in] nMinorVersion - Minor version of app to be started. Fails if app does not exist or only with wrong minor number.
-	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, IDeviceConfiguration* pDeviceConfig) = 0;
+	virtual void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion) = 0;
 
 	/**
 	* IOIEDevice::StopApp - Stops the currently running app. Does nothing if no app is running. Stops recording of signals.
@@ -683,6 +672,12 @@ typedef IBaseSharedPtr<IOIEDevice> PIOIEDevice;
 class IDriver_ScanLab_OIE : public virtual IDriver {
 public:
 	/**
+	* IDriver_ScanLab_OIE::GetDriverType - Returns the type of the device driver.
+	* @return Type of device driver.
+	*/
+	virtual LibMCDriver_ScanLabOIE::eOIEDeviceDriverType GetDriverType() = 0;
+
+	/**
 	* IDriver_ScanLab_OIE::SetDependencyResourceNames - Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
 	* @param[in] sLibSSLResourceName - Resource name of LibSSL DLL. Default is libssl_win64 or libssl_linux64, depending on platform.
 	* @param[in] sLibCryptoResourceName - Resource name of LibCrypto DLL. Default is libcrypto_win64 or libcrypto_linux64, depending on platform.
@@ -690,6 +685,13 @@ public:
 	* @param[in] sQT5NetworkResourceName - Resource name of Qt5Network DLL. Default is qt5network_win64 or qt5network_linux64, depending on platform.
 	*/
 	virtual void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::SetOIE3ResourceNames - Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.
+	* @param[in] sOIECalibrationLibraryResourceName - Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform.
+	* @param[in] sRTCStreamParserResourceName - Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform.
+	*/
+	virtual void SetOIE3ResourceNames(const std::string & sOIECalibrationLibraryResourceName, const std::string & sRTCStreamParserResourceName) = 0;
 
 	/**
 	* IDriver_ScanLab_OIE::InitializeSDK - Initializes the ScanLab OIE SDK.
@@ -709,10 +711,13 @@ public:
 	* @param[in] sName - Name of the device. MUST be a unique string and not exist yet.
 	* @param[in] sHostName - Host name of device.
 	* @param[in] nPort - Port of device.
+	* @param[in] pDeviceConfig - Device configuration instance.
+	* @param[in] nCorrectionDataBufferSize - Number of elements in buffer
+	* @param[in] pCorrectionDataBuffer - Patch version of the app.
 	* @param[in] nResponseTimeOut - Response timeout of device in ms.
 	* @return OIE Device Instance
 	*/
-	virtual IOIEDevice * AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) = 0;
+	virtual IOIEDevice * AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, IDeviceConfiguration* pDeviceConfig, const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) = 0;
 
 	/**
 	* IDriver_ScanLab_OIE::HasDevice - Checks a device with the given name has been previously added.

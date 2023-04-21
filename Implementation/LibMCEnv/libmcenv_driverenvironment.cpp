@@ -39,10 +39,12 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_tcpipconnection.hpp"
 #include "libmcenv_modbustcpconnection.hpp"
 #include "libmcenv_driverstatusupdatesession.hpp"
+#include "libmcenv_xmldocument.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
-
+#include "amc_xmldocument.hpp"
+#include "amc_xmldocumentnode.hpp"
 
 // Include custom headers here.
 
@@ -287,3 +289,42 @@ IImageData* CDriverEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBuffe
     return CImageData::createFromPNG (pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
+
+LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace)
+{
+    auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+    pDocument->createEmptyDocument(sRootNodeName, sDefaultNamespace);
+
+    return new CXMLDocument(pDocument);
+}
+
+LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::ParseXMLString(const std::string& sXMLString)
+{
+    auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+    try {
+        pDocument->parseXMLString(sXMLString);
+    }
+    catch (std::exception& E) {
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTPARSEXMLSTRING, "could not parse XML string: " + std::string(E.what()));
+    }
+
+    return new CXMLDocument(pDocument);
+
+}
+
+LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)
+{
+    auto pDocument = std::make_shared<AMC::CXMLDocumentInstance>();
+
+    try {
+        pDocument->parseXMLData(nXMLDataBufferSize, pXMLDataBuffer);
+    }
+    catch (std::exception& E) {
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTPARSEXMLDATA, "could not parse XML data: " + std::string(E.what()));
+    }
+
+    return new CXMLDocument(pDocument);
+
+}

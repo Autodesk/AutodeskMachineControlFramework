@@ -65,9 +65,9 @@ private:
 
 	LibMCDriver_ScanLabOIE::eRTCDeviceType m_RTCDeviceType;
 
-	std::vector<uint32_t> m_RTCSignalIDs;
+    std::vector<uint32_t> m_RTCSignalIDs;
 
-	std::vector<uint32_t> m_SensorSignalIDs;
+    std::vector<uint32_t> m_SensorSignalIDs;
 
 
 public:

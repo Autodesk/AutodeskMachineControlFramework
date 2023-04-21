@@ -105,6 +105,17 @@ namespace AMC {
 		return iter->second->checkSignalInternal(sCurrentSignalUUID);
 	}
 
+	bool CStateSignalHandler::checkSignalUUID(const std::string& sInstanceName, std::string sCurrentSignalUUID)
+	{
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sCurrentSignalUUID);
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
+		if (iIter == m_SignalUUIDLookupMap.end())
+			return false;
+
+		return iIter->second->checkSignalInternal(sNormalizedUUID);
+	}
+
 
 	bool CStateSignalHandler::canTrigger(const std::string& sInstanceName, const std::string& sSignalName)
 	{

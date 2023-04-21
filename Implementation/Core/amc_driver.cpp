@@ -81,12 +81,14 @@ void CDriver::configureDriver(const std::string& sConfigurationData)
 
 HDriverHandle CDriver::acquireDriverHandle(const std::string& sInstanceName)
 {		
-	if (!m_sReservationInstance.empty())
-		throw ELibMCCustomException(LIBMC_ERROR_DRIVERALREADYRESERVED, m_sName);
+	if (!m_sReservationInstance.empty()) {
+		if (m_sReservationInstance != sInstanceName)
+			throw ELibMCCustomException(LIBMC_ERROR_DRIVERALREADYRESERVED, m_sName);
+	}
 
 	m_sReservationInstance = sInstanceName;
 	m_pDriverWrapper->AcquireInstance(m_pDriverInstance.get());
-	return  m_pDriverInstance->handle();	
+	return m_pDriverInstance->handle();	
 }
 
 void CDriver::releaseDriverHandle(const std::string& sInstanceName)

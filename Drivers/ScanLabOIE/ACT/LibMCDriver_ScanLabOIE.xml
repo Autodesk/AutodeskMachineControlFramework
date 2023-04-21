@@ -92,7 +92,21 @@
 		<error name="INVALIDRTCVALUESPERRECORD" code="1035" description="Invalid RTC values per record." />	
 		<error name="INVALIDRECORDINDEX" code="1036" description="Invalid record index." />			
 		<error name="INVALIDSIGNALINDEX" code="1037" description="Invalid signal index." />	
-
+		<error name="COULDNOTSTARTAPP" code="1038" description="Could not start app." />	
+		<error name="COULDNOTSTOPAPP" code="1039" description="Could not stop app." />	
+		<error name="INVALIDSENSORINDEX" code="1040" description="Invalid sensor index." />	
+		<error name="INVALIDRTCINDEX" code="1041" description="Invalid RTC index." />
+		<error name="COULDNOTSTOREOIECALIBRATIONLIBRARYBUFFER" code="1042" description="Could not store OIE Calibration library buffer." />
+		<error name="COULDNOTSTORERTCSTREAMPARSERBUFFER" code="1043" description="Could not store RTC Stream parser buffer." />
+		<error name="COULDNOTGETRTCSIGNALIDS" code="1044" description="Could not get RTC Signal IDs." />
+		
+		<error name="COULDNOTCREATEDEVICECONFIGURATION" code="1045" description="Could not create device configuration." />
+		<error name="UNSUPPORTEDOIESDKVERSION" code="1046" description="Unsupported OIE SDK Version." />
+		<error name="INVALIDDEVICECONFIGURATION" code="1047" description="Invalid device configuration." />
+		<error name="OIESDKLIBRARYRETURNSINVALIDVERSION" code="1048" description="OIE SDK Library returns invalid version." />
+		
+		
+		
 	</errors>
 	
 	<enum name="RTCDeviceType">
@@ -100,7 +114,14 @@
 		<option name="RTC5" value="1" />
 		<option name="RTC6" value="2" />
 	</enum>
-	
+
+	<enum name="OIEDeviceDriverType">
+	   <option name="Unknown" value="0" />
+	   <option name="OIEVersion2" value="1" />
+	   <option name="OIEVersion3Compatibility" value="2" />
+	   <option name="OIEVersion3" value="3" />
+	</enum>
+
 	
 <!--
 
@@ -193,7 +214,7 @@ Custom implementation
 		</method>	
 		
 		<method name="GetRecordCount" description="Returns the number of records in the recording.">
-			<param name="Record" type="uint32" pass="return" description="Number of records in the recording" />
+			<param name="Record" type="uint64" pass="return" description="Number of records in the recording" />
 		</method>	
 
 		<method name="GetRecordInformation" description="Returns the information about a specific record.">
@@ -237,13 +258,13 @@ Custom implementation
 			<param name="Build" type="class" class="LibMCEnv:Build" pass="in" description="Build that should store the data." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the build data." />
 		</method>	
-		
+				
 
 	</class>
 
 
 	<class name="OIEDevice" parent="Base" description="An attached device of the Open Interface Extension.">
-
+		
 		<method name="GetDeviceName" description="Returns the unique name of the device.">
 			<param name="DeviceName" type="string" pass="return" description="Name of device." />
 		</method>
@@ -307,32 +328,24 @@ Custom implementation
 			<param name="Minor" type="uint32" pass="out" description="Minor version of the app." />
 			<param name="Patch" type="uint32" pass="out" description="Patch version of the app." />
 		</method>
-		
-		<method name="SetRTCCorrectionData" description="Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.">
-			<param name="CorrectionData" type="basicarray" class="uint8"  pass="in" description="Patch version of the app." />
-		</method>		
-		
+				
 		<method name="StartAppByName" description="Starts an app by its name. Fails if an app is already running. Starts recording of signals.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
-			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 		
 		<method name="StartAppByIndex" description="Starts an app by its index. Fails if an app is already running.">
 			<param name="Index" type="uint32" pass="in" description="Index of App, 0-based" />
-			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 
 		<method name="StartAppByMajorVersion" description="Starts an app by its major version. Fails if an app is already running.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
 			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be started. Fails if app does not exist or only with wrong major number." />
-			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 
 		<method name="StartAppByMinorVersion" description="Starts an app by its major version. Fails if an app is already running.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
 			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be started. Fails if app does not exist or only with wrong major number." />
 			<param name="MinorVersion" type="uint32" pass="in" description="Minor version of app to be started. Fails if app does not exist or only with wrong minor number." />
-			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 
 		<method name="StopApp" description="Stops the currently running app. Does nothing if no app is running. Stops recording of signals.">
@@ -392,11 +405,20 @@ Custom implementation
 
 	<class name="Driver_ScanLab_OIE" parent="Driver" description="A Driver for the ScanLab OIE Extension.">
 
+		<method name="GetDriverType" description="Returns the type of the device driver.">
+			<param name="DeviceDriverType" type="enum" class="OIEDeviceDriverType" pass="return" description="Type of device driver." />
+		</method>
+
 		<method name="SetDependencyResourceNames" description="Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.">
 			<param name="LibSSLResourceName" type="string" pass="in" description="Resource name of LibSSL DLL. Default is libssl_win64 or libssl_linux64, depending on platform." />
 			<param name="LibCryptoResourceName" type="string" pass="in" description="Resource name of LibCrypto DLL. Default is libcrypto_win64 or libcrypto_linux64, depending on platform." />
 			<param name="QT5CoreResourceName" type="string" pass="in" description="Resource name of Qt5Core DLL. Default is qt5core_win64 or qt5core_linux64, depending on platform." />
 			<param name="QT5NetworkResourceName" type="string" pass="in" description="Resource name of Qt5Network DLL. Default is qt5network_win64 or qt5network_linux64, depending on platform." />
+		</method>
+
+		<method name="SetOIE3ResourceNames" description="Sets the resource names of the OIE SDK Dependencies for version 3. Searches in Machine Resources first, then in Driver Resources.">
+			<param name="OIECalibrationLibraryResourceName" type="string" pass="in" description="Resource name of OIE Calibration Library DLL. Default is oiecalibrationlibrary_win64 or oiecalibrationlibrary_linux64, depending on platform." />
+			<param name="RTCStreamParserResourceName" type="string" pass="in" description="Resource name of RTC Stream Parser Library DLL. Default is oiestreamparser_win64 or oiestreamparser_linux64, depending on platform." />
 		</method>
 
 		<method name="InitializeSDK" description="Initializes the ScanLab OIE SDK.">
@@ -411,6 +433,8 @@ Custom implementation
 			<param name="Name" type="string" pass="in" description="Name of the device. MUST be a unique string and not exist yet." />
 			<param name="HostName" type="string" pass="in" description="Host name of device." />
 			<param name="Port" type="uint32" pass="in" description="Port of device." />
+			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
+			<param name="CorrectionData" type="basicarray" class="uint8"  pass="in" description="Patch version of the app." />
 			<param name="ResponseTimeOut" type="uint32" pass="in" description="Response timeout of device in ms." />
 			<param name="DeviceInstance" type="class" class="OIEDevice" pass="return" description="OIE Device Instance" />
 		</method>
@@ -439,7 +463,6 @@ Custom implementation
 		</method>
 		
 	</class>
-
 
 
 <!--

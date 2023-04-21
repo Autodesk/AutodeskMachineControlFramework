@@ -72,33 +72,38 @@ protected:
 	std::string m_sLibCryptoResourceName;
 	std::string m_sQT5CoreResourceName;
 	std::string m_sQT5NetworkResourceName;
+	std::string m_sOIECalibrationLibraryResourceName;
+	std::string m_sRTCStreamParserResourceName;
 
 	LibMCEnv::PWorkingFile m_pLibSSLResourceFile;
 	LibMCEnv::PWorkingFile m_pLibCryptoResourceFile;
 	LibMCEnv::PWorkingFile m_pQT5CoreResourceFile;
 	LibMCEnv::PWorkingFile m_pQT5NetworkResourceFile;
+	LibMCEnv::PWorkingFile m_pOIECalibrationLibraryResourceFile;
+	LibMCEnv::PWorkingFile m_pRTCStreamParserResourceFile;
 
 	bool bSimulationMode;
+	LibMCDriver_ScanLabOIE::eOIEDeviceDriverType m_DeviceDriverType;
 
 	oie_instance m_pInstance;
 
 	std::map<std::string, POIEDeviceInstance> m_Devices;
 
-	void initializeSDKEx (const std::vector<uint8_t> & SDKDLLBuffer);
+	void initializeSDKEx (const std::vector<uint8_t> & SDKDLLBuffer, bool bForVersion3);
 
 	void releaseInstance();
 
 public:
 
-	CDriver_ScanLab_OIE (const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CDriver_ScanLab_OIE (const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType eDeviceDriverType);
 
 	virtual ~CDriver_ScanLab_OIE ();
+
+	LibMCDriver_ScanLabOIE::eOIEDeviceDriverType GetDriverType() override;
 
 	void Configure(const std::string& sConfigurationString) override;
 
 	std::string GetName() override;
-
-	std::string GetType() override;
 
 	void GetVersion(LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nMicro, std::string& sBuild) override;
 
@@ -108,11 +113,13 @@ public:
 
 	void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName) override;
 
+	void SetOIE3ResourceNames(const std::string& sOIECalibrationLibraryResourceName, const std::string& sRTCStreamParserResourceName) override;
+
 	void InitializeSDK(const std::string & sOIEResourceName) override;
 
 	void InitializeCustomSDK(const LibMCDriver_ScanLabOIE_uint64 nOIEDLLBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pOIEDLLBuffer) override;
 
-	IOIEDevice* AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) override;
+	IOIEDevice* AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, IDeviceConfiguration* pDeviceConfig, const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8* pCorrectionDataBuffer, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) override;
 
 	bool HasDevice(const std::string& sName) override;
 
@@ -122,12 +129,58 @@ public:
 
 	void RemoveDeviceByName(const std::string& sName) override;
 
-	static std::string getTypeString();
-
 	IDeviceConfiguration* ParseDeviceConfiguration(const std::string& sDeviceConfigString) override;
 
 
 };
+
+
+class CDriver_ScanLab_OIE2 : public virtual CDriver_ScanLab_OIE
+{
+private:
+public:
+
+	CDriver_ScanLab_OIE2(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	virtual ~CDriver_ScanLab_OIE2();
+
+	std::string GetType() override;
+
+	static std::string getTypeString();
+
+};
+
+
+class CDriver_ScanLab_OIE3Compat : public virtual CDriver_ScanLab_OIE
+{
+private:
+public:
+
+	CDriver_ScanLab_OIE3Compat(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	virtual ~CDriver_ScanLab_OIE3Compat();
+
+	std::string GetType() override;
+
+	static std::string getTypeString();
+
+};
+
+
+class CDriver_ScanLab_OIE3 : public virtual CDriver_ScanLab_OIE
+{
+private:
+public:
+
+	CDriver_ScanLab_OIE3(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	virtual ~CDriver_ScanLab_OIE3();
+
+	std::string GetType() override;
+
+	static std::string getTypeString();
+};
+
 
 } // namespace Impl
 } // namespace LibMCDriver_ScanLabOIE
