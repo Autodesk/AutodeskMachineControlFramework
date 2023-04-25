@@ -577,6 +577,9 @@ public:
 			case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "MISSINGCOMPONENTNAME";
 			case LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING: return "CUSTOMPAGEPROPERTYNAMEMISSING";
 			case LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING: return "CUSTOMPAGEPROPERTYTYPEMISSING";
+			case LIBMC_ERROR_EMTPYEVENTNAME: return "EMTPYEVENTNAME";
+			case LIBMC_ERROR_INVALIDEVENTNAME: return "INVALIDEVENTNAME";
+			case LIBMC_ERROR_INVALIDEVENTPATH: return "INVALIDEVENTPATH";
 		}
 		return "UNKNOWN";
 	}
@@ -996,6 +999,9 @@ public:
 			case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "missing component name.";
 			case LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING: return "custom page property name missing.";
 			case LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING: return "custom page property type missing.";
+			case LIBMC_ERROR_EMTPYEVENTNAME: return "empty event name.";
+			case LIBMC_ERROR_INVALIDEVENTNAME: return "invalid event name.";
+			case LIBMC_ERROR_INVALIDEVENTPATH: return "invalid event path.";
 		}
 		return "unknown error";
 	}

@@ -514,6 +514,9 @@
 		<error name="CUSTOMPAGEPROPERTYNAMEMISSING" code="491" description="custom page property name missing." />
 		<error name="CUSTOMPAGEPROPERTYTYPEMISSING" code="492" description="custom page property type missing." />
 		
+		<error name="EMTPYEVENTNAME" code="493" description="empty event name." />
+		<error name="INVALIDEVENTNAME" code="494" description="invalid event name." />
+		<error name="INVALIDEVENTPATH" code="495" description="invalid event path." />
 		
 
 	</errors>

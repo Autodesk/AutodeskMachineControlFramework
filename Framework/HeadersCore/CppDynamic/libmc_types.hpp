@@ -507,6 +507,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGCOMPONENTNAME 490 /** missing component name. */
 #define LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING 491 /** custom page property name missing. */
 #define LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING 492 /** custom page property type missing. */
+#define LIBMC_ERROR_EMTPYEVENTNAME 493 /** empty event name. */
+#define LIBMC_ERROR_INVALIDEVENTNAME 494 /** invalid event name. */
+#define LIBMC_ERROR_INVALIDEVENTPATH 495 /** invalid event path. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -926,6 +929,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "missing component name.";
     case LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING: return "custom page property name missing.";
     case LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING: return "custom page property type missing.";
+    case LIBMC_ERROR_EMTPYEVENTNAME: return "empty event name.";
+    case LIBMC_ERROR_INVALIDEVENTNAME: return "invalid event name.";
+    case LIBMC_ERROR_INVALIDEVENTPATH: return "invalid event path.";
     default: return "unknown error";
   }
 }
