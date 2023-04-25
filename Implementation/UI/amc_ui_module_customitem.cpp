@@ -106,3 +106,94 @@ void CUIModuleCustomItem_Properties::registerProperty(const std::string& sName, 
 {
 	m_Properties.insert (std::make_pair (sName, valueExpression));
 }
+
+CUIModuleCustomItem_EventParameter::CUIModuleCustomItem_EventParameter(const std::string& sParameterName, CUIExpression expression)
+	: m_sParameterName (sParameterName), m_Expression (expression)
+
+{
+
+}
+
+CUIModuleCustomItem_EventParameter::~CUIModuleCustomItem_EventParameter()
+{
+
+}
+
+std::string CUIModuleCustomItem_EventParameter::getParameterName()
+{
+	return m_sParameterName;
+}
+
+CUIExpression& CUIModuleCustomItem_EventParameter::getExpression()
+{
+	return m_Expression;
+}
+
+
+CUIModuleCustomItem_Event::CUIModuleCustomItem_Event(const std::string& sUUID, const std::string& sEventName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+	: CUIModuleItem(sModulePath + "." + sEventName), m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)), m_pUIModuleEnvironment(pUIModuleEnvironment)
+{
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
+	if (sEventName.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_EMTPYEVENTNAME, sModulePath);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sEventName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTNAME, sModulePath + "." + sEventName);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sEventName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPATH, sModulePath + "." + sEventName);
+
+}
+
+CUIModuleCustomItem_Event::~CUIModuleCustomItem_Event()
+{
+
+}
+
+std::string CUIModuleCustomItem_Event::getUUID()
+{
+	return m_sUUID;
+}
+
+
+
+
+void CUIModuleCustomItem_Event::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
+{
+	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+
+	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
+
+	for (auto iIter : m_EventParameters) {
+		std::string sName = iIter.first;
+		auto& expression = iIter.second.getExpression ();
+		if (expression.needsSync())
+			pGroup->setParameterValueByName(sName, expression.evaluateStringValue(pStateMachineData));
+
+		object.addString(sName, pGroup->getParameterValueByName(sName));
+	}
+
+}
+
+std::list <std::string> CUIModuleCustomItem_Event::getReferenceUUIDs()
+{
+	std::list <std::string> resultList;
+	resultList.push_back(m_sUUID);
+
+	return resultList;
+}
+
+
+void CUIModuleCustomItem_Event::populateClientVariables(CParameterHandler* pParameterHandler)
+{
+	LibMCAssertNotNull(pParameterHandler);
+	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
+
+	auto pGroup = pParameterHandler->addGroup(getItemPath(), "custom event parameters");
+	for (auto iIter : m_EventParameters) {
+		auto& expression = iIter.second.getExpression();
+		pGroup->addNewStringParameter(iIter.first, iIter.first, expression.evaluateStringValue(pStateMachineData));
+	}
+
+}
+

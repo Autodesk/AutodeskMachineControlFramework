@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Libraries/PugiXML/pugixml.hpp"
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
+#include "amc_ui_expression.hpp"
 
 namespace AMC {
 
@@ -82,7 +83,56 @@ namespace AMC {
 
 	};
 
+
+	class CUIModuleCustomItem_EventParameter
+	{
+	private:
+
+		std::string m_sParameterName;
+		CUIExpression m_Expression;
+
+	public:
 	
+		CUIModuleCustomItem_EventParameter(const std::string & sParameterName, CUIExpression expression);
+
+		virtual ~CUIModuleCustomItem_EventParameter();
+
+		std::string getParameterName ();
+		CUIExpression& getExpression();
+
+	};
+
+
+	class CUIModuleCustomItem_Event : public CUIModuleItem {
+	protected:
+
+		std::string m_sUUID;
+
+		std::string m_sEventName;
+
+		std::map<std::string, CUIModuleCustomItem_EventParameter> m_EventParameters;
+
+		PUIModuleEnvironment m_pUIModuleEnvironment;
+
+	public:
+
+		CUIModuleCustomItem_Event(const std::string& sUUID, const std::string & sEventName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+
+		virtual ~CUIModuleCustomItem_Event();
+
+		virtual std::string getUUID() override;
+
+		std::string getEventName ();
+
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
+
+		// Returns all UUIDs that could be contained in this Item
+		virtual std::list <std::string> getReferenceUUIDs();
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+
+	};
+
 }
 
 
