@@ -672,5 +672,23 @@ export default class AMCApplication extends Common.AMCObject {
     storeWebGLInstance(uuid, instance) {
         this.AppState.WebGLInstances[uuid] = instance;
     }
+	
+	findPage (pageName) {
+		
+		if (this.PageMap.has (pageName))
+			return this.PageMap.get (pageName);
+		
+		return null;
+		
+	}
+
+	findCustomPage (pageName) {
+		
+		if (this.CustomPageMap.has (pageName))
+			return this.CustomPageMap.get (pageName);
+		
+		return null;
+		
+	}
 
 }

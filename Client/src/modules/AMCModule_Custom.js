@@ -64,6 +64,68 @@ class AMCApplicationItem_Custom_Properties extends Common.AMCApplicationItem {
 
 
 
+class AMCApplicationItem_Custom_Event extends Common.AMCApplicationItem {
+	
+	constructor (moduleInstance, itemJSON) 
+	{
+		Assert.ObjectValue (itemJSON);		
+		
+		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
+		this.registerClass ("amcItem_CustomEvent");
+		
+		
+		this.name = Assert.StringValue (itemJSON.name);
+		this.parameters = Assert.ArrayValue (itemJSON.parameters);
+		this.parameterNameMap = new Map ();
+		for (let parameter of this.parameters) {
+			this.parameterNameMap.set (parameter.name, parameter.uuid);			
+		}
+				
+		this.updateFromJSON (itemJSON);
+		
+		this.setRefreshFlag ();
+											
+	}
+
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);		
+				
+	}
+
+	prepareUIEvent (parameters)
+	{
+		Assert.ObjectValue (parameters);
+		let resultUIEventParameter = {};
+		
+		for (let defaultParameter of this.parameters) {			
+			resultUIEventParameter [defaultParameter.uuid] = defaultParameter.defaultvalue;			
+		}
+
+		const objectEntries = Object.entries(parameters);
+					
+		for (let objectEntry of objectEntries) {
+			let parameterName = objectEntry[0];
+			let parameterValue = objectEntry[1];					
+			if (this.parameterNameMap.has (parameterName)) {
+				let uuid = this.parameterNameMap.get (parameterName);
+				resultUIEventParameter [uuid] = parameterValue;
+			}				
+		} 
+		
+		return resultUIEventParameter;
+		
+		
+		
+	}
+		
+	
+
+		
+}
+
+
+
 
 export default class AMCApplicationModule_Custom extends Common.AMCApplicationModule {
 	
@@ -76,6 +138,7 @@ export default class AMCApplicationModule_Custom extends Common.AMCApplicationMo
 		Assert.ArrayValue (moduleJSON.items);
 		this.items = [];
 		this.propertiesitem = null;
+		this.eventitems = new Map();
 
 		for (let itemJSON of moduleJSON.items) {
 			
@@ -85,7 +148,13 @@ export default class AMCApplicationModule_Custom extends Common.AMCApplicationMo
 				item = new AMCApplicationItem_Custom_Properties (this, itemJSON);
 				this.propertiesitem = item;
 			}
+
+			if (itemJSON.type === "event") {
+				item = new AMCApplicationItem_Custom_Event (this, itemJSON);
+				this.eventitems.set (item.name, item);
+			}
 			
+
 			if (item) {
 				this.items.push (item);
 				this.page.addItem (item);
@@ -96,6 +165,17 @@ export default class AMCApplicationModule_Custom extends Common.AMCApplicationMo
 		}			
 		
 		
+	}
+	
+	
+	findEvent (name)
+	{
+		if (this.eventitems.has (name)) 
+		{
+			return this.eventitems.get (name); 
+		}
+		
+		return null;
 	}
 		
 }
