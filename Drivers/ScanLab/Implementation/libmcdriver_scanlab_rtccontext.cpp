@@ -866,3 +866,26 @@ void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimela
 }
 
 
+void CRTCContext::SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_angle(m_CardNo, 1, dAngleInDegrees, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_scale(m_CardNo, 1, dScaleFactor, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+void CRTCContext::SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_offset(m_CardNo, 1, nOffsetX, nOffsetY, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+

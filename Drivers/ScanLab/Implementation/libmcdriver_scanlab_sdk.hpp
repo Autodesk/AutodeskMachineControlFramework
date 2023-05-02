@@ -167,7 +167,11 @@ namespace LibMCDriver_ScanLab {
 
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_error) (uint32_t nCardNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_reset_error) (uint32_t nCardNo, uint32_t nCode);
-		
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_angle) (uint32_t nCardNo, uint32_t nHeadNo, double dAngle, uint32_t nAtOnce);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scale) (uint32_t nCardNo, uint32_t nHeadNo, double dScaleFactor, uint32_t nAtOnce);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_offset) (uint32_t nCardNo, uint32_t nHeadNo, int32_t nXOffset, int32_t nYOffset, uint32_t nAtOnce);
+
 
 		class CScanLabSDK {
 		private:
@@ -283,6 +287,9 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_reset_error n_reset_error = nullptr;
 			PScanLabPtr_n_set_multi_mcbsp_in_list n_set_multi_mcbsp_in_list = nullptr;
 			PScanLabPtr_n_set_laser_power n_set_laser_power = nullptr;
+			PScanLabPtr_n_set_angle n_set_angle = nullptr;
+			PScanLabPtr_n_set_scale n_set_scale = nullptr;
+			PScanLabPtr_n_set_offset n_set_offset = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

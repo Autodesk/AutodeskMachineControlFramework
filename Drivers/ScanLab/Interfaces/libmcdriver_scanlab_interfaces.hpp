@@ -798,6 +798,25 @@ public:
 	*/
 	virtual void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit) = 0;
 
+	/**
+	* IRTCContext::SetTransformationAngle - Sets the transformation angle of the scan field.
+	* @param[in] dAngleInDegrees - Angle in Degrees
+	*/
+	virtual void SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees) = 0;
+
+	/**
+	* IRTCContext::SetTransformationScale - Sets the transformation scale of the scan field.
+	* @param[in] dScaleFactor - Scale Factor (1.0 is no scaling). Allowed value is -16 to 16.
+	*/
+	virtual void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor) = 0;
+
+	/**
+	* IRTCContext::SetTransformationOffset - Sets the transformation offset of the scan field.
+	* @param[in] nOffsetX - Offset in X (in bits)
+	* @param[in] nOffsetY - Offset in X (in bits)
+	*/
+	virtual void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY) = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;

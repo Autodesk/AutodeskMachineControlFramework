@@ -212,6 +212,9 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 
 	this->n_set_multi_mcbsp_in_list = (PScanLabPtr_n_set_multi_mcbsp_in_list)_loadScanLabAddress(hLibrary, "n_set_multi_mcbsp_in_list");
 	this->n_set_laser_power = (PScanLabPtr_n_set_laser_power)_loadScanLabAddress(hLibrary, "n_set_laser_power");
+	this->n_set_angle = (PScanLabPtr_n_set_angle)_loadScanLabAddress(hLibrary, "n_set_angle");
+	this->n_set_scale = (PScanLabPtr_n_set_scale)_loadScanLabAddress(hLibrary, "n_set_scale");
+	this->n_set_offset = (PScanLabPtr_n_set_offset)_loadScanLabAddress(hLibrary, "n_set_offset");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -376,6 +379,9 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_set_multi_mcbsp_in_list = nullptr;
 	n_set_laser_power = nullptr;
 
+	n_set_angle = nullptr;
+	n_set_scale = nullptr;
+	n_set_offset = nullptr;
 
 }
 

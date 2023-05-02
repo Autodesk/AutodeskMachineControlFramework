@@ -602,6 +602,34 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWrit
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
 
+/**
+* Sets the transformation angle of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dAngleInDegrees - Angle in Degrees
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dAngleInDegrees);
+
+/**
+* Sets the transformation scale of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dScaleFactor - Scale Factor (1.0 is no scaling). Allowed value is -16 to 16.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dScaleFactor);
+
+/**
+* Sets the transformation offset of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nOffsetX - Offset in X (in bits)
+* @param[in] nOffsetY - Offset in X (in bits)
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nOffsetX, LibMCDriver_ScanLab_int32 nOffsetY);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -1329,6 +1357,9 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr m_RTCContext_EnableSkyWritingMode2;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr m_RTCContext_EnableSkyWritingMode3;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr m_RTCContext_SetTransformationAngle;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr m_RTCContext_SetTransformationScale;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr m_RTCContext_SetTransformationOffset;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;

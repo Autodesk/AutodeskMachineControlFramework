@@ -581,6 +581,9 @@ public:
 	inline void EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
 	inline void EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
 	inline void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit);
+	inline void SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees);
+	inline void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor);
+	inline void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY);
 };
 	
 /*************************************************************************************************************************
@@ -874,6 +877,9 @@ public:
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode2 = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode3 = nullptr;
+		pWrapperTable->m_RTCContext_SetTransformationAngle = nullptr;
+		pWrapperTable->m_RTCContext_SetTransformationScale = nullptr;
+		pWrapperTable->m_RTCContext_SetTransformationOffset = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1442,6 +1448,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_EnableSkyWritingMode3 == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationAngle = (PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationangle");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationAngle = (PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationangle");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetTransformationAngle == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationScale = (PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationscale");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationScale = (PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationscale");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetTransformationScale == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationOffset = (PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationoffset");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationOffset = (PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationoffset");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetTransformationOffset == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2211,6 +2244,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableskywritingmode3", (void**)&(pWrapperTable->m_RTCContext_EnableSkyWritingMode3));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableSkyWritingMode3 == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_settransformationangle", (void**)&(pWrapperTable->m_RTCContext_SetTransformationAngle));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetTransformationAngle == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_settransformationscale", (void**)&(pWrapperTable->m_RTCContext_SetTransformationScale));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetTransformationScale == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_settransformationoffset", (void**)&(pWrapperTable->m_RTCContext_SetTransformationOffset));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetTransformationOffset == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -3041,6 +3086,34 @@ public:
 	void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableSkyWritingMode3(m_pHandle, dTimelag, nLaserOnShift, nNPrev, nNPost, dLimit));
+	}
+	
+	/**
+	* CRTCContext::SetTransformationAngle - Sets the transformation angle of the scan field.
+	* @param[in] dAngleInDegrees - Angle in Degrees
+	*/
+	void CRTCContext::SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetTransformationAngle(m_pHandle, dAngleInDegrees));
+	}
+	
+	/**
+	* CRTCContext::SetTransformationScale - Sets the transformation scale of the scan field.
+	* @param[in] dScaleFactor - Scale Factor (1.0 is no scaling). Allowed value is -16 to 16.
+	*/
+	void CRTCContext::SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetTransformationScale(m_pHandle, dScaleFactor));
+	}
+	
+	/**
+	* CRTCContext::SetTransformationOffset - Sets the transformation offset of the scan field.
+	* @param[in] nOffsetX - Offset in X (in bits)
+	* @param[in] nOffsetY - Offset in X (in bits)
+	*/
+	void CRTCContext::SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetTransformationOffset(m_pHandle, nOffsetX, nOffsetY));
 	}
 	
 	/**

@@ -457,6 +457,19 @@ Custom implementation
 			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
 		</method>
 		
+		<method name="SetTransformationAngle" description="Sets the transformation angle of the scan field.">
+			<param name="AngleInDegrees" type="double" pass="in" description="Angle in Degrees" />
+		</method>
+		
+		<method name="SetTransformationScale" description="Sets the transformation scale of the scan field.">
+			<param name="ScaleFactor" type="double" pass="in" description="Scale Factor (1.0 is no scaling). Allowed value is -16 to 16." />
+		</method>
+
+		<method name="SetTransformationOffset" description="Sets the transformation offset of the scan field.">
+			<param name="OffsetX" type="int32" pass="in" description="Offset in X (in bits)" />
+			<param name="OffsetY" type="int32" pass="in" description="Offset in X (in bits)" />
+		</method>
+
 		
 	</class>
 

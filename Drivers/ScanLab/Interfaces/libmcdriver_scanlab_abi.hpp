@@ -615,6 +615,34 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableskywritingmode3(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
 
+/**
+* Sets the transformation angle of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dAngleInDegrees - Angle in Degrees
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationangle(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dAngleInDegrees);
+
+/**
+* Sets the transformation scale of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dScaleFactor - Scale Factor (1.0 is no scaling). Allowed value is -16 to 16.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationscale(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dScaleFactor);
+
+/**
+* Sets the transformation offset of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nOffsetX - Offset in X (in bits)
+* @param[in] nOffsetY - Offset in X (in bits)
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationoffset(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nOffsetX, LibMCDriver_ScanLab_int32 nOffsetY);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
