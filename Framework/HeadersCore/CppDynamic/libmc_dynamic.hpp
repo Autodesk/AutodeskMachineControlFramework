@@ -580,6 +580,10 @@ public:
 			case LIBMC_ERROR_EMTPYEVENTNAME: return "EMTPYEVENTNAME";
 			case LIBMC_ERROR_INVALIDEVENTNAME: return "INVALIDEVENTNAME";
 			case LIBMC_ERROR_INVALIDEVENTPATH: return "INVALIDEVENTPATH";
+			case LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING: return "CUSTOMPAGEVENTNAMEMISSING";
+			case LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME: return "INVALIDCUSTOMPAGEVENTNAME";
+			case LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME: return "DUPLICATECUSTOMPAGEVENTNAME";
+			case LIBMC_ERROR_INVALIDEVENTPARAMETERNAME: return "INVALIDEVENTPARAMETERNAME";
 		}
 		return "UNKNOWN";
 	}
@@ -1002,6 +1006,10 @@ public:
 			case LIBMC_ERROR_EMTPYEVENTNAME: return "empty event name.";
 			case LIBMC_ERROR_INVALIDEVENTNAME: return "invalid event name.";
 			case LIBMC_ERROR_INVALIDEVENTPATH: return "invalid event path.";
+			case LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING: return "custom page event name missing.";
+			case LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME: return "invalid custom page event name.";
+			case LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME: return "duplicate custom page event name.";
+			case LIBMC_ERROR_INVALIDEVENTPARAMETERNAME: return "invalid event parameter name.";
 		}
 		return "unknown error";
 	}

@@ -518,6 +518,11 @@
 		<error name="INVALIDEVENTNAME" code="494" description="invalid event name." />
 		<error name="INVALIDEVENTPATH" code="495" description="invalid event path." />
 		
+		<error name="CUSTOMPAGEVENTNAMEMISSING" code="496" description="custom page event name missing." />
+		<error name="INVALIDCUSTOMPAGEVENTNAME" code="497" description="invalid custom page event name." />
+		<error name="DUPLICATECUSTOMPAGEVENTNAME" code="498" description="duplicate custom page event name." />
+		<error name="INVALIDEVENTPARAMETERNAME" code="499" description="invalid event parameter name." />
+		
 
 	</errors>
 	

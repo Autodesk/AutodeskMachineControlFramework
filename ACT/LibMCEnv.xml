@@ -132,7 +132,7 @@
 		<error name="INVALIDINTEGERVALUEATTRIBUTE" code="10092" description="Invalid integer value attribute." />				
 		<error name="INTEGERVALUEATTRIBUTEOUTOFRANGE" code="10093" description="Integer value attribute out of range." />				
 		<error name="INVALIDDOUBLEVALUEATTRIBUTE" code="10094" description="Invalid double value attribute." />				
-		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />				
+		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />						
 									
 	</errors>
 

@@ -666,7 +666,7 @@ PUIPage CUIHandler::findPageOfModuleItem(const std::string& sUUID)
             return pPage.second;
     }
 
-    for (auto pCustomPage : m_Pages) {
+    for (auto pCustomPage : m_CustomPages) {
         auto pModuleItem = pCustomPage.second->findModuleItemByUUID(sUUID);
         if (pModuleItem.get() != nullptr)
             return pCustomPage.second;

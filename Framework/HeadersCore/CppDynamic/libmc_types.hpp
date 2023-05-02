@@ -510,6 +510,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EMTPYEVENTNAME 493 /** empty event name. */
 #define LIBMC_ERROR_INVALIDEVENTNAME 494 /** invalid event name. */
 #define LIBMC_ERROR_INVALIDEVENTPATH 495 /** invalid event path. */
+#define LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING 496 /** custom page event name missing. */
+#define LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME 497 /** invalid custom page event name. */
+#define LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME 498 /** duplicate custom page event name. */
+#define LIBMC_ERROR_INVALIDEVENTPARAMETERNAME 499 /** invalid event parameter name. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -932,6 +936,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EMTPYEVENTNAME: return "empty event name.";
     case LIBMC_ERROR_INVALIDEVENTNAME: return "invalid event name.";
     case LIBMC_ERROR_INVALIDEVENTPATH: return "invalid event path.";
+    case LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING: return "custom page event name missing.";
+    case LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME: return "invalid custom page event name.";
+    case LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME: return "duplicate custom page event name.";
+    case LIBMC_ERROR_INVALIDEVENTPARAMETERNAME: return "invalid event parameter name.";
     default: return "unknown error";
   }
 }

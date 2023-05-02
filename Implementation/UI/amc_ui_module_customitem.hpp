@@ -53,8 +53,8 @@ namespace AMC {
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIExpression, PUIExpression);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
-
-	
+	amcDeclareDependingClass(CUIModuleCustomItem_EventParameter, PUIModuleCustomItem_EventParameter);
+		
 
 	class CUIModuleCustomItem_Properties : public CUIModuleItem {
 	protected:		
@@ -81,6 +81,8 @@ namespace AMC {
 
 		void registerProperty(const std::string & sName, const std::string & sTypeString, CUIExpression valueExpression);
 
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
+
 	};
 
 
@@ -89,6 +91,7 @@ namespace AMC {
 	private:
 
 		std::string m_sParameterName;
+		std::string m_sUUID;
 		CUIExpression m_Expression;
 
 	public:
@@ -97,6 +100,7 @@ namespace AMC {
 
 		virtual ~CUIModuleCustomItem_EventParameter();
 
+		std::string getUUID();
 		std::string getParameterName ();
 		CUIExpression& getExpression();
 
@@ -110,13 +114,14 @@ namespace AMC {
 
 		std::string m_sEventName;
 
-		std::map<std::string, CUIModuleCustomItem_EventParameter> m_EventParameters;
+		std::map<std::string, PUIModuleCustomItem_EventParameter> m_EventParameterNameMap;
+		std::map<std::string, PUIModuleCustomItem_EventParameter> m_EventParameterUUIDMap;
 
 		PUIModuleEnvironment m_pUIModuleEnvironment;
 
 	public:
 
-		CUIModuleCustomItem_Event(const std::string& sUUID, const std::string & sEventName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModuleCustomItem_Event(const std::string & sEventName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
 		virtual ~CUIModuleCustomItem_Event();
 
@@ -130,6 +135,12 @@ namespace AMC {
 		virtual std::list <std::string> getReferenceUUIDs();
 
 		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+
+		void registerParameter (const std::string sParameterName, CUIExpression expression);
+
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
+
+		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
 
 	};
 

@@ -51,6 +51,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_Custom, PUIModuleCustom);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CUIModuleCustomItem_Properties, PUIModuleCustomItem_Properties);
+	amcDeclareDependingClass(CUIModuleCustomItem_Event, PUIModuleCustomItem_Event);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
@@ -63,6 +64,9 @@ namespace AMC {
 		std::string m_sModulePath;
 
 		PUIModuleCustomItem_Properties m_pCustomItem;
+
+		std::map<std::string, PUIModuleCustomItem_Event> m_EventItemNameMap;
+		std::map<std::string, PUIModuleCustomItem_Event> m_EventItemUUIDMap;
 
 	public:
 
@@ -85,6 +89,7 @@ namespace AMC {
 		void configurePostLoading() override;
 
 		virtual void populateClientVariables(CParameterHandler* pParameterHandler) override;
+
 
 
 	};
