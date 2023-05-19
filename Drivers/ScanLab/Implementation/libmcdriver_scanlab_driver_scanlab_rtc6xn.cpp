@@ -34,6 +34,8 @@ Abstract: This is a stub class definition of CDriver_ScanLab_RTC6xN
 #include "libmcdriver_scanlab_driver_scanlab_rtc6xn.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
+#include <cmath>
+
 // Include custom headers here.
 #define RTC6_MINLASERCOUNT 2
 #define RTC6_MAXLASERCOUNT 64
