@@ -391,8 +391,11 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
         if (nIntPolygonDelay < 0)
             nIntPolygonDelay = 0;
 
+        m_pRTCContext->SetStartList(1, 0);
         m_pRTCContext->SetLaserDelaysInMicroseconds(dLaserOnDelay, dLaserOffDelay);
         m_pRTCContext->SetDelays(nIntMarkDelay, nIntJumpDelay, nIntPolygonDelay);
+        m_pRTCContext->SetEndOfList();
+        m_pRTCContext->ExecuteList(1, 0);
 
 
     }

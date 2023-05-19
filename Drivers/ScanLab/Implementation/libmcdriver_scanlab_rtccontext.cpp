@@ -677,13 +677,13 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 		
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
-	// Magic number parameters, MUST be 1, 1
-	m_pScanLabSDK->n_mcbsp_init(m_CardNo, 1, 1);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
-
 	// Frequency should be 6MHz by specification
 	uint32_t nMCBSPSignalFrequency = 6000000;
 	m_pScanLabSDK->n_set_mcbsp_freq(m_CardNo, nMCBSPSignalFrequency);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	// Magic number parameters, MUST be 1, 1
+	m_pScanLabSDK->n_mcbsp_init(m_CardNo, 1, 1);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	// Set signal channels
@@ -765,6 +765,7 @@ void CRTCContext::StartOIEMeasurement()
 	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
 	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3:
 		// Bit 4 triggers OIE Measurement Start
+		// Bit 5 sets LaserON Trigger flag
 		sendFreeVariable0(1UL | (1UL << 4));
 		break;
 	}

@@ -627,7 +627,7 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 				if (m_bHasCorrectionData) {
 					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY));
-				}
+				}				
 
 				//std::cout << "Packet: " << " X: " << dX << " Y: " << dY << std::endl;
 
