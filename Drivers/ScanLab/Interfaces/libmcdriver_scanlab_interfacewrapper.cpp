@@ -1373,6 +1373,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_startoiemeasurement(Lib
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_startoiemeasurementex(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOnTrigger)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->StartOIEMeasurementEx(bLaserOnTrigger);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_stopoiemeasurement(LibMCDriver_ScanLab_RTCContext pRTCContext)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -3255,6 +3279,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disableoie;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_startoiemeasurement") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_startoiemeasurement;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_startoiemeasurementex") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_startoiemeasurementex;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_stopoiemeasurement") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_stopoiemeasurement;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setoiepidmode") 

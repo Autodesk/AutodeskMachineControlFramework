@@ -424,8 +424,6 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         m_pRTCContext->SetStartList(1, 0);
 
-        bool bEnableOIEMeasurementPerHatch = (m_OIERecordingMode == eOIERecordingMode::OIELaserActiveMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndLaserActiveMeasurement);
-
         switch (m_OIERecordingMode) {
         case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
         case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
@@ -437,6 +435,10 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
         case eOIERecordingMode::OIEContinuousMeasurement:
         case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
             m_pRTCContext->StartOIEMeasurement();
+            break;
+        case eOIERecordingMode::OIELaserActiveMeasurement:
+        case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
+            m_pRTCContext->StartOIEMeasurementEx(true);
             break;
         }
   
@@ -511,7 +513,7 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
                         pContourPoint->m_Y = (float)(Points[nPointIndex].m_Coordinates[1] * dUnits);
                     }
 
-                    m_pRTCContext->DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+                    m_pRTCContext->DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, 0);
 
                     break;
                 }
@@ -533,7 +535,7 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
                         pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
                     }
 
-                    m_pRTCContext->DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+                    m_pRTCContext->DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, 0);
 
                     break;
                 }

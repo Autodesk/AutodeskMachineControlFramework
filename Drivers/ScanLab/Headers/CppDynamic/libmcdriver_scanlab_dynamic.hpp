@@ -575,6 +575,7 @@ public:
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline void StartOIEMeasurement();
+	inline void StartOIEMeasurementEx(const bool bLaserOnTrigger);
 	inline void StopOIEMeasurement();
 	inline void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex);
 	inline void DisableSkyWriting();
@@ -871,6 +872,7 @@ public:
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
+		pWrapperTable->m_RTCContext_StartOIEMeasurementEx = nullptr;
 		pWrapperTable->m_RTCContext_StopOIEMeasurement = nullptr;
 		pWrapperTable->m_RTCContext_SetOIEPIDMode = nullptr;
 		pWrapperTable->m_RTCContext_DisableSkyWriting = nullptr;
@@ -1394,6 +1396,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_StartOIEMeasurement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_StartOIEMeasurementEx = (PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_startoiemeasurementex");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_StartOIEMeasurementEx = (PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_startoiemeasurementex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_StartOIEMeasurementEx == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2222,6 +2233,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StartOIEMeasurement == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_startoiemeasurementex", (void**)&(pWrapperTable->m_RTCContext_StartOIEMeasurementEx));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StartOIEMeasurementEx == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_stopoiemeasurement", (void**)&(pWrapperTable->m_RTCContext_StopOIEMeasurement));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StopOIEMeasurement == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3019,11 +3034,20 @@ public:
 	}
 	
 	/**
-	* CRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list.
+	* CRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
 	*/
 	void CRTCContext::StartOIEMeasurement()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_StartOIEMeasurement(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::StartOIEMeasurementEx - Writes an OIE measurement start command block to the open list, with parameterized LaserOn Trigger
+	* @param[in] bLaserOnTrigger - If true, only triggers a measurement, when the laser is on.
+	*/
+	void CRTCContext::StartOIEMeasurementEx(const bool bLaserOnTrigger)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_StartOIEMeasurementEx(m_pHandle, bLaserOnTrigger));
 	}
 	
 	/**
@@ -3451,7 +3475,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::ConfigureLaserMode - Configures the laser mode.
+	* CDriver_ScanLab_RTC6::ConfigureLaserMode - Configures the laser mode. MUST be called before any exposure.
 	* @param[in] eLaserMode - Laser Mode Enum
 	* @param[in] eLaserPort - Laser Port Enum
 	* @param[in] dMaxLaserPower - Maximum laser power.
@@ -3468,7 +3492,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::ConfigureDelays - Configures the default laser and scanner delays.
+	* CDriver_ScanLab_RTC6::ConfigureDelays - Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 	* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
 	* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds
 	* @param[in] dMarkDelay - Mark delay in microseconds (will be rounded to a multiple of 10)
@@ -3753,7 +3777,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::ConfigureDelays - Configures the default laser and scanner delays.
+	* CDriver_ScanLab_RTC6xN::ConfigureDelays - Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
 	* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds

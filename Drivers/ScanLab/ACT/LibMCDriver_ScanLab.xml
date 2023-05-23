@@ -422,7 +422,11 @@ Custom implementation
 		<method name="DisableOIE" description="Writes an OIE disabling command block to the open list.">
 		</method>
 				
-		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
+		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.">
+		</method>
+
+		<method name="StartOIEMeasurementEx" description="Writes an OIE measurement start command block to the open list, with parameterized LaserOn Trigger">
+			<param name="LaserOnTrigger" type="bool" pass="in" description="If true, only triggers a measurement, when the laser is on." />
 		</method>
 
 		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">

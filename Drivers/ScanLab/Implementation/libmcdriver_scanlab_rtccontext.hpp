@@ -149,6 +149,8 @@ public:
 
 	void StartOIEMeasurement() override;
 
+	void StartOIEMeasurementEx(bool bTriggerOnFlag);
+
 	void StopOIEMeasurement() override;
 
 	void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) override;

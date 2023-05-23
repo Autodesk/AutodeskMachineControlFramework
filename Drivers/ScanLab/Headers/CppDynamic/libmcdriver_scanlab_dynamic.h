@@ -533,12 +533,21 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPtr)
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
-* Writes an OIE measurement start command block to the open list.
+* Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Writes an OIE measurement start command block to the open list, with parameterized LaserOn Trigger
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bLaserOnTrigger - If true, only triggers a measurement, when the laser is on.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOnTrigger);
 
 /**
 * Writes an OIE measurement start command block to the open list.
@@ -899,7 +908,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Load
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCorrectionFilePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension, LibMCDriver_ScanLab_uint32 nTableNumberHeadA, LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 
 /**
-* Configures the laser mode.
+* Configures the laser mode. MUST be called before any exposure.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] eLaserMode - Laser Mode Enum
@@ -916,7 +925,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetC
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureLaserModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
-* Configures the default laser and scanner delays.
+* Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] dLaserOnDelay - Laser On Delay in Microseconds
@@ -1164,7 +1173,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Se
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureLaserModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
-* Configures the default laser and scanner delays.
+* Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
 * @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
@@ -1351,6 +1360,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;
+	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr m_RTCContext_StartOIEMeasurementEx;
 	PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr m_RTCContext_StopOIEMeasurement;
 	PLibMCDriver_ScanLabRTCContext_SetOIEPIDModePtr m_RTCContext_SetOIEPIDMode;
 	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;

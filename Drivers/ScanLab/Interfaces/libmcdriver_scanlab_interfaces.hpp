@@ -750,9 +750,15 @@ public:
 	virtual void DisableOIE() = 0;
 
 	/**
-	* IRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list.
+	* IRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
 	*/
 	virtual void StartOIEMeasurement() = 0;
+
+	/**
+	* IRTCContext::StartOIEMeasurementEx - Writes an OIE measurement start command block to the open list, with parameterized LaserOn Trigger
+	* @param[in] bLaserOnTrigger - If true, only triggers a measurement, when the laser is on.
+	*/
+	virtual void StartOIEMeasurementEx(const bool bLaserOnTrigger) = 0;
 
 	/**
 	* IRTCContext::StopOIEMeasurement - Writes an OIE measurement start command block to the open list.
@@ -1028,7 +1034,7 @@ public:
 	virtual void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::ConfigureLaserMode - Configures the laser mode.
+	* IDriver_ScanLab_RTC6::ConfigureLaserMode - Configures the laser mode. MUST be called before any exposure.
 	* @param[in] eLaserMode - Laser Mode Enum
 	* @param[in] eLaserPort - Laser Port Enum
 	* @param[in] dMaxLaserPower - Maximum laser power.
@@ -1042,7 +1048,7 @@ public:
 	virtual void ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::ConfigureDelays - Configures the default laser and scanner delays.
+	* IDriver_ScanLab_RTC6::ConfigureDelays - Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 	* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
 	* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds
 	* @param[in] dMarkDelay - Mark delay in microseconds (will be rounded to a multiple of 10)
@@ -1227,7 +1233,7 @@ public:
 	virtual void ConfigureLaserMode(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::ConfigureDelays - Configures the default laser and scanner delays.
+	* IDriver_ScanLab_RTC6xN::ConfigureDelays - Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
 	* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds

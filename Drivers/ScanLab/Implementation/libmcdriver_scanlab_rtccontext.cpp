@@ -746,6 +746,11 @@ void CRTCContext::DisableOIE()
 
 void CRTCContext::StartOIEMeasurement()
 {
+	StartOIEMeasurementEx(false);
+}
+
+void CRTCContext::StartOIEMeasurementEx(bool bTriggerOnFlag)
+{
 	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_OIEHASNOTBEENINITIALIZED);
 
@@ -755,6 +760,7 @@ void CRTCContext::StartOIEMeasurement()
 
 	m_pScanLabSDK->n_list_nop(m_CardNo);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	uint32_t nFreeVariable = 0;
 
 	switch (m_OIEOperationMode) {
 	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion2:
@@ -765,8 +771,13 @@ void CRTCContext::StartOIEMeasurement()
 	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
 	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3:
 		// Bit 4 triggers OIE Measurement Start
+		nFreeVariable = 1UL | (1UL << 4);
+
 		// Bit 5 sets LaserON Trigger flag
-		sendFreeVariable0(1UL | (1UL << 4));
+		if (bTriggerOnFlag)
+			nFreeVariable |= (1UL << 5);
+
+		sendFreeVariable0(nFreeVariable);
 		break;
 	}
 	
