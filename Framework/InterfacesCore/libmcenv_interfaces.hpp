@@ -739,30 +739,6 @@ public:
 	virtual LibMCEnv_double GetUnits() = 0;
 
 	/**
-	* IToolpathAccessor::HasMetaData - Checks if a metadata value exists for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns if metadata exists.
-	*/
-	virtual bool HasMetaData(const std::string & sNameSpace, const std::string & sName) = 0;
-
-	/**
-	* IToolpathAccessor::GetMetaDataValue - Returns the value of a metadata for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns the value
-	*/
-	virtual std::string GetMetaDataValue(const std::string & sNameSpace, const std::string & sName) = 0;
-
-	/**
-	* IToolpathAccessor::GetMetaDataType - Returns the type of a metadata for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns the type
-	*/
-	virtual std::string GetMetaDataType(const std::string & sNameSpace, const std::string & sName) = 0;
-
-	/**
 	* IToolpathAccessor::GetPartCount - Retrieves the number of parts in the toolpath.
 	* @return Number of parts.
 	*/
@@ -807,6 +783,43 @@ public:
 	* @return Z Value of the layer in mm.
 	*/
 	virtual LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataCount - Retrieves the number of metadata nodes in the build file.
+	* @return Meta Data information.
+	*/
+	virtual LibMCEnv_uint32 GetMetaDataCount() = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataInfo - Returns the namespace and identifier of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @param[out] sNamespace - Namespace of the metadata
+	* @param[out] sName - Name of the metadata
+	*/
+	virtual void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataContent - Returns the metadata XML content of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex) = 0;
+
+	/**
+	* IToolpathAccessor::HasUniqueMetaData - Checks if a metadata exists in the build file.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return Returns true if metadata exists and is unique.
+	*/
+	virtual bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::FindUniqueMetaData - Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * FindUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
 
 };
 
@@ -2904,6 +2917,13 @@ public:
 	* @return XML Document Instance.
 	*/
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
+
+	/**
+	* IUIEnvironment::GetBuildJob - Returns a instance of a build object.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
+	*/
+	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 };
 

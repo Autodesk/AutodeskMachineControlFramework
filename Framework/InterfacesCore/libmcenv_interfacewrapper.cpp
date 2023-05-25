@@ -1821,146 +1821,6 @@ LibMCEnvResult libmcenv_toolpathaccessor_getunits(LibMCEnv_ToolpathAccessor pToo
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathaccessor_hasmetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, bool * pExists)
-{
-	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
-
-	try {
-		if (pNameSpace == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pExists == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sNameSpace(pNameSpace);
-		std::string sName(pName);
-		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
-		if (!pIToolpathAccessor)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pExists = pIToolpathAccessor->HasMetaData(sNameSpace, sName);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_toolpathaccessor_getmetadatavalue(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataValueBufferSize, LibMCEnv_uint32* pMetaDataValueNeededChars, char * pMetaDataValueBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
-
-	try {
-		if (pNameSpace == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pMetaDataValueBuffer) && !(pMetaDataValueNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sNameSpace(pNameSpace);
-		std::string sName(pName);
-		std::string sMetaDataValue("");
-		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
-		if (!pIToolpathAccessor)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pMetaDataValueBuffer == nullptr);
-		if (isCacheCall) {
-			sMetaDataValue = pIToolpathAccessor->GetMetaDataValue(sNameSpace, sName);
-
-			pIToolpathAccessor->_setCache (new ParameterCache_1<std::string> (sMetaDataValue));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIToolpathAccessor->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sMetaDataValue);
-			pIToolpathAccessor->_setCache (nullptr);
-		}
-		
-		if (pMetaDataValueNeededChars)
-			*pMetaDataValueNeededChars = (LibMCEnv_uint32) (sMetaDataValue.size()+1);
-		if (pMetaDataValueBuffer) {
-			if (sMetaDataValue.size() >= nMetaDataValueBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iMetaDataValue = 0; iMetaDataValue < sMetaDataValue.size(); iMetaDataValue++)
-				pMetaDataValueBuffer[iMetaDataValue] = sMetaDataValue[iMetaDataValue];
-			pMetaDataValueBuffer[sMetaDataValue.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_toolpathaccessor_getmetadatatype(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataTypeBufferSize, LibMCEnv_uint32* pMetaDataTypeNeededChars, char * pMetaDataTypeBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
-
-	try {
-		if (pNameSpace == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pMetaDataTypeBuffer) && !(pMetaDataTypeNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sNameSpace(pNameSpace);
-		std::string sName(pName);
-		std::string sMetaDataType("");
-		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
-		if (!pIToolpathAccessor)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pMetaDataTypeBuffer == nullptr);
-		if (isCacheCall) {
-			sMetaDataType = pIToolpathAccessor->GetMetaDataType(sNameSpace, sName);
-
-			pIToolpathAccessor->_setCache (new ParameterCache_1<std::string> (sMetaDataType));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIToolpathAccessor->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sMetaDataType);
-			pIToolpathAccessor->_setCache (nullptr);
-		}
-		
-		if (pMetaDataTypeNeededChars)
-			*pMetaDataTypeNeededChars = (LibMCEnv_uint32) (sMetaDataType.size()+1);
-		if (pMetaDataTypeBuffer) {
-			if (sMetaDataType.size() >= nMetaDataTypeBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iMetaDataType = 0; iMetaDataType < sMetaDataType.size(); iMetaDataType++)
-				pMetaDataTypeBuffer[iMetaDataType] = sMetaDataType[iMetaDataType];
-			pMetaDataTypeBuffer[sMetaDataType.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCEnvResult libmcenv_toolpathaccessor_getpartcount(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pPartCount)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
@@ -2137,6 +1997,186 @@ LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinmm(LibMCEnv_ToolpathAccessor
 		
 		*pZValue = pIToolpathAccessor->GetZValueInMM(nLayerIndex);
 
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getmetadatacount(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pMetaDataCount)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pMetaDataCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMetaDataCount = pIToolpathAccessor->GetMetaDataCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getmetadatainfo(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nMetaDataIndex, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if ( (!pNamespaceBuffer) && !(pNamespaceNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace("");
+		std::string sName("");
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNamespaceBuffer == nullptr) || (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			pIToolpathAccessor->GetMetaDataInfo(nMetaDataIndex, sNamespace, sName);
+
+			pIToolpathAccessor->_setCache (new ParameterCache_2<std::string, std::string> (sNamespace, sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_2<std::string, std::string>*> (pIToolpathAccessor->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sNamespace, sName);
+			pIToolpathAccessor->_setCache (nullptr);
+		}
+		
+		if (pNamespaceNeededChars)
+			*pNamespaceNeededChars = (LibMCEnv_uint32) (sNamespace.size()+1);
+		if (pNamespaceBuffer) {
+			if (sNamespace.size() >= nNamespaceBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iNamespace = 0; iNamespace < sNamespace.size(); iNamespace++)
+				pNamespaceBuffer[iNamespace] = sNamespace[iNamespace];
+			pNamespaceBuffer[sNamespace.size()] = 0;
+		}
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCEnv_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getmetadatacontent(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nMetaDataIndex, LibMCEnv_XMLDocumentNode * pXMLNode)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pXMLNode == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseXMLNode(nullptr);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseXMLNode = pIToolpathAccessor->GetMetaDataContent(nMetaDataIndex);
+
+		*pXMLNode = (IBase*)(pBaseXMLNode);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_hasuniquemetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, bool * pMetaDataExists)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMetaDataExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sName(pName);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMetaDataExists = pIToolpathAccessor->HasUniqueMetaData(sNamespace, sName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_finduniquemetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pXMLNode == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sName(pName);
+		IBase* pBaseXMLNode(nullptr);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseXMLNode = pIToolpathAccessor->FindUniqueMetaData(sNamespace, sName);
+
+		*pXMLNode = (IBase*)(pBaseXMLNode);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -10749,6 +10789,37 @@ LibMCEnvResult libmcenv_uienvironment_parsexmldata(LibMCEnv_UIEnvironment pUIEnv
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pBuildUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pBuildInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sBuildUUID(pBuildUUID);
+		IBase* pBaseBuildInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseBuildInstance = pIUIEnvironment->GetBuildJob(sBuildUUID);
+
+		*pBuildInstance = (IBase*)(pBaseBuildInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -10876,12 +10947,6 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_loadlayer;
 	if (sProcName == "libmcenv_toolpathaccessor_getunits") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getunits;
-	if (sProcName == "libmcenv_toolpathaccessor_hasmetadata") 
-		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_hasmetadata;
-	if (sProcName == "libmcenv_toolpathaccessor_getmetadatavalue") 
-		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getmetadatavalue;
-	if (sProcName == "libmcenv_toolpathaccessor_getmetadatatype") 
-		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getmetadatatype;
 	if (sProcName == "libmcenv_toolpathaccessor_getpartcount") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getpartcount;
 	if (sProcName == "libmcenv_toolpathaccessor_getpart") 
@@ -10896,6 +10961,16 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getbuildheightinmm;
 	if (sProcName == "libmcenv_toolpathaccessor_getzvalueinmm") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getzvalueinmm;
+	if (sProcName == "libmcenv_toolpathaccessor_getmetadatacount") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getmetadatacount;
+	if (sProcName == "libmcenv_toolpathaccessor_getmetadatainfo") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getmetadatainfo;
+	if (sProcName == "libmcenv_toolpathaccessor_getmetadatacontent") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getmetadatacontent;
+	if (sProcName == "libmcenv_toolpathaccessor_hasuniquemetadata") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_hasuniquemetadata;
+	if (sProcName == "libmcenv_toolpathaccessor_finduniquemetadata") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_finduniquemetadata;
 	if (sProcName == "libmcenv_build_getname") 
 		*ppProcAddress = (void*) &libmcenv_build_getname;
 	if (sProcName == "libmcenv_build_getbuilduuid") 
@@ -11428,6 +11503,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_parsexmlstring;
 	if (sProcName == "libmcenv_uienvironment_parsexmldata") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_parsexmldata;
+	if (sProcName == "libmcenv_uienvironment_getbuildjob") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getbuildjob;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

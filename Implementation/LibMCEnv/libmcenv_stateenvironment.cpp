@@ -148,7 +148,7 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
 	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
-	return new CBuild(pBuildJob, m_pSystemState);
+	return new CBuild(pBuildJob, m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getStorageInstance(), m_pSystemState->getSystemUserID ());
 }
 
 

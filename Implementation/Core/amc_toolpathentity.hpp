@@ -82,10 +82,6 @@ namespace AMC {
 
 		std::string getDebugName ();
 		
-		std::string getMetaDataValue (const std::string & sNameSpace, const std::string & sName);
-		std::string getMetaDataType (const std::string& sNameSpace, const std::string& sName);
-		bool hasMetaData (const std::string& sNameSpace, const std::string& sName);
-
 		uint32_t getPartCount();
 		PToolpathPart getPart(uint32_t nIndex);
 		PToolpathPart findPartByUUID(const std::string & sUUID);

@@ -47,15 +47,20 @@ using namespace LibMCEnv::Impl;
  Class definition of CBuild 
 **************************************************************************************************************************/
 
-CBuild::CBuild(LibMCData::PBuildJob pBuildJob, AMC::PSystemState pSystemState)
-	: m_pBuildJob(pBuildJob), m_pSystemState (pSystemState)
+CBuild::CBuild(LibMCData::PBuildJob pBuildJob, AMC::PToolpathHandler pToolpathHandler, LibMCData::PStorage pStorage, const std::string& sSystemUserID)
+	: m_pBuildJob(pBuildJob), m_pToolpathHandler(pToolpathHandler), m_pStorage (pStorage), m_sSystemUserID (sSystemUserID)
 {
-	if (pSystemState.get() == nullptr)
+	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pBuildJob.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pStorage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
+CBuild::~CBuild()
+{
+}
 
 std::string CBuild::GetName()
 {
@@ -81,7 +86,7 @@ std::string CBuild::GetStorageSHA256()
 
 LibMCEnv_double CBuild::GetBuildHeightInMM()
 {
-	auto pToolpathEntity = m_pSystemState->toolpathHandler()->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
 	if (pToolpathEntity == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
 
@@ -94,7 +99,7 @@ LibMCEnv_double CBuild::GetBuildHeightInMM()
 
 LibMCEnv_double CBuild::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
 {
-	auto pToolpathEntity = m_pSystemState->toolpathHandler()->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
 	if (pToolpathEntity == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
 
@@ -117,38 +122,37 @@ LibMCEnv_uint32 CBuild::GetLayerCount()
 IToolpathAccessor * CBuild::CreateToolpathAccessor()
 {
 	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
-	return new CToolpathAccessor(sStreamUUID, m_pSystemState->getToolpathHandlerInstance());
+	return new CToolpathAccessor(sStreamUUID, m_pToolpathHandler);
 }
 
 
 void CBuild::LoadToolpath()
 {
 	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
-	m_pSystemState->toolpathHandler()->loadToolpathEntity(sStreamUUID);
+	m_pToolpathHandler->loadToolpathEntity(sStreamUUID);
 }
 
 
 void CBuild::UnloadToolpath()
 {
 	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
-	m_pSystemState->toolpathHandler()->unloadToolpathEntity(sStreamUUID);
+	m_pToolpathHandler->unloadToolpathEntity(sStreamUUID);
 }
 
 bool CBuild::ToolpathIsLoaded()
 {
 	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
-	return (m_pSystemState->toolpathHandler()->findToolpathEntity(sStreamUUID, false) != nullptr);
+	return (m_pToolpathHandler->findToolpathEntity(sStreamUUID, false) != nullptr);
 }
 
 std::string CBuild::AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)
 {
 	auto sDataUUID = AMCCommon::CUtils::createUUID();
-	auto sSystemUserID = m_pSystemState->getSystemUserID ();
+	auto sSystemUserID = m_sSystemUserID;
 
-	auto pStorage = m_pSystemState->storage();
-	pStorage->StoreNewStream(sDataUUID, m_pBuildJob->GetUUID(), sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
+	m_pStorage->StoreNewStream(sDataUUID, m_pBuildJob->GetUUID(), sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
 
-	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
+	auto pStorageStream = m_pStorage->RetrieveStream(sDataUUID);
 	m_pBuildJob->AddJobData(sName, pStorageStream, LibMCData::eBuildJobDataType::CustomBinaryData, sSystemUserID);
 
 	return sDataUUID;

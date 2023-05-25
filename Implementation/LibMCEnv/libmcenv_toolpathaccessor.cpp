@@ -80,24 +80,6 @@ LibMCEnv_double CToolpathAccessor::GetUnits()
 }
 
 
-bool CToolpathAccessor::HasMetaData(const std::string& sNameSpace, const std::string& sName)
-{
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
-	return pToolpathEntity->hasMetaData(sNameSpace, sName);
-}
-
-std::string CToolpathAccessor::GetMetaDataValue(const std::string& sNameSpace, const std::string& sName)
-{
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
-	return pToolpathEntity->getMetaDataValue(sNameSpace, sName);
-}
-
-std::string CToolpathAccessor::GetMetaDataType(const std::string& sNameSpace, const std::string& sName)
-{
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
-	return pToolpathEntity->getMetaDataType(sNameSpace, sName);
-}
-
 LibMCEnv_uint32 CToolpathAccessor::GetPartCount()
 {
 	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
@@ -180,5 +162,30 @@ LibMCEnv_double CToolpathAccessor::GetZValueInMM(const LibMCEnv_uint32 nLayerInd
 
 	return pToolpathEntity->getLayerZInUnits(nLayerIndex) * pToolpathEntity->getUnits();
 
+}
+
+LibMCEnv_uint32 CToolpathAccessor::GetMetaDataCount()
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+void CToolpathAccessor::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IXMLDocumentNode* CToolpathAccessor::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+bool CToolpathAccessor::HasUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IXMLDocumentNode* CToolpathAccessor::FindUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 

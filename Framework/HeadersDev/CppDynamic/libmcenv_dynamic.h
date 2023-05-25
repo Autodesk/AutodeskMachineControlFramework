@@ -674,43 +674,6 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_LoadLayerPtr) (LibMCEnv_Toolp
 typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetUnitsPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pUnits);
 
 /**
-* Checks if a metadata value exists for this toolpath model.
-*
-* @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pNameSpace - Namespace of metadata.
-* @param[in] pName - Name of metadata.
-* @param[out] pExists - Returns if metadata exists.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_HasMetaDataPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, bool * pExists);
-
-/**
-* Returns the value of a metadata for this toolpath model.
-*
-* @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pNameSpace - Namespace of metadata.
-* @param[in] pName - Name of metadata.
-* @param[in] nMetaDataValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pMetaDataValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pMetaDataValueBuffer -  buffer of Returns the value, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetMetaDataValuePtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataValueBufferSize, LibMCEnv_uint32* pMetaDataValueNeededChars, char * pMetaDataValueBuffer);
-
-/**
-* Returns the type of a metadata for this toolpath model.
-*
-* @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pNameSpace - Namespace of metadata.
-* @param[in] pName - Name of metadata.
-* @param[in] nMetaDataTypeBufferSize - size of the buffer (including trailing 0)
-* @param[out] pMetaDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pMetaDataTypeBuffer -  buffer of Returns the type, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetMetaDataTypePtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataTypeBufferSize, LibMCEnv_uint32* pMetaDataTypeNeededChars, char * pMetaDataTypeBuffer);
-
-/**
 * Retrieves the number of parts in the toolpath.
 *
 * @param[in] pToolpathAccessor - ToolpathAccessor instance.
@@ -776,6 +739,62 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetBuildHeightInMMPtr) (LibMC
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetZValueInMMPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue);
+
+/**
+* Retrieves the number of metadata nodes in the build file.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pMetaDataCount - Meta Data information.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetMetaDataCountPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pMetaDataCount);
+
+/**
+* Returns the namespace and identifier of the given metadata index.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[in] nNamespaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespaceBuffer -  buffer of Namespace of the metadata, may be NULL
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the metadata, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetMetaDataInfoPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nMetaDataIndex, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the metadata XML content of the given metadata index.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetMetaDataContentPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nMetaDataIndex, LibMCEnv_XMLDocumentNode * pXMLNode);
+
+/**
+* Checks if a metadata exists in the build file.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pMetaDataExists - Returns true if metadata exists and is unique.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_HasUniqueMetaDataPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, bool * pMetaDataExists);
+
+/**
+* Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_FindUniqueMetaDataPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
 
 /*************************************************************************************************************************
  Class definition for Build
@@ -3620,6 +3639,16 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ParseXMLStringPtr) (LibMCEnv_UIE
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ParseXMLDataPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
+/**
+* Returns a instance of a build object.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildInstance - Build instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildJobPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -3732,9 +3761,6 @@ typedef struct {
 	PLibMCEnvToolpathAccessor_GetLayerCountPtr m_ToolpathAccessor_GetLayerCount;
 	PLibMCEnvToolpathAccessor_LoadLayerPtr m_ToolpathAccessor_LoadLayer;
 	PLibMCEnvToolpathAccessor_GetUnitsPtr m_ToolpathAccessor_GetUnits;
-	PLibMCEnvToolpathAccessor_HasMetaDataPtr m_ToolpathAccessor_HasMetaData;
-	PLibMCEnvToolpathAccessor_GetMetaDataValuePtr m_ToolpathAccessor_GetMetaDataValue;
-	PLibMCEnvToolpathAccessor_GetMetaDataTypePtr m_ToolpathAccessor_GetMetaDataType;
 	PLibMCEnvToolpathAccessor_GetPartCountPtr m_ToolpathAccessor_GetPartCount;
 	PLibMCEnvToolpathAccessor_GetPartPtr m_ToolpathAccessor_GetPart;
 	PLibMCEnvToolpathAccessor_FindPartByUUIDPtr m_ToolpathAccessor_FindPartByUUID;
@@ -3742,6 +3768,11 @@ typedef struct {
 	PLibMCEnvToolpathAccessor_GetZValueInUnitsPtr m_ToolpathAccessor_GetZValueInUnits;
 	PLibMCEnvToolpathAccessor_GetBuildHeightInMMPtr m_ToolpathAccessor_GetBuildHeightInMM;
 	PLibMCEnvToolpathAccessor_GetZValueInMMPtr m_ToolpathAccessor_GetZValueInMM;
+	PLibMCEnvToolpathAccessor_GetMetaDataCountPtr m_ToolpathAccessor_GetMetaDataCount;
+	PLibMCEnvToolpathAccessor_GetMetaDataInfoPtr m_ToolpathAccessor_GetMetaDataInfo;
+	PLibMCEnvToolpathAccessor_GetMetaDataContentPtr m_ToolpathAccessor_GetMetaDataContent;
+	PLibMCEnvToolpathAccessor_HasUniqueMetaDataPtr m_ToolpathAccessor_HasUniqueMetaData;
+	PLibMCEnvToolpathAccessor_FindUniqueMetaDataPtr m_ToolpathAccessor_FindUniqueMetaData;
 	PLibMCEnvBuild_GetNamePtr m_Build_GetName;
 	PLibMCEnvBuild_GetBuildUUIDPtr m_Build_GetBuildUUID;
 	PLibMCEnvBuild_GetStorageUUIDPtr m_Build_GetStorageUUID;
@@ -4008,6 +4039,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_CreateXMLDocumentPtr m_UIEnvironment_CreateXMLDocument;
 	PLibMCEnvUIEnvironment_ParseXMLStringPtr m_UIEnvironment_ParseXMLString;
 	PLibMCEnvUIEnvironment_ParseXMLDataPtr m_UIEnvironment_ParseXMLData;
+	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

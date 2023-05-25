@@ -75,12 +75,6 @@ public:
 
 	LibMCEnv_double GetUnits() override;
 
-	bool HasMetaData(const std::string& sNameSpace, const std::string& sName) override;
-
-	std::string GetMetaDataValue(const std::string& sNameSpace, const std::string& sName) override;
-
-	std::string GetMetaDataType(const std::string& sNameSpace, const std::string& sName) override;
-
 	LibMCEnv_uint32 GetPartCount() override;
 
 	IToolpathPart* GetPart(const LibMCEnv_uint32 nPartIndex) override;
@@ -94,6 +88,16 @@ public:
 	LibMCEnv_double GetBuildHeightInMM() override;
 
 	LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) override;
+
+	LibMCEnv_uint32 GetMetaDataCount() override;
+
+	void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName) override;
+
+	IXMLDocumentNode* GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex) override;
+
+	bool HasUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
+
+	IXMLDocumentNode* FindUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
 
 };
 

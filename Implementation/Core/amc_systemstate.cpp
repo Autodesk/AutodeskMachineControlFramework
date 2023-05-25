@@ -77,7 +77,7 @@ namespace AMC {
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger, getTestEnvironmentPath ());
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, getTestEnvironmentPath (), getSystemUserID ());
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
 		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
@@ -163,6 +163,11 @@ namespace AMC {
 	LibMCData::PLoginHandler CSystemState::getLoginHandlerInstance()
 	{
 		return m_pLoginHandler;
+	}
+
+	LibMCData::PStorage CSystemState::getStorageInstance()
+	{
+		return m_pStorage;
 	}
 
 	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()

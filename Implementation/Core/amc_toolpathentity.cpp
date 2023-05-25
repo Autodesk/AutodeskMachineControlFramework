@@ -138,33 +138,6 @@ namespace AMC {
 		return m_sDebugName;
 	}
 
-	bool CToolpathEntity::hasMetaData (const std::string& sNameSpace, const std::string& sName)
-	{
-		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
-		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
-		return (pMetaData.get() != nullptr);
-	}
-
-	std::string CToolpathEntity::getMetaDataValue(const std::string& sNameSpace, const std::string& sName)
-	{
-		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
-		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
-		if (pMetaData.get() == nullptr)
-			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHMETADATANOTFOUND, sNameSpace + "#" + sName);
-		
-		return pMetaData->GetValue();
-	}
-
-	std::string CToolpathEntity::getMetaDataType(const std::string& sNameSpace, const std::string& sName)
-	{
-		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
-		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
-		if (pMetaData.get() == nullptr)
-			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHMETADATANOTFOUND, sNameSpace + "#" + sName);
-
-		return pMetaData->GetType();
-	}
-
 
 	uint32_t CToolpathEntity::getPartCount()
 	{

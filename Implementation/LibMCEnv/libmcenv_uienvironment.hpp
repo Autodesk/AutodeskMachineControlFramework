@@ -40,6 +40,7 @@ Abstract: This is the class declaration of CUIEnvironment
 #include "amc_statemachinedata.hpp"
 #include "amc_statesignalhandler.hpp"
 #include "amc_ui_clientaction.hpp"
+#include "amc_systemstate.hpp"
 
 #include <vector>
 
@@ -72,11 +73,17 @@ private:
 	AMC::PStateMachineData m_pStateMachineData;
 	AMC::PParameterHandler m_pClientVariableHandler;
 	AMC::PStateSignalHandler m_pSignalHandler;
+	AMC::PToolpathHandler m_pToolpathHandler;
 	AMC::CUIHandler * m_pUIHandler;
+
+	LibMCData::PStorage m_pStorage;
+	LibMCData::PBuildJobHandler m_pBuildJobHandler;
+
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
 	std::string m_sTestEnvironmentPath;
+	std::string m_sSystemUserID;
 
 	AMCCommon::CChrono m_Chrono;
 
@@ -86,7 +93,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string & sTestEnvironmentPath);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID);
 
 	virtual ~CUIEnvironment();
 
@@ -166,6 +173,8 @@ public:
 	IXMLDocument* ParseXMLString(const std::string& sXMLString) override;
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
+
+	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
 
 };

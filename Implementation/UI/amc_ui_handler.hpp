@@ -51,6 +51,7 @@ namespace LibMCUI {
 
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+	amcDeclareDependingClass(CStorage, PStorage);
 }
 
 namespace LibMCEnv {
@@ -77,6 +78,7 @@ namespace AMC {
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
+	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
 
 
 	class CUIHandleEventResponse {
@@ -112,6 +114,7 @@ namespace AMC {
 
 		std::string m_sMainPageName;
 		std::string m_sTestOutputPath;
+		std::string m_sSystemUserID;
 
 		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
@@ -132,6 +135,10 @@ namespace AMC {
 		LibMCUI::PEventHandler m_pUIEventHandler;
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
+		PToolpathHandler m_pToolpathHandler;
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		LibMCData::PStorage m_pStorage;
+
 		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string & sDescription, const std::string& sTargetPage, const std::string & sEventName);
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName);
 
@@ -143,7 +150,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, const std::string & sTestOutputPath);
+		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, const std::string & sTestOutputPath, const std::string & sSystemUserID);
 		
 		virtual ~CUIHandler();
 		

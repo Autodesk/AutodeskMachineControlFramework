@@ -527,24 +527,6 @@
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
 
-		<method name="HasMetaData" description="Checks if a metadata value exists for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="Exists" type="bool" pass="return" description="Returns if metadata exists." />
-		</method>
-
-		<method name="GetMetaDataValue" description="Returns the value of a metadata for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="MetaDataValue" type="string" pass="return" description="Returns the value" />
-		</method>
-			
-		<method name="GetMetaDataType" description="Returns the type of a metadata for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="MetaDataType" type="string" pass="return" description="Returns the type" />
-		</method>
-
 		<method name="GetPartCount" description="Retrieves the number of parts in the toolpath.">
 			<param name="PartCount" type="uint32" pass="return" description="Number of parts." />
 		</method>
@@ -575,6 +557,33 @@
 		<method name="GetZValueInMM" description="Retrieves the layers Z Value in mm.">
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index to return." />
 			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
+		</method>		
+
+		<method name="GetMetaDataCount" description="Retrieves the number of metadata nodes in the build file.">
+			<param name="MetaDataCount" type="uint32" pass="return" description="Meta Data information." />
+		</method>		
+
+		<method name="GetMetaDataInfo" description="Returns the namespace and identifier of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="Namespace" type="string" pass="out" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="out" description="Name of the metadata" />
+		</method>		
+
+		<method name="GetMetaDataContent" description="Returns the metadata XML content of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
+		<method name="HasUniqueMetaData" description="Checks if a metadata exists in the build file.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="MetaDataExists" type="bool" pass="return" description="Returns true if metadata exists and is unique." />
+		</method>		
+
+		<method name="FindUniqueMetaData" description="Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
 		</method>		
 
 	</class>
@@ -2012,6 +2021,10 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 		
+		<method name="GetBuildJob" description="Returns a instance of a build object.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
+		</method>		
 		
 	</class>
 
