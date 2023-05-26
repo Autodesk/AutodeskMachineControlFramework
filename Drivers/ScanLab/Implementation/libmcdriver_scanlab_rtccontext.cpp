@@ -687,7 +687,8 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	// Set signal channels
-	m_pScanLabSDK->n_set_mcbsp_out_ptr(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size (), m_MCBSPSignalChannels.data ());
+	uint32_t nTransferLaserOnFlag = (1UL << 31);
+	m_pScanLabSDK->n_set_mcbsp_out_ptr(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size () | nTransferLaserOnFlag, m_MCBSPSignalChannels.data ());
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	// No PID control for now
