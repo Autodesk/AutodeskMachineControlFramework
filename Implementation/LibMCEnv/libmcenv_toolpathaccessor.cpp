@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_toolpathlayer.hpp"
 #include "libmcenv_toolpathpart.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_xmldocument.hpp"
+#include "libmcenv_xmldocumentnode.hpp"
 
 // Include custom headers here.
 
@@ -166,26 +168,48 @@ LibMCEnv_double CToolpathAccessor::GetZValueInMM(const LibMCEnv_uint32 nLayerInd
 
 LibMCEnv_uint32 CToolpathAccessor::GetMetaDataCount()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	return pToolpathEntity->getMetaDataCount();
 }
 
 void CToolpathAccessor::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	pToolpathEntity->getMetaDataInfo(nMetaDataIndex, sNamespace, sName);
 }
 
 IXMLDocumentNode* CToolpathAccessor::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	auto pXMLDocumentInstance = pToolpathEntity->getMetaData(nMetaDataIndex);
+	return new CXMLDocumentNode (pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode ());
 }
 
 bool CToolpathAccessor::HasUniqueMetaData(const std::string& sNamespace, const std::string& sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	return pToolpathEntity->hasUniqueMetaData(sNamespace, sName);
 }
 
 IXMLDocumentNode* CToolpathAccessor::FindUniqueMetaData(const std::string& sNamespace, const std::string& sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	auto pXMLDocumentInstance = pToolpathEntity->findUniqueMetaData(sNamespace, sName);
+	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
 }
 

@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_toolpathlayerdata.hpp"
 #include "amc_toolpathpart.hpp"
+#include "amc_xmldocument.hpp"
+
 #include "lib3mf/lib3mf_dynamic.hpp"
 #include "libmcdata_dynamic.hpp"
 
@@ -66,6 +68,8 @@ namespace AMC {
 
 		std::string m_sDebugName;
 
+		void copyMetaDataNode (AMC::PXMLDocumentNodeInstance pTargetNodeInstance, Lib3MF::PCustomXMLNode pSourceNodeInstance);
+
 	public:
 
 		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
@@ -88,6 +92,11 @@ namespace AMC {
 
 		uint32_t getLayerZInUnits(uint32_t nLayerIndex);
 
+		uint32_t getMetaDataCount ();
+		void getMetaDataInfo (uint32_t nMetaDataIndex, std::string & sNameSpace, std::string& sName);
+		PXMLDocumentInstance getMetaData (uint32_t nMetaDataIndex);
+		bool hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
+		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 	};
 
 	

@@ -133,6 +133,114 @@ namespace AMC {
 
 	}
 
+	uint32_t CToolpathEntity::getMetaDataCount()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		return m_pToolpath->GetCustomDataCount();
+
+	}
+	void CToolpathEntity::getMetaDataInfo(uint32_t nMetaDataIndex, std::string& sNameSpace, std::string& sName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+		if (nMetaDataIndex >= nDataCount)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		m_pToolpath->GetCustomDataName(nMetaDataIndex, sNameSpace, sName);
+	}
+
+
+	PXMLDocumentInstance CToolpathEntity::getMetaData(uint32_t nMetaDataIndex)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+		if (nMetaDataIndex >= nDataCount)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		auto pMetaData = m_pToolpath->GetCustomData(nMetaDataIndex);
+		auto pMetaDataRootNode = pMetaData->GetRootNode();
+
+		PXMLDocumentInstance pXMLDocument = std::make_shared<CXMLDocumentInstance>();
+		pXMLDocument->createEmptyDocument (pMetaDataRootNode->GetName (), pMetaData->GetNameSpace ());
+
+		copyMetaDataNode(pXMLDocument->GetRootNode(), pMetaDataRootNode);
+
+		return pXMLDocument;
+
+	}
+
+	void CToolpathEntity::copyMetaDataNode(AMC::PXMLDocumentNodeInstance pTargetNodeInstance, Lib3MF::PCustomXMLNode pSourceNodeInstance)
+	{
+		if (pTargetNodeInstance.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pSourceNodeInstance.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		size_t nAttributeCount = pSourceNodeInstance->GetAttributeCount();
+		for (size_t nAttributeIndex = 0; nAttributeIndex < nAttributeCount; nAttributeIndex++) {
+			auto pAttribute = pSourceNodeInstance->GetAttribute(nAttributeIndex);
+			pTargetNodeInstance->AddAttribute(pTargetNodeInstance->GetNameSpace(), pAttribute->GetName(), pAttribute->GetValue());
+		}
+
+		auto pSourceChildren = pSourceNodeInstance->GetChildren ();
+		size_t nChildCount = pSourceChildren->GetNodeCount();
+		for (size_t nChildIndex = 0; nChildIndex < nChildCount; nChildIndex++) {
+			auto pSourceChild = pSourceChildren->GetNode(nChildIndex);
+			auto pTargetChild = pTargetNodeInstance->AddChild(pTargetNodeInstance->GetNameSpace(), pSourceChild->GetName());
+
+			copyMetaDataNode(pTargetChild, pSourceChild);
+		}
+	}
+
+
+	bool CToolpathEntity::hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		uint32_t nFoundData = 0;
+		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+
+		for (uint32_t nMetaDataIndex = 0; nMetaDataIndex < nDataCount; nMetaDataIndex++) {
+			std::string sMetaDataNameSpace, sMetaDataName;
+			m_pToolpath->GetCustomDataName(nMetaDataIndex, sMetaDataNameSpace, sMetaDataName);
+			if ((sMetaDataNameSpace == sNameSpace) && (sMetaDataName == sName))
+				nFoundData++;
+		}
+
+		return (nFoundData == 1);
+	}
+
+	PXMLDocumentInstance CToolpathEntity::findUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		int64_t nFoundIndex = -1;
+
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+			uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+
+			for (uint32_t nMetaDataIndex = 0; nMetaDataIndex < nDataCount; nMetaDataIndex++) {
+				std::string sMetaDataNameSpace, sMetaDataName;
+				m_pToolpath->GetCustomDataName(nMetaDataIndex, sMetaDataNameSpace, sMetaDataName);
+				if ((sMetaDataNameSpace == sNameSpace) && (sMetaDataName == sName)) {
+					if (nFoundIndex != -1)
+						throw ELibMCCustomException(LIBMC_ERROR_METADATAISNOTUNIQUE, sNameSpace + "/" + sName);
+
+					nFoundIndex = nMetaDataIndex;
+				}
+			}
+		}
+
+		if (nFoundIndex < 0)
+			throw ELibMCCustomException(LIBMC_ERROR_METADATANOTFOUND, sNameSpace + "/" + sName);
+
+		return getMetaData ((uint32_t) nFoundIndex);
+	}
+
+
 	std::string CToolpathEntity::getDebugName()
 	{
 		return m_sDebugName;

@@ -514,6 +514,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME 497 /** invalid custom page event name. */
 #define LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME 498 /** duplicate custom page event name. */
 #define LIBMC_ERROR_INVALIDEVENTPARAMETERNAME 499 /** invalid event parameter name. */
+#define LIBMC_ERROR_INVALIDMETADATAINDEX 500 /** invalid metadata index. */
+#define LIBMC_ERROR_METADATAISNOTUNIQUE 501 /** metadata is not unique. */
+#define LIBMC_ERROR_METADATANOTFOUND 502 /** metadata not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -940,6 +943,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME: return "invalid custom page event name.";
     case LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME: return "duplicate custom page event name.";
     case LIBMC_ERROR_INVALIDEVENTPARAMETERNAME: return "invalid event parameter name.";
+    case LIBMC_ERROR_INVALIDMETADATAINDEX: return "invalid metadata index.";
+    case LIBMC_ERROR_METADATAISNOTUNIQUE: return "metadata is not unique.";
+    case LIBMC_ERROR_METADATANOTFOUND: return "metadata not found.";
     default: return "unknown error";
   }
 }

@@ -584,6 +584,9 @@ public:
 			case LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME: return "INVALIDCUSTOMPAGEVENTNAME";
 			case LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME: return "DUPLICATECUSTOMPAGEVENTNAME";
 			case LIBMC_ERROR_INVALIDEVENTPARAMETERNAME: return "INVALIDEVENTPARAMETERNAME";
+			case LIBMC_ERROR_INVALIDMETADATAINDEX: return "INVALIDMETADATAINDEX";
+			case LIBMC_ERROR_METADATAISNOTUNIQUE: return "METADATAISNOTUNIQUE";
+			case LIBMC_ERROR_METADATANOTFOUND: return "METADATANOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -1010,6 +1013,9 @@ public:
 			case LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME: return "invalid custom page event name.";
 			case LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME: return "duplicate custom page event name.";
 			case LIBMC_ERROR_INVALIDEVENTPARAMETERNAME: return "invalid event parameter name.";
+			case LIBMC_ERROR_INVALIDMETADATAINDEX: return "invalid metadata index.";
+			case LIBMC_ERROR_METADATAISNOTUNIQUE: return "metadata is not unique.";
+			case LIBMC_ERROR_METADATANOTFOUND: return "metadata not found.";
 		}
 		return "unknown error";
 	}
