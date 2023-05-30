@@ -93,6 +93,20 @@ namespace AMC {
 
 	CSystemState::~CSystemState()
 	{
+		m_pDriverHandler = nullptr;
+		m_pUIHandler = nullptr;
+		m_pStateMachineData = nullptr;
+		m_pToolpathHandler = nullptr;
+		m_pServiceHandler = nullptr;
+		m_pSignalHandler = nullptr;
+
+		m_pPersistencyHandler = nullptr;
+		m_pLoginHandler = nullptr;
+		m_pBuildJobHandler = nullptr;
+		m_pStorage = nullptr;
+		m_pDataModel = nullptr;
+
+		m_pLogger = nullptr;
 	}
 
 	CLogger* CSystemState::logger()
