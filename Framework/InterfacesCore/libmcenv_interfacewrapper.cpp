@@ -1689,6 +1689,186 @@ LibMCEnvResult libmcenv_toolpathlayer_getunits(LibMCEnv_ToolpathLayer pToolpathL
 	}
 }
 
+LibMCEnvResult libmcenv_toolpathlayer_getmetadatacount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 * pMetaDataCount)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pMetaDataCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMetaDataCount = pIToolpathLayer->GetMetaDataCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getmetadatainfo(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nMetaDataIndex, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if ( (!pNamespaceBuffer) && !(pNamespaceNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace("");
+		std::string sName("");
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNamespaceBuffer == nullptr) || (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			pIToolpathLayer->GetMetaDataInfo(nMetaDataIndex, sNamespace, sName);
+
+			pIToolpathLayer->_setCache (new ParameterCache_2<std::string, std::string> (sNamespace, sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_2<std::string, std::string>*> (pIToolpathLayer->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sNamespace, sName);
+			pIToolpathLayer->_setCache (nullptr);
+		}
+		
+		if (pNamespaceNeededChars)
+			*pNamespaceNeededChars = (LibMCEnv_uint32) (sNamespace.size()+1);
+		if (pNamespaceBuffer) {
+			if (sNamespace.size() >= nNamespaceBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iNamespace = 0; iNamespace < sNamespace.size(); iNamespace++)
+				pNamespaceBuffer[iNamespace] = sNamespace[iNamespace];
+			pNamespaceBuffer[sNamespace.size()] = 0;
+		}
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCEnv_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getmetadatacontent(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nMetaDataIndex, LibMCEnv_XMLDocumentNode * pXMLNode)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pXMLNode == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseXMLNode(nullptr);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseXMLNode = pIToolpathLayer->GetMetaDataContent(nMetaDataIndex);
+
+		*pXMLNode = (IBase*)(pBaseXMLNode);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_hasuniquemetadata(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, bool * pMetaDataExists)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMetaDataExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sName(pName);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMetaDataExists = pIToolpathLayer->HasUniqueMetaData(sNamespace, sName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_finduniquemetadata(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pXMLNode == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sName(pName);
+		IBase* pBaseXMLNode(nullptr);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseXMLNode = pIToolpathLayer->FindUniqueMetaData(sNamespace, sName);
+
+		*pXMLNode = (IBase*)(pBaseXMLNode);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for ToolpathAccessor
@@ -10939,6 +11119,16 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getzvalueinmm;
 	if (sProcName == "libmcenv_toolpathlayer_getunits") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getunits;
+	if (sProcName == "libmcenv_toolpathlayer_getmetadatacount") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getmetadatacount;
+	if (sProcName == "libmcenv_toolpathlayer_getmetadatainfo") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getmetadatainfo;
+	if (sProcName == "libmcenv_toolpathlayer_getmetadatacontent") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getmetadatacontent;
+	if (sProcName == "libmcenv_toolpathlayer_hasuniquemetadata") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_hasuniquemetadata;
+	if (sProcName == "libmcenv_toolpathlayer_finduniquemetadata") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_finduniquemetadata;
 	if (sProcName == "libmcenv_toolpathaccessor_getstorageuuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getstorageuuid;
 	if (sProcName == "libmcenv_toolpathaccessor_getlayercount") 

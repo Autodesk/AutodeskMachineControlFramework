@@ -118,6 +118,16 @@ public:
 
 	LibMCEnv_double GetUnits() override;
 
+	LibMCEnv_uint32 GetMetaDataCount() override;
+
+	void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName) override;
+
+	IXMLDocumentNode* GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex) override;
+
+	bool HasUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
+
+	IXMLDocumentNode* FindUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
+
 };
 
 } // namespace Impl

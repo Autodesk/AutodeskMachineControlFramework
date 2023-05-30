@@ -790,6 +790,11 @@ public:
 	inline LibMCEnv_int32 GetZValue();
 	inline LibMCEnv_double GetZValueInMM();
 	inline LibMCEnv_double GetUnits();
+	inline LibMCEnv_uint32 GetMetaDataCount();
+	inline void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName);
+	inline PXMLDocumentNode GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex);
+	inline bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName);
+	inline PXMLDocumentNode FindUniqueMetaData(const std::string & sNamespace, const std::string & sName);
 };
 	
 /*************************************************************************************************************************
@@ -1544,6 +1549,11 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValueInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetMetaDataCount = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetMetaDataInfo = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetMetaDataContent = nullptr;
+		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
 		pWrapperTable->m_ToolpathAccessor_LoadLayer = nullptr;
@@ -2348,6 +2358,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetUnits == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataCount = (PLibMCEnvToolpathLayer_GetMetaDataCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getmetadatacount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataCount = (PLibMCEnvToolpathLayer_GetMetaDataCountPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getmetadatacount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetMetaDataCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataInfo = (PLibMCEnvToolpathLayer_GetMetaDataInfoPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getmetadatainfo");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataInfo = (PLibMCEnvToolpathLayer_GetMetaDataInfoPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getmetadatainfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetMetaDataInfo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataContent = (PLibMCEnvToolpathLayer_GetMetaDataContentPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getmetadatacontent");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataContent = (PLibMCEnvToolpathLayer_GetMetaDataContentPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getmetadatacontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetMetaDataContent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = (PLibMCEnvToolpathLayer_HasUniqueMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_hasuniquemetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = (PLibMCEnvToolpathLayer_HasUniqueMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_hasuniquemetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_HasUniqueMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = (PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_finduniquemetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = (PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_finduniquemetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindUniqueMetaData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5166,6 +5221,26 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetUnits == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getmetadatacount", (void**)&(pWrapperTable->m_ToolpathLayer_GetMetaDataCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetMetaDataCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getmetadatainfo", (void**)&(pWrapperTable->m_ToolpathLayer_GetMetaDataInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetMetaDataInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getmetadatacontent", (void**)&(pWrapperTable->m_ToolpathLayer_GetMetaDataContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetMetaDataContent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_hasuniquemetadata", (void**)&(pWrapperTable->m_ToolpathLayer_HasUniqueMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_HasUniqueMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_finduniquemetadata", (void**)&(pWrapperTable->m_ToolpathLayer_FindUniqueMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindUniqueMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getstorageuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetStorageUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetStorageUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -7030,6 +7105,85 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetUnits(m_pHandle, &resultUnits));
 		
 		return resultUnits;
+	}
+	
+	/**
+	* CToolpathLayer::GetMetaDataCount - Retrieves the number of metadata nodes in the build file.
+	* @return Meta Data information.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetMetaDataCount()
+	{
+		LibMCEnv_uint32 resultMetaDataCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataCount(m_pHandle, &resultMetaDataCount));
+		
+		return resultMetaDataCount;
+	}
+	
+	/**
+	* CToolpathLayer::GetMetaDataInfo - Returns the namespace and identifier of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @param[out] sNamespace - Namespace of the metadata
+	* @param[out] sName - Name of the metadata
+	*/
+	void CToolpathLayer::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededNamespace = 0;
+		LibMCEnv_uint32 bytesWrittenNamespace = 0;
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataInfo(m_pHandle, nMetaDataIndex, 0, &bytesNeededNamespace, nullptr, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferNamespace(bytesNeededNamespace);
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataInfo(m_pHandle, nMetaDataIndex, bytesNeededNamespace, &bytesWrittenNamespace, &bufferNamespace[0], bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		sNamespace = std::string(&bufferNamespace[0]);
+		sName = std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CToolpathLayer::GetMetaDataContent - Returns the metadata XML content of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @return XML Metadata Object
+	*/
+	PXMLDocumentNode CToolpathLayer::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
+	{
+		LibMCEnvHandle hXMLNode = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataContent(m_pHandle, nMetaDataIndex, &hXMLNode));
+		
+		if (!hXMLNode) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
+	}
+	
+	/**
+	* CToolpathLayer::HasUniqueMetaData - Checks if a metadata exists in the build file.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return Returns true if metadata exists and is unique.
+	*/
+	bool CToolpathLayer::HasUniqueMetaData(const std::string & sNamespace, const std::string & sName)
+	{
+		bool resultMetaDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_HasUniqueMetaData(m_pHandle, sNamespace.c_str(), sName.c_str(), &resultMetaDataExists));
+		
+		return resultMetaDataExists;
+	}
+	
+	/**
+	* CToolpathLayer::FindUniqueMetaData - Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return XML Metadata Object
+	*/
+	PXMLDocumentNode CToolpathLayer::FindUniqueMetaData(const std::string & sNamespace, const std::string & sName)
+	{
+		LibMCEnvHandle hXMLNode = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindUniqueMetaData(m_pHandle, sNamespace.c_str(), sName.c_str(), &hXMLNode));
+		
+		if (!hXMLNode) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
 	}
 	
 	/**

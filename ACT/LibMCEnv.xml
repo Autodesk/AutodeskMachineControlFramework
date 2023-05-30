@@ -504,6 +504,33 @@
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
+
+		<method name="GetMetaDataCount" description="Retrieves the number of metadata nodes in the build file.">
+			<param name="MetaDataCount" type="uint32" pass="return" description="Meta Data information." />
+		</method>		
+
+		<method name="GetMetaDataInfo" description="Returns the namespace and identifier of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="Namespace" type="string" pass="out" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="out" description="Name of the metadata" />
+		</method>		
+
+		<method name="GetMetaDataContent" description="Returns the metadata XML content of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
+		<method name="HasUniqueMetaData" description="Checks if a metadata exists in the build file.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="MetaDataExists" type="bool" pass="return" description="Returns true if metadata exists and is unique." />
+		</method>		
+
+		<method name="FindUniqueMetaData" description="Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
 		
 	</class>
 

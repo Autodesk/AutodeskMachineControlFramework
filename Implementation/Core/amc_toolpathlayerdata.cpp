@@ -144,6 +144,15 @@ namespace AMC {
 			}
 		}
 
+		uint32_t nCustomDataCount = pToolpath->GetCustomDataCount();
+		for (uint32_t nCustomDataIndex = 0; nCustomDataIndex < nCustomDataCount; nCustomDataIndex++) {
+			auto pCustomData = pToolpath->GetCustomData(nCustomDataIndex);
+			std::string sNameSpace = pCustomData->GetNameSpace();
+			std::string sRootName = pCustomData->GetRootNode()->GetName();
+			auto sXMLString = pCustomData->SaveToString(true);
+
+			m_CustomData.push_back(std::make_pair (std::make_pair (sNameSpace, sRootName), sXMLString));
+		}
 		
 
 	}
@@ -366,6 +375,71 @@ namespace AMC {
 			throw ELibMCCustomException(LIBMC_ERROR_PROFILENOTFOUND, m_sDebugName + "/" + sProfileUUID);
 
 		return iIter->second;
+	}
+
+	uint32_t CToolpathLayerData::getMetaDataCount()
+	{
+		return (uint32_t)m_CustomData.size();
+	}
+
+	void CToolpathLayerData::getMetaDataInfo(uint32_t nMetaDataIndex, std::string& sNameSpace, std::string& sName)
+	{
+		if (nMetaDataIndex >= m_CustomData.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		auto& entry = m_CustomData.at(nMetaDataIndex);
+		sNameSpace = entry.first.first;
+		sName = entry.first.second;
+	}
+
+	PXMLDocumentInstance CToolpathLayerData::getMetaData(uint32_t nMetaDataIndex)
+	{
+		if (nMetaDataIndex >= m_CustomData.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		auto& entry = m_CustomData.at(nMetaDataIndex);
+
+		PXMLDocumentInstance pXMLInstance = std::make_shared <CXMLDocumentInstance>();
+		pXMLInstance->parseXMLString(entry.second);
+
+		return pXMLInstance;
+
+	}
+
+	bool CToolpathLayerData::hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		uint32_t nFoundCount = 0;
+		for (auto& entry : m_CustomData) {
+			if ((entry.first.first == sNameSpace) && (entry.first.second == sName))
+				nFoundCount++;
+		}
+
+		return (nFoundCount == 1);
+	}
+
+	PXMLDocumentInstance CToolpathLayerData::findUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		uint32_t nFoundCount = 0;
+		std::pair<std::pair<std::string, std::string>, std::string> foundEntry;
+
+		for (auto& entry : m_CustomData) {
+			if ((entry.first.first == sNameSpace) && (entry.first.second == sName)) {
+				foundEntry = entry;
+				nFoundCount++;
+			}
+		}
+
+		if (nFoundCount == 0) 
+			throw ELibMCCustomException(LIBMC_ERROR_METADATANOTFOUND, sNameSpace + "/" + sName);
+	
+		if (nFoundCount > 1)
+			throw ELibMCCustomException(LIBMC_ERROR_METADATAISNOTUNIQUE, sNameSpace + "/" + sName);
+
+		PXMLDocumentInstance pXMLInstance = std::make_shared <CXMLDocumentInstance>();
+		pXMLInstance->parseXMLString(foundEntry.second);
+
+		return pXMLInstance;
+
 	}
 
 }

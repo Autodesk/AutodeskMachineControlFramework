@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "lib3mf/lib3mf_dynamic.hpp"
 #include "libmcenv_types.hpp"
+#include "amc_xmldocument.hpp"
 
 namespace AMC {
 
@@ -87,6 +88,8 @@ namespace AMC {
 		std::map<std::string, uint32_t> m_UUIDMap;
 		std::map<std::string, PToolpathLayerProfile> m_ProfileMap;
 
+		std::vector<std::pair<std::pair<std::string, std::string>, std::string>> m_CustomData;
+
 		std::string m_sDebugName;
 
 		uint32_t registerUUID(const std::string& sUUID);
@@ -118,6 +121,13 @@ namespace AMC {
 		double getUnits();
 
 		int32_t getZValue ();
+
+		uint32_t getMetaDataCount();
+		void getMetaDataInfo(uint32_t nMetaDataIndex, std::string& sNameSpace, std::string& sName);
+		PXMLDocumentInstance getMetaData(uint32_t nMetaDataIndex);
+		bool hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
+		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
+
 
 	};
 

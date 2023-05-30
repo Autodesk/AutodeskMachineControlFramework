@@ -643,6 +643,62 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getzvalueinmm(LibMCEnv_T
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getunits(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pUnits);
 
+/**
+* Retrieves the number of metadata nodes in the build file.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pMetaDataCount - Meta Data information.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getmetadatacount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 * pMetaDataCount);
+
+/**
+* Returns the namespace and identifier of the given metadata index.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[in] nNamespaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespaceBuffer -  buffer of Namespace of the metadata, may be NULL
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the metadata, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getmetadatainfo(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nMetaDataIndex, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the metadata XML content of the given metadata index.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getmetadatacontent(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nMetaDataIndex, LibMCEnv_XMLDocumentNode * pXMLNode);
+
+/**
+* Checks if a metadata exists in the build file.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pMetaDataExists - Returns true if metadata exists and is unique.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_hasuniquemetadata(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, bool * pMetaDataExists);
+
+/**
+* Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_finduniquemetadata(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
+
 /*************************************************************************************************************************
  Class definition for ToolpathAccessor
 **************************************************************************************************************************/

@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_toolpathlayer.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_xmldocument.hpp"
+#include "libmcenv_xmldocumentnode.hpp"
 
 // Include custom headers here.
 #include "Common/common_utils.hpp"
@@ -333,4 +335,35 @@ LibMCEnv_int32 CToolpathLayer::GetZValue()
 LibMCEnv_double CToolpathLayer::GetZValueInMM()
 {
 	return m_pToolpathLayerData->getUnits() * m_pToolpathLayerData->getZValue();
+}
+
+LibMCEnv_uint32 CToolpathLayer::GetMetaDataCount()
+{
+	return m_pToolpathLayerData->getMetaDataCount();
+}
+
+void CToolpathLayer::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName)
+{
+	m_pToolpathLayerData->getMetaDataInfo(nMetaDataIndex, sNamespace, sName);
+
+}
+
+IXMLDocumentNode* CToolpathLayer::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
+{
+	auto pXMLDocumentInstance = m_pToolpathLayerData->getMetaData(nMetaDataIndex);
+	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
+
+}
+
+bool CToolpathLayer::HasUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	return m_pToolpathLayerData->hasUniqueMetaData(sNamespace, sName);
+
+}
+
+IXMLDocumentNode* CToolpathLayer::FindUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	auto pXMLDocumentInstance = m_pToolpathLayerData->findUniqueMetaData(sNamespace, sName);
+	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
+
 }

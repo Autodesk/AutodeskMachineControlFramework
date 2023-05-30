@@ -702,6 +702,43 @@ public:
 	*/
 	virtual LibMCEnv_double GetUnits() = 0;
 
+	/**
+	* IToolpathLayer::GetMetaDataCount - Retrieves the number of metadata nodes in the build file.
+	* @return Meta Data information.
+	*/
+	virtual LibMCEnv_uint32 GetMetaDataCount() = 0;
+
+	/**
+	* IToolpathLayer::GetMetaDataInfo - Returns the namespace and identifier of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @param[out] sNamespace - Namespace of the metadata
+	* @param[out] sName - Name of the metadata
+	*/
+	virtual void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName) = 0;
+
+	/**
+	* IToolpathLayer::GetMetaDataContent - Returns the metadata XML content of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex) = 0;
+
+	/**
+	* IToolpathLayer::HasUniqueMetaData - Checks if a metadata exists in the build file.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return Returns true if metadata exists and is unique.
+	*/
+	virtual bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathLayer::FindUniqueMetaData - Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * FindUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
+
 };
 
 typedef IBaseSharedPtr<IToolpathLayer> PIToolpathLayer;
