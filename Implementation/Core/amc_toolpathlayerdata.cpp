@@ -149,7 +149,7 @@ namespace AMC {
 			auto pCustomData = pToolpath->GetCustomData(nCustomDataIndex);
 			std::string sNameSpace = pCustomData->GetNameSpace();
 			std::string sRootName = pCustomData->GetRootNode()->GetName();
-			auto sXMLString = pCustomData->SaveToString(true);
+			auto sXMLString = pCustomData->SaveToString();
 
 			m_CustomData.push_back(std::make_pair (std::make_pair (sNameSpace, sRootName), sXMLString));
 		}
