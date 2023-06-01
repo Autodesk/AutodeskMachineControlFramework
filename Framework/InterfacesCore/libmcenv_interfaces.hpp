@@ -58,6 +58,7 @@ class IBase;
 class IIterator;
 class ITestEnvironment;
 class IImageData;
+class IDiscreteFieldData2D;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
@@ -430,7 +431,7 @@ public:
 	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
 	* @param[in] nValueBufferSize - Number of elements in buffer
 	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
 	*/
 	virtual void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer) = 0;
 
@@ -448,6 +449,188 @@ public:
 };
 
 typedef IBaseSharedPtr<IImageData> PIImageData;
+
+
+/*************************************************************************************************************************
+ Class interface for DiscreteFieldData2D 
+**************************************************************************************************************************/
+
+class IDiscreteFieldData2D : public virtual IBase {
+public:
+	/**
+	* IDiscreteFieldData2D::GetDPI - Returns DPI values in X and Y.
+	* @param[out] dDPIValueX - DPI value in X
+	* @param[out] dDPIValueY - DPI value in Y
+	*/
+	virtual void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetDPI - Sets DPI values in X and Y.
+	* @param[in] dDPIValueX - new DPI value in X. MUST be positive.
+	* @param[in] dDPIValueY - new DPI value in Y. MUST be positive.
+	*/
+	virtual void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetOriginInMM - Returns field origin in mm.
+	* @param[out] dOriginX - Origin in X in mm
+	* @param[out] dOriginY - Origin in Y in mm
+	*/
+	virtual void GetOriginInMM(LibMCEnv_double & dOriginX, LibMCEnv_double & dOriginY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetOriginInMM - Set field origin in mm.
+	* @param[in] dOriginX - Origin in X in mm
+	* @param[in] dOriginY - Origin in Y in mm
+	*/
+	virtual void SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetSizeInMM - Returns field sizes in mm.
+	* @param[out] dSizeX - Size in X in mm
+	* @param[out] dSizeY - Size in Y in mm
+	*/
+	virtual void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetSizeInPixels - Returns field pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::ResizeField - Resizes field pixel data.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Clear - Sets all pixels to a single value.
+	* @param[in] dValue - Pixel value.
+	*/
+	virtual void Clear(const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetPixel - Returns one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @return Pixel value at this position
+	*/
+	virtual LibMCEnv_double GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetPixel - Sets one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @param[in] dValue - New Pixel value at this position
+	*/
+	virtual void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetPixelRange - Returns a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValueBuffer - double buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size.
+	*/
+	virtual void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_double * pValueBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetPixelRange - Exchanges a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[in] pValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
+	*/
+	virtual void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_double * pValueBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::RenderAveragePointValues - Renders and array of average point values into the field. 
+	* @param[in] dDefaultValue - If a pixel does not contain any value, fall back to this given value.
+	* @param[in] eSamplingMode - Sampling mode of point values.
+	* @param[in] dSampleSizeX - How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] dSampleSizeY - How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] nPointValuesBufferSize - Number of elements in buffer
+	* @param[in] pPointValuesBuffer - Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels.
+	*/
+	virtual void RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const LibMCEnv::eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const LibMCEnv_uint64 nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint * pPointValuesBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::ScaleFieldDown - Scales the field to a smaller size.
+	* @param[in] nFactorX - The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX
+	* @param[in] nFactorY - The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY
+	* @return Scaled Field Instance
+	*/
+	virtual IDiscreteFieldData2D * ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::ScaleFieldUp - Scales the field to a larger size.
+	* @param[in] nFactorX - The new field will be this factor larger in X. MUST be positive.
+	* @param[in] nFactorY - The new field will be this factor larger in Y. MUST be positive.
+	* @return Scaled Field Instance
+	*/
+	virtual IDiscreteFieldData2D * ScaleFieldUp(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Discretize - Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.
+	* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+	* @param[in] pDiscreteValuesBuffer - An array of values. MUST NOT be empty.
+	*/
+	virtual void Discretize(const LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::DiscretizeWithMapping - Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.
+	* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+	* @param[in] pDiscreteValuesBuffer - An array of values. MUST NOT be empty.  
+	* @param[in] nNewValuesBufferSize - Number of elements in buffer
+	* @param[in] pNewValuesBuffer - An array of values. MUST have the same cardinality as DiscreteValues.
+	*/
+	virtual void DiscretizeWithMapping(const LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer, const LibMCEnv_uint64 nNewValuesBufferSize, const LibMCEnv_double * pNewValuesBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::RenderToImageRaw - Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.
+	* @param[in] dMinValue - Min point value. Values smaller than MinValue will be clamped to MinValue.
+	* @param[in] MinColor - The color assigned to MinValue.
+	* @param[in] dMidValue - Mid point value. MUST be at least 1E-6 larger than MinValue.
+	* @param[in] MidColor - The color assigned to MidValue
+	* @param[in] dMaxValue - Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue.
+	* @param[in] MaxColor - The color assigned to MaxValue
+	* @return New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit.
+	*/
+	virtual IImageData * RenderToImageRaw(const LibMCEnv_double dMinValue, const LibMCEnv::sColorRGB MinColor, const LibMCEnv_double dMidValue, const LibMCEnv::sColorRGB MidColor, const LibMCEnv_double dMaxValue, const LibMCEnv::sColorRGB MaxColor) = 0;
+
+	/**
+	* IDiscreteFieldData2D::TransformField - Scales the field values with a factor and a translation.
+	* @param[in] dScale - A scaling factor will be applied to all values in the field.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	virtual void TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset) = 0;
+
+	/**
+	* IDiscreteFieldData2D::AddField - Adds another field to the field. Both fields MUST have the same pixel extensions.
+	* @param[in] pOtherField - Field Instance to add
+	* @param[in] dScale - A scaling factor will be applied to all values in the other field before adding.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	virtual void AddField(IDiscreteFieldData2D* pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Duplicate - Creates a copy of the field.
+	* @param[in] pOtherField - Field Instance to add
+	* @return Scaled Field Instance
+	*/
+	virtual IDiscreteFieldData2D * Duplicate(IDiscreteFieldData2D* pOtherField) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDiscreteFieldData2D> PIDiscreteFieldData2D;
 
 
 /*************************************************************************************************************************
@@ -2155,6 +2338,19 @@ public:
 	*/
 	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
+	/**
+	* IDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;
@@ -2628,6 +2824,19 @@ public:
 	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
+	* IStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
 	* IStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
@@ -2961,6 +3170,19 @@ public:
 	* @return Build instance
 	*/
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 };
 

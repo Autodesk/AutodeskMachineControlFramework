@@ -144,6 +144,15 @@
 		<option name="RGBA32bit" value="3" />
 	</enum>
 	
+	<enum name="FieldSamplingMode">
+		<option name="Unknown" value="0" description="Field sampling mode is invalid." />
+		<option name="FloorCoordinate" value="1" description="Point Coordinates are rounded down to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is nearer to the origin." />
+		<option name="CeilCoordinate" value="2" description="Point Coordinates are rounded up to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is farer from the origin." />
+		<option name="WeightByRectangleArea" value="3" description="Point values are valued by a rectangle shape area and its overlap with each pixel (with the center as the given coordinate)." />
+		<option name="WeightByEllipseArea" value="4" description="Point values are valued by a ellipse shape area that its overlap with each pixel (with the center as the given coordinate)." />
+	</enum>
+	
+	
 	<enum name="ToolpathSegmentType">
 		<option name="Unknown" value="0" />
 		<option name="Hatch" value="1" />
@@ -192,6 +201,16 @@
 		<member name="Coordinates" type="double" rows="2"/>
 	</struct>
 
+	<struct name="FieldData2DPoint">
+		<member name="Coordinates" type="double" rows="2"/>
+		<member name="Value" type="double" />
+	</struct>
+
+	<struct name="FieldData3DPoint">
+		<member name="Coordinates" type="double" rows="3"/>
+		<member name="Value" type="double" />
+	</struct>
+
 	<struct name="FloatHatch2D">
 		<member name="X1" type="double" />
 		<member name="Y1" type="double" />
@@ -206,9 +225,9 @@
 	</struct>
 
 	<struct name="ColorRGB">
-		<member name="Red" type="double" />
-		<member name="Green" type="double" />
-		<member name="Blue" type="double" />
+		<member name="Red" type="double" description="Red value of color (0..1)" />
+		<member name="Green" type="double" description="Green value of color (0..1)"/>
+		<member name="Blue" type="double" description="Blue value of color (0..1)" />
 	</struct>
 
 	
@@ -315,7 +334,7 @@
 			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
 			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
 			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
-			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
 		</method>		
 
 		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
@@ -328,6 +347,132 @@
 	
 	</class>
 	
+
+	<class name="DiscreteFieldData2D" parent="Base" description="In-memory representation of discrete field in space.">
+
+		<method name="GetDPI" description="Returns DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
+			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
+		</method>
+
+		<method name="SetDPI" description="Sets DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="in" description="new DPI value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="new DPI value in Y. MUST be positive." />
+		</method>
+
+		<method name="GetOriginInMM" description="Returns field origin in mm.">
+			<param name="OriginX" type="double" pass="out" description="Origin in X in mm" />
+			<param name="OriginY" type="double" pass="out" description="Origin in Y in mm" />
+		</method>
+
+		<method name="SetOriginInMM" description="Set field origin in mm.">
+			<param name="OriginX" type="double" pass="in" description="Origin in X in mm" />
+			<param name="OriginY" type="double" pass="in" description="Origin in Y in mm" />
+		</method>
+		
+		<method name="GetSizeInMM" description="Returns field sizes in mm.">
+			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
+			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
+		</method>
+
+		<method name="GetSizeInPixels" description="Returns field pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="ResizeField" description="Resizes field pixel data.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>
+
+		<method name="Clear" description="Sets all pixels to a single value.">
+			<param name="Value" type="double" pass="in" description="Pixel value." />
+		</method>		
+
+		<method name="GetPixel" description="Returns one pixel of an field. Fails if outside of field size.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="double" pass="return" description="Pixel value at this position" />
+		</method>		
+
+		<method name="SetPixel" description="Sets one pixel of an field. Fails if outside of field size.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="double" pass="in" description="New Pixel value at this position" />
+		</method>		
+
+		<method name="GetPixelRange" description="Returns a subset of an field or the whole field data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within field bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within field bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="double" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size." />
+		</method>		
+
+		<method name="SetPixelRange" description="Exchanges a subset of an field or the whole field data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within field bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within field bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="double" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size." />
+		</method>
+		
+		<method name="RenderAveragePointValues" description="Renders and array of average point values into the field. ">
+			<param name="DefaultValue" type="double" pass="in" description="If a pixel does not contain any value, fall back to this given value." />
+			<param name="SamplingMode" type="enum" class="FieldSamplingMode" pass="in" description="Sampling mode of point values." />
+			<param name="SampleSizeX" type="double" pass="in" description="How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise." />
+			<param name="SampleSizeY" type="double" pass="in" description="How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise." />
+			<param name="PointValues" type="structarray" class="FieldData2DPoint" pass="in" description="Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels." />
+		</method>
+		
+		<method name="ScaleFieldDown" description="Scales the field to a smaller size.">
+			<param name="FactorX" type="uint32" pass="in" description="The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX" />
+			<param name="FactorY" type="uint32" pass="in" description="The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY" />
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+		
+		<method name="ScaleFieldUp" description="Scales the field to a larger size.">
+			<param name="FactorX" type="uint32" pass="in" description="The new field will be this factor larger in X. MUST be positive." />
+			<param name="FactorY" type="uint32" pass="in" description="The new field will be this factor larger in Y. MUST be positive." />
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+
+		<method name="Discretize" description="Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.">
+			<param name="DiscreteValues" type="basicarray" class="double" pass="in" description="An array of values. MUST NOT be empty." />
+		</method>
+		
+		<method name="DiscretizeWithMapping" description="Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.">
+			<param name="DiscreteValues" type="basicarray" class="double" pass="in" description="An array of values. MUST NOT be empty.  " />
+			<param name="NewValues" type="basicarray" class="double" pass="in" description="An array of values. MUST have the same cardinality as DiscreteValues." />
+		</method>
+
+		<method name="RenderToImageRaw" description="Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.">
+			<param name="MinValue" type="double" pass="in" description="Min point value. Values smaller than MinValue will be clamped to MinValue." />
+			<param name="MinColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MinValue." />
+			<param name="MidValue" type="double" pass="in" description="Mid point value. MUST be at least 1E-6 larger than MinValue." />
+			<param name="MidColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MidValue" />
+			<param name="MaxValue" type="double" pass="in" description="Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue." />
+			<param name="MaxColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MaxValue" />
+			<param name="NewImage" type="class" class="ImageData" pass="return" description="New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit." />
+		</method>		
+		
+		<method name="TransformField" description="Scales the field values with a factor and a translation.">
+			<param name="Scale" type="double" pass="in" description="A scaling factor will be applied to all values in the field." />
+			<param name="Offset" type="double" pass="in" description="The offset will be applied to all values in the field after scaling." />
+		</method>		
+
+		<method name="AddField" description="Adds another field to the field. Both fields MUST have the same pixel extensions.">
+			<param name="OtherField" type="class" class="DiscreteFieldData2D" pass="in" description="Field Instance to add" />
+			<param name="Scale" type="double" pass="in" description="A scaling factor will be applied to all values in the other field before adding." />
+			<param name="Offset" type="double" pass="in" description="The offset will be applied to all values in the field after scaling." />
+		</method>		
+
+		<method name="Duplicate" description="Creates a copy of the field.">
+			<param name="OtherField" type="class" class="DiscreteFieldData2D" pass="in" description="Field Instance to add" />
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+
+	</class>
 
 	<class name="ToolpathPart" parent="Base">
 	
@@ -1471,6 +1616,17 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
 		</method>
 
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
 	</class>
 	
 	
@@ -1807,6 +1963,18 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />	
 		</method>
 
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
@@ -2052,7 +2220,18 @@
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>		
-		
+	
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
 	</class>
 
 

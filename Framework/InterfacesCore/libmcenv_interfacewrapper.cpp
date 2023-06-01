@@ -668,6 +668,574 @@ LibMCEnvResult libmcenv_imagedata_setpixelrange(LibMCEnv_ImageData pImageData, L
 
 
 /*************************************************************************************************************************
+ Class implementation for DiscreteFieldData2D
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_discretefielddata2d_getdpi(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pDPIValueX, LibMCEnv_double * pDPIValueY)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (!pDPIValueX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pDPIValueY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->GetDPI(*pDPIValueX, *pDPIValueY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_setdpi(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->SetDPI(dDPIValueX, dDPIValueY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_getorigininmm(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pOriginX, LibMCEnv_double * pOriginY)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (!pOriginX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pOriginY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->GetOriginInMM(*pOriginX, *pOriginY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_setorigininmm(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->SetOriginInMM(dOriginX, dOriginY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_getsizeinmm(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pSizeX, LibMCEnv_double * pSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (!pSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->GetSizeInMM(*pSizeX, *pSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_getsizeinpixels(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (!pPixelSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pPixelSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->GetSizeInPixels(*pPixelSizeX, *pPixelSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_resizefield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (!pPixelSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pPixelSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->ResizeField(*pPixelSizeX, *pPixelSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_clear(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->Clear(dValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_getpixel(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIDiscreteFieldData2D->GetPixel(nX, nY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_setpixel(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->SetPixel(nX, nY, dValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_getpixelrange(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_double * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if ((!pValueBuffer) && !(pValueNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->GetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueNeededCount, pValueBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_setpixelrange(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_double * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if ( (!pValueBuffer) && (nValueBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->SetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_renderaveragepointvalues(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dDefaultValue, eLibMCEnvFieldSamplingMode eSamplingMode, LibMCEnv_double dSampleSizeX, LibMCEnv_double dSampleSizeY, LibMCEnv_uint64 nPointValuesBufferSize, const sLibMCEnvFieldData2DPoint * pPointValuesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if ( (!pPointValuesBuffer) && (nPointValuesBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->RenderAveragePointValues(dDefaultValue, eSamplingMode, dSampleSizeX, dSampleSizeY, nPointValuesBufferSize, pPointValuesBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_scalefielddown(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nFactorX, LibMCEnv_uint32 nFactorY, LibMCEnv_DiscreteFieldData2D * pNewField)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (pNewField == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseNewField(nullptr);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseNewField = pIDiscreteFieldData2D->ScaleFieldDown(nFactorX, nFactorY);
+
+		*pNewField = (IBase*)(pBaseNewField);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_scalefieldup(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nFactorX, LibMCEnv_uint32 nFactorY, LibMCEnv_DiscreteFieldData2D * pNewField)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (pNewField == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseNewField(nullptr);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseNewField = pIDiscreteFieldData2D->ScaleFieldUp(nFactorX, nFactorY);
+
+		*pNewField = (IBase*)(pBaseNewField);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_discretize(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if ( (!pDiscreteValuesBuffer) && (nDiscreteValuesBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->Discretize(nDiscreteValuesBufferSize, pDiscreteValuesBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_discretizewithmapping(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer, LibMCEnv_uint64 nNewValuesBufferSize, const LibMCEnv_double * pNewValuesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if ( (!pDiscreteValuesBuffer) && (nDiscreteValuesBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pNewValuesBuffer) && (nNewValuesBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->DiscretizeWithMapping(nDiscreteValuesBufferSize, pDiscreteValuesBuffer, nNewValuesBufferSize, pNewValuesBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_rendertoimageraw(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dMinValue, const sLibMCEnvColorRGB * pMinColor, LibMCEnv_double dMidValue, const sLibMCEnvColorRGB * pMidColor, LibMCEnv_double dMaxValue, const sLibMCEnvColorRGB * pMaxColor, LibMCEnv_ImageData * pNewImage)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (pNewImage == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseNewImage(nullptr);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseNewImage = pIDiscreteFieldData2D->RenderToImageRaw(dMinValue, *pMinColor, dMidValue, *pMidColor, dMaxValue, *pMaxColor);
+
+		*pNewImage = (IBase*)(pBaseNewImage);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_transformfield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dScale, LibMCEnv_double dOffset)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->TransformField(dScale, dOffset);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_addfield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D pOtherField, LibMCEnv_double dScale, LibMCEnv_double dOffset)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		IBase* pIBaseClassOtherField = (IBase *)pOtherField;
+		IDiscreteFieldData2D* pIOtherField = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClassOtherField);
+		if (!pIOtherField)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->AddField(pIOtherField, dScale, dOffset);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D pOtherField, LibMCEnv_DiscreteFieldData2D * pNewField)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		if (pNewField == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassOtherField = (IBase *)pOtherField;
+		IDiscreteFieldData2D* pIOtherField = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClassOtherField);
+		if (!pIOtherField)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseNewField(nullptr);
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseNewField = pIDiscreteFieldData2D->Duplicate(pIOtherField);
+
+		*pNewField = (IBase*)(pBaseNewField);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for ToolpathPart
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_toolpathpart_getname(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
@@ -7402,6 +7970,34 @@ LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEnv_DriverEnvironmen
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseFieldDataInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIDriverEnvironment->CreateDiscreteField2D(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for SignalTrigger
@@ -9525,6 +10121,34 @@ LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv_StateEnvironment 
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseFieldDataInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIStateEnvironment->CreateDiscreteField2D(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -11000,6 +11624,34 @@ LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIEnvironment pUIEnvi
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseFieldDataInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIUIEnvironment->CreateDiscreteField2D(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -11059,6 +11711,48 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelrange;
 	if (sProcName == "libmcenv_imagedata_setpixelrange") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_setpixelrange;
+	if (sProcName == "libmcenv_discretefielddata2d_getdpi") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getdpi;
+	if (sProcName == "libmcenv_discretefielddata2d_setdpi") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_setdpi;
+	if (sProcName == "libmcenv_discretefielddata2d_getorigininmm") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getorigininmm;
+	if (sProcName == "libmcenv_discretefielddata2d_setorigininmm") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_setorigininmm;
+	if (sProcName == "libmcenv_discretefielddata2d_getsizeinmm") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getsizeinmm;
+	if (sProcName == "libmcenv_discretefielddata2d_getsizeinpixels") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getsizeinpixels;
+	if (sProcName == "libmcenv_discretefielddata2d_resizefield") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_resizefield;
+	if (sProcName == "libmcenv_discretefielddata2d_clear") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_clear;
+	if (sProcName == "libmcenv_discretefielddata2d_getpixel") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getpixel;
+	if (sProcName == "libmcenv_discretefielddata2d_setpixel") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_setpixel;
+	if (sProcName == "libmcenv_discretefielddata2d_getpixelrange") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getpixelrange;
+	if (sProcName == "libmcenv_discretefielddata2d_setpixelrange") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_setpixelrange;
+	if (sProcName == "libmcenv_discretefielddata2d_renderaveragepointvalues") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_renderaveragepointvalues;
+	if (sProcName == "libmcenv_discretefielddata2d_scalefielddown") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_scalefielddown;
+	if (sProcName == "libmcenv_discretefielddata2d_scalefieldup") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_scalefieldup;
+	if (sProcName == "libmcenv_discretefielddata2d_discretize") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_discretize;
+	if (sProcName == "libmcenv_discretefielddata2d_discretizewithmapping") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_discretizewithmapping;
+	if (sProcName == "libmcenv_discretefielddata2d_rendertoimageraw") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_rendertoimageraw;
+	if (sProcName == "libmcenv_discretefielddata2d_transformfield") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_transformfield;
+	if (sProcName == "libmcenv_discretefielddata2d_addfield") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_addfield;
+	if (sProcName == "libmcenv_discretefielddata2d_duplicate") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_duplicate;
 	if (sProcName == "libmcenv_toolpathpart_getname") 
 		*ppProcAddress = (void*) &libmcenv_toolpathpart_getname;
 	if (sProcName == "libmcenv_toolpathpart_getuuid") 
@@ -11485,6 +12179,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createemptyimage;
 	if (sProcName == "libmcenv_driverenvironment_loadpngimage") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_loadpngimage;
+	if (sProcName == "libmcenv_driverenvironment_creatediscretefield2d") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_creatediscretefield2d;
 	if (sProcName == "libmcenv_signaltrigger_cantrigger") 
 		*ppProcAddress = (void*) &libmcenv_signaltrigger_cantrigger;
 	if (sProcName == "libmcenv_signaltrigger_trigger") 
@@ -11609,6 +12305,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createemptyimage;
 	if (sProcName == "libmcenv_stateenvironment_loadpngimage") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadpngimage;
+	if (sProcName == "libmcenv_stateenvironment_creatediscretefield2d") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_creatediscretefield2d;
 	if (sProcName == "libmcenv_stateenvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getglobaltimerinmilliseconds;
 	if (sProcName == "libmcenv_stateenvironment_gettestenvironment") 
@@ -11695,6 +12393,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_parsexmldata;
 	if (sProcName == "libmcenv_uienvironment_getbuildjob") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getbuildjob;
+	if (sProcName == "libmcenv_uienvironment_creatediscretefield2d") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_creatediscretefield2d;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

@@ -262,7 +262,7 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelPtr) (LibMCEnv_ImageData pIm
 * @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
 * @param[in] nValueBufferSize - Number of elements in buffer
 * @param[out] pValueNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pValueBuffer - uint8  buffer of Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+* @param[out] pValueBuffer - uint8  buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelRangePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer);
@@ -280,6 +280,244 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelRangePtr) (LibMCEnv_ImageDat
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelRangePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
+
+/*************************************************************************************************************************
+ Class definition for DiscreteFieldData2D
+**************************************************************************************************************************/
+
+/**
+* Returns DPI values in X and Y.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pDPIValueX - DPI value in X
+* @param[out] pDPIValueY - DPI value in Y
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_GetDPIPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pDPIValueX, LibMCEnv_double * pDPIValueY);
+
+/**
+* Sets DPI values in X and Y.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dDPIValueX - new DPI value in X. MUST be positive.
+* @param[in] dDPIValueY - new DPI value in Y. MUST be positive.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_SetDPIPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY);
+
+/**
+* Returns field origin in mm.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pOriginX - Origin in X in mm
+* @param[out] pOriginY - Origin in Y in mm
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_GetOriginInMMPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pOriginX, LibMCEnv_double * pOriginY);
+
+/**
+* Set field origin in mm.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dOriginX - Origin in X in mm
+* @param[in] dOriginY - Origin in Y in mm
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_SetOriginInMMPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY);
+
+/**
+* Returns field sizes in mm.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pSizeX - Size in X in mm
+* @param[out] pSizeY - Size in Y in mm
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_GetSizeInMMPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pSizeX, LibMCEnv_double * pSizeY);
+
+/**
+* Returns field pixel sizes.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pPixelSizeX - Number of pixels in X
+* @param[out] pPixelSizeY - Number of pixels in Y
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_GetSizeInPixelsPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+
+/**
+* Resizes field pixel data.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pPixelSizeX - Number of pixels in X
+* @param[out] pPixelSizeY - Number of pixels in Y
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+
+/**
+* Sets all pixels to a single value.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dValue - Pixel value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_ClearPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dValue);
+
+/**
+* Returns one pixel of an field. Fails if outside of field size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nX - Pixel coordinate in X
+* @param[in] nY - Pixel coordinate in Y
+* @param[out] pValue - Pixel value at this position
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_GetPixelPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_double * pValue);
+
+/**
+* Sets one pixel of an field. Fails if outside of field size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nX - Pixel coordinate in X
+* @param[in] nY - Pixel coordinate in Y
+* @param[in] dValue - New Pixel value at this position
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_SetPixelPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_double dValue);
+
+/**
+* Returns a subset of an field or the whole field data.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[out] pValueNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValueBuffer - double  buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_GetPixelRangePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_double * pValueBuffer);
+
+/**
+* Exchanges a subset of an field or the whole field data.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[in] pValueBuffer - double buffer of New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_SetPixelRangePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_double * pValueBuffer);
+
+/**
+* Renders and array of average point values into the field. 
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dDefaultValue - If a pixel does not contain any value, fall back to this given value.
+* @param[in] eSamplingMode - Sampling mode of point values.
+* @param[in] dSampleSizeX - How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+* @param[in] dSampleSizeY - How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+* @param[in] nPointValuesBufferSize - Number of elements in buffer
+* @param[in] pPointValuesBuffer - FieldData2DPoint buffer of Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_RenderAveragePointValuesPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dDefaultValue, LibMCEnv::eFieldSamplingMode eSamplingMode, LibMCEnv_double dSampleSizeX, LibMCEnv_double dSampleSizeY, LibMCEnv_uint64 nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint * pPointValuesBuffer);
+
+/**
+* Scales the field to a smaller size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nFactorX - The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX
+* @param[in] nFactorY - The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY
+* @param[out] pNewField - Scaled Field Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_ScaleFieldDownPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nFactorX, LibMCEnv_uint32 nFactorY, LibMCEnv_DiscreteFieldData2D * pNewField);
+
+/**
+* Scales the field to a larger size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nFactorX - The new field will be this factor larger in X. MUST be positive.
+* @param[in] nFactorY - The new field will be this factor larger in Y. MUST be positive.
+* @param[out] pNewField - Scaled Field Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_ScaleFieldUpPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nFactorX, LibMCEnv_uint32 nFactorY, LibMCEnv_DiscreteFieldData2D * pNewField);
+
+/**
+* Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+* @param[in] pDiscreteValuesBuffer - double buffer of An array of values. MUST NOT be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DiscretizePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer);
+
+/**
+* Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+* @param[in] pDiscreteValuesBuffer - double buffer of An array of values. MUST NOT be empty.  
+* @param[in] nNewValuesBufferSize - Number of elements in buffer
+* @param[in] pNewValuesBuffer - double buffer of An array of values. MUST have the same cardinality as DiscreteValues.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DiscretizeWithMappingPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer, LibMCEnv_uint64 nNewValuesBufferSize, const LibMCEnv_double * pNewValuesBuffer);
+
+/**
+* Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dMinValue - Min point value. Values smaller than MinValue will be clamped to MinValue.
+* @param[in] pMinColor - The color assigned to MinValue.
+* @param[in] dMidValue - Mid point value. MUST be at least 1E-6 larger than MinValue.
+* @param[in] pMidColor - The color assigned to MidValue
+* @param[in] dMaxValue - Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue.
+* @param[in] pMaxColor - The color assigned to MaxValue
+* @param[out] pNewImage - New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_RenderToImageRawPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dMinValue, const LibMCEnv::sColorRGB * pMinColor, LibMCEnv_double dMidValue, const LibMCEnv::sColorRGB * pMidColor, LibMCEnv_double dMaxValue, const LibMCEnv::sColorRGB * pMaxColor, LibMCEnv_ImageData * pNewImage);
+
+/**
+* Scales the field values with a factor and a translation.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dScale - A scaling factor will be applied to all values in the field.
+* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_TransformFieldPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dScale, LibMCEnv_double dOffset);
+
+/**
+* Adds another field to the field. Both fields MUST have the same pixel extensions.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] pOtherField - Field Instance to add
+* @param[in] dScale - A scaling factor will be applied to all values in the other field before adding.
+* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_AddFieldPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D pOtherField, LibMCEnv_double dScale, LibMCEnv_double dOffset);
+
+/**
+* Creates a copy of the field.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] pOtherField - Field Instance to add
+* @param[out] pNewField - Scaled Field Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DuplicatePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D pOtherField, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
  Class definition for ToolpathPart
@@ -2565,6 +2803,22 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) (LibMCE
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LoadPNGImagePtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
+/**
+* Creates an empty discrete field.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[in] dDefaultValue - Default value of the field.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -3233,6 +3487,22 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateEmptyImagePtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadPNGImagePtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
+* Creates an empty discrete field.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[in] dDefaultValue - Default value of the field.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
 * Returns the global timer in milliseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -3705,6 +3975,22 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ParseXMLDataPtr) (LibMCEnv_UIEnv
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildJobPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
+/**
+* Creates an empty discrete field.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[in] dDefaultValue - Default value of the field.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -3783,6 +4069,27 @@ typedef struct {
 	PLibMCEnvImageData_SetPixelPtr m_ImageData_SetPixel;
 	PLibMCEnvImageData_GetPixelRangePtr m_ImageData_GetPixelRange;
 	PLibMCEnvImageData_SetPixelRangePtr m_ImageData_SetPixelRange;
+	PLibMCEnvDiscreteFieldData2D_GetDPIPtr m_DiscreteFieldData2D_GetDPI;
+	PLibMCEnvDiscreteFieldData2D_SetDPIPtr m_DiscreteFieldData2D_SetDPI;
+	PLibMCEnvDiscreteFieldData2D_GetOriginInMMPtr m_DiscreteFieldData2D_GetOriginInMM;
+	PLibMCEnvDiscreteFieldData2D_SetOriginInMMPtr m_DiscreteFieldData2D_SetOriginInMM;
+	PLibMCEnvDiscreteFieldData2D_GetSizeInMMPtr m_DiscreteFieldData2D_GetSizeInMM;
+	PLibMCEnvDiscreteFieldData2D_GetSizeInPixelsPtr m_DiscreteFieldData2D_GetSizeInPixels;
+	PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr m_DiscreteFieldData2D_ResizeField;
+	PLibMCEnvDiscreteFieldData2D_ClearPtr m_DiscreteFieldData2D_Clear;
+	PLibMCEnvDiscreteFieldData2D_GetPixelPtr m_DiscreteFieldData2D_GetPixel;
+	PLibMCEnvDiscreteFieldData2D_SetPixelPtr m_DiscreteFieldData2D_SetPixel;
+	PLibMCEnvDiscreteFieldData2D_GetPixelRangePtr m_DiscreteFieldData2D_GetPixelRange;
+	PLibMCEnvDiscreteFieldData2D_SetPixelRangePtr m_DiscreteFieldData2D_SetPixelRange;
+	PLibMCEnvDiscreteFieldData2D_RenderAveragePointValuesPtr m_DiscreteFieldData2D_RenderAveragePointValues;
+	PLibMCEnvDiscreteFieldData2D_ScaleFieldDownPtr m_DiscreteFieldData2D_ScaleFieldDown;
+	PLibMCEnvDiscreteFieldData2D_ScaleFieldUpPtr m_DiscreteFieldData2D_ScaleFieldUp;
+	PLibMCEnvDiscreteFieldData2D_DiscretizePtr m_DiscreteFieldData2D_Discretize;
+	PLibMCEnvDiscreteFieldData2D_DiscretizeWithMappingPtr m_DiscreteFieldData2D_DiscretizeWithMapping;
+	PLibMCEnvDiscreteFieldData2D_RenderToImageRawPtr m_DiscreteFieldData2D_RenderToImageRaw;
+	PLibMCEnvDiscreteFieldData2D_TransformFieldPtr m_DiscreteFieldData2D_TransformField;
+	PLibMCEnvDiscreteFieldData2D_AddFieldPtr m_DiscreteFieldData2D_AddField;
+	PLibMCEnvDiscreteFieldData2D_DuplicatePtr m_DiscreteFieldData2D_Duplicate;
 	PLibMCEnvToolpathPart_GetNamePtr m_ToolpathPart_GetName;
 	PLibMCEnvToolpathPart_GetUUIDPtr m_ToolpathPart_GetUUID;
 	PLibMCEnvToolpathPart_GetMeshUUIDPtr m_ToolpathPart_GetMeshUUID;
@@ -3996,6 +4303,7 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_LogInfoPtr m_DriverEnvironment_LogInfo;
 	PLibMCEnvDriverEnvironment_CreateEmptyImagePtr m_DriverEnvironment_CreateEmptyImage;
 	PLibMCEnvDriverEnvironment_LoadPNGImagePtr m_DriverEnvironment_LoadPNGImage;
+	PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr m_DriverEnvironment_CreateDiscreteField2D;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
 	PLibMCEnvSignalTrigger_TriggerPtr m_SignalTrigger_Trigger;
 	PLibMCEnvSignalTrigger_WaitForHandlingPtr m_SignalTrigger_WaitForHandling;
@@ -4058,6 +4366,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_LoadResourceStringPtr m_StateEnvironment_LoadResourceString;
 	PLibMCEnvStateEnvironment_CreateEmptyImagePtr m_StateEnvironment_CreateEmptyImage;
 	PLibMCEnvStateEnvironment_LoadPNGImagePtr m_StateEnvironment_LoadPNGImage;
+	PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr m_StateEnvironment_CreateDiscreteField2D;
 	PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr m_StateEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvStateEnvironment_GetTestEnvironmentPtr m_StateEnvironment_GetTestEnvironment;
 	PLibMCEnvStateEnvironment_CreateXMLDocumentPtr m_StateEnvironment_CreateXMLDocument;
@@ -4101,6 +4410,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_ParseXMLStringPtr m_UIEnvironment_ParseXMLString;
 	PLibMCEnvUIEnvironment_ParseXMLDataPtr m_UIEnvironment_ParseXMLData;
 	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
+	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

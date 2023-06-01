@@ -63,6 +63,7 @@ class CBase;
 class CIterator;
 class CTestEnvironment;
 class CImageData;
+class CDiscreteFieldData2D;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
@@ -95,6 +96,7 @@ typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
 typedef CTestEnvironment CLibMCEnvTestEnvironment;
 typedef CImageData CLibMCEnvImageData;
+typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
@@ -127,6 +129,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CTestEnvironment> PTestEnvironment;
 typedef std::shared_ptr<CImageData> PImageData;
+typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
@@ -159,6 +162,7 @@ typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
 typedef PTestEnvironment PLibMCEnvTestEnvironment;
 typedef PImageData PLibMCEnvImageData;
+typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
@@ -577,6 +581,7 @@ private:
 	friend class CIterator;
 	friend class CTestEnvironment;
 	friend class CImageData;
+	friend class CDiscreteFieldData2D;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
@@ -728,6 +733,43 @@ public:
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
 	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer);
 	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CDiscreteFieldData2D 
+**************************************************************************************************************************/
+class CDiscreteFieldData2D : public CBase {
+public:
+	
+	/**
+	* CDiscreteFieldData2D::CDiscreteFieldData2D - Constructor for DiscreteFieldData2D class.
+	*/
+	CDiscreteFieldData2D(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY);
+	inline void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY);
+	inline void GetOriginInMM(LibMCEnv_double & dOriginX, LibMCEnv_double & dOriginY);
+	inline void SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
+	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void Clear(const LibMCEnv_double dValue);
+	inline LibMCEnv_double GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
+	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue);
+	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_double> & ValueBuffer);
+	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_double> & ValueBuffer);
+	inline void RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const CInputVector<sFieldData2DPoint> & PointValuesBuffer);
+	inline PDiscreteFieldData2D ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY);
+	inline PDiscreteFieldData2D ScaleFieldUp(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY);
+	inline void Discretize(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer);
+	inline void DiscretizeWithMapping(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer, const CInputVector<LibMCEnv_double> & NewValuesBuffer);
+	inline PImageData RenderToImageRaw(const LibMCEnv_double dMinValue, const sColorRGB & MinColor, const LibMCEnv_double dMidValue, const sColorRGB & MidColor, const LibMCEnv_double dMaxValue, const sColorRGB & MaxColor);
+	inline void TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
+	inline void AddField(classParam<CDiscreteFieldData2D> pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
+	inline PDiscreteFieldData2D Duplicate(classParam<CDiscreteFieldData2D> pOtherField);
 };
 	
 /*************************************************************************************************************************
@@ -1245,6 +1287,7 @@ public:
 	inline void LogInfo(const std::string & sLogString);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 };
 	
 /*************************************************************************************************************************
@@ -1355,6 +1398,7 @@ public:
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
@@ -1414,6 +1458,7 @@ public:
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 };
 	
 	/**
@@ -1519,6 +1564,27 @@ public:
 		pWrapperTable->m_ImageData_SetPixel = nullptr;
 		pWrapperTable->m_ImageData_GetPixelRange = nullptr;
 		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetDPI = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetDPI = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_ResizeField = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Clear = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetPixel = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetPixel = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetPixelRange = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetPixelRange = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Discretize = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_TransformField = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_AddField = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
@@ -1732,6 +1798,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -1794,6 +1861,7 @@ public:
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
@@ -1837,6 +1905,7 @@ public:
 		pWrapperTable->m_UIEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLData = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -2088,6 +2157,195 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_SetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetDPI = (PLibMCEnvDiscreteFieldData2D_GetDPIPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getdpi");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetDPI = (PLibMCEnvDiscreteFieldData2D_GetDPIPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetDPI = (PLibMCEnvDiscreteFieldData2D_SetDPIPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setdpi");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetDPI = (PLibMCEnvDiscreteFieldData2D_SetDPIPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM = (PLibMCEnvDiscreteFieldData2D_GetOriginInMMPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getorigininmm");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM = (PLibMCEnvDiscreteFieldData2D_GetOriginInMMPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getorigininmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM = (PLibMCEnvDiscreteFieldData2D_SetOriginInMMPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setorigininmm");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM = (PLibMCEnvDiscreteFieldData2D_SetOriginInMMPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setorigininmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM = (PLibMCEnvDiscreteFieldData2D_GetSizeInMMPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getsizeinmm");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM = (PLibMCEnvDiscreteFieldData2D_GetSizeInMMPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getsizeinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels = (PLibMCEnvDiscreteFieldData2D_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels = (PLibMCEnvDiscreteFieldData2D_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ResizeField = (PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_resizefield");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ResizeField = (PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_resizefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_ResizeField == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clear = (PLibMCEnvDiscreteFieldData2D_ClearPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_clear");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clear = (PLibMCEnvDiscreteFieldData2D_ClearPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_clear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Clear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixel = (PLibMCEnvDiscreteFieldData2D_GetPixelPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getpixel");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixel = (PLibMCEnvDiscreteFieldData2D_GetPixelPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixel = (PLibMCEnvDiscreteFieldData2D_SetPixelPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setpixel");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixel = (PLibMCEnvDiscreteFieldData2D_SetPixelPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixelRange = (PLibMCEnvDiscreteFieldData2D_GetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixelRange = (PLibMCEnvDiscreteFieldData2D_GetPixelRangePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixelRange = (PLibMCEnvDiscreteFieldData2D_SetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixelRange = (PLibMCEnvDiscreteFieldData2D_SetPixelRangePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues = (PLibMCEnvDiscreteFieldData2D_RenderAveragePointValuesPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_renderaveragepointvalues");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues = (PLibMCEnvDiscreteFieldData2D_RenderAveragePointValuesPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_renderaveragepointvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown = (PLibMCEnvDiscreteFieldData2D_ScaleFieldDownPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_scalefielddown");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown = (PLibMCEnvDiscreteFieldData2D_ScaleFieldDownPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_scalefielddown");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp = (PLibMCEnvDiscreteFieldData2D_ScaleFieldUpPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_scalefieldup");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp = (PLibMCEnvDiscreteFieldData2D_ScaleFieldUpPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_scalefieldup");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Discretize = (PLibMCEnvDiscreteFieldData2D_DiscretizePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_discretize");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Discretize = (PLibMCEnvDiscreteFieldData2D_DiscretizePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_discretize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Discretize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping = (PLibMCEnvDiscreteFieldData2D_DiscretizeWithMappingPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_discretizewithmapping");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping = (PLibMCEnvDiscreteFieldData2D_DiscretizeWithMappingPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_discretizewithmapping");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw = (PLibMCEnvDiscreteFieldData2D_RenderToImageRawPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_rendertoimageraw");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw = (PLibMCEnvDiscreteFieldData2D_RenderToImageRawPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_rendertoimageraw");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_TransformField = (PLibMCEnvDiscreteFieldData2D_TransformFieldPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_transformfield");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_TransformField = (PLibMCEnvDiscreteFieldData2D_TransformFieldPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_transformfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_TransformField == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_AddField = (PLibMCEnvDiscreteFieldData2D_AddFieldPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_addfield");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_AddField = (PLibMCEnvDiscreteFieldData2D_AddFieldPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_addfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_AddField == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Duplicate = (PLibMCEnvDiscreteFieldData2D_DuplicatePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_duplicate");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Duplicate = (PLibMCEnvDiscreteFieldData2D_DuplicatePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_duplicate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4008,6 +4266,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_creatediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_driverenvironment_creatediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) GetProcAddress(hLibrary, "libmcenv_signaltrigger_cantrigger");
 		#else // _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) dlsym(hLibrary, "libmcenv_signaltrigger_cantrigger");
@@ -4566,6 +4833,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = (PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_creatediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = (PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_stateenvironment_creatediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
@@ -4953,6 +5229,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = (PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_creatediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = (PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_uienvironment_creatediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -5099,6 +5384,90 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_setpixelrange", (void**)&(pWrapperTable->m_ImageData_SetPixelRange));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getdpi", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setdpi", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getorigininmm", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setorigininmm", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getsizeinmm", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getsizeinpixels", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_resizefield", (void**)&(pWrapperTable->m_DiscreteFieldData2D_ResizeField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_ResizeField == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_clear", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Clear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Clear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getpixel", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setpixel", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getpixelrange", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setpixelrange", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_renderaveragepointvalues", (void**)&(pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_scalefielddown", (void**)&(pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_scalefieldup", (void**)&(pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_discretize", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Discretize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Discretize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_discretizewithmapping", (void**)&(pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_rendertoimageraw", (void**)&(pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_transformfield", (void**)&(pWrapperTable->m_DiscreteFieldData2D_TransformField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_TransformField == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_addfield", (void**)&(pWrapperTable->m_DiscreteFieldData2D_AddField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_AddField == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_duplicate", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Duplicate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
@@ -5953,6 +6322,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalTrigger_CanTrigger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6201,6 +6574,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_StateEnvironment_CreateDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6371,6 +6748,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_GetBuildJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -6643,7 +7024,7 @@ public:
 	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
 	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
 	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
 	*/
 	void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer)
 	{
@@ -6665,6 +7046,270 @@ public:
 	void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CDiscreteFieldData2D
+	 */
+	
+	/**
+	* CDiscreteFieldData2D::GetDPI - Returns DPI values in X and Y.
+	* @param[out] dDPIValueX - DPI value in X
+	* @param[out] dDPIValueY - DPI value in Y
+	*/
+	void CDiscreteFieldData2D::GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetDPI(m_pHandle, &dDPIValueX, &dDPIValueY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetDPI - Sets DPI values in X and Y.
+	* @param[in] dDPIValueX - new DPI value in X. MUST be positive.
+	* @param[in] dDPIValueY - new DPI value in Y. MUST be positive.
+	*/
+	void CDiscreteFieldData2D::SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetDPI(m_pHandle, dDPIValueX, dDPIValueY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetOriginInMM - Returns field origin in mm.
+	* @param[out] dOriginX - Origin in X in mm
+	* @param[out] dOriginY - Origin in Y in mm
+	*/
+	void CDiscreteFieldData2D::GetOriginInMM(LibMCEnv_double & dOriginX, LibMCEnv_double & dOriginY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetOriginInMM(m_pHandle, &dOriginX, &dOriginY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetOriginInMM - Set field origin in mm.
+	* @param[in] dOriginX - Origin in X in mm
+	* @param[in] dOriginY - Origin in Y in mm
+	*/
+	void CDiscreteFieldData2D::SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetOriginInMM(m_pHandle, dOriginX, dOriginY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetSizeInMM - Returns field sizes in mm.
+	* @param[out] dSizeX - Size in X in mm
+	* @param[out] dSizeY - Size in Y in mm
+	*/
+	void CDiscreteFieldData2D::GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetSizeInMM(m_pHandle, &dSizeX, &dSizeY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetSizeInPixels - Returns field pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CDiscreteFieldData2D::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::ResizeField - Resizes field pixel data.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CDiscreteFieldData2D::ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ResizeField(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Clear - Sets all pixels to a single value.
+	* @param[in] dValue - Pixel value.
+	*/
+	void CDiscreteFieldData2D::Clear(const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Clear(m_pHandle, dValue));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetPixel - Returns one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @return Pixel value at this position
+	*/
+	LibMCEnv_double CDiscreteFieldData2D::GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetPixel(m_pHandle, nX, nY, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetPixel - Sets one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @param[in] dValue - New Pixel value at this position
+	*/
+	void CDiscreteFieldData2D::SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetPixel(m_pHandle, nX, nY, dValue));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetPixelRange - Returns a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size.
+	*/
+	void CDiscreteFieldData2D::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_double> & ValueBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValue = 0;
+		LibMCEnv_uint64 elementsWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, 0, &elementsNeededValue, nullptr));
+		ValueBuffer.resize((size_t) elementsNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, elementsNeededValue, &elementsWrittenValue, ValueBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetPixelRange - Exchanges a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[in] ValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
+	*/
+	void CDiscreteFieldData2D::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_double> & ValueBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::RenderAveragePointValues - Renders and array of average point values into the field. 
+	* @param[in] dDefaultValue - If a pixel does not contain any value, fall back to this given value.
+	* @param[in] eSamplingMode - Sampling mode of point values.
+	* @param[in] dSampleSizeX - How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] dSampleSizeY - How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] PointValuesBuffer - Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels.
+	*/
+	void CDiscreteFieldData2D::RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const CInputVector<sFieldData2DPoint> & PointValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_RenderAveragePointValues(m_pHandle, dDefaultValue, eSamplingMode, dSampleSizeX, dSampleSizeY, (LibMCEnv_uint64)PointValuesBuffer.size(), PointValuesBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::ScaleFieldDown - Scales the field to a smaller size.
+	* @param[in] nFactorX - The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX
+	* @param[in] nFactorY - The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY
+	* @return Scaled Field Instance
+	*/
+	PDiscreteFieldData2D CDiscreteFieldData2D::ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY)
+	{
+		LibMCEnvHandle hNewField = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ScaleFieldDown(m_pHandle, nFactorX, nFactorY, &hNewField));
+		
+		if (!hNewField) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
+	}
+	
+	/**
+	* CDiscreteFieldData2D::ScaleFieldUp - Scales the field to a larger size.
+	* @param[in] nFactorX - The new field will be this factor larger in X. MUST be positive.
+	* @param[in] nFactorY - The new field will be this factor larger in Y. MUST be positive.
+	* @return Scaled Field Instance
+	*/
+	PDiscreteFieldData2D CDiscreteFieldData2D::ScaleFieldUp(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY)
+	{
+		LibMCEnvHandle hNewField = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ScaleFieldUp(m_pHandle, nFactorX, nFactorY, &hNewField));
+		
+		if (!hNewField) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Discretize - Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.
+	* @param[in] DiscreteValuesBuffer - An array of values. MUST NOT be empty.
+	*/
+	void CDiscreteFieldData2D::Discretize(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Discretize(m_pHandle, (LibMCEnv_uint64)DiscreteValuesBuffer.size(), DiscreteValuesBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::DiscretizeWithMapping - Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.
+	* @param[in] DiscreteValuesBuffer - An array of values. MUST NOT be empty.  
+	* @param[in] NewValuesBuffer - An array of values. MUST have the same cardinality as DiscreteValues.
+	*/
+	void CDiscreteFieldData2D::DiscretizeWithMapping(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer, const CInputVector<LibMCEnv_double> & NewValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_DiscretizeWithMapping(m_pHandle, (LibMCEnv_uint64)DiscreteValuesBuffer.size(), DiscreteValuesBuffer.data(), (LibMCEnv_uint64)NewValuesBuffer.size(), NewValuesBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::RenderToImageRaw - Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.
+	* @param[in] dMinValue - Min point value. Values smaller than MinValue will be clamped to MinValue.
+	* @param[in] MinColor - The color assigned to MinValue.
+	* @param[in] dMidValue - Mid point value. MUST be at least 1E-6 larger than MinValue.
+	* @param[in] MidColor - The color assigned to MidValue
+	* @param[in] dMaxValue - Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue.
+	* @param[in] MaxColor - The color assigned to MaxValue
+	* @return New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit.
+	*/
+	PImageData CDiscreteFieldData2D::RenderToImageRaw(const LibMCEnv_double dMinValue, const sColorRGB & MinColor, const LibMCEnv_double dMidValue, const sColorRGB & MidColor, const LibMCEnv_double dMaxValue, const sColorRGB & MaxColor)
+	{
+		LibMCEnvHandle hNewImage = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_RenderToImageRaw(m_pHandle, dMinValue, &MinColor, dMidValue, &MidColor, dMaxValue, &MaxColor, &hNewImage));
+		
+		if (!hNewImage) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hNewImage);
+	}
+	
+	/**
+	* CDiscreteFieldData2D::TransformField - Scales the field values with a factor and a translation.
+	* @param[in] dScale - A scaling factor will be applied to all values in the field.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	void CDiscreteFieldData2D::TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_TransformField(m_pHandle, dScale, dOffset));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::AddField - Adds another field to the field. Both fields MUST have the same pixel extensions.
+	* @param[in] pOtherField - Field Instance to add
+	* @param[in] dScale - A scaling factor will be applied to all values in the other field before adding.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	void CDiscreteFieldData2D::AddField(classParam<CDiscreteFieldData2D> pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset)
+	{
+		LibMCEnvHandle hOtherField = pOtherField.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_AddField(m_pHandle, hOtherField, dScale, dOffset));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Duplicate - Creates a copy of the field.
+	* @param[in] pOtherField - Field Instance to add
+	* @return Scaled Field Instance
+	*/
+	PDiscreteFieldData2D CDiscreteFieldData2D::Duplicate(classParam<CDiscreteFieldData2D> pOtherField)
+	{
+		LibMCEnvHandle hOtherField = pOtherField.GetHandle();
+		LibMCEnvHandle hNewField = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Duplicate(m_pHandle, hOtherField, &hNewField));
+		
+		if (!hNewField) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
 	}
 	
 	/**
@@ -9600,6 +10245,28 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDiscreteField2D(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
 	 * Method definitions for class CSignalTrigger
 	 */
 	
@@ -10417,6 +11084,28 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDiscreteField2D(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
 	* CStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
@@ -11012,6 +11701,28 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDiscreteField2D(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
 	}
 
 } // namespace LibMCEnv

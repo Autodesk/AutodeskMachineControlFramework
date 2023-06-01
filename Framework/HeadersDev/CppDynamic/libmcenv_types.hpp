@@ -304,6 +304,7 @@ typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
 typedef LibMCEnvHandle LibMCEnv_TestEnvironment;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
+typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
@@ -339,6 +340,14 @@ namespace LibMCEnv {
     GreyScale8bit = 1,
     RGB24bit = 2,
     RGBA32bit = 3
+  };
+  
+  enum class eFieldSamplingMode : LibMCEnv_int32 {
+    Unknown = 0, /** Field sampling mode is invalid. */
+    FloorCoordinate = 1, /** Point Coordinates are rounded down to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is nearer to the origin. */
+    CeilCoordinate = 2, /** Point Coordinates are rounded up to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is farer from the origin. */
+    WeightByRectangleArea = 3, /** Point values are valued by a rectangle shape area and its overlap with each pixel (with the center as the given coordinate). */
+    WeightByEllipseArea = 4 /** Point values are valued by a ellipse shape area that its overlap with each pixel (with the center as the given coordinate). */
   };
   
   enum class eToolpathSegmentType : LibMCEnv_int32 {
@@ -394,6 +403,16 @@ namespace LibMCEnv {
       LibMCEnv_double m_Coordinates[2];
   } sFloatPosition2D;
   
+  typedef struct sFieldData2DPoint {
+      LibMCEnv_double m_Coordinates[2];
+      LibMCEnv_double m_Value;
+  } sFieldData2DPoint;
+  
+  typedef struct sFieldData3DPoint {
+      LibMCEnv_double m_Coordinates[3];
+      LibMCEnv_double m_Value;
+  } sFieldData3DPoint;
+  
   typedef struct sFloatHatch2D {
       LibMCEnv_double m_X1;
       LibMCEnv_double m_Y1;
@@ -418,12 +437,15 @@ namespace LibMCEnv {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
+typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;
+typedef LibMCEnv::sFieldData2DPoint sLibMCEnvFieldData2DPoint;
+typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;
 typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
 typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
