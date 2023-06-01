@@ -35,7 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <iostream>
 #include <thread>
+#include <fstream>
 
+#include <chrono>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include <string>
 using namespace LibMCDriver_ScanLab::Impl;
 
 /*************************************************************************************************************************
@@ -544,7 +550,7 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 
 void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D* pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
-	DrawHatchesOIE(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue, false);
+	DrawHatchesOIE(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue, 0);
 }
 
 
@@ -901,4 +907,193 @@ void CRTCContext::SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffse
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
+void CRTCContext::PrepareRecording()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
+	m_HeadTransform.resize(528520 * 4);
+	
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_upload_transform(m_CardNo, 1, m_HeadTransform.data()));
+	 
+	double CalibrationFactorXY = 10000;  // get_table_para(1,1)
+
+	uint32_t nHeadNoXY = 1;
+	uint32_t nHeadNoZ = 2;
+	uint32_t nAxisX = 1;
+	uint32_t nAxisY = 2;
+	uint32_t nAxisZ = 2;
+
+	// check whether scan head is connected
+	uint32_t HeadStatus1 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoXY);
+	if (!HeadStatus1)
+	{
+		throw std::runtime_error("head status 1 invalid");
+	}
+
+	uint32_t HeadStatus2 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoZ);
+	if (!HeadStatus2)
+	{
+		throw std::runtime_error("head status 2 invalid");
+	}
+
+	uint32_t ControlCommand = 0x0501; // activates actual position recording
+	//activate porition recording for each axis induvidually, x-axis = 1, y-axis = 2
+	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoXY, nAxisX, ControlCommand);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoXY, nAxisY, ControlCommand);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	m_pScanLabSDK->n_control_command(m_CardNo, 2, 1, ControlCommand);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	m_pScanLabSDK->n_control_command(m_CardNo, 2, 2, ControlCommand);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::EnableRecording ()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 1, 2, 4, 32); // record signals: 1=StatusAX (actual x position of first scanhead), 2=StatusAY (actual y position of first scanhead), 0=LaserOn
+	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 7, 8, 9, 0); // 
+	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 10, 11, 12, 0); // 
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::DisableRecording()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_long_delay(m_CardNo, 1200); // add long delay ~ tracking error or preview time
+	m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 1, 2, 4, 32); // deactivates signal recording
+	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 7, 8, 9, 0); // deactivates signal recording
+	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 10, 11, 12, 0); // deactivates signal recording
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+constexpr UINT MAXMESPOSITION = (1 << 23) - 1;
+
+UINT CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY)
+{
+	UINT Error = 0;
+	uint32_t nDataLength = DataEnd - DataStart;
+
+	std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
+
+	if (nDataLength > 0) {
+
+		std::vector<std::vector<int32_t>> ChannelData;
+		std::vector<std::vector<int32_t>> ChannelDataTransformed;
+		ChannelData.resize(4);
+
+		for (int Channel = 1; Channel < 5; Channel++)
+		{
+			ChannelData[Channel - 1].resize(nDataLength);
+			m_pScanLabSDK->n_get_waveform_offset(m_CardNo, Channel, DataStart, nDataLength, ChannelData[Channel - 1].data ());
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		}
+
+
+		for (uint32_t nDataIndex = 0; nDataIndex < nDataLength; nDataIndex++) {
+			// Apply BackTransformation XY
+			m_pScanLabSDK->checkError(m_pScanLabSDK->transform(&ChannelData[0].at(nDataIndex), &ChannelData[1].at(nDataIndex), m_HeadTransform.data(), 0));
+
+			// Apply BackTransformation Z
+			int32_t nDummy = 0;
+			m_pScanLabSDK->checkError(m_pScanLabSDK->transform(&ChannelData[2].at(nDataIndex), &nDummy, m_HeadTransform.data(), 1));
+
+			MyFile << ChannelData[0][nDataIndex] << ", " << ChannelData[1][nDataIndex] << ", " << ChannelData[2][nDataIndex] << ", " << ChannelData[3][nDataIndex] << std::endl;
+		}
+
+	}
+	return Error;
+
+}
+
+std::string return_current_time_and_date()
+{
+	auto now = std::chrono::system_clock::now();
+	auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+	std::stringstream ss;
+	ss << std::put_time(std::localtime(&in_time_t), "%Y_%m_%d_%H_%M_%S_");
+	return ss.str();
+}
+
+void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
+{
+	std::cout << "Executing list position" << std::endl;
+
+	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+	UINT Busy, Position, MesBusy, MesPosition;
+	UINT LastPosition = 0;
+	UINT Increment = 100000;
+
+	std::string sFileName = "c:/temp/recording_out_" + return_current_time_and_date() + ".csv";
+	std::cout << "Creating recording file" << std::endl;
+
+	std::ofstream MyFile;
+	MyFile.open(sFileName, std::ios::out);
+	if (!MyFile.is_open())
+		throw std::runtime_error("could not create file");
+
+	double CalibrationFactorXY = 10000;  // get_table_para(1,1)
+
+	std::cout << "Wait for measurement to start" << std::endl;
+	do // Wait for measurement to start
+	{
+		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	} while ((MesBusy == 0) && (MesPosition == (UINT)-1));
+
+	do   //blockwise data polling
+	{
+		m_pScanLabSDK->n_get_status(m_CardNo, &Busy, &Position);
+		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
+		std::cout << "RTC Status busy: " << Busy << " Position: " << Position << " Measure Busy: " << MesBusy << " Measure Position: " << MesPosition << std::endl;
+
+		if (MesPosition > LastPosition + Increment)
+		{
+			saveRecordedDataBlock(MyFile, LastPosition, LastPosition + Increment, CalibrationFactorXY);
+		}
+		else if (MesPosition < LastPosition)
+		{
+			saveRecordedDataBlock(MyFile, LastPosition, MAXMESPOSITION, CalibrationFactorXY);
+			LastPosition = 0;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+	} while (Busy);           // Wait for the job to be finished executing
+
+}
+
+void CRTCContext::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	if (nTimeLagXYInMicroseconds % 10 != 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10);
+	if (nTimeLagZInMicroseconds % 10 != 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10);
+
+	uint32_t nTimeLagXYInTicks = nTimeLagXYInMicroseconds / 10;
+	uint32_t nTimeLagZInTicks = nTimeLagZInMicroseconds / 10;
+	
+	m_pScanLabSDK->n_set_timelag_compensation(m_CardNo, 1, nTimeLagXYInTicks, nTimeLagZInTicks);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::DisableTimelagCompensation()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	m_pScanLabSDK->n_set_timelag_compensation(m_CardNo, 1, 0, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}

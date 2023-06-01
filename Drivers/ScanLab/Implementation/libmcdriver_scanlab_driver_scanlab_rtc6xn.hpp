@@ -151,6 +151,11 @@ public:
 
 	PDriver_ScanLab_RTC6ConfigurationPreset findPresetByName(const std::string& sPresetName, bool bMustExist);
 
+	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
+
+	void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex) override;
+
+
 };
 
 } // namespace Impl

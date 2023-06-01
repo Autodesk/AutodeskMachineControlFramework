@@ -652,6 +652,58 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationoffset(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nOffsetX, LibMCDriver_ScanLab_int32 nOffsetY);
 
+/**
+* Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables recording of position data of the RTC Card. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablerecording(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables recording of position data of the RTC Card. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablerecording(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Executes the list with recording the position data from the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nListIndex - Index of List (1 or 2).
+* @param[in] nPosition - Relative Position in List.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_executelistwithrecording(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition);
+
+/**
+* Enables timelag compensation.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enabletimelagcompensation(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+
+/**
+* Disables timelag compensation.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disabletimelagcompensation(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -989,6 +1041,24 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
 
+/**
+* Enables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+
+/**
+* Disables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_disabletimelagcompensation(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
+
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_RTC6xN
 **************************************************************************************************************************/
@@ -1251,6 +1321,26 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
+/**
+* Enables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+
+/**
+* Disables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_disabletimelagcompensation(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex);
 
 /*************************************************************************************************************************
  Global functions

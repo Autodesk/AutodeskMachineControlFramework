@@ -743,6 +743,26 @@ act_managed_ptr<IRTCContext> CDriver_ScanLab_RTC6xN::getRTCContextForLaserIndex(
 }
 
 
+void CDriver_ScanLab_RTC6xN::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
+{
+	auto iIter = m_ScannerContexts.find(nScannerIndex);
+	if (iIter == m_ScannerContexts.end()) 
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX, "invalid scanner index: " + std::to_string(nScannerIndex));
+
+	iIter->second->EnableTimelagCompensation(nTimeLagXYInMicroseconds, nTimeLagZInMicroseconds);
+
+}
+
+void CDriver_ScanLab_RTC6xN::DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex)
+{
+	auto iIter = m_ScannerContexts.find(nScannerIndex);
+	if (iIter == m_ScannerContexts.end())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERINDEX, "invalid scanner index: " + std::to_string(nScannerIndex));
+
+	iIter->second->DisableTimelagCompensation();
+
+}
+
 
 PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6xN::findPresetByName(const std::string& sPresetName, bool bMustExist)
 {

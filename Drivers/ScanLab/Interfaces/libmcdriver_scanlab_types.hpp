@@ -157,6 +157,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION 1050 /** No version definition. */
 #define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME 1051 /** Duplicate configuration preset name. */
 #define LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS 1052 /** OIE PID Variable out of bounds. */
+#define LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10 1053 /** Timelag must be a multiple of 10 microseconds. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -226,6 +227,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION: return "No version definition.";
     case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
     case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIE PID Variable out of bounds.";
+    case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
     default: return "unknown error";
   }
 }

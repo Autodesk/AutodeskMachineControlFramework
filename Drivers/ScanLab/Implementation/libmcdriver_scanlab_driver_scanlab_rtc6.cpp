@@ -651,6 +651,30 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
 }
 
 
+void CDriver_ScanLab_RTC6::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->EnableTimelagCompensation(nTimeLagXYInMicroseconds, nTimeLagZInMicroseconds);
+
+    }
+
+}
+
+void CDriver_ScanLab_RTC6::DisableTimelagCompensation()
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->DisableTimelagCompensation();
+
+    }
+
+}
+
 
 PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(const std::string& sPresetName, bool bMustExist)
 {
@@ -665,6 +689,5 @@ PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(c
         return nullptr;
     }
 }
-
 
 

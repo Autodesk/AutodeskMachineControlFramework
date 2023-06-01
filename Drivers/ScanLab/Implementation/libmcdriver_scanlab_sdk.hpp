@@ -172,6 +172,15 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scale) (uint32_t nCardNo, uint32_t nHeadNo, double dScaleFactor, uint32_t nAtOnce);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_offset) (uint32_t nCardNo, uint32_t nHeadNo, int32_t nXOffset, int32_t nYOffset, uint32_t nAtOnce);
 
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_waveform_offset) (uint32_t nCardNo, uint32_t nChannel, uint32_t nOffset, uint32_t nNumber, int32_t* pPtr);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_measurement_status) (uint32_t nCardNo, uint32_t* pnBusy, uint32_t* pnPos);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_transform) (int32_t * pSignal1, int32_t * pSignal2, uint8_t * pTransform, uint32_t nCode);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_upload_transform) (uint32_t nCardNo, uint32_t nHeadNo, uint8_t * pTransformData);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_timelag_compensation) (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nTimelagXY, uint32_t nTimelagZ);
+		
+
+
 
 		class CScanLabSDK {
 		private:
@@ -290,6 +299,12 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_angle n_set_angle = nullptr;
 			PScanLabPtr_n_set_scale n_set_scale = nullptr;
 			PScanLabPtr_n_set_offset n_set_offset = nullptr;
+
+			PScanLabPtr_n_get_waveform_offset n_get_waveform_offset = nullptr;
+			PScanLabPtr_n_measurement_status n_measurement_status = nullptr;
+			PScanLabPtr_transform transform = nullptr;
+			PScanLabPtr_n_upload_transform n_upload_transform = nullptr;
+			PScanLabPtr_n_set_timelag_compensation n_set_timelag_compensation = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

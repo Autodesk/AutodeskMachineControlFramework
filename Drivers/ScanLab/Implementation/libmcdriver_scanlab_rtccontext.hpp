@@ -50,6 +50,8 @@ protected:
 
 	uint32_t m_nCurrentFreeVariable0;
 
+	std::vector<uint8_t> m_HeadTransform;
+
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
@@ -59,6 +61,9 @@ protected:
 	uint32_t getCurrentFreeVariable0 ();
 
 	void sendFreeVariable0 (uint32_t nValue);
+
+	UINT saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY);
+
 
 public:
 
@@ -168,8 +173,21 @@ public:
 	void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor) override;
 
 	void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY) override;
+	
+	void PrepareRecording() override;
+
+	void EnableRecording() override;
+
+	void DisableRecording() override;
+
+	void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) override;
+
+	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
+
+	void DisableTimelagCompensation() override;
 
 };
+
 
 } // namespace Impl
 } // namespace LibMCDriver_ScanLab

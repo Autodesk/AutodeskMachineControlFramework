@@ -102,6 +102,8 @@
 		<error name="NOVERSIONDEFINITION" code="1050" description="No version definition." />			
 		<error name="DUPLICATECONFIGURATIONPRESETNAME" code="1051" description="Duplicate configuration preset name." />					
 		<error name="OIEPIDVARIABLEOUTOFBOUNDS" code="1052" description="OIE PID Variable out of bounds." />		
+		<error name="TIMELAGMUSTBEAMULTIPLEOF10" code="1053" description="Timelag must be a multiple of 10 microseconds." />		
+		
 						
 	</errors>
 
@@ -474,6 +476,27 @@ Custom implementation
 			<param name="OffsetY" type="int32" pass="in" description="Offset in X (in bits)" />
 		</method>
 
+		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
+		</method>
+
+		<method name="EnableRecording" description="Enables recording of position data of the RTC Card. This is a list command.">
+		</method>
+
+		<method name="DisableRecording" description="Disables recording of position data of the RTC Card. This is a list command.">
+		</method>
+
+		<method name="ExecuteListWithRecording" description="Executes the list with recording the position data from the RTC card.">
+			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
+			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
+		</method>
+
+		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
+			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
+			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
+		</method>
+
+		<method name="DisableTimelagCompensation" description="Disables timelag compensation.">
+		</method>
 		
 	</class>
 
@@ -654,6 +677,13 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 						
+		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
+			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
+			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
+		</method>
+
+		<method name="DisableTimelagCompensation" description="Disables timelag compensation.">
+		</method>
 		
 	</class>
 
@@ -798,6 +828,15 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 						
+		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
+			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
+		</method>
+
+		<method name="DisableTimelagCompensation" description="Disables timelag compensation.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+		</method>
 
 	</class>
 

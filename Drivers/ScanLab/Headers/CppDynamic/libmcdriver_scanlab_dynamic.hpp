@@ -243,6 +243,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION: return "NOVERSIONDEFINITION";
 			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "DUPLICATECONFIGURATIONPRESETNAME";
 			case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIEPIDVARIABLEOUTOFBOUNDS";
+			case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "TIMELAGMUSTBEAMULTIPLEOF10";
 		}
 		return "UNKNOWN";
 	}
@@ -312,6 +313,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION: return "No version definition.";
 			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
 			case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIE PID Variable out of bounds.";
+			case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
 		}
 		return "unknown error";
 	}
@@ -585,6 +587,12 @@ public:
 	inline void SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees);
 	inline void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor);
 	inline void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY);
+	inline void PrepareRecording();
+	inline void EnableRecording();
+	inline void DisableRecording();
+	inline void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
+	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+	inline void DisableTimelagCompensation();
 };
 	
 /*************************************************************************************************************************
@@ -664,6 +672,8 @@ public:
 	inline eOIERecordingMode GetOIERecordingMode();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+	inline void DisableTimelagCompensation();
 };
 	
 /*************************************************************************************************************************
@@ -703,6 +713,8 @@ public:
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+	inline void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex);
 };
 	
 	/**
@@ -882,6 +894,12 @@ public:
 		pWrapperTable->m_RTCContext_SetTransformationAngle = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationScale = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationOffset = nullptr;
+		pWrapperTable->m_RTCContext_PrepareRecording = nullptr;
+		pWrapperTable->m_RTCContext_EnableRecording = nullptr;
+		pWrapperTable->m_RTCContext_DisableRecording = nullptr;
+		pWrapperTable->m_RTCContext_ExecuteListWithRecording = nullptr;
+		pWrapperTable->m_RTCContext_EnableTimelagCompensation = nullptr;
+		pWrapperTable->m_RTCContext_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -913,6 +931,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_IsInitialized = nullptr;
@@ -936,6 +956,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1489,6 +1511,60 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_PrepareRecording = (PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_preparerecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_PrepareRecording = (PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_preparerecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_PrepareRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableRecording = (PLibMCDriver_ScanLabRTCContext_EnableRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablerecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableRecording = (PLibMCDriver_ScanLabRTCContext_EnableRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablerecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableRecording = (PLibMCDriver_ScanLabRTCContext_DisableRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablerecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableRecording = (PLibMCDriver_ScanLabRTCContext_DisableRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablerecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ExecuteListWithRecording = (PLibMCDriver_ScanLabRTCContext_ExecuteListWithRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_executelistwithrecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ExecuteListWithRecording = (PLibMCDriver_ScanLabRTCContext_ExecuteListWithRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_executelistwithrecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ExecuteListWithRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableTimelagCompensation = (PLibMCDriver_ScanLabRTCContext_EnableTimelagCompensationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enabletimelagcompensation");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableTimelagCompensation = (PLibMCDriver_ScanLabRTCContext_EnableTimelagCompensationPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enabletimelagcompensation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableTimelagCompensation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableTimelagCompensation = (PLibMCDriver_ScanLabRTCContext_DisableTimelagCompensationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disabletimelagcompensation");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableTimelagCompensation = (PLibMCDriver_ScanLabRTCContext_DisableTimelagCompensationPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disabletimelagcompensation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableTimelagCompensation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
 		#else // _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
@@ -1768,6 +1844,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableTimelagCompensationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableTimelagCompensationPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableTimelagCompensationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_disabletimelagcompensation");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableTimelagCompensationPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_disabletimelagcompensation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_settosimulationmode");
@@ -1972,6 +2066,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableTimelagCompensationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableTimelagCompensationPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableTimelagCompensationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_disabletimelagcompensation");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableTimelagCompensationPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_disabletimelagcompensation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2273,6 +2385,30 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetTransformationOffset == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_preparerecording", (void**)&(pWrapperTable->m_RTCContext_PrepareRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_PrepareRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablerecording", (void**)&(pWrapperTable->m_RTCContext_EnableRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablerecording", (void**)&(pWrapperTable->m_RTCContext_DisableRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_executelistwithrecording", (void**)&(pWrapperTable->m_RTCContext_ExecuteListWithRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ExecuteListWithRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enabletimelagcompensation", (void**)&(pWrapperTable->m_RTCContext_EnableTimelagCompensation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableTimelagCompensation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disabletimelagcompensation", (void**)&(pWrapperTable->m_RTCContext_DisableTimelagCompensation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableTimelagCompensation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCSelector_SearchCards == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2397,6 +2533,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_disabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_settosimulationmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2487,6 +2631,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_disabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -3141,6 +3293,58 @@ public:
 	}
 	
 	/**
+	* CRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+	*/
+	void CRTCContext::PrepareRecording()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_PrepareRecording(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	*/
+	void CRTCContext::EnableRecording()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableRecording(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.
+	*/
+	void CRTCContext::DisableRecording()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableRecording(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::ExecuteListWithRecording - Executes the list with recording the position data from the RTC card.
+	* @param[in] nListIndex - Index of List (1 or 2).
+	* @param[in] nPosition - Relative Position in List.
+	*/
+	void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ExecuteListWithRecording(m_pHandle, nListIndex, nPosition));
+	}
+	
+	/**
+	* CRTCContext::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	void CRTCContext::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableTimelagCompensation(m_pHandle, nTimeLagXYInMicroseconds, nTimeLagZInMicroseconds));
+	}
+	
+	/**
+	* CRTCContext::DisableTimelagCompensation - Disables timelag compensation.
+	*/
+	void CRTCContext::DisableTimelagCompensation()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableTimelagCompensation(m_pHandle));
+	}
+	
+	/**
 	 * Method definitions for class CRTCSelector
 	 */
 	
@@ -3547,6 +3751,24 @@ public:
 	}
 	
 	/**
+	* CDriver_ScanLab_RTC6::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	void CDriver_ScanLab_RTC6::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_EnableTimelagCompensation(m_pHandle, nTimeLagXYInMicroseconds, nTimeLagZInMicroseconds));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::DisableTimelagCompensation - Disables timelag compensation.
+	*/
+	void CDriver_ScanLab_RTC6::DisableTimelagCompensation()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_DisableTimelagCompensation(m_pHandle));
+	}
+	
+	/**
 	 * Method definitions for class CDriver_ScanLab_RTC6xN
 	 */
 	
@@ -3844,6 +4066,26 @@ public:
 	void CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts(m_pHandle, nScannerIndex, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	void CDriver_ScanLab_RTC6xN::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation(m_pHandle, nScannerIndex, nTimeLagXYInMicroseconds, nTimeLagZInMicroseconds));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::DisableTimelagCompensation - Disables timelag compensation.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	*/
+	void CDriver_ScanLab_RTC6xN::DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation(m_pHandle, nScannerIndex));
 	}
 
 } // namespace LibMCDriver_ScanLab

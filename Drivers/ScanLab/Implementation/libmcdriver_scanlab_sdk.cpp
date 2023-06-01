@@ -216,6 +216,12 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_set_scale = (PScanLabPtr_n_set_scale)_loadScanLabAddress(hLibrary, "n_set_scale");
 	this->n_set_offset = (PScanLabPtr_n_set_offset)_loadScanLabAddress(hLibrary, "n_set_offset");
 
+	this->n_get_waveform_offset = (PScanLabPtr_n_get_waveform_offset)_loadScanLabAddress(hLibrary, "n_get_waveform_offset");
+	this->n_measurement_status = (PScanLabPtr_n_measurement_status)_loadScanLabAddress(hLibrary, "n_measurement_status");
+	this->transform = (PScanLabPtr_transform)_loadScanLabAddress(hLibrary, "transform");
+	this->n_upload_transform = (PScanLabPtr_n_upload_transform)_loadScanLabAddress(hLibrary, "n_upload_transform");
+	this->n_set_timelag_compensation = (PScanLabPtr_n_set_timelag_compensation)_loadScanLabAddress(hLibrary, "n_set_timelag_compensation");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -382,6 +388,11 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_set_angle = nullptr;
 	n_set_scale = nullptr;
 	n_set_offset = nullptr;
+	n_get_waveform_offset = nullptr;
+	n_measurement_status = nullptr;
+	transform = nullptr;
+	n_upload_transform = nullptr;
+	n_set_timelag_compensation = nullptr;
 
 }
 

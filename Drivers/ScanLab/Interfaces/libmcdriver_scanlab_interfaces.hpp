@@ -823,6 +823,40 @@ public:
 	*/
 	virtual void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY) = 0;
 
+	/**
+	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+	*/
+	virtual void PrepareRecording() = 0;
+
+	/**
+	* IRTCContext::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	*/
+	virtual void EnableRecording() = 0;
+
+	/**
+	* IRTCContext::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.
+	*/
+	virtual void DisableRecording() = 0;
+
+	/**
+	* IRTCContext::ExecuteListWithRecording - Executes the list with recording the position data from the RTC card.
+	* @param[in] nListIndex - Index of List (1 or 2).
+	* @param[in] nPosition - Relative Position in List.
+	*/
+	virtual void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) = 0;
+
+	/**
+	* IRTCContext::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	virtual void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) = 0;
+
+	/**
+	* IRTCContext::DisableTimelagCompensation - Disables timelag compensation.
+	*/
+	virtual void DisableTimelagCompensation() = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;
@@ -1084,6 +1118,18 @@ public:
 	*/
 	virtual void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
 
+	/**
+	* IDriver_ScanLab_RTC6::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	virtual void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::DisableTimelagCompensation - Disables timelag compensation.
+	*/
+	virtual void DisableTimelagCompensation() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver_ScanLab_RTC6> PIDriver_ScanLab_RTC6;
@@ -1280,6 +1326,20 @@ public:
 	* @param[out] dMultiplier - Multiplier
 	*/
 	virtual void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	virtual void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::DisableTimelagCompensation - Disables timelag compensation.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	*/
+	virtual void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
 
 };
 
