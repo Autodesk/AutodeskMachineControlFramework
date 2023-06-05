@@ -854,6 +854,7 @@ public:
 	}
 	
 	inline std::string GetStorageUUID();
+	inline std::string GetBuildUUID();
 	inline LibMCEnv_uint32 GetLayerCount();
 	inline PToolpathLayer LoadLayer(const LibMCEnv_uint32 nLayerIndex);
 	inline LibMCEnv_double GetUnits();
@@ -1288,6 +1289,8 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline bool HasBuildJob(const std::string & sBuildUUID);
+	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 };
 	
 /*************************************************************************************************************************
@@ -1373,6 +1376,7 @@ public:
 	inline PSignalHandler GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
+	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline void UnloadAllToolpathes();
 	inline void SetNextState(const std::string & sStateName);
@@ -1429,6 +1433,7 @@ public:
 	inline void HideHint();
 	inline std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent);
 	inline std::string RetrieveEventSender();
+	inline std::string RetrieveEventSenderPage();
 	inline std::string RetrieveEventSenderUUID();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
@@ -1457,6 +1462,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 };
@@ -1621,6 +1627,7 @@ public:
 		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
 		pWrapperTable->m_ToolpathAccessor_LoadLayer = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetUnits = nullptr;
@@ -1799,6 +1806,8 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -1836,6 +1845,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
+		pWrapperTable->m_StateEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_StateEnvironment_UnloadAllToolpathes = nullptr;
 		pWrapperTable->m_StateEnvironment_SetNextState = nullptr;
@@ -1876,6 +1886,7 @@ public:
 		pWrapperTable->m_UIEnvironment_HideHint = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowMessageDlg = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
@@ -1904,6 +1915,7 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_UIEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -2670,6 +2682,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetStorageUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = (PLibMCEnvToolpathAccessor_GetBuildUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbuilduuid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = (PLibMCEnvToolpathAccessor_GetBuildUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbuilduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetBuildUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4275,6 +4296,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_HasBuildJob == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetBuildJob = (PLibMCEnvDriverEnvironment_GetBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetBuildJob = (PLibMCEnvDriverEnvironment_GetBuildJobPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetBuildJob == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) GetProcAddress(hLibrary, "libmcenv_signaltrigger_cantrigger");
 		#else // _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) dlsym(hLibrary, "libmcenv_signaltrigger_cantrigger");
@@ -4605,6 +4644,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_CreateDriverAccess == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasBuildJob = (PLibMCEnvStateEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasBuildJob = (PLibMCEnvStateEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasBuildJob == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4968,6 +5016,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = (PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrieveeventsenderpage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = (PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr) dlsym(hLibrary, "libmcenv_uienvironment_retrieveeventsenderpage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = (PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrieveeventsenderuuid");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = (PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr) dlsym(hLibrary, "libmcenv_uienvironment_retrieveeventsenderuuid");
@@ -5217,6 +5274,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_ParseXMLData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasBuildJob == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5612,6 +5678,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getstorageuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetStorageUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetStorageUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbuilduuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBuildUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBuildUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getlayercount", (void**)&(pWrapperTable->m_ToolpathAccessor_GetLayerCount));
@@ -6326,6 +6396,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_hasbuildjob", (void**)&(pWrapperTable->m_DriverEnvironment_HasBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_HasBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getbuildjob", (void**)&(pWrapperTable->m_DriverEnvironment_GetBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalTrigger_CanTrigger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6472,6 +6550,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createdriveraccess", (void**)&(pWrapperTable->m_StateEnvironment_CreateDriverAccess));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDriverAccess == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasbuildjob", (void**)&(pWrapperTable->m_StateEnvironment_HasBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getbuildjob", (void**)&(pWrapperTable->m_StateEnvironment_GetBuildJob));
@@ -6634,6 +6716,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsenderpage", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsenderuuid", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6744,6 +6830,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_parsexmldata", (void**)&(pWrapperTable->m_UIEnvironment_ParseXMLData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ParseXMLData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_HasBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_GetBuildJob));
@@ -7848,6 +7938,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetStorageUUID(m_pHandle, bytesNeededStorageUUID, &bytesWrittenStorageUUID, &bufferStorageUUID[0]));
 		
 		return std::string(&bufferStorageUUID[0]);
+	}
+	
+	/**
+	* CToolpathAccessor::GetBuildUUID - Returns UUID of the toolpath's build file.
+	* @return Returns build uuid.
+	*/
+	std::string CToolpathAccessor::GetBuildUUID()
+	{
+		LibMCEnv_uint32 bytesNeededBuildUUID = 0;
+		LibMCEnv_uint32 bytesWrittenBuildUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildUUID(m_pHandle, 0, &bytesNeededBuildUUID, nullptr));
+		std::vector<char> bufferBuildUUID(bytesNeededBuildUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildUUID(m_pHandle, bytesNeededBuildUUID, &bytesWrittenBuildUUID, &bufferBuildUUID[0]));
+		
+		return std::string(&bufferBuildUUID[0]);
 	}
 	
 	/**
@@ -10267,6 +10372,35 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::HasBuildJob - Returns if a build object exists.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	bool CDriverEnvironment::HasBuildJob(const std::string & sBuildUUID)
+	{
+		bool resultBuildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_HasBuildJob(m_pHandle, sBuildUUID.c_str(), &resultBuildExists));
+		
+		return resultBuildExists;
+	}
+	
+	/**
+	* CDriverEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
+	*/
+	PBuild CDriverEnvironment::GetBuildJob(const std::string & sBuildUUID)
+	{
+		LibMCEnvHandle hBuildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetBuildJob(m_pHandle, sBuildUUID.c_str(), &hBuildInstance));
+		
+		if (!hBuildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
 	 * Method definitions for class CSignalTrigger
 	 */
 	
@@ -10767,7 +10901,20 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* CStateEnvironment::HasBuildJob - Returns if a build object exists.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	bool CStateEnvironment::HasBuildJob(const std::string & sBuildUUID)
+	{
+		bool resultBuildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasBuildJob(m_pHandle, sBuildUUID.c_str(), &resultBuildExists));
+		
+		return resultBuildExists;
+	}
+	
+	/**
+	* CStateEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Build instance
 	*/
@@ -11271,18 +11418,33 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
-	* @return Name of the sender element.
+	* CUIEnvironment::RetrieveEventSender - returns path of the UI control that triggered the event.
+	* @return Path of the sender element.
 	*/
 	std::string CUIEnvironment::RetrieveEventSender()
 	{
-		LibMCEnv_uint32 bytesNeededSenderName = 0;
-		LibMCEnv_uint32 bytesWrittenSenderName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, 0, &bytesNeededSenderName, nullptr));
-		std::vector<char> bufferSenderName(bytesNeededSenderName);
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, bytesNeededSenderName, &bytesWrittenSenderName, &bufferSenderName[0]));
+		LibMCEnv_uint32 bytesNeededSenderPath = 0;
+		LibMCEnv_uint32 bytesWrittenSenderPath = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, 0, &bytesNeededSenderPath, nullptr));
+		std::vector<char> bufferSenderPath(bytesNeededSenderPath);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, bytesNeededSenderPath, &bytesWrittenSenderPath, &bufferSenderPath[0]));
 		
-		return std::string(&bufferSenderName[0]);
+		return std::string(&bufferSenderPath[0]);
+	}
+	
+	/**
+	* CUIEnvironment::RetrieveEventSenderPage - returns name of the page of the UI control that triggered the event.
+	* @return Page of the sender element.
+	*/
+	std::string CUIEnvironment::RetrieveEventSenderPage()
+	{
+		LibMCEnv_uint32 bytesNeededPageName = 0;
+		LibMCEnv_uint32 bytesWrittenPageName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSenderPage(m_pHandle, 0, &bytesNeededPageName, nullptr));
+		std::vector<char> bufferPageName(bytesNeededPageName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSenderPage(m_pHandle, bytesNeededPageName, &bytesWrittenPageName, &bufferPageName[0]));
+		
+		return std::string(&bufferPageName[0]);
 	}
 	
 	/**
@@ -11685,6 +11847,19 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CUIEnvironment::HasBuildJob - Returns if a build object exists.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	bool CUIEnvironment::HasBuildJob(const std::string & sBuildUUID)
+	{
+		bool resultBuildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasBuildJob(m_pHandle, sBuildUUID.c_str(), &resultBuildExists));
+		
+		return resultBuildExists;
 	}
 	
 	/**

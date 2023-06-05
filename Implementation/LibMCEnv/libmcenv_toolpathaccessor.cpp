@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_xmldocumentnode.hpp"
 
 // Include custom headers here.
-
+#include "Common/common_utils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -45,8 +45,10 @@ using namespace LibMCEnv::Impl;
  Class definition of CToolpathAccessor 
 **************************************************************************************************************************/
 
-CToolpathAccessor::CToolpathAccessor(const std::string& sStorageUUID, AMC::PToolpathHandler pToolpathHandler)
-	: m_sStorageUUID(sStorageUUID), m_pToolpathHandler(pToolpathHandler)
+CToolpathAccessor::CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler)
+	: m_sStorageUUID(AMCCommon::CUtils::normalizeUUIDString(sStorageUUID)), 
+	m_sBuildUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildUUID)),	
+	m_pToolpathHandler(pToolpathHandler)
 {
 	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -59,6 +61,11 @@ CToolpathAccessor::~CToolpathAccessor()
 std::string CToolpathAccessor::GetStorageUUID()
 {
 	return m_sStorageUUID;
+}
+
+std::string CToolpathAccessor::GetBuildUUID()
+{
+	return m_sBuildUUID;
 }
 
 LibMCEnv_uint32 CToolpathAccessor::GetLayerCount()

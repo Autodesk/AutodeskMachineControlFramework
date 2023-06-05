@@ -940,6 +940,17 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr) (LibMCEnv
 typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetStorageUUIDPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nStorageUUIDBufferSize, LibMCEnv_uint32* pStorageUUIDNeededChars, char * pStorageUUIDBuffer);
 
 /**
+* Returns UUID of the toolpath's build file.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of Returns build uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetBuildUUIDPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
 * Returns layer count.
 *
 * @param[in] pToolpathAccessor - ToolpathAccessor instance.
@@ -2819,6 +2830,26 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LoadPNGImagePtr) (LibMCEnv_D
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
+/**
+* Returns if a build object exists.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_HasBuildJobPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
+* Returns a instance of a build object. Fails if build uuid does not exist.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildInstance - Build instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_GetBuildJobPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -3220,7 +3251,17 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetDriverLibraryPtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateDriverAccessPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pDriverName, LibMCEnv_pvoid * pDriverHandle);
 
 /**
-* Returns a instance of a build object.
+* Returns if a build object exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasBuildJobPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
+* Returns a instance of a build object. Fails if build uuid does not exist.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pBuildUUID - UUID of the build entity.
@@ -3638,15 +3679,26 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HideHintPtr) (LibMCEnv_UIEnviron
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ShowMessageDlgPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pCaption, const char * pTitle, LibMCEnv::eMessageDialogType eDialogType, const char * pYesEvent, const char * pNoEvent, const char * pCancelEvent, const LibMCEnv_uint32 nDialogUUIDBufferSize, LibMCEnv_uint32* pDialogUUIDNeededChars, char * pDialogUUIDBuffer);
 
 /**
-* returns name of the UI control that triggered the event.
+* returns path of the UI control that triggered the event.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] nSenderNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pSenderNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pSenderNameBuffer -  buffer of Name of the sender element., may be NULL
+* @param[in] nSenderPathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSenderPathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSenderPathBuffer -  buffer of Path of the sender element., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderPathBufferSize, LibMCEnv_uint32* pSenderPathNeededChars, char * pSenderPathBuffer);
+
+/**
+* returns name of the page of the UI control that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nPageNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pPageNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pPageNameBuffer -  buffer of Page of the sender element., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nPageNameBufferSize, LibMCEnv_uint32* pPageNameNeededChars, char * pPageNameBuffer);
 
 /**
 * returns uuid of the UI control that triggered the event.
@@ -3966,6 +4018,16 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ParseXMLStringPtr) (LibMCEnv_UIE
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ParseXMLDataPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
+* Returns if a build object exists.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasBuildJobPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
 * Returns a instance of a build object.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -4126,6 +4188,7 @@ typedef struct {
 	PLibMCEnvToolpathLayer_HasUniqueMetaDataPtr m_ToolpathLayer_HasUniqueMetaData;
 	PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr m_ToolpathLayer_FindUniqueMetaData;
 	PLibMCEnvToolpathAccessor_GetStorageUUIDPtr m_ToolpathAccessor_GetStorageUUID;
+	PLibMCEnvToolpathAccessor_GetBuildUUIDPtr m_ToolpathAccessor_GetBuildUUID;
 	PLibMCEnvToolpathAccessor_GetLayerCountPtr m_ToolpathAccessor_GetLayerCount;
 	PLibMCEnvToolpathAccessor_LoadLayerPtr m_ToolpathAccessor_LoadLayer;
 	PLibMCEnvToolpathAccessor_GetUnitsPtr m_ToolpathAccessor_GetUnits;
@@ -4304,6 +4367,8 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_CreateEmptyImagePtr m_DriverEnvironment_CreateEmptyImage;
 	PLibMCEnvDriverEnvironment_LoadPNGImagePtr m_DriverEnvironment_LoadPNGImage;
 	PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr m_DriverEnvironment_CreateDiscreteField2D;
+	PLibMCEnvDriverEnvironment_HasBuildJobPtr m_DriverEnvironment_HasBuildJob;
+	PLibMCEnvDriverEnvironment_GetBuildJobPtr m_DriverEnvironment_GetBuildJob;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
 	PLibMCEnvSignalTrigger_TriggerPtr m_SignalTrigger_Trigger;
 	PLibMCEnvSignalTrigger_WaitForHandlingPtr m_SignalTrigger_WaitForHandling;
@@ -4341,6 +4406,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr m_StateEnvironment_GetUnhandledSignalByUUID;
 	PLibMCEnvStateEnvironment_GetDriverLibraryPtr m_StateEnvironment_GetDriverLibrary;
 	PLibMCEnvStateEnvironment_CreateDriverAccessPtr m_StateEnvironment_CreateDriverAccess;
+	PLibMCEnvStateEnvironment_HasBuildJobPtr m_StateEnvironment_HasBuildJob;
 	PLibMCEnvStateEnvironment_GetBuildJobPtr m_StateEnvironment_GetBuildJob;
 	PLibMCEnvStateEnvironment_UnloadAllToolpathesPtr m_StateEnvironment_UnloadAllToolpathes;
 	PLibMCEnvStateEnvironment_SetNextStatePtr m_StateEnvironment_SetNextState;
@@ -4381,6 +4447,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_HideHintPtr m_UIEnvironment_HideHint;
 	PLibMCEnvUIEnvironment_ShowMessageDlgPtr m_UIEnvironment_ShowMessageDlg;
 	PLibMCEnvUIEnvironment_RetrieveEventSenderPtr m_UIEnvironment_RetrieveEventSender;
+	PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr m_UIEnvironment_RetrieveEventSenderPage;
 	PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr m_UIEnvironment_RetrieveEventSenderUUID;
 	PLibMCEnvUIEnvironment_PrepareSignalPtr m_UIEnvironment_PrepareSignal;
 	PLibMCEnvUIEnvironment_GetMachineStatePtr m_UIEnvironment_GetMachineState;
@@ -4409,6 +4476,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_CreateXMLDocumentPtr m_UIEnvironment_CreateXMLDocument;
 	PLibMCEnvUIEnvironment_ParseXMLStringPtr m_UIEnvironment_ParseXMLString;
 	PLibMCEnvUIEnvironment_ParseXMLDataPtr m_UIEnvironment_ParseXMLData;
+	PLibMCEnvUIEnvironment_HasBuildJobPtr m_UIEnvironment_HasBuildJob;
 	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;
 	PLibMCEnvGetVersionPtr m_GetVersion;

@@ -150,6 +150,18 @@ std::string CUIEnvironment::RetrieveEventSender()
     return m_sSenderName;
 }
 
+std::string CUIEnvironment::RetrieveEventSenderPage()
+{
+    std::vector<std::string> sPathNames;
+    AMCCommon::CUtils::splitString(m_sSenderName, ".", sPathNames);
+
+    if (sPathNames.empty())
+        return "";
+
+    return sPathNames.at(0);
+}
+
+
 std::string CUIEnvironment::RetrieveEventSenderUUID()
 {
     return m_sSenderUUID;
@@ -440,12 +452,28 @@ LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64
 }
 
 
-IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
-{    
-    auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sBuildUUID);
-    return new CBuild(pBuildJob, m_pToolpathHandler, m_pStorage, m_sSystemUserID);
 
+bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    try {
+        m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+        return true;
+    }
+    catch (std::exception& E) {
+        return false;
+    }
 }
+
+IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(pBuildJob, m_pToolpathHandler, m_pStorage, m_sSystemUserID);
+}
+
 
 IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
 {

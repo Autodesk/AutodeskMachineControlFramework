@@ -122,7 +122,7 @@ LibMCEnv_uint32 CBuild::GetLayerCount()
 IToolpathAccessor * CBuild::CreateToolpathAccessor()
 {
 	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
-	return new CToolpathAccessor(sStreamUUID, m_pToolpathHandler);
+	return new CToolpathAccessor(sStreamUUID, m_pBuildJob->GetUUID(), m_pToolpathHandler);
 }
 
 

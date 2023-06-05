@@ -686,6 +686,10 @@
 			<param name="StorageUUID" type="string" pass="return" description="Returns toolpath storage uuid." />
 		</method>
 	
+		<method name="GetBuildUUID" description="Returns UUID of the toolpath's build file.">
+			<param name="BuildUUID" type="string" pass="return" description="Returns build uuid." />
+		</method>
+
 		<method name="GetLayerCount" description="Returns layer count.">
 			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
 		</method>
@@ -1627,6 +1631,16 @@
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
 		</method>	
 
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
+
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
+		</method>
+
 	</class>
 	
 	
@@ -1825,7 +1839,12 @@
 			<param name="DriverHandle" type="pointer" pass="out" description="Handle of the driver." />
 		</method>
 
-		<method name="GetBuildJob" description="Returns a instance of a build object.">
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
+
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
@@ -2045,13 +2064,18 @@
 			<param name="DialogUUID" type="string" pass="return" description="Dialog UUID. Will be set as sender for triggered events." />
 		</method>
 
-		<method name="RetrieveEventSender" description="returns name of the UI control that triggered the event.">
-			<param name="SenderName" type="string" pass="return" description="Name of the sender element." />
+		<method name="RetrieveEventSender" description="returns path of the UI control that triggered the event.">
+			<param name="SenderPath" type="string" pass="return" description="Path of the sender element." />
+		</method>
+
+		<method name="RetrieveEventSenderPage" description="returns name of the page of the UI control that triggered the event.">
+			<param name="PageName" type="string" pass="return" description="Page of the sender element." />
 		</method>
 
 		<method name="RetrieveEventSenderUUID" description="returns uuid of the UI control that triggered the event.">
 			<param name="SenderUUID" type="string" pass="return" description="Name of the sender uuid." />
 		</method>
+				
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
@@ -2215,8 +2239,13 @@
 			<param name="XMLData" type="basicarray" class="uint8" pass="in" description="XML Binary data." />
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
+
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
 		
-		<method name="GetBuildJob" description="Returns a instance of a build object.">
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>		

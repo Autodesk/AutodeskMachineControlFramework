@@ -144,11 +144,26 @@ ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& s
 
 }
 
+bool CStateEnvironment::HasBuildJob(const std::string& sBuildUUID)
+{
+	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	try {
+		pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+		return true;
+	}
+	catch (std::exception) {
+		return false;
+	}
+}
 
 IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
+	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
 	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
-	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
 	return new CBuild(pBuildJob, m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getStorageInstance(), m_pSystemState->getSystemUserID ());
 }
 

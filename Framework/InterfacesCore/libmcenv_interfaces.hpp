@@ -940,6 +940,12 @@ public:
 	virtual std::string GetStorageUUID() = 0;
 
 	/**
+	* IToolpathAccessor::GetBuildUUID - Returns UUID of the toolpath's build file.
+	* @return Returns build uuid.
+	*/
+	virtual std::string GetBuildUUID() = 0;
+
+	/**
 	* IToolpathAccessor::GetLayerCount - Returns layer count.
 	* @return Returns layer count.
 	*/
@@ -2351,6 +2357,20 @@ public:
 	*/
 	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
+	/**
+	* IDriverEnvironment::HasBuildJob - Returns if a build object exists.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	virtual bool HasBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IDriverEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
+	*/
+	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;
@@ -2638,7 +2658,14 @@ public:
 	virtual void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle) = 0;
 
 	/**
-	* IStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* IStateEnvironment::HasBuildJob - Returns if a build object exists.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	virtual bool HasBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IStateEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Build instance
 	*/
@@ -2938,10 +2965,16 @@ public:
 	virtual std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const LibMCEnv::eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent) = 0;
 
 	/**
-	* IUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
-	* @return Name of the sender element.
+	* IUIEnvironment::RetrieveEventSender - returns path of the UI control that triggered the event.
+	* @return Path of the sender element.
 	*/
 	virtual std::string RetrieveEventSender() = 0;
+
+	/**
+	* IUIEnvironment::RetrieveEventSenderPage - returns name of the page of the UI control that triggered the event.
+	* @return Page of the sender element.
+	*/
+	virtual std::string RetrieveEventSenderPage() = 0;
 
 	/**
 	* IUIEnvironment::RetrieveEventSenderUUID - returns uuid of the UI control that triggered the event.
@@ -3163,6 +3196,13 @@ public:
 	* @return XML Document Instance.
 	*/
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
+
+	/**
+	* IUIEnvironment::HasBuildJob - Returns if a build object exists.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	virtual bool HasBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
 	* IUIEnvironment::GetBuildJob - Returns a instance of a build object.

@@ -953,6 +953,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_finduniquemetadata(LibMC
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getstorageuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nStorageUUIDBufferSize, LibMCEnv_uint32* pStorageUUIDNeededChars, char * pStorageUUIDBuffer);
 
 /**
+* Returns UUID of the toolpath's build file.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of Returns build uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuilduuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
 * Returns layer count.
 *
 * @param[in] pToolpathAccessor - ToolpathAccessor instance.
@@ -2832,6 +2843,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEn
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
+/**
+* Returns if a build object exists.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_hasbuildjob(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
+* Returns a instance of a build object. Fails if build uuid does not exist.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildInstance - Build instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getbuildjob(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -3233,7 +3264,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getdriverlibrary(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createdriveraccess(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDriverName, LibMCEnv_pvoid * pDriverHandle);
 
 /**
-* Returns a instance of a build object.
+* Returns if a build object exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasbuildjob(LibMCEnv_StateEnvironment pStateEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
+* Returns a instance of a build object. Fails if build uuid does not exist.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pBuildUUID - UUID of the build entity.
@@ -3651,15 +3692,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hidehint(LibMCEnv_UIEnvi
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_showmessagedlg(LibMCEnv_UIEnvironment pUIEnvironment, const char * pCaption, const char * pTitle, LibMCEnv::eMessageDialogType eDialogType, const char * pYesEvent, const char * pNoEvent, const char * pCancelEvent, const LibMCEnv_uint32 nDialogUUIDBufferSize, LibMCEnv_uint32* pDialogUUIDNeededChars, char * pDialogUUIDBuffer);
 
 /**
-* returns name of the UI control that triggered the event.
+* returns path of the UI control that triggered the event.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] nSenderNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pSenderNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pSenderNameBuffer -  buffer of Name of the sender element., may be NULL
+* @param[in] nSenderPathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSenderPathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSenderPathBuffer -  buffer of Path of the sender element., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderPathBufferSize, LibMCEnv_uint32* pSenderPathNeededChars, char * pSenderPathBuffer);
+
+/**
+* returns name of the page of the UI control that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nPageNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pPageNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pPageNameBuffer -  buffer of Page of the sender element., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsenderpage(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nPageNameBufferSize, LibMCEnv_uint32* pPageNameNeededChars, char * pPageNameBuffer);
 
 /**
 * returns uuid of the UI control that triggered the event.
@@ -3977,6 +4029,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmlstring(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmldata(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* Returns if a build object exists.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasbuildjob(LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, bool * pBuildExists);
 
 /**
 * Returns a instance of a build object.

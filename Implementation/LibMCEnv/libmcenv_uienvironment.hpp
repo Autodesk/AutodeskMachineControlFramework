@@ -105,6 +105,8 @@ public:
 
 	std::string RetrieveEventSender() override;
 
+	std::string RetrieveEventSenderPage() override;
+
 	std::string RetrieveEventSenderUUID() override;
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
@@ -173,6 +175,8 @@ public:
 	IXMLDocument* ParseXMLString(const std::string& sXMLString) override;
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
+
+	bool HasBuildJob(const std::string& sBuildUUID) override;
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
