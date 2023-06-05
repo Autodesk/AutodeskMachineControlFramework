@@ -830,20 +830,16 @@ LibMCEnvResult libmcenv_discretefielddata2d_getsizeinpixels(LibMCEnv_DiscreteFie
 	}
 }
 
-LibMCEnvResult libmcenv_discretefielddata2d_resizefield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY)
+LibMCEnvResult libmcenv_discretefielddata2d_resizefield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDefaultValue)
 {
 	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
 
 	try {
-		if (!pPixelSizeX)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (!pPixelSizeY)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
 		if (!pIDiscreteFieldData2D)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIDiscreteFieldData2D->ResizeField(*pPixelSizeX, *pPixelSizeY);
+		pIDiscreteFieldData2D->ResizeField(nPixelSizeX, nPixelSizeY, dDefaultValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -1201,24 +1197,19 @@ LibMCEnvResult libmcenv_discretefielddata2d_addfield(LibMCEnv_DiscreteFieldData2
 	}
 }
 
-LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D pOtherField, LibMCEnv_DiscreteFieldData2D * pNewField)
+LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField)
 {
 	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
 
 	try {
 		if (pNewField == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		IBase* pIBaseClassOtherField = (IBase *)pOtherField;
-		IDiscreteFieldData2D* pIOtherField = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClassOtherField);
-		if (!pIOtherField)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
-		
 		IBase* pBaseNewField(nullptr);
 		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
 		if (!pIDiscreteFieldData2D)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseNewField = pIDiscreteFieldData2D->Duplicate(pIOtherField);
+		pBaseNewField = pIDiscreteFieldData2D->Duplicate();
 
 		*pNewField = (IBase*)(pBaseNewField);
 		return LIBMCENV_SUCCESS;

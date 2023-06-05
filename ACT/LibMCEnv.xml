@@ -133,6 +133,15 @@
 		<error name="INTEGERVALUEATTRIBUTEOUTOFRANGE" code="10093" description="Integer value attribute out of range." />				
 		<error name="INVALIDDOUBLEVALUEATTRIBUTE" code="10094" description="Invalid double value attribute." />				
 		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />						
+		<error name="INVALIDDEFAULTIMAGEVALUE" code="10096" description="Invalid default image value." />
+		<error name="INVALIDPIXELMEMORYSIZE" code="10097" description="Invalid pixel memory size." />
+		<error name="INVALIDFIELDBUFFER" code="10098" description="Invalid field buffer." />
+		<error name="INTERNALFIELDSIZEERROR" code="10099" description="Internal field size error." />
+		<error name="INVALIDFIELDSIZE" code="10100" description="Invalid field size." />
+		<error name="INVALIDFIELDSCALINGFACTOR" code="10101" description="Invalid field scaling factor." />
+		<error name="SCALINGEXCEEDSMAXIMUMPIXELCOUNT" code="10102" description="Scaling exceeds maximum pixel count." />
+		<error name="INTERNALSCALINGERROR" code="10103" description="Internal scaling error." />
+		
 									
 	</errors>
 
@@ -381,8 +390,9 @@
 		</method>		
 
 		<method name="ResizeField" description="Resizes field pixel data.">
-			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
-			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Number of pixels in Y" />
+			<param name="DefaultValue" type="double" pass="in" description="Default Pixel value." />
 		</method>
 
 		<method name="Clear" description="Sets all pixels to a single value.">
@@ -468,7 +478,6 @@
 		</method>		
 
 		<method name="Duplicate" description="Creates a copy of the field.">
-			<param name="OtherField" type="class" class="DiscreteFieldData2D" pass="in" description="Field Instance to add" />
 			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
 		</method>		
 

@@ -66,6 +66,8 @@ public:
 
 	virtual ~CDiscreteFieldData2D();
 
+	AMC::PDiscreteFieldData2DInstance getInstance();
+
 	void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY) override;
 
 	void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY) override;
@@ -78,7 +80,7 @@ public:
 
 	void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) override;
 
-	void ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) override;
+	void ResizeField(LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue) override;
 
 	void Clear(const LibMCEnv_double dValue) override;
 
@@ -106,7 +108,7 @@ public:
 
 	void AddField(IDiscreteFieldData2D* pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset) override;
 
-	IDiscreteFieldData2D * Duplicate(IDiscreteFieldData2D* pOtherField) override;
+	IDiscreteFieldData2D * Duplicate() override;
 
 };
 

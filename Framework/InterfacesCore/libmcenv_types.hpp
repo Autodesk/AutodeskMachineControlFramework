@@ -190,6 +190,14 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE 10093 /** Integer value attribute out of range. */
 #define LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE 10094 /** Invalid double value attribute. */
 #define LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE 10095 /** Double value attribute out of range. */
+#define LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE 10096 /** Invalid default image value. */
+#define LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE 10097 /** Invalid pixel memory size. */
+#define LIBMCENV_ERROR_INVALIDFIELDBUFFER 10098 /** Invalid field buffer. */
+#define LIBMCENV_ERROR_INTERNALFIELDSIZEERROR 10099 /** Internal field size error. */
+#define LIBMCENV_ERROR_INVALIDFIELDSIZE 10100 /** Invalid field size. */
+#define LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR 10101 /** Invalid field scaling factor. */
+#define LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT 10102 /** Scaling exceeds maximum pixel count. */
+#define LIBMCENV_ERROR_INTERNALSCALINGERROR 10103 /** Internal scaling error. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -292,6 +300,14 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "Integer value attribute out of range.";
     case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "Invalid double value attribute.";
     case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "Double value attribute out of range.";
+    case LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE: return "Invalid default image value.";
+    case LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE: return "Invalid pixel memory size.";
+    case LIBMCENV_ERROR_INVALIDFIELDBUFFER: return "Invalid field buffer.";
+    case LIBMCENV_ERROR_INTERNALFIELDSIZEERROR: return "Internal field size error.";
+    case LIBMCENV_ERROR_INVALIDFIELDSIZE: return "Invalid field size.";
+    case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "Invalid field scaling factor.";
+    case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "Scaling exceeds maximum pixel count.";
+    case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "Internal scaling error.";
     default: return "unknown error";
   }
 }

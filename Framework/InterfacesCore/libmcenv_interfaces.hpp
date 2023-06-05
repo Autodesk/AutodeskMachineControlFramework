@@ -501,10 +501,11 @@ public:
 
 	/**
 	* IDiscreteFieldData2D::ResizeField - Resizes field pixel data.
-	* @param[out] nPixelSizeX - Number of pixels in X
-	* @param[out] nPixelSizeY - Number of pixels in Y
+	* @param[in] nPixelSizeX - Number of pixels in X
+	* @param[in] nPixelSizeY - Number of pixels in Y
+	* @param[in] dDefaultValue - Default Pixel value.
 	*/
-	virtual void ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+	virtual void ResizeField(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
 	* IDiscreteFieldData2D::Clear - Sets all pixels to a single value.
@@ -623,10 +624,9 @@ public:
 
 	/**
 	* IDiscreteFieldData2D::Duplicate - Creates a copy of the field.
-	* @param[in] pOtherField - Field Instance to add
 	* @return Scaled Field Instance
 	*/
-	virtual IDiscreteFieldData2D * Duplicate(IDiscreteFieldData2D* pOtherField) = 0;
+	virtual IDiscreteFieldData2D * Duplicate() = 0;
 
 };
 
@@ -2358,7 +2358,7 @@ public:
 	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
-	* IDriverEnvironment::HasBuildJob - Returns if a build object exists.
+	* IDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
 	*/
@@ -2658,7 +2658,7 @@ public:
 	virtual void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle) = 0;
 
 	/**
-	* IStateEnvironment::HasBuildJob - Returns if a build object exists.
+	* IStateEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
 	*/
@@ -3198,14 +3198,14 @@ public:
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 	/**
-	* IUIEnvironment::HasBuildJob - Returns if a build object exists.
+	* IUIEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
 	*/
 	virtual bool HasBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
-	* IUIEnvironment::GetBuildJob - Returns a instance of a build object.
+	* IUIEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Build instance
 	*/

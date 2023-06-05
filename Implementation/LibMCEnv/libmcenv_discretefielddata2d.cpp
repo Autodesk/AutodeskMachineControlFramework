@@ -55,64 +55,70 @@ CDiscreteFieldData2D::~CDiscreteFieldData2D()
 
 }
 
+AMC::PDiscreteFieldData2DInstance CDiscreteFieldData2D::getInstance()
+{
+	return m_pDiscreteFieldDataInstance;
+}
+
+
 void CDiscreteFieldData2D::GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->GetDPI(dDPIValueX, dDPIValueY);
 }
 
 void CDiscreteFieldData2D::SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->SetDPI(dDPIValueX, dDPIValueY);
 }
 
 void CDiscreteFieldData2D::GetOriginInMM(LibMCEnv_double & dOriginX, LibMCEnv_double & dOriginY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->GetOriginInMM(dOriginX, dOriginY);
 }
 
 void CDiscreteFieldData2D::SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->SetOriginInMM(dOriginX, dOriginY);
 }
 
 void CDiscreteFieldData2D::GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->GetSizeInMM(dSizeX, dSizeY);
 }
 
 void CDiscreteFieldData2D::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
 }
 
-void CDiscreteFieldData2D::ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+void CDiscreteFieldData2D::ResizeField(LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->ResizeField(nPixelSizeX, nPixelSizeY, dDefaultValue);
 }
 
 void CDiscreteFieldData2D::Clear(const LibMCEnv_double dValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->Clear(dValue);
 }
 
 LibMCEnv_double CDiscreteFieldData2D::GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pDiscreteFieldDataInstance->GetPixel(nX, nY);
 }
 
 void CDiscreteFieldData2D::SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->SetPixel(nX, nY, dValue);
 }
 
 void CDiscreteFieldData2D::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_double * pValueBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->GetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueNeededCount, pValueBuffer);
 }
 
 void CDiscreteFieldData2D::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_double * pValueBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->SetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueBuffer);
 }
 
 void CDiscreteFieldData2D::RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const LibMCEnv::eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const LibMCEnv_uint64 nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint * pPointValuesBuffer)
@@ -122,22 +128,24 @@ void CDiscreteFieldData2D::RenderAveragePointValues(const LibMCEnv_double dDefau
 
 IDiscreteFieldData2D * CDiscreteFieldData2D::ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pNewField = m_pDiscreteFieldDataInstance->ScaleFieldDown(nFactorX, nFactorY);
+	return new CDiscreteFieldData2D(pNewField);
 }
 
 IDiscreteFieldData2D * CDiscreteFieldData2D::ScaleFieldUp(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pNewField = m_pDiscreteFieldDataInstance->ScaleFieldUp(nFactorX, nFactorY);
+	return new CDiscreteFieldData2D(pNewField);
 }
 
 void CDiscreteFieldData2D::Discretize(const LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->DiscretizeWithMapping(nDiscreteValuesBufferSize, pDiscreteValuesBuffer, nDiscreteValuesBufferSize, pDiscreteValuesBuffer);
 }
 
 void CDiscreteFieldData2D::DiscretizeWithMapping(const LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer, const LibMCEnv_uint64 nNewValuesBufferSize, const LibMCEnv_double * pNewValuesBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->DiscretizeWithMapping(nDiscreteValuesBufferSize, pDiscreteValuesBuffer, nNewValuesBufferSize, pNewValuesBuffer);
 }
 
 IImageData * CDiscreteFieldData2D::RenderToImageRaw(const LibMCEnv_double dMinValue, const LibMCEnv::sColorRGB MinColor, const LibMCEnv_double dMidValue, const LibMCEnv::sColorRGB MidColor, const LibMCEnv_double dMaxValue, const LibMCEnv::sColorRGB MaxColor)
@@ -147,16 +155,24 @@ IImageData * CDiscreteFieldData2D::RenderToImageRaw(const LibMCEnv_double dMinVa
 
 void CDiscreteFieldData2D::TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDiscreteFieldDataInstance->TransformField(dScale, dOffset);
 }
 
 void CDiscreteFieldData2D::AddField(IDiscreteFieldData2D* pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pOtherField == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto pOtherFieldInstance = dynamic_cast<CDiscreteFieldData2D*> (pOtherField);
+	if (pOtherFieldInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+	m_pDiscreteFieldDataInstance->AddField(pOtherFieldInstance->getInstance().get(), dScale, dOffset);
 }
 
-IDiscreteFieldData2D * CDiscreteFieldData2D::Duplicate(IDiscreteFieldData2D* pOtherField)
+IDiscreteFieldData2D * CDiscreteFieldData2D::Duplicate()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pNewField = m_pDiscreteFieldDataInstance->Duplicate();
+	return new CDiscreteFieldData2D(pNewField);
 }
 

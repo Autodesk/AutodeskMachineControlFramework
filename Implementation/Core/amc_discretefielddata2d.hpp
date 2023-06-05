@@ -55,15 +55,51 @@ namespace AMC {
 		double m_dOriginX;
 		double m_dOriginY;
 		
-		std::vector<double> m_Data;
+		std::unique_ptr<std::vector<double>> m_Data;
 
 	public:
 
-		CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dValue);
+		CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dDefaultValue, bool bDoClear);
 		
 		virtual ~CDiscreteFieldData2DInstance();
 
+		void GetDPI(double& dDPIValueX, double& dDPIValueY);
 
+		void SetDPI(const double dDPIValueX, const double dDPIValueY);
+
+		void GetOriginInMM(double& dOriginX, double& dOriginY);
+
+		void SetOriginInMM(const double dOriginX, const double dOriginY);
+
+		void GetSizeInMM(double& dSizeX, double& dSizeY);
+
+		void GetSizeInPixels(uint32_t& nPixelSizeX, uint32_t& nPixelSizeY) ;
+
+		void ResizeField(uint32_t& nPixelSizeX, uint32_t& nPixelSizeY, double dDefaultValue);
+
+		void Clear(const double dValue);
+
+		double GetPixel(const uint32_t nX, const uint32_t nY);
+
+		void SetPixel(const uint32_t nX, const uint32_t nY, const double dValue);
+
+		void GetPixelRange(const uint32_t nXMin, const uint32_t nYMin, const uint32_t nXMax, const uint32_t nYMax, uint64_t nValueBufferSize, uint64_t* pValueNeededCount, double* pValueBuffer);
+
+		void SetPixelRange(const uint32_t nXMin, const uint32_t nYMin, const uint32_t nXMax, const uint32_t nYMax, const uint64_t nValueBufferSize, const double* pValueBuffer);
+
+		//void RenderAveragePointValues(const double dDefaultValue, const LibMCEnv::eFieldSamplingMode eSamplingMode, const double dSampleSizeX, const double dSampleSizeY, const uint64_t nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint* pPointValuesBuffer);
+
+		PDiscreteFieldData2DInstance ScaleFieldDown(const uint32_t nFactorX, const uint32_t nFactorY);
+
+		PDiscreteFieldData2DInstance ScaleFieldUp(const uint32_t nFactorX, const uint32_t nFactorY);
+
+		void DiscretizeWithMapping(const uint64_t nDiscreteValuesBufferSize, const double* pDiscreteValuesBuffer, const uint64_t nNewValuesBufferSize, const double* pNewValuesBuffer);
+
+		void TransformField(const double dScale, const double dOffset);
+
+		void AddField(CDiscreteFieldData2DInstance* pOtherField, const double dScale, const double dOffset);
+
+		PDiscreteFieldData2DInstance Duplicate();
 	};
 
 	

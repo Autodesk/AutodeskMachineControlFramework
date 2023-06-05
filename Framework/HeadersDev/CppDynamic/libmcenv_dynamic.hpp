@@ -359,6 +359,14 @@ public:
 			case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "INTEGERVALUEATTRIBUTEOUTOFRANGE";
 			case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "INVALIDDOUBLEVALUEATTRIBUTE";
 			case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "DOUBLEVALUEATTRIBUTEOUTOFRANGE";
+			case LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE: return "INVALIDDEFAULTIMAGEVALUE";
+			case LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE: return "INVALIDPIXELMEMORYSIZE";
+			case LIBMCENV_ERROR_INVALIDFIELDBUFFER: return "INVALIDFIELDBUFFER";
+			case LIBMCENV_ERROR_INTERNALFIELDSIZEERROR: return "INTERNALFIELDSIZEERROR";
+			case LIBMCENV_ERROR_INVALIDFIELDSIZE: return "INVALIDFIELDSIZE";
+			case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "INVALIDFIELDSCALINGFACTOR";
+			case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "SCALINGEXCEEDSMAXIMUMPIXELCOUNT";
+			case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "INTERNALSCALINGERROR";
 		}
 		return "UNKNOWN";
 	}
@@ -461,6 +469,14 @@ public:
 			case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "Integer value attribute out of range.";
 			case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "Invalid double value attribute.";
 			case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "Double value attribute out of range.";
+			case LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE: return "Invalid default image value.";
+			case LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE: return "Invalid pixel memory size.";
+			case LIBMCENV_ERROR_INVALIDFIELDBUFFER: return "Invalid field buffer.";
+			case LIBMCENV_ERROR_INTERNALFIELDSIZEERROR: return "Internal field size error.";
+			case LIBMCENV_ERROR_INVALIDFIELDSIZE: return "Invalid field size.";
+			case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "Invalid field scaling factor.";
+			case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "Scaling exceeds maximum pixel count.";
+			case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "Internal scaling error.";
 		}
 		return "unknown error";
 	}
@@ -755,7 +771,7 @@ public:
 	inline void SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
-	inline void ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void ResizeField(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue);
 	inline void Clear(const LibMCEnv_double dValue);
 	inline LibMCEnv_double GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue);
@@ -769,7 +785,7 @@ public:
 	inline PImageData RenderToImageRaw(const LibMCEnv_double dMinValue, const sColorRGB & MinColor, const LibMCEnv_double dMidValue, const sColorRGB & MidColor, const LibMCEnv_double dMaxValue, const sColorRGB & MaxColor);
 	inline void TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
 	inline void AddField(classParam<CDiscreteFieldData2D> pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
-	inline PDiscreteFieldData2D Duplicate(classParam<CDiscreteFieldData2D> pOtherField);
+	inline PDiscreteFieldData2D Duplicate();
 };
 	
 /*************************************************************************************************************************
@@ -7204,12 +7220,13 @@ public:
 	
 	/**
 	* CDiscreteFieldData2D::ResizeField - Resizes field pixel data.
-	* @param[out] nPixelSizeX - Number of pixels in X
-	* @param[out] nPixelSizeY - Number of pixels in Y
+	* @param[in] nPixelSizeX - Number of pixels in X
+	* @param[in] nPixelSizeY - Number of pixels in Y
+	* @param[in] dDefaultValue - Default Pixel value.
 	*/
-	void CDiscreteFieldData2D::ResizeField(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	void CDiscreteFieldData2D::ResizeField(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ResizeField(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ResizeField(m_pHandle, nPixelSizeX, nPixelSizeY, dDefaultValue));
 	}
 	
 	/**
@@ -7387,14 +7404,12 @@ public:
 	
 	/**
 	* CDiscreteFieldData2D::Duplicate - Creates a copy of the field.
-	* @param[in] pOtherField - Field Instance to add
 	* @return Scaled Field Instance
 	*/
-	PDiscreteFieldData2D CDiscreteFieldData2D::Duplicate(classParam<CDiscreteFieldData2D> pOtherField)
+	PDiscreteFieldData2D CDiscreteFieldData2D::Duplicate()
 	{
-		LibMCEnvHandle hOtherField = pOtherField.GetHandle();
 		LibMCEnvHandle hNewField = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Duplicate(m_pHandle, hOtherField, &hNewField));
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Duplicate(m_pHandle, &hNewField));
 		
 		if (!hNewField) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -10372,7 +10387,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::HasBuildJob - Returns if a build object exists.
+	* CDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
 	*/
@@ -10901,7 +10916,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::HasBuildJob - Returns if a build object exists.
+	* CStateEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
 	*/
@@ -11850,7 +11865,7 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::HasBuildJob - Returns if a build object exists.
+	* CUIEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
 	*/
@@ -11863,7 +11878,7 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::GetBuildJob - Returns a instance of a build object.
+	* CUIEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Build instance
 	*/

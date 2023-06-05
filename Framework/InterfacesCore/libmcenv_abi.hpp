@@ -362,11 +362,12 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_getsizeinpixels(Li
 * Resizes field pixel data.
 *
 * @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
-* @param[out] pPixelSizeX - Number of pixels in X
-* @param[out] pPixelSizeY - Number of pixels in Y
+* @param[in] nPixelSizeX - Number of pixels in X
+* @param[in] nPixelSizeY - Number of pixels in Y
+* @param[in] dDefaultValue - Default Pixel value.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_resizefield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_resizefield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDefaultValue);
 
 /**
 * Sets all pixels to a single value.
@@ -526,11 +527,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_addfield(LibMCEnv_
 * Creates a copy of the field.
 *
 * @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
-* @param[in] pOtherField - Field Instance to add
 * @param[out] pNewField - Scaled Field Instance
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D pOtherField, LibMCEnv_DiscreteFieldData2D * pNewField);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
  Class definition for ToolpathPart
@@ -2844,7 +2844,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
-* Returns if a build object exists.
+* Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pBuildUUID - UUID of the build entity.
@@ -3264,7 +3264,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getdriverlibrary(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createdriveraccess(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDriverName, LibMCEnv_pvoid * pDriverHandle);
 
 /**
-* Returns if a build object exists.
+* Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pBuildUUID - UUID of the build entity.
@@ -4031,7 +4031,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmlstring(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmldata(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
-* Returns if a build object exists.
+* Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pBuildUUID - UUID of the build entity.
@@ -4041,7 +4041,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmldata(LibMCEnv_UI
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasbuildjob(LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, bool * pBuildExists);
 
 /**
-* Returns a instance of a build object.
+* Returns a instance of a build object. Fails if build uuid does not exist.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pBuildUUID - UUID of the build entity.
