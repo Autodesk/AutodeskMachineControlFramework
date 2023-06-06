@@ -8009,7 +8009,7 @@ LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEnv_DriverEnvironmen
 	}
 }
 
-LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
 
@@ -8021,7 +8021,7 @@ LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverE
 		if (!pIDriverEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseFieldDataInstance = pIDriverEnvironment->CreateDiscreteField2D(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
+		pBaseFieldDataInstance = pIDriverEnvironment->CreateDiscreteField2D(nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
 
 		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
 		return LIBMCENV_SUCCESS;
@@ -10249,7 +10249,7 @@ LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv_StateEnvironment 
 	}
 }
 
-LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
 
@@ -10261,7 +10261,7 @@ LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnv
 		if (!pIStateEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseFieldDataInstance = pIStateEnvironment->CreateDiscreteField2D(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
+		pBaseFieldDataInstance = pIStateEnvironment->CreateDiscreteField2D(nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
 
 		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
 		return LIBMCENV_SUCCESS;
@@ -11829,7 +11829,7 @@ LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIEnvironment pUIEnvi
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -11841,7 +11841,7 @@ LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironme
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseFieldDataInstance = pIUIEnvironment->CreateDiscreteField2D(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
+		pBaseFieldDataInstance = pIUIEnvironment->CreateDiscreteField2D(nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue);
 
 		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
 		return LIBMCENV_SUCCESS;

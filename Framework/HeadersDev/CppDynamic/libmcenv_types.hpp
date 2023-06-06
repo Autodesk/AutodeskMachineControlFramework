@@ -198,6 +198,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR 10101 /** Invalid field scaling factor. */
 #define LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT 10102 /** Scaling exceeds maximum pixel count. */
 #define LIBMCENV_ERROR_INTERNALSCALINGERROR 10103 /** Internal scaling error. */
+#define LIBMCENV_ERROR_INVALIDCOLORRANGE 10104 /** Invalid color range. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -308,6 +309,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "Invalid field scaling factor.";
     case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "Scaling exceeds maximum pixel count.";
     case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "Internal scaling error.";
+    case LIBMCENV_ERROR_INVALIDCOLORRANGE: return "Invalid color range.";
     default: return "unknown error";
   }
 }
@@ -365,7 +367,7 @@ namespace LibMCEnv {
     WeightByRectangleArea = 3, /** Point values are valued by a rectangle shape area and its overlap with each pixel (with the center as the given coordinate). */
     WeightByEllipseArea = 4 /** Point values are valued by a ellipse shape area that its overlap with each pixel (with the center as the given coordinate). */
   };
-    
+  
   enum class eToolpathSegmentType : LibMCEnv_int32 {
     Unknown = 0,
     Hatch = 1,

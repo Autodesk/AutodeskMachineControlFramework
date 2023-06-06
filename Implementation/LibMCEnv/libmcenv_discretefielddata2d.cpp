@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of CDiscreteFieldData2D
 */
 
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_imagedata.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -150,7 +151,18 @@ void CDiscreteFieldData2D::DiscretizeWithMapping(const LibMCEnv_uint64 nDiscrete
 
 IImageData * CDiscreteFieldData2D::RenderToImageRaw(const LibMCEnv_double dMinValue, const LibMCEnv::sColorRGB MinColor, const LibMCEnv_double dMidValue, const LibMCEnv::sColorRGB MidColor, const LibMCEnv_double dMaxValue, const LibMCEnv::sColorRGB MaxColor)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pixelData = std::make_unique<std::vector<uint8_t>>();
+
+	uint32_t nPixelCountX, nPixelCountY;
+	m_pDiscreteFieldDataInstance->GetSizeInPixels(nPixelCountX, nPixelCountY);
+
+	double dDPIValueX, dDPIValueY;
+	m_pDiscreteFieldDataInstance->GetDPI(dDPIValueX, dDPIValueY);
+
+	m_pDiscreteFieldDataInstance->renderRGBImage(pixelData.get(), dMinValue, MinColor.m_Red, MinColor.m_Green, MinColor.m_Blue, dMidValue, MidColor.m_Red, MidColor.m_Green, MidColor.m_Blue, dMaxValue, MaxColor.m_Red, MaxColor.m_Green, MaxColor.m_Blue);
+
+	return new CImageData(pixelData.release(), nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, LibMCEnv::eImagePixelFormat::RGB24bit, false);
+
 }
 
 void CDiscreteFieldData2D::TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset)

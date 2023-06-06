@@ -367,6 +367,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "INVALIDFIELDSCALINGFACTOR";
 			case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "SCALINGEXCEEDSMAXIMUMPIXELCOUNT";
 			case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "INTERNALSCALINGERROR";
+			case LIBMCENV_ERROR_INVALIDCOLORRANGE: return "INVALIDCOLORRANGE";
 		}
 		return "UNKNOWN";
 	}
@@ -477,6 +478,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "Invalid field scaling factor.";
 			case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "Scaling exceeds maximum pixel count.";
 			case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "Internal scaling error.";
+			case LIBMCENV_ERROR_INVALIDCOLORRANGE: return "Invalid color range.";
 		}
 		return "unknown error";
 	}
@@ -1304,7 +1306,7 @@ public:
 	inline void LogInfo(const std::string & sLogString);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 };
@@ -1418,7 +1420,7 @@ public:
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
@@ -1480,7 +1482,7 @@ public:
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
-	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 };
 	
 	/**
@@ -10366,8 +10368,8 @@ public:
 	
 	/**
 	* CDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
-	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] dOriginX - Origin X of the field in mm.
@@ -10375,10 +10377,10 @@ public:
 	* @param[in] dDefaultValue - Default value of the field.
 	* @return Empty field instance.
 	*/
-	PDiscreteFieldData2D CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	PDiscreteFieldData2D CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDiscreteField2D(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDiscreteField2D(m_pHandle, nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -11247,8 +11249,8 @@ public:
 	
 	/**
 	* CStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
-	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] dOriginX - Origin X of the field in mm.
@@ -11256,10 +11258,10 @@ public:
 	* @param[in] dDefaultValue - Default value of the field.
 	* @return Empty field instance.
 	*/
-	PDiscreteFieldData2D CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	PDiscreteFieldData2D CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDiscreteField2D(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDiscreteField2D(m_pHandle, nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -11895,8 +11897,8 @@ public:
 	
 	/**
 	* CUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
-	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] dOriginX - Origin X of the field in mm.
@@ -11904,10 +11906,10 @@ public:
 	* @param[in] dDefaultValue - Default value of the field.
 	* @return Empty field instance.
 	*/
-	PDiscreteFieldData2D CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	PDiscreteFieldData2D CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDiscreteField2D(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDiscreteField2D(m_pHandle, nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

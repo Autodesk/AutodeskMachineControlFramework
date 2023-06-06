@@ -141,6 +141,8 @@
 		<error name="INVALIDFIELDSCALINGFACTOR" code="10101" description="Invalid field scaling factor." />
 		<error name="SCALINGEXCEEDSMAXIMUMPIXELCOUNT" code="10102" description="Scaling exceeds maximum pixel count." />
 		<error name="INTERNALSCALINGERROR" code="10103" description="Internal scaling error." />
+		<error name="INVALIDCOLORRANGE" code="10104" description="Invalid color range." />
+		
 		
 									
 	</errors>
@@ -1630,8 +1632,8 @@
 		</method>
 
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
-			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
-			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
 			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
 			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
@@ -1992,8 +1994,8 @@
 		</method>
 
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
-			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
-			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
 			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
 			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
@@ -2260,8 +2262,8 @@
 		</method>		
 	
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
-			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
-			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
 			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
 			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />

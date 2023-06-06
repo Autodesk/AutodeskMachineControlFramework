@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 #define DISCRETEFIELD_MAXPIXELCOUNT (1024ULL * 1024ULL * 32ULL)
+#define DISCRETEFIELD_MINVALUEDISTANCE 1E-6
 
 CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dDefaultValue, bool bDoClear)
 	: m_nPixelCountX (nPixelCountX), m_nPixelCountY (nPixelCountY), m_dDPIX (dDPIX), m_dDPIY (dDPIY), m_dOriginX (dOriginX), m_dOriginY (dOriginY)
@@ -367,3 +368,85 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::Duplicate()
 
 }
 
+void CDiscreteFieldData2DInstance::renderRGBImage(std::vector<uint8_t>* pPixelData, double minValue, double minRed, double minGreen, double minBlue, double midValue, double midRed, double midGreen, double midBlue, double maxValue, double maxRed, double maxGreen, double maxBlue)
+{
+	if (pPixelData == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	pPixelData->resize((size_t) m_nPixelCountX * (size_t)m_nPixelCountY * 3);
+
+	double dDeltaMin = midValue - minValue;
+	double dDeltaMax = maxValue - midValue;
+
+	if (dDeltaMin < 0.0)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCOLORRANGE);
+	if (dDeltaMax < 0.0)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCOLORRANGE);
+
+	size_t nPixelIndex = 0;
+
+	for (auto iter = m_Data->begin(); iter != m_Data->end(); iter++) {
+		double dValue = *iter;
+		double dFactor;
+
+		double dRed, dGreen, dBlue;
+
+		if (dValue < midValue) {
+
+			if (dDeltaMin > DISCRETEFIELD_MINVALUEDISTANCE) {
+				dFactor = (dValue - minValue) / dDeltaMin;
+			}
+			else {
+				dFactor = 0.0;
+			}
+
+			if (dFactor < 0.0)
+				dFactor = 0.0;
+
+			if (dFactor > 1.0)
+				dFactor = 1.0;
+
+			dRed = minRed * (1.0 - dFactor) + midRed * dFactor;
+			dGreen = minGreen * (1.0 - dFactor) + midGreen * dFactor;
+			dBlue = minBlue * (1.0 - dFactor) + midBlue * dFactor;
+
+
+		} else {
+
+			if (dDeltaMax > DISCRETEFIELD_MINVALUEDISTANCE) {
+				dFactor = (dValue - midValue) / dDeltaMax;
+			}
+			else {
+				dFactor = 0.0;
+			}
+
+			if (dFactor < 0.0)
+				dFactor = 0.0;
+
+			if (dFactor > 1.0)
+				dFactor = 1.0;
+
+			dRed = midRed * (1.0 - dFactor) + maxRed * dFactor;
+			dGreen = midGreen * (1.0 - dFactor) + maxGreen * dFactor;
+			dBlue = midBlue * (1.0 - dFactor) + maxBlue * dFactor;
+
+
+		}
+
+		dRed = std::clamp(dRed, 0.0, 1.0);
+		dGreen = std::clamp(dGreen, 0.0, 1.0);
+		dBlue = std::clamp(dBlue, 0.0, 1.0);
+
+		uint8_t nRed = (uint8_t) round(dRed * 255.0);
+		uint8_t nGreen = (uint8_t)round(dGreen * 255.0);
+		uint8_t nBlue = (uint8_t)round(dBlue * 255.0);
+
+		pPixelData->at(nPixelIndex * 3) = nRed;
+		pPixelData->at(nPixelIndex * 3 + 1) = nGreen;
+		pPixelData->at(nPixelIndex * 3 + 2) = nBlue;
+
+		nPixelIndex++;
+	}
+
+	
+}

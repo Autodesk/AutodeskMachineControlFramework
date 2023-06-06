@@ -2346,8 +2346,8 @@ public:
 
 	/**
 	* IDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
-	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] dOriginX - Origin X of the field in mm.
@@ -2355,7 +2355,7 @@ public:
 	* @param[in] dDefaultValue - Default value of the field.
 	* @return Empty field instance.
 	*/
-	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
 	* IDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
@@ -2852,8 +2852,8 @@ public:
 
 	/**
 	* IStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
-	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] dOriginX - Origin X of the field in mm.
@@ -2861,7 +2861,7 @@ public:
 	* @param[in] dDefaultValue - Default value of the field.
 	* @return Empty field instance.
 	*/
-	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
 	* IStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
@@ -3213,8 +3213,8 @@ public:
 
 	/**
 	* IUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
-	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] dOriginX - Origin X of the field in mm.
@@ -3222,7 +3222,7 @@ public:
 	* @param[in] dDefaultValue - Default value of the field.
 	* @return Empty field instance.
 	*/
-	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 };
 

@@ -2831,8 +2831,8 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEn
 * Creates an empty discrete field.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
-* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 * @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 * @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 * @param[in] dOriginX - Origin X of the field in mm.
@@ -2841,7 +2841,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEn
 * @param[out] pFieldDataInstance - Empty field instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
 * Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
@@ -3544,8 +3544,8 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv
 * Creates an empty discrete field.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 * @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 * @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 * @param[in] dOriginX - Origin X of the field in mm.
@@ -3554,7 +3554,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv
 * @param[out] pFieldDataInstance - Empty field instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
 * Returns the global timer in milliseconds.
@@ -4054,8 +4054,8 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIE
 * Creates an empty discrete field.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
-* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
 * @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 * @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 * @param[in] dOriginX - Origin X of the field in mm.
@@ -4064,7 +4064,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIE
 * @param[out] pFieldDataInstance - Empty field instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /*************************************************************************************************************************
  Global functions

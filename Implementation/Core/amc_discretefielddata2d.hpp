@@ -100,6 +100,8 @@ namespace AMC {
 		void AddField(CDiscreteFieldData2DInstance* pOtherField, const double dScale, const double dOffset);
 
 		PDiscreteFieldData2DInstance Duplicate();
+
+		void renderRGBImage(std::vector<uint8_t>* pPixelData, double minValue, double minRed, double minGreen, double minBlue, double midValue, double midRed, double midGreen, double midBlue, double maxValue, double maxRed, double maxGreen, double maxBlue);
 	};
 
 	
