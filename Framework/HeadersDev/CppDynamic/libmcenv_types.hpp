@@ -365,7 +365,7 @@ namespace LibMCEnv {
     WeightByRectangleArea = 3, /** Point values are valued by a rectangle shape area and its overlap with each pixel (with the center as the given coordinate). */
     WeightByEllipseArea = 4 /** Point values are valued by a ellipse shape area that its overlap with each pixel (with the center as the given coordinate). */
   };
-  
+    
   enum class eToolpathSegmentType : LibMCEnv_int32 {
     Unknown = 0,
     Hatch = 1,
