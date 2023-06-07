@@ -976,6 +976,14 @@
 			<param name="Value" type="string" pass="return" description="returns the value of the attribute." />
 		</method>
 
+		<method name="IsValidUUID" description="Checks if the value is a valid UUID string.">
+			<param name="IsValid" type="bool" pass="return" description="returns if the value is a valid UUID string." />
+		</method>
+		
+		<method name="GetUUIDValue" description="Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.">
+			<param name="Value" type="string" pass="return" description="returns the value of the attribute as normalized UUID string." />
+		</method>
+
 		<method name="IsValidInteger" description="Checks if the value is a valid integer in the given range.">
 			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value" />
 			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value" />
@@ -1006,8 +1014,6 @@
 		</method>
 
 		<method name="GetBoolValue" description="Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.">
-			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
-			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
 			<param name="Value" type="bool" pass="return" description="returns the value ." />
 		</method>
 
@@ -1015,6 +1021,10 @@
 			<param name="Value" type="string" pass="in" description="new value of the attribute." />
 		</method>
 		
+		<method name="SetUUIDValue" description="Sets the value of the attribute as UUID string.">
+			<param name="Value" type="string" pass="in" description="new value of the attribute. Fails if Value is not a UUID." />
+		</method>
+
 		<method name="SetIntegerValue" description="Sets the value of the attribute as integer.">
 			<param name="Value" type="int64" pass="in" description="new value of the attribute." />
 		</method>
@@ -1063,6 +1073,79 @@
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist." />			
 			<param name="AttributeInstance" type="optionalclass" class="XMLDocumentAttribute" pass="return" description="XML Document attribute." />
+		</method>
+
+		<method name="GetAttributeValue" description="Returns string value of an attribute. Fails if attribute does not exist.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeIntegerValue" description="Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="Value" type="int64" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeDoubleValue" description="Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
+			<param name="Value" type="double" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeBoolValue" description="Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="bool" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeUUIDValue" description="Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeValueDef" description="Returns string value of an attribute. Returns default value if attribute does not exist.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="string" pass="in" description="Default value." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeIntegerValueDef" description="Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="DefaultValue" type="int64" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="int64" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeDoubleValueDef" description="Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
+			<param name="DefaultValue" type="double" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="double" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeBoolValueDef" description="Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="bool" pass="in" description="Default value." />
+			<param name="Value" type="bool" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeUUIDValueDef" description="Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="string" pass="in" description="Attribute value. MUST be a valid UUID" />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
 		</method>
 
 		<method name="RemoveAttribute" description="Removes the attribute with a specific name. Does nothing if attribute does not exist.">

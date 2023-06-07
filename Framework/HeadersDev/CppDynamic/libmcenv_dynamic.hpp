@@ -1024,13 +1024,16 @@ public:
 	inline std::string GetNameSpace();
 	inline std::string GetName();
 	inline std::string GetValue();
+	inline bool IsValidUUID();
+	inline std::string GetUUIDValue();
 	inline bool IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
 	inline LibMCEnv_int64 GetIntegerValue(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
 	inline bool IsValidDouble(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline LibMCEnv_double GetDoubleValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline bool IsValidBool();
-	inline bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool GetBoolValue();
 	inline void SetValue(const std::string & sValue);
+	inline void SetUUIDValue(const std::string & sValue);
 	inline void SetIntegerValue(const LibMCEnv_int64 nValue);
 	inline void SetDoubleValue(const LibMCEnv_double dValue);
 	inline void SetBoolValue(const bool bValue);
@@ -1057,6 +1060,16 @@ public:
 	inline PXMLDocumentAttribute GetAttribute(const LibMCEnv_uint64 nIndex);
 	inline bool HasAttribute(const std::string & sNameSpace, const std::string & sName);
 	inline PXMLDocumentAttribute FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist);
+	inline std::string GetAttributeValue(const std::string & sNameSpace, const std::string & sName);
+	inline LibMCEnv_int64 GetAttributeIntegerValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
+	inline LibMCEnv_double GetAttributeDoubleValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool GetAttributeBoolValue(const std::string & sNameSpace, const std::string & sName);
+	inline std::string GetAttributeUUIDValue(const std::string & sNameSpace, const std::string & sName);
+	inline std::string GetAttributeValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue);
+	inline LibMCEnv_int64 GetAttributeIntegerValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue);
+	inline LibMCEnv_double GetAttributeDoubleValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue);
+	inline bool GetAttributeBoolValueDef(const std::string & sNameSpace, const std::string & sName, const bool bDefaultValue);
+	inline std::string GetAttributeUUIDValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue);
 	inline void RemoveAttribute(const std::string & sNameSpace, const std::string & sName);
 	inline void RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex);
 	inline void AddAttribute(const std::string & sNameSpace, const std::string & sName, const std::string & sValue);
@@ -1701,6 +1714,8 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_GetNameSpace = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetName = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_IsValidUUID = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_IsValidDouble = nullptr;
@@ -1708,6 +1723,7 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_IsValidBool = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetBoolValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetBoolValue = nullptr;
@@ -1718,6 +1734,16 @@ public:
 		pWrapperTable->m_XMLDocumentNode_GetAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_HasAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_FindAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex = nullptr;
 		pWrapperTable->m_XMLDocumentNode_AddAttribute = nullptr;
@@ -3207,6 +3233,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidUUID = (PLibMCEnvXMLDocumentAttribute_IsValidUUIDPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_isvaliduuid");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidUUID = (PLibMCEnvXMLDocumentAttribute_IsValidUUIDPtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_isvaliduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_IsValidUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue = (PLibMCEnvXMLDocumentAttribute_GetUUIDValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getuuidvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue = (PLibMCEnvXMLDocumentAttribute_GetUUIDValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getuuidvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = (PLibMCEnvXMLDocumentAttribute_IsValidIntegerPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_isvalidinteger");
 		#else // _WIN32
 		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = (PLibMCEnvXMLDocumentAttribute_IsValidIntegerPtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_isvalidinteger");
@@ -3267,6 +3311,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentAttribute_SetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue = (PLibMCEnvXMLDocumentAttribute_SetUUIDValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_setuuidvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue = (PLibMCEnvXMLDocumentAttribute_SetUUIDValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_setuuidvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3357,6 +3410,96 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentNode_FindAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValue = (PLibMCEnvXMLDocumentNode_GetAttributeValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributevalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValue = (PLibMCEnvXMLDocumentNode_GetAttributeValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributevaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributevaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5922,6 +6065,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_isvaliduuid", (void**)&(pWrapperTable->m_XMLDocumentAttribute_IsValidUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_IsValidUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getuuidvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_isvalidinteger", (void**)&(pWrapperTable->m_XMLDocumentAttribute_IsValidInteger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_IsValidInteger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5948,6 +6099,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetValue));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setuuidvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setintegervalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue));
@@ -5988,6 +6143,46 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_findattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_FindAttribute));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_FindAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributevalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeintegervalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributedoublevalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeboolvalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeuuidvalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributevaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeintegervaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributedoublevaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeboolvaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeuuidvaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removeattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveAttribute));
@@ -8767,6 +8962,33 @@ public:
 	}
 	
 	/**
+	* CXMLDocumentAttribute::IsValidUUID - Checks if the value is a valid UUID string.
+	* @return returns if the value is a valid UUID string.
+	*/
+	bool CXMLDocumentAttribute::IsValidUUID()
+	{
+		bool resultIsValid = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_IsValidUUID(m_pHandle, &resultIsValid));
+		
+		return resultIsValid;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::GetUUIDValue - Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.
+	* @return returns the value of the attribute as normalized UUID string.
+	*/
+	std::string CXMLDocumentAttribute::GetUUIDValue()
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetUUIDValue(m_pHandle, 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetUUIDValue(m_pHandle, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
 	* CXMLDocumentAttribute::IsValidInteger - Checks if the value is a valid integer in the given range.
 	* @param[in] nMinValue - Minimum allowed value
 	* @param[in] nMaxValue - Maximum allowed value
@@ -8836,14 +9058,12 @@ public:
 	
 	/**
 	* CXMLDocumentAttribute::GetBoolValue - Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
-	* @param[in] dMinValue - Minimum allowed value
-	* @param[in] dMaxValue - Maximum allowed value
 	* @return returns the value .
 	*/
-	bool CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	bool CXMLDocumentAttribute::GetBoolValue()
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetBoolValue(m_pHandle, dMinValue, dMaxValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetBoolValue(m_pHandle, &resultValue));
 		
 		return resultValue;
 	}
@@ -8855,6 +9075,15 @@ public:
 	void CXMLDocumentAttribute::SetValue(const std::string & sValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetValue(m_pHandle, sValue.c_str()));
+	}
+	
+	/**
+	* CXMLDocumentAttribute::SetUUIDValue - Sets the value of the attribute as UUID string.
+	* @param[in] sValue - new value of the attribute. Fails if Value is not a UUID.
+	*/
+	void CXMLDocumentAttribute::SetUUIDValue(const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetUUIDValue(m_pHandle, sValue.c_str()));
 	}
 	
 	/**
@@ -8985,6 +9214,171 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeValue - Returns string value of an attribute. Fails if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeValue(const std::string & sNameSpace, const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeIntegerValue - Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Attribute value.
+	*/
+	LibMCEnv_int64 CXMLDocumentNode::GetAttributeIntegerValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeIntegerValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), nMinValue, nMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeDoubleValue - Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return Attribute value.
+	*/
+	LibMCEnv_double CXMLDocumentNode::GetAttributeDoubleValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeDoubleValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), dMinValue, dMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeBoolValue - Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	bool CXMLDocumentNode::GetAttributeBoolValue(const std::string & sNameSpace, const std::string & sName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeBoolValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeUUIDValue - Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeUUIDValue(const std::string & sNameSpace, const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeValueDef - Returns string value of an attribute. Returns default value if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeIntegerValueDef - Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	LibMCEnv_int64 CXMLDocumentNode::GetAttributeIntegerValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeIntegerValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), nMinValue, nMaxValue, nDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeDoubleValueDef - Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	LibMCEnv_double CXMLDocumentNode::GetAttributeDoubleValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeDoubleValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), dMinValue, dMaxValue, dDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeBoolValueDef - Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] bDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	bool CXMLDocumentNode::GetAttributeBoolValueDef(const std::string & sNameSpace, const std::string & sName, const bool bDefaultValue)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeBoolValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), bDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeUUIDValueDef - Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Attribute value. MUST be a valid UUID
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeUUIDValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
 	}
 	
 	/**

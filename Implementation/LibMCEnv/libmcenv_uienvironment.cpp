@@ -461,7 +461,7 @@ bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
         m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
         return true;
     }
-    catch (std::exception& E) {
+    catch (std::exception) {
         return false;
     }
 }

@@ -1526,6 +1526,26 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetNamePtr) (LibMCEnv_XML
 typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
+* Checks if the value is a valid UUID string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[out] pIsValid - returns if the value is a valid UUID string.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_IsValidUUIDPtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, bool * pIsValid);
+
+/**
+* Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of returns the value of the attribute as normalized UUID string., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetUUIDValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
 * Checks if the value is a valid integer in the given range.
 *
 * @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
@@ -1582,12 +1602,10 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_IsValidBoolPtr) (LibMCEnv
 * Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
 *
 * @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
-* @param[in] dMinValue - Minimum allowed value
-* @param[in] dMaxValue - Maximum allowed value
 * @param[out] pValue - returns the value .
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, bool * pValue);
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, bool * pValue);
 
 /**
 * Sets the value of the attribute as string.
@@ -1597,6 +1615,15 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr) (LibMCEn
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_SetValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const char * pValue);
+
+/**
+* Sets the value of the attribute as UUID string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] pValue - new value of the attribute. Fails if Value is not a UUID.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_SetUUIDValuePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const char * pValue);
 
 /**
 * Sets the value of the attribute as integer.
@@ -1700,6 +1727,137 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_HasAttributePtr) (LibMCEnv_XML
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_FindAttributePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentAttribute * pAttributeInstance);
+
+/**
+* Returns string value of an attribute. Fails if attribute does not exist.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeValuePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeIntegerValuePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] dMinValue - Minimum allowed value
+* @param[in] dMaxValue - Maximum allowed value
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeDoubleValuePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+
+/**
+* Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeBoolValuePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pValue);
+
+/**
+* Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeUUIDValuePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns string value of an attribute. Returns default value if attribute does not exist.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] pDefaultValue - Default value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeValueDefPtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[in] nDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeIntegerValueDefPtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] dMinValue - Minimum allowed value
+* @param[in] dMaxValue - Maximum allowed value
+* @param[in] dDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeDoubleValueDefPtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+
+/**
+* Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] bDefaultValue - Default value.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeBoolValueDefPtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bDefaultValue, bool * pValue);
+
+/**
+* Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] pDefaultValue - Attribute value. MUST be a valid UUID
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_GetAttributeUUIDValueDefPtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Removes the attribute with a specific name. Does nothing if attribute does not exist.
@@ -4244,6 +4402,8 @@ typedef struct {
 	PLibMCEnvXMLDocumentAttribute_GetNameSpacePtr m_XMLDocumentAttribute_GetNameSpace;
 	PLibMCEnvXMLDocumentAttribute_GetNamePtr m_XMLDocumentAttribute_GetName;
 	PLibMCEnvXMLDocumentAttribute_GetValuePtr m_XMLDocumentAttribute_GetValue;
+	PLibMCEnvXMLDocumentAttribute_IsValidUUIDPtr m_XMLDocumentAttribute_IsValidUUID;
+	PLibMCEnvXMLDocumentAttribute_GetUUIDValuePtr m_XMLDocumentAttribute_GetUUIDValue;
 	PLibMCEnvXMLDocumentAttribute_IsValidIntegerPtr m_XMLDocumentAttribute_IsValidInteger;
 	PLibMCEnvXMLDocumentAttribute_GetIntegerValuePtr m_XMLDocumentAttribute_GetIntegerValue;
 	PLibMCEnvXMLDocumentAttribute_IsValidDoublePtr m_XMLDocumentAttribute_IsValidDouble;
@@ -4251,6 +4411,7 @@ typedef struct {
 	PLibMCEnvXMLDocumentAttribute_IsValidBoolPtr m_XMLDocumentAttribute_IsValidBool;
 	PLibMCEnvXMLDocumentAttribute_GetBoolValuePtr m_XMLDocumentAttribute_GetBoolValue;
 	PLibMCEnvXMLDocumentAttribute_SetValuePtr m_XMLDocumentAttribute_SetValue;
+	PLibMCEnvXMLDocumentAttribute_SetUUIDValuePtr m_XMLDocumentAttribute_SetUUIDValue;
 	PLibMCEnvXMLDocumentAttribute_SetIntegerValuePtr m_XMLDocumentAttribute_SetIntegerValue;
 	PLibMCEnvXMLDocumentAttribute_SetDoubleValuePtr m_XMLDocumentAttribute_SetDoubleValue;
 	PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr m_XMLDocumentAttribute_SetBoolValue;
@@ -4261,6 +4422,16 @@ typedef struct {
 	PLibMCEnvXMLDocumentNode_GetAttributePtr m_XMLDocumentNode_GetAttribute;
 	PLibMCEnvXMLDocumentNode_HasAttributePtr m_XMLDocumentNode_HasAttribute;
 	PLibMCEnvXMLDocumentNode_FindAttributePtr m_XMLDocumentNode_FindAttribute;
+	PLibMCEnvXMLDocumentNode_GetAttributeValuePtr m_XMLDocumentNode_GetAttributeValue;
+	PLibMCEnvXMLDocumentNode_GetAttributeIntegerValuePtr m_XMLDocumentNode_GetAttributeIntegerValue;
+	PLibMCEnvXMLDocumentNode_GetAttributeDoubleValuePtr m_XMLDocumentNode_GetAttributeDoubleValue;
+	PLibMCEnvXMLDocumentNode_GetAttributeBoolValuePtr m_XMLDocumentNode_GetAttributeBoolValue;
+	PLibMCEnvXMLDocumentNode_GetAttributeUUIDValuePtr m_XMLDocumentNode_GetAttributeUUIDValue;
+	PLibMCEnvXMLDocumentNode_GetAttributeValueDefPtr m_XMLDocumentNode_GetAttributeValueDef;
+	PLibMCEnvXMLDocumentNode_GetAttributeIntegerValueDefPtr m_XMLDocumentNode_GetAttributeIntegerValueDef;
+	PLibMCEnvXMLDocumentNode_GetAttributeDoubleValueDefPtr m_XMLDocumentNode_GetAttributeDoubleValueDef;
+	PLibMCEnvXMLDocumentNode_GetAttributeBoolValueDefPtr m_XMLDocumentNode_GetAttributeBoolValueDef;
+	PLibMCEnvXMLDocumentNode_GetAttributeUUIDValueDefPtr m_XMLDocumentNode_GetAttributeUUIDValueDef;
 	PLibMCEnvXMLDocumentNode_RemoveAttributePtr m_XMLDocumentNode_RemoveAttribute;
 	PLibMCEnvXMLDocumentNode_RemoveAttributeByIndexPtr m_XMLDocumentNode_RemoveAttributeByIndex;
 	PLibMCEnvXMLDocumentNode_AddAttributePtr m_XMLDocumentNode_AddAttribute;

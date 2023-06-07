@@ -35,9 +35,10 @@ Abstract: This is a stub class definition of CXMLDocumentNode
 #include "libmcenv_xmldocumentnodes.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_xmldocumentattribute.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 // Include custom headers here.
-
+#include "Common/common_utils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -98,6 +99,106 @@ IXMLDocumentAttribute* CXMLDocumentNode::FindAttribute(const std::string& sNameS
 
     return nullptr;
 }
+
+std::string CXMLDocumentNode::GetAttributeValue(const std::string& sNameSpace, const std::string& sName)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute (FindAttribute(sNameSpace, sName, true));
+    return pAttribute->GetValue();
+}
+
+LibMCEnv_int64 CXMLDocumentNode::GetAttributeIntegerValue(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, true));
+    return pAttribute->GetIntegerValue(nMinValue, nMaxValue);
+
+}
+
+LibMCEnv_double CXMLDocumentNode::GetAttributeDoubleValue(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, true));
+    return pAttribute->GetDoubleValue(dMinValue, dMaxValue);
+
+}
+
+bool CXMLDocumentNode::GetAttributeBoolValue(const std::string& sNameSpace, const std::string& sName)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, true));
+    return pAttribute->GetBoolValue();
+}
+
+std::string CXMLDocumentNode::GetAttributeUUIDValue(const std::string& sNameSpace, const std::string& sName)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, true));
+    return AMCCommon::CUtils::normalizeUUIDString (pAttribute->GetValue());
+
+}
+
+std::string CXMLDocumentNode::GetAttributeValueDef(const std::string& sNameSpace, const std::string& sName, const std::string& sDefaultValue)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, false));
+    if (pAttribute != nullptr)
+        return pAttribute->GetValue();
+
+    return sDefaultValue;
+
+}
+
+LibMCEnv_int64 CXMLDocumentNode::GetAttributeIntegerValueDef(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, false));
+    if (pAttribute != nullptr) {
+        if (pAttribute->IsValidInteger (nMinValue, nMaxValue))
+            return pAttribute->GetIntegerValue(nMinValue, nMaxValue);
+    }
+
+    if ((nDefaultValue >= nMinValue) && (nDefaultValue <= nMaxValue)) {
+        return nDefaultValue;
+    }
+    else
+        throw ELibMCCustomException(LIBMCENV_ERROR_INVALIDINTEGERVALUEATTRIBUTE, std::to_string(nDefaultValue));
+
+
+}
+
+LibMCEnv_double CXMLDocumentNode::GetAttributeDoubleValueDef(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, false));
+    if (pAttribute != nullptr) {
+        if (pAttribute->IsValidDouble(dMinValue, dMaxValue))
+            return pAttribute->GetDoubleValue(dMinValue, dMaxValue);
+    }
+
+    if ((dDefaultValue >= dMinValue) && (dDefaultValue <= dMaxValue)) {
+        return dDefaultValue;
+    } else
+        throw ELibMCCustomException(LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE, std::to_string (dDefaultValue));
+
+}
+
+bool CXMLDocumentNode::GetAttributeBoolValueDef(const std::string& sNameSpace, const std::string& sName, const bool bDefaultValue) 
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, false));
+    if (pAttribute != nullptr) {
+        if (pAttribute->IsValidBool())
+            return pAttribute->GetBoolValue();
+    }
+
+    return bDefaultValue;
+
+}
+
+std::string CXMLDocumentNode::GetAttributeUUIDValueDef(const std::string& sNameSpace, const std::string& sName, const std::string& sDefaultValue)
+{
+    std::unique_ptr<IXMLDocumentAttribute> pAttribute(FindAttribute(sNameSpace, sName, false));
+    if (pAttribute != nullptr) {
+        if (pAttribute->IsValidUUID())
+            return pAttribute->GetUUIDValue();
+    }
+
+    return AMCCommon::CUtils::normalizeUUIDString (sDefaultValue);
+
+}
+
 
 void CXMLDocumentNode::RemoveAttribute(const std::string& sNameSpace, const std::string& sName)
 {

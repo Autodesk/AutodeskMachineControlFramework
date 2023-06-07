@@ -1370,6 +1370,18 @@ public:
 	virtual std::string GetValue() = 0;
 
 	/**
+	* IXMLDocumentAttribute::IsValidUUID - Checks if the value is a valid UUID string.
+	* @return returns if the value is a valid UUID string.
+	*/
+	virtual bool IsValidUUID() = 0;
+
+	/**
+	* IXMLDocumentAttribute::GetUUIDValue - Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.
+	* @return returns the value of the attribute as normalized UUID string.
+	*/
+	virtual std::string GetUUIDValue() = 0;
+
+	/**
 	* IXMLDocumentAttribute::IsValidInteger - Checks if the value is a valid integer in the given range.
 	* @param[in] nMinValue - Minimum allowed value
 	* @param[in] nMaxValue - Maximum allowed value
@@ -1409,17 +1421,21 @@ public:
 
 	/**
 	* IXMLDocumentAttribute::GetBoolValue - Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
-	* @param[in] dMinValue - Minimum allowed value
-	* @param[in] dMaxValue - Maximum allowed value
 	* @return returns the value .
 	*/
-	virtual bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+	virtual bool GetBoolValue() = 0;
 
 	/**
 	* IXMLDocumentAttribute::SetValue - Sets the value of the attribute as string.
 	* @param[in] sValue - new value of the attribute.
 	*/
 	virtual void SetValue(const std::string & sValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::SetUUIDValue - Sets the value of the attribute as UUID string.
+	* @param[in] sValue - new value of the attribute. Fails if Value is not a UUID.
+	*/
+	virtual void SetUUIDValue(const std::string & sValue) = 0;
 
 	/**
 	* IXMLDocumentAttribute::SetIntegerValue - Sets the value of the attribute as integer.
@@ -1496,6 +1512,99 @@ public:
 	* @return XML Document attribute.
 	*/
 	virtual IXMLDocumentAttribute * FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeValue - Returns string value of an attribute. Fails if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeIntegerValue - Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_int64 GetAttributeIntegerValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeDoubleValue - Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_double GetAttributeDoubleValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeBoolValue - Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	virtual bool GetAttributeBoolValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeUUIDValue - Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeUUIDValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeValueDef - Returns string value of an attribute. Returns default value if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeIntegerValueDef - Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_int64 GetAttributeIntegerValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeDoubleValueDef - Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_double GetAttributeDoubleValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeBoolValueDef - Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] bDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	virtual bool GetAttributeBoolValueDef(const std::string & sNameSpace, const std::string & sName, const bool bDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeUUIDValueDef - Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Attribute value. MUST be a valid UUID
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeUUIDValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue) = 0;
 
 	/**
 	* IXMLDocumentNode::RemoveAttribute - Removes the attribute with a specific name. Does nothing if attribute does not exist.
