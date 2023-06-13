@@ -110,6 +110,8 @@ void CDriver_ScanLab_RTC6::Configure(const std::string& sConfigurationString)
     m_pDriverEnvironment->RegisterIntegerParameter("dll_version", "Scanlab DLL Version", 0);
     m_pDriverEnvironment->RegisterIntegerParameter("hex_version", "Scanlab HEX Version", 0);
     m_pDriverEnvironment->RegisterIntegerParameter("bios_version", "Scanlab BIOS Version", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("encoder_position_x", "Encoder Position X", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("encoder_position_y", "Encoder Position Y", 0);
 }
 
 std::string CDriver_ScanLab_RTC6::GetName()
@@ -607,8 +609,11 @@ void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession
         int32_t nPositionX, nPositionY, nPositionZ;
         int32_t nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ;
         int32_t nFocusShift, nMarkSpeed;
+        int32_t nEncoderPositionX, nEncoderPositionY;
 
         m_pRTCContext->GetStateValues(bLaserIsOn, nPositionX, nPositionY, nPositionZ, nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ, nFocusShift, nMarkSpeed);
+        m_pRTCContext->Get2DMarkOnTheFlyPosition(nEncoderPositionX, nEncoderPositionY);
+
         pDriverUpdateInstance->SetBoolParameter("laser_on", bLaserIsOn);
         pDriverUpdateInstance->SetIntegerParameter("position_x", nPositionX);
         pDriverUpdateInstance->SetIntegerParameter("position_y", nPositionY);
@@ -618,6 +623,8 @@ void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession
         pDriverUpdateInstance->SetIntegerParameter("position_z_corrected", nCorrectedPositionZ);
         pDriverUpdateInstance->SetIntegerParameter("focus_shift", nFocusShift);
         pDriverUpdateInstance->SetIntegerParameter("mark_speed", nMarkSpeed);
+        pDriverUpdateInstance->SetIntegerParameter("encoder_position_x", nEncoderPositionX);
+        pDriverUpdateInstance->SetIntegerParameter("encoder_position_y", nEncoderPositionY);
 
     }
 

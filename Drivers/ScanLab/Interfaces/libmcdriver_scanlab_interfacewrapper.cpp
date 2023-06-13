@@ -1757,6 +1757,108 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disabletimelagcompensat
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablemarkonthefly2d(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->EnableMarkOnTheFly2D(dScaleXInMMperEncoderStep, dScaleYInMMperEncoderStep);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablemarkonthefly2d(LibMCDriver_ScanLab_RTCContext pRTCContext)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->DisableMarkOnTheFly2D();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_markonthefly2disenabled(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pIsEnabled == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pIsEnabled = pIRTCContext->MarkOnTheFly2DIsEnabled();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 * pPositionX, LibMCDriver_ScanLab_int32 * pPositionY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (!pPositionX)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pPositionY)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->Get2DMarkOnTheFlyPosition(*pPositionX, *pPositionY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for RTCSelector
@@ -3551,6 +3653,14 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enabletimelagcompensation;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disabletimelagcompensation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disabletimelagcompensation;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_enablemarkonthefly2d") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enablemarkonthefly2d;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_disablemarkonthefly2d") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disablemarkonthefly2d;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_markonthefly2disenabled") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_markonthefly2disenabled;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcards") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_searchcards;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcardsbyrange") 

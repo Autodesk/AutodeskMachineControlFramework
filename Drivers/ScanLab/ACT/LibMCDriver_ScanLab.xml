@@ -104,6 +104,10 @@
 		<error name="OIEPIDVARIABLEOUTOFBOUNDS" code="1052" description="OIE PID Variable out of bounds." />		
 		<error name="TIMELAGMUSTBEAMULTIPLEOF10" code="1053" description="Timelag must be a multiple of 10 microseconds." />		
 		
+		<error name="INVALIDENCODERSCALINGINX" code="1054" description="Invalid Encoder Scaling in X" />		
+		<error name="INVALIDENCODERSCALINGINY" code="1055" description="Invalid Encoder Scaling in Y" />		
+		
+		
 						
 	</errors>
 
@@ -496,6 +500,23 @@ Custom implementation
 		</method>
 
 		<method name="DisableTimelagCompensation" description="Disables timelag compensation.">
+		</method>
+		
+		<method name="EnableMarkOnTheFly2D" description="Enables mark on the fly 2D. This is a list command.">
+			<param name="ScaleXInMMperEncoderStep" type="double" pass="in" description="Scale factor X in mm per encoder step" />
+			<param name="ScaleYInMMperEncoderStep" type="double" pass="in" description="Scale factor Y in mm per encoder step" />
+		</method>
+		
+		<method name="DisableMarkOnTheFly2D" description="Disable mark on the fly 2D. This is a list command.">
+		</method>
+
+		<method name="MarkOnTheFly2DIsEnabled" description="Returns if mark on the fly 2D has been enabled.">
+			<param name="IsEnabled" type="bool" pass="return" description="Returns true if mark on the fly 2D is enabled." />
+		</method>
+
+		<method name="Get2DMarkOnTheFlyPosition" description="Returns 2D mark on the fly position.">
+			<param name="PositionX" type="int32" pass="out" description="Mark on the fly position X" />
+			<param name="PositionY" type="int32" pass="out" description="Mark on the fly position Y" />
 		</method>
 		
 	</class>

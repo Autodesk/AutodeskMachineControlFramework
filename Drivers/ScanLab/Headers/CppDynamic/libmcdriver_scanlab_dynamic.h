@@ -691,6 +691,43 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableTimelag
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableTimelagCompensationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
+/**
+* Enables mark on the fly 2D. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dScaleXInMMperEncoderStep - Scale factor X in mm per encoder step
+* @param[in] dScaleYInMMperEncoderStep - Scale factor Y in mm per encoder step
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableMarkOnTheFly2DPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep);
+
+/**
+* Disable mark on the fly 2D. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableMarkOnTheFly2DPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns if mark on the fly 2D has been enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pIsEnabled - Returns true if mark on the fly 2D is enabled.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2DIsEnabledPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled);
+
+/**
+* Returns 2D mark on the fly position.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pPositionX - Mark on the fly position X
+* @param[out] pPositionY - Mark on the fly position Y
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 * pPositionX, LibMCDriver_ScanLab_int32 * pPositionY);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -1466,6 +1503,10 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_ExecuteListWithRecordingPtr m_RTCContext_ExecuteListWithRecording;
 	PLibMCDriver_ScanLabRTCContext_EnableTimelagCompensationPtr m_RTCContext_EnableTimelagCompensation;
 	PLibMCDriver_ScanLabRTCContext_DisableTimelagCompensationPtr m_RTCContext_DisableTimelagCompensation;
+	PLibMCDriver_ScanLabRTCContext_EnableMarkOnTheFly2DPtr m_RTCContext_EnableMarkOnTheFly2D;
+	PLibMCDriver_ScanLabRTCContext_DisableMarkOnTheFly2DPtr m_RTCContext_DisableMarkOnTheFly2D;
+	PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2DIsEnabledPtr m_RTCContext_MarkOnTheFly2DIsEnabled;
+	PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr m_RTCContext_Get2DMarkOnTheFlyPosition;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;

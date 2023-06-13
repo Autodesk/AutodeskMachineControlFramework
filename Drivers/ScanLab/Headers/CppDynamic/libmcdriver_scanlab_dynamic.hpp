@@ -244,6 +244,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "DUPLICATECONFIGURATIONPRESETNAME";
 			case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIEPIDVARIABLEOUTOFBOUNDS";
 			case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "TIMELAGMUSTBEAMULTIPLEOF10";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "INVALIDENCODERSCALINGINX";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "INVALIDENCODERSCALINGINY";
 		}
 		return "UNKNOWN";
 	}
@@ -314,6 +316,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
 			case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIE PID Variable out of bounds.";
 			case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "Invalid Encoder Scaling in X";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "Invalid Encoder Scaling in Y";
 		}
 		return "unknown error";
 	}
@@ -593,6 +597,10 @@ public:
 	inline void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
 	inline void DisableTimelagCompensation();
+	inline void EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep);
+	inline void DisableMarkOnTheFly2D();
+	inline bool MarkOnTheFly2DIsEnabled();
+	inline void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY);
 };
 	
 /*************************************************************************************************************************
@@ -900,6 +908,10 @@ public:
 		pWrapperTable->m_RTCContext_ExecuteListWithRecording = nullptr;
 		pWrapperTable->m_RTCContext_EnableTimelagCompensation = nullptr;
 		pWrapperTable->m_RTCContext_DisableTimelagCompensation = nullptr;
+		pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D = nullptr;
+		pWrapperTable->m_RTCContext_DisableMarkOnTheFly2D = nullptr;
+		pWrapperTable->m_RTCContext_MarkOnTheFly2DIsEnabled = nullptr;
+		pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1562,6 +1574,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_DisableTimelagCompensation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D = (PLibMCDriver_ScanLabRTCContext_EnableMarkOnTheFly2DPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablemarkonthefly2d");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D = (PLibMCDriver_ScanLabRTCContext_EnableMarkOnTheFly2DPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablemarkonthefly2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableMarkOnTheFly2D = (PLibMCDriver_ScanLabRTCContext_DisableMarkOnTheFly2DPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablemarkonthefly2d");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableMarkOnTheFly2D = (PLibMCDriver_ScanLabRTCContext_DisableMarkOnTheFly2DPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablemarkonthefly2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableMarkOnTheFly2D == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_MarkOnTheFly2DIsEnabled = (PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2DIsEnabledPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_markonthefly2disenabled");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_MarkOnTheFly2DIsEnabled = (PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2DIsEnabledPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_markonthefly2disenabled");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_MarkOnTheFly2DIsEnabled == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition = (PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition = (PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2407,6 +2455,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disabletimelagcompensation", (void**)&(pWrapperTable->m_RTCContext_DisableTimelagCompensation));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableTimelagCompensation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablemarkonthefly2d", (void**)&(pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablemarkonthefly2d", (void**)&(pWrapperTable->m_RTCContext_DisableMarkOnTheFly2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableMarkOnTheFly2D == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_markonthefly2disenabled", (void**)&(pWrapperTable->m_RTCContext_MarkOnTheFly2DIsEnabled));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_MarkOnTheFly2DIsEnabled == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition", (void**)&(pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -3342,6 +3406,46 @@ public:
 	void CRTCContext::DisableTimelagCompensation()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableTimelagCompensation(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::EnableMarkOnTheFly2D - Enables mark on the fly 2D. This is a list command.
+	* @param[in] dScaleXInMMperEncoderStep - Scale factor X in mm per encoder step
+	* @param[in] dScaleYInMMperEncoderStep - Scale factor Y in mm per encoder step
+	*/
+	void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableMarkOnTheFly2D(m_pHandle, dScaleXInMMperEncoderStep, dScaleYInMMperEncoderStep));
+	}
+	
+	/**
+	* CRTCContext::DisableMarkOnTheFly2D - Disable mark on the fly 2D. This is a list command.
+	*/
+	void CRTCContext::DisableMarkOnTheFly2D()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableMarkOnTheFly2D(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::MarkOnTheFly2DIsEnabled - Returns if mark on the fly 2D has been enabled.
+	* @return Returns true if mark on the fly 2D is enabled.
+	*/
+	bool CRTCContext::MarkOnTheFly2DIsEnabled()
+	{
+		bool resultIsEnabled = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_MarkOnTheFly2DIsEnabled(m_pHandle, &resultIsEnabled));
+		
+		return resultIsEnabled;
+	}
+	
+	/**
+	* CRTCContext::Get2DMarkOnTheFlyPosition - Returns 2D mark on the fly position.
+	* @param[out] nPositionX - Mark on the fly position X
+	* @param[out] nPositionY - Mark on the fly position Y
+	*/
+	void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_Get2DMarkOnTheFlyPosition(m_pHandle, &nPositionX, &nPositionY));
 	}
 	
 	/**

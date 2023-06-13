@@ -222,6 +222,12 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_upload_transform = (PScanLabPtr_n_upload_transform)_loadScanLabAddress(hLibrary, "n_upload_transform");
 	this->n_set_timelag_compensation = (PScanLabPtr_n_set_timelag_compensation)_loadScanLabAddress(hLibrary, "n_set_timelag_compensation");
 
+	this->n_init_fly_2d = (PScanLabPtr_n_init_fly_2d)_loadScanLabAddress(hLibrary, "n_init_fly_2d");
+	this->n_activate_fly_2d = (PScanLabPtr_n_activate_fly_2d)_loadScanLabAddress(hLibrary, "n_activate_fly_2d");
+	this->n_activate_fly_2d_encoder = (PScanLabPtr_n_activate_fly_2d_encoder)_loadScanLabAddress(hLibrary, "n_activate_fly_2d_encoder");
+	this->n_set_fly_2d = (PScanLabPtr_n_set_fly_2d)_loadScanLabAddress(hLibrary, "n_set_fly_2d");
+	this->n_get_fly_2d_offset = (PScanLabPtr_n_get_fly_2d_offset)_loadScanLabAddress(hLibrary, "n_get_fly_2d_offset");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -393,6 +399,12 @@ void CScanLabSDK::resetFunctionPtrs()
 	transform = nullptr;
 	n_upload_transform = nullptr;
 	n_set_timelag_compensation = nullptr;
+
+	n_init_fly_2d = nullptr;
+	n_activate_fly_2d = nullptr;
+	n_set_fly_2d = nullptr;
+	n_activate_fly_2d_encoder = nullptr;
+	n_get_fly_2d_offset = nullptr;
 
 }
 

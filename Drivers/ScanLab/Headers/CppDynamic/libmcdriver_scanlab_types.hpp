@@ -158,6 +158,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME 1051 /** Duplicate configuration preset name. */
 #define LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS 1052 /** OIE PID Variable out of bounds. */
 #define LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10 1053 /** Timelag must be a multiple of 10 microseconds. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX 1054 /** Invalid Encoder Scaling in X */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY 1055 /** Invalid Encoder Scaling in Y */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -228,6 +230,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
     case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIE PID Variable out of bounds.";
     case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "Invalid Encoder Scaling in X";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "Invalid Encoder Scaling in Y";
     default: return "unknown error";
   }
 }

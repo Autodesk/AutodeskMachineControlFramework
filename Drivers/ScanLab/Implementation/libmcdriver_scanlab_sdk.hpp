@@ -179,7 +179,11 @@ namespace LibMCDriver_ScanLab {
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_timelag_compensation) (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nTimelagXY, uint32_t nTimelagZ);
 		
-
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_init_fly_2d) (uint32_t nCardNo, int32_t nOffsetX, int32_t nOffsetY, uint32_t nNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_activate_fly_2d) (uint32_t nCardNo, const double ScaleX, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_activate_fly_2d_encoder) (uint32_t nCardNo, const double ScaleX, const double ScaleY, int32_t nEncoderOffsetX, int32_t nEncoderOffsetY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_2d) (uint32_t nCardNo, const double ScaleX, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_fly_2d_offset) (uint32_t nCardNo, const int32_t * pOffsetX, const int32_t* pOffsetY);
 
 
 		class CScanLabSDK {
@@ -305,6 +309,12 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_transform transform = nullptr;
 			PScanLabPtr_n_upload_transform n_upload_transform = nullptr;
 			PScanLabPtr_n_set_timelag_compensation n_set_timelag_compensation = nullptr;
+
+			PScanLabPtr_n_init_fly_2d n_init_fly_2d = nullptr;
+			PScanLabPtr_n_activate_fly_2d n_activate_fly_2d = nullptr;
+			PScanLabPtr_n_activate_fly_2d_encoder n_activate_fly_2d_encoder = nullptr;
+			PScanLabPtr_n_set_fly_2d n_set_fly_2d = nullptr;
+			PScanLabPtr_n_get_fly_2d_offset n_get_fly_2d_offset = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

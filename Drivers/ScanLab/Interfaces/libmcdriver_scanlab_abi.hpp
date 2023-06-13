@@ -704,6 +704,43 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disabletimelagcompensation(LibMCDriver_ScanLab_RTCContext pRTCContext);
 
+/**
+* Enables mark on the fly 2D. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dScaleXInMMperEncoderStep - Scale factor X in mm per encoder step
+* @param[in] dScaleYInMMperEncoderStep - Scale factor Y in mm per encoder step
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablemarkonthefly2d(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep);
+
+/**
+* Disable mark on the fly 2D. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablemarkonthefly2d(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns if mark on the fly 2D has been enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pIsEnabled - Returns true if mark on the fly 2D is enabled.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_markonthefly2disenabled(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled);
+
+/**
+* Returns 2D mark on the fly position.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pPositionX - Mark on the fly position X
+* @param[out] pPositionY - Mark on the fly position Y
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 * pPositionX, LibMCDriver_ScanLab_int32 * pPositionY);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/

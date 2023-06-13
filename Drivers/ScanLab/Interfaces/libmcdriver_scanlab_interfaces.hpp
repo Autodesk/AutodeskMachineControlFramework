@@ -857,6 +857,31 @@ public:
 	*/
 	virtual void DisableTimelagCompensation() = 0;
 
+	/**
+	* IRTCContext::EnableMarkOnTheFly2D - Enables mark on the fly 2D. This is a list command.
+	* @param[in] dScaleXInMMperEncoderStep - Scale factor X in mm per encoder step
+	* @param[in] dScaleYInMMperEncoderStep - Scale factor Y in mm per encoder step
+	*/
+	virtual void EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep) = 0;
+
+	/**
+	* IRTCContext::DisableMarkOnTheFly2D - Disable mark on the fly 2D. This is a list command.
+	*/
+	virtual void DisableMarkOnTheFly2D() = 0;
+
+	/**
+	* IRTCContext::MarkOnTheFly2DIsEnabled - Returns if mark on the fly 2D has been enabled.
+	* @return Returns true if mark on the fly 2D is enabled.
+	*/
+	virtual bool MarkOnTheFly2DIsEnabled() = 0;
+
+	/**
+	* IRTCContext::Get2DMarkOnTheFlyPosition - Returns 2D mark on the fly position.
+	* @param[out] nPositionX - Mark on the fly position X
+	* @param[out] nPositionY - Mark on the fly position Y
+	*/
+	virtual void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY) = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;

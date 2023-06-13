@@ -44,6 +44,8 @@ protected:
 	bool m_bIsNetwork;
 	std::vector<uint32_t> m_MCBSPSignalChannels;
 
+	bool m_b2DMarkOnTheFlyEnabled;
+
 	std::string m_sIPAddress;
 	std::string m_sNetmask;
 	uint32_t m_nLaserIndex;
@@ -185,6 +187,14 @@ public:
 	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
 
 	void DisableTimelagCompensation() override;
+
+	void EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderSteps, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderSteps) override;
+
+	void DisableMarkOnTheFly2D() override;
+	
+	bool MarkOnTheFly2DIsEnabled() override; 	
+
+	void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPositionX, LibMCDriver_ScanLab_int32& nPositionY) override;
 
 };
 

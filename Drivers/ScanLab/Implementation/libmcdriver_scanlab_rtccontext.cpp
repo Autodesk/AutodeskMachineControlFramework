@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <iomanip>
 #include <string>
+
 using namespace LibMCDriver_ScanLab::Impl;
 
 /*************************************************************************************************************************
@@ -58,7 +59,8 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 	m_pDriverEnvironment (pDriverEnvironment),
 	m_OIEOperationMode (LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized),
 	m_bIsNetwork (bIsNetwork),
-	m_nCurrentFreeVariable0 (0)
+	m_nCurrentFreeVariable0 (0),
+	m_b2DMarkOnTheFlyEnabled (false)
 {
 	if (pScanLabSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -1096,4 +1098,56 @@ void CRTCContext::DisableTimelagCompensation()
 	m_pScanLabSDK->n_set_timelag_compensation(m_CardNo, 1, 0, 0);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
+}
+
+void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	double dBitsPerMM = m_dCorrectionFactor;
+
+	double dScaleXInBitsPerEncoderStep = dScaleXInMMperEncoderStep * dBitsPerMM;
+	double dScaleYInBitsPerEncoderStep = dScaleYInMMperEncoderStep * dBitsPerMM;
+
+	double dAbsScaleX = abs(dScaleXInBitsPerEncoderStep);
+	double dAbsScaleY = abs(dScaleYInBitsPerEncoderStep);
+	if ((dAbsScaleX < (1.0 / 256.0)) || (dAbsScaleX > 16000.0))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX);
+	if ((dAbsScaleY < (1.0 / 256.0)) || (dAbsScaleY > 16000.0))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY);
+
+	m_pScanLabSDK->n_activate_fly_2d_encoder(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep, 0,0 );
+
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	m_b2DMarkOnTheFlyEnabled = true;
+
+}
+
+void CRTCContext::DisableMarkOnTheFly2D()
+{
+	m_b2DMarkOnTheFlyEnabled = false;
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
+
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+
+bool CRTCContext::MarkOnTheFly2DIsEnabled()
+{
+	return m_b2DMarkOnTheFlyEnabled;
+}
+
+void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPositionX, LibMCDriver_ScanLab_int32& nPositionY)
+{
+	nPositionX = 0;
+	nPositionY = 0;
+	if (m_b2DMarkOnTheFlyEnabled) {
+		m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+		m_pScanLabSDK->n_get_fly_2d_offset(m_CardNo, &nPositionX, &nPositionY);
+
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		
+	}
 }

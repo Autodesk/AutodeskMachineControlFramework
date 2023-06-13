@@ -116,6 +116,8 @@ void CDriver_ScanLab_RTC6xN::Configure(const std::string& sConfigurationString)
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "focus_shift", "current Focus Shift", 0);
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "mark_speed", "current Mark Speed", 0);
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "list_position", "current List Position", 0);
+		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "encoder_position_x", "Encoder Position X", 0);
+		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "encoder_position_y", "Encoder Position Y", 0);
 		m_pDriverEnvironment->RegisterBoolParameter(sPrefix + "card_busy", "Card is busy", false);
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "rtc_version", "Scanlab RTC Version", 0);
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "card_type", "Scanlab RTC Type", 0);
@@ -696,8 +698,11 @@ void CDriver_ScanLab_RTC6xN::updateCardStatus(LibMCEnv::PDriverStatusUpdateSessi
 				int32_t nPositionX, nPositionY, nPositionZ;
 				int32_t nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ;
 				int32_t nFocusShift, nMarkSpeed;
+				int32_t nEncoderPositionX, nEncoderPositionY;
 
 				pRTCContext->GetStateValues(bLaserIsOn, nPositionX, nPositionY, nPositionZ, nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ, nFocusShift, nMarkSpeed);
+				pRTCContext->Get2DMarkOnTheFlyPosition(nEncoderPositionX, nEncoderPositionY);
+
 				pDriverUpdateInstance->SetBoolParameter(sPrefix + "laser_on", bLaserIsOn);
 				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "position_x", nPositionX);
 				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "position_y", nPositionY);
@@ -707,6 +712,9 @@ void CDriver_ScanLab_RTC6xN::updateCardStatus(LibMCEnv::PDriverStatusUpdateSessi
 				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "position_z_corrected", nCorrectedPositionZ);
 				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "focus_shift", nFocusShift);
 				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "mark_speed", nMarkSpeed);
+				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "encoder_position_x", nEncoderPositionX);
+				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "encoder_position_y", nEncoderPositionY);
+
 			}
 
 		}
