@@ -144,9 +144,9 @@ namespace AMC {
 			}
 		}
 
-		uint32_t nCustomDataCount = pToolpath->GetCustomDataCount();
+		uint32_t nCustomDataCount = p3MFLayer->GetCustomDataCount();
 		for (uint32_t nCustomDataIndex = 0; nCustomDataIndex < nCustomDataCount; nCustomDataIndex++) {
-			auto pCustomData = pToolpath->GetCustomData(nCustomDataIndex);
+			auto pCustomData = p3MFLayer->GetCustomData(nCustomDataIndex);
 			std::string sNameSpace = pCustomData->GetNameSpace();
 			std::string sRootName = pCustomData->GetRootNode()->GetName();
 			auto sXMLString = pCustomData->SaveToString();
