@@ -1115,8 +1115,8 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 	if ((dAbsScaleY < (1.0 / 256.0)) || (dAbsScaleY > 16000.0))
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY);
 
-	m_pScanLabSDK->n_activate_fly_2d_encoder(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep, 0,0 );
-
+	
+	m_pScanLabSDK->n_activate_fly_2d_encoder(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep, 0, 0);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_b2DMarkOnTheFlyEnabled = true;
@@ -1125,6 +1125,7 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 
 void CRTCContext::DisableMarkOnTheFly2D()
 {
+	
 	m_b2DMarkOnTheFlyEnabled = false;
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
@@ -1144,10 +1145,27 @@ void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPosition
 	nPositionX = 0;
 	nPositionY = 0;
 	if (m_b2DMarkOnTheFlyEnabled) {
+
 		m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-		m_pScanLabSDK->n_get_fly_2d_offset(m_CardNo, &nPositionX, &nPositionY);
+		m_pScanLabSDK->n_get_encoder(m_CardNo, &nPositionX, &nPositionY);
+
+		
+
 
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
-		
+
+		/*uint32_t nMarkingInfo = m_pScanLabSDK->n_get_marking_info(m_CardNo);
+
+		std::cout << "n_get_marking_info: " << nMarkingInfo << std::endl;
+
+		int32_t nRawEncoderX = m_pScanLabSDK->n_get_value(m_CardNo, 43);
+		int32_t nRawEncoderY = m_pScanLabSDK->n_get_value(m_CardNo, 44);
+
+		int32_t nScaledEncoderX = m_pScanLabSDK->n_get_value(m_CardNo, 55);
+		int32_t nScaledEncoderY = m_pScanLabSDK->n_get_value(m_CardNo, 56);
+
+		std::cout << "raw encoder: " << nRawEncoderX << "/" << nRawEncoderY << std::endl;
+		std::cout << "scaled encoder: " << nScaledEncoderX << "/" << nScaledEncoderY << std::endl; */
+
 	}
 }

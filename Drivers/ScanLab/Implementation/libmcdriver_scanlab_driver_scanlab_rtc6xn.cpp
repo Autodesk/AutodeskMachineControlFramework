@@ -496,9 +496,7 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 
 				act_managed_ptr<IRTCContext> pRTCContext;
 
-				if ((nLaserIndex >= 1) && (nLaserIndex < m_nScannerCount)) {
-					pRTCContext = getRTCContextForLaserIndex((uint32_t) nLaserIndex, false);
-				}
+				pRTCContext = getRTCContextForLaserIndex((uint32_t) nLaserIndex, false);
 
 				if (pRTCContext.get() == nullptr) {
 					if (bFailIfNonAssignedDataExists)

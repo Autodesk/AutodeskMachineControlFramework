@@ -227,6 +227,12 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_activate_fly_2d_encoder = (PScanLabPtr_n_activate_fly_2d_encoder)_loadScanLabAddress(hLibrary, "n_activate_fly_2d_encoder");
 	this->n_set_fly_2d = (PScanLabPtr_n_set_fly_2d)_loadScanLabAddress(hLibrary, "n_set_fly_2d");
 	this->n_get_fly_2d_offset = (PScanLabPtr_n_get_fly_2d_offset)_loadScanLabAddress(hLibrary, "n_get_fly_2d_offset");
+	this->n_set_fly_x_pos = (PScanLabPtr_n_set_fly_x_pos)_loadScanLabAddress(hLibrary, "n_set_fly_x_pos");
+	this->n_set_fly_y_pos = (PScanLabPtr_n_set_fly_y_pos)_loadScanLabAddress(hLibrary, "n_set_fly_y_pos");
+	this->n_set_fly_x = (PScanLabPtr_n_set_fly_x)_loadScanLabAddress(hLibrary, "n_set_fly_x");
+	this->n_set_fly_y = (PScanLabPtr_n_set_fly_y)_loadScanLabAddress(hLibrary, "n_set_fly_y");	
+	this->n_get_encoder = (PScanLabPtr_n_get_encoder)_loadScanLabAddress(hLibrary, "n_get_encoder");
+	this->n_get_marking_info = (PScanLabPtr_n_get_marking_info)_loadScanLabAddress(hLibrary, "n_get_marking_info");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -405,6 +411,14 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_set_fly_2d = nullptr;
 	n_activate_fly_2d_encoder = nullptr;
 	n_get_fly_2d_offset = nullptr;
+
+	n_set_fly_x_pos = nullptr;
+	n_set_fly_y_pos = nullptr;
+	n_set_fly_x = nullptr;
+	n_set_fly_y = nullptr;
+	n_get_encoder = nullptr;
+
+	n_get_marking_info = nullptr;
 
 }
 

@@ -184,6 +184,12 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_activate_fly_2d_encoder) (uint32_t nCardNo, const double ScaleX, const double ScaleY, int32_t nEncoderOffsetX, int32_t nEncoderOffsetY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_2d) (uint32_t nCardNo, const double ScaleX, const double ScaleY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_fly_2d_offset) (uint32_t nCardNo, const int32_t * pOffsetX, const int32_t* pOffsetY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_x_pos) (uint32_t nCardNo, const double ScaleX);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y_pos) (uint32_t nCardNo, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_x) (uint32_t nCardNo, const double ScaleX);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y) (uint32_t nCardNo, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_encoder) (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_marking_info) (uint32_t nCardNo);
 
 
 		class CScanLabSDK {
@@ -315,6 +321,12 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_activate_fly_2d_encoder n_activate_fly_2d_encoder = nullptr;
 			PScanLabPtr_n_set_fly_2d n_set_fly_2d = nullptr;
 			PScanLabPtr_n_get_fly_2d_offset n_get_fly_2d_offset = nullptr;
+			PScanLabPtr_n_set_fly_x_pos n_set_fly_x_pos = nullptr;
+			PScanLabPtr_n_set_fly_y_pos n_set_fly_y_pos = nullptr;
+			PScanLabPtr_n_set_fly_x n_set_fly_x = nullptr;
+			PScanLabPtr_n_set_fly_y n_set_fly_y = nullptr;
+			PScanLabPtr_n_get_encoder n_get_encoder = nullptr;
+			PScanLabPtr_n_get_marking_info n_get_marking_info = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();
