@@ -488,3 +488,7 @@ IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_ui
 	return new CDiscreteFieldData2D(pInstance);
 }
 
+IJournalVariable* CStateEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}

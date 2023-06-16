@@ -3326,6 +3326,132 @@ typedef LibMCEnvResult (*PLibMCEnvSignalHandler_SetIntegerResultPtr) (LibMCEnv_S
 typedef LibMCEnvResult (*PLibMCEnvSignalHandler_SetBoolResultPtr) (LibMCEnv_SignalHandler pSignalHandler, const char * pName, bool bValue);
 
 /*************************************************************************************************************************
+ Class definition for UniformJournalSampling
+**************************************************************************************************************************/
+
+/**
+* returns the name of the recorded variable.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Path or name., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetVariableNamePtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the number of samples in the interval.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[out] pNumberOfSamples - Number of samples in the sampling.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetNumberOfSamplesPtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint32 * pNumberOfSamples);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[out] pStartTimeStampInMS - Start Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetStartTimeStampPtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pStartTimeStampInMS);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[out] pEndTimeStampInMS - End Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetEndTimeStampPtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pEndTimeStampInMS);
+
+/**
+* Returns the timestamp and value of the given sample.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
+* @param[out] pTimeStamp - TimeStamp of the sample in ms.
+* @param[out] pValue - Value of the sample in ms.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetSamplePtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint32 nIndex, LibMCEnv_uint64 * pTimeStamp, LibMCEnv_double * pValue);
+
+/**
+* Returns all timestamps and values of the sampling.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nTimeStampsBufferSize - Number of elements in buffer
+* @param[out] pTimeStampsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTimeStampsBuffer - uint64  buffer of Array of TimeStamps in ms, in increasing order.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - double  buffer of Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer);
+
+/*************************************************************************************************************************
+ Class definition for JournalVariable
+**************************************************************************************************************************/
+
+/**
+* returns the name of the recorded variable.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Path or name., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetVariableNamePtr) (LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[out] pRecordingStartInMS - Start Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetStartTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMS);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[out] pRecordingEndInMS - End Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetEndTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMS);
+
+/**
+* Calculates the average value over a time interval. Fails if no data is available in this time interval.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+* @param[out] pAverageValue - Average value of the variable.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeAveragePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, bool bClampInterval, LibMCEnv_double * pAverageValue);
+
+/**
+* Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
+* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+* @param[out] pJournalSampling - Returns an instance with the sampling results.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
+
+/*************************************************************************************************************************
  Class definition for StateEnvironment
 **************************************************************************************************************************/
 
@@ -3750,6 +3876,17 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ParseXMLStringPtr) (LibMCEnv_
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ParseXMLDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* Retrieves the history of a given variable in the system journal.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
+* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+* @param[out] pJournalVariable - Journal Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
 
 /*************************************************************************************************************************
  Class definition for UIEnvironment
@@ -4570,6 +4707,17 @@ typedef struct {
 	PLibMCEnvSignalHandler_SetDoubleResultPtr m_SignalHandler_SetDoubleResult;
 	PLibMCEnvSignalHandler_SetIntegerResultPtr m_SignalHandler_SetIntegerResult;
 	PLibMCEnvSignalHandler_SetBoolResultPtr m_SignalHandler_SetBoolResult;
+	PLibMCEnvUniformJournalSampling_GetVariableNamePtr m_UniformJournalSampling_GetVariableName;
+	PLibMCEnvUniformJournalSampling_GetNumberOfSamplesPtr m_UniformJournalSampling_GetNumberOfSamples;
+	PLibMCEnvUniformJournalSampling_GetStartTimeStampPtr m_UniformJournalSampling_GetStartTimeStamp;
+	PLibMCEnvUniformJournalSampling_GetEndTimeStampPtr m_UniformJournalSampling_GetEndTimeStamp;
+	PLibMCEnvUniformJournalSampling_GetSamplePtr m_UniformJournalSampling_GetSample;
+	PLibMCEnvUniformJournalSampling_GetAllSamplesPtr m_UniformJournalSampling_GetAllSamples;
+	PLibMCEnvJournalVariable_GetVariableNamePtr m_JournalVariable_GetVariableName;
+	PLibMCEnvJournalVariable_GetStartTimeStampPtr m_JournalVariable_GetStartTimeStamp;
+	PLibMCEnvJournalVariable_GetEndTimeStampPtr m_JournalVariable_GetEndTimeStamp;
+	PLibMCEnvJournalVariable_ComputeAveragePtr m_JournalVariable_ComputeAverage;
+	PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr m_JournalVariable_ComputeUniformAverageSamples;
 	PLibMCEnvStateEnvironment_GetMachineStatePtr m_StateEnvironment_GetMachineState;
 	PLibMCEnvStateEnvironment_PrepareSignalPtr m_StateEnvironment_PrepareSignal;
 	PLibMCEnvStateEnvironment_WaitForSignalPtr m_StateEnvironment_WaitForSignal;
@@ -4609,6 +4757,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateXMLDocumentPtr m_StateEnvironment_CreateXMLDocument;
 	PLibMCEnvStateEnvironment_ParseXMLStringPtr m_StateEnvironment_ParseXMLString;
 	PLibMCEnvStateEnvironment_ParseXMLDataPtr m_StateEnvironment_ParseXMLData;
+	PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr m_StateEnvironment_RetrieveJournalVariable;
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;

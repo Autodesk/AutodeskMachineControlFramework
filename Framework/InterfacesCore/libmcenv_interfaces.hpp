@@ -80,6 +80,8 @@ class IDriverStatusUpdateSession;
 class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
+class IUniformJournalSampling;
+class IJournalVariable;
 class IStateEnvironment;
 class IUIEnvironment;
 
@@ -2707,6 +2709,109 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for UniformJournalSampling 
+**************************************************************************************************************************/
+
+class IUniformJournalSampling : public virtual IBase {
+public:
+	/**
+	* IUniformJournalSampling::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	virtual std::string GetVariableName() = 0;
+
+	/**
+	* IUniformJournalSampling::GetNumberOfSamples - Returns the number of samples in the interval.
+	* @return Number of samples in the sampling.
+	*/
+	virtual LibMCEnv_uint32 GetNumberOfSamples() = 0;
+
+	/**
+	* IUniformJournalSampling::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in ms.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
+
+	/**
+	* IUniformJournalSampling::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in ms.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
+
+	/**
+	* IUniformJournalSampling::GetSample - Returns the timestamp and value of the given sample.
+	* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
+	* @param[out] nTimeStamp - TimeStamp of the sample in ms.
+	* @param[out] dValue - Value of the sample in ms.
+	*/
+	virtual void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue) = 0;
+
+	/**
+	* IUniformJournalSampling::GetAllSamples - Returns all timestamps and values of the sampling.
+	* @param[in] nTimeStampsBufferSize - Number of elements in buffer
+	* @param[out] pTimeStampsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTimeStampsBuffer - uint64 buffer of Array of TimeStamps in ms, in increasing order.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - double buffer of Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+	*/
+	virtual void GetAllSamples(LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUniformJournalSampling> PIUniformJournalSampling;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalVariable 
+**************************************************************************************************************************/
+
+class IJournalVariable : public virtual IBase {
+public:
+	/**
+	* IJournalVariable::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	virtual std::string GetVariableName() = 0;
+
+	/**
+	* IJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in ms.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
+
+	/**
+	* IJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in ms.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
+
+	/**
+	* IJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
+	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Average value of the variable.
+	*/
+	virtual LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval) = 0;
+
+	/**
+	* IJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
+	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Returns an instance with the sampling results.
+	*/
+	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalVariable> PIJournalVariable;
+
+
+/*************************************************************************************************************************
  Class interface for StateEnvironment 
 **************************************************************************************************************************/
 
@@ -3006,6 +3111,14 @@ public:
 	* @return XML Document Instance.
 	*/
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
+
+	/**
+	* IStateEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @return Journal Instance.
+	*/
+	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
 
 };
 

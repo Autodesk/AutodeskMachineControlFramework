@@ -1889,6 +1889,69 @@
 
 	</class>
 
+	<class name="UniformJournalSampling" parent="Base" description="Result class for Journal Sampling">
+
+		<method name="GetVariableName" description="returns the name of the recorded variable.">
+			<param name="Name" type="string" pass="return" description="Path or name." />
+		</method>
+
+		<method name="GetNumberOfSamples" description="Returns the number of samples in the interval.">
+			<param name="NumberOfSamples" type="uint32" pass="return" description="Number of samples in the sampling." />
+		</method>
+
+		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="StartTimeStampInMS" type="uint64" pass="return" description="Start Timestamp of Recording in ms." />
+		</method>
+	
+		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="EndTimeStampInMS" type="uint64" pass="return" description="End Timestamp of Recording in ms." />
+		</method>
+
+		<method name="GetSample" description="Returns the timestamp and value of the given sample.">
+			<param name="Index" type="uint32" pass="in" description="Index of the sample. 0-based. MUST be smaller than NumberOfSamples." />
+			<param name="TimeStamp" type="uint64" pass="out" description="TimeStamp of the sample in ms." />
+			<param name="Value" type="double" pass="out" description="Value of the sample in ms." />
+		</method>
+
+		<method name="GetAllSamples" description="Returns all timestamps and values of the sampling.">
+			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Array of TimeStamps in ms, in increasing order." />
+			<param name="Values" type="basicarray" class="double" pass="out" description="Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array." />
+		</method>
+
+	</class>
+
+
+	<class name="JournalVariable" parent="Base" description="Class for accessing journal statistics">
+	
+		<method name="GetVariableName" description="returns the name of the recorded variable.">
+			<param name="Name" type="string" pass="return" description="Path or name." />
+		</method>
+		
+		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="RecordingStartInMS" type="uint64" pass="return" description="Start Timestamp of Recording in ms." />
+		</method>
+	
+		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="RecordingEndInMS" type="uint64" pass="return" description="End Timestamp of Recording in ms." />
+		</method>
+		
+		<method name="ComputeAverage" description="Calculates the average value over a time interval. Fails if no data is available in this time interval.">
+			<param name="StartTimeInMS" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
+			<param name="EndTimeInMS" type="uint64" pass="in" description="End Timestamp of the interval in ms. MUST be larger than Timestamp." />
+			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />
+			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
+		</method>
+		
+		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
+			<param name="StartTimeInMS" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
+			<param name="EndTimeInMS" type="uint64" pass="in" description="End Timestamp of the interval in ms." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples." />
+			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
+			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
+			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
+		</method>
+
+	</class>
 
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
 
@@ -2112,7 +2175,12 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 		
-
+		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
+			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
+			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
+		</method>
+		
 	</class>
 
 

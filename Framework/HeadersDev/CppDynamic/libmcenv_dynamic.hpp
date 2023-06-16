@@ -85,6 +85,8 @@ class CDriverStatusUpdateSession;
 class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
+class CUniformJournalSampling;
+class CJournalVariable;
 class CStateEnvironment;
 class CUIEnvironment;
 
@@ -118,6 +120,8 @@ typedef CDriverStatusUpdateSession CLibMCEnvDriverStatusUpdateSession;
 typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
+typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
+typedef CJournalVariable CLibMCEnvJournalVariable;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
 typedef CUIEnvironment CLibMCEnvUIEnvironment;
 
@@ -151,6 +155,8 @@ typedef std::shared_ptr<CDriverStatusUpdateSession> PDriverStatusUpdateSession;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
+typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
+typedef std::shared_ptr<CJournalVariable> PJournalVariable;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
 typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 
@@ -184,6 +190,8 @@ typedef PDriverStatusUpdateSession PLibMCEnvDriverStatusUpdateSession;
 typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
+typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
+typedef PJournalVariable PLibMCEnvJournalVariable;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
 typedef PUIEnvironment PLibMCEnvUIEnvironment;
 
@@ -621,6 +629,8 @@ private:
 	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
+	friend class CUniformJournalSampling;
+	friend class CJournalVariable;
 	friend class CStateEnvironment;
 	friend class CUIEnvironment;
 
@@ -1387,6 +1397,49 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CUniformJournalSampling 
+**************************************************************************************************************************/
+class CUniformJournalSampling : public CBase {
+public:
+	
+	/**
+	* CUniformJournalSampling::CUniformJournalSampling - Constructor for UniformJournalSampling class.
+	*/
+	CUniformJournalSampling(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetVariableName();
+	inline LibMCEnv_uint32 GetNumberOfSamples();
+	inline LibMCEnv_uint64 GetStartTimeStamp();
+	inline LibMCEnv_uint64 GetEndTimeStamp();
+	inline void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue);
+	inline void GetAllSamples(std::vector<LibMCEnv_uint64> & TimeStampsBuffer, std::vector<LibMCEnv_double> & ValuesBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CJournalVariable 
+**************************************************************************************************************************/
+class CJournalVariable : public CBase {
+public:
+	
+	/**
+	* CJournalVariable::CJournalVariable - Constructor for JournalVariable class.
+	*/
+	CJournalVariable(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetVariableName();
+	inline LibMCEnv_uint64 GetStartTimeStamp();
+	inline LibMCEnv_uint64 GetEndTimeStamp();
+	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval);
+	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+};
+	
+/*************************************************************************************************************************
  Class CStateEnvironment 
 **************************************************************************************************************************/
 class CStateEnvironment : public CBase {
@@ -1439,6 +1492,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
 };
 	
 /*************************************************************************************************************************
@@ -1882,6 +1936,17 @@ public:
 		pWrapperTable->m_SignalHandler_SetDoubleResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetIntegerResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetBoolResult = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetVariableName = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetSample = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetAllSamples = nullptr;
+		pWrapperTable->m_JournalVariable_GetVariableName = nullptr;
+		pWrapperTable->m_JournalVariable_GetStartTimeStamp = nullptr;
+		pWrapperTable->m_JournalVariable_GetEndTimeStamp = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeAverage = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = nullptr;
 		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
@@ -1921,6 +1986,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -4745,6 +4811,105 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetVariableName = (PLibMCEnvUniformJournalSampling_GetVariableNamePtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getvariablename");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetVariableName = (PLibMCEnvUniformJournalSampling_GetVariableNamePtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getvariablename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetVariableName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples = (PLibMCEnvUniformJournalSampling_GetNumberOfSamplesPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getnumberofsamples");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples = (PLibMCEnvUniformJournalSampling_GetNumberOfSamplesPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getnumberofsamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp = (PLibMCEnvUniformJournalSampling_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp = (PLibMCEnvUniformJournalSampling_GetStartTimeStampPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = (PLibMCEnvUniformJournalSampling_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = (PLibMCEnvUniformJournalSampling_GetEndTimeStampPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetSample = (PLibMCEnvUniformJournalSampling_GetSamplePtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getsample");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetSample = (PLibMCEnvUniformJournalSampling_GetSamplePtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getsample");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetSample == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamples = (PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getallsamples");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamples = (PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getallsamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetAllSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getvariablename");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) dlsym(hLibrary, "libmcenv_journalvariable_getvariablename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_GetVariableName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeaverage");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) dlsym(hLibrary, "libmcenv_journalvariable_computeaverage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getmachinestate");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getmachinestate");
@@ -5093,6 +5258,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = (PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievejournalvariable");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = (PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievejournalvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_RetrieveJournalVariable == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6737,6 +6911,50 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_SetBoolResult == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getvariablename", (void**)&(pWrapperTable->m_UniformJournalSampling_GetVariableName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetVariableName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getnumberofsamples", (void**)&(pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getstarttimestamp", (void**)&(pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getendtimestamp", (void**)&(pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getsample", (void**)&(pWrapperTable->m_UniformJournalSampling_GetSample));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetSample == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getallsamples", (void**)&(pWrapperTable->m_UniformJournalSampling_GetAllSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetAllSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_getvariablename", (void**)&(pWrapperTable->m_JournalVariable_GetVariableName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetVariableName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_getstarttimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetStartTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_getendtimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetEndTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computeaverage", (void**)&(pWrapperTable->m_JournalVariable_ComputeAverage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computeuniformaveragesamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getmachinestate", (void**)&(pWrapperTable->m_StateEnvironment_GetMachineState));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetMachineState == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6891,6 +7109,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_parsexmldata", (void**)&(pWrapperTable->m_StateEnvironment_ParseXMLData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievejournalvariable", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveJournalVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
@@ -11193,6 +11415,167 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CUniformJournalSampling
+	 */
+	
+	/**
+	* CUniformJournalSampling::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	std::string CUniformJournalSampling::GetVariableName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetVariableName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetVariableName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CUniformJournalSampling::GetNumberOfSamples - Returns the number of samples in the interval.
+	* @return Number of samples in the sampling.
+	*/
+	LibMCEnv_uint32 CUniformJournalSampling::GetNumberOfSamples()
+	{
+		LibMCEnv_uint32 resultNumberOfSamples = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetNumberOfSamples(m_pHandle, &resultNumberOfSamples));
+		
+		return resultNumberOfSamples;
+	}
+	
+	/**
+	* CUniformJournalSampling::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CUniformJournalSampling::GetStartTimeStamp()
+	{
+		LibMCEnv_uint64 resultStartTimeStampInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetStartTimeStamp(m_pHandle, &resultStartTimeStampInMS));
+		
+		return resultStartTimeStampInMS;
+	}
+	
+	/**
+	* CUniformJournalSampling::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CUniformJournalSampling::GetEndTimeStamp()
+	{
+		LibMCEnv_uint64 resultEndTimeStampInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetEndTimeStamp(m_pHandle, &resultEndTimeStampInMS));
+		
+		return resultEndTimeStampInMS;
+	}
+	
+	/**
+	* CUniformJournalSampling::GetSample - Returns the timestamp and value of the given sample.
+	* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
+	* @param[out] nTimeStamp - TimeStamp of the sample in ms.
+	* @param[out] dValue - Value of the sample in ms.
+	*/
+	void CUniformJournalSampling::GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetSample(m_pHandle, nIndex, &nTimeStamp, &dValue));
+	}
+	
+	/**
+	* CUniformJournalSampling::GetAllSamples - Returns all timestamps and values of the sampling.
+	* @param[out] TimeStampsBuffer - Array of TimeStamps in ms, in increasing order.
+	* @param[out] ValuesBuffer - Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+	*/
+	void CUniformJournalSampling::GetAllSamples(std::vector<LibMCEnv_uint64> & TimeStampsBuffer, std::vector<LibMCEnv_double> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTimeStamps = 0;
+		LibMCEnv_uint64 elementsWrittenTimeStamps = 0;
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, 0, &elementsNeededTimeStamps, nullptr, 0, &elementsNeededValues, nullptr));
+		TimeStampsBuffer.resize((size_t) elementsNeededTimeStamps);
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, elementsNeededTimeStamps, &elementsWrittenTimeStamps, TimeStampsBuffer.data(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CJournalVariable
+	 */
+	
+	/**
+	* CJournalVariable::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	std::string CJournalVariable::GetVariableName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetVariableName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetVariableName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CJournalVariable::GetStartTimeStamp()
+	{
+		LibMCEnv_uint64 resultRecordingStartInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetStartTimeStamp(m_pHandle, &resultRecordingStartInMS));
+		
+		return resultRecordingStartInMS;
+	}
+	
+	/**
+	* CJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CJournalVariable::GetEndTimeStamp()
+	{
+		LibMCEnv_uint64 resultRecordingEndInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetEndTimeStamp(m_pHandle, &resultRecordingEndInMS));
+		
+		return resultRecordingEndInMS;
+	}
+	
+	/**
+	* CJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
+	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Average value of the variable.
+	*/
+	LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval)
+	{
+		LibMCEnv_double resultAverageValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeAverage(m_pHandle, nStartTimeInMS, nEndTimeInMS, bClampInterval, &resultAverageValue));
+		
+		return resultAverageValue;
+	}
+	
+	/**
+	* CJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
+	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Returns an instance with the sampling results.
+	*/
+	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+	{
+		LibMCEnvHandle hJournalSampling = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMS, nEndTimeInMS, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		
+		if (!hJournalSampling) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hJournalSampling);
+	}
+	
+	/**
 	 * Method definitions for class CStateEnvironment
 	 */
 	
@@ -11737,6 +12120,23 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CStateEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @return Journal Instance.
+	*/
+	PJournalVariable CStateEnvironment::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+	{
+		LibMCEnvHandle hJournalVariable = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMilliseconds, &hJournalVariable));
+		
+		if (!hJournalVariable) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
 	}
 	
 	/**
