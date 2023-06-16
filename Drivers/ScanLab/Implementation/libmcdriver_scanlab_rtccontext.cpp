@@ -60,6 +60,12 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 	m_OIEOperationMode (LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized),
 	m_bIsNetwork (bIsNetwork),
 	m_nCurrentFreeVariable0 (0),
+	m_dLaserOriginX (0.0),
+	m_dLaserOriginY (0.0),
+	m_dLaserFieldMinX (0.0),
+	m_dLaserFieldMinY (0.0),
+	m_dLaserFieldMaxX (0.0),
+	m_dLaserFieldMaxY (0.0),
 	m_b2DMarkOnTheFlyEnabled (false)
 {
 	if (pScanLabSDK.get() == nullptr)
@@ -70,7 +76,6 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 	m_pScanLabSDK->n_reset_error(m_CardNo, 0xffffffff);
-
 
 }
 
@@ -99,6 +104,7 @@ void CRTCContext::setIPAddress(const std::string& sIPAddress, const std::string&
 	m_sNetmask = sNetmask;
 }
 
+// setLaserIndex should not be exposed via API
 void CRTCContext::setLaserIndex(const uint32_t nLaserIndex)
 {
 	m_nLaserIndex = nLaserIndex;
@@ -382,31 +388,39 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 		fClippedPowerFactor = 0.0f;
 
 	int digitalPowerValue = 0;
-	uint32_t nPortIndex = 1024;
+	
 
 	if (bOIEPIDControlFlag) {
 
 		switch (m_LaserPort) {
 		case eLaserPort::Port16bitDigital:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
-			nPortIndex = 6; // See set_auto_laser_control in SDK documentation
+			//nPortIndex = 6;  See set_auto_laser_control in SDK documentation
+			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 6, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port8bitDigital:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
-			nPortIndex = 3; // See set_auto_laser_control in SDK documentation
+			//nPortIndex = 3;  See set_auto_laser_control in SDK documentation
+			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 3, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog1:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			nPortIndex = 1; // See set_auto_laser_control in SDK documentation
+			//nPortIndex = 1; // See set_auto_laser_control in SDK documentation
+			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 1, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog2:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			nPortIndex = 2; // See set_auto_laser_control in SDK documentation
+			//nPortIndex = 2; // See set_auto_laser_control in SDK documentation
+			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
+			break;
+		case eLaserPort::Port12BitAnalog1andAnalog2:
+			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 1, digitalPowerValue, 1);
+			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
 			break;
 		}
 	
 		// See documentation what 1 means.
-		m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, nPortIndex, digitalPowerValue, 1);
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 
@@ -416,23 +430,32 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 		switch (m_LaserPort) {
 		case eLaserPort::Port16bitDigital:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
-			nPortIndex = 3; // See set_laser_power in SDK documentation
+			//nPortIndex = 3;  See set_laser_power in SDK documentation
+			m_pScanLabSDK->n_set_laser_power(m_CardNo, 3, digitalPowerValue);
+
 			break;
 		case eLaserPort::Port8bitDigital:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
-			nPortIndex = 2; // See set_laser_power in SDK documentation
+			//nPortIndex = 2; See set_laser_power in SDK documentation
+			m_pScanLabSDK->n_set_laser_power(m_CardNo, 2, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog1:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			nPortIndex = 0; // See set_laser_power in SDK documentation
+			//nPortIndex = 0;  See set_laser_power in SDK documentation
+			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog2:
 			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			nPortIndex = 1; // See set_laser_power in SDK documentation
+			//nPortIndex = 1; // See set_laser_power in SDK documentation
+			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
+			break;
+		case eLaserPort::Port12BitAnalog1andAnalog2:
+			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
+			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
 			break;
 		}
 
-		m_pScanLabSDK->n_set_laser_power(m_CardNo, nPortIndex, digitalPowerValue);
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 		/*
@@ -486,8 +509,8 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
 
 	const sPoint2D* pPoint = pPointsBuffer;
-	double dX = round(pPoint->m_X * m_dCorrectionFactor);
-	double dY = round(pPoint->m_Y * m_dCorrectionFactor);
+	double dX = round((pPoint->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
+	double dY = round((pPoint->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
 	pPoint++;
 
 	int intX = (int)dX;
@@ -497,8 +520,8 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
-		dX = round(pPoint->m_X * m_dCorrectionFactor);
-		dY = round(pPoint->m_Y * m_dCorrectionFactor);
+		dX = round((pPoint->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
+		dY = round((pPoint->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
 		pPoint++;
 
 		intX = (int)dX;
@@ -529,16 +552,16 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 	const sHatch2D* pHatch = pHatchesBuffer;
 
 	for (uint64_t index = 0; index < nHatchesBufferSize; index++) {
-		double dX = round(pHatch->m_X1 * m_dCorrectionFactor);
-		double dY = round(pHatch->m_Y1 * m_dCorrectionFactor);
+		double dX = round((pHatch->m_X1 - m_dLaserOriginX) * m_dCorrectionFactor);
+		double dY = round((pHatch->m_Y1 - m_dLaserOriginY) * m_dCorrectionFactor);
 	
 		int intX = (int)dX;
 		int intY = (int)dY;
 		m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
-		dX = round(pHatch->m_X2 * m_dCorrectionFactor);
-		dY = round(pHatch->m_Y2 * m_dCorrectionFactor);
+		dX = round((pHatch->m_X2 - m_dLaserOriginX) * m_dCorrectionFactor);
+		dY = round((pHatch->m_Y2 - m_dLaserOriginY) * m_dCorrectionFactor);
 		
 		intX = (int)dX;
 		intY = (int)dY;
@@ -1099,6 +1122,39 @@ void CRTCContext::DisableTimelagCompensation()
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
+
+
+void CRTCContext::SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY)
+{
+	m_dLaserOriginX = dOriginX;
+	m_dLaserOriginY = dOriginY;
+}
+
+void CRTCContext::GetLaserOrigin(LibMCDriver_ScanLab_double& dOriginX, LibMCDriver_ScanLab_double& dOriginY)
+{
+	dOriginX = m_dLaserOriginX;
+	dOriginY = m_dLaserOriginY;
+
+}
+
+void CRTCContext::SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY)
+{
+	m_dLaserFieldMinX = dMinX;
+	m_dLaserFieldMinY = dMinY;
+	m_dLaserFieldMaxX = dMaxX;
+	m_dLaserFieldMaxY = dMaxY;
+}
+
+void CRTCContext::GetLaserField(LibMCDriver_ScanLab_double& dMinX, LibMCDriver_ScanLab_double& dMinY, LibMCDriver_ScanLab_double& dMaxX, LibMCDriver_ScanLab_double& dMaxY)
+{
+	dMinX = m_dLaserFieldMinX;
+	dMinY = m_dLaserFieldMinY;
+	dMaxX = m_dLaserFieldMaxX;
+	dMaxY = m_dLaserFieldMaxY;
+
+	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+}
+
 
 void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep)
 {

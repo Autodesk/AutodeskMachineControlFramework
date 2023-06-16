@@ -268,7 +268,8 @@ namespace LibMCDriver_ScanLab {
     Port8bitDigital = 1,
     Port16bitDigital = 2,
     Port12BitAnalog1 = 3,
-    Port12BitAnalog2 = 4
+    Port12BitAnalog2 = 4,
+    Port12BitAnalog1andAnalog2 = 5
   };
   
   enum class eOIEOperationMode : LibMCDriver_ScanLab_int32 {

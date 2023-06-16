@@ -127,6 +127,7 @@
 	   <option name="Port16bitDigital" value="2" />
 	   <option name="Port12BitAnalog1" value="3" />
 	   <option name="Port12BitAnalog2" value="4" />
+	   <option name="Port12BitAnalog1andAnalog2" value="5" />
 	</enum>
 
 
@@ -289,6 +290,30 @@ Custom implementation
 		
 		<method name="GetLaserIndex" description="Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.">
 			<param name="LaserIndex" type="uint32" pass="return" description="Returns laser index of board." />
+		</method>
+
+		<method name="SetLaserOrigin" description="Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.">
+			<param name="OriginX" type="double" pass="in" description="Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+			<param name="OriginY" type="double" pass="in" description="Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+		</method>
+
+		<method name="GetLaserOrigin" description="Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.">
+			<param name="OriginX" type="double" pass="out" description="Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+			<param name="OriginY" type="double" pass="out" description="Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+		</method>
+
+		<method name="SetLaserField" description="Sets the laser field limits in absolute coordinates.">
+			<param name="MinX" type="double" pass="in" description="Sets minimum laser X coordinate in mm." />
+			<param name="MinY" type="double" pass="in" description="Sets minimum laser Y coordinate in mm." />
+			<param name="MaxX" type="double" pass="in" description="Sets maximum laser X coordinate in mm." />
+			<param name="MaxY" type="double" pass="in" description="Sets maximum laser Y coordinate in mm." />
+		</method>
+
+		<method name="GetLaserField" description="Returns the laser field limits in absolute coordinates.">
+			<param name="MinX" type="double" pass="out" description="Sets minimum laser X coordinate in mm." />
+			<param name="MinY" type="double" pass="out" description="Sets minimum laser Y coordinate in mm." />
+			<param name="MaxX" type="double" pass="out" description="Sets maximum laser X coordinate in mm." />
+			<param name="MaxY" type="double" pass="out" description="Sets maximum laser Y coordinate in mm." />
 		</method>
 
 		<method name="SetStartList" description="Opens the list to write">

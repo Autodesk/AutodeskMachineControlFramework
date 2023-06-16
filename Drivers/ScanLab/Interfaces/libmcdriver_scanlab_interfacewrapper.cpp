@@ -737,6 +737,114 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserindex(LibMCDriv
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserorigin(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dOriginX, LibMCDriver_ScanLab_double dOriginY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->SetLaserOrigin(dOriginX, dOriginY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserorigin(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pOriginX, LibMCDriver_ScanLab_double * pOriginY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (!pOriginX)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pOriginY)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->GetLaserOrigin(*pOriginX, *pOriginY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserfield(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dMinX, LibMCDriver_ScanLab_double dMinY, LibMCDriver_ScanLab_double dMaxX, LibMCDriver_ScanLab_double dMaxY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->SetLaserField(dMinX, dMinY, dMaxX, dMaxY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserfield(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pMinX, LibMCDriver_ScanLab_double * pMinY, LibMCDriver_ScanLab_double * pMaxX, LibMCDriver_ScanLab_double * pMaxY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (!pMinX)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pMinY)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pMaxX)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pMaxY)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->GetLaserField(*pMinX, *pMinY, *pMaxX, *pMaxY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setstartlist(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -3573,6 +3681,14 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getserialnumber;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_getlaserindex") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getlaserindex;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_setlaserorigin") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlaserorigin;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getlaserorigin") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getlaserorigin;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_setlaserfield") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlaserfield;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getlaserfield") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getlaserfield;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setstartlist") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setstartlist;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setendoflist") 

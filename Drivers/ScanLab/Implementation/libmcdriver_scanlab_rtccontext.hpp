@@ -52,6 +52,13 @@ protected:
 
 	uint32_t m_nCurrentFreeVariable0;
 
+	double m_dLaserOriginX;
+	double m_dLaserOriginY;
+	double m_dLaserFieldMinX;
+	double m_dLaserFieldMinY;
+	double m_dLaserFieldMaxX;
+	double m_dLaserFieldMaxY;
+
 	std::vector<uint8_t> m_HeadTransform;
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
@@ -79,6 +86,8 @@ public:
 
 	void setIPAddress(const std::string & sIPAddress, const std::string & sNetmask);
 
+	// setLaserIndex should not be exposed via API from the Context.
+	// Laser Index Management should be implemented in the Driver.
 	void setLaserIndex (const uint32_t nLaserIndex);
 
 	void LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer);
@@ -195,6 +204,14 @@ public:
 	bool MarkOnTheFly2DIsEnabled() override; 	
 
 	void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPositionX, LibMCDriver_ScanLab_int32& nPositionY) override;
+
+	void SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY) override;
+
+	void GetLaserOrigin(LibMCDriver_ScanLab_double& dOriginX, LibMCDriver_ScanLab_double& dOriginY) override;
+
+	void SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY) override;
+
+	void GetLaserField(LibMCDriver_ScanLab_double& dMinX, LibMCDriver_ScanLab_double& dMinY, LibMCDriver_ScanLab_double& dMaxX, LibMCDriver_ScanLab_double& dMaxY) override;
 
 };
 

@@ -557,6 +557,10 @@ public:
 	inline std::string GetNetmask();
 	inline LibMCDriver_ScanLab_uint32 GetSerialNumber();
 	inline LibMCDriver_ScanLab_uint32 GetLaserIndex();
+	inline void SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY);
+	inline void GetLaserOrigin(LibMCDriver_ScanLab_double & dOriginX, LibMCDriver_ScanLab_double & dOriginY);
+	inline void SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY);
+	inline void GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY);
 	inline void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
 	inline void SetEndOfList();
 	inline void ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
@@ -868,6 +872,10 @@ public:
 		pWrapperTable->m_RTCContext_GetNetmask = nullptr;
 		pWrapperTable->m_RTCContext_GetSerialNumber = nullptr;
 		pWrapperTable->m_RTCContext_GetLaserIndex = nullptr;
+		pWrapperTable->m_RTCContext_SetLaserOrigin = nullptr;
+		pWrapperTable->m_RTCContext_GetLaserOrigin = nullptr;
+		pWrapperTable->m_RTCContext_SetLaserField = nullptr;
+		pWrapperTable->m_RTCContext_GetLaserField = nullptr;
 		pWrapperTable->m_RTCContext_SetStartList = nullptr;
 		pWrapperTable->m_RTCContext_SetEndOfList = nullptr;
 		pWrapperTable->m_RTCContext_ExecuteList = nullptr;
@@ -1214,6 +1222,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_GetLaserIndex == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetLaserOrigin = (PLibMCDriver_ScanLabRTCContext_SetLaserOriginPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserorigin");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetLaserOrigin = (PLibMCDriver_ScanLabRTCContext_SetLaserOriginPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserorigin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetLaserOrigin == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetLaserOrigin = (PLibMCDriver_ScanLabRTCContext_GetLaserOriginPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserorigin");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetLaserOrigin = (PLibMCDriver_ScanLabRTCContext_GetLaserOriginPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserorigin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetLaserOrigin == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetLaserField = (PLibMCDriver_ScanLabRTCContext_SetLaserFieldPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserfield");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetLaserField = (PLibMCDriver_ScanLabRTCContext_SetLaserFieldPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetLaserField == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetLaserField = (PLibMCDriver_ScanLabRTCContext_GetLaserFieldPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserfield");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetLaserField = (PLibMCDriver_ScanLabRTCContext_GetLaserFieldPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetLaserField == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2297,6 +2341,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserIndex == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlaserorigin", (void**)&(pWrapperTable->m_RTCContext_SetLaserOrigin));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserOrigin == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getlaserorigin", (void**)&(pWrapperTable->m_RTCContext_GetLaserOrigin));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserOrigin == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlaserfield", (void**)&(pWrapperTable->m_RTCContext_SetLaserField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserField == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getlaserfield", (void**)&(pWrapperTable->m_RTCContext_GetLaserField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserField == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setstartlist", (void**)&(pWrapperTable->m_RTCContext_SetStartList));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetStartList == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2991,6 +3051,50 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserIndex(m_pHandle, &resultLaserIndex));
 		
 		return resultLaserIndex;
+	}
+	
+	/**
+	* CRTCContext::SetLaserOrigin - Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+	* @param[in] dOriginX - Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	* @param[in] dOriginY - Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	*/
+	void CRTCContext::SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserOrigin(m_pHandle, dOriginX, dOriginY));
+	}
+	
+	/**
+	* CRTCContext::GetLaserOrigin - Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+	* @param[out] dOriginX - Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	* @param[out] dOriginY - Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	*/
+	void CRTCContext::GetLaserOrigin(LibMCDriver_ScanLab_double & dOriginX, LibMCDriver_ScanLab_double & dOriginY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserOrigin(m_pHandle, &dOriginX, &dOriginY));
+	}
+	
+	/**
+	* CRTCContext::SetLaserField - Sets the laser field limits in absolute coordinates.
+	* @param[in] dMinX - Sets minimum laser X coordinate in mm.
+	* @param[in] dMinY - Sets minimum laser Y coordinate in mm.
+	* @param[in] dMaxX - Sets maximum laser X coordinate in mm.
+	* @param[in] dMaxY - Sets maximum laser Y coordinate in mm.
+	*/
+	void CRTCContext::SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserField(m_pHandle, dMinX, dMinY, dMaxX, dMaxY));
+	}
+	
+	/**
+	* CRTCContext::GetLaserField - Returns the laser field limits in absolute coordinates.
+	* @param[out] dMinX - Sets minimum laser X coordinate in mm.
+	* @param[out] dMinY - Sets minimum laser Y coordinate in mm.
+	* @param[out] dMaxX - Sets maximum laser X coordinate in mm.
+	* @param[out] dMaxY - Sets maximum laser Y coordinate in mm.
+	*/
+	void CRTCContext::GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserField(m_pHandle, &dMinX, &dMinY, &dMaxX, &dMaxY));
 	}
 	
 	/**

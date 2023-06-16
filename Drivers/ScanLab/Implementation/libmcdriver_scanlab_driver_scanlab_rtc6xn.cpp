@@ -224,6 +224,8 @@ void CDriver_ScanLab_RTC6xN::InitialiseScanner(const LibMCDriver_ScanLab_uint32 
 			auto pContextInstance = dynamic_cast<CRTCContext*> (pContext);
 			if (pContextInstance != nullptr)
 				pContextInstance->setIPAddress(sIP, sNetmask);
+
+			pContextInstance->setLaserIndex(nLaserIndex);
 		}
 
 		uint32_t nRTCVersion = 0;

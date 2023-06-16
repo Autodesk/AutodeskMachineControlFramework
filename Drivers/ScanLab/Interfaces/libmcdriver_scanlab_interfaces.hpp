@@ -564,6 +564,38 @@ public:
 	virtual LibMCDriver_ScanLab_uint32 GetLaserIndex() = 0;
 
 	/**
+	* IRTCContext::SetLaserOrigin - Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+	* @param[in] dOriginX - Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	* @param[in] dOriginY - Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	*/
+	virtual void SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY) = 0;
+
+	/**
+	* IRTCContext::GetLaserOrigin - Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+	* @param[out] dOriginX - Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	* @param[out] dOriginY - Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	*/
+	virtual void GetLaserOrigin(LibMCDriver_ScanLab_double & dOriginX, LibMCDriver_ScanLab_double & dOriginY) = 0;
+
+	/**
+	* IRTCContext::SetLaserField - Sets the laser field limits in absolute coordinates.
+	* @param[in] dMinX - Sets minimum laser X coordinate in mm.
+	* @param[in] dMinY - Sets minimum laser Y coordinate in mm.
+	* @param[in] dMaxX - Sets maximum laser X coordinate in mm.
+	* @param[in] dMaxY - Sets maximum laser Y coordinate in mm.
+	*/
+	virtual void SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY) = 0;
+
+	/**
+	* IRTCContext::GetLaserField - Returns the laser field limits in absolute coordinates.
+	* @param[out] dMinX - Sets minimum laser X coordinate in mm.
+	* @param[out] dMinY - Sets minimum laser Y coordinate in mm.
+	* @param[out] dMaxX - Sets maximum laser X coordinate in mm.
+	* @param[out] dMaxY - Sets maximum laser Y coordinate in mm.
+	*/
+	virtual void GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY) = 0;
+
+	/**
 	* IRTCContext::SetStartList - Opens the list to write
 	* @param[in] nListIndex - Index of List (1 or 2).
 	* @param[in] nPosition - Relative Position in List.

@@ -291,6 +291,50 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserindex(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pLaserIndex);
 
 /**
+* Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dOriginX - Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @param[in] dOriginY - Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserorigin(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dOriginX, LibMCDriver_ScanLab_double dOriginY);
+
+/**
+* Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pOriginX - Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @param[out] pOriginY - Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserorigin(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pOriginX, LibMCDriver_ScanLab_double * pOriginY);
+
+/**
+* Sets the laser field limits in absolute coordinates.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dMinX - Sets minimum laser X coordinate in mm.
+* @param[in] dMinY - Sets minimum laser Y coordinate in mm.
+* @param[in] dMaxX - Sets maximum laser X coordinate in mm.
+* @param[in] dMaxY - Sets maximum laser Y coordinate in mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserfield(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dMinX, LibMCDriver_ScanLab_double dMinY, LibMCDriver_ScanLab_double dMaxX, LibMCDriver_ScanLab_double dMaxY);
+
+/**
+* Returns the laser field limits in absolute coordinates.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pMinX - Sets minimum laser X coordinate in mm.
+* @param[out] pMinY - Sets minimum laser Y coordinate in mm.
+* @param[out] pMaxX - Sets maximum laser X coordinate in mm.
+* @param[out] pMaxY - Sets maximum laser Y coordinate in mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserfield(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pMinX, LibMCDriver_ScanLab_double * pMinY, LibMCDriver_ScanLab_double * pMaxX, LibMCDriver_ScanLab_double * pMaxY);
+
+/**
 * Opens the list to write
 *
 * @param[in] pRTCContext - RTCContext instance.
