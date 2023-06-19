@@ -64,6 +64,8 @@ Abstract: This is the class declaration of CDriver_BuR
 
 #define PACKET_SIGNATURE_LEGACY 0xAB
 
+#define BUR_MAX_PAYLOADLENGTH (1024 * 1024)
+
 namespace LibMCDriver_BuR {
 namespace Impl {
 

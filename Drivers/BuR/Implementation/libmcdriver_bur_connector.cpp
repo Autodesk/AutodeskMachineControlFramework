@@ -88,8 +88,7 @@ struct sPLCToAMCFPacketVersion3 {
     uint32_t m_nClientID;
     uint32_t m_nSequenceID;
     uint32_t m_nErrorCode;
-    uint32_t m_nCommandID;
-    uint32_t m_nMessageLen;
+    uint32_t m_nPayloadLength;
     uint32_t m_nHeaderChecksum;
     uint32_t m_nDataChecksum;
 };
@@ -311,14 +310,13 @@ void CDriver_BuRConnector::sendCommandsToPLCVersion3(std::vector<sAMCFToPLCPacke
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETSIGNATURE);
         }
 
-        auto pPacket = std::make_shared<CDriver_BuRPacket>(receivedPacket->m_nCommandID, receivedPacket->m_nErrorCode);
+        auto pPacket = std::make_shared<CDriver_BuRPacket>(sendInfo.m_CommandID, receivedPacket->m_nErrorCode);
 
-        if (receivedPacket->m_nMessageLen < sizeof(sPLCToAMCFPacketVersion3))
+        if (receivedPacket->m_nPayloadLength > BUR_MAX_PAYLOADLENGTH)
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH);
 
-        uint32_t nDataLen = (receivedPacket->m_nMessageLen - sizeof(sPLCToAMCFPacketVersion3));
-        if (nDataLen > 0) {
-            m_pCurrentConnection->receiveBuffer(pPacket->getDataBuffer(), nDataLen, true);
+        if (receivedPacket->m_nPayloadLength > 0) {
+            m_pCurrentConnection->receiveBuffer(pPacket->getDataBuffer(), receivedPacket->m_nPayloadLength, true);
         }
 
         if (sendInfo.m_SequenceID != receivedPacket->m_nSequenceID)
