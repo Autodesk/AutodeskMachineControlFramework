@@ -62,11 +62,17 @@ Abstract: This is the class declaration of CDriver_BuR
 #define BUR_COMMAND_DIRECT_JOURNALRETRIEVE 111
 #define BUR_COMMAND_DIRECT_DELETELIST 112
 
+#define PACKET_SIGNATURE_LEGACY 0xAB
 
 namespace LibMCDriver_BuR {
 namespace Impl {
 
 
+    enum class eDriver_BurProtocolVersion {
+        Unknown = 0,
+        Legacy = 1,
+        Version3 = 3
+    };
 
 /*************************************************************************************************************************
  Class declaration of CDriver_BuR 
@@ -77,6 +83,7 @@ private:
     uint32_t m_nCommandID;
     uint32_t m_nStatusCode;
     std::vector<uint8_t> m_Data;
+
 public:
     CDriver_BuRPacket(uint32_t nCommandID, uint32_t nStatusCode);
     ~CDriver_BuRPacket();
@@ -107,6 +114,8 @@ protected:
     uint32_t m_nWorkerThreadCount;
     uint32_t m_nMaxReceiveBufferSize;
 
+    eDriver_BurProtocolVersion m_ProtocolVersion;
+
     uint32_t m_nMajorVersion;
     uint32_t m_nMinorVersion;
     uint32_t m_nPatchVersion;
@@ -114,6 +123,7 @@ protected:
 
     uint32_t m_nMaxPacketQueueSize;
     uint32_t m_nSequenceID;
+    uint32_t m_nPacketSignature;
 
     bool m_StartJournaling;
 
@@ -130,9 +140,13 @@ protected:
 
     //PDriver_BuRPacket receiveCommandFromPLCEx (CDriver_BuRSocketConnection* pConnection);
 
+    void sendCommandsToPLCLegacy(std::vector<sAMCFToPLCPacketToSend>& packetList);
+    void sendCommandsToPLCVersion3(std::vector<sAMCFToPLCPacketToSend>& packetList);
+
+
 public:
 
-	CDriver_BuRConnector (uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize);
+	CDriver_BuRConnector (uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature);
 
     void queryParameters (BurPacketCallback callback);
 

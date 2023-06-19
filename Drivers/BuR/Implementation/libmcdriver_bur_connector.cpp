@@ -38,14 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCDriver_BuR::Impl;
 
-#define PACKET_SIGNATURE 0xAB
-
 
 #pragma pack(push)
 #pragma pack(1)
 
 
-struct sAMCFToPLCPacket {
+struct sAMCFToPLCPacketLegacy {
     uint32_t m_nSignature;
     uint8_t m_nMajorVersion;
     uint8_t m_nMinorVersion;
@@ -59,12 +57,34 @@ struct sAMCFToPLCPacket {
 };
 
 
-struct sPLCToAMCFPacket {
+struct sPLCToAMCFPacketLegacy {
     uint32_t m_nSignature;
     uint8_t m_nMajorVersion;
     uint8_t m_nMinorVersion;
     uint8_t m_nPatchVersion;
     uint8_t m_nBuildVersion;
+    uint32_t m_nClientID;
+    uint32_t m_nSequenceID;
+    uint32_t m_nErrorCode;
+    uint32_t m_nCommandID;
+    uint32_t m_nMessageLen;
+    uint32_t m_nHeaderChecksum;
+    uint32_t m_nDataChecksum;
+};
+
+
+struct sAMCFToPLCPacketVersion3 {
+    uint32_t m_nSignature;
+    uint32_t m_nClientID;
+    uint32_t m_nSequenceID;
+    uint32_t m_nCommandID;
+    sAMCFToPLCPacketPayload m_Payload;
+    uint32_t m_nChecksum;
+};
+
+
+struct sPLCToAMCFPacketVersion3 {
+    uint32_t m_nSignature;
     uint32_t m_nClientID;
     uint32_t m_nSequenceID;
     uint32_t m_nErrorCode;
@@ -172,13 +192,15 @@ std::vector<uint8_t>& CDriver_BuRPacket::getDataBuffer()
 }
 
 
-CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize)
+CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature)
     : m_nWorkerThreadCount(nWorkerThreadCount),
     m_nMaxReceiveBufferSize(nMaxReceiveBufferSize),
     m_nMajorVersion(nMajorVersion),
     m_nMinorVersion(nMinorVersion),
     m_nPatchVersion(nPatchVersion),
+    m_nPacketSignature (nPacketSignature),
     m_nBuildVersion (nBuildVersion),
+    m_ProtocolVersion (ProtocolVersion),
     m_StartJournaling (false),
     m_nSequenceID (1),
     m_nMaxPacketQueueSize (nMaxPacketQueueSize)
@@ -206,6 +228,21 @@ void CDriver_BuRConnector::queryParameters(BurPacketCallback callback)
 
 void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>& packetList)
 {
+    switch (m_ProtocolVersion) {
+        case eDriver_BurProtocolVersion::Legacy: 
+            sendCommandsToPLCLegacy(packetList);
+            break;
+        case eDriver_BurProtocolVersion::Version3:
+            sendCommandsToPLCVersion3(packetList);
+            break;
+        default:
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_UNKNOWNDRIVERPROTOCOLVERSION);
+    }
+
+}
+
+void CDriver_BuRConnector::sendCommandsToPLCVersion3(std::vector<sAMCFToPLCPacketToSend>& packetList)
+{
     if (packetList.empty())
         return;
 
@@ -215,14 +252,109 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(1, 1024 * 1024 * 1024);
 
-    std::vector<sAMCFToPLCPacket> TCPPacketList;
+    std::vector<sAMCFToPLCPacketVersion3> TCPPacketList;
     std::vector<sAMCFToPLCPacketSendInfo> SendInfoList;
 
     for (auto& packet : packetList) {
         uint32_t nClientID = distribution(generator);
 
-        sAMCFToPLCPacket TCPpacket;
-        TCPpacket.m_nSignature = PACKET_SIGNATURE;
+        sAMCFToPLCPacketVersion3 TCPpacket;
+        TCPpacket.m_nSignature = m_nPacketSignature;
+        TCPpacket.m_nCommandID = packet.m_CommandID;
+        TCPpacket.m_nClientID = nClientID;
+        TCPpacket.m_nSequenceID = m_nSequenceID;
+        TCPpacket.m_Payload = packet.m_Payload;
+        TCPpacket.m_nChecksum = CRC::Calculate(&TCPpacket, ((intptr_t)(&TCPpacket.m_nChecksum) - (intptr_t)(&TCPpacket)), CRC::CRC_32());
+        TCPPacketList.push_back(TCPpacket);
+
+        // Store send info
+        sAMCFToPLCPacketSendInfo sendInfo;
+        sendInfo.m_CommandID = TCPpacket.m_nCommandID;
+        sendInfo.m_SequenceID = TCPpacket.m_nSequenceID;
+        sendInfo.m_ClientID = TCPpacket.m_nClientID;
+        sendInfo.m_Callback = packet.m_Callback;
+        SendInfoList.push_back(sendInfo);
+
+        m_nSequenceID++;
+    }
+
+    if (TCPPacketList.empty())
+        throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    int index = 0;
+    for (auto& packetToSend : TCPPacketList) {
+        auto sendInfo = SendInfoList.at(index);
+
+        if (packetToSend.m_nSequenceID != sendInfo.m_SequenceID)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+        m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacketVersion3));
+        index++;
+
+
+    }
+
+    //index = 0;
+    for (auto& sendInfo : SendInfoList) {
+
+        //auto sendInfo = SendInfoList.at(index);
+
+        std::vector<uint8_t> recvBuffer;
+        m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacketVersion3), true);
+
+        if (recvBuffer.size() != sizeof(sPLCToAMCFPacketVersion3))
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR);
+
+        const sPLCToAMCFPacketVersion3* receivedPacket = (const sPLCToAMCFPacketVersion3*)recvBuffer.data();
+        if (receivedPacket->m_nSignature != m_nPacketSignature) {
+            m_pCurrentConnection->disconnect();
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETSIGNATURE);
+        }
+
+        auto pPacket = std::make_shared<CDriver_BuRPacket>(receivedPacket->m_nCommandID, receivedPacket->m_nErrorCode);
+
+        if (receivedPacket->m_nMessageLen < sizeof(sPLCToAMCFPacketVersion3))
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH);
+
+        uint32_t nDataLen = (receivedPacket->m_nMessageLen - sizeof(sPLCToAMCFPacketVersion3));
+        if (nDataLen > 0) {
+            m_pCurrentConnection->receiveBuffer(pPacket->getDataBuffer(), nDataLen, true);
+        }
+
+        if (sendInfo.m_SequenceID != receivedPacket->m_nSequenceID)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTSEQUENCEID);
+        if (sendInfo.m_ClientID != receivedPacket->m_nClientID)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTID);
+
+        if (sendInfo.m_Callback != nullptr) {
+            auto callback = sendInfo.m_Callback;
+            callback(pPacket.get());
+        }
+
+        //index++;
+    }
+
+}
+
+void CDriver_BuRConnector::sendCommandsToPLCLegacy(std::vector<sAMCFToPLCPacketToSend>& packetList)
+{
+    if (packetList.empty())
+        return;
+
+    if (m_pCurrentConnection == nullptr)
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTCONNECTED);
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(1, 1024 * 1024 * 1024);
+
+    std::vector<sAMCFToPLCPacketLegacy> TCPPacketList;
+    std::vector<sAMCFToPLCPacketSendInfo> SendInfoList;
+
+    for (auto& packet : packetList) {
+        uint32_t nClientID = distribution(generator);
+
+        sAMCFToPLCPacketLegacy TCPpacket;
+        TCPpacket.m_nSignature = m_nPacketSignature;
         TCPpacket.m_nCommandID = packet.m_CommandID;
         TCPpacket.m_nMajorVersion = m_nMajorVersion;
         TCPpacket.m_nMinorVersion = m_nMinorVersion;
@@ -255,7 +387,7 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
         if (packetToSend.m_nSequenceID != sendInfo.m_SequenceID)
             throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-        m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacket));
+        m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacketLegacy));
         index++;
 
         
@@ -267,23 +399,23 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
         //auto sendInfo = SendInfoList.at(index);
 
         std::vector<uint8_t> recvBuffer;
-        m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacket), true);
+        m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacketLegacy), true);
 
-        if (recvBuffer.size() != sizeof(sPLCToAMCFPacket))
+        if (recvBuffer.size() != sizeof(sPLCToAMCFPacketLegacy))
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR);
 
-        const sPLCToAMCFPacket* receivedPacket = (const sPLCToAMCFPacket*)recvBuffer.data();
-        if (receivedPacket->m_nSignature != PACKET_SIGNATURE) {
+        const sPLCToAMCFPacketLegacy* receivedPacket = (const sPLCToAMCFPacketLegacy*)recvBuffer.data();
+        if (receivedPacket->m_nSignature != m_nPacketSignature) {
             m_pCurrentConnection->disconnect();
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETSIGNATURE);
         }
 
         auto pPacket = std::make_shared<CDriver_BuRPacket>(receivedPacket->m_nCommandID, receivedPacket->m_nErrorCode);
 
-        if (receivedPacket->m_nMessageLen < sizeof(sPLCToAMCFPacket))
+        if (receivedPacket->m_nMessageLen < sizeof(sPLCToAMCFPacketLegacy))
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH);
 
-        uint32_t nDataLen = (receivedPacket->m_nMessageLen - sizeof(sPLCToAMCFPacket));
+        uint32_t nDataLen = (receivedPacket->m_nMessageLen - sizeof(sPLCToAMCFPacketLegacy));
         if (nDataLen > 0) {
             m_pCurrentConnection->receiveBuffer(pPacket->getDataBuffer(), nDataLen, true);
         }
