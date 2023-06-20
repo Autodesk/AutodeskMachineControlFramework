@@ -215,6 +215,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_set_angle = (PScanLabPtr_n_set_angle)_loadScanLabAddress(hLibrary, "n_set_angle");
 	this->n_set_scale = (PScanLabPtr_n_set_scale)_loadScanLabAddress(hLibrary, "n_set_scale");
 	this->n_set_offset = (PScanLabPtr_n_set_offset)_loadScanLabAddress(hLibrary, "n_set_offset");
+	this->n_set_matrix = (PScanLabPtr_n_set_matrix)_loadScanLabAddress(hLibrary, "n_set_matrix");
 
 	this->n_get_waveform_offset = (PScanLabPtr_n_get_waveform_offset)_loadScanLabAddress(hLibrary, "n_get_waveform_offset");
 	this->n_measurement_status = (PScanLabPtr_n_measurement_status)_loadScanLabAddress(hLibrary, "n_measurement_status");
@@ -400,6 +401,8 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_set_angle = nullptr;
 	n_set_scale = nullptr;
 	n_set_offset = nullptr;
+	n_set_matrix = nullptr;
+
 	n_get_waveform_offset = nullptr;
 	n_measurement_status = nullptr;
 	transform = nullptr;

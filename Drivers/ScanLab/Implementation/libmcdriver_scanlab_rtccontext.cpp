@@ -932,6 +932,14 @@ void CRTCContext::SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffse
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
+void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_matrix(m_CardNo, 1, dM11, dM12, dM21, dM22, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+
 void CRTCContext::PrepareRecording()
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);

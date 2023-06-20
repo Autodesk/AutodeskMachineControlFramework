@@ -856,6 +856,15 @@ public:
 	virtual void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY) = 0;
 
 	/**
+	* IRTCContext::SetTransformationMatrix - Sets the transformation matrix of the scan field.
+	* @param[in] dM11 - Upper left field of the transformation matrix
+	* @param[in] dM12 - Upper right field of the transformation matrix
+	* @param[in] dM21 - Lower left field of the transformation matrix
+	* @param[in] dM22 - Lower right field of the transformation matrix
+	*/
+	virtual void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) = 0;
+
+	/**
 	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 	*/
 	virtual void PrepareRecording() = 0;

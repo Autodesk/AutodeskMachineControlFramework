@@ -505,6 +505,13 @@ Custom implementation
 			<param name="OffsetY" type="int32" pass="in" description="Offset in X (in bits)" />
 		</method>
 
+		<method name="SetTransformationMatrix" description="Sets the transformation matrix of the scan field.">
+			<param name="M11" type="double" pass="in" description="Upper left field of the transformation matrix" />
+			<param name="M12" type="double" pass="in" description="Upper right field of the transformation matrix" />
+			<param name="M21" type="double" pass="in" description="Lower left field of the transformation matrix" />
+			<param name="M22" type="double" pass="in" description="Lower right field of the transformation matrix" />
+		</method>
+
 		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
 		</method>
 

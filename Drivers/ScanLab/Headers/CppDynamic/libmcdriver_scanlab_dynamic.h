@@ -684,6 +684,18 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransforma
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nOffsetX, LibMCDriver_ScanLab_int32 nOffsetY);
 
 /**
+* Sets the transformation matrix of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dM11 - Upper left field of the transformation matrix
+* @param[in] dM12 - Upper right field of the transformation matrix
+* @param[in] dM21 - Lower left field of the transformation matrix
+* @param[in] dM22 - Lower right field of the transformation matrix
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dM11, LibMCDriver_ScanLab_double dM12, LibMCDriver_ScanLab_double dM21, LibMCDriver_ScanLab_double dM22);
+
+/**
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1545,6 +1557,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr m_RTCContext_SetTransformationAngle;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr m_RTCContext_SetTransformationScale;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr m_RTCContext_SetTransformationOffset;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr m_RTCContext_SetTransformationMatrix;
 	PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr m_RTCContext_PrepareRecording;
 	PLibMCDriver_ScanLabRTCContext_EnableRecordingPtr m_RTCContext_EnableRecording;
 	PLibMCDriver_ScanLabRTCContext_DisableRecordingPtr m_RTCContext_DisableRecording;

@@ -595,6 +595,7 @@ public:
 	inline void SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees);
 	inline void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor);
 	inline void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY);
+	inline void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22);
 	inline void PrepareRecording();
 	inline void EnableRecording();
 	inline void DisableRecording();
@@ -910,6 +911,7 @@ public:
 		pWrapperTable->m_RTCContext_SetTransformationAngle = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationScale = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationOffset = nullptr;
+		pWrapperTable->m_RTCContext_SetTransformationMatrix = nullptr;
 		pWrapperTable->m_RTCContext_PrepareRecording = nullptr;
 		pWrapperTable->m_RTCContext_EnableRecording = nullptr;
 		pWrapperTable->m_RTCContext_DisableRecording = nullptr;
@@ -1564,6 +1566,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_SetTransformationOffset == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationMatrix = (PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationmatrix");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetTransformationMatrix = (PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_settransformationmatrix");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetTransformationMatrix == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2491,6 +2502,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_settransformationoffset", (void**)&(pWrapperTable->m_RTCContext_SetTransformationOffset));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetTransformationOffset == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_settransformationmatrix", (void**)&(pWrapperTable->m_RTCContext_SetTransformationMatrix));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetTransformationMatrix == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_preparerecording", (void**)&(pWrapperTable->m_RTCContext_PrepareRecording));
@@ -3458,6 +3473,18 @@ public:
 	void CRTCContext::SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetTransformationOffset(m_pHandle, nOffsetX, nOffsetY));
+	}
+	
+	/**
+	* CRTCContext::SetTransformationMatrix - Sets the transformation matrix of the scan field.
+	* @param[in] dM11 - Upper left field of the transformation matrix
+	* @param[in] dM12 - Upper right field of the transformation matrix
+	* @param[in] dM21 - Lower left field of the transformation matrix
+	* @param[in] dM22 - Lower right field of the transformation matrix
+	*/
+	void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetTransformationMatrix(m_pHandle, dM11, dM12, dM21, dM22));
 	}
 	
 	/**

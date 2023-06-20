@@ -171,6 +171,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_angle) (uint32_t nCardNo, uint32_t nHeadNo, double dAngle, uint32_t nAtOnce);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scale) (uint32_t nCardNo, uint32_t nHeadNo, double dScaleFactor, uint32_t nAtOnce);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_offset) (uint32_t nCardNo, uint32_t nHeadNo, int32_t nXOffset, int32_t nYOffset, uint32_t nAtOnce);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_matrix) (uint32_t nCardNo, uint32_t nHeadNo, double dM11, double dM12, double dM21, double dM22, uint32_t nAtOnce);
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_waveform_offset) (uint32_t nCardNo, uint32_t nChannel, uint32_t nOffset, uint32_t nNumber, int32_t* pPtr);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_measurement_status) (uint32_t nCardNo, uint32_t* pnBusy, uint32_t* pnPos);
@@ -309,6 +310,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_angle n_set_angle = nullptr;
 			PScanLabPtr_n_set_scale n_set_scale = nullptr;
 			PScanLabPtr_n_set_offset n_set_offset = nullptr;
+			PScanLabPtr_n_set_matrix n_set_matrix = nullptr;
 
 			PScanLabPtr_n_get_waveform_offset n_get_waveform_offset = nullptr;
 			PScanLabPtr_n_measurement_status n_measurement_status = nullptr;

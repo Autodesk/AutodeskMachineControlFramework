@@ -697,6 +697,18 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationoffset(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nOffsetX, LibMCDriver_ScanLab_int32 nOffsetY);
 
 /**
+* Sets the transformation matrix of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dM11 - Upper left field of the transformation matrix
+* @param[in] dM12 - Upper right field of the transformation matrix
+* @param[in] dM21 - Lower left field of the transformation matrix
+* @param[in] dM22 - Lower right field of the transformation matrix
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationmatrix(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dM11, LibMCDriver_ScanLab_double dM12, LibMCDriver_ScanLab_double dM21, LibMCDriver_ScanLab_double dM22);
+
+/**
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
