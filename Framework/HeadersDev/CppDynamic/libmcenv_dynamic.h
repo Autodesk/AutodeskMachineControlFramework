@@ -4348,6 +4348,17 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildJobPtr) (LibMCEnv_UIEnvi
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
+/**
+* Retrieves the history of a given variable in the system journal.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
+* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+* @param[out] pJournalVariable - Journal Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -4799,6 +4810,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_HasBuildJobPtr m_UIEnvironment_HasBuildJob;
 	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;
+	PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr m_UIEnvironment_RetrieveJournalVariable;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

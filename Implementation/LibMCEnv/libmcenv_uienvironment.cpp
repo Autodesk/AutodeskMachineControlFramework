@@ -41,6 +41,8 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_journalvariable.hpp"
+
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
@@ -481,5 +483,9 @@ IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint3
     return new CDiscreteFieldData2D(pInstance);
 }
 
+IJournalVariable* CUIEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
 
 
