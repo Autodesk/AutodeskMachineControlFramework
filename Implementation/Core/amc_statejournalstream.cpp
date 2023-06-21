@@ -123,7 +123,7 @@ namespace AMC {
 	};
 
 	CStateJournalStream::CStateJournalStream()
-		: m_nCurrentTimeStamp (0)
+		: m_nCurrentTimeStamp (0), m_nStartTimeStamp (0)
 	{
 
 	}

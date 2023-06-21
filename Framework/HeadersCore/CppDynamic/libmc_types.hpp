@@ -517,6 +517,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDMETADATAINDEX 500 /** invalid metadata index. */
 #define LIBMC_ERROR_METADATAISNOTUNIQUE 501 /** metadata is not unique. */
 #define LIBMC_ERROR_METADATANOTFOUND 502 /** metadata not found. */
+#define LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING 503 /** Time stamp is not incrementing. */
+#define LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL 504 /** Invalid time stamp interval. */
+#define LIBMC_ERROR_TIMESTREAMISEMPTY 505 /** Time stream is empty. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -946,6 +949,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDMETADATAINDEX: return "invalid metadata index.";
     case LIBMC_ERROR_METADATAISNOTUNIQUE: return "metadata is not unique.";
     case LIBMC_ERROR_METADATANOTFOUND: return "metadata not found.";
+    case LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING: return "Time stamp is not incrementing.";
+    case LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL: return "Invalid time stamp interval.";
+    case LIBMC_ERROR_TIMESTREAMISEMPTY: return "Time stream is empty.";
     default: return "unknown error";
   }
 }

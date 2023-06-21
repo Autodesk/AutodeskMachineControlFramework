@@ -587,6 +587,9 @@ public:
 			case LIBMC_ERROR_INVALIDMETADATAINDEX: return "INVALIDMETADATAINDEX";
 			case LIBMC_ERROR_METADATAISNOTUNIQUE: return "METADATAISNOTUNIQUE";
 			case LIBMC_ERROR_METADATANOTFOUND: return "METADATANOTFOUND";
+			case LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING: return "TIMESTAMPISNOTINCREMENTING";
+			case LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL: return "INVALIDTIMESTAMPINTERVAL";
+			case LIBMC_ERROR_TIMESTREAMISEMPTY: return "TIMESTREAMISEMPTY";
 		}
 		return "UNKNOWN";
 	}
@@ -1016,6 +1019,9 @@ public:
 			case LIBMC_ERROR_INVALIDMETADATAINDEX: return "invalid metadata index.";
 			case LIBMC_ERROR_METADATAISNOTUNIQUE: return "metadata is not unique.";
 			case LIBMC_ERROR_METADATANOTFOUND: return "metadata not found.";
+			case LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING: return "Time stamp is not incrementing.";
+			case LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL: return "Invalid time stamp interval.";
+			case LIBMC_ERROR_TIMESTREAMISEMPTY: return "Time stream is empty.";
 		}
 		return "unknown error";
 	}

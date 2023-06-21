@@ -142,8 +142,14 @@
 		<error name="SCALINGEXCEEDSMAXIMUMPIXELCOUNT" code="10102" description="Scaling exceeds maximum pixel count." />
 		<error name="INTERNALSCALINGERROR" code="10103" description="Internal scaling error." />
 		<error name="INVALIDCOLORRANGE" code="10104" description="Invalid color range." />
+		<error name="EMPTYJOURNALVARIABLENAME" code="10105" description="Empty journal variable name." />
+		<error name="INVALIDJOURNALVARIABLEINTERVAL" code="10106" description="Invalid journal variable interval." />
+		<error name="JOURNALVARIABLENOTFOUND" code="10107" description="Journal variable not found." />
+		<error name="COMPUTATIONOUTSIDEOFJOURNALDATA" code="10108" description="Computation outside of journal data." />
+		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="10109" description="Invalid Journal compute interval." />
+		<error name="INVALIDJOURNALCOMPUTEDATA" code="10110" description="Invalid Journal compute data." />
 		
-		
+			
 									
 	</errors>
 

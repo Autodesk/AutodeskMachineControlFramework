@@ -81,7 +81,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
         pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel));
 
     // Create system state
-    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, "./testoutput");
+    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput");
 
     // Create API Handlers for data model requests
     m_pAPI = std::make_shared<AMC::CAPI>();

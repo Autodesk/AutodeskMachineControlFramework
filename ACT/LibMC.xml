@@ -525,6 +525,12 @@
 		<error name="INVALIDMETADATAINDEX" code="500" description="invalid metadata index." />
 		<error name="METADATAISNOTUNIQUE" code="501" description="metadata is not unique." />
 		<error name="METADATANOTFOUND" code="502" description="metadata not found." />
+		<error name="TIMESTAMPISNOTINCREMENTING" code="503" description="Time stamp is not incrementing." />
+		
+		<error name="INVALIDTIMESTAMPINTERVAL" code="504" description="Invalid time stamp interval." />
+		<error name="TIMESTREAMISEMPTY" code="505" description="Time stream is empty." />
+		
+		
 		
 		
 		

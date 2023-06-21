@@ -199,6 +199,12 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT 10102 /** Scaling exceeds maximum pixel count. */
 #define LIBMCENV_ERROR_INTERNALSCALINGERROR 10103 /** Internal scaling error. */
 #define LIBMCENV_ERROR_INVALIDCOLORRANGE 10104 /** Invalid color range. */
+#define LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME 10105 /** Empty journal variable name. */
+#define LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL 10106 /** Invalid journal variable interval. */
+#define LIBMCENV_ERROR_JOURNALVARIABLENOTFOUND 10107 /** Journal variable not found. */
+#define LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA 10108 /** Computation outside of journal data. */
+#define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL 10109 /** Invalid Journal compute interval. */
+#define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA 10110 /** Invalid Journal compute data. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -310,6 +316,12 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "Scaling exceeds maximum pixel count.";
     case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "Internal scaling error.";
     case LIBMCENV_ERROR_INVALIDCOLORRANGE: return "Invalid color range.";
+    case LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name.";
+    case LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL: return "Invalid journal variable interval.";
+    case LIBMCENV_ERROR_JOURNALVARIABLENOTFOUND: return "Journal variable not found.";
+    case LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA: return "Computation outside of journal data.";
+    case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid Journal compute interval.";
+    case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
     default: return "unknown error";
   }
 }

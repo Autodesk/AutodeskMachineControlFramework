@@ -74,6 +74,7 @@ private:
 	AMC::PParameterHandler m_pClientVariableHandler;
 	AMC::PStateSignalHandler m_pSignalHandler;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	AMC::PStateJournal m_pStateJournal;
 	AMC::CUIHandler * m_pUIHandler;
 
 	LibMCData::PStorage m_pStorage;
@@ -93,7 +94,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID);
 
 	virtual ~CUIEnvironment();
 

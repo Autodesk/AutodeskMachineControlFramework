@@ -51,12 +51,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, const std::string& sTestEnvironmentPath)
-		: m_sTestEnvironmentPath (sTestEnvironmentPath)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath)
+		: m_sTestEnvironmentPath (sTestEnvironmentPath), m_pStateJournal (pStateJournal)
 	{
 		LibMCAssertNotNull(pLogger.get());
 		LibMCAssertNotNull(pDataModel.get());
 		LibMCAssertNotNull(pEnvWrapper.get());
+		LibMCAssertNotNull(pStateJournal.get());
 
 		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
 
@@ -77,7 +78,7 @@ namespace AMC {
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, getTestEnvironmentPath (), getSystemUserID ());
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID ());
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
 		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
