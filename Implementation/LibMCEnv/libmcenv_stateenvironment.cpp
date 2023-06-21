@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_journalvariable.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
@@ -490,5 +491,9 @@ IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_ui
 
 IJournalVariable* CStateEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint64_t nStartTimeStamp = 0;
+	uint64_t nEndTimeStamp = 0;
+	auto pStateJournal = m_pSystemState->getStateJournalInstance();
+	pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
+	return new CJournalVariable(pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
 }

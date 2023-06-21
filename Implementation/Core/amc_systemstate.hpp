@@ -133,6 +133,7 @@ namespace AMC {
 		PDriverHandler getDriverHandlerInstance();
 		PToolpathHandler getToolpathHandlerInstance();
 		PStateMachineData getStateMachineData ();
+		PStateJournal getStateJournalInstance();
 
 		LibMCData::PStorage getStorageInstance();
 		LibMCData::PLoginHandler getLoginHandlerInstance();

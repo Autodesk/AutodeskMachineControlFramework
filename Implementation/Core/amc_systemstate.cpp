@@ -169,6 +169,12 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
+	PStateJournal CSystemState::getStateJournalInstance()
+	{
+		return m_pStateJournal;
+	}
+
+
 	PStateMachineData CSystemState::getStateMachineData()
 	{
 		return m_pStateMachineData;
