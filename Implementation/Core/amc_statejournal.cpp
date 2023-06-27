@@ -113,6 +113,8 @@ namespace AMC {
 	class CStateJournalImplIntegerVariable : public CStateJournalImplVariable {
 	private:
 		int64_t m_nCurrentValue;
+		std::list<std::pair<uint64_t, int64_t>> m_TimeStream;
+
 	public:
 		CStateJournalImplIntegerVariable(CStateJournalStream* pStream, const uint32_t nID, const std::string& sName)
 			: CStateJournalImplVariable(pStream, nID, sName), m_nCurrentValue(0)
@@ -133,6 +135,8 @@ namespace AMC {
 				m_pStream->writeTimeStamp(nAbsoluteTimeStamp);
 				m_pStream->writeInt64Delta(m_nID, nDelta);
 
+				m_TimeStream.push_back(std::make_pair(nAbsoluteTimeStamp, nValue));
+
 				m_nCurrentValue = nValue;
 			}
 		}
@@ -141,6 +145,25 @@ namespace AMC {
 		{
 			m_pStream->writeNameDefinition(m_nID, m_sName);
 			m_pStream->writeInt64Delta(m_nID, m_nCurrentValue);
+		}
+
+		void readTimeStream(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, int64_t& dStartValue, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
+		{
+			dStartValue = 0;
+
+			for (auto& timeStreamEntry : m_TimeStream) {
+				if (timeStreamEntry.first <= nStartTimeStamp) {
+					dStartValue = timeStreamEntry.second;
+				}
+				else {
+					if (timeStreamEntry.first <= nEndTimeStamp) {
+						sJournalTimeStreamDoubleEntry entry;
+						entry.m_nTimeStamp = timeStreamEntry.first;
+						entry.m_dValue = timeStreamEntry.second;
+						timeStream.push_back(entry);
+					}
+				}
+			}
 		}
 
 
@@ -212,9 +235,6 @@ namespace AMC {
 
 		void readTimeStream(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, double & dStartValue, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 		{
-			if (m_TimeStream.empty ())
-				throw ELibMCCustomException(LIBMC_ERROR_TIMESTREAMISEMPTY, m_sName);
-
 			dStartValue = 0.0;
 
 			for (auto& timeStreamEntry : m_TimeStream) {
