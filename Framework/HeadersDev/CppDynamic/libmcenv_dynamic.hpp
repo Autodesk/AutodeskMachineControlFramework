@@ -382,6 +382,7 @@ public:
 			case LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA: return "COMPUTATIONOUTSIDEOFJOURNALDATA";
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "INVALIDJOURNALCOMPUTEINTERVAL";
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "INVALIDJOURNALCOMPUTEDATA";
+			case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "INVALIDSEGMENTATTRIBUTETYPE";
 		}
 		return "UNKNOWN";
 	}
@@ -499,6 +500,7 @@ public:
 			case LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA: return "Computation outside of journal data.";
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid Journal compute interval.";
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
+			case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "Invalid Segment Attribute Type.";
 		}
 		return "unknown error";
 	}
@@ -850,6 +852,8 @@ public:
 	inline LibMCEnv_uint32 GetSegmentCount();
 	inline void GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount);
 	inline eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
+	inline LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
 	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
 	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
@@ -896,6 +900,7 @@ public:
 	inline std::string GetStorageUUID();
 	inline std::string GetBuildUUID();
 	inline LibMCEnv_uint32 GetLayerCount();
+	inline void RegisterCustomSegmentAttribute(const std::string & sNameSpace, const std::string & sAttributeName, const eToolpathAttributeType eAttributeType);
 	inline PToolpathLayer LoadLayer(const LibMCEnv_uint32 nLayerIndex);
 	inline LibMCEnv_double GetUnits();
 	inline LibMCEnv_uint32 GetPartCount();
@@ -1697,6 +1702,8 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentType = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = nullptr;
@@ -1727,6 +1734,7 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
+		pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute = nullptr;
 		pWrapperTable->m_ToolpathAccessor_LoadLayer = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetUnits = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetPartCount = nullptr;
@@ -2557,6 +2565,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = (PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentintegerattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = (PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentintegerattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = (PLibMCEnvToolpathLayer_GetSegmentDoubleAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentdoubleattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = (PLibMCEnvToolpathLayer_GetSegmentDoubleAttributePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentdoubleattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = (PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentpointcount");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = (PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentpointcount");
@@ -2824,6 +2850,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetLayerCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute = (PLibMCEnvToolpathAccessor_RegisterCustomSegmentAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_registercustomsegmentattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute = (PLibMCEnvToolpathAccessor_RegisterCustomSegmentAttributePtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_registercustomsegmentattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5926,6 +5961,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentintegerattribute", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentdoubleattribute", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointcount", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6044,6 +6087,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getlayercount", (void**)&(pWrapperTable->m_ToolpathAccessor_GetLayerCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetLayerCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_registercustomsegmentattribute", (void**)&(pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_loadlayer", (void**)&(pWrapperTable->m_ToolpathAccessor_LoadLayer));
@@ -7980,6 +8027,34 @@ public:
 	}
 	
 	/**
+	* CToolpathLayer::GetSegmentIntegerAttribute - Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	LibMCEnv_int64 CToolpathLayer::GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentIntegerAttribute(m_pHandle, nIndex, nAttributeID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentDoubleAttribute - Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	LibMCEnv_double CToolpathLayer::GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentDoubleAttribute(m_pHandle, nIndex, nAttributeID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
 	* CToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
@@ -8426,6 +8501,17 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetLayerCount(m_pHandle, &resultLayerCount));
 		
 		return resultLayerCount;
+	}
+	
+	/**
+	* CToolpathAccessor::RegisterCustomSegmentAttribute - Registers a new custom segment attribute to be read.
+	* @param[in] sNameSpace - Namespace of the custom attribute.
+	* @param[in] sAttributeName - Name of the custom attribute.
+	* @param[in] eAttributeType - Attribute Type.
+	*/
+	void CToolpathAccessor::RegisterCustomSegmentAttribute(const std::string & sNameSpace, const std::string & sAttributeName, const eToolpathAttributeType eAttributeType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_RegisterCustomSegmentAttribute(m_pHandle, sNameSpace.c_str(), sAttributeName.c_str(), eAttributeType));
 	}
 	
 	/**

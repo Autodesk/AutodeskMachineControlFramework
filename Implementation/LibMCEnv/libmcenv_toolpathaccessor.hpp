@@ -74,6 +74,8 @@ public:
 
 	LibMCEnv_uint32 GetLayerCount() override;
 
+	void RegisterCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType) override;
+
 	IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) override;
 
 	LibMCEnv_double GetUnits() override;

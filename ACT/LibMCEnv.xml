@@ -148,6 +148,7 @@
 		<error name="COMPUTATIONOUTSIDEOFJOURNALDATA" code="10108" description="Computation outside of journal data." />
 		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="10109" description="Invalid Journal compute interval." />
 		<error name="INVALIDJOURNALCOMPUTEDATA" code="10110" description="Invalid Journal compute data." />
+		<error name="INVALIDSEGMENTATTRIBUTETYPE" code="10111" description="Invalid Segment Attribute Type." />
 		
 			
 									
@@ -177,6 +178,12 @@
 		<option name="Polyline" value="3" />
 	</enum>
 	
+	<enum name="ToolpathAttributeType">
+		<option name="Unknown" value="0" />
+		<option name="Integer" value="1" />
+		<option name="Double" value="2" />
+	</enum>
+
 	<enum name="ToolpathProfileValueType">
 		<option name="Custom" value="0" />
 		<option name="Speed" value="1" />
@@ -533,6 +540,18 @@
 			<param name="Type" type="enum" class="ToolpathSegmentType" pass="return" description="Segment Type" />
 		</method>
 
+		<method name="GetSegmentIntegerAttribute" description="Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
+			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
+			<param name="Value" type="int64" pass="return" description="Attribute Value." />
+		</method>
+
+		<method name="GetSegmentDoubleAttribute" description="Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
+			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
+			<param name="Value" type="double" pass="return" description="Attribute Value." />
+		</method>
+
 		<method name="GetSegmentPointCount" description="Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="HatchCount" type="uint32" pass="return" description="Hatch count of segment." />
@@ -711,6 +730,12 @@
 			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
 		</method>
 
+		<method name="RegisterCustomSegmentAttribute" description="Registers a new custom segment attribute to be read.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the custom attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the custom attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="in" description="Attribute Type." />
+		</method>
+
 		<method name="LoadLayer" description="Reads and returns a layer object.">
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index." />
 			<param name="LayerData" type="class" class="ToolpathLayer" pass="return" description="Toolpath layer object." />
@@ -778,6 +803,7 @@
 			<param name="Name" type="string" pass="in" description="Name of the metadata" />
 			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
 		</method>		
+
 
 	</class>
 

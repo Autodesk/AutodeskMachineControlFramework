@@ -205,6 +205,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA 10108 /** Computation outside of journal data. */
 #define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL 10109 /** Invalid Journal compute interval. */
 #define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA 10110 /** Invalid Journal compute data. */
+#define LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE 10111 /** Invalid Segment Attribute Type. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -322,6 +323,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA: return "Computation outside of journal data.";
     case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid Journal compute interval.";
     case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
+    case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "Invalid Segment Attribute Type.";
     default: return "unknown error";
   }
 }
@@ -387,6 +389,12 @@ namespace LibMCEnv {
     Hatch = 1,
     Loop = 2,
     Polyline = 3
+  };
+  
+  enum class eToolpathAttributeType : LibMCEnv_int32 {
+    Unknown = 0,
+    Integer = 1,
+    Double = 2
   };
   
   enum class eToolpathProfileValueType : LibMCEnv_int32 {
@@ -471,6 +479,7 @@ namespace LibMCEnv {
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
+typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;

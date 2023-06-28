@@ -75,6 +75,13 @@ LibMCEnv_uint32 CToolpathAccessor::GetLayerCount()
 
 }
 
+void CToolpathAccessor::RegisterCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	pToolpathEntity->registerCustomSegmentAttribute(sNameSpace, sAttributeName, eAttributeType);
+
+}
+
 IToolpathLayer * CToolpathAccessor::LoadLayer(const LibMCEnv_uint32 nLayerIndex)
 {
 	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);

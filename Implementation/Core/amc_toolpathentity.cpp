@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_toolpathentity.hpp"
 #include "libmc_exceptiontypes.hpp"
+#include "libmcenv_dynamic.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 namespace AMC {
 
@@ -121,7 +123,7 @@ namespace AMC {
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
 		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
-		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName);
+		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName, m_CustomSegmentAttributes);
 	}
 
 
@@ -265,6 +267,31 @@ namespace AMC {
 
 		return iIter->second;
 	}
+
+	void CToolpathEntity::registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType)
+	{
+		switch (eAttributeType) {
+		case LibMCEnv::eToolpathAttributeType::Integer: 
+			m_pToolpath->RegisterCustomUint32Attribute (sNameSpace, sAttributeName);
+			break;
+		case LibMCEnv::eToolpathAttributeType::Double:
+			m_pToolpath->RegisterCustomDoubleAttribute(sNameSpace, sAttributeName);
+			break;
+		default: 
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE);
+		}
+		
+		sToolpathCustomSegmentAttribute segmentAttribute;
+		segmentAttribute.nAttributeID = 0;
+		segmentAttribute.m_sNameSpace = sNameSpace;
+		segmentAttribute.m_sAttributeName = sAttributeName;
+		segmentAttribute.m_AttributeType = eAttributeType;
+
+		m_CustomSegmentAttributes.push_back(segmentAttribute);
+		
+
+	}
+
 
 }
 

@@ -624,6 +624,28 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentinfo(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmenttype(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType);
 
 /**
+* Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] nAttributeID - ID of the attribute.
+* @param[out] pValue - Attribute Value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentintegerattribute(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_int64 * pValue);
+
+/**
+* Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] nAttributeID - ID of the attribute.
+* @param[out] pValue - Attribute Value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentdoubleattribute(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_double * pValue);
+
+/**
 * Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
@@ -971,6 +993,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuilduuid(LibMCEnv
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getlayercount(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pLayerCount);
+
+/**
+* Registers a new custom segment attribute to be read.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of the custom attribute.
+* @param[in] pAttributeName - Name of the custom attribute.
+* @param[in] eAttributeType - Attribute Type.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_registercustomsegmentattribute(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pAttributeName, LibMCEnv::eToolpathAttributeType eAttributeType);
 
 /**
 * Reads and returns a layer object.

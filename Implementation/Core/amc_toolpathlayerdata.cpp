@@ -81,9 +81,8 @@ namespace AMC {
 	}
 
 
-
-	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName)
-		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName)
+	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName, std::vector<sToolpathCustomSegmentAttribute> customSegmentAttributes)
+		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName), m_CustomSegmentAttributes (customSegmentAttributes)
 	{
 		LibMCAssertNotNull(p3MFLayer.get());
 		LibMCAssertNotNull(pToolpath.get());
@@ -91,6 +90,12 @@ namespace AMC {
 		m_sUUID = p3MFLayer->GetLayerDataUUID();
 		uint32_t nSegmentCount = p3MFLayer->GetSegmentCount();
 		uint32_t nTotalPointCount = 0;
+
+		for (auto& attribute : m_CustomSegmentAttributes) {
+			attribute.nAttributeID = p3MFLayer->FindAttributeIDByName(attribute.m_sNameSpace, attribute.m_sAttributeName);
+		}
+
+		m_SegmentAttributeData.resize((size_t)nSegmentCount * m_CustomSegmentAttributes.size());
 
 		// Read segment information
 		m_Segments.resize(nSegmentCount);
@@ -107,6 +112,18 @@ namespace AMC {
 			pSegment->m_Type = (LibMCEnv::eToolpathSegmentType) eType;
 			pSegment->m_ProfileID = registerUUID (sProfileUUID);
 			pSegment->m_PartID = registerUUID(sPartUUID);
+			if (m_CustomSegmentAttributes.size() > 0) {
+				pSegment->m_AttributeData = &m_SegmentAttributeData.at((size_t)nSegmentIndex * m_CustomSegmentAttributes.size());
+				int64_t* pAttributeData = pSegment->m_AttributeData;
+				for (auto& attribute : m_CustomSegmentAttributes) {
+					*pAttributeData = p3MFLayer->GetSegmentIntegerAttributeByID(nSegmentIndex, attribute.nAttributeID);
+					pAttributeData++;
+				}
+
+			}
+			else {
+				pSegment->m_AttributeData = nullptr;
+			}
 
 			storeProfileData (pToolpath, sProfileUUID);
 
@@ -329,6 +346,17 @@ namespace AMC {
 
 		auto sProfileUUID = getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
 		return retrieveProfileData(sProfileUUID);
+	}
+
+	int64_t CToolpathLayerData::getSegmentIntegerAttribute(const uint32_t nSegmentIndex, uint32_t nAttributeID)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+
+		if ((nAttributeID < 1) || (nAttributeID > m_CustomSegmentAttributes.size ()))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDATTRIBUTEINDEX, m_sDebugName);
+
+		return m_Segments[nSegmentIndex].m_AttributeData[nAttributeID - 1];
 	}
 
 	double CToolpathLayerData::getUnits()

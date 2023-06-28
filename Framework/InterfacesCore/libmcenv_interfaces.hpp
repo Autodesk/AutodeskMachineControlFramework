@@ -704,6 +704,22 @@ public:
 	virtual LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
+	* IToolpathLayer::GetSegmentIntegerAttribute - Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	virtual LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentDoubleAttribute - Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	virtual LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) = 0;
+
+	/**
 	* IToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
@@ -952,6 +968,14 @@ public:
 	* @return Returns layer count.
 	*/
 	virtual LibMCEnv_uint32 GetLayerCount() = 0;
+
+	/**
+	* IToolpathAccessor::RegisterCustomSegmentAttribute - Registers a new custom segment attribute to be read.
+	* @param[in] sNameSpace - Namespace of the custom attribute.
+	* @param[in] sAttributeName - Name of the custom attribute.
+	* @param[in] eAttributeType - Attribute Type.
+	*/
+	virtual void RegisterCustomSegmentAttribute(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType) = 0;
 
 	/**
 	* IToolpathAccessor::LoadLayer - Reads and returns a layer object.

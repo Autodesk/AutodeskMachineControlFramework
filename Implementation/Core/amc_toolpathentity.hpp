@@ -66,6 +66,8 @@ namespace AMC {
 		std::map<std::string, PToolpathPart> m_PartMap;
 		std::vector<PToolpathPart> m_PartList;
 
+		std::vector<sToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
+
 		std::string m_sDebugName;
 
 		void copyMetaDataNode (AMC::PXMLDocumentNodeInstance pTargetNodeInstance, Lib3MF::PCustomXMLNode pSourceNodeInstance);
@@ -97,6 +99,8 @@ namespace AMC {
 		PXMLDocumentInstance getMetaData (uint32_t nMetaDataIndex);
 		bool hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
+
+		void registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType);
 	};
 
 	

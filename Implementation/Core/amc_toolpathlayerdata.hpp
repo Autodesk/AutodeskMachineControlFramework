@@ -52,7 +52,16 @@ namespace AMC {
 		uint32_t m_PointCount;
 		uint32_t m_ProfileID;
 		uint32_t m_PartID;
+		int64_t* m_AttributeData;
 	} sToolpathLayerSegment;
+
+	typedef struct _sToolpathCustomSegmentAttribute {
+		uint32_t nAttributeID;
+		LibMCEnv::eToolpathAttributeType m_AttributeType;
+		std::string m_sNameSpace;
+		std::string m_sAttributeName;
+
+	} sToolpathCustomSegmentAttribute;
 
 	class CToolpathLayerProfile {
 		private:
@@ -82,6 +91,7 @@ namespace AMC {
 		std::string m_sUUID;
 		
 		std::vector<sToolpathLayerSegment> m_Segments;
+		std::vector<int64_t> m_SegmentAttributeData;
 		std::vector<LibMCEnv::sPosition2D> m_Points;
 
 		std::vector<std::string> m_UUIDs;
@@ -92,6 +102,8 @@ namespace AMC {
 
 		std::string m_sDebugName;
 
+		std::vector<sToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
+
 		uint32_t registerUUID(const std::string& sUUID);
 		std::string getRegisteredUUID(const uint32_t nID);
 
@@ -100,7 +112,7 @@ namespace AMC {
 
 	public:
 
-		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName);
+		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName, std::vector<sToolpathCustomSegmentAttribute> customSegmentAttributes);
 		virtual ~CToolpathLayerData();		
 
 		std::string getUUID ();
@@ -117,6 +129,8 @@ namespace AMC {
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
 		PToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
+
+		int64_t getSegmentIntegerAttribute(const uint32_t nSegmentIndex, uint32_t nAttributeID);
 
 		double getUnits();
 

@@ -76,6 +76,16 @@ LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nInde
 	return m_pToolpathLayerData->getSegmentPointCount(nIndex);
 }
 
+LibMCEnv_int64 CToolpathLayer::GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+{
+	return m_pToolpathLayerData->getSegmentIntegerAttribute(nIndex, nAttributeID);
+}
+
+LibMCEnv_double CToolpathLayer::GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
 LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)
 {
 	auto segmentType = m_pToolpathLayerData->getSegmentType(nIndex);

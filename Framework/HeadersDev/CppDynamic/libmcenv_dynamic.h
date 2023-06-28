@@ -611,6 +611,28 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentInfoPtr) (LibMCEnv_Too
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentTypePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType);
 
 /**
+* Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] nAttributeID - ID of the attribute.
+* @param[out] pValue - Attribute Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_int64 * pValue);
+
+/**
+* Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] nAttributeID - ID of the attribute.
+* @param[out] pValue - Attribute Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentDoubleAttributePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_double * pValue);
+
+/**
 * Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
@@ -958,6 +980,17 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetBuildUUIDPtr) (LibMCEnv_To
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetLayerCountPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pLayerCount);
+
+/**
+* Registers a new custom segment attribute to be read.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of the custom attribute.
+* @param[in] pAttributeName - Name of the custom attribute.
+* @param[in] eAttributeType - Attribute Type.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_RegisterCustomSegmentAttributePtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pAttributeName, LibMCEnv::eToolpathAttributeType eAttributeType);
 
 /**
 * Reads and returns a layer object.
@@ -4466,6 +4499,8 @@ typedef struct {
 	PLibMCEnvToolpathLayer_GetSegmentCountPtr m_ToolpathLayer_GetSegmentCount;
 	PLibMCEnvToolpathLayer_GetSegmentInfoPtr m_ToolpathLayer_GetSegmentInfo;
 	PLibMCEnvToolpathLayer_GetSegmentTypePtr m_ToolpathLayer_GetSegmentType;
+	PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr m_ToolpathLayer_GetSegmentIntegerAttribute;
+	PLibMCEnvToolpathLayer_GetSegmentDoubleAttributePtr m_ToolpathLayer_GetSegmentDoubleAttribute;
 	PLibMCEnvToolpathLayer_GetSegmentPointCountPtr m_ToolpathLayer_GetSegmentPointCount;
 	PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr m_ToolpathLayer_GetSegmentHatchCount;
 	PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr m_ToolpathLayer_GetSegmentProfileUUID;
@@ -4496,6 +4531,7 @@ typedef struct {
 	PLibMCEnvToolpathAccessor_GetStorageUUIDPtr m_ToolpathAccessor_GetStorageUUID;
 	PLibMCEnvToolpathAccessor_GetBuildUUIDPtr m_ToolpathAccessor_GetBuildUUID;
 	PLibMCEnvToolpathAccessor_GetLayerCountPtr m_ToolpathAccessor_GetLayerCount;
+	PLibMCEnvToolpathAccessor_RegisterCustomSegmentAttributePtr m_ToolpathAccessor_RegisterCustomSegmentAttribute;
 	PLibMCEnvToolpathAccessor_LoadLayerPtr m_ToolpathAccessor_LoadLayer;
 	PLibMCEnvToolpathAccessor_GetUnitsPtr m_ToolpathAccessor_GetUnits;
 	PLibMCEnvToolpathAccessor_GetPartCountPtr m_ToolpathAccessor_GetPartCount;
