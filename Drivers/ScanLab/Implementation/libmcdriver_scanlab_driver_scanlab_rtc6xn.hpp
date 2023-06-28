@@ -71,6 +71,9 @@ private:
 
 	float m_fMaxLaserPowerInWatts;
 
+	uint32_t m_nAttributeFilterID;
+	int64_t m_nAttributeFilterValue;
+
 	act_managed_ptr<IRTCSelector> m_pRTCSelector;
 	
 	std::map<uint32_t, act_managed_ptr<IRTCContext>> m_ScannerContexts;
@@ -142,6 +145,8 @@ public:
 	void SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode) override;
 
 	LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() override;
+
+	void SetAttributeFilter(const LibMCDriver_ScanLab_uint32 nAttributeID, const LibMCDriver_ScanLab_int64 nAttributeValue) override;
 
 	void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists) override;
 

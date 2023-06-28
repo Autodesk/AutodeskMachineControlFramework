@@ -3519,6 +3519,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecord
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setattributefilter(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nAttributeID, LibMCDriver_ScanLab_int64 nAttributeValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
+
+	try {
+		IDriver_ScanLab_RTC6xN* pIDriver_ScanLab_RTC6xN = dynamic_cast<IDriver_ScanLab_RTC6xN*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6xN)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC6xN->SetAttributeFilter(nAttributeID, nAttributeValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
@@ -3909,6 +3933,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_setoierecordingmode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_setattributefilter") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_setattributefilter;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts") 

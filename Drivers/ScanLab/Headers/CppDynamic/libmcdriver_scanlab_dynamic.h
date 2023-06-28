@@ -1368,6 +1368,16 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Se
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
 
 /**
+* Enables or disables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nAttributeID - Attribute ID to filter for. Filtering will be disabled if AttributeID is 0.
+* @param[in] nAttributeValue - Attribute Value to filter for.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAttributeFilterPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nAttributeID, LibMCDriver_ScanLab_int64 nAttributeValue);
+
+/**
 * Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
@@ -1621,6 +1631,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureDelaysPtr m_Driver_ScanLab_RTC6xN_ConfigureDelays;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetOIERecordingModePtr m_Driver_ScanLab_RTC6xN_SetOIERecordingMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr m_Driver_ScanLab_RTC6xN_GetOIERecordingMode;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAttributeFilterPtr m_Driver_ScanLab_RTC6xN_SetAttributeFilter;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DrawLayerPtr m_Driver_ScanLab_RTC6xN_DrawLayer;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts;

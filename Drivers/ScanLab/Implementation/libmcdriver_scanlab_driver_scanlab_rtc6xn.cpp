@@ -48,7 +48,9 @@ using namespace LibMCDriver_ScanLab::Impl;
 
 CDriver_ScanLab_RTC6xN::CDriver_ScanLab_RTC6xN(const std::string& sName, const std::string& sType, uint32_t nScannerCount, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: CDriver_ScanLab(pDriverEnvironment), m_sName(sName), m_sType(sType), m_fMaxLaserPowerInWatts(0.0f), m_SimulationMode(false), m_nScannerCount(nScannerCount),
-		m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled)
+		m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled),
+	m_nAttributeFilterID (0), m_nAttributeFilterValue (0)
+
 {
 	if ((nScannerCount < RTC6_MINLASERCOUNT) || (nScannerCount > RTC6_MAXLASERCOUNT))
 		throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERCOUNT);
@@ -486,7 +488,13 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 			uint32_t nPointCount;
 			pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
 
-			if (nPointCount >= 2) {
+			bool bDrawSegment = true;
+			if (m_nAttributeFilterID != 0) {
+				int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, m_nAttributeFilterID);
+				bDrawSegment = (segmentAttributeValue == m_nAttributeFilterValue);
+			}
+
+			if (bDrawSegment && (nPointCount >= 2)) {
 
 				float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
 				float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
@@ -750,6 +758,12 @@ act_managed_ptr<IRTCContext> CDriver_ScanLab_RTC6xN::getRTCContextForLaserIndex(
 
 }
 
+void CDriver_ScanLab_RTC6xN::SetAttributeFilter(const LibMCDriver_ScanLab_uint32 nAttributeID, const LibMCDriver_ScanLab_int64 nAttributeValue)
+{
+	m_nAttributeFilterID = nAttributeID;
+	m_nAttributeFilterValue = nAttributeValue;
+
+}
 
 void CDriver_ScanLab_RTC6xN::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
 {
@@ -785,3 +799,5 @@ PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6xN::findPresetByName
 		return nullptr;
 	}
 }
+
+

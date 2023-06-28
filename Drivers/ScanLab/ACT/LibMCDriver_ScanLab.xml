@@ -861,6 +861,11 @@ Custom implementation
 			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="return" description="Recording mode enum" />
 		</method>
 
+		<method name="SetAttributeFilter" description="Enables or disables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.">
+			<param name="AttributeID" type="uint32" pass="in" description="Attribute ID to filter for. Filtering will be disabled if AttributeID is 0." />
+			<param name="AttributeValue" type="int64" pass="in" description="Attribute Value to filter for." />
+		</method>
+
 		<method name="DrawLayer" description="Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if ">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
