@@ -157,9 +157,9 @@ namespace AMC {
 				}
 				else {
 					if (timeStreamEntry.first <= nEndTimeStamp) {
-						sJournalTimeStreamDoubleEntry entry;
+						sJournalTimeStreamInt64Entry entry;
 						entry.m_nTimeStamp = timeStreamEntry.first;
-						entry.m_dValue = timeStreamEntry.second;
+						entry.m_nValue = timeStreamEntry.second;
 						timeStream.push_back(entry);
 					}
 				}

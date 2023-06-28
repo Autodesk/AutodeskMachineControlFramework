@@ -67,7 +67,11 @@ namespace AMC {
 		double m_dValue;
 	} sJournalTimeStreamDoubleEntry;
 
-	
+	typedef struct _sJournalTimeStreamInt64Entry {
+		uint64_t m_nTimeStamp;
+		int64_t m_nValue;
+	} sJournalTimeStreamInt64Entry;
+
 	class CStateJournal {		
 	protected:
 		PStateJournalImpl m_pImpl;
