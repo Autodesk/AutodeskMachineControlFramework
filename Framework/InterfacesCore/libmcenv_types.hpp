@@ -206,6 +206,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL 10109 /** Invalid Journal compute interval. */
 #define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA 10110 /** Invalid Journal compute data. */
 #define LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE 10111 /** Invalid Segment Attribute Type. */
+#define LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND 10112 /** Segment Attribute not Found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -324,6 +325,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid Journal compute interval.";
     case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
     case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "Invalid Segment Attribute Type.";
+    case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "Segment Attribute not Found.";
     default: return "unknown error";
   }
 }

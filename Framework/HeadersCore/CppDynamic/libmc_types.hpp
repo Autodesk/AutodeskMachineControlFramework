@@ -520,6 +520,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING 503 /** Time stamp is not incrementing. */
 #define LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL 504 /** Invalid time stamp interval. */
 #define LIBMC_ERROR_TIMESTREAMISEMPTY 505 /** Time stream is empty. */
+#define LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE 506 /** Invalid toolpath attribute type. */
+#define LIBMC_ERROR_INVALIDSEGMENTINDEX 507 /** Invalid segment index. */
+#define LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID 508 /** Invalid toolpath attribute ID. */
+#define LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE 509 /** Ambiguous segment attribute type. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -952,6 +956,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING: return "Time stamp is not incrementing.";
     case LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL: return "Invalid time stamp interval.";
     case LIBMC_ERROR_TIMESTREAMISEMPTY: return "Time stream is empty.";
+    case LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE: return "Invalid toolpath attribute type.";
+    case LIBMC_ERROR_INVALIDSEGMENTINDEX: return "Invalid segment index.";
+    case LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID: return "Invalid toolpath attribute ID.";
+    case LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE: return "Ambiguous segment attribute type.";
     default: return "unknown error";
   }
 }

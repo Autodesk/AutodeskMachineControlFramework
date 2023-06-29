@@ -270,26 +270,36 @@ namespace AMC {
 
 	void CToolpathEntity::registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType)
 	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto key = std::make_pair(sNameSpace, sAttributeName);
+
+		auto iIter = m_CustomSegmentAttributeMap.find(key);
+		if (iIter != m_CustomSegmentAttributeMap.end()) {
+			if (iIter->second->getAttributeType () != eAttributeType)
+				throw ELibMCInterfaceException(LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE, "ambiguous segment attribute type of " + sNameSpace + "/" + sAttributeName);
+
+			return;
+		}
+
+
 		switch (eAttributeType) {
 		case LibMCEnv::eToolpathAttributeType::Integer: 
 			m_pToolpath->RegisterCustomUint32Attribute (sNameSpace, sAttributeName);
 			break;
 		case LibMCEnv::eToolpathAttributeType::Double:
-			m_pToolpath->RegisterCustomDoubleAttribute(sNameSpace, sAttributeName);
+			m_pToolpath->RegisterCustomDoubleAttribute (sNameSpace, sAttributeName);
 			break;
 		default: 
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE);
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE, "invalid segment attribute type of " + sNameSpace + "/" + sAttributeName);
 		}
 		
-		sToolpathCustomSegmentAttribute segmentAttribute;
-		segmentAttribute.nAttributeID = 0;
-		segmentAttribute.m_sNameSpace = sNameSpace;
-		segmentAttribute.m_sAttributeName = sAttributeName;
-		segmentAttribute.m_AttributeType = eAttributeType;
-
+		CToolpathCustomSegmentAttribute segmentAttribute(sNameSpace, sAttributeName, eAttributeType);
 		m_CustomSegmentAttributes.push_back(segmentAttribute);
-		
+		auto pAttribute = &(*m_CustomSegmentAttributes.rbegin());
 
+		m_CustomSegmentAttributeMap.insert(std::make_pair (key, pAttribute));
+		
 	}
 
 

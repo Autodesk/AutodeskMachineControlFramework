@@ -1583,6 +1583,136 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentdoubleattribute(LibMCEnv_Toolpat
 	}
 }
 
+LibMCEnvResult libmcenv_toolpathlayer_hascustomsegmentattribute(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, bool * pValueExists)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pAttributeName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValueExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sAttributeName(pAttributeName);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValueExists = pIToolpathLayer->HasCustomSegmentAttribute(sNamespace, sAttributeName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributeid(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv_uint32 * pAttributeID)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pAttributeName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pAttributeID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sAttributeName(pAttributeName);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAttributeID = pIToolpathLayer->FindCustomSegmentAttributeID(sNamespace, sAttributeName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributetype(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, eLibMCEnvToolpathAttributeType * pAttributeType)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pAttributeName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pAttributeType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sAttributeName(pAttributeName);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAttributeType = pIToolpathLayer->FindCustomSegmentAttributeType(sNamespace, sAttributeName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributeinfo(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv_uint32 * pAttributeID, eLibMCEnvToolpathAttributeType * pAttributeType)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pNamespace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pAttributeName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pAttributeID)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pAttributeType)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNamespace(pNamespace);
+		std::string sAttributeName(pAttributeName);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIToolpathLayer->FindCustomSegmentAttributeInfo(sNamespace, sAttributeName, *pAttributeID, *pAttributeType);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointcount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
@@ -12981,6 +13111,14 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentintegerattribute;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentdoubleattribute") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentdoubleattribute;
+	if (sProcName == "libmcenv_toolpathlayer_hascustomsegmentattribute") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_hascustomsegmentattribute;
+	if (sProcName == "libmcenv_toolpathlayer_findcustomsegmentattributeid") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_findcustomsegmentattributeid;
+	if (sProcName == "libmcenv_toolpathlayer_findcustomsegmentattributetype") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_findcustomsegmentattributetype;
+	if (sProcName == "libmcenv_toolpathlayer_findcustomsegmentattributeinfo") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_findcustomsegmentattributeinfo;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentpointcount") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpointcount;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmenthatchcount") 

@@ -78,6 +78,14 @@ public:
 
 	LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) override;
 
+	bool HasCustomSegmentAttribute(const std::string& sNamespace, const std::string& sAttributeName) override;
+
+	LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string& sNamespace, const std::string& sAttributeName) override;
+
+	LibMCEnv::eToolpathAttributeType FindCustomSegmentAttributeType(const std::string& sNamespace, const std::string& sAttributeName) override;
+
+	void FindCustomSegmentAttributeInfo(const std::string& sNamespace, const std::string& sAttributeName, LibMCEnv_uint32& nAttributeID, LibMCEnv::eToolpathAttributeType& eAttributeType) override;
+
 	LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex) override;
 
 	LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex) override;

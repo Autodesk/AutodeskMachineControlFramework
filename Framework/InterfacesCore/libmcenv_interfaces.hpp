@@ -720,6 +720,39 @@ public:
 	virtual LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) = 0;
 
 	/**
+	* IToolpathLayer::HasCustomSegmentAttribute - Checks if a segment attribute is registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Flag if attribute is registered.
+	*/
+	virtual bool HasCustomSegmentAttribute(const std::string & sNamespace, const std::string & sAttributeName) = 0;
+
+	/**
+	* IToolpathLayer::FindCustomSegmentAttributeID - Finds a segment attribute ID. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return ID of the attribute.
+	*/
+	virtual LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName) = 0;
+
+	/**
+	* IToolpathLayer::FindCustomSegmentAttributeType - Finds a segment attribute type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Type of the attribute.
+	*/
+	virtual LibMCEnv::eToolpathAttributeType FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName) = 0;
+
+	/**
+	* IToolpathLayer::FindCustomSegmentAttributeInfo - Finds a segment attribute ID and type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @param[out] nAttributeID - ID of the attribute.
+	* @param[out] eAttributeType - Type of the attribute.
+	*/
+	virtual void FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, LibMCEnv::eToolpathAttributeType & eAttributeType) = 0;
+
+	/**
 	* IToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.

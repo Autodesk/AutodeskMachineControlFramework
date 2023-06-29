@@ -529,12 +529,12 @@
 		
 		<error name="INVALIDTIMESTAMPINTERVAL" code="504" description="Invalid time stamp interval." />
 		<error name="TIMESTREAMISEMPTY" code="505" description="Time stream is empty." />
+		<error name="INVALIDTOOLPATHATTRIBUTETYPE" code="506" description="Invalid toolpath attribute type." />
+		<error name="INVALIDSEGMENTINDEX" code="507" description="Invalid segment index." />
 		
+		<error name="INVALIDTOOLPATHATTRIBUTEID" code="508" description="Invalid toolpath attribute ID." />
+		<error name="AMBIGUOUSSEGMENTATTRIBUTETYPE" code="509" description="Ambiguous segment attribute type." />
 		
-		
-		
-		
-
 	</errors>
 	
 	

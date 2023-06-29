@@ -646,6 +646,51 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentintegerattribu
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentdoubleattribute(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_double * pValue);
 
 /**
+* Checks if a segment attribute is registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pValueExists - Flag if attribute is registered.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_hascustomsegmentattribute(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, bool * pValueExists);
+
+/**
+* Finds a segment attribute ID. Fails if attribute is not registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pAttributeID - ID of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributeid(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv_uint32 * pAttributeID);
+
+/**
+* Finds a segment attribute type. Fails if attribute is not registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pAttributeType - Type of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributetype(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv::eToolpathAttributeType * pAttributeType);
+
+/**
+* Finds a segment attribute ID and type. Fails if attribute is not registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pAttributeID - ID of the attribute.
+* @param[out] pAttributeType - Type of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributeinfo(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv_uint32 * pAttributeID, LibMCEnv::eToolpathAttributeType * pAttributeType);
+
+/**
 * Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.

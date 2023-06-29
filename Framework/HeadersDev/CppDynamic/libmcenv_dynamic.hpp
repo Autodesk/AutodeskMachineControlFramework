@@ -383,6 +383,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "INVALIDJOURNALCOMPUTEINTERVAL";
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "INVALIDJOURNALCOMPUTEDATA";
 			case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "INVALIDSEGMENTATTRIBUTETYPE";
+			case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "SEGMENTATTRIBUTENOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -501,6 +502,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid Journal compute interval.";
 			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
 			case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "Invalid Segment Attribute Type.";
+			case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "Segment Attribute not Found.";
 		}
 		return "unknown error";
 	}
@@ -854,6 +856,10 @@ public:
 	inline eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex);
 	inline LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
 	inline LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
+	inline bool HasCustomSegmentAttribute(const std::string & sNamespace, const std::string & sAttributeName);
+	inline LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName);
+	inline eToolpathAttributeType FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName);
+	inline void FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, eToolpathAttributeType & eAttributeType);
 	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
 	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
@@ -1704,6 +1710,10 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentType = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = nullptr;
+		pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = nullptr;
@@ -2580,6 +2590,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute = (PLibMCEnvToolpathLayer_HasCustomSegmentAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_hascustomsegmentattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute = (PLibMCEnvToolpathLayer_HasCustomSegmentAttributePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_hascustomsegmentattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeIDPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeTypePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributetype");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeTypePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeInfoPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeinfo");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeInfoPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeinfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5969,6 +6015,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_hascustomsegmentattribute", (void**)&(pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_findcustomsegmentattributeid", (void**)&(pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_findcustomsegmentattributetype", (void**)&(pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_findcustomsegmentattributeinfo", (void**)&(pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointcount", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8052,6 +8114,60 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentDoubleAttribute(m_pHandle, nIndex, nAttributeID, &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::HasCustomSegmentAttribute - Checks if a segment attribute is registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Flag if attribute is registered.
+	*/
+	bool CToolpathLayer::HasCustomSegmentAttribute(const std::string & sNamespace, const std::string & sAttributeName)
+	{
+		bool resultValueExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_HasCustomSegmentAttribute(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &resultValueExists));
+		
+		return resultValueExists;
+	}
+	
+	/**
+	* CToolpathLayer::FindCustomSegmentAttributeID - Finds a segment attribute ID. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return ID of the attribute.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName)
+	{
+		LibMCEnv_uint32 resultAttributeID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindCustomSegmentAttributeID(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &resultAttributeID));
+		
+		return resultAttributeID;
+	}
+	
+	/**
+	* CToolpathLayer::FindCustomSegmentAttributeType - Finds a segment attribute type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Type of the attribute.
+	*/
+	eToolpathAttributeType CToolpathLayer::FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName)
+	{
+		eToolpathAttributeType resultAttributeType = (eToolpathAttributeType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindCustomSegmentAttributeType(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &resultAttributeType));
+		
+		return resultAttributeType;
+	}
+	
+	/**
+	* CToolpathLayer::FindCustomSegmentAttributeInfo - Finds a segment attribute ID and type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @param[out] nAttributeID - ID of the attribute.
+	* @param[out] eAttributeType - Type of the attribute.
+	*/
+	void CToolpathLayer::FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, eToolpathAttributeType & eAttributeType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindCustomSegmentAttributeInfo(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &nAttributeID, &eAttributeType));
 	}
 	
 	/**

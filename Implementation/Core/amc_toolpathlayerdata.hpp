@@ -55,13 +55,30 @@ namespace AMC {
 		int64_t* m_AttributeData;
 	} sToolpathLayerSegment;
 
-	typedef struct _sToolpathCustomSegmentAttribute {
-		uint32_t nAttributeID;
+	class CToolpathCustomSegmentAttribute {
+	private:
+		uint32_t m_nAttributeID;
 		LibMCEnv::eToolpathAttributeType m_AttributeType;
 		std::string m_sNameSpace;
 		std::string m_sAttributeName;
 
-	} sToolpathCustomSegmentAttribute;
+	public:
+
+		CToolpathCustomSegmentAttribute (const std::string & sNameSpace, const std::string & sAttributeName, LibMCEnv::eToolpathAttributeType attributeType);
+
+		virtual ~CToolpathCustomSegmentAttribute();
+
+		uint32_t getAttributeID();
+		void setAttributeID(uint32_t nAttributeID);
+		LibMCEnv::eToolpathAttributeType getAttributeType ();
+		std::string getNameSpace();
+		std::string getAttributeName ();
+
+	};
+
+	typedef std::shared_ptr<CToolpathCustomSegmentAttribute> PToolpathCustomSegmentAttribute;
+
+
 
 	class CToolpathLayerProfile {
 		private:
@@ -102,7 +119,8 @@ namespace AMC {
 
 		std::string m_sDebugName;
 
-		std::vector<sToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
+		std::map<std::pair<std::string, std::string>, CToolpathCustomSegmentAttribute*> m_CustomSegmentAttributeMap;
+		std::vector<CToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
 
 		uint32_t registerUUID(const std::string& sUUID);
 		std::string getRegisteredUUID(const uint32_t nID);
@@ -112,7 +130,7 @@ namespace AMC {
 
 	public:
 
-		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName, std::vector<sToolpathCustomSegmentAttribute> customSegmentAttributes);
+		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName, std::vector<CToolpathCustomSegmentAttribute> customSegmentAttributes);
 		virtual ~CToolpathLayerData();		
 
 		std::string getUUID ();
@@ -130,7 +148,9 @@ namespace AMC {
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
 		PToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
 
+		bool findCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sName, uint32_t& nAttributeID, LibMCEnv::eToolpathAttributeType & attributeType);
 		int64_t getSegmentIntegerAttribute(const uint32_t nSegmentIndex, uint32_t nAttributeID);
+		double getSegmentDoubleAttribute(const uint32_t nSegmentIndex, uint32_t nAttributeID);
 
 		double getUnits();
 
@@ -141,7 +161,6 @@ namespace AMC {
 		PXMLDocumentInstance getMetaData(uint32_t nMetaDataIndex);
 		bool hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
-
 
 	};
 

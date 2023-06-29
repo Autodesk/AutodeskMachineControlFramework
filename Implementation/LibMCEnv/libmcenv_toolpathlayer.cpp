@@ -83,7 +83,48 @@ LibMCEnv_int64 CToolpathLayer::GetSegmentIntegerAttribute(const LibMCEnv_uint32 
 
 LibMCEnv_double CToolpathLayer::GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pToolpathLayerData->getSegmentDoubleAttribute(nIndex, nAttributeID);
+}
+
+bool CToolpathLayer::HasCustomSegmentAttribute(const std::string& sNamespace, const std::string& sAttributeName)
+{
+	uint32_t nAttributeID = 0;
+	LibMCEnv::eToolpathAttributeType attributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	return m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, attributeType);
+}
+
+LibMCEnv_uint32 CToolpathLayer::FindCustomSegmentAttributeID(const std::string& sNamespace, const std::string& sAttributeName)
+{
+	uint32_t nAttributeID = 0;
+	LibMCEnv::eToolpathAttributeType attributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	if (!m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, attributeType))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND, "segment attribute not found: " + sNamespace + "/" + sAttributeName);
+
+	return nAttributeID;
+}
+
+LibMCEnv::eToolpathAttributeType CToolpathLayer::FindCustomSegmentAttributeType(const std::string& sNamespace, const std::string& sAttributeName)
+{
+	uint32_t nAttributeID = 0;
+	LibMCEnv::eToolpathAttributeType attributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	if (!m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, attributeType))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND, "segment attribute not found: " + sNamespace + "/" + sAttributeName);
+
+	return attributeType;
+
+}
+
+void CToolpathLayer::FindCustomSegmentAttributeInfo(const std::string& sNamespace, const std::string& sAttributeName, LibMCEnv_uint32& nAttributeID, LibMCEnv::eToolpathAttributeType& eAttributeType)
+{
+	nAttributeID = 0;
+	eAttributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	if (!m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, eAttributeType))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND, "segment attribute not found: " + sNamespace + "/" + sAttributeName);
+
 }
 
 LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)

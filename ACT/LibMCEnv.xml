@@ -149,6 +149,8 @@
 		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="10109" description="Invalid Journal compute interval." />
 		<error name="INVALIDJOURNALCOMPUTEDATA" code="10110" description="Invalid Journal compute data." />
 		<error name="INVALIDSEGMENTATTRIBUTETYPE" code="10111" description="Invalid Segment Attribute Type." />
+		<error name="SEGMENTATTRIBUTENOTFOUND" code="10112" description="Segment Attribute not Found." />
+		
 		
 			
 									
@@ -550,6 +552,31 @@
 			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
 			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
 			<param name="Value" type="double" pass="return" description="Attribute Value." />
+		</method>
+
+		<method name="HasCustomSegmentAttribute" description="Checks if a segment attribute is registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="ValueExists" type="bool" pass="return" description="Flag if attribute is registered." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeID" description="Finds a segment attribute ID. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeID" type="uint32" pass="return" description="ID of the attribute." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeType" description="Finds a segment attribute type. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="return" description="Type of the attribute." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeInfo" description="Finds a segment attribute ID and type. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeID" type="uint32" pass="out" description="ID of the attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="out" description="Type of the attribute." />
 		</method>
 
 		<method name="GetSegmentPointCount" description="Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.">
