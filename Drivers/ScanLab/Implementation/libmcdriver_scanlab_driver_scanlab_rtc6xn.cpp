@@ -49,7 +49,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 CDriver_ScanLab_RTC6xN::CDriver_ScanLab_RTC6xN(const std::string& sName, const std::string& sType, uint32_t nScannerCount, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: CDriver_ScanLab(pDriverEnvironment), m_sName(sName), m_sType(sType), m_fMaxLaserPowerInWatts(0.0f), m_SimulationMode(false), m_nScannerCount(nScannerCount),
 		m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled),
-	m_nAttributeFilterID (0), m_nAttributeFilterValue (0)
+	m_nAttributeFilterValue (0)
 
 {
 	if ((nScannerCount < RTC6_MINLASERCOUNT) || (nScannerCount > RTC6_MAXLASERCOUNT))
@@ -479,6 +479,11 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 		auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
 		auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
+		uint32_t nAttributeFilterID = 0;
+		if ((!m_nAttributeFilterNameSpace.empty()) && (!m_nAttributeFilterAttributeName.empty())) {
+			nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(m_nAttributeFilterNameSpace, m_nAttributeFilterAttributeName);
+		}
+			
 		double dUnits = pToolpathAccessor->GetUnits();
 
 		uint32_t nSegmentCount = pLayer->GetSegmentCount();
@@ -489,8 +494,8 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 			pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
 
 			bool bDrawSegment = true;
-			if (m_nAttributeFilterID != 0) {
-				int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, m_nAttributeFilterID);
+			if (nAttributeFilterID != 0) {
+				int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nAttributeFilterID);
 				bDrawSegment = (segmentAttributeValue == m_nAttributeFilterValue);
 			}
 
@@ -758,12 +763,22 @@ act_managed_ptr<IRTCContext> CDriver_ScanLab_RTC6xN::getRTCContextForLaserIndex(
 
 }
 
-void CDriver_ScanLab_RTC6xN::SetAttributeFilter(const LibMCDriver_ScanLab_uint32 nAttributeID, const LibMCDriver_ScanLab_int64 nAttributeValue)
+void CDriver_ScanLab_RTC6xN::EnableAttributeFilter(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue)
 {
-	m_nAttributeFilterID = nAttributeID;
-	m_nAttributeFilterValue = nAttributeValue;
+	m_nAttributeFilterNameSpace = sNameSpace;
+	m_nAttributeFilterAttributeName = sAttributeName;
+	m_nAttributeFilterValue = 0;
 
 }
+
+void CDriver_ScanLab_RTC6xN::DisableAttributeFilter()
+{
+	m_nAttributeFilterNameSpace = "";
+	m_nAttributeFilterAttributeName = "";
+	m_nAttributeFilterValue = 0;
+}
+
+
 
 void CDriver_ScanLab_RTC6xN::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
 {

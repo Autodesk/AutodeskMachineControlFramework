@@ -1114,6 +1114,25 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
 
 /**
+* Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] pNameSpace - Namespace of Attribute to filter for.
+* @param[in] pAttributeName - Name of Attribute to filter for.
+* @param[in] nAttributeValue - Attribute Value to filter for.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_enableattributefilter(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pNameSpace, const char * pAttributeName, LibMCDriver_ScanLab_int64 nAttributeValue);
+
+/**
+* Disables filtering of the segments by segment attributes.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_disableattributefilter(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
+
+/**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
@@ -1381,14 +1400,23 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getoierecordingmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
 
 /**
-* Enables or disables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+* Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
-* @param[in] nAttributeID - Attribute ID to filter for. Filtering will be disabled if AttributeID is 0.
+* @param[in] pNameSpace - Namespace of Attribute to filter for.
+* @param[in] pAttributeName - Name of Attribute to filter for.
 * @param[in] nAttributeValue - Attribute Value to filter for.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setattributefilter(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nAttributeID, LibMCDriver_ScanLab_int64 nAttributeValue);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_enableattributefilter(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, const char * pNameSpace, const char * pAttributeName, LibMCDriver_ScanLab_int64 nAttributeValue);
+
+/**
+* Disables filtering of the segments by segment attributes.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_disableattributefilter(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN);
 
 /**
 * Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 

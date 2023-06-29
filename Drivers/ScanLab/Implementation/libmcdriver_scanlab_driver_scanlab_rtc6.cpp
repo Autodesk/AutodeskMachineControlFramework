@@ -44,7 +44,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 
 CDriver_ScanLab_RTC6::CDriver_ScanLab_RTC6(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f), m_SimulationMode (false),
-    m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled)
+    m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled), m_nAttributeFilterValue (0)
 {
 }
 
@@ -448,6 +448,11 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
         auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
         auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
+        uint32_t nAttributeFilterID = 0;
+        if ((!m_nAttributeFilterNameSpace.empty()) && (!m_nAttributeFilterAttributeName.empty())) {
+            nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(m_nAttributeFilterNameSpace, m_nAttributeFilterAttributeName);
+        }
+
         double dUnits = pToolpathAccessor->GetUnits();
 
         uint32_t nSegmentCount = pLayer->GetSegmentCount();
@@ -457,7 +462,13 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
             uint32_t nPointCount;
             pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
 
-            if (nPointCount >= 2) {
+            bool bDrawSegment = true;
+            if (nAttributeFilterID != 0) {
+                int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nAttributeFilterID);
+                bDrawSegment = (segmentAttributeValue == m_nAttributeFilterValue);
+            }
+
+            if (bDrawSegment && (nPointCount >= 2)) {
 
                 float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
                 float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
@@ -680,6 +691,21 @@ void CDriver_ScanLab_RTC6::DisableTimelagCompensation()
 
     }
 
+}
+
+void CDriver_ScanLab_RTC6::EnableAttributeFilter(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue)
+{
+    m_nAttributeFilterNameSpace = sNameSpace;
+    m_nAttributeFilterAttributeName = sAttributeName;
+    m_nAttributeFilterValue = 0;
+
+}
+
+void CDriver_ScanLab_RTC6::DisableAttributeFilter()
+{
+    m_nAttributeFilterNameSpace = "";
+    m_nAttributeFilterAttributeName = "";
+    m_nAttributeFilterValue = 0;
 }
 
 

@@ -1170,6 +1170,19 @@ public:
 	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
 
 	/**
+	* IDriver_ScanLab_RTC6::EnableAttributeFilter - Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+	* @param[in] sNameSpace - Namespace of Attribute to filter for.
+	* @param[in] sAttributeName - Name of Attribute to filter for.
+	* @param[in] nAttributeValue - Attribute Value to filter for.
+	*/
+	virtual void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::DisableAttributeFilter - Disables filtering of the segments by segment attributes.
+	*/
+	virtual void DisableAttributeFilter() = 0;
+
+	/**
 	* IDriver_ScanLab_RTC6::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
@@ -1368,11 +1381,17 @@ public:
 	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::SetAttributeFilter - Enables or disables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
-	* @param[in] nAttributeID - Attribute ID to filter for. Filtering will be disabled if AttributeID is 0.
+	* IDriver_ScanLab_RTC6xN::EnableAttributeFilter - Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+	* @param[in] sNameSpace - Namespace of Attribute to filter for.
+	* @param[in] sAttributeName - Name of Attribute to filter for.
 	* @param[in] nAttributeValue - Attribute Value to filter for.
 	*/
-	virtual void SetAttributeFilter(const LibMCDriver_ScanLab_uint32 nAttributeID, const LibMCDriver_ScanLab_int64 nAttributeValue) = 0;
+	virtual void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::DisableAttributeFilter - Disables filtering of the segments by segment attributes.
+	*/
+	virtual void DisableAttributeFilter() = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 

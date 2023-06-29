@@ -683,6 +683,8 @@ public:
 	inline void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay);
 	inline void SetOIERecordingMode(const eOIERecordingMode eRecordingMode);
 	inline eOIERecordingMode GetOIERecordingMode();
+	inline void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue);
+	inline void DisableAttributeFilter();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
@@ -723,7 +725,8 @@ public:
 	inline void ConfigureDelays(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay);
 	inline void SetOIERecordingMode(const eOIERecordingMode eRecordingMode);
 	inline eOIERecordingMode GetOIERecordingMode();
-	inline void SetAttributeFilter(const LibMCDriver_ScanLab_uint32 nAttributeID, const LibMCDriver_ScanLab_int64 nAttributeValue);
+	inline void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue);
+	inline void DisableAttributeFilter();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
@@ -952,6 +955,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureDelays = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetOIERecordingMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_EnableAttributeFilter = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation = nullptr;
@@ -976,7 +981,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_ConfigureDelays = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetOIERecordingMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode = nullptr;
-		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAttributeFilter = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts = nullptr;
@@ -1931,6 +1937,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_EnableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableAttributeFilterPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_enableattributefilter");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_EnableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableAttributeFilterPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_enableattributefilter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_EnableAttributeFilter == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableAttributeFilterPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_disableattributefilter");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableAttributeFilterPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_disableattributefilter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer");
@@ -2147,12 +2171,21 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAttributeFilterPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setattributefilter");
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableAttributeFilterPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_enableattributefilter");
 		#else // _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAttributeFilterPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setattributefilter");
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableAttributeFilterPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_enableattributefilter");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAttributeFilter == nullptr)
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableAttributeFilterPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_disableattributefilter");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableAttributeFilterPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_disableattributefilter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2675,6 +2708,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetOIERecordingMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_enableattributefilter", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_EnableAttributeFilter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_EnableAttributeFilter == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_disableattributefilter", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2771,8 +2812,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetOIERecordingMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_setattributefilter", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAttributeFilter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAttributeFilter == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_enableattributefilter", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_disableattributefilter", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer));
@@ -3980,6 +4025,25 @@ public:
 	}
 	
 	/**
+	* CDriver_ScanLab_RTC6::EnableAttributeFilter - Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+	* @param[in] sNameSpace - Namespace of Attribute to filter for.
+	* @param[in] sAttributeName - Name of Attribute to filter for.
+	* @param[in] nAttributeValue - Attribute Value to filter for.
+	*/
+	void CDriver_ScanLab_RTC6::EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_EnableAttributeFilter(m_pHandle, sNameSpace.c_str(), sAttributeName.c_str(), nAttributeValue));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::DisableAttributeFilter - Disables filtering of the segments by segment attributes.
+	*/
+	void CDriver_ScanLab_RTC6::DisableAttributeFilter()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_DisableAttributeFilter(m_pHandle));
+	}
+	
+	/**
 	* CDriver_ScanLab_RTC6::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
@@ -4284,13 +4348,22 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::SetAttributeFilter - Enables or disables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
-	* @param[in] nAttributeID - Attribute ID to filter for. Filtering will be disabled if AttributeID is 0.
+	* CDriver_ScanLab_RTC6xN::EnableAttributeFilter - Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+	* @param[in] sNameSpace - Namespace of Attribute to filter for.
+	* @param[in] sAttributeName - Name of Attribute to filter for.
 	* @param[in] nAttributeValue - Attribute Value to filter for.
 	*/
-	void CDriver_ScanLab_RTC6xN::SetAttributeFilter(const LibMCDriver_ScanLab_uint32 nAttributeID, const LibMCDriver_ScanLab_int64 nAttributeValue)
+	void CDriver_ScanLab_RTC6xN::EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_SetAttributeFilter(m_pHandle, nAttributeID, nAttributeValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_EnableAttributeFilter(m_pHandle, sNameSpace.c_str(), sAttributeName.c_str(), nAttributeValue));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::DisableAttributeFilter - Disables filtering of the segments by segment attributes.
+	*/
+	void CDriver_ScanLab_RTC6xN::DisableAttributeFilter()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_DisableAttributeFilter(m_pHandle));
 	}
 	
 	/**
