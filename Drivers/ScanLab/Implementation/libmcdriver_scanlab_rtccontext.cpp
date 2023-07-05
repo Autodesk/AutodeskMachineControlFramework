@@ -1179,8 +1179,9 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 	if ((dAbsScaleY < (1.0 / 256.0)) || (dAbsScaleY > 16000.0))
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY);
 
-	
-	m_pScanLabSDK->n_activate_fly_2d_encoder(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep, 0, 0);
+	//std::cout << "n_set_fly_2d: card no:" << m_CardNo << " " << dScaleXInBitsPerEncoderStep << " / " << dScaleYInBitsPerEncoderStep << std::endl;
+
+	m_pScanLabSDK->n_set_fly_2d(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_b2DMarkOnTheFlyEnabled = true;
