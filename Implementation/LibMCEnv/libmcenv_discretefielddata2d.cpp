@@ -124,7 +124,16 @@ void CDiscreteFieldData2D::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibM
 
 void CDiscreteFieldData2D::RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const LibMCEnv::eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const LibMCEnv_uint64 nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint * pPointValuesBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	switch (eSamplingMode) {
+		case LibMCEnv::eFieldSamplingMode::FloorCoordinate:
+			m_pDiscreteFieldDataInstance->renderAveragePointValues_FloorSampling (dDefaultValue, nPointValuesBufferSize, pPointValuesBuffer);
+			break;
+
+		default:
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE);
+	}
+
+	
 }
 
 IDiscreteFieldData2D * CDiscreteFieldData2D::ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY)

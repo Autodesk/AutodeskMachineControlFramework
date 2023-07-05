@@ -207,6 +207,8 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA 10110 /** Invalid Journal compute data. */
 #define LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE 10111 /** Invalid Segment Attribute Type. */
 #define LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND 10112 /** Segment Attribute not Found. */
+#define LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE 10113 /** Unsupported field sampling mode. */
+#define LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM 10114 /** Sample point count exceeds maximum */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -326,6 +328,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
     case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "Invalid Segment Attribute Type.";
     case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "Segment Attribute not Found.";
+    case LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE: return "Unsupported field sampling mode.";
+    case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
     default: return "unknown error";
   }
 }

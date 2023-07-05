@@ -34,11 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_interfaceexception.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 using namespace AMC;
 
 #define DISCRETEFIELD_MAXPIXELCOUNT (1024ULL * 1024ULL * 32ULL)
 #define DISCRETEFIELD_MINVALUEDISTANCE 1E-6
+#define DISCRETEFIELD_MAXPOINTVALUESCOUNT (1024ULL * 1024ULL * 1024ULL)
 
 CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dDefaultValue, bool bDoClear)
 	: m_nPixelCountX (nPixelCountX), m_nPixelCountY (nPixelCountY), m_dDPIX (dDPIX), m_dDPIY (dDPIY), m_dOriginX (dOriginX), m_dOriginY (dOriginY)
@@ -449,4 +451,76 @@ void CDiscreteFieldData2DInstance::renderRGBImage(std::vector<uint8_t>* pPixelDa
 	}
 
 	
+	
+}
+
+void CDiscreteFieldData2DInstance::renderAveragePointValues_FloorSampling(const LibMCEnv_double dDefaultValue, const uint64_t nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint* pPointValuesBuffer)
+{
+	if (nPointValuesBufferSize == 0) {
+		Clear(dDefaultValue);
+		return;
+	}
+
+	if (nPointValuesBufferSize > DISCRETEFIELD_MAXPOINTVALUESCOUNT)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM);
+	if (pPointValuesBuffer == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	std::vector<double> sampleSumBuffer;
+	sampleSumBuffer.resize(m_nPixelCountX * m_nPixelCountY);
+
+
+	std::vector<uint32_t> sampleCountBuffer;
+	sampleCountBuffer.resize(m_nPixelCountX * m_nPixelCountY);
+	for (auto& sampleCount : sampleCountBuffer)
+		sampleCount = 0;
+
+	double dPixelPerMMX = m_dDPIX / 25.4;
+	double dPixelPerMMY = m_dDPIY / 25.4;
+
+	auto pPointValue = pPointValuesBuffer;
+	for (size_t nPointValueIndex = 0; nPointValueIndex < nPointValuesBufferSize; nPointValueIndex++) {
+		double dPixelPositionX = (pPointValue->m_Coordinates[0] - m_dOriginX) * dPixelPerMMX;
+		double dPixelPositionY = (pPointValue->m_Coordinates[1] - m_dOriginY) * dPixelPerMMY;
+		double dValue = pPointValue->m_Value;
+
+		int64_t nRoundedPixelPositionX = (int64_t) floor(dPixelPositionX);
+		int64_t nRoundedPixelPositionY = (int64_t) floor(dPixelPositionY);
+
+		if ((nRoundedPixelPositionX >= 0) && (nRoundedPixelPositionY >= 0) &&
+			(nRoundedPixelPositionX < (int64_t) m_nPixelCountX) && (nRoundedPixelPositionY < (int64_t) m_nPixelCountY)) {
+
+			size_t nAddress = nRoundedPixelPositionX + nRoundedPixelPositionY * m_nPixelCountX;
+			auto & sampleCount = sampleCountBuffer.at (nAddress);
+			auto & sampleSum = sampleSumBuffer.at(nAddress);
+			if (sampleCount == 0) {
+				sampleSum = dValue;
+				sampleCount = 1;
+			}
+			else {
+				sampleSum += dValue;
+				sampleCount++;
+			}
+
+		}
+
+		pPointValue++;
+	}
+
+	for (uint32_t nY = 0; nY < m_nPixelCountY; nY++) {
+		for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
+			size_t nAddress = nX + nY * m_nPixelCountX;
+			auto& sampleCount = sampleCountBuffer.at(nAddress);
+			auto& sampleSum = sampleSumBuffer.at(nAddress);
+
+			if (sampleCount == 0) {
+				SetPixel(nX, nY, dDefaultValue);
+			}
+			else {
+				SetPixel(nX, nY, sampleSum / (double)sampleCount);
+			}
+		}
+
+	}
+
 }

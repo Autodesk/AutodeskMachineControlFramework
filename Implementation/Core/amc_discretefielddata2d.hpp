@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <map>
 
+#include "libmcenv_types.hpp"
+
 namespace AMC {
 
 	class CDiscreteFieldData2DInstance;
@@ -102,6 +104,8 @@ namespace AMC {
 		PDiscreteFieldData2DInstance Duplicate();
 
 		void renderRGBImage(std::vector<uint8_t>* pPixelData, double minValue, double minRed, double minGreen, double minBlue, double midValue, double midRed, double midGreen, double midBlue, double maxValue, double maxRed, double maxGreen, double maxBlue);
+
+		void renderAveragePointValues_FloorSampling(const LibMCEnv_double dDefaultValue, const uint64_t nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint* pPointValuesBuffer);
 	};
 
 	
