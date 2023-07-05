@@ -90,6 +90,10 @@ private:
 
 	act_managed_ptr<IRTCContext> getRTCContextForLaserIndex(uint32_t nLaserIndex, bool bFailIfNotExisting);
 
+protected:
+
+	virtual void updateDLLVersionParameter(uint32_t nDLLVersionParameter) override;
+
 public:
 
 	CDriver_ScanLab_RTC6xN(const std::string& sName, const std::string& sType, uint32_t nLaserCount, LibMCEnv::PDriverEnvironment pDriverEnvironment);

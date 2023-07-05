@@ -45,7 +45,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab::CDriver_ScanLab(LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_pDriverEnvironment (pDriverEnvironment)
+    : m_pDriverEnvironment (pDriverEnvironment), m_nDLLVersion (0)
 {
     if (pDriverEnvironment.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -93,6 +93,10 @@ void CDriver_ScanLab::LoadSDK(const std::string& sResourceName)
 
     m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
 
+    m_nDLLVersion = m_pScanLabSDK->get_dll_version();
+
+    updateDLLVersionParameter(m_nDLLVersion);
+
 }
 
 void CDriver_ScanLab::LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8* pScanlabDLLBuffer)
@@ -114,4 +118,13 @@ void CDriver_ScanLab::LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLL
     m_pSDKLibraryFile = m_pWorkingDirectory->StoreCustomData(sFileName, LibMCEnv::CInputVector<uint8_t> (pScanlabDLLBuffer, nScanlabDLLBufferSize));
     m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
 
+    m_nDLLVersion = m_pScanLabSDK->get_dll_version();
+
+    updateDLLVersionParameter(m_nDLLVersion);
+
+}
+
+uint32_t CDriver_ScanLab::getDLLVersion()
+{
+    return m_nDLLVersion;
 }

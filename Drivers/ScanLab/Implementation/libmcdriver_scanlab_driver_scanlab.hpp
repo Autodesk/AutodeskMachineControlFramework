@@ -81,6 +81,10 @@ protected:
     LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
     LibMCEnv::PWorkingFile m_pSDKLibraryFile;
 
+    uint32_t m_nDLLVersion;
+
+    virtual void updateDLLVersionParameter(uint32_t nDLLVersionParameter) = 0;
+
 public:
 
     CDriver_ScanLab(LibMCEnv::PDriverEnvironment pDriverEnvironment);
@@ -90,6 +94,8 @@ public:
     void LoadSDK(const std::string& sResourceName) override;
 
     void LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8* pScanlabDLLBuffer) override;
+
+    uint32_t getDLLVersion();
 
 
 };

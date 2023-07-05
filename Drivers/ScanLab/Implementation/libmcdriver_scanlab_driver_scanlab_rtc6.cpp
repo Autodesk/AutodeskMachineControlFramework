@@ -158,11 +158,11 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
     if (m_SimulationMode) {
         m_pDriverEnvironment->SetIntegerParameter("rtc_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("card_type", 1);
-        m_pDriverEnvironment->SetIntegerParameter("dll_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("hex_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("bios_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("serialnumber", 123456);
 
+        updateDLLVersionParameter(1);
 
     } else {
 
@@ -194,10 +194,11 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
         m_pRTCContext->GetRTCVersion(nRTCVersion, nRTCType, nDLLVersion, nHEXVersion, nBIOSVersion);
         m_pDriverEnvironment->SetIntegerParameter("rtc_version", nRTCVersion);
         m_pDriverEnvironment->SetIntegerParameter("card_type", nRTCType);
-        m_pDriverEnvironment->SetIntegerParameter("dll_version", nDLLVersion);
         m_pDriverEnvironment->SetIntegerParameter("hex_version", nHEXVersion);
         m_pDriverEnvironment->SetIntegerParameter("bios_version", nBIOSVersion);
         m_pDriverEnvironment->SetIntegerParameter("serialnumber", m_pRTCContext->GetSerialNumber ());
+
+        updateDLLVersionParameter(nDLLVersion);
     }
 
 }
@@ -706,6 +707,12 @@ void CDriver_ScanLab_RTC6::DisableAttributeFilter()
     m_nAttributeFilterNameSpace = "";
     m_nAttributeFilterAttributeName = "";
     m_nAttributeFilterValue = 0;
+}
+
+
+void CDriver_ScanLab_RTC6::updateDLLVersionParameter(uint32_t nDLLVersionParameter)
+{
+    m_pDriverEnvironment->SetIntegerParameter("dll_version", nDLLVersionParameter);
 }
 
 

@@ -60,9 +60,10 @@ private:
 
 	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
-	
 
 protected:
+
+	virtual void updateDLLVersionParameter(uint32_t nDLLVersionParameter) override;
 
 public:
 

@@ -816,3 +816,15 @@ PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6xN::findPresetByName
 }
 
 
+
+
+void CDriver_ScanLab_RTC6xN::updateDLLVersionParameter(uint32_t nDLLVersionParameter)
+{
+	for (uint32_t nIndex = 1; nIndex <= m_nScannerCount; nIndex++) {
+
+		std::string sPrefix = "scanner" + std::to_string(nIndex) + "_";
+
+		m_pDriverEnvironment->SetIntegerParameter(sPrefix + "dll_version", nDLLVersionParameter);
+	}
+
+}

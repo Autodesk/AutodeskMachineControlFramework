@@ -150,9 +150,9 @@
 		<error name="INVALIDJOURNALCOMPUTEDATA" code="10110" description="Invalid Journal compute data." />
 		<error name="INVALIDSEGMENTATTRIBUTETYPE" code="10111" description="Invalid Segment Attribute Type." />
 		<error name="SEGMENTATTRIBUTENOTFOUND" code="10112" description="Segment Attribute not Found." />
+		<error name="UNSUPPORTEDFIELDSAMPLINGMODE" code="10113" description="Unsupported field sampling mode." />
+		<error name="SAMPLEPOINTCOUNTEXCEEDSMAXIMUM" code="10114" description="Sample point count exceeds maximum"/>
 		
-		
-			
 									
 	</errors>
 
