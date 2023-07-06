@@ -1449,15 +1449,6 @@ void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPosition
 
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-		uint32_t nMarkingInfo = m_pScanLabSDK->n_get_marking_info(m_CardNo);
-
-		if (nMarkingInfo != 0) 
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR, "Scanlab on the fly marking error: " + std::to_string (nMarkingInfo));
-
-		//int32_t nRawEncoderX = m_pScanLabSDK->n_get_value(m_CardNo, 43);
-		//int32_t nRawEncoderY = m_pScanLabSDK->n_get_value(m_CardNo, 44);
-		//std::cout << "raw encoder: " << nRawEncoderX << "/" << nRawEncoderY << std::endl;
-
 	}
 
 	
