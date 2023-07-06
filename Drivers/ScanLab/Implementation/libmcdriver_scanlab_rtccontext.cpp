@@ -1205,6 +1205,28 @@ bool CRTCContext::MarkOnTheFly2DIsEnabled()
 	return m_b2DMarkOnTheFlyEnabled;
 }
 
+void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter)
+{
+
+}
+
+void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_wait_for_encoder(m_CardNo, nPositionValue, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_wait_for_encoder(m_CardNo, nPositionValue, 1);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+
 void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPositionX, LibMCDriver_ScanLab_int32& nPositionY)
 {
 	nPositionX = 0;

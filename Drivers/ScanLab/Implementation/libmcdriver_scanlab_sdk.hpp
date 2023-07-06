@@ -190,7 +190,8 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_x) (uint32_t nCardNo, const double ScaleX);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y) (uint32_t nCardNo, const double ScaleY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_encoder) (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
-		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_marking_info) (uint32_t nCardNo);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_marking_info) (uint32_t nCardNo);		
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo);
 
 
 		class CScanLabSDK {
@@ -329,6 +330,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_fly_y n_set_fly_y = nullptr;
 			PScanLabPtr_n_get_encoder n_get_encoder = nullptr;
 			PScanLabPtr_n_get_marking_info n_get_marking_info = nullptr;
+			PScanLabPtr_n_wait_for_encoder n_wait_for_encoder = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

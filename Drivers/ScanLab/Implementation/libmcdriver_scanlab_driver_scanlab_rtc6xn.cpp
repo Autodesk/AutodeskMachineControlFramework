@@ -450,15 +450,28 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 {
 	if (!m_SimulationMode) {
 
+		auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+		auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+
 		if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
-
-		bool bEnableOIEMeasurementPerHatch = (m_OIERecordingMode == eOIERecordingMode::OIELaserActiveMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndLaserActiveMeasurement);
 
 		for (uint32_t nScannerIndex = 1; nScannerIndex <= m_nScannerCount; nScannerIndex++) {
 			auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, true);
 			pRTCContext->SetStartList(1, 0);
+		}
 
+		bool bEnableOIEMeasurementPerHatch = (m_OIERecordingMode == eOIERecordingMode::OIELaserActiveMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndLaserActiveMeasurement);
+
+		uint32_t nAttributeFilterID = 0;
+		if ((!m_nAttributeFilterNameSpace.empty()) && (!m_nAttributeFilterAttributeName.empty())) {
+			nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(m_nAttributeFilterNameSpace, m_nAttributeFilterAttributeName);
+		}
+
+		double dUnits = pToolpathAccessor->GetUnits();
+
+		for (uint32_t nScannerIndex = 1; nScannerIndex <= m_nScannerCount; nScannerIndex++) {
+			auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, true);
 			switch (m_OIERecordingMode) {
 			case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
 			case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
@@ -474,139 +487,124 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 			}
 
 
-		}
+		
 
-		auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
-		auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+			uint32_t nSegmentCount = pLayer->GetSegmentCount();
+			for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 
-		uint32_t nAttributeFilterID = 0;
-		if ((!m_nAttributeFilterNameSpace.empty()) && (!m_nAttributeFilterAttributeName.empty())) {
-			nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(m_nAttributeFilterNameSpace, m_nAttributeFilterAttributeName);
-		}
-			
-		double dUnits = pToolpathAccessor->GetUnits();
+				LibMCEnv::eToolpathSegmentType eSegmentType;
+				uint32_t nPointCount;
+				pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
 
-		uint32_t nSegmentCount = pLayer->GetSegmentCount();
-		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
-
-			LibMCEnv::eToolpathSegmentType eSegmentType;
-			uint32_t nPointCount;
-			pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
-
-			bool bDrawSegment = true;
-			if (nAttributeFilterID != 0) {
-				int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nAttributeFilterID);
-				bDrawSegment = (segmentAttributeValue == m_nAttributeFilterValue);
-			}
-
-			if (bDrawSegment && (nPointCount >= 2)) {
-
-				float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
-				float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
-				float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
-				float fPowerInPercent = (fPowerInWatts * 100.f) / m_fMaxLaserPowerInWatts;
-				float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
-
-				int64_t nLaserIndex = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
-
-				act_managed_ptr<IRTCContext> pRTCContext;
-
-				pRTCContext = getRTCContextForLaserIndex((uint32_t) nLaserIndex, false);
-
-				if (pRTCContext.get() == nullptr) {
-					if (bFailIfNonAssignedDataExists)
-						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndex));
+				bool bDrawSegment = true;
+				if (nAttributeFilterID != 0) {
+					int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nAttributeFilterID);
+					bDrawSegment = (segmentAttributeValue == m_nAttributeFilterValue);
 				}
 
-				if (pRTCContext.get() != nullptr) {
+				if (bDrawSegment && (nPointCount >= 2)) {
 
-					int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
+					float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+					float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
+					float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
+					float fPowerInPercent = (fPowerInWatts * 100.f) / m_fMaxLaserPowerInWatts;
+					float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
 
-					if (nSkywritingMode != 0) {
-						double dSkywritingTimeLag = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "timelag");
-						int64_t nSkywritingLaserOnShift = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "laseronshift");
-						int64_t nSkywritingPrev = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "nprev");
-						int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
+					int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
+					int64_t nCurrentLaserIndex = pRTCContext->GetLaserIndex();
 
-						double dSkywritingLimit = 0.0;
-						if (nSkywritingMode == 3) {
-							dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
-						}
-
-
-						switch (nSkywritingMode) {
-						case 1:
-							pRTCContext->EnableSkyWritingMode1(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
-							break;
-						case 2:
-							pRTCContext->EnableSkyWritingMode2(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
-							break;
-						case 3:
-							pRTCContext->EnableSkyWritingMode3(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
-							break;
-						default:
-							pRTCContext->DisableSkyWriting();
-						}
-
+					if (nLaserIndexToDraw == 0) {
+						if (bFailIfNonAssignedDataExists)
+							throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndexToDraw));
 					}
 
-					std::vector<LibMCEnv::sPosition2D> Points;
-					pLayer->GetSegmentPointData(nSegmentIndex, Points);
+					if (nLaserIndexToDraw == nCurrentLaserIndex) {
 
-					if (nPointCount != Points.size())
-						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
 
-					switch (eSegmentType) {
-					case LibMCEnv::eToolpathSegmentType::Loop:
-					case LibMCEnv::eToolpathSegmentType::Polyline:
-					{
 
-						std::vector<sPoint2D> ContourPoints;
-						ContourPoints.resize(nPointCount);
+						int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
 
-						for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
-							auto pContourPoint = &ContourPoints.at(nPointIndex);
-							pContourPoint->m_X = (float)(Points[nPointIndex].m_Coordinates[0] * dUnits);
-							pContourPoint->m_Y = (float)(Points[nPointIndex].m_Coordinates[1] * dUnits);
+						if (nSkywritingMode != 0) {
+							double dSkywritingTimeLag = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "timelag");
+							int64_t nSkywritingLaserOnShift = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "laseronshift");
+							int64_t nSkywritingPrev = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "nprev");
+							int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
+
+							double dSkywritingLimit = 0.0;
+							if (nSkywritingMode == 3) {
+								dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
+							}
+
+
+							switch (nSkywritingMode) {
+							case 1:
+								pRTCContext->EnableSkyWritingMode1(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+								break;
+							case 2:
+								pRTCContext->EnableSkyWritingMode2(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+								break;
+							case 3:
+								pRTCContext->EnableSkyWritingMode3(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
+								break;
+							default:
+								pRTCContext->DisableSkyWriting();
+							}
+
 						}
 
-						pRTCContext->DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+						std::vector<LibMCEnv::sPosition2D> Points;
+						pLayer->GetSegmentPointData(nSegmentIndex, Points);
 
-						break;
-					}
-
-					case LibMCEnv::eToolpathSegmentType::Hatch:
-					{
-						if (nPointCount % 2 == 1)
+						if (nPointCount != Points.size())
 							throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
 
-						uint64_t nHatchCount = nPointCount / 2;
-						std::vector<sHatch2D> Hatches;
-						Hatches.resize(nHatchCount);
+						switch (eSegmentType) {
+							case LibMCEnv::eToolpathSegmentType::Loop:
+							case LibMCEnv::eToolpathSegmentType::Polyline:
+							{
 
-						for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
-							auto pHatch = &Hatches.at(nHatchIndex);
-							pHatch->m_X1 = (float)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
-							pHatch->m_Y1 = (float)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
-							pHatch->m_X2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
-							pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
+								std::vector<sPoint2D> ContourPoints;
+								ContourPoints.resize(nPointCount);
+
+								for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+									auto pContourPoint = &ContourPoints.at(nPointIndex);
+									pContourPoint->m_X = (float)(Points[nPointIndex].m_Coordinates[0] * dUnits);
+									pContourPoint->m_Y = (float)(Points[nPointIndex].m_Coordinates[1] * dUnits);
+								}
+
+								pRTCContext->DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+
+								break;
+							}
+
+							case LibMCEnv::eToolpathSegmentType::Hatch:
+							{
+								if (nPointCount % 2 == 1)
+									throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
+
+								uint64_t nHatchCount = nPointCount / 2;
+								std::vector<sHatch2D> Hatches;
+								Hatches.resize(nHatchCount);
+
+								for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+									auto pHatch = &Hatches.at(nHatchIndex);
+									pHatch->m_X1 = (float)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
+									pHatch->m_Y1 = (float)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
+									pHatch->m_X2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
+									pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
+								}
+
+								pRTCContext->DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+
+								break;
+							}
+
 						}
-
-						pRTCContext->DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
-
-						break;
-					}
-
 					}
 
 				}
 
 			}
-
-		}
-
-		for (uint32_t nScannerIndex = 1; nScannerIndex <= m_nScannerCount; nScannerIndex++) {
-			auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, true);
 
 			if ((m_OIERecordingMode != eOIERecordingMode::OIERecordingDisabled))
 				pRTCContext->StopOIEMeasurement();
@@ -618,6 +616,11 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 				break;
 			}
 
+
+		}
+
+		for (uint32_t nScannerIndex = 1; nScannerIndex <= m_nScannerCount; nScannerIndex++) {
+			auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, true);			
 
 			pRTCContext->SetEndOfList();
 			pRTCContext->ExecuteList(1, 0);

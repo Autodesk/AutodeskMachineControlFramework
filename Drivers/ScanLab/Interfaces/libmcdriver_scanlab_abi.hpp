@@ -461,6 +461,34 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatchesoie(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue, LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 
 /**
+* Adds a layer instance to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pLayer - Instance of the layer to add to the lists.
+* @param[in] nLaserIndexFilter - Laser Index to match. 0 means laser index of toolpath is ignored.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addlayertolist(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCEnv_ToolpathLayer pLayer, LibMCDriver_ScanLab_uint32 nLaserIndexFilter);
+
+/**
+* Adds a command to wait for the encoder for reaching an X axis position.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nPositionValue - Position Value to reach in encoder steps.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderx(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionValue);
+
+/**
+* Adds a command to wait for the encoder for reaching an Y axis position.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nPositionValue - Position Value to reach in encoder steps.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencodery(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionValue);
+
+/**
 * Adds a custom delay to the list
 *
 * @param[in] pRTCContext - RTCContext instance.

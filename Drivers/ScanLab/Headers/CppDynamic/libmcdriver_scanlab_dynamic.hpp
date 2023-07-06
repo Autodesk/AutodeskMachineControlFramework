@@ -572,6 +572,9 @@ public:
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
+	inline void AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter);
+	inline void WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue);
+	inline void WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue);
 	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
@@ -892,6 +895,9 @@ public:
 		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatchesOIE = nullptr;
+		pWrapperTable->m_RTCContext_AddLayerToList = nullptr;
+		pWrapperTable->m_RTCContext_WaitForEncoderX = nullptr;
+		pWrapperTable->m_RTCContext_WaitForEncoderY = nullptr;
 		pWrapperTable->m_RTCContext_AddCustomDelay = nullptr;
 		pWrapperTable->m_RTCContext_GetCorrectionFactor = nullptr;
 		pWrapperTable->m_RTCContext_GetStatus = nullptr;
@@ -1367,6 +1373,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_DrawHatchesOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddLayerToList = (PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addlayertolist");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddLayerToList = (PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addlayertolist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddLayerToList == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderX = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencoderx");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderX = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencoderx");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_WaitForEncoderX == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderY = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderYPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencodery");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderY = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderYPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencodery");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_WaitForEncoderY == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2456,6 +2489,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawHatchesOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addlayertolist", (void**)&(pWrapperTable->m_RTCContext_AddLayerToList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddLayerToList == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_waitforencoderx", (void**)&(pWrapperTable->m_RTCContext_WaitForEncoderX));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_WaitForEncoderX == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_waitforencodery", (void**)&(pWrapperTable->m_RTCContext_WaitForEncoderY));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_WaitForEncoderY == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addcustomdelay", (void**)&(pWrapperTable->m_RTCContext_AddCustomDelay));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddCustomDelay == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3292,6 +3337,35 @@ public:
 	void CRTCContext::DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatchesOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue, nOIEPIDControlIndex));
+	}
+	
+	/**
+	* CRTCContext::AddLayerToList - Adds a layer instance to the current open list.
+	* @param[in] pLayer - Instance of the layer to add to the lists.
+	* @param[in] nLaserIndexFilter - Laser Index to match. 0 means laser index of toolpath is ignored.
+	*/
+	void CRTCContext::AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter)
+	{
+		LibMCEnvHandle hLayer = pLayer.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddLayerToList(m_pHandle, hLayer, nLaserIndexFilter));
+	}
+	
+	/**
+	* CRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position.
+	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	*/
+	void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderX(m_pHandle, nPositionValue));
+	}
+	
+	/**
+	* CRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position.
+	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	*/
+	void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderY(m_pHandle, nPositionValue));
 	}
 	
 	/**

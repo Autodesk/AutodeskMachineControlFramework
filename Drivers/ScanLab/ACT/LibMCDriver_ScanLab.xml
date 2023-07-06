@@ -385,6 +385,19 @@ Custom implementation
 			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
 		</method>
 
+		<method name="AddLayerToList" description="Adds a layer instance to the current open list.">
+			<param name="Layer" type="class" class="LibMCEnv:ToolpathLayer" pass="in" description="Instance of the layer to add to the lists." />
+			<param name="LaserIndexFilter" type="uint32" pass="in" description="Laser Index to match. 0 means laser index of toolpath is ignored." />
+		</method>
+
+		<method name="WaitForEncoderX" description="Adds a command to wait for the encoder for reaching an X axis position.">
+			<param name="PositionValue" type="int32" pass="in" description="Position Value to reach in encoder steps." />
+		</method>
+
+		<method name="WaitForEncoderY" description="Adds a command to wait for the encoder for reaching an Y axis position.">
+			<param name="PositionValue" type="int32" pass="in" description="Position Value to reach in encoder steps." />
+		</method>
+
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
 			<param name="Delay" type="uint32" pass="in" description="Custom delay value in microseconds (MUST be multiple of 10)" />
 		</method>

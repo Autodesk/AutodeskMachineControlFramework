@@ -689,6 +689,25 @@ public:
 	virtual void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex) = 0;
 
 	/**
+	* IRTCContext::AddLayerToList - Adds a layer instance to the current open list.
+	* @param[in] pLayer - Instance of the layer to add to the lists.
+	* @param[in] nLaserIndexFilter - Laser Index to match. 0 means laser index of toolpath is ignored.
+	*/
+	virtual void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position.
+	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	*/
+	virtual void WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position.
+	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	*/
+	virtual void WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue) = 0;
+
+	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
 	* @param[in] nDelay - Custom delay value in microseconds (MUST be multiple of 10)
 	*/

@@ -139,6 +139,12 @@ public:
 	
 	void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D* pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const uint32_t nOIEControlIndex) override;
 
+	void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter) override;
+
+	void WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue) override;
+
+	void WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue) override;
+
 	void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay) override;
 
 	LibMCDriver_ScanLab_double GetCorrectionFactor() override;
