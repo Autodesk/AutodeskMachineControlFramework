@@ -767,7 +767,7 @@ void CDriver_ScanLab_RTC6xN::EnableAttributeFilter(const std::string& sNameSpace
 {
 	m_nAttributeFilterNameSpace = sNameSpace;
 	m_nAttributeFilterAttributeName = sAttributeName;
-	m_nAttributeFilterValue = 0;
+	m_nAttributeFilterValue = nAttributeValue;
 
 }
 
