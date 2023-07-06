@@ -39,6 +39,8 @@ Abstract: This is the class declaration of CDriver_ScanLab
 
 // Parent classes
 #include "libmcdriver_scanlab_driver.hpp"
+#include "libmcdriver_scanlab_rtccontext.hpp"
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -71,7 +73,7 @@ namespace Impl {
  Class declaration of CDriver_ScanLab 
 **************************************************************************************************************************/
 
-class CDriver_ScanLab : public virtual IDriver_ScanLab, public virtual CDriver {
+class CDriver_ScanLab : public virtual IDriver_ScanLab, public virtual CDriver, public virtual IRTCContextOwner {
 private:
 
 protected:

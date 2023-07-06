@@ -58,8 +58,7 @@ namespace Impl {
 /*************************************************************************************************************************
  Class declaration of CDriver_ScanLab_RTC6xN 
 **************************************************************************************************************************/
-
-class CDriver_ScanLab_RTC6xN : public virtual IDriver_ScanLab_RTC6xN, public virtual CDriver_ScanLab {
+class CDriver_ScanLab_RTC6xN : public virtual IDriver_ScanLab_RTC6xN, public virtual CDriver_ScanLab, public virtual IRTCContextOwner {
 private:
 
 	uint32_t m_nScannerCount;
@@ -166,6 +165,12 @@ public:
 	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
 
 	void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex) override;
+
+	virtual void getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& sAttributeFilterValue) override;
+
+	virtual void getExposureParameters(float& fMaxLaserPowerInWatts, eOIERecordingMode& oieRecordingMode) override;
+
+	virtual PScanLabSDK getScanLabSDK() override;
 
 
 };

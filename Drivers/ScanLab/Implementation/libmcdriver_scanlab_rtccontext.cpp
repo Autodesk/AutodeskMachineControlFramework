@@ -49,8 +49,8 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCContext 
 **************************************************************************************************************************/
 
-CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: m_pScanLabSDK (pScanLabSDK), 
+CRTCContext::CRTCContext(IRTCContextOwner* pOwner, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_pOwner(pOwner),
 	m_CardNo (nCardNo), 
 	m_dCorrectionFactor(10000.0), 
 	m_dZCorrectionFactor(10000.0),
@@ -66,10 +66,17 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 	m_dLaserFieldMinY (0.0),
 	m_dLaserFieldMaxX (0.0),
 	m_dLaserFieldMaxY (0.0),
-	m_b2DMarkOnTheFlyEnabled (false)
+	m_b2DMarkOnTheFlyEnabled (false),
+	m_dScaleXInBitsPerEncoderStep (1.0),
+	m_dScaleYInBitsPerEncoderStep (1.0)
+
 {
-	if (pScanLabSDK.get() == nullptr)
+	if (pOwner == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+	m_pScanLabSDK = pOwner->getScanLabSDK();
+	if (m_pScanLabSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
 	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 	if (nCardNo == 0)
@@ -1021,10 +1028,10 @@ UINT CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStar
 		std::vector<std::vector<int32_t>> ChannelDataTransformed;
 		ChannelData.resize(4);
 
-		for (int Channel = 1; Channel < 5; Channel++)
+		for (int64_t Channel = 1; Channel < 5; Channel++)
 		{
 			ChannelData[Channel - 1].resize(nDataLength);
-			m_pScanLabSDK->n_get_waveform_offset(m_CardNo, Channel, DataStart, nDataLength, ChannelData[Channel - 1].data ());
+			m_pScanLabSDK->n_get_waveform_offset(m_CardNo, (uint32_t)Channel, DataStart, nDataLength, ChannelData[Channel - 1].data ());
 			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 		}
 
@@ -1184,6 +1191,9 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
+	m_dScaleXInBitsPerEncoderStep = dScaleXInBitsPerEncoderStep;
+	m_dScaleYInBitsPerEncoderStep = dScaleYInBitsPerEncoderStep;
+
 	m_b2DMarkOnTheFlyEnabled = true;
 
 }
@@ -1205,12 +1215,213 @@ bool CRTCContext::MarkOnTheFly2DIsEnabled()
 	return m_b2DMarkOnTheFlyEnabled;
 }
 
-void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter)
+void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNonAssignedDataExists)
 {
+
+	if (pLayer.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	LibMCDriver_ScanLab::eOIERecordingMode oieRecordingMode = LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled;
+	float fMaxLaserPowerInWatts = 100.0;
+
+	int64_t nAttributeFilterValue = 0;
+	std::string sAttributeFilterNameSpace;
+	std::string sAttributeFilterName;
+	m_pOwner->getAttributeFilters(sAttributeFilterNameSpace, sAttributeFilterName, nAttributeFilterValue);
+	uint32_t nAttributeFilterID = 0;
+	if ((!sAttributeFilterNameSpace.empty()) && (!sAttributeFilterName.empty())) {
+		nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(sAttributeFilterNameSpace, sAttributeFilterName);
+	}
+
+	m_pOwner->getExposureParameters(fMaxLaserPowerInWatts, oieRecordingMode);
+
+	addLayerToListEx(pLayer, oieRecordingMode, nAttributeFilterID, nAttributeFilterValue, fMaxLaserPowerInWatts, bFailIfNonAssignedDataExists);
+}
+
+
+void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists)
+{
+	if (pLayer.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	double dUnits = pLayer->GetUnits();
+	bool bEnableOIEMeasurementPerHatch = (oieRecordingMode == eOIERecordingMode::OIELaserActiveMeasurement) || (oieRecordingMode == eOIERecordingMode::OIEEnableAndLaserActiveMeasurement);
+
+	switch (oieRecordingMode) {
+	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
+	case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
+		EnableOIE();
+		break;
+	}
+
+	switch (oieRecordingMode) {
+	case eOIERecordingMode::OIEContinuousMeasurement:
+	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
+		StartOIEMeasurement();
+		break;
+	}
+
+
+
+
+	uint32_t nSegmentCount = pLayer->GetSegmentCount();
+	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
+
+		LibMCEnv::eToolpathSegmentType eSegmentType;
+		uint32_t nPointCount;
+		pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
+
+		bool bDrawSegment = true;
+		if (nAttributeFilterID != 0) {
+			int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nAttributeFilterID);
+			bDrawSegment = (segmentAttributeValue == nAttributeFilterValue);
+		}
+
+		if (bDrawSegment && (nPointCount >= 2)) {
+
+			float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+			float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
+			float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
+			float fPowerInPercent = (fPowerInWatts * 100.f) / fMaxLaserPowerInWatts;
+			float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
+
+			int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
+			int64_t nCurrentLaserIndex = GetLaserIndex();
+
+			if (nLaserIndexToDraw == 0) {
+				if (bFailIfNonAssignedDataExists)
+					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndexToDraw));
+			}
+
+			if (nLaserIndexToDraw == nCurrentLaserIndex) {
+
+				int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
+
+				if (nSkywritingMode != 0) {
+					double dSkywritingTimeLag = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "timelag");
+					int64_t nSkywritingLaserOnShift = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "laseronshift");
+					int64_t nSkywritingPrev = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "nprev");
+					int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
+
+					double dSkywritingLimit = 0.0;
+					if (nSkywritingMode == 3) {
+						dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
+					}
+
+
+					switch (nSkywritingMode) {
+					case 1:
+						EnableSkyWritingMode1(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+						break;
+					case 2:
+						EnableSkyWritingMode2(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
+						break;
+					case 3:
+						EnableSkyWritingMode3(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
+						break;
+					default:
+						DisableSkyWriting();
+					}
+
+				}
+
+				std::vector<LibMCEnv::sPosition2D> Points;
+				pLayer->GetSegmentPointData(nSegmentIndex, Points);
+
+				if (nPointCount != Points.size())
+					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
+
+				switch (eSegmentType) {
+				case LibMCEnv::eToolpathSegmentType::Loop:
+				case LibMCEnv::eToolpathSegmentType::Polyline:
+				{
+
+					std::vector<sPoint2D> ContourPoints;
+					ContourPoints.resize(nPointCount);
+
+					for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+						auto pContourPoint = &ContourPoints.at(nPointIndex);
+						pContourPoint->m_X = (float)(Points[nPointIndex].m_Coordinates[0] * dUnits);
+						pContourPoint->m_Y = (float)(Points[nPointIndex].m_Coordinates[1] * dUnits);
+					}
+
+					DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+
+					break;
+				}
+
+				case LibMCEnv::eToolpathSegmentType::Hatch:
+				{
+					if (nPointCount % 2 == 1)
+						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
+
+					uint64_t nHatchCount = nPointCount / 2;
+					std::vector<sHatch2D> Hatches;
+					Hatches.resize(nHatchCount);
+
+					for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+						auto pHatch = &Hatches.at(nHatchIndex);
+						pHatch->m_X1 = (float)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
+						pHatch->m_Y1 = (float)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
+						pHatch->m_X2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
+						pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
+					}
+
+					DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+
+					break;
+				}
+
+				}
+			}
+
+		}
+
+	}
+
+	if ((oieRecordingMode != eOIERecordingMode::OIERecordingDisabled))
+		StopOIEMeasurement();
+
+	switch (oieRecordingMode) {
+	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
+	case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
+		DisableOIE();
+		break;
+	}
 
 }
 
-void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue)
+void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM)
+{
+	if (!m_b2DMarkOnTheFlyEnabled)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED);
+	if (m_dScaleXInBitsPerEncoderStep <= 0.0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED);
+
+	double dBitsPerMM = m_dCorrectionFactor;
+	double dPositionInBits = dPositionInMM * dBitsPerMM;
+
+	double dEncoderSteps = dPositionInBits / m_dScaleXInBitsPerEncoderStep;
+
+	WaitForEncoderXSteps ((int32_t) round (dPositionInBits));
+}
+
+void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM)
+{
+	if (!m_b2DMarkOnTheFlyEnabled)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED);
+	if (m_dScaleYInBitsPerEncoderStep <= 0.0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED);
+
+	double dBitsPerMM = m_dCorrectionFactor;
+	double dPositionInBits = dPositionInMM * dBitsPerMM;
+
+	double dEncoderSteps = dPositionInBits / m_dScaleYInBitsPerEncoderStep;
+
+	WaitForEncoderYSteps((int32_t)round(dPositionInBits));
+}
+
+void CRTCContext::WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionValue)
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 	m_pScanLabSDK->n_wait_for_encoder(m_CardNo, nPositionValue, 0);
@@ -1218,7 +1429,7 @@ void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue
 
 }
 
-void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue)
+void CRTCContext::WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionValue)
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 	m_pScanLabSDK->n_wait_for_encoder(m_CardNo, nPositionValue, 1);
@@ -1236,23 +1447,35 @@ void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPosition
 		m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 		m_pScanLabSDK->n_get_encoder(m_CardNo, &nPositionX, &nPositionY);
 
-		
-
-
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-		/*uint32_t nMarkingInfo = m_pScanLabSDK->n_get_marking_info(m_CardNo);
+		uint32_t nMarkingInfo = m_pScanLabSDK->n_get_marking_info(m_CardNo);
 
-		std::cout << "n_get_marking_info: " << nMarkingInfo << std::endl;
+		if (nMarkingInfo != 0) 
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR, "Scanlab on the fly marking error: " + std::to_string (nMarkingInfo));
 
-		int32_t nRawEncoderX = m_pScanLabSDK->n_get_value(m_CardNo, 43);
-		int32_t nRawEncoderY = m_pScanLabSDK->n_get_value(m_CardNo, 44);
-
-		int32_t nScaledEncoderX = m_pScanLabSDK->n_get_value(m_CardNo, 55);
-		int32_t nScaledEncoderY = m_pScanLabSDK->n_get_value(m_CardNo, 56);
-
-		std::cout << "raw encoder: " << nRawEncoderX << "/" << nRawEncoderY << std::endl;
-		std::cout << "scaled encoder: " << nScaledEncoderX << "/" << nScaledEncoderY << std::endl; */
+		//int32_t nRawEncoderX = m_pScanLabSDK->n_get_value(m_CardNo, 43);
+		//int32_t nRawEncoderY = m_pScanLabSDK->n_get_value(m_CardNo, 44);
+		//std::cout << "raw encoder: " << nRawEncoderX << "/" << nRawEncoderY << std::endl;
 
 	}
+
+	
+
+}
+
+LibMCDriver_ScanLab_uint32 CRTCContext::CheckOnTheFlyError(const bool bFailIfError)
+{
+	if (m_b2DMarkOnTheFlyEnabled) {
+		uint32_t nMarkingInfo = m_pScanLabSDK->n_get_marking_info(m_CardNo);
+
+		if (bFailIfError) {
+			if (nMarkingInfo != 0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR, "Scanlab on the fly marking error: " + std::to_string(nMarkingInfo));
+		}
+
+		return nMarkingInfo;
+	}
+	else
+		return 0;
 }

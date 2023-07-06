@@ -452,28 +452,46 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesOI
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] pLayer - Instance of the layer to add to the lists.
-* @param[in] nLaserIndexFilter - Laser Index to match. 0 means laser index of toolpath is ignored.
+* @param[in] bFailIfNonAssignedDataExists - If true, fails if there is a laser index that does not match.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCEnv_ToolpathLayer pLayer, LibMCDriver_ScanLab_uint32 nLaserIndexFilter);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCEnv_ToolpathLayer pLayer, bool bFailIfNonAssignedDataExists);
 
 /**
-* Adds a command to wait for the encoder for reaching an X axis position.
+* Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] nPositionValue - Position Value to reach in encoder steps.
+* @param[in] dPositionInMM - Position Value to reach in mm.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionValue);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM);
 
 /**
-* Adds a command to wait for the encoder for reaching an Y axis position.
+* Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] nPositionValue - Position Value to reach in encoder steps.
+* @param[in] dPositionInMM - Position Value to reach in mm.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderYPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionValue);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderYPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM);
+
+/**
+* Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nPositionInSteps - Position Value to reach in steps.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderXStepsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps);
+
+/**
+* Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nPositionInSteps - Position Value to reach in steps.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderYStepsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps);
 
 /**
 * Adds a custom delay to the list
@@ -811,6 +829,16 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 * pPositionX, LibMCDriver_ScanLab_int32 * pPositionY);
+
+/**
+* Checks mark on the fly error.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bFailIfError - If true, the call will fail in case of an error.
+* @param[out] pErrorCode - Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_CheckOnTheFlyErrorPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bFailIfError, LibMCDriver_ScanLab_uint32 * pErrorCode);
 
 /*************************************************************************************************************************
  Class definition for RTCSelector
@@ -1603,6 +1631,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr m_RTCContext_AddLayerToList;
 	PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr m_RTCContext_WaitForEncoderX;
 	PLibMCDriver_ScanLabRTCContext_WaitForEncoderYPtr m_RTCContext_WaitForEncoderY;
+	PLibMCDriver_ScanLabRTCContext_WaitForEncoderXStepsPtr m_RTCContext_WaitForEncoderXSteps;
+	PLibMCDriver_ScanLabRTCContext_WaitForEncoderYStepsPtr m_RTCContext_WaitForEncoderYSteps;
 	PLibMCDriver_ScanLabRTCContext_AddCustomDelayPtr m_RTCContext_AddCustomDelay;
 	PLibMCDriver_ScanLabRTCContext_GetCorrectionFactorPtr m_RTCContext_GetCorrectionFactor;
 	PLibMCDriver_ScanLabRTCContext_GetStatusPtr m_RTCContext_GetStatus;
@@ -1637,6 +1667,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DisableMarkOnTheFly2DPtr m_RTCContext_DisableMarkOnTheFly2D;
 	PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2DIsEnabledPtr m_RTCContext_MarkOnTheFly2DIsEnabled;
 	PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr m_RTCContext_Get2DMarkOnTheFlyPosition;
+	PLibMCDriver_ScanLabRTCContext_CheckOnTheFlyErrorPtr m_RTCContext_CheckOnTheFlyError;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;

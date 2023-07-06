@@ -131,6 +131,12 @@ public:
 
 	void DisableTimelagCompensation() override;
 
+	virtual void getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& nAttributeFilterValue) override;
+
+	virtual void getExposureParameters(float& fMaxLaserPowerInWatts, eOIERecordingMode& oieRecordingMode) override;
+
+	virtual PScanLabSDK getScanLabSDK() override;
+
 };
 
 } // namespace Impl

@@ -106,7 +106,8 @@
 		
 		<error name="INVALIDENCODERSCALINGINX" code="1054" description="Invalid Encoder Scaling in X" />		
 		<error name="INVALIDENCODERSCALINGINY" code="1055" description="Invalid Encoder Scaling in Y" />		
-		
+		<error name="ONTHEFLYMARKINGERROR" code="1056" description="On the fly marking error" />		
+		<error name="MARKONTHEFLYISDISABLED" code="1057" description="Mark on the fly is disabled" />		
 		
 						
 	</errors>
@@ -387,15 +388,23 @@ Custom implementation
 
 		<method name="AddLayerToList" description="Adds a layer instance to the current open list.">
 			<param name="Layer" type="class" class="LibMCEnv:ToolpathLayer" pass="in" description="Instance of the layer to add to the lists." />
-			<param name="LaserIndexFilter" type="uint32" pass="in" description="Laser Index to match. 0 means laser index of toolpath is ignored." />
+			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, fails if there is a laser index that does not match." />
 		</method>
 
-		<method name="WaitForEncoderX" description="Adds a command to wait for the encoder for reaching an X axis position.">
-			<param name="PositionValue" type="int32" pass="in" description="Position Value to reach in encoder steps." />
+		<method name="WaitForEncoderX" description="Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInMM" type="double" pass="in" description="Position Value to reach in mm." />
 		</method>
 
-		<method name="WaitForEncoderY" description="Adds a command to wait for the encoder for reaching an Y axis position.">
-			<param name="PositionValue" type="int32" pass="in" description="Position Value to reach in encoder steps." />
+		<method name="WaitForEncoderY" description="Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInMM" type="double" pass="in" description="Position Value to reach in mm." />
+		</method>
+
+		<method name="WaitForEncoderXSteps" description="Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInSteps" type="int32" pass="in" description="Position Value to reach in steps." />
+		</method>
+
+		<method name="WaitForEncoderYSteps" description="Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInSteps" type="int32" pass="in" description="Position Value to reach in steps." />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
@@ -563,6 +572,12 @@ Custom implementation
 			<param name="PositionX" type="int32" pass="out" description="Mark on the fly position X" />
 			<param name="PositionY" type="int32" pass="out" description="Mark on the fly position Y" />
 		</method>
+		
+		<method name="CheckOnTheFlyError" description="Checks mark on the fly error.">
+			<param name="FailIfError" type="bool" pass="in" description="If true, the call will fail in case of an error." />
+			<param name="ErrorCode" type="uint32" pass="return" description="Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation." />
+		</method>
+		
 		
 	</class>
 

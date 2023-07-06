@@ -39,11 +39,15 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCSelector 
 **************************************************************************************************************************/
 
-CRTCSelector::CRTCSelector(PScanLabSDK pScanLabSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment) :
-	m_pScanLabSDK(pScanLabSDK), m_pDriverEnvironment (pDriverEnvironment)
+CRTCSelector::CRTCSelector(IRTCContextOwner* pRTCContextOwner, LibMCEnv::PDriverEnvironment pDriverEnvironment) :
+	 m_pDriverEnvironment (pDriverEnvironment)
 
 {
-	if (pScanLabSDK.get() == nullptr)
+	if (pRTCContextOwner == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	m_pScanLabSDK = pRTCContextOwner->getScanLabSDK();
+	if (m_pScanLabSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -116,7 +120,7 @@ IRTCContext* CRTCSelector::acquireCardEx(const LibMCDriver_ScanLab_uint32 nNumbe
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYACQUIRED);
 	}
 
-	return new CRTCContext(m_pScanLabSDK, cardNo, bIsNetworkCard, m_pDriverEnvironment);
+	return new CRTCContext(m_pRTCContextOwner, cardNo, bIsNetworkCard, m_pDriverEnvironment);
 }
 
 IRTCContext* CRTCSelector::AcquireCard(const LibMCDriver_ScanLab_uint32 nNumber)

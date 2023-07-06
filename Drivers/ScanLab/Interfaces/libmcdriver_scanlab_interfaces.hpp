@@ -691,21 +691,33 @@ public:
 	/**
 	* IRTCContext::AddLayerToList - Adds a layer instance to the current open list.
 	* @param[in] pLayer - Instance of the layer to add to the lists.
-	* @param[in] nLaserIndexFilter - Laser Index to match. 0 means laser index of toolpath is ignored.
+	* @param[in] bFailIfNonAssignedDataExists - If true, fails if there is a laser index that does not match.
 	*/
-	virtual void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter) = 0;
+	virtual void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const bool bFailIfNonAssignedDataExists) = 0;
 
 	/**
-	* IRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position.
-	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	* IRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] dPositionInMM - Position Value to reach in mm.
 	*/
-	virtual void WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue) = 0;
+	virtual void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM) = 0;
 
 	/**
-	* IRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position.
-	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	* IRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] dPositionInMM - Position Value to reach in mm.
 	*/
-	virtual void WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue) = 0;
+	virtual void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderXSteps - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	*/
+	virtual void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderYSteps - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	*/
+	virtual void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
@@ -941,6 +953,13 @@ public:
 	* @param[out] nPositionY - Mark on the fly position Y
 	*/
 	virtual void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY) = 0;
+
+	/**
+	* IRTCContext::CheckOnTheFlyError - Checks mark on the fly error.
+	* @param[in] bFailIfError - If true, the call will fail in case of an error.
+	* @return Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 CheckOnTheFlyError(const bool bFailIfError) = 0;
 
 };
 

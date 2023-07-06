@@ -246,6 +246,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "TIMELAGMUSTBEAMULTIPLEOF10";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "INVALIDENCODERSCALINGINX";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "INVALIDENCODERSCALINGINY";
+			case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "ONTHEFLYMARKINGERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "MARKONTHEFLYISDISABLED";
 		}
 		return "UNKNOWN";
 	}
@@ -318,6 +320,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "Invalid Encoder Scaling in X";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "Invalid Encoder Scaling in Y";
+			case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "On the fly marking error";
+			case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "Mark on the fly is disabled";
 		}
 		return "unknown error";
 	}
@@ -572,9 +576,11 @@ public:
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
-	inline void AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter);
-	inline void WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue);
-	inline void WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue);
+	inline void AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const bool bFailIfNonAssignedDataExists);
+	inline void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM);
+	inline void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM);
+	inline void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps);
+	inline void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps);
 	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
@@ -609,6 +615,7 @@ public:
 	inline void DisableMarkOnTheFly2D();
 	inline bool MarkOnTheFly2DIsEnabled();
 	inline void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY);
+	inline LibMCDriver_ScanLab_uint32 CheckOnTheFlyError(const bool bFailIfError);
 };
 	
 /*************************************************************************************************************************
@@ -898,6 +905,8 @@ public:
 		pWrapperTable->m_RTCContext_AddLayerToList = nullptr;
 		pWrapperTable->m_RTCContext_WaitForEncoderX = nullptr;
 		pWrapperTable->m_RTCContext_WaitForEncoderY = nullptr;
+		pWrapperTable->m_RTCContext_WaitForEncoderXSteps = nullptr;
+		pWrapperTable->m_RTCContext_WaitForEncoderYSteps = nullptr;
 		pWrapperTable->m_RTCContext_AddCustomDelay = nullptr;
 		pWrapperTable->m_RTCContext_GetCorrectionFactor = nullptr;
 		pWrapperTable->m_RTCContext_GetStatus = nullptr;
@@ -932,6 +941,7 @@ public:
 		pWrapperTable->m_RTCContext_DisableMarkOnTheFly2D = nullptr;
 		pWrapperTable->m_RTCContext_MarkOnTheFly2DIsEnabled = nullptr;
 		pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition = nullptr;
+		pWrapperTable->m_RTCContext_CheckOnTheFlyError = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1403,6 +1413,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderXSteps = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderXStepsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencoderxsteps");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderXSteps = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderXStepsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencoderxsteps");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_WaitForEncoderXSteps == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderYSteps = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderYStepsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencoderysteps");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_WaitForEncoderYSteps = (PLibMCDriver_ScanLabRTCContext_WaitForEncoderYStepsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_waitforencoderysteps");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_WaitForEncoderYSteps == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_AddCustomDelay = (PLibMCDriver_ScanLabRTCContext_AddCustomDelayPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addcustomdelay");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_AddCustomDelay = (PLibMCDriver_ScanLabRTCContext_AddCustomDelayPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addcustomdelay");
@@ -1706,6 +1734,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_CheckOnTheFlyError = (PLibMCDriver_ScanLabRTCContext_CheckOnTheFlyErrorPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_checkontheflyerror");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_CheckOnTheFlyError = (PLibMCDriver_ScanLabRTCContext_CheckOnTheFlyErrorPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_checkontheflyerror");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_CheckOnTheFlyError == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2501,6 +2538,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_WaitForEncoderY == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_waitforencoderxsteps", (void**)&(pWrapperTable->m_RTCContext_WaitForEncoderXSteps));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_WaitForEncoderXSteps == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_waitforencoderysteps", (void**)&(pWrapperTable->m_RTCContext_WaitForEncoderYSteps));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_WaitForEncoderYSteps == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addcustomdelay", (void**)&(pWrapperTable->m_RTCContext_AddCustomDelay));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddCustomDelay == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2635,6 +2680,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_get2dmarkontheflyposition", (void**)&(pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_Get2DMarkOnTheFlyPosition == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_checkontheflyerror", (void**)&(pWrapperTable->m_RTCContext_CheckOnTheFlyError));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_CheckOnTheFlyError == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -3342,30 +3391,48 @@ public:
 	/**
 	* CRTCContext::AddLayerToList - Adds a layer instance to the current open list.
 	* @param[in] pLayer - Instance of the layer to add to the lists.
-	* @param[in] nLaserIndexFilter - Laser Index to match. 0 means laser index of toolpath is ignored.
+	* @param[in] bFailIfNonAssignedDataExists - If true, fails if there is a laser index that does not match.
 	*/
-	void CRTCContext::AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter)
+	void CRTCContext::AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const bool bFailIfNonAssignedDataExists)
 	{
 		LibMCEnvHandle hLayer = pLayer.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddLayerToList(m_pHandle, hLayer, nLaserIndexFilter));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddLayerToList(m_pHandle, hLayer, bFailIfNonAssignedDataExists));
 	}
 	
 	/**
-	* CRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position.
-	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	* CRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] dPositionInMM - Position Value to reach in mm.
 	*/
-	void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue)
+	void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderX(m_pHandle, nPositionValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderX(m_pHandle, dPositionInMM));
 	}
 	
 	/**
-	* CRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position.
-	* @param[in] nPositionValue - Position Value to reach in encoder steps.
+	* CRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] dPositionInMM - Position Value to reach in mm.
 	*/
-	void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue)
+	void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderY(m_pHandle, nPositionValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderY(m_pHandle, dPositionInMM));
+	}
+	
+	/**
+	* CRTCContext::WaitForEncoderXSteps - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	*/
+	void CRTCContext::WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderXSteps(m_pHandle, nPositionInSteps));
+	}
+	
+	/**
+	* CRTCContext::WaitForEncoderYSteps - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	*/
+	void CRTCContext::WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderYSteps(m_pHandle, nPositionInSteps));
 	}
 	
 	/**
@@ -3711,6 +3778,19 @@ public:
 	void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_Get2DMarkOnTheFlyPosition(m_pHandle, &nPositionX, &nPositionY));
+	}
+	
+	/**
+	* CRTCContext::CheckOnTheFlyError - Checks mark on the fly error.
+	* @param[in] bFailIfError - If true, the call will fail in case of an error.
+	* @return Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation.
+	*/
+	LibMCDriver_ScanLab_uint32 CRTCContext::CheckOnTheFlyError(const bool bFailIfError)
+	{
+		LibMCDriver_ScanLab_uint32 resultErrorCode = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_CheckOnTheFlyError(m_pHandle, bFailIfError, &resultErrorCode));
+		
+		return resultErrorCode;
 	}
 	
 	/**

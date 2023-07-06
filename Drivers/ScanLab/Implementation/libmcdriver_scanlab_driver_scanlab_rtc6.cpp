@@ -730,4 +730,20 @@ PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(c
     }
 }
 
+void CDriver_ScanLab_RTC6::getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& nAttributeFilterValue)
+{
+    sAttributeFilterNameSpace = m_nAttributeFilterNameSpace;
+    sAttributeFilterName = m_nAttributeFilterAttributeName;
+    nAttributeFilterValue = m_nAttributeFilterValue;
+}
 
+void CDriver_ScanLab_RTC6::getExposureParameters(float& fMaxLaserPowerInWatts, eOIERecordingMode& oieRecordingMode)
+{
+    fMaxLaserPowerInWatts = m_fMaxLaserPowerInWatts;
+    oieRecordingMode = m_OIERecordingMode;
+}
+
+PScanLabSDK CDriver_ScanLab_RTC6::getScanLabSDK()
+{
+    return m_pScanLabSDK;
+}

@@ -23,7 +23,7 @@ Abstract: This is the class declaration of CRTCSelector
 #endif
 
 // Include custom headers here.
-
+#include "libmcdriver_scanlab_rtccontext.hpp"
 
 namespace LibMCDriver_ScanLab {
 namespace Impl {
@@ -44,9 +44,11 @@ protected:
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
+	IRTCContextOwner* m_pRTCContextOwner;
+
 public:
 
-	CRTCSelector(PScanLabSDK pScanLabSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CRTCSelector(IRTCContextOwner* pRTCContextOwner, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CRTCSelector();
 

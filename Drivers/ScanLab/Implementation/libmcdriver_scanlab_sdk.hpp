@@ -192,6 +192,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_encoder) (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_marking_info) (uint32_t nCardNo);		
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder_mode) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo, int32_t nMode);
 
 
 		class CScanLabSDK {

@@ -160,6 +160,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10 1053 /** Timelag must be a multiple of 10 microseconds. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX 1054 /** Invalid Encoder Scaling in X */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY 1055 /** Invalid Encoder Scaling in Y */
+#define LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR 1056 /** On the fly marking error */
+#define LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED 1057 /** Mark on the fly is disabled */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -232,6 +234,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "Invalid Encoder Scaling in X";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "Invalid Encoder Scaling in Y";
+    case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "On the fly marking error";
+    case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "Mark on the fly is disabled";
     default: return "unknown error";
   }
 }

@@ -33,9 +33,19 @@ namespace Impl {
  Class declaration of CRTCContext 
 **************************************************************************************************************************/
 
+class IRTCContextOwner {
+public:
+
+	virtual void getAttributeFilters(std::string& nAttributeFilterNameSpace, std::string& nAttributeFilterName, int64_t& nAttributeFilterValue) = 0;
+	virtual void getExposureParameters(float & fMaxLaserPowerInWatts, eOIERecordingMode & oieRecordingMode) = 0;
+	virtual PScanLabSDK getScanLabSDK() = 0;
+};
+
 class CRTCContext : public virtual IRTCContext, public virtual CBase {
 
 protected:
+	IRTCContextOwner * m_pOwner;
+
 	PScanLabSDK m_pScanLabSDK;
 	uint32_t m_CardNo;
 	double m_dCorrectionFactor;
@@ -45,6 +55,8 @@ protected:
 	std::vector<uint32_t> m_MCBSPSignalChannels;
 
 	bool m_b2DMarkOnTheFlyEnabled;
+	double m_dScaleXInBitsPerEncoderStep;
+	double m_dScaleYInBitsPerEncoderStep;
 
 	std::string m_sIPAddress;
 	std::string m_sNetmask;
@@ -73,10 +85,11 @@ protected:
 
 	UINT saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY);
 
+	void addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists);
 
 public:
 
-	CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CRTCContext(IRTCContextOwner* pOwner, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	~CRTCContext();
 
@@ -139,11 +152,15 @@ public:
 	
 	void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D* pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const uint32_t nOIEControlIndex) override;
 
-	void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const LibMCDriver_ScanLab_uint32 nLaserIndexFilter) override;
+	void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNonAssignedDataExists) override;
 
-	void WaitForEncoderX(const LibMCDriver_ScanLab_int32 nPositionValue) override;
+	void WaitForEncoderX(const LibMCDriver_ScanLab_double dPosition) override;
 
-	void WaitForEncoderY(const LibMCDriver_ScanLab_int32 nPositionValue) override;
+	void WaitForEncoderY(const LibMCDriver_ScanLab_double dPosition) override;
+
+	void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) override;
+
+	void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) override;
 
 	void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay) override;
 
@@ -212,6 +229,8 @@ public:
 	bool MarkOnTheFly2DIsEnabled() override; 	
 
 	void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPositionX, LibMCDriver_ScanLab_int32& nPositionY) override;
+
+	LibMCDriver_ScanLab_uint32 CheckOnTheFlyError(const bool bFailIfError) override;
 
 	void SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY) override;
 
