@@ -285,7 +285,7 @@ namespace AMC {
 
 		switch (eAttributeType) {
 		case LibMCEnv::eToolpathAttributeType::Integer: 
-			m_pToolpath->RegisterCustomUint32Attribute (sNameSpace, sAttributeName);
+			m_pToolpath->RegisterCustomIntegerAttribute (sNameSpace, sAttributeName);
 			break;
 		case LibMCEnv::eToolpathAttributeType::Double:
 			m_pToolpath->RegisterCustomDoubleAttribute (sNameSpace, sAttributeName);
