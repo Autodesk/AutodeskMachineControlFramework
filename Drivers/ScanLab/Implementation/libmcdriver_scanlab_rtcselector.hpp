@@ -44,11 +44,11 @@ protected:
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
-	IRTCContextOwner* m_pRTCContextOwner;
+	PRTCContextOwnerData m_pRTCContextOwnerData;
 
 public:
 
-	CRTCSelector(IRTCContextOwner* pRTCContextOwner, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CRTCSelector();
 

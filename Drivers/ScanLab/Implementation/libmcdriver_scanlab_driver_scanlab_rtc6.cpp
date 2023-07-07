@@ -43,8 +43,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab_RTC6::CDriver_ScanLab_RTC6(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f), m_SimulationMode (false),
-    m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled), m_nAttributeFilterValue (0)
+	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_SimulationMode (false)    
 {
 }
 
@@ -351,7 +350,7 @@ void CDriver_ScanLab_RTC6::ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserM
         if (((float)dMaxLaserPower < RTC6_MIN_MAXLASERPOWER) || ((float)dMaxLaserPower > RTC6_MAX_MAXLASERPOWER))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
 
-        m_fMaxLaserPowerInWatts = (float)dMaxLaserPower;
+        m_pOwnerData->setMaxLaserPower(dMaxLaserPower);
 
         m_pRTCContext->ConfigureLists(1 << 22, 1 << 22);
         m_pRTCContext->SetLaserMode(eLaserMode, eLaserPort);
@@ -407,12 +406,12 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
 
 void CDriver_ScanLab_RTC6::SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode)
 {
-    m_OIERecordingMode = eRecordingMode;
+    m_pOwnerData->setOIERecordingMode(eRecordingMode);
 }
 
 LibMCDriver_ScanLab::eOIERecordingMode CDriver_ScanLab_RTC6::GetOIERecordingMode()
 {
-    return m_OIERecordingMode;
+    return m_pOwnerData->getOIERecordingMode ();
 }
 
 
@@ -422,7 +421,7 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         if (m_pRTCContext.get() == nullptr)
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-        if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
+        if ((m_pOwnerData->getMaxLaserPower () < RTC6_MIN_MAXLASERPOWER) || (m_pOwnerData->getMaxLaserPower() > RTC6_MAX_MAXLASERPOWER))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
 
         m_pRTCContext->SetStartList(1, 0);
@@ -432,14 +431,8 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         m_pRTCContext->AddLayerToList(pLayer, true);
 
-        if ((m_OIERecordingMode != eOIERecordingMode::OIERecordingDisabled))
+        if ((m_pOwnerData->getOIERecordingMode() != eOIERecordingMode::OIERecordingDisabled))
             m_pRTCContext->StopOIEMeasurement();
-
-        switch (m_OIERecordingMode) {
-        case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
-        case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
-            m_pRTCContext->DisableOIE();
-        }
 
         m_pRTCContext->SetEndOfList();
 
@@ -567,17 +560,13 @@ void CDriver_ScanLab_RTC6::DisableTimelagCompensation()
 
 void CDriver_ScanLab_RTC6::EnableAttributeFilter(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue)
 {
-    m_nAttributeFilterNameSpace = sNameSpace;
-    m_nAttributeFilterAttributeName = sAttributeName;
-    m_nAttributeFilterValue = nAttributeValue;
+    m_pOwnerData->setAttributeFilters(sNameSpace, sAttributeName, nAttributeValue);
 
 }
 
 void CDriver_ScanLab_RTC6::DisableAttributeFilter()
 {
-    m_nAttributeFilterNameSpace = "";
-    m_nAttributeFilterAttributeName = "";
-    m_nAttributeFilterValue = 0;
+    m_pOwnerData->setAttributeFilters("", "", 0);
 }
 
 
@@ -599,22 +588,4 @@ PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(c
 
         return nullptr;
     }
-}
-
-void CDriver_ScanLab_RTC6::getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& nAttributeFilterValue)
-{
-    sAttributeFilterNameSpace = m_nAttributeFilterNameSpace;
-    sAttributeFilterName = m_nAttributeFilterAttributeName;
-    nAttributeFilterValue = m_nAttributeFilterValue;
-}
-
-void CDriver_ScanLab_RTC6::getExposureParameters(float& fMaxLaserPowerInWatts, eOIERecordingMode& oieRecordingMode)
-{
-    fMaxLaserPowerInWatts = m_fMaxLaserPowerInWatts;
-    oieRecordingMode = m_OIERecordingMode;
-}
-
-PScanLabSDK CDriver_ScanLab_RTC6::getScanLabSDK()
-{
-    return m_pScanLabSDK;
 }

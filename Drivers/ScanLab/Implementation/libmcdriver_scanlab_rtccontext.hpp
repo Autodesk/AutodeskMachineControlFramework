@@ -33,18 +33,37 @@ namespace Impl {
  Class declaration of CRTCContext 
 **************************************************************************************************************************/
 
-class IRTCContextOwner {
-public:
+class CRTCContextOwnerData {
+private:
+	PScanLabSDK m_pScanlabSDK;
+	std::string m_sAttributeFilterNameSpace;
+	std::string m_sAttributeFilterName;
+	int64_t m_nAttributeFilterValue;
+	double m_dMaxLaserPowerInWatts;
+	eOIERecordingMode m_OIERecordingMode;
 
-	virtual void getAttributeFilters(std::string& nAttributeFilterNameSpace, std::string& nAttributeFilterName, int64_t& nAttributeFilterValue) = 0;
-	virtual void getExposureParameters(float & fMaxLaserPowerInWatts, eOIERecordingMode & oieRecordingMode) = 0;
-	virtual PScanLabSDK getScanLabSDK() = 0;
+
+public:
+	CRTCContextOwnerData();
+	virtual ~CRTCContextOwnerData();
+
+	void getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& nAttributeFilterValue);
+	void setAttributeFilters(const std::string& sAttributeFilterNameSpace, const std::string& sAttributeFilterName, const int64_t sAttributeFilterValue);
+	void getExposureParameters(double & dMaxLaserPowerInWatts, eOIERecordingMode & oieRecordingMode);
+	void setMaxLaserPower(double dMaxLaserPowerInWatts);
+	double getMaxLaserPower();
+	void setOIERecordingMode(eOIERecordingMode oieRecordingMode);
+	eOIERecordingMode getOIERecordingMode();
+	PScanLabSDK getScanLabSDK();
+	void setScanLabSDK(PScanLabSDK pScanLabSDK);
 };
+
+typedef std::shared_ptr<CRTCContextOwnerData> PRTCContextOwnerData;
 
 class CRTCContext : public virtual IRTCContext, public virtual CBase {
 
 protected:
-	IRTCContextOwner * m_pOwner;
+	PRTCContextOwnerData m_pOwnerData;
 
 	PScanLabSDK m_pScanLabSDK;
 	uint32_t m_CardNo;
@@ -89,7 +108,7 @@ protected:
 
 public:
 
-	CRTCContext(IRTCContextOwner* pOwner, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	~CRTCContext();
 

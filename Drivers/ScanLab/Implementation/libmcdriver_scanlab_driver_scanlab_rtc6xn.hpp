@@ -58,7 +58,7 @@ namespace Impl {
 /*************************************************************************************************************************
  Class declaration of CDriver_ScanLab_RTC6xN 
 **************************************************************************************************************************/
-class CDriver_ScanLab_RTC6xN : public virtual IDriver_ScanLab_RTC6xN, public virtual CDriver_ScanLab, public virtual IRTCContextOwner {
+class CDriver_ScanLab_RTC6xN : public virtual IDriver_ScanLab_RTC6xN, public virtual CDriver_ScanLab {
 private:
 
 	uint32_t m_nScannerCount;
@@ -68,11 +68,6 @@ private:
 
 	bool m_SimulationMode;
 
-	float m_fMaxLaserPowerInWatts;
-
-	std::string m_nAttributeFilterNameSpace;
-	std::string m_nAttributeFilterAttributeName;
-	int64_t m_nAttributeFilterValue;
 
 	act_managed_ptr<IRTCSelector> m_pRTCSelector;
 	
@@ -80,8 +75,6 @@ private:
 	std::map<uint32_t, act_managed_ptr<IRTCContext>> m_LaserIndexMapping;
 
 	std::map<std::string, PDriver_ScanLab_RTC6ConfigurationPreset> m_ConfigurationPresets;
-
-	LibMCDriver_ScanLab::eOIERecordingMode m_OIERecordingMode;
 
 	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
@@ -165,12 +158,6 @@ public:
 	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
 
 	void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex) override;
-
-	virtual void getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& sAttributeFilterValue) override;
-
-	virtual void getExposureParameters(float& fMaxLaserPowerInWatts, eOIERecordingMode& oieRecordingMode) override;
-
-	virtual PScanLabSDK getScanLabSDK() override;
 
 
 };

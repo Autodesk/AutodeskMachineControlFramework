@@ -45,16 +45,11 @@ private:
 
 	bool m_SimulationMode;
 
-	float m_fMaxLaserPowerInWatts;
-
-	std::string m_nAttributeFilterNameSpace;
-	std::string m_nAttributeFilterAttributeName;
-	int64_t m_nAttributeFilterValue;
 
 	act_managed_ptr<IRTCSelector> m_pRTCSelector;
 	act_managed_ptr<IRTCContext> m_pRTCContext;
 
-	LibMCDriver_ScanLab::eOIERecordingMode m_OIERecordingMode;
+
 
 	std::map<std::string, PDriver_ScanLab_RTC6ConfigurationPreset> m_ConfigurationPresets;
 
@@ -130,12 +125,6 @@ public:
 	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
 
 	void DisableTimelagCompensation() override;
-
-	virtual void getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& nAttributeFilterValue) override;
-
-	virtual void getExposureParameters(float& fMaxLaserPowerInWatts, eOIERecordingMode& oieRecordingMode) override;
-
-	virtual PScanLabSDK getScanLabSDK() override;
 
 };
 

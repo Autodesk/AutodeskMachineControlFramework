@@ -49,8 +49,8 @@ Abstract: This is the class declaration of CDriver_ScanLab
 // Include custom headers here.
 #include "libmcdriver_scanlab_sdk.hpp"
 
-#define RTC6_MIN_MAXLASERPOWER 10.0f
-#define RTC6_MAX_MAXLASERPOWER 10000.0f
+#define RTC6_MIN_MAXLASERPOWER 10.0
+#define RTC6_MAX_MAXLASERPOWER 10000.0
 
 #define RTC6_MIN_LASER_DELAY -1000000.0f
 #define RTC6_MAX_LASER_DELAY 1000000.0f
@@ -73,7 +73,7 @@ namespace Impl {
  Class declaration of CDriver_ScanLab 
 **************************************************************************************************************************/
 
-class CDriver_ScanLab : public virtual IDriver_ScanLab, public virtual CDriver, public virtual IRTCContextOwner {
+class CDriver_ScanLab : public virtual IDriver_ScanLab, public virtual CDriver {
 private:
 
 protected:
@@ -82,6 +82,8 @@ protected:
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
     LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
     LibMCEnv::PWorkingFile m_pSDKLibraryFile;
+
+    PRTCContextOwnerData m_pOwnerData;
 
     uint32_t m_nDLLVersion;
 

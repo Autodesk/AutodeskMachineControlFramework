@@ -45,12 +45,77 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCDriver_ScanLab::Impl;
 
+CRTCContextOwnerData::CRTCContextOwnerData()
+	: m_nAttributeFilterValue (0), m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled), m_dMaxLaserPowerInWatts (100.0)
+{
+
+}
+
+CRTCContextOwnerData::~CRTCContextOwnerData()
+{
+
+}
+
+void CRTCContextOwnerData::getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& nAttributeFilterValue)
+{
+	sAttributeFilterNameSpace = m_sAttributeFilterNameSpace;
+	sAttributeFilterName = m_sAttributeFilterName;
+	nAttributeFilterValue = m_nAttributeFilterValue;
+}
+
+void CRTCContextOwnerData::setAttributeFilters(const std::string& sAttributeFilterNameSpace, const std::string& sAttributeFilterName, const int64_t nAttributeFilterValue)
+{
+	m_sAttributeFilterNameSpace = sAttributeFilterNameSpace;
+	m_sAttributeFilterName = sAttributeFilterName;
+	m_nAttributeFilterValue = nAttributeFilterValue;
+}
+
+void CRTCContextOwnerData::getExposureParameters(double& dMaxLaserPowerInWatts, LibMCDriver_ScanLab::eOIERecordingMode& oieRecordingMode)
+{
+	dMaxLaserPowerInWatts = dMaxLaserPowerInWatts;
+	oieRecordingMode = m_OIERecordingMode;
+}
+
+void CRTCContextOwnerData::setMaxLaserPower(double dMaxLaserPowerInWatts)
+{
+	m_dMaxLaserPowerInWatts = dMaxLaserPowerInWatts;
+}
+
+double CRTCContextOwnerData::getMaxLaserPower()
+{
+	return m_dMaxLaserPowerInWatts;
+}
+
+void CRTCContextOwnerData::setOIERecordingMode(LibMCDriver_ScanLab::eOIERecordingMode oieRecordingMode)
+{
+	m_OIERecordingMode = oieRecordingMode;
+}
+
+LibMCDriver_ScanLab::eOIERecordingMode CRTCContextOwnerData::getOIERecordingMode()
+{
+	return m_OIERecordingMode;
+}
+
+PScanLabSDK CRTCContextOwnerData::getScanLabSDK()
+{
+	if (m_pScanlabSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKNOTLOADED);
+
+	return m_pScanlabSDK;
+}
+
+void CRTCContextOwnerData::setScanLabSDK(PScanLabSDK pScanLabSDK)
+{
+	m_pScanlabSDK = pScanLabSDK;
+}
+
+
 /*************************************************************************************************************************
  Class definition of CRTCContext 
 **************************************************************************************************************************/
 
-CRTCContext::CRTCContext(IRTCContextOwner* pOwner, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: m_pOwner(pOwner),
+CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_pOwnerData(pOwnerData),
 	m_CardNo (nCardNo), 
 	m_dCorrectionFactor(10000.0), 
 	m_dZCorrectionFactor(10000.0),
@@ -71,9 +136,9 @@ CRTCContext::CRTCContext(IRTCContextOwner* pOwner, uint32_t nCardNo, bool bIsNet
 	m_dScaleYInBitsPerEncoderStep (1.0)
 
 {
-	if (pOwner == nullptr)
+	if (pOwnerData.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-	m_pScanLabSDK = pOwner->getScanLabSDK();
+	m_pScanLabSDK = pOwnerData->getScanLabSDK();
 	if (m_pScanLabSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
@@ -1222,20 +1287,20 @@ void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNo
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 	LibMCDriver_ScanLab::eOIERecordingMode oieRecordingMode = LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled;
-	float fMaxLaserPowerInWatts = 100.0;
+	double dMaxLaserPowerInWatts = 100.0;
 
 	int64_t nAttributeFilterValue = 0;
 	std::string sAttributeFilterNameSpace;
 	std::string sAttributeFilterName;
-	m_pOwner->getAttributeFilters(sAttributeFilterNameSpace, sAttributeFilterName, nAttributeFilterValue);
+	m_pOwnerData->getAttributeFilters(sAttributeFilterNameSpace, sAttributeFilterName, nAttributeFilterValue);
 	uint32_t nAttributeFilterID = 0;
 	if ((!sAttributeFilterNameSpace.empty()) && (!sAttributeFilterName.empty())) {
 		nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(sAttributeFilterNameSpace, sAttributeFilterName);
 	}
 
-	m_pOwner->getExposureParameters(fMaxLaserPowerInWatts, oieRecordingMode);
+	m_pOwnerData->getExposureParameters(dMaxLaserPowerInWatts, oieRecordingMode);
 
-	addLayerToListEx(pLayer, oieRecordingMode, nAttributeFilterID, nAttributeFilterValue, fMaxLaserPowerInWatts, bFailIfNonAssignedDataExists);
+	addLayerToListEx(pLayer, oieRecordingMode, nAttributeFilterID, nAttributeFilterValue, (float)dMaxLaserPowerInWatts, bFailIfNonAssignedDataExists);
 }
 
 
