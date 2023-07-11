@@ -248,6 +248,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "INVALIDENCODERSCALINGINY";
 			case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "ONTHEFLYMARKINGERROR";
 			case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "MARKONTHEFLYISDISABLED";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "INVALIDLASERFIELDCOORDINATES";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "NOLASERFIELDSET";
 		}
 		return "UNKNOWN";
 	}
@@ -322,6 +324,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "Invalid Encoder Scaling in Y";
 			case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "On the fly marking error";
 			case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "Mark on the fly is disabled";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "Invalid laser field coordinates";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set";
 		}
 		return "unknown error";
 	}
@@ -564,7 +568,10 @@ public:
 	inline void SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY);
 	inline void GetLaserOrigin(LibMCDriver_ScanLab_double & dOriginX, LibMCDriver_ScanLab_double & dOriginY);
 	inline void SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY);
-	inline void GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY);
+	inline void ResetLaserField();
+	inline void EnableRangeChecking();
+	inline void DisableRangeChecking();
+	inline bool GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY);
 	inline void SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
 	inline void SetEndOfList();
 	inline void ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
@@ -890,6 +897,9 @@ public:
 		pWrapperTable->m_RTCContext_SetLaserOrigin = nullptr;
 		pWrapperTable->m_RTCContext_GetLaserOrigin = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserField = nullptr;
+		pWrapperTable->m_RTCContext_ResetLaserField = nullptr;
+		pWrapperTable->m_RTCContext_EnableRangeChecking = nullptr;
+		pWrapperTable->m_RTCContext_DisableRangeChecking = nullptr;
 		pWrapperTable->m_RTCContext_GetLaserField = nullptr;
 		pWrapperTable->m_RTCContext_SetStartList = nullptr;
 		pWrapperTable->m_RTCContext_SetEndOfList = nullptr;
@@ -1275,6 +1285,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_SetLaserField == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ResetLaserField = (PLibMCDriver_ScanLabRTCContext_ResetLaserFieldPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_resetlaserfield");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ResetLaserField = (PLibMCDriver_ScanLabRTCContext_ResetLaserFieldPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_resetlaserfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ResetLaserField == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableRangeChecking = (PLibMCDriver_ScanLabRTCContext_EnableRangeCheckingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablerangechecking");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableRangeChecking = (PLibMCDriver_ScanLabRTCContext_EnableRangeCheckingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablerangechecking");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableRangeChecking == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableRangeChecking = (PLibMCDriver_ScanLabRTCContext_DisableRangeCheckingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablerangechecking");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableRangeChecking = (PLibMCDriver_ScanLabRTCContext_DisableRangeCheckingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablerangechecking");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableRangeChecking == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2478,6 +2515,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserField == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_resetlaserfield", (void**)&(pWrapperTable->m_RTCContext_ResetLaserField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ResetLaserField == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablerangechecking", (void**)&(pWrapperTable->m_RTCContext_EnableRangeChecking));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableRangeChecking == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablerangechecking", (void**)&(pWrapperTable->m_RTCContext_DisableRangeChecking));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableRangeChecking == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getlaserfield", (void**)&(pWrapperTable->m_RTCContext_GetLaserField));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserField == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3255,15 +3304,43 @@ public:
 	}
 	
 	/**
+	* CRTCContext::ResetLaserField - Resets the laser field to default values.
+	*/
+	void CRTCContext::ResetLaserField()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ResetLaserField(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::EnableRangeChecking - Enables range checking of the laser field. A laser field MUST have been set before.
+	*/
+	void CRTCContext::EnableRangeChecking()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableRangeChecking(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DisableRangeChecking - Disables range checking of the laser field.
+	*/
+	void CRTCContext::DisableRangeChecking()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableRangeChecking(m_pHandle));
+	}
+	
+	/**
 	* CRTCContext::GetLaserField - Returns the laser field limits in absolute coordinates.
 	* @param[out] dMinX - Sets minimum laser X coordinate in mm.
 	* @param[out] dMinY - Sets minimum laser Y coordinate in mm.
 	* @param[out] dMaxX - Sets maximum laser X coordinate in mm.
 	* @param[out] dMaxY - Sets maximum laser Y coordinate in mm.
+	* @return Returns true if a laser field has been set.
 	*/
-	void CRTCContext::GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY)
+	bool CRTCContext::GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserField(m_pHandle, &dMinX, &dMinY, &dMaxX, &dMaxY));
+		bool resultHasLaserField = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserField(m_pHandle, &dMinX, &dMinY, &dMaxX, &dMaxY, &resultHasLaserField));
+		
+		return resultHasLaserField;
 	}
 	
 	/**

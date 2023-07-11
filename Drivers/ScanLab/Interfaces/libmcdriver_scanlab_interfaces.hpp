@@ -587,13 +587,29 @@ public:
 	virtual void SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY) = 0;
 
 	/**
+	* IRTCContext::ResetLaserField - Resets the laser field to default values.
+	*/
+	virtual void ResetLaserField() = 0;
+
+	/**
+	* IRTCContext::EnableRangeChecking - Enables range checking of the laser field. A laser field MUST have been set before.
+	*/
+	virtual void EnableRangeChecking() = 0;
+
+	/**
+	* IRTCContext::DisableRangeChecking - Disables range checking of the laser field.
+	*/
+	virtual void DisableRangeChecking() = 0;
+
+	/**
 	* IRTCContext::GetLaserField - Returns the laser field limits in absolute coordinates.
 	* @param[out] dMinX - Sets minimum laser X coordinate in mm.
 	* @param[out] dMinY - Sets minimum laser Y coordinate in mm.
 	* @param[out] dMaxX - Sets maximum laser X coordinate in mm.
 	* @param[out] dMaxY - Sets maximum laser Y coordinate in mm.
+	* @return Returns true if a laser field has been set.
 	*/
-	virtual void GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY) = 0;
+	virtual bool GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY) = 0;
 
 	/**
 	* IRTCContext::SetStartList - Opens the list to write

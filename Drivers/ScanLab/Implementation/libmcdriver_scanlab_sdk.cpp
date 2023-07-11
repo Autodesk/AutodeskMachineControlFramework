@@ -235,6 +235,9 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_get_encoder = (PScanLabPtr_n_get_encoder)_loadScanLabAddress(hLibrary, "n_get_encoder");
 	this->n_get_marking_info = (PScanLabPtr_n_get_marking_info)_loadScanLabAddress(hLibrary, "n_get_marking_info");
 	this->n_wait_for_encoder = (PScanLabPtr_n_wait_for_encoder)_loadScanLabAddress(hLibrary, "n_wait_for_encoder");
+	this->n_wait_for_encoder_mode = (PScanLabPtr_n_wait_for_encoder_mode)_loadScanLabAddress(hLibrary, "n_wait_for_encoder_mode");
+	this->n_set_fly_limits = (PScanLabPtr_n_set_fly_limits)_loadScanLabAddress(hLibrary, "n_set_fly_limits");
+	this->n_range_checking = (PScanLabPtr_n_range_checking)_loadScanLabAddress(hLibrary, "n_range_checking");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -424,6 +427,9 @@ void CScanLabSDK::resetFunctionPtrs()
 
 	n_get_marking_info = nullptr;
 	n_wait_for_encoder = nullptr;
+	n_wait_for_encoder_mode = nullptr;
+	n_set_fly_limits = nullptr;
+	n_range_checking = nullptr;
 
 }
 

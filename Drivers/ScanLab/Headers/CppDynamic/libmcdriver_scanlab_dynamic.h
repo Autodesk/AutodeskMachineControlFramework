@@ -310,6 +310,30 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserOrigi
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserFieldPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dMinX, LibMCDriver_ScanLab_double dMinY, LibMCDriver_ScanLab_double dMaxX, LibMCDriver_ScanLab_double dMaxY);
 
 /**
+* Resets the laser field to default values.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ResetLaserFieldPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables range checking of the laser field. A laser field MUST have been set before.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableRangeCheckingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables range checking of the laser field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableRangeCheckingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
 * Returns the laser field limits in absolute coordinates.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -317,9 +341,10 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserField
 * @param[out] pMinY - Sets minimum laser Y coordinate in mm.
 * @param[out] pMaxX - Sets maximum laser X coordinate in mm.
 * @param[out] pMaxY - Sets maximum laser Y coordinate in mm.
+* @param[out] pHasLaserField - Returns true if a laser field has been set.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserFieldPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pMinX, LibMCDriver_ScanLab_double * pMinY, LibMCDriver_ScanLab_double * pMaxX, LibMCDriver_ScanLab_double * pMaxY);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserFieldPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pMinX, LibMCDriver_ScanLab_double * pMinY, LibMCDriver_ScanLab_double * pMaxX, LibMCDriver_ScanLab_double * pMaxY, bool * pHasLaserField);
 
 /**
 * Opens the list to write
@@ -1616,6 +1641,9 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetLaserOriginPtr m_RTCContext_SetLaserOrigin;
 	PLibMCDriver_ScanLabRTCContext_GetLaserOriginPtr m_RTCContext_GetLaserOrigin;
 	PLibMCDriver_ScanLabRTCContext_SetLaserFieldPtr m_RTCContext_SetLaserField;
+	PLibMCDriver_ScanLabRTCContext_ResetLaserFieldPtr m_RTCContext_ResetLaserField;
+	PLibMCDriver_ScanLabRTCContext_EnableRangeCheckingPtr m_RTCContext_EnableRangeChecking;
+	PLibMCDriver_ScanLabRTCContext_DisableRangeCheckingPtr m_RTCContext_DisableRangeChecking;
 	PLibMCDriver_ScanLabRTCContext_GetLaserFieldPtr m_RTCContext_GetLaserField;
 	PLibMCDriver_ScanLabRTCContext_SetStartListPtr m_RTCContext_SetStartList;
 	PLibMCDriver_ScanLabRTCContext_SetEndOfListPtr m_RTCContext_SetEndOfList;

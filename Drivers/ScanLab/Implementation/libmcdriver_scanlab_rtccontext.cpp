@@ -131,6 +131,7 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_dLaserFieldMinY (0.0),
 	m_dLaserFieldMaxX (0.0),
 	m_dLaserFieldMaxY (0.0),
+	m_bHasLaserField (false),
 	m_b2DMarkOnTheFlyEnabled (false),
 	m_dScaleXInBitsPerEncoderStep (1.0),
 	m_dScaleYInBitsPerEncoderStep (1.0)
@@ -1208,6 +1209,10 @@ void CRTCContext::SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, cons
 {
 	m_dLaserOriginX = dOriginX;
 	m_dLaserOriginY = dOriginY;
+
+	if (m_bHasLaserField)
+		updateLaserField(m_dLaserFieldMinX, m_dLaserFieldMaxX, m_dLaserFieldMinY, m_dLaserFieldMinY);
+
 }
 
 void CRTCContext::GetLaserOrigin(LibMCDriver_ScanLab_double& dOriginX, LibMCDriver_ScanLab_double& dOriginY)
@@ -1218,22 +1223,99 @@ void CRTCContext::GetLaserOrigin(LibMCDriver_ScanLab_double& dOriginX, LibMCDriv
 }
 
 void CRTCContext::SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY)
-{
+{	
+	if ((dMinX >= dMaxX) || (dMinY >= dMaxY))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
+
+	updateLaserField(dMinX, dMaxX, dMinY, dMaxY);
+
+	m_bHasLaserField = true;
 	m_dLaserFieldMinX = dMinX;
-	m_dLaserFieldMinY = dMinY;
 	m_dLaserFieldMaxX = dMaxX;
+	m_dLaserFieldMinY = dMinY;
 	m_dLaserFieldMaxY = dMaxY;
+
+
 }
 
-void CRTCContext::GetLaserField(LibMCDriver_ScanLab_double& dMinX, LibMCDriver_ScanLab_double& dMinY, LibMCDriver_ScanLab_double& dMaxX, LibMCDriver_ScanLab_double& dMaxY)
+bool CRTCContext::GetLaserField(LibMCDriver_ScanLab_double& dMinX, LibMCDriver_ScanLab_double& dMinY, LibMCDriver_ScanLab_double& dMaxX, LibMCDriver_ScanLab_double& dMaxY)
 {
 	dMinX = m_dLaserFieldMinX;
-	dMinY = m_dLaserFieldMinY;
 	dMaxX = m_dLaserFieldMaxX;
+	dMinY = m_dLaserFieldMinY;
 	dMaxY = m_dLaserFieldMaxY;
-
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	return m_bHasLaserField;
 }
+
+
+
+void CRTCContext::ResetLaserField()
+{
+	m_bHasLaserField = false;
+	m_dLaserFieldMinX = 0.0;
+	m_dLaserFieldMaxX = 0.0;
+	m_dLaserFieldMinY = 0.0;
+	m_dLaserFieldMaxY = 0.0;
+
+	clearLaserField();
+}
+
+void CRTCContext::EnableRangeChecking()
+{
+	if (!m_bHasLaserField)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET);
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	m_pScanLabSDK->n_range_checking(m_CardNo, 1, 2, 4);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::DisableRangeChecking()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	m_pScanLabSDK->n_range_checking(m_CardNo, 0, 0, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::updateLaserField(double dMinXInMM, double dMaxXInMM, double dMinYInMM, double dMaxYInMM)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	int64_t nMinX = (int64_t)(round((dMinXInMM - m_dLaserOriginX) / m_dCorrectionFactor));
+	int64_t nMaxX = (int64_t)(round((dMaxXInMM - m_dLaserOriginX) / m_dCorrectionFactor));
+	int64_t nMinY = (int64_t)(round((dMinYInMM - m_dLaserOriginY) / m_dCorrectionFactor));
+	int64_t nMaxY = (int64_t)(round((dMaxYInMM - m_dLaserOriginY) / m_dCorrectionFactor));
+
+	if (nMinX < SCANLAB_LASERFIELD_MINIMUMUNITS)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
+	if (nMinY < SCANLAB_LASERFIELD_MINIMUMUNITS)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
+	if (nMaxX > SCANLAB_LASERFIELD_MAXIMUMUNITS)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
+	if (nMaxY > SCANLAB_LASERFIELD_MAXIMUMUNITS)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
+	if (nMaxX <= nMinX)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
+	if (nMaxY <= nMinY)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
+
+	m_pScanLabSDK->n_set_fly_limits(m_CardNo, (int32_t)nMinX, (int32_t)nMaxX, (int32_t)nMinY, (int32_t)nMaxY);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::clearLaserField()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_fly_limits(m_CardNo, SCANLAB_LASERFIELD_MINIMUMUNITS, SCANLAB_LASERFIELD_MAXIMUMUNITS, SCANLAB_LASERFIELD_MINIMUMUNITS, SCANLAB_LASERFIELD_MAXIMUMUNITS);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+
 
 
 void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep)

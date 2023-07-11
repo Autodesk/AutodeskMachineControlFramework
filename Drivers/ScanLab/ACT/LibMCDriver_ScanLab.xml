@@ -108,6 +108,8 @@
 		<error name="INVALIDENCODERSCALINGINY" code="1055" description="Invalid Encoder Scaling in Y" />		
 		<error name="ONTHEFLYMARKINGERROR" code="1056" description="On the fly marking error" />		
 		<error name="MARKONTHEFLYISDISABLED" code="1057" description="Mark on the fly is disabled" />		
+		<error name="INVALIDLASERFIELDCOORDINATES" code="1058" description="Invalid laser field coordinates" />		
+		<error name="NOLASERFIELDSET" code="1059" description="No laser field has been set" />		
 		
 						
 	</errors>
@@ -310,11 +312,21 @@ Custom implementation
 			<param name="MaxY" type="double" pass="in" description="Sets maximum laser Y coordinate in mm." />
 		</method>
 
+		<method name="ResetLaserField" description="Resets the laser field to default values.">
+		</method>
+		
+		<method name="EnableRangeChecking" description="Enables range checking of the laser field. A laser field MUST have been set before.">
+		</method>
+
+		<method name="DisableRangeChecking" description="Disables range checking of the laser field.">
+		</method>
+
 		<method name="GetLaserField" description="Returns the laser field limits in absolute coordinates.">
 			<param name="MinX" type="double" pass="out" description="Sets minimum laser X coordinate in mm." />
 			<param name="MinY" type="double" pass="out" description="Sets minimum laser Y coordinate in mm." />
 			<param name="MaxX" type="double" pass="out" description="Sets maximum laser X coordinate in mm." />
 			<param name="MaxY" type="double" pass="out" description="Sets maximum laser Y coordinate in mm." />
+			<param name="HasLaserField" type="bool" pass="return" description="Returns true if a laser field has been set." />
 		</method>
 
 		<method name="SetStartList" description="Opens the list to write">

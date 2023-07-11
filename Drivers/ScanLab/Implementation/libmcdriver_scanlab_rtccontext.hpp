@@ -89,6 +89,7 @@ protected:
 	double m_dLaserFieldMinY;
 	double m_dLaserFieldMaxX;
 	double m_dLaserFieldMaxY;
+	bool m_bHasLaserField;
 
 	std::vector<uint8_t> m_HeadTransform;
 
@@ -105,6 +106,10 @@ protected:
 	UINT saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY);
 
 	void addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists);
+
+	void updateLaserField(double dMinXInMM, double dMaxXInMM, double dMinYInMM, double dMaxYInMM);
+	
+	void clearLaserField();
 
 public:
 
@@ -257,7 +262,13 @@ public:
 
 	void SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY) override;
 
-	void GetLaserField(LibMCDriver_ScanLab_double& dMinX, LibMCDriver_ScanLab_double& dMinY, LibMCDriver_ScanLab_double& dMaxX, LibMCDriver_ScanLab_double& dMaxY) override;
+	bool GetLaserField(LibMCDriver_ScanLab_double& dMinX, LibMCDriver_ScanLab_double& dMinY, LibMCDriver_ScanLab_double& dMaxX, LibMCDriver_ScanLab_double& dMaxY) override;
+
+	void ResetLaserField() override;
+
+	void EnableRangeChecking() override;
+
+	void DisableRangeChecking() override;
 
 };
 
