@@ -500,36 +500,40 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] dPositionInMM - Position Value to reach in mm.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderx(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderx(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM, bool bInPositiveHalfPlane);
 
 /**
 * Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] dPositionInMM - Position Value to reach in mm.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencodery(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencodery(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM, bool bInPositiveHalfPlane);
 
 /**
 * Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] nPositionInSteps - Position Value to reach in steps.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderxsteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderxsteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps, bool bInPositiveHalfPlane);
 
 /**
 * Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] nPositionInSteps - Position Value to reach in steps.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderysteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderysteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps, bool bInPositiveHalfPlane);
 
 /**
 * Adds a custom delay to the list

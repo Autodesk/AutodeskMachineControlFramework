@@ -1230,10 +1230,6 @@ void CRTCContext::SetLaserField(const LibMCDriver_ScanLab_double dMinX, const Li
 	updateLaserField(dMinX, dMaxX, dMinY, dMaxY);
 
 	m_bHasLaserField = true;
-	m_dLaserFieldMinX = dMinX;
-	m_dLaserFieldMaxX = dMaxX;
-	m_dLaserFieldMinY = dMinY;
-	m_dLaserFieldMaxY = dMaxY;
 
 
 }
@@ -1285,10 +1281,10 @@ void CRTCContext::updateLaserField(double dMinXInMM, double dMaxXInMM, double dM
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
-	int64_t nMinX = (int64_t)(round((dMinXInMM - m_dLaserOriginX) / m_dCorrectionFactor));
-	int64_t nMaxX = (int64_t)(round((dMaxXInMM - m_dLaserOriginX) / m_dCorrectionFactor));
-	int64_t nMinY = (int64_t)(round((dMinYInMM - m_dLaserOriginY) / m_dCorrectionFactor));
-	int64_t nMaxY = (int64_t)(round((dMaxYInMM - m_dLaserOriginY) / m_dCorrectionFactor));
+	int64_t nMinX = (int64_t)(round((dMinXInMM - m_dLaserOriginX) * m_dCorrectionFactor));
+	int64_t nMaxX = (int64_t)(round((dMaxXInMM - m_dLaserOriginX) * m_dCorrectionFactor));
+	int64_t nMinY = (int64_t)(round((dMinYInMM - m_dLaserOriginY) * m_dCorrectionFactor));
+	int64_t nMaxY = (int64_t)(round((dMaxYInMM - m_dLaserOriginY) * m_dCorrectionFactor));
 
 	if (nMinX < SCANLAB_LASERFIELD_MINIMUMUNITS)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
@@ -1305,6 +1301,11 @@ void CRTCContext::updateLaserField(double dMinXInMM, double dMaxXInMM, double dM
 
 	m_pScanLabSDK->n_set_fly_limits(m_CardNo, (int32_t)nMinX, (int32_t)nMaxX, (int32_t)nMinY, (int32_t)nMaxY);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	m_dLaserFieldMinX = dMinXInMM;
+	m_dLaserFieldMaxX = dMaxXInMM;
+	m_dLaserFieldMinY = dMinYInMM;
+	m_dLaserFieldMaxY = dMaxYInMM;
 
 }
 
@@ -1538,7 +1539,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 }
 
-void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM)
+void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane)
 {
 	if (!m_b2DMarkOnTheFlyEnabled)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED);
@@ -1550,10 +1551,10 @@ void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM
 
 	double dEncoderSteps = dPositionInBits / m_dScaleXInBitsPerEncoderStep;
 
-	WaitForEncoderXSteps ((int32_t) round (dPositionInBits));
+	WaitForEncoderXSteps ((int32_t) round (dEncoderSteps), bInPositiveHalfPlane);
 }
 
-void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM)
+void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane)
 {
 	if (!m_b2DMarkOnTheFlyEnabled)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED);
@@ -1565,21 +1566,33 @@ void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM
 
 	double dEncoderSteps = dPositionInBits / m_dScaleYInBitsPerEncoderStep;
 
-	WaitForEncoderYSteps((int32_t)round(dPositionInBits));
+	WaitForEncoderYSteps((int32_t)round(dEncoderSteps), bInPositiveHalfPlane);
 }
 
-void CRTCContext::WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionValue)
+void CRTCContext::WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionValue, const bool bInPositiveHalfPlane)
 {
+	int32_t nMode;
+	if (bInPositiveHalfPlane)
+		nMode = 1;
+	else
+		nMode = -1;
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_wait_for_encoder(m_CardNo, nPositionValue, 0);
+	m_pScanLabSDK->n_wait_for_encoder_mode(m_CardNo, nPositionValue, 0, nMode);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
 
-void CRTCContext::WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionValue)
+void CRTCContext::WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionValue, const bool bInPositiveHalfPlane)
 {
+	int32_t nMode;
+	if (bInPositiveHalfPlane)
+		nMode = 1;
+	else
+		nMode = -1;
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_wait_for_encoder(m_CardNo, nPositionValue, 1);
+	m_pScanLabSDK->n_wait_for_encoder_mode(m_CardNo, nPositionValue, 1, nMode);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }

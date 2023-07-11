@@ -714,26 +714,30 @@ public:
 	/**
 	* IRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] dPositionInMM - Position Value to reach in mm.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	virtual void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM) = 0;
+	virtual void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane) = 0;
 
 	/**
 	* IRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] dPositionInMM - Position Value to reach in mm.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	virtual void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM) = 0;
+	virtual void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane) = 0;
 
 	/**
 	* IRTCContext::WaitForEncoderXSteps - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	virtual void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) = 0;
+	virtual void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane) = 0;
 
 	/**
 	* IRTCContext::WaitForEncoderYSteps - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	virtual void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) = 0;
+	virtual void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list

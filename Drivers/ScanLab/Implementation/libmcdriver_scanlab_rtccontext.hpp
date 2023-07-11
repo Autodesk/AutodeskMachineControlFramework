@@ -178,13 +178,13 @@ public:
 
 	void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNonAssignedDataExists) override;
 
-	void WaitForEncoderX(const LibMCDriver_ScanLab_double dPosition) override;
+	void WaitForEncoderX(const LibMCDriver_ScanLab_double dPosition, const bool bInPositiveHalfPlane) override;
 
-	void WaitForEncoderY(const LibMCDriver_ScanLab_double dPosition) override;
+	void WaitForEncoderY(const LibMCDriver_ScanLab_double dPosition, const bool bInPositiveHalfPlane) override;
 
-	void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) override;
+	void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane) override;
 
-	void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps) override;
+	void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane) override;
 
 	void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay) override;
 

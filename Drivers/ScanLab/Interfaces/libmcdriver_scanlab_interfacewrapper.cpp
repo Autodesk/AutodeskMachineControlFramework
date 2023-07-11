@@ -1220,7 +1220,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addlayertolist(LibMCDri
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderx(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderx(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM, bool bInPositiveHalfPlane)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -1229,7 +1229,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderx(LibMCDr
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->WaitForEncoderX(dPositionInMM);
+		pIRTCContext->WaitForEncoderX(dPositionInMM, bInPositiveHalfPlane);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1244,7 +1244,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderx(LibMCDr
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencodery(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencodery(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM, bool bInPositiveHalfPlane)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -1253,7 +1253,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencodery(LibMCDr
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->WaitForEncoderY(dPositionInMM);
+		pIRTCContext->WaitForEncoderY(dPositionInMM, bInPositiveHalfPlane);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1268,7 +1268,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencodery(LibMCDr
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderxsteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderxsteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps, bool bInPositiveHalfPlane)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -1277,7 +1277,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderxsteps(Li
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->WaitForEncoderXSteps(nPositionInSteps);
+		pIRTCContext->WaitForEncoderXSteps(nPositionInSteps, bInPositiveHalfPlane);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1292,7 +1292,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderxsteps(Li
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderysteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderysteps(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps, bool bInPositiveHalfPlane)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -1301,7 +1301,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderysteps(Li
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->WaitForEncoderYSteps(nPositionInSteps);
+		pIRTCContext->WaitForEncoderYSteps(nPositionInSteps, bInPositiveHalfPlane);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}

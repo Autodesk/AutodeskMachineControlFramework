@@ -584,10 +584,10 @@ public:
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const bool bFailIfNonAssignedDataExists);
-	inline void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM);
-	inline void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM);
-	inline void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps);
-	inline void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps);
+	inline void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane);
+	inline void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane);
+	inline void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane);
+	inline void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane);
 	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
@@ -3479,37 +3479,41 @@ public:
 	/**
 	* CRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] dPositionInMM - Position Value to reach in mm.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM)
+	void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderX(m_pHandle, dPositionInMM));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderX(m_pHandle, dPositionInMM, bInPositiveHalfPlane));
 	}
 	
 	/**
 	* CRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] dPositionInMM - Position Value to reach in mm.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM)
+	void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderY(m_pHandle, dPositionInMM));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderY(m_pHandle, dPositionInMM, bInPositiveHalfPlane));
 	}
 	
 	/**
 	* CRTCContext::WaitForEncoderXSteps - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	void CRTCContext::WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps)
+	void CRTCContext::WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderXSteps(m_pHandle, nPositionInSteps));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderXSteps(m_pHandle, nPositionInSteps, bInPositiveHalfPlane));
 	}
 	
 	/**
 	* CRTCContext::WaitForEncoderYSteps - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
 	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
 	*/
-	void CRTCContext::WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps)
+	void CRTCContext::WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderYSteps(m_pHandle, nPositionInSteps));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WaitForEncoderYSteps(m_pHandle, nPositionInSteps, bInPositiveHalfPlane));
 	}
 	
 	/**

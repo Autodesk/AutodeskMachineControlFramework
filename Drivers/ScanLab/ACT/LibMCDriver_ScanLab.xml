@@ -405,18 +405,22 @@ Custom implementation
 
 		<method name="WaitForEncoderX" description="Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.">
 			<param name="PositionInMM" type="double" pass="in" description="Position Value to reach in mm." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
 		</method>
 
 		<method name="WaitForEncoderY" description="Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.">
 			<param name="PositionInMM" type="double" pass="in" description="Position Value to reach in mm." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
 		</method>
 
 		<method name="WaitForEncoderXSteps" description="Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.">
 			<param name="PositionInSteps" type="int32" pass="in" description="Position Value to reach in steps." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
 		</method>
 
 		<method name="WaitForEncoderYSteps" description="Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.">
 			<param name="PositionInSteps" type="int32" pass="in" description="Position Value to reach in steps." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
