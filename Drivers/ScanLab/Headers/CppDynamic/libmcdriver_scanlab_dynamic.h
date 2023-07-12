@@ -458,6 +458,44 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineO
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
 
 /**
+* Adds a Jump movement to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY);
+
+/**
+* Adds a Mark movement to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY);
+
+/**
+* Adds a free variable set to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nVariableNo - Number of the variable (0-7).
+* @param[in] nValue - Value to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 nValue);
+
+/**
+* Stops the execution of the current list immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StopExecutionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
 * Writes a list of hatches into the open list with OIE Enabled.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1659,6 +1697,10 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DrawPolylinePtr m_RTCContext_DrawPolyline;
 	PLibMCDriver_ScanLabRTCContext_DrawPolylineOIEPtr m_RTCContext_DrawPolylineOIE;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr m_RTCContext_DrawHatches;
+	PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr m_RTCContext_AddJumpMovement;
+	PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr m_RTCContext_AddMarkMovement;
+	PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr m_RTCContext_AddFreeVariable;
+	PLibMCDriver_ScanLabRTCContext_StopExecutionPtr m_RTCContext_StopExecution;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr m_RTCContext_DrawHatchesOIE;
 	PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr m_RTCContext_AddLayerToList;
 	PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr m_RTCContext_WaitForEncoderX;

@@ -651,6 +651,48 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 	DrawHatchesOIE(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue, 0);
 }
 
+void CRTCContext::AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	double dX = round((dTargetX - m_dLaserOriginX) * m_dCorrectionFactor);
+	double dY = round((dTargetY - m_dLaserOriginY) * m_dCorrectionFactor);
+
+	int32_t intX = (int32_t)dX;
+	int32_t intY = (int32_t)dY;
+
+	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
+void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	double dX = round((dTargetX - m_dLaserOriginX) * m_dCorrectionFactor);
+	double dY = round((dTargetY - m_dLaserOriginY) * m_dCorrectionFactor);
+
+	int32_t intX = (int32_t)dX;
+	int32_t intY = (int32_t)dY;
+
+	m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
+void CRTCContext::AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, nVariableNo, nValue);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
+void CRTCContext::StopExecution()
+{
+	m_pScanLabSDK->n_stop_execution(m_CardNo);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
 
 void CRTCContext::AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay)
 {
@@ -1209,10 +1251,6 @@ void CRTCContext::SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, cons
 {
 	m_dLaserOriginX = dOriginX;
 	m_dLaserOriginY = dOriginY;
-
-	if (m_bHasLaserField)
-		updateLaserField(m_dLaserFieldMinX, m_dLaserFieldMaxX, m_dLaserFieldMinY, m_dLaserFieldMinY);
-
 }
 
 void CRTCContext::GetLaserOrigin(LibMCDriver_ScanLab_double& dOriginX, LibMCDriver_ScanLab_double& dOriginY)
@@ -1224,6 +1262,7 @@ void CRTCContext::GetLaserOrigin(LibMCDriver_ScanLab_double& dOriginX, LibMCDriv
 
 void CRTCContext::SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY)
 {	
+	//std::cout << "Setting laser field: " << dMinX << "/" << dMinY << " - " << dMaxX << "/" << dMaxY << std::endl;
 	if ((dMinX >= dMaxX) || (dMinY >= dMaxY))
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
 
@@ -1281,10 +1320,17 @@ void CRTCContext::updateLaserField(double dMinXInMM, double dMaxXInMM, double dM
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
-	int64_t nMinX = (int64_t)(round((dMinXInMM - m_dLaserOriginX) * m_dCorrectionFactor));
-	int64_t nMaxX = (int64_t)(round((dMaxXInMM - m_dLaserOriginX) * m_dCorrectionFactor));
-	int64_t nMinY = (int64_t)(round((dMinYInMM - m_dLaserOriginY) * m_dCorrectionFactor));
-	int64_t nMaxY = (int64_t)(round((dMaxYInMM - m_dLaserOriginY) * m_dCorrectionFactor));
+	int64_t nMinX = (int64_t)(round(dMinXInMM * m_dCorrectionFactor));
+	int64_t nMaxX = (int64_t)(round(dMaxXInMM * m_dCorrectionFactor));
+	int64_t nMinY = (int64_t)(round(dMinYInMM * m_dCorrectionFactor));
+	int64_t nMaxY = (int64_t)(round(dMaxYInMM * m_dCorrectionFactor));
+
+	/*std::cout << "updating laser field" << std::endl;
+	std::cout << " minx: " << nMinX << std::endl;
+	std::cout << " maxx: " << nMaxX << std::endl;
+	std::cout << " miny: " << nMinY << std::endl;
+	std::cout << " maxy: " << nMaxY << std::endl;*/
+
 
 	if (nMinX < SCANLAB_LASERFIELD_MINIMUMUNITS)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
@@ -1336,6 +1382,10 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 
 	//std::cout << "n_set_fly_2d: card no:" << m_CardNo << " " << dScaleXInBitsPerEncoderStep << " / " << dScaleYInBitsPerEncoderStep << std::endl;
 
+	// Reset Laser position to be sure we are in scope.
+	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
@@ -1353,6 +1403,9 @@ void CRTCContext::DisableMarkOnTheFly2D()
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
+
+	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
@@ -1550,8 +1603,15 @@ void CRTCContext::WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM
 	double dPositionInBits = dPositionInMM * dBitsPerMM;
 
 	double dEncoderSteps = dPositionInBits / m_dScaleXInBitsPerEncoderStep;
+	int32_t nEncoderSteps = (int32_t)round(dEncoderSteps);
 
-	WaitForEncoderXSteps ((int32_t) round (dEncoderSteps), bInPositiveHalfPlane);
+	if (m_dScaleXInBitsPerEncoderStep > 0) {
+		WaitForEncoderXSteps(nEncoderSteps, bInPositiveHalfPlane);
+	} 
+	else {
+		// If scaling is negative, positive half plane changes
+		WaitForEncoderXSteps(nEncoderSteps, !bInPositiveHalfPlane);
+	}
 }
 
 void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane)
@@ -1566,7 +1626,16 @@ void CRTCContext::WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM
 
 	double dEncoderSteps = dPositionInBits / m_dScaleYInBitsPerEncoderStep;
 
-	WaitForEncoderYSteps((int32_t)round(dEncoderSteps), bInPositiveHalfPlane);
+	int32_t nEncoderSteps = (int32_t)round(dEncoderSteps);
+
+	if (m_dScaleYInBitsPerEncoderStep > 0) {
+		WaitForEncoderYSteps(nEncoderSteps, bInPositiveHalfPlane);
+	}
+	else {
+		// If scaling is negative, positive half plane changes sign too
+		WaitForEncoderYSteps(nEncoderSteps, !bInPositiveHalfPlane);
+	}
+
 }
 
 void CRTCContext::WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionValue, const bool bInPositiveHalfPlane)

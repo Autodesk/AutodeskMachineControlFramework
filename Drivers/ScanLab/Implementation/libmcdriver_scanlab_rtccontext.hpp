@@ -270,6 +270,14 @@ public:
 
 	void DisableRangeChecking() override;
 
+	void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) override;
+
+	void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) override;
+
+	void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) override;
+
+	void StopExecution() override;
+
 };
 
 

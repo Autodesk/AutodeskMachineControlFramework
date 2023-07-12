@@ -388,6 +388,24 @@ Custom implementation
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
+		
+		<method name="AddJumpMovement" description="Adds a Jump movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddMarkMovement" description="Adds a Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddFreeVariable" description="Adds a free variable set to the open list">
+			<param name="VariableNo" type="uint32" pass="in" description="Number of the variable (0-7)." />
+			<param name="Value" type="uint32" pass="in" description="Value to set." />
+		</method>	
+		
+		<method name="StopExecution" description="Stops the execution of the current list immediately.">
+		</method>	
 
 		<method name="DrawHatchesOIE" description="Writes a list of hatches into the open list with OIE Enabled.">
 			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />

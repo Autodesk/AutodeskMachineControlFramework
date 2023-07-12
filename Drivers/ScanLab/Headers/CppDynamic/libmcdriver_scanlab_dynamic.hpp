@@ -582,6 +582,10 @@ public:
 	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
+	inline void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
+	inline void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue);
+	inline void StopExecution();
 	inline void DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const bool bFailIfNonAssignedDataExists);
 	inline void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane);
@@ -911,6 +915,10 @@ public:
 		pWrapperTable->m_RTCContext_DrawPolyline = nullptr;
 		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
+		pWrapperTable->m_RTCContext_AddJumpMovement = nullptr;
+		pWrapperTable->m_RTCContext_AddMarkMovement = nullptr;
+		pWrapperTable->m_RTCContext_AddFreeVariable = nullptr;
+		pWrapperTable->m_RTCContext_StopExecution = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatchesOIE = nullptr;
 		pWrapperTable->m_RTCContext_AddLayerToList = nullptr;
 		pWrapperTable->m_RTCContext_WaitForEncoderX = nullptr;
@@ -1411,6 +1419,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_DrawHatches == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddJumpMovement = (PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addjumpmovement");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddJumpMovement = (PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addjumpmovement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddJumpMovement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddMarkMovement = (PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addmarkmovement");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddMarkMovement = (PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addmarkmovement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddMarkMovement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddFreeVariable = (PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addfreevariable");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddFreeVariable = (PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addfreevariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddFreeVariable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_StopExecution = (PLibMCDriver_ScanLabRTCContext_StopExecutionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_stopexecution");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_StopExecution = (PLibMCDriver_ScanLabRTCContext_StopExecutionPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_stopexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_StopExecution == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2571,6 +2615,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawHatches == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addjumpmovement", (void**)&(pWrapperTable->m_RTCContext_AddJumpMovement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddJumpMovement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addmarkmovement", (void**)&(pWrapperTable->m_RTCContext_AddMarkMovement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddMarkMovement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addfreevariable", (void**)&(pWrapperTable->m_RTCContext_AddFreeVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddFreeVariable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_stopexecution", (void**)&(pWrapperTable->m_RTCContext_StopExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StopExecution == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_drawhatchesoie", (void**)&(pWrapperTable->m_RTCContext_DrawHatchesOIE));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawHatchesOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3449,6 +3509,44 @@ public:
 	void CRTCContext::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
+	}
+	
+	/**
+	* CRTCContext::AddJumpMovement - Adds a Jump movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	void CRTCContext::AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddJumpMovement(m_pHandle, dTargetX, dTargetY));
+	}
+	
+	/**
+	* CRTCContext::AddMarkMovement - Adds a Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddMarkMovement(m_pHandle, dTargetX, dTargetY));
+	}
+	
+	/**
+	* CRTCContext::AddFreeVariable - Adds a free variable set to the open list
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @param[in] nValue - Value to set.
+	*/
+	void CRTCContext::AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddFreeVariable(m_pHandle, nVariableNo, nValue));
+	}
+	
+	/**
+	* CRTCContext::StopExecution - Stops the execution of the current list immediately.
+	*/
+	void CRTCContext::StopExecution()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_StopExecution(m_pHandle));
 	}
 	
 	/**

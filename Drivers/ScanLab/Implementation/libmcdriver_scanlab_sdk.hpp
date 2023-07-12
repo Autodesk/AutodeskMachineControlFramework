@@ -198,7 +198,8 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder_mode) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo, int32_t nMode);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_limits) (uint32_t nCardNo, int32_t nXMin, int32_t nXMax, int32_t nYMin, int32_t nYMax);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_range_checking) (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nMode, uint32_t nData);
-		
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_stop_execution) (uint32_t nCardNo);
+
 
 		class CScanLabSDK {
 		private:
@@ -340,6 +341,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_wait_for_encoder_mode n_wait_for_encoder_mode = nullptr;
 			PScanLabPtr_n_set_fly_limits n_set_fly_limits = nullptr;
 			PScanLabPtr_n_range_checking n_range_checking = nullptr;
+			PScanLabPtr_n_stop_execution n_stop_execution = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

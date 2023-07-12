@@ -693,6 +693,32 @@ public:
 	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
+	* IRTCContext::AddJumpMovement - Adds a Jump movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	virtual void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) = 0;
+
+	/**
+	* IRTCContext::AddMarkMovement - Adds a Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	virtual void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) = 0;
+
+	/**
+	* IRTCContext::AddFreeVariable - Adds a free variable set to the open list
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @param[in] nValue - Value to set.
+	*/
+	virtual void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) = 0;
+
+	/**
+	* IRTCContext::StopExecution - Stops the execution of the current list immediately.
+	*/
+	virtual void StopExecution() = 0;
+
+	/**
 	* IRTCContext::DrawHatchesOIE - Writes a list of hatches into the open list with OIE Enabled.
 	* @param[in] nHatchesBufferSize - Number of elements in buffer
 	* @param[in] pHatchesBuffer - Hatches to draw.
