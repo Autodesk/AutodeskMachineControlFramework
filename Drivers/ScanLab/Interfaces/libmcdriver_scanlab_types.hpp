@@ -163,7 +163,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR 1056 /** On the fly marking error */
 #define LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED 1057 /** Mark on the fly is disabled */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES 1058 /** Invalid laser field coordinates */
-#define LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET 1059 /** No laser field has been set */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET 1059 /** No laser field has been set. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX 1060 /** Invalid free variable index. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -239,7 +240,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "On the fly marking error";
     case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "Mark on the fly is disabled";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "Invalid laser field coordinates";
-    case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "Invalid free variable index.";
     default: return "unknown error";
   }
 }

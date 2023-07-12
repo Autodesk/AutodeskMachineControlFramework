@@ -501,6 +501,25 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addfreevariable(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 nValue);
 
 /**
+* Returns the currently set free variable.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nVariableNo - Number of the variable (0-7).
+* @param[out] pValue - Value to return.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getcurrentfreevariable(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 * pValue);
+
+/**
+* Returns the current RTC time stamp.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pTimeStamp - TimeStamp Value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_gettimestamp(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pTimeStamp);
+
+/**
 * Stops the execution of the current list immediately.
 *
 * @param[in] pRTCContext - RTCContext instance.

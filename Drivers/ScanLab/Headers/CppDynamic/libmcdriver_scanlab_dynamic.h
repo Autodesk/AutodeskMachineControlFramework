@@ -488,6 +488,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddMarkMoveme
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 nValue);
 
 /**
+* Returns the currently set free variable.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nVariableNo - Number of the variable (0-7).
+* @param[out] pValue - Value to return.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 * pValue);
+
+/**
+* Returns the current RTC time stamp.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pTimeStamp - TimeStamp Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pTimeStamp);
+
+/**
 * Stops the execution of the current list immediately.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1700,6 +1719,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr m_RTCContext_AddJumpMovement;
 	PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr m_RTCContext_AddMarkMovement;
 	PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr m_RTCContext_AddFreeVariable;
+	PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr m_RTCContext_GetCurrentFreeVariable;
+	PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr m_RTCContext_GetTimeStamp;
 	PLibMCDriver_ScanLabRTCContext_StopExecutionPtr m_RTCContext_StopExecution;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr m_RTCContext_DrawHatchesOIE;
 	PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr m_RTCContext_AddLayerToList;

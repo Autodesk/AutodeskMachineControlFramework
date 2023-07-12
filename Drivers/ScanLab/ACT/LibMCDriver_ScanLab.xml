@@ -102,14 +102,14 @@
 		<error name="NOVERSIONDEFINITION" code="1050" description="No version definition." />			
 		<error name="DUPLICATECONFIGURATIONPRESETNAME" code="1051" description="Duplicate configuration preset name." />					
 		<error name="OIEPIDVARIABLEOUTOFBOUNDS" code="1052" description="OIE PID Variable out of bounds." />		
-		<error name="TIMELAGMUSTBEAMULTIPLEOF10" code="1053" description="Timelag must be a multiple of 10 microseconds." />		
-		
+		<error name="TIMELAGMUSTBEAMULTIPLEOF10" code="1053" description="Timelag must be a multiple of 10 microseconds." />				
 		<error name="INVALIDENCODERSCALINGINX" code="1054" description="Invalid Encoder Scaling in X" />		
 		<error name="INVALIDENCODERSCALINGINY" code="1055" description="Invalid Encoder Scaling in Y" />		
 		<error name="ONTHEFLYMARKINGERROR" code="1056" description="On the fly marking error" />		
 		<error name="MARKONTHEFLYISDISABLED" code="1057" description="Mark on the fly is disabled" />		
 		<error name="INVALIDLASERFIELDCOORDINATES" code="1058" description="Invalid laser field coordinates" />		
-		<error name="NOLASERFIELDSET" code="1059" description="No laser field has been set" />		
+		<error name="NOLASERFIELDSET" code="1059" description="No laser field has been set." />
+		<error name="INVALIDFREEVARIABLEINDEX" code="1060" description="Invalid free variable index." />		
 		
 						
 	</errors>
@@ -404,6 +404,15 @@ Custom implementation
 			<param name="Value" type="uint32" pass="in" description="Value to set." />
 		</method>	
 		
+		<method name="GetCurrentFreeVariable" description="Returns the currently set free variable.">
+			<param name="VariableNo" type="uint32" pass="in" description="Number of the variable (0-7)." />
+			<param name="Value" type="uint32" pass="return" description="Value to return." />
+		</method>	
+
+		<method name="GetTimeStamp" description="Returns the current RTC time stamp.">
+			<param name="TimeStamp" type="uint32" pass="return" description="TimeStamp Value." />
+		</method>	
+
 		<method name="StopExecution" description="Stops the execution of the current list immediately.">
 		</method>	
 

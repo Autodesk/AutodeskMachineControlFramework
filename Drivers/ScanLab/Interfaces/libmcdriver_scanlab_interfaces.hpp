@@ -714,6 +714,19 @@ public:
 	virtual void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) = 0;
 
 	/**
+	* IRTCContext::GetCurrentFreeVariable - Returns the currently set free variable.
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @return Value to return.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo) = 0;
+
+	/**
+	* IRTCContext::GetTimeStamp - Returns the current RTC time stamp.
+	* @return TimeStamp Value.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetTimeStamp() = 0;
+
+	/**
 	* IRTCContext::StopExecution - Stops the execution of the current list immediately.
 	*/
 	virtual void StopExecution() = 0;

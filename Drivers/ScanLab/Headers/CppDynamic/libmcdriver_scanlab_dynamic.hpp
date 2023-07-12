@@ -250,6 +250,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "MARKONTHEFLYISDISABLED";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "INVALIDLASERFIELDCOORDINATES";
 			case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "NOLASERFIELDSET";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "INVALIDFREEVARIABLEINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -325,7 +326,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "On the fly marking error";
 			case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "Mark on the fly is disabled";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "Invalid laser field coordinates";
-			case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "Invalid free variable index.";
 		}
 		return "unknown error";
 	}
@@ -585,6 +587,8 @@ public:
 	inline void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
 	inline void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
 	inline void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue);
+	inline LibMCDriver_ScanLab_uint32 GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo);
+	inline LibMCDriver_ScanLab_uint32 GetTimeStamp();
 	inline void StopExecution();
 	inline void DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const bool bFailIfNonAssignedDataExists);
@@ -918,6 +922,8 @@ public:
 		pWrapperTable->m_RTCContext_AddJumpMovement = nullptr;
 		pWrapperTable->m_RTCContext_AddMarkMovement = nullptr;
 		pWrapperTable->m_RTCContext_AddFreeVariable = nullptr;
+		pWrapperTable->m_RTCContext_GetCurrentFreeVariable = nullptr;
+		pWrapperTable->m_RTCContext_GetTimeStamp = nullptr;
 		pWrapperTable->m_RTCContext_StopExecution = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatchesOIE = nullptr;
 		pWrapperTable->m_RTCContext_AddLayerToList = nullptr;
@@ -1446,6 +1452,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_AddFreeVariable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetCurrentFreeVariable = (PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getcurrentfreevariable");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetCurrentFreeVariable = (PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getcurrentfreevariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetCurrentFreeVariable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetTimeStamp = (PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_gettimestamp");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetTimeStamp = (PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_gettimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetTimeStamp == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2627,6 +2651,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddFreeVariable == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getcurrentfreevariable", (void**)&(pWrapperTable->m_RTCContext_GetCurrentFreeVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetCurrentFreeVariable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_gettimestamp", (void**)&(pWrapperTable->m_RTCContext_GetTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetTimeStamp == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_stopexecution", (void**)&(pWrapperTable->m_RTCContext_StopExecution));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StopExecution == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3539,6 +3571,31 @@ public:
 	void CRTCContext::AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddFreeVariable(m_pHandle, nVariableNo, nValue));
+	}
+	
+	/**
+	* CRTCContext::GetCurrentFreeVariable - Returns the currently set free variable.
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @return Value to return.
+	*/
+	LibMCDriver_ScanLab_uint32 CRTCContext::GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo)
+	{
+		LibMCDriver_ScanLab_uint32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetCurrentFreeVariable(m_pHandle, nVariableNo, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CRTCContext::GetTimeStamp - Returns the current RTC time stamp.
+	* @return TimeStamp Value.
+	*/
+	LibMCDriver_ScanLab_uint32 CRTCContext::GetTimeStamp()
+	{
+		LibMCDriver_ScanLab_uint32 resultTimeStamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetTimeStamp(m_pHandle, &resultTimeStamp));
+		
+		return resultTimeStamp;
 	}
 	
 	/**

@@ -681,6 +681,9 @@ void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, con
 
 void CRTCContext::AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue)
 {
+	if (nVariableNo > 7)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX);
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, nVariableNo, nValue);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
@@ -692,6 +695,21 @@ void CRTCContext::StopExecution()
 	m_pScanLabSDK->n_stop_execution(m_CardNo);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+}
+
+LibMCDriver_ScanLab_uint32 CRTCContext::GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo)
+{
+	if (nVariableNo > 7)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX);
+
+	return m_pScanLabSDK->n_get_free_variable(m_CardNo, nVariableNo);
+
+}
+
+LibMCDriver_ScanLab_uint32 CRTCContext::GetTimeStamp()
+{
+	// See set_trigger in Scanlab documentation. 52 is time stamp counter.
+	return m_pScanLabSDK->n_get_value(m_CardNo, 52);
 }
 
 void CRTCContext::AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay)
@@ -715,6 +733,8 @@ void CRTCContext::GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition
 	uint32_t Status = 0;
 	uint32_t Pos = 0;
 	m_pScanLabSDK->n_get_status(m_CardNo, &Status, &Pos);
+
+	//std::cout << "Free Variable: " << m_pScanLabSDK->n_get_value (m_CardNo, 40) << std::endl;
 
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 

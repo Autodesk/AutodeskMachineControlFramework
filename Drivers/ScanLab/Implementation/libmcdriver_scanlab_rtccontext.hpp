@@ -276,6 +276,10 @@ public:
 
 	void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) override;
 
+	LibMCDriver_ScanLab_uint32 GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo) override;
+
+	LibMCDriver_ScanLab_uint32 GetTimeStamp() override;
+
 	void StopExecution() override;
 
 };
