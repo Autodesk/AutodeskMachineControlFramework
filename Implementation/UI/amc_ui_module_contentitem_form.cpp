@@ -165,7 +165,16 @@ PUIModule_ContentFormEdit CUIModule_ContentFormEdit::makeFromXML(const pugi::xml
 	CUIExpression prefix(xmlNode, "prefix");
 	CUIExpression suffix(xmlNode, "suffix");
 
-	return std::make_shared<CUIModule_ContentFormEdit>(nameAttrib.as_string(), sFormPath, caption, value, prefix, suffix, pStateMachineData);
+	CUIExpression validation(xmlNode, "validation");
+	CUIExpression validationmessage(xmlNode, "validationmessage");
+	CUIExpression minvalue(xmlNode, "minvalue");
+	CUIExpression maxvalue(xmlNode, "maxvalue");
+
+	auto pEdit = std::make_shared<CUIModule_ContentFormEdit>(nameAttrib.as_string(), sFormPath, caption, value, prefix, suffix, pStateMachineData);
+
+	pEdit->setValidationExpressions(validation, validationmessage, minvalue, maxvalue);
+
+	return pEdit;
 
 }
 
@@ -176,6 +185,20 @@ CUIModule_ContentFormEdit::CUIModule_ContentFormEdit(const std::string& sName, c
 	m_SuffixExpression.checkExpressionSyntax(m_pStateMachineData);
 	m_ValueExpression.checkExpressionSyntax(m_pStateMachineData);
 }
+
+void CUIModule_ContentFormEdit::setValidationExpressions(CUIExpression validationExpression, CUIExpression validationMessageExpression, CUIExpression minValueExpression, CUIExpression maxValueExpression)
+{
+	m_ValidationExpression = validationExpression;
+	m_ValidationMessageExpression = validationMessageExpression;
+	m_MinValueExpression = minValueExpression;
+	m_MaxValueExpression = maxValueExpression;
+
+	m_ValidationExpression.checkExpressionSyntax (m_pStateMachineData);
+	m_ValidationMessageExpression.checkExpressionSyntax(m_pStateMachineData);
+	m_MinValueExpression.checkExpressionSyntax (m_pStateMachineData);
+	m_MaxValueExpression.checkExpressionSyntax (m_pStateMachineData);
+}
+
 
 CUIModule_ContentFormEdit::~CUIModule_ContentFormEdit()
 {
@@ -193,6 +216,12 @@ void CUIModule_ContentFormEdit::populateClientVariables(CParameterHandler* pClie
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_FORMDEFAULTVALUE, "edit value", m_ValueExpression.evaluateStringValue (m_pStateMachineData));
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_FORMPREFIX, "edit value prefix", m_PrefixExpression.evaluateStringValue(m_pStateMachineData));
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_FORMSUFFIX, "edit value suffix", m_SuffixExpression.evaluateStringValue(m_pStateMachineData));
+
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_FORMVALIDATION, "edit form validation", m_ValidationExpression.evaluateStringValue(m_pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_FORMVALIDATIONMESSAGE, "edit form validation message", m_ValidationMessageExpression.evaluateStringValue(m_pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_FORMMINVALUE, "edit form min value", m_MinValueExpression.evaluateStringValue(m_pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_FORMMAXVALUE, "edit form max value", m_MaxValueExpression.evaluateStringValue(m_pStateMachineData));
+
 }
 
 void CUIModule_ContentFormEdit::syncClientVariables(CParameterHandler* pClientVariableHandler)
@@ -204,8 +233,14 @@ void CUIModule_ContentFormEdit::syncClientVariables(CParameterHandler* pClientVa
 		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE, m_ValueExpression.evaluateStringValue(m_pStateMachineData));
 	if (m_PrefixExpression.needsSync())
 		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMPREFIX, m_PrefixExpression.evaluateStringValue(m_pStateMachineData));
-	if (m_SuffixExpression.needsSync())
-		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMSUFFIX, m_SuffixExpression.evaluateStringValue(m_pStateMachineData));
+	if (m_ValidationExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMVALIDATION, m_ValidationExpression.evaluateStringValue(m_pStateMachineData));
+	if (m_ValidationMessageExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMVALIDATIONMESSAGE, m_ValidationMessageExpression.evaluateStringValue(m_pStateMachineData));
+	if (m_MinValueExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMMINVALUE, m_MinValueExpression.evaluateStringValue(m_pStateMachineData));
+	if (m_MaxValueExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMMAXVALUE, m_MaxValueExpression.evaluateStringValue(m_pStateMachineData));
 
 }
 
