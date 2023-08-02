@@ -1216,7 +1216,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 	{
 		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	} while ((MesBusy == 0) && (MesPosition == (UINT)-1));
+	} while ((MesBusy == 0) && (MesPosition == (uint32_t)-1));
 
 	do   //blockwise data polling
 	{
