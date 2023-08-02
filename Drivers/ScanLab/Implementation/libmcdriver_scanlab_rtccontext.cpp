@@ -1143,9 +1143,9 @@ void CRTCContext::DisableRecording()
 
 constexpr UINT MAXMESPOSITION = (1 << 23) - 1;
 
-UINT CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY)
+uint32_t CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY)
 {
-	UINT Error = 0;
+	uint32_t Error = 0;
 	uint32_t nDataLength = DataEnd - DataStart;
 
 	std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
