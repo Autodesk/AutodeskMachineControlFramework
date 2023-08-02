@@ -1141,7 +1141,7 @@ void CRTCContext::DisableRecording()
 
 }
 
-constexpr UINT MAXMESPOSITION = (1 << 23) - 1;
+constexpr uint32_t MAXMESPOSITION = (1 << 23) - 1;
 
 uint32_t CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY)
 {
@@ -1197,9 +1197,9 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
-	UINT Busy, Position, MesBusy, MesPosition;
-	UINT LastPosition = 0;
-	UINT Increment = 100000;
+	uint32_t Busy, Position, MesBusy, MesPosition;
+	uint32_t LastPosition = 0;
+	uint32_t Increment = 100000;
 
 	std::string sFileName = "c:/temp/recording_out_" + return_current_time_and_date() + ".csv";
 	std::cout << "Creating recording file" << std::endl;
