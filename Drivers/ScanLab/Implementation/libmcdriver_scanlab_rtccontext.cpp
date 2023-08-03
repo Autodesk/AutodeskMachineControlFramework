@@ -1410,9 +1410,13 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 	//std::cout << "n_set_fly_2d: card no:" << m_CardNo << " " << dScaleXInBitsPerEncoderStep << " / " << dScaleYInBitsPerEncoderStep << std::endl;
 
 	// Reset Laser position to be sure we are in scope.
+	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
 	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
+	m_pScanLabSDK->n_init_fly_2d(m_CardNo, 0, 0, 0);
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
@@ -1482,8 +1486,14 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	if (pLayer.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-	uint32_t nPIDControlIndexAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "pidindex");
-	uint32_t nMeasurementTagAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "measurementtag");
+	uint32_t nPIDControlIndexAttributeID = 0; 
+	uint32_t nMeasurementTagAttributeID = 0;
+
+	if (pLayer->HasCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "pidindex")) 
+		nPIDControlIndexAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "pidindex");
+	if (pLayer->HasCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "measurementtag"))
+		nMeasurementTagAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "measurementtag");
+
 
 	double dUnits = pLayer->GetUnits();
 
