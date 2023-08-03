@@ -15,7 +15,7 @@ DEVPACKAGE=$(<"./devpackage_version.txt")
 DEVPACKAGESHA=$(<"./devpackage_sha256_rpi.txt")
 
 echo "Verifying package ${DEVPACKAGE}"
-DevTools/packageManager.arm download "DevPackages/amcf_rpi_${DEVPACKAGE}.zip" "https://ssl.netfabb.com/amcf/" "rpi_${DEVPACKAGE}" "${DEVPACKAGESHA}"
+DevTools/packageManager.arm download "DevPackages/amcf_rpi_${DEVPACKAGE}.zip" "http://cicd.aleos.io:8865/" "rpi_${DEVPACKAGE}" "${DEVPACKAGESHA}"
 
 echo "Using developer package rpi_${DEVPACKAGE}"
 

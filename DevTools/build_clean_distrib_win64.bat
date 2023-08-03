@@ -6,7 +6,7 @@ SET /p DEVPACKAGE=<devpackage_version.txt
 SET /p DEVPACKAGESHA=<devpackage_sha256_win64.txt
 
 echo "Verifying package %DEVPACKAGE%"
-DevTools\packageManager.exe download "DevPackages\amcf_win64_%DEVPACKAGE%.zip" "https://ssl.netfabb.com/amcf/" "win64_%DEVPACKAGE%" "%DEVPACKAGESHA%"
+DevTools\packageManager.exe download "DevPackages\amcf_win64_%DEVPACKAGE%.zip" "http://cicd.aleos.io:8865/" "win64_%DEVPACKAGE%" "%DEVPACKAGESHA%"
 
 if %ERRORLEVEL% == 0 goto :verification_done
 
