@@ -743,6 +743,22 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StopOIEMeasur
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetOIEPIDModePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nOIEPIDIndex);
 
 /**
+* Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables OIE PID Control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
 * Disable skywriting.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1744,6 +1760,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr m_RTCContext_StartOIEMeasurementEx;
 	PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr m_RTCContext_StopOIEMeasurement;
 	PLibMCDriver_ScanLabRTCContext_SetOIEPIDModePtr m_RTCContext_SetOIEPIDMode;
+	PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr m_RTCContext_EnableOIEPIDControl;
+	PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr m_RTCContext_DisableOIEPIDControl;
 	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr m_RTCContext_EnableSkyWritingMode2;

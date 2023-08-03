@@ -894,6 +894,16 @@ public:
 	virtual void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) = 0;
 
 	/**
+	* IRTCContext::EnableOIEPIDControl - Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.
+	*/
+	virtual void EnableOIEPIDControl() = 0;
+
+	/**
+	* IRTCContext::DisableOIEPIDControl - Disables OIE PID Control.
+	*/
+	virtual void DisableOIEPIDControl() = 0;
+
+	/**
 	* IRTCContext::DisableSkyWriting - Disable skywriting.
 	*/
 	virtual void DisableSkyWriting() = 0;

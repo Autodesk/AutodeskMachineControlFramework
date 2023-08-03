@@ -532,6 +532,12 @@ Custom implementation
 			<param name="OIEPIDIndex" type="uint32" pass="in" description="OIE PID Index. MUST be between 0 and 63. 0 means PID disabled." />
 		</method>
 
+		<method name="EnableOIEPIDControl" description="Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.">
+		</method>
+
+		<method name="DisableOIEPIDControl" description="Disables OIE PID Control.">
+		</method>
+
 		<method name="DisableSkyWriting" description="Disable skywriting.">
 		</method>
 

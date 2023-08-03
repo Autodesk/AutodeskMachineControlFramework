@@ -612,6 +612,8 @@ public:
 	inline void StartOIEMeasurementEx(const bool bLaserOnTrigger);
 	inline void StopOIEMeasurement();
 	inline void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex);
+	inline void EnableOIEPIDControl();
+	inline void DisableOIEPIDControl();
 	inline void DisableSkyWriting();
 	inline void EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
 	inline void EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
@@ -947,6 +949,8 @@ public:
 		pWrapperTable->m_RTCContext_StartOIEMeasurementEx = nullptr;
 		pWrapperTable->m_RTCContext_StopOIEMeasurement = nullptr;
 		pWrapperTable->m_RTCContext_SetOIEPIDMode = nullptr;
+		pWrapperTable->m_RTCContext_EnableOIEPIDControl = nullptr;
+		pWrapperTable->m_RTCContext_DisableOIEPIDControl = nullptr;
 		pWrapperTable->m_RTCContext_DisableSkyWriting = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode2 = nullptr;
@@ -1677,6 +1681,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_SetOIEPIDMode == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableOIEPIDControl = (PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableoiepidcontrol");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableOIEPIDControl = (PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableoiepidcontrol");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableOIEPIDControl == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableOIEPIDControl = (PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disableoiepidcontrol");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableOIEPIDControl = (PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disableoiepidcontrol");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableOIEPIDControl == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2749,6 +2771,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setoiepidmode", (void**)&(pWrapperTable->m_RTCContext_SetOIEPIDMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetOIEPIDMode == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoiepidcontrol", (void**)&(pWrapperTable->m_RTCContext_EnableOIEPIDControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableOIEPIDControl == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableoiepidcontrol", (void**)&(pWrapperTable->m_RTCContext_DisableOIEPIDControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableOIEPIDControl == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableskywriting", (void**)&(pWrapperTable->m_RTCContext_DisableSkyWriting));
@@ -3837,6 +3867,22 @@ public:
 	void CRTCContext::SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetOIEPIDMode(m_pHandle, nOIEPIDIndex));
+	}
+	
+	/**
+	* CRTCContext::EnableOIEPIDControl - Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.
+	*/
+	void CRTCContext::EnableOIEPIDControl()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableOIEPIDControl(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DisableOIEPIDControl - Disables OIE PID Control.
+	*/
+	void CRTCContext::DisableOIEPIDControl()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableOIEPIDControl(m_pHandle));
 	}
 	
 	/**

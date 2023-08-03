@@ -77,10 +77,12 @@ protected:
 	double m_dScaleXInBitsPerEncoderStep;
 	double m_dScaleYInBitsPerEncoderStep;
 
+
 	std::string m_sIPAddress;
 	std::string m_sNetmask;
 	uint32_t m_nLaserIndex;
 
+	bool m_bEnableOIEPIDControl;
 	uint32_t m_nCurrentFreeVariable0;
 
 	double m_dLaserOriginX;
@@ -217,6 +219,10 @@ public:
 	void StopOIEMeasurement() override;
 
 	void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) override;
+
+	void EnableOIEPIDControl() override;
+
+	void DisableOIEPIDControl() override;
 
 	void DisableSkyWriting() override;
 

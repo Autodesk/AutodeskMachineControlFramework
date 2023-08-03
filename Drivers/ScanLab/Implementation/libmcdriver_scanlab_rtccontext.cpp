@@ -134,7 +134,8 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_bHasLaserField (false),
 	m_b2DMarkOnTheFlyEnabled (false),
 	m_dScaleXInBitsPerEncoderStep (1.0),
-	m_dScaleYInBitsPerEncoderStep (1.0)
+	m_dScaleYInBitsPerEncoderStep (1.0),
+	m_bEnableOIEPIDControl (false)
 
 {
 	if (pOwnerData.get() == nullptr)
@@ -589,6 +590,9 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	int intX = (int)dX;
 	int intY = (int)dY;
 
+	if (nOIEPIDControlIndex != 0)
+		SetOIEPIDMode(nOIEPIDControlIndex);
+
 	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -621,6 +625,9 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 	double defocusZ = round(fZValue * m_dZCorrectionFactor);
 	int intDefocusZ = (int)defocusZ;
 	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
+
+	if (nOIEPIDControlIndex != 0)
+		SetOIEPIDMode(nOIEPIDControlIndex);
 
 	const sHatch2D* pHatch = pHatchesBuffer;
 
@@ -982,7 +989,7 @@ void CRTCContext::SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex)
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
-	// Check: is that 0xFFFFF03F
+	// That bitmask is 0xFFFFF03F (see documentation?)
 	uint32_t nCurrentVariable0 = getCurrentFreeVariable0() & (0xffffffff ^ (63UL << 6));
 
 	sendFreeVariable0 (nCurrentVariable0 | (nOIEPIDIndex << 6));
@@ -1430,6 +1437,16 @@ void CRTCContext::DisableMarkOnTheFly2D()
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
+void CRTCContext::EnableOIEPIDControl()
+{
+	m_bEnableOIEPIDControl = true;
+}
+
+void CRTCContext::DisableOIEPIDControl()
+{
+	m_bEnableOIEPIDControl = false;
+}
+
 
 bool CRTCContext::MarkOnTheFly2DIsEnabled()
 {
@@ -1465,8 +1482,10 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	if (pLayer.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
+	uint32_t nPIDControlIndexAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "pidindex");
+	uint32_t nMeasurementTagAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "measurementtag");
+
 	double dUnits = pLayer->GetUnits();
-	bool bEnableOIEMeasurementPerHatch = (oieRecordingMode == eOIERecordingMode::OIELaserActiveMeasurement) || (oieRecordingMode == eOIERecordingMode::OIEEnableAndLaserActiveMeasurement);
 
 	switch (oieRecordingMode) {
 	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
@@ -1482,8 +1501,9 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 		break;
 	}
 
-
-
+	if (m_bEnableOIEPIDControl) {
+		SetOIEPIDMode(0);
+	}
 
 	uint32_t nSegmentCount = pLayer->GetSegmentCount();
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -1505,6 +1525,12 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 			float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
 			float fPowerInPercent = (fPowerInWatts * 100.f) / fMaxLaserPowerInWatts;
 			float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
+
+			uint32_t nOIEPIDControlIndex = 0;
+			uint32_t nOIEPIDMeasurementTag = 0;
+			if (m_bEnableOIEPIDControl) {
+				nOIEPIDControlIndex = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nPIDControlIndexAttributeID);
+			}
 
 			int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
 			int64_t nCurrentLaserIndex = GetLaserIndex();
@@ -1566,7 +1592,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 						pContourPoint->m_Y = (float)(Points[nPointIndex].m_Coordinates[1] * dUnits);
 					}
 
-					DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+					DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, nOIEPIDControlIndex);
 
 					break;
 				}
@@ -1588,7 +1614,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 						pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
 					}
 
-					DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
+					DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, nOIEPIDControlIndex);
 
 					break;
 				}
@@ -1598,6 +1624,10 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 		}
 
+	}
+
+	if (m_bEnableOIEPIDControl) {
+		SetOIEPIDMode(0);
 	}
 
 	if ((oieRecordingMode != eOIERecordingMode::OIERecordingDisabled))

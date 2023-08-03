@@ -756,6 +756,22 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setoiepidmode(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nOIEPIDIndex);
 
 /**
+* Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableoiepidcontrol(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables OIE PID Control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableoiepidcontrol(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
 * Disable skywriting.
 *
 * @param[in] pRTCContext - RTCContext instance.
