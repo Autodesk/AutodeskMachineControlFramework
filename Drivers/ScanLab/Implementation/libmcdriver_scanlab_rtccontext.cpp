@@ -1691,15 +1691,11 @@ void CRTCContext::Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32& nPosition
 {
 	nPositionX = 0;
 	nPositionY = 0;
-	if (m_b2DMarkOnTheFlyEnabled) {
 
-		m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-		m_pScanLabSDK->n_get_encoder(m_CardNo, &nPositionX, &nPositionY);
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_get_encoder(m_CardNo, &nPositionX, &nPositionY);
 
-		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
-
-	}
-
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 	
 
 }
