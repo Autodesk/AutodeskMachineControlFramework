@@ -367,7 +367,7 @@ Custom implementation
 		<method name="DrawPolyline" description="Writes a polyline into the open list">
 			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
@@ -375,7 +375,7 @@ Custom implementation
 		<method name="DrawPolylineOIE" description="Writes a polyline into the open list with OIE Enabled.">
 			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
@@ -384,7 +384,7 @@ Custom implementation
 		<method name="DrawHatches" description="Writes a list of hatches into the open list">
 			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
@@ -419,7 +419,7 @@ Custom implementation
 		<method name="DrawHatchesOIE" description="Writes a list of hatches into the open list with OIE Enabled.">
 			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
