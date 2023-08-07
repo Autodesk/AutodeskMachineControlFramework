@@ -102,6 +102,14 @@ void CDiscreteFieldData2D::Clear(const LibMCEnv_double dValue)
 	m_pDiscreteFieldDataInstance->Clear(dValue);
 }
 
+void CDiscreteFieldData2D::Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+{
+	if (dMinValue >= dMaxValue)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCLAMPINTERVAL);
+	m_pDiscreteFieldDataInstance->Clamp(dMinValue, dMaxValue);
+}
+
+
 LibMCEnv_double CDiscreteFieldData2D::GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY)
 {
 	return m_pDiscreteFieldDataInstance->GetPixel(nX, nY);

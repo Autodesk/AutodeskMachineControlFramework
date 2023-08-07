@@ -152,8 +152,10 @@
 		<error name="SEGMENTATTRIBUTENOTFOUND" code="10112" description="Segment Attribute not Found." />
 		<error name="UNSUPPORTEDFIELDSAMPLINGMODE" code="10113" description="Unsupported field sampling mode." />
 		<error name="SAMPLEPOINTCOUNTEXCEEDSMAXIMUM" code="10114" description="Sample point count exceeds maximum"/>
+		<error name="INVALIDCLAMPINTERVAL" code="10115" description="Invalid clamp interval"/>
+		<error name="COULDNOTRETRIEVEPNGSTREAM" code="10116" description="Could not retrieve PNG stream"/>
 		
-									
+		
 	</errors>
 
 
@@ -290,6 +292,27 @@
 	</class>
 
 	
+	<class name="PNGImageStoreOptions" parent="Base" description="Option class to parametrize saving of PNG Images.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+	
+	
+	<class name="PNGImageData" parent="Base" description="Binary representation of PNG Data.">
+
+		<method name="GetSizeInPixels" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="GetPNGDataStream" description="Retrieves encoded data stream of image object.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>
+
+	</class>
+	
 	<class name="ImageData" parent="Base" description="In memory representation of an image.">
 
 		<method name="GetPixelFormat" description="Returns Pixel format of the image.">
@@ -326,18 +349,23 @@
 		</method>		
 
 		<method name="LoadPNG" description="Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="PNG Data stream." />
 		</method>		
 
-		<method name="EncodePNG" description="Encodes PNG and stores data stream in image object.">
-		</method>		
+		<method name="CreatePNGImage" description="Creates PNG Image out of the pixel data.">		
+			<param name="PNGStorageOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
+			<param name="PNGImage" type="class" class="PNGImageData" pass="return" description="Image data." />		
+		</method>
 
-		<method name="GetEncodedPNGData" description="Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
+		<method name="EncodePNG" description="Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.">
+		</method>
+
+		<method name="GetEncodedPNGData" description="Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
 			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
-		</method>		
+		</method>
 		
-		<method name="ClearEncodedPNGData" description="Releases encoded data stream of image object.">
-		</method>		
+		<method name="ClearEncodedPNGData" description="Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.">
+		</method>
 		
 		<method name="Clear" description="Sets all pixels to a single value.">
 			<param name="Value" type="uint32" pass="in" description="Pixel value." />
@@ -373,6 +401,13 @@
 	
 	</class>
 	
+	<class name="DiscreteFieldData2DStoreOptions" parent="Base" description="Option class to parametrize saving of Field Data.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+
 
 	<class name="DiscreteFieldData2D" parent="Base" description="In-memory representation of discrete field in space.">
 
@@ -414,6 +449,11 @@
 
 		<method name="Clear" description="Sets all pixels to a single value.">
 			<param name="Value" type="double" pass="in" description="Pixel value." />
+		</method>		
+
+		<method name="Clamp" description="Clamps all pixels to a certain interval.">
+			<param name="MinValue" type="double" pass="in" description="Minimum value. MUST be smaller or equal than MaxValue." />
+			<param name="MaxValue" type="double" pass="in" description="Maximum value. MUST be larger or equal than MinValue." />
 		</method>		
 
 		<method name="GetPixel" description="Returns one pixel of an field. Fails if outside of field size.">
@@ -881,11 +921,45 @@
 		</method>
 
 		<method name="AddBinaryData" description="Adds binary data to store with the build.">
-			<param name="Name" type="string" pass="in" description="Name of the attache data block." />
+			<param name="Name" type="string" pass="in" description="Unique name of the attache data block. Fails if ther already exists a binary data with the equal name." />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
+		
+		<method name="LoadDiscreteField2DByName" description="Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+		
+		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+
+		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
+			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
+
+		<method name="LoadPNGImageByName" description="Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+		
+		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+
+		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
+			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
 
 				
 	</class>

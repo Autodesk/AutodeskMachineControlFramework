@@ -186,6 +186,22 @@ void CDiscreteFieldData2DInstance::Clear(const double dValue)
 
 }
 
+void CDiscreteFieldData2DInstance::Clamp(const double dMinValue, const double dMaxValue)
+{
+	if (dMinValue >= dMaxValue)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCLAMPINTERVAL);
+
+	for (auto iter = m_Data->begin(); iter != m_Data->end(); iter++) {
+		auto dValue = *iter;
+		if (dValue < dMinValue)
+			*iter = dMinValue;
+		if (dValue > dMaxValue)
+			*iter = dMaxValue;
+	}
+
+}
+
+
 double CDiscreteFieldData2DInstance::GetPixel(const uint32_t nX, const uint32_t nY)
 {
 	if (m_Data.get() == nullptr)

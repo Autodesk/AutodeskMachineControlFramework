@@ -62,7 +62,10 @@ class CWrapper;
 class CBase;
 class CIterator;
 class CTestEnvironment;
+class CPNGImageStoreOptions;
+class CPNGImageData;
 class CImageData;
+class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
 class CToolpathPart;
 class CToolpathLayer;
@@ -97,7 +100,10 @@ typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
 typedef CTestEnvironment CLibMCEnvTestEnvironment;
+typedef CPNGImageStoreOptions CLibMCEnvPNGImageStoreOptions;
+typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
+typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
@@ -132,7 +138,10 @@ typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CTestEnvironment> PTestEnvironment;
+typedef std::shared_ptr<CPNGImageStoreOptions> PPNGImageStoreOptions;
+typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
+typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
@@ -167,7 +176,10 @@ typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
 typedef PTestEnvironment PLibMCEnvTestEnvironment;
+typedef PPNGImageStoreOptions PLibMCEnvPNGImageStoreOptions;
+typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
+typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
@@ -386,6 +398,8 @@ public:
 			case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "SEGMENTATTRIBUTENOTFOUND";
 			case LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE: return "UNSUPPORTEDFIELDSAMPLINGMODE";
 			case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "SAMPLEPOINTCOUNTEXCEEDSMAXIMUM";
+			case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "INVALIDCLAMPINTERVAL";
+			case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "COULDNOTRETRIEVEPNGSTREAM";
 		}
 		return "UNKNOWN";
 	}
@@ -507,6 +521,8 @@ public:
 			case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "Segment Attribute not Found.";
 			case LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE: return "Unsupported field sampling mode.";
 			case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
+			case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "Invalid clamp interval";
+			case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
 		}
 		return "unknown error";
 	}
@@ -626,7 +642,10 @@ private:
 	friend class CBase;
 	friend class CIterator;
 	friend class CTestEnvironment;
+	friend class CPNGImageStoreOptions;
+	friend class CPNGImageData;
 	friend class CImageData;
+	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
@@ -752,6 +771,41 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CPNGImageStoreOptions 
+**************************************************************************************************************************/
+class CPNGImageStoreOptions : public CBase {
+public:
+	
+	/**
+	* CPNGImageStoreOptions::CPNGImageStoreOptions - Constructor for PNGImageStoreOptions class.
+	*/
+	CPNGImageStoreOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void ResetToDefaults();
+};
+	
+/*************************************************************************************************************************
+ Class CPNGImageData 
+**************************************************************************************************************************/
+class CPNGImageData : public CBase {
+public:
+	
+	/**
+	* CPNGImageData::CPNGImageData - Constructor for PNGImageData class.
+	*/
+	CPNGImageData(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CImageData 
 **************************************************************************************************************************/
 class CImageData : public CBase {
@@ -772,7 +826,8 @@ public:
 	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
-	inline void LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void LoadPNG(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline PPNGImageData CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions);
 	inline void EncodePNG();
 	inline void GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
 	inline void ClearEncodedPNGData();
@@ -781,6 +836,23 @@ public:
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
 	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer);
 	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CDiscreteFieldData2DStoreOptions 
+**************************************************************************************************************************/
+class CDiscreteFieldData2DStoreOptions : public CBase {
+public:
+	
+	/**
+	* CDiscreteFieldData2DStoreOptions::CDiscreteFieldData2DStoreOptions - Constructor for DiscreteFieldData2DStoreOptions class.
+	*/
+	CDiscreteFieldData2DStoreOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void ResetToDefaults();
 };
 	
 /*************************************************************************************************************************
@@ -805,6 +877,7 @@ public:
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void ResizeField(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue);
 	inline void Clear(const LibMCEnv_double dValue);
+	inline void Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline LibMCEnv_double GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue);
 	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_double> & ValueBuffer);
@@ -953,6 +1026,12 @@ public:
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
 	inline std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByName(const std::string & sName);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
+	inline std::string StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByName(const std::string & sName);
+	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
+	inline std::string StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 };
 	
 /*************************************************************************************************************************
@@ -1667,6 +1746,9 @@ public:
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
 		pWrapperTable->m_TestEnvironment_WriteTestOutput = nullptr;
+		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = nullptr;
+		pWrapperTable->m_PNGImageData_GetSizeInPixels = nullptr;
+		pWrapperTable->m_PNGImageData_GetPNGDataStream = nullptr;
 		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
 		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
 		pWrapperTable->m_ImageData_GetDPI = nullptr;
@@ -1675,6 +1757,7 @@ public:
 		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_ImageData_ResizeImage = nullptr;
 		pWrapperTable->m_ImageData_LoadPNG = nullptr;
+		pWrapperTable->m_ImageData_CreatePNGImage = nullptr;
 		pWrapperTable->m_ImageData_EncodePNG = nullptr;
 		pWrapperTable->m_ImageData_GetEncodedPNGData = nullptr;
 		pWrapperTable->m_ImageData_ClearEncodedPNGData = nullptr;
@@ -1683,6 +1766,7 @@ public:
 		pWrapperTable->m_ImageData_SetPixel = nullptr;
 		pWrapperTable->m_ImageData_GetPixelRange = nullptr;
 		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
+		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_GetDPI = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_SetDPI = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM = nullptr;
@@ -1691,6 +1775,7 @@ public:
 		pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_ResizeField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_Clear = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Clamp = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_GetPixel = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_SetPixel = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_GetPixelRange = nullptr;
@@ -1775,6 +1860,12 @@ public:
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
+		pWrapperTable->m_Build_LoadDiscreteField2DByName = nullptr;
+		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = nullptr;
+		pWrapperTable->m_Build_StoreDiscreteField2D = nullptr;
+		pWrapperTable->m_Build_LoadPNGImageByName = nullptr;
+		pWrapperTable->m_Build_LoadPNGImageByUUID = nullptr;
+		pWrapperTable->m_Build_StorePNGImage = nullptr;
 		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
 		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = nullptr;
 		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = nullptr;
@@ -2174,6 +2265,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = (PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_pngimagestoreoptions_resettodefaults");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = (PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) dlsym(hLibrary, "libmcenv_pngimagestoreoptions_resettodefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageData_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PNGImageData_GetPNGDataStream = (PLibMCEnvPNGImageData_GetPNGDataStreamPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_getpngdatastream");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageData_GetPNGDataStream = (PLibMCEnvPNGImageData_GetPNGDataStreamPtr) dlsym(hLibrary, "libmcenv_pngimagedata_getpngdatastream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixelformat");
 		#else // _WIN32
 		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixelformat");
@@ -2243,6 +2361,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_LoadPNG == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createpngimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) dlsym(hLibrary, "libmcenv_imagedata_createpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_CreatePNGImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2318,6 +2445,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = (PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2dstoreoptions_resettodefaults");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = (PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr) dlsym(hLibrary, "libmcenv_discretefielddata2dstoreoptions_resettodefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DiscreteFieldData2D_GetDPI = (PLibMCEnvDiscreteFieldData2D_GetDPIPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getdpi");
 		#else // _WIN32
 		pWrapperTable->m_DiscreteFieldData2D_GetDPI = (PLibMCEnvDiscreteFieldData2D_GetDPIPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getdpi");
@@ -2387,6 +2523,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DiscreteFieldData2D_Clear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clamp = (PLibMCEnvDiscreteFieldData2D_ClampPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_clamp");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clamp = (PLibMCEnvDiscreteFieldData2D_ClampPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_clamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Clamp == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3143,6 +3288,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_AddBinaryData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = (PLibMCEnvBuild_LoadDiscreteField2DByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = (PLibMCEnvBuild_LoadDiscreteField2DByUUIDPtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadDiscreteField2DByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_StoreDiscreteField2D = (PLibMCEnvBuild_StoreDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_build_storediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_Build_StoreDiscreteField2D = (PLibMCEnvBuild_StoreDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_build_storediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyname");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadPNGImageByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByUUID = (PLibMCEnvBuild_LoadPNGImageByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByUUID = (PLibMCEnvBuild_LoadPNGImageByUUIDPtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadPNGImageByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_StorePNGImage = (PLibMCEnvBuild_StorePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_build_storepngimage");
+		#else // _WIN32
+		pWrapperTable->m_Build_StorePNGImage = (PLibMCEnvBuild_StorePNGImagePtr) dlsym(hLibrary, "libmcenv_build_storepngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_StorePNGImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5831,6 +6030,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_TestEnvironment_WriteTestOutput == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_pngimagestoreoptions_resettodefaults", (void**)&(pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_pngimagedata_getsizeinpixels", (void**)&(pWrapperTable->m_PNGImageData_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_pngimagedata_getpngdatastream", (void**)&(pWrapperTable->m_PNGImageData_GetPNGDataStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixelFormat == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5861,6 +6072,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_loadpng", (void**)&(pWrapperTable->m_ImageData_LoadPNG));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_LoadPNG == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_createpngimage", (void**)&(pWrapperTable->m_ImageData_CreatePNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreatePNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_encodepng", (void**)&(pWrapperTable->m_ImageData_EncodePNG));
@@ -5895,6 +6110,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelRange == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2dstoreoptions_resettodefaults", (void**)&(pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getdpi", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetDPI));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetDPI == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5925,6 +6144,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_clear", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Clear));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Clear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_clamp", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Clamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Clamp == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getpixel", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetPixel));
@@ -6261,6 +6484,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_addbinarydata", (void**)&(pWrapperTable->m_Build_AddBinaryData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddBinaryData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyname", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyuuid", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_storediscretefield2d", (void**)&(pWrapperTable->m_Build_StoreDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyname", (void**)&(pWrapperTable->m_Build_LoadPNGImageByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyuuid", (void**)&(pWrapperTable->m_Build_LoadPNGImageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_storepngimage", (void**)&(pWrapperTable->m_Build_StorePNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StorePNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingfileexecution_getstatus", (void**)&(pWrapperTable->m_WorkingFileExecution_GetStatus));
@@ -7533,6 +7780,45 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CPNGImageStoreOptions
+	 */
+	
+	/**
+	* CPNGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	void CPNGImageStoreOptions::ResetToDefaults()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageStoreOptions_ResetToDefaults(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CPNGImageData
+	 */
+	
+	/**
+	* CPNGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CPNGImageData::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* @param[out] PNGDataBuffer - PNG Data stream.
+	*/
+	void CPNGImageData::GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPNGData = 0;
+		LibMCEnv_uint64 elementsWrittenPNGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, 0, &elementsNeededPNGData, nullptr));
+		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CImageData
 	 */
 	
@@ -7609,19 +7895,32 @@ public:
 	
 	/**
 	* CImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
-	* @param[out] PNGDataBuffer - PNG Data stream.
+	* @param[in] PNGDataBuffer - PNG Data stream.
 	*/
-	void CImageData::LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	void CImageData::LoadPNG(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer)
 	{
-		LibMCEnv_uint64 elementsNeededPNGData = 0;
-		LibMCEnv_uint64 elementsWrittenPNGData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, 0, &elementsNeededPNGData, nullptr));
-		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data()));
 	}
 	
 	/**
-	* CImageData::EncodePNG - Encodes PNG and stores data stream in image object.
+	* CImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
+	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
+	*/
+	PPNGImageData CImageData::CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions)
+	{
+		LibMCEnvHandle hPNGStorageOptions = pPNGStorageOptions.GetHandle();
+		LibMCEnvHandle hPNGImage = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreatePNGImage(m_pHandle, hPNGStorageOptions, &hPNGImage));
+		
+		if (!hPNGImage) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPNGImageData>(m_pWrapper, hPNGImage);
+	}
+	
+	/**
+	* CImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
 	*/
 	void CImageData::EncodePNG()
 	{
@@ -7629,7 +7928,7 @@ public:
 	}
 	
 	/**
-	* CImageData::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+	* CImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
 	* @param[out] PNGDataBuffer - PNG Data stream.
 	*/
 	void CImageData::GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
@@ -7642,7 +7941,7 @@ public:
 	}
 	
 	/**
-	* CImageData::ClearEncodedPNGData - Releases encoded data stream of image object.
+	* CImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
 	*/
 	void CImageData::ClearEncodedPNGData()
 	{
@@ -7711,6 +8010,18 @@ public:
 	void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CDiscreteFieldData2DStoreOptions
+	 */
+	
+	/**
+	* CDiscreteFieldData2DStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	void CDiscreteFieldData2DStoreOptions::ResetToDefaults()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2DStoreOptions_ResetToDefaults(m_pHandle));
 	}
 	
 	/**
@@ -7795,6 +8106,16 @@ public:
 	void CDiscreteFieldData2D::Clear(const LibMCEnv_double dValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Clear(m_pHandle, dValue));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Clamp - Clamps all pixels to a certain interval.
+	* @param[in] dMinValue - Minimum value. MUST be smaller or equal than MaxValue.
+	* @param[in] dMaxValue - Maximum value. MUST be larger or equal than MinValue.
+	*/
+	void CDiscreteFieldData2D::Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Clamp(m_pHandle, dMinValue, dMaxValue));
 	}
 	
 	/**
@@ -8982,7 +9303,7 @@ public:
 	
 	/**
 	* CBuild::AddBinaryData - Adds binary data to store with the build.
-	* @param[in] sName - Name of the attache data block.
+	* @param[in] sName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
 	* @param[in] sMIMEType - Mime type of the data.
 	* @param[in] ContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
@@ -8994,6 +9315,110 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::LoadDiscreteField2DByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByName(const std::string & sName)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByName(m_pHandle, sName.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuild::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByUUID(m_pHandle, sDataUUID.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuild::StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::LoadPNGImageByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuild::LoadPNGImageByName(const std::string & sName)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByName(m_pHandle, sName.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuild::LoadPNGImageByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuild::StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}

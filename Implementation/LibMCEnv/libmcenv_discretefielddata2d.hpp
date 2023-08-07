@@ -84,6 +84,8 @@ public:
 
 	void Clear(const LibMCEnv_double dValue) override;
 
+	void Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) override;
+
 	LibMCEnv_double GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY) override;
 
 	void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue) override;

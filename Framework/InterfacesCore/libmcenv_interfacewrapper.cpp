@@ -252,6 +252,92 @@ LibMCEnvResult libmcenv_testenvironment_writetestoutput(LibMCEnv_TestEnvironment
 
 
 /*************************************************************************************************************************
+ Class implementation for PNGImageStoreOptions
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_pngimagestoreoptions_resettodefaults(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions)
+{
+	IBase* pIBaseClass = (IBase *)pPNGImageStoreOptions;
+
+	try {
+		IPNGImageStoreOptions* pIPNGImageStoreOptions = dynamic_cast<IPNGImageStoreOptions*>(pIBaseClass);
+		if (!pIPNGImageStoreOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIPNGImageStoreOptions->ResetToDefaults();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for PNGImageData
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_pngimagedata_getsizeinpixels(LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pPNGImageData;
+
+	try {
+		if (!pPixelSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pPixelSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IPNGImageData* pIPNGImageData = dynamic_cast<IPNGImageData*>(pIBaseClass);
+		if (!pIPNGImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIPNGImageData->GetSizeInPixels(*pPixelSizeX, *pPixelSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_pngimagedata_getpngdatastream(LibMCEnv_PNGImageData pPNGImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pPNGImageData;
+
+	try {
+		if ((!pPNGDataBuffer) && !(pPNGDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IPNGImageData* pIPNGImageData = dynamic_cast<IPNGImageData*>(pIBaseClass);
+		if (!pIPNGImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIPNGImageData->GetPNGDataStream(nPNGDataBufferSize, pPNGDataNeededCount, pPNGDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for ImageData
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_imagedata_getpixelformat(LibMCEnv_ImageData pImageData, eLibMCEnvImagePixelFormat * pPixelFormat)
@@ -440,19 +526,49 @@ LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageData pImageData, Lib
 	}
 }
 
-LibMCEnvResult libmcenv_imagedata_loadpng(LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer)
+LibMCEnvResult libmcenv_imagedata_loadpng(LibMCEnv_ImageData pImageData, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pImageData;
 
 	try {
-		if ((!pPNGDataBuffer) && !(pPNGDataNeededCount))
+		if ( (!pPNGDataBuffer) && (nPNGDataBufferSize>0))
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
 		if (!pIImageData)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIImageData->LoadPNG(nPNGDataBufferSize, pPNGDataNeededCount, pPNGDataBuffer);
+		pIImageData->LoadPNG(nPNGDataBufferSize, pPNGDataBuffer);
 
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_createpngimage(LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (pPNGImage == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassPNGStorageOptions = (IBase *)pPNGStorageOptions;
+		IPNGImageStoreOptions* pIPNGStorageOptions = dynamic_cast<IPNGImageStoreOptions*>(pIBaseClassPNGStorageOptions);
+		IBase* pBasePNGImage(nullptr);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBasePNGImage = pIImageData->CreatePNGImage(pIPNGStorageOptions);
+
+		*pPNGImage = (IBase*)(pBasePNGImage);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -668,6 +784,34 @@ LibMCEnvResult libmcenv_imagedata_setpixelrange(LibMCEnv_ImageData pImageData, L
 
 
 /*************************************************************************************************************************
+ Class implementation for DiscreteFieldData2DStoreOptions
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_discretefielddata2dstoreoptions_resettodefaults(LibMCEnv_DiscreteFieldData2DStoreOptions pDiscreteFieldData2DStoreOptions)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2DStoreOptions;
+
+	try {
+		IDiscreteFieldData2DStoreOptions* pIDiscreteFieldData2DStoreOptions = dynamic_cast<IDiscreteFieldData2DStoreOptions*>(pIBaseClass);
+		if (!pIDiscreteFieldData2DStoreOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2DStoreOptions->ResetToDefaults();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DiscreteFieldData2D
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_discretefielddata2d_getdpi(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pDPIValueX, LibMCEnv_double * pDPIValueY)
@@ -864,6 +1008,30 @@ LibMCEnvResult libmcenv_discretefielddata2d_clear(LibMCEnv_DiscreteFieldData2D p
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIDiscreteFieldData2D->Clear(dValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_discretefielddata2d_clamp(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue)
+{
+	IBase* pIBaseClass = (IBase *)pDiscreteFieldData2D;
+
+	try {
+		IDiscreteFieldData2D* pIDiscreteFieldData2D = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClass);
+		if (!pIDiscreteFieldData2D)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDiscreteFieldData2D->Clamp(dMinValue, dMaxValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -3588,6 +3756,246 @@ LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * 
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
 			sDataUUID = pIBuild->AddBinaryData(sName, sMIMEType, nContentBufferSize, pContentBuffer);
+
+			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuild->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sDataUUID);
+			pIBuild->_setCache (nullptr);
+		}
+		
+		if (pDataUUIDNeededChars)
+			*pDataUUIDNeededChars = (LibMCEnv_uint32) (sDataUUID.size()+1);
+		if (pDataUUIDBuffer) {
+			if (sDataUUID.size() >= nDataUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDataUUID = 0; iDataUUID < sDataUUID.size(); iDataUUID++)
+				pDataUUIDBuffer[iDataUUID] = sDataUUID[iDataUUID];
+			pDataUUIDBuffer[sDataUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_loaddiscretefield2dbyname(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IBase* pBaseFieldDataInstance(nullptr);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIBuild->LoadDiscreteField2DByName(sName);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_loaddiscretefield2dbyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pDataUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sDataUUID(pDataUUID);
+		IBase* pBaseFieldDataInstance(nullptr);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIBuild->LoadDiscreteField2DByUUID(sDataUUID);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IBase* pIBaseClassFieldDataInstance = (IBase *)pFieldDataInstance;
+		IDiscreteFieldData2D* pIFieldDataInstance = dynamic_cast<IDiscreteFieldData2D*>(pIBaseClassFieldDataInstance);
+		if (!pIFieldDataInstance)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
+		IDiscreteFieldData2DStoreOptions* pIStoreOptions = dynamic_cast<IDiscreteFieldData2DStoreOptions*>(pIBaseClassStoreOptions);
+		std::string sDataUUID("");
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDataUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sDataUUID = pIBuild->StoreDiscreteField2D(sName, pIFieldDataInstance, pIStoreOptions);
+
+			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuild->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sDataUUID);
+			pIBuild->_setCache (nullptr);
+		}
+		
+		if (pDataUUIDNeededChars)
+			*pDataUUIDNeededChars = (LibMCEnv_uint32) (sDataUUID.size()+1);
+		if (pDataUUIDBuffer) {
+			if (sDataUUID.size() >= nDataUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDataUUID = 0; iDataUUID < sDataUUID.size(); iDataUUID++)
+				pDataUUIDBuffer[iDataUUID] = sDataUUID[iDataUUID];
+			pDataUUIDBuffer[sDataUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_loadpngimagebyname(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IBase* pBaseImageDataInstance(nullptr);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIBuild->LoadPNGImageByName(sName);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pDataUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sDataUUID(pDataUUID);
+		IBase* pBaseImageDataInstance(nullptr);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIBuild->LoadPNGImageByUUID(sDataUUID);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IBase* pIBaseClassImageDataInstance = (IBase *)pImageDataInstance;
+		IImageData* pIImageDataInstance = dynamic_cast<IImageData*>(pIBaseClassImageDataInstance);
+		if (!pIImageDataInstance)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
+		IPNGImageStoreOptions* pIStoreOptions = dynamic_cast<IPNGImageStoreOptions*>(pIBaseClassStoreOptions);
+		std::string sDataUUID("");
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDataUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sDataUUID = pIBuild->StorePNGImage(sName, pIImageDataInstance, pIStoreOptions);
 
 			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -13017,6 +13425,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_iterator_count;
 	if (sProcName == "libmcenv_testenvironment_writetestoutput") 
 		*ppProcAddress = (void*) &libmcenv_testenvironment_writetestoutput;
+	if (sProcName == "libmcenv_pngimagestoreoptions_resettodefaults") 
+		*ppProcAddress = (void*) &libmcenv_pngimagestoreoptions_resettodefaults;
+	if (sProcName == "libmcenv_pngimagedata_getsizeinpixels") 
+		*ppProcAddress = (void*) &libmcenv_pngimagedata_getsizeinpixels;
+	if (sProcName == "libmcenv_pngimagedata_getpngdatastream") 
+		*ppProcAddress = (void*) &libmcenv_pngimagedata_getpngdatastream;
 	if (sProcName == "libmcenv_imagedata_getpixelformat") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelformat;
 	if (sProcName == "libmcenv_imagedata_changepixelformat") 
@@ -13033,6 +13447,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_imagedata_resizeimage;
 	if (sProcName == "libmcenv_imagedata_loadpng") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_loadpng;
+	if (sProcName == "libmcenv_imagedata_createpngimage") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_createpngimage;
 	if (sProcName == "libmcenv_imagedata_encodepng") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_encodepng;
 	if (sProcName == "libmcenv_imagedata_getencodedpngdata") 
@@ -13049,6 +13465,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelrange;
 	if (sProcName == "libmcenv_imagedata_setpixelrange") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_setpixelrange;
+	if (sProcName == "libmcenv_discretefielddata2dstoreoptions_resettodefaults") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2dstoreoptions_resettodefaults;
 	if (sProcName == "libmcenv_discretefielddata2d_getdpi") 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getdpi;
 	if (sProcName == "libmcenv_discretefielddata2d_setdpi") 
@@ -13065,6 +13483,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_resizefield;
 	if (sProcName == "libmcenv_discretefielddata2d_clear") 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_clear;
+	if (sProcName == "libmcenv_discretefielddata2d_clamp") 
+		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_clamp;
 	if (sProcName == "libmcenv_discretefielddata2d_getpixel") 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_getpixel;
 	if (sProcName == "libmcenv_discretefielddata2d_setpixel") 
@@ -13233,6 +13653,18 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_build_createtoolpathaccessor;
 	if (sProcName == "libmcenv_build_addbinarydata") 
 		*ppProcAddress = (void*) &libmcenv_build_addbinarydata;
+	if (sProcName == "libmcenv_build_loaddiscretefield2dbyname") 
+		*ppProcAddress = (void*) &libmcenv_build_loaddiscretefield2dbyname;
+	if (sProcName == "libmcenv_build_loaddiscretefield2dbyuuid") 
+		*ppProcAddress = (void*) &libmcenv_build_loaddiscretefield2dbyuuid;
+	if (sProcName == "libmcenv_build_storediscretefield2d") 
+		*ppProcAddress = (void*) &libmcenv_build_storediscretefield2d;
+	if (sProcName == "libmcenv_build_loadpngimagebyname") 
+		*ppProcAddress = (void*) &libmcenv_build_loadpngimagebyname;
+	if (sProcName == "libmcenv_build_loadpngimagebyuuid") 
+		*ppProcAddress = (void*) &libmcenv_build_loadpngimagebyuuid;
+	if (sProcName == "libmcenv_build_storepngimage") 
+		*ppProcAddress = (void*) &libmcenv_build_storepngimage;
 	if (sProcName == "libmcenv_workingfileexecution_getstatus") 
 		*ppProcAddress = (void*) &libmcenv_workingfileexecution_getstatus;
 	if (sProcName == "libmcenv_workingfileexecution_returnstdout") 

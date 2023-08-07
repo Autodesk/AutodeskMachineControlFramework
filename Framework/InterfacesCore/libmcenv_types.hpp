@@ -209,6 +209,8 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND 10112 /** Segment Attribute not Found. */
 #define LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE 10113 /** Unsupported field sampling mode. */
 #define LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM 10114 /** Sample point count exceeds maximum */
+#define LIBMCENV_ERROR_INVALIDCLAMPINTERVAL 10115 /** Invalid clamp interval */
+#define LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM 10116 /** Could not retrieve PNG stream */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -330,6 +332,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "Segment Attribute not Found.";
     case LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE: return "Unsupported field sampling mode.";
     case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
+    case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "Invalid clamp interval";
+    case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
     default: return "unknown error";
   }
 }
@@ -341,7 +345,10 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
 typedef LibMCEnvHandle LibMCEnv_TestEnvironment;
+typedef LibMCEnvHandle LibMCEnv_PNGImageStoreOptions;
+typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
+typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;

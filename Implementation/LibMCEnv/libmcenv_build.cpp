@@ -157,6 +157,55 @@ std::string CBuild::AddBinaryData(const std::string & sName, const std::string &
 
 	return sDataUUID;
 
+}
+
+IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByName(const std::string& sName)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByUUID(const std::string& sDataUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CBuild::StoreDiscreteField2D(const std::string& sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IImageData* CBuild::LoadPNGImageByName(const std::string& sName)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IImageData* CBuild::LoadPNGImageByUUID(const std::string& sDataUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CBuild::StorePNGImage(const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions)
+{
+	if (pImageDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	uint64_t nNeededCount = 0;
+	std::unique_ptr<LibMCEnv::Impl::IPNGImageData> pPNGImage(pImageDataInstance->CreatePNGImage(pStoreOptions));
+	pPNGImage->GetPNGDataStream(0, &nNeededCount, nullptr);
+
+	if (nNeededCount == 0)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE);
+
+	std::vector<uint8_t> pngBuffer;
+	pngBuffer.resize(nNeededCount);
+
+	uint64_t nWrittenCount = 0;
+	pPNGImage->GetPNGDataStream(pngBuffer.size (), &nWrittenCount, pngBuffer.data ());
+
+	if (nWrittenCount != pngBuffer.size())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM);
+
+	return AddBinaryData(sName, "image/png", pngBuffer.size(), pngBuffer.data());
 
 }
 

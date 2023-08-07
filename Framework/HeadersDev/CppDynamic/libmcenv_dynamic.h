@@ -112,6 +112,43 @@ typedef LibMCEnvResult (*PLibMCEnvIterator_CountPtr) (LibMCEnv_Iterator pIterato
 typedef LibMCEnvResult (*PLibMCEnvTestEnvironment_WriteTestOutputPtr) (LibMCEnv_TestEnvironment pTestEnvironment, const char * pOutputName, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer);
 
 /*************************************************************************************************************************
+ Class definition for PNGImageStoreOptions
+**************************************************************************************************************************/
+
+/**
+* Resets Options to default.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) (LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions);
+
+/*************************************************************************************************************************
+ Class definition for PNGImageData
+**************************************************************************************************************************/
+
+/**
+* Returns image pixel sizes.
+*
+* @param[in] pPNGImageData - PNGImageData instance.
+* @param[out] pPixelSizeX - Number of pixels in X
+* @param[out] pPixelSizeY - Number of pixels in Y
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetSizeInPixelsPtr) (LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+
+/**
+* Retrieves encoded data stream of image object.
+*
+* @param[in] pPNGImageData - PNGImageData instance.
+* @param[in] nPNGDataBufferSize - Number of elements in buffer
+* @param[out] pPNGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pPNGDataBuffer - uint8  buffer of PNG Data stream.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetPNGDataStreamPtr) (LibMCEnv_PNGImageData pPNGImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for ImageData
 **************************************************************************************************************************/
 
@@ -188,14 +225,23 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_ResizeImagePtr) (LibMCEnv_ImageData 
 *
 * @param[in] pImageData - ImageData instance.
 * @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[out] pPNGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pPNGDataBuffer - uint8  buffer of PNG Data stream.
+* @param[in] pPNGDataBuffer - uint8 buffer of PNG Data stream.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvImageData_LoadPNGPtr) (LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvImageData_LoadPNGPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer);
 
 /**
-* Encodes PNG and stores data stream in image object.
+* Creates PNG Image out of the pixel data.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] pPNGStorageOptions - Optional encoding options for the image.
+* @param[out] pPNGImage - Image data.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_CreatePNGImagePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage);
+
+/**
+* Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
 *
 * @param[in] pImageData - ImageData instance.
 * @return error code or 0 (success)
@@ -203,7 +249,7 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_LoadPNGPtr) (LibMCEnv_ImageData pIma
 typedef LibMCEnvResult (*PLibMCEnvImageData_EncodePNGPtr) (LibMCEnv_ImageData pImageData);
 
 /**
-* Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+* Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
 *
 * @param[in] pImageData - ImageData instance.
 * @param[in] nPNGDataBufferSize - Number of elements in buffer
@@ -214,7 +260,7 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_EncodePNGPtr) (LibMCEnv_ImageData pI
 typedef LibMCEnvResult (*PLibMCEnvImageData_GetEncodedPNGDataPtr) (LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
 
 /**
-* Releases encoded data stream of image object.
+* Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
 *
 * @param[in] pImageData - ImageData instance.
 * @return error code or 0 (success)
@@ -280,6 +326,18 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelRangePtr) (LibMCEnv_ImageDat
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelRangePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
+
+/*************************************************************************************************************************
+ Class definition for DiscreteFieldData2DStoreOptions
+**************************************************************************************************************************/
+
+/**
+* Resets Options to default.
+*
+* @param[in] pDiscreteFieldData2DStoreOptions - DiscreteFieldData2DStoreOptions instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr) (LibMCEnv_DiscreteFieldData2DStoreOptions pDiscreteFieldData2DStoreOptions);
 
 /*************************************************************************************************************************
  Class definition for DiscreteFieldData2D
@@ -364,6 +422,16 @@ typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr) (LibMCEnv_
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_ClearPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dValue);
+
+/**
+* Clamps all pixels to a certain interval.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dMinValue - Minimum value. MUST be smaller or equal than MaxValue.
+* @param[in] dMaxValue - Maximum value. MUST be larger or equal than MinValue.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_ClampPtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue);
 
 /**
 * Returns one pixel of an field. Fails if outside of field size.
@@ -1293,7 +1361,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_CreateToolpathAccessorPtr) (LibMCEnv_Bui
 * Adds binary data to store with the build.
 *
 * @param[in] pBuild - Build instance.
-* @param[in] pName - Name of the attache data block.
+* @param[in] pName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
 * @param[in] pMIMEType - Mime type of the data.
 * @param[in] nContentBufferSize - Number of elements in buffer
 * @param[in] pContentBuffer - uint8 buffer of Stream content to store
@@ -1303,6 +1371,74 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_CreateToolpathAccessorPtr) (LibMCEnv_Bui
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvBuild_AddBinaryDataPtr) (LibMCEnv_Build pBuild, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pFieldDataInstance - Loaded field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) (LibMCEnv_Build pBuild, const char * pName, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pFieldDataInstance - Loaded field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_LoadDiscreteField2DByUUIDPtr) (LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pFieldDataInstance - Field instance to store.
+* @param[in] pStoreOptions - Field Data Store Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_StoreDiscreteField2DPtr) (LibMCEnv_Build pBuild, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pImageDataInstance - Image data instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_LoadPNGImageByNamePtr) (LibMCEnv_Build pBuild, const char * pName, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pImageDataInstance - Image data instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_LoadPNGImageByUUIDPtr) (LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* Stores a discrete field in the build job. MIME Type will be image/png
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pImageDataInstance - Image data instance.
+* @param[in] pStoreOptions - PNG Store Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_StorePNGImagePtr) (LibMCEnv_Build pBuild, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /*************************************************************************************************************************
  Class definition for WorkingFileExecution
@@ -4499,6 +4635,9 @@ typedef struct {
 	PLibMCEnvIterator_ClonePtr m_Iterator_Clone;
 	PLibMCEnvIterator_CountPtr m_Iterator_Count;
 	PLibMCEnvTestEnvironment_WriteTestOutputPtr m_TestEnvironment_WriteTestOutput;
+	PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr m_PNGImageStoreOptions_ResetToDefaults;
+	PLibMCEnvPNGImageData_GetSizeInPixelsPtr m_PNGImageData_GetSizeInPixels;
+	PLibMCEnvPNGImageData_GetPNGDataStreamPtr m_PNGImageData_GetPNGDataStream;
 	PLibMCEnvImageData_GetPixelFormatPtr m_ImageData_GetPixelFormat;
 	PLibMCEnvImageData_ChangePixelFormatPtr m_ImageData_ChangePixelFormat;
 	PLibMCEnvImageData_GetDPIPtr m_ImageData_GetDPI;
@@ -4507,6 +4646,7 @@ typedef struct {
 	PLibMCEnvImageData_GetSizeInPixelsPtr m_ImageData_GetSizeInPixels;
 	PLibMCEnvImageData_ResizeImagePtr m_ImageData_ResizeImage;
 	PLibMCEnvImageData_LoadPNGPtr m_ImageData_LoadPNG;
+	PLibMCEnvImageData_CreatePNGImagePtr m_ImageData_CreatePNGImage;
 	PLibMCEnvImageData_EncodePNGPtr m_ImageData_EncodePNG;
 	PLibMCEnvImageData_GetEncodedPNGDataPtr m_ImageData_GetEncodedPNGData;
 	PLibMCEnvImageData_ClearEncodedPNGDataPtr m_ImageData_ClearEncodedPNGData;
@@ -4515,6 +4655,7 @@ typedef struct {
 	PLibMCEnvImageData_SetPixelPtr m_ImageData_SetPixel;
 	PLibMCEnvImageData_GetPixelRangePtr m_ImageData_GetPixelRange;
 	PLibMCEnvImageData_SetPixelRangePtr m_ImageData_SetPixelRange;
+	PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr m_DiscreteFieldData2DStoreOptions_ResetToDefaults;
 	PLibMCEnvDiscreteFieldData2D_GetDPIPtr m_DiscreteFieldData2D_GetDPI;
 	PLibMCEnvDiscreteFieldData2D_SetDPIPtr m_DiscreteFieldData2D_SetDPI;
 	PLibMCEnvDiscreteFieldData2D_GetOriginInMMPtr m_DiscreteFieldData2D_GetOriginInMM;
@@ -4523,6 +4664,7 @@ typedef struct {
 	PLibMCEnvDiscreteFieldData2D_GetSizeInPixelsPtr m_DiscreteFieldData2D_GetSizeInPixels;
 	PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr m_DiscreteFieldData2D_ResizeField;
 	PLibMCEnvDiscreteFieldData2D_ClearPtr m_DiscreteFieldData2D_Clear;
+	PLibMCEnvDiscreteFieldData2D_ClampPtr m_DiscreteFieldData2D_Clamp;
 	PLibMCEnvDiscreteFieldData2D_GetPixelPtr m_DiscreteFieldData2D_GetPixel;
 	PLibMCEnvDiscreteFieldData2D_SetPixelPtr m_DiscreteFieldData2D_SetPixel;
 	PLibMCEnvDiscreteFieldData2D_GetPixelRangePtr m_DiscreteFieldData2D_GetPixelRange;
@@ -4607,6 +4749,12 @@ typedef struct {
 	PLibMCEnvBuild_ToolpathIsLoadedPtr m_Build_ToolpathIsLoaded;
 	PLibMCEnvBuild_CreateToolpathAccessorPtr m_Build_CreateToolpathAccessor;
 	PLibMCEnvBuild_AddBinaryDataPtr m_Build_AddBinaryData;
+	PLibMCEnvBuild_LoadDiscreteField2DByNamePtr m_Build_LoadDiscreteField2DByName;
+	PLibMCEnvBuild_LoadDiscreteField2DByUUIDPtr m_Build_LoadDiscreteField2DByUUID;
+	PLibMCEnvBuild_StoreDiscreteField2DPtr m_Build_StoreDiscreteField2D;
+	PLibMCEnvBuild_LoadPNGImageByNamePtr m_Build_LoadPNGImageByName;
+	PLibMCEnvBuild_LoadPNGImageByUUIDPtr m_Build_LoadPNGImageByUUID;
+	PLibMCEnvBuild_StorePNGImagePtr m_Build_StorePNGImage;
 	PLibMCEnvWorkingFileExecution_GetStatusPtr m_WorkingFileExecution_GetStatus;
 	PLibMCEnvWorkingFileExecution_ReturnStdOutPtr m_WorkingFileExecution_ReturnStdOut;
 	PLibMCEnvWorkingFile_GetAbsoluteFileNamePtr m_WorkingFile_GetAbsoluteFileName;

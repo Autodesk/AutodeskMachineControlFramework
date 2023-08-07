@@ -57,7 +57,10 @@ namespace Impl {
 class IBase;
 class IIterator;
 class ITestEnvironment;
+class IPNGImageStoreOptions;
+class IPNGImageData;
 class IImageData;
+class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
 class IToolpathPart;
 class IToolpathLayer;
@@ -325,6 +328,48 @@ typedef IBaseSharedPtr<ITestEnvironment> PITestEnvironment;
 
 
 /*************************************************************************************************************************
+ Class interface for PNGImageStoreOptions 
+**************************************************************************************************************************/
+
+class IPNGImageStoreOptions : public virtual IBase {
+public:
+	/**
+	* IPNGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	virtual void ResetToDefaults() = 0;
+
+};
+
+typedef IBaseSharedPtr<IPNGImageStoreOptions> PIPNGImageStoreOptions;
+
+
+/*************************************************************************************************************************
+ Class interface for PNGImageData 
+**************************************************************************************************************************/
+
+class IPNGImageData : public virtual IBase {
+public:
+	/**
+	* IPNGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
+	*/
+	virtual void GetPNGDataStream(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IPNGImageData> PIPNGImageData;
+
+
+/*************************************************************************************************************************
  Class interface for ImageData 
 **************************************************************************************************************************/
 
@@ -380,18 +425,24 @@ public:
 	/**
 	* IImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
 	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
+	* @param[in] pPNGDataBuffer - PNG Data stream.
 	*/
-	virtual void LoadPNG(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
+	virtual void LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer) = 0;
 
 	/**
-	* IImageData::EncodePNG - Encodes PNG and stores data stream in image object.
+	* IImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
+	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
+	*/
+	virtual IPNGImageData * CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) = 0;
+
+	/**
+	* IImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
 	*/
 	virtual void EncodePNG() = 0;
 
 	/**
-	* IImageData::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+	* IImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
 	* @param[in] nPNGDataBufferSize - Number of elements in buffer
 	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
@@ -399,7 +450,7 @@ public:
 	virtual void GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
 
 	/**
-	* IImageData::ClearEncodedPNGData - Releases encoded data stream of image object.
+	* IImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
 	*/
 	virtual void ClearEncodedPNGData() = 0;
 
@@ -451,6 +502,22 @@ public:
 };
 
 typedef IBaseSharedPtr<IImageData> PIImageData;
+
+
+/*************************************************************************************************************************
+ Class interface for DiscreteFieldData2DStoreOptions 
+**************************************************************************************************************************/
+
+class IDiscreteFieldData2DStoreOptions : public virtual IBase {
+public:
+	/**
+	* IDiscreteFieldData2DStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	virtual void ResetToDefaults() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDiscreteFieldData2DStoreOptions> PIDiscreteFieldData2DStoreOptions;
 
 
 /*************************************************************************************************************************
@@ -514,6 +581,13 @@ public:
 	* @param[in] dValue - Pixel value.
 	*/
 	virtual void Clear(const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Clamp - Clamps all pixels to a certain interval.
+	* @param[in] dMinValue - Minimum value. MUST be smaller or equal than MaxValue.
+	* @param[in] dMaxValue - Maximum value. MUST be larger or equal than MinValue.
+	*/
+	virtual void Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
 
 	/**
 	* IDiscreteFieldData2D::GetPixel - Returns one pixel of an field. Fails if outside of field size.
@@ -1184,13 +1258,59 @@ public:
 
 	/**
 	* IBuild::AddBinaryData - Adds binary data to store with the build.
-	* @param[in] sName - Name of the attache data block.
+	* @param[in] sName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
 	* @param[in] sMIMEType - Mime type of the data.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
 	virtual std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+
+	/**
+	* IBuild::LoadDiscreteField2DByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByName(const std::string & sName) = 0;
+
+	/**
+	* IBuild::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StoreDiscreteField2D(const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuild::LoadPNGImageByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByName(const std::string & sName) = 0;
+
+	/**
+	* IBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StorePNGImage(const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
 
 };
 

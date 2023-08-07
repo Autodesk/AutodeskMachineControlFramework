@@ -81,6 +81,8 @@ namespace AMC {
 
 		void Clear(const double dValue);
 
+		void Clamp(const double dMinValue, const double dMaxValue);
+
 		double GetPixel(const uint32_t nX, const uint32_t nY);
 
 		void SetPixel(const uint32_t nX, const uint32_t nY, const double dValue);
