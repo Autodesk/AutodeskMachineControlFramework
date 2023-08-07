@@ -564,6 +564,54 @@ public:
 	virtual LibMCDriver_ScanLab_uint32 GetLaserIndex() = 0;
 
 	/**
+	* IRTCContext::SetLaserOrigin - Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+	* @param[in] dOriginX - Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	* @param[in] dOriginY - Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	*/
+	virtual void SetLaserOrigin(const LibMCDriver_ScanLab_double dOriginX, const LibMCDriver_ScanLab_double dOriginY) = 0;
+
+	/**
+	* IRTCContext::GetLaserOrigin - Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+	* @param[out] dOriginX - Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	* @param[out] dOriginY - Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+	*/
+	virtual void GetLaserOrigin(LibMCDriver_ScanLab_double & dOriginX, LibMCDriver_ScanLab_double & dOriginY) = 0;
+
+	/**
+	* IRTCContext::SetLaserField - Sets the laser field limits in absolute coordinates.
+	* @param[in] dMinX - Sets minimum laser X coordinate in mm.
+	* @param[in] dMinY - Sets minimum laser Y coordinate in mm.
+	* @param[in] dMaxX - Sets maximum laser X coordinate in mm.
+	* @param[in] dMaxY - Sets maximum laser Y coordinate in mm.
+	*/
+	virtual void SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY) = 0;
+
+	/**
+	* IRTCContext::ResetLaserField - Resets the laser field to default values.
+	*/
+	virtual void ResetLaserField() = 0;
+
+	/**
+	* IRTCContext::EnableRangeChecking - Enables range checking of the laser field. A laser field MUST have been set before.
+	*/
+	virtual void EnableRangeChecking() = 0;
+
+	/**
+	* IRTCContext::DisableRangeChecking - Disables range checking of the laser field.
+	*/
+	virtual void DisableRangeChecking() = 0;
+
+	/**
+	* IRTCContext::GetLaserField - Returns the laser field limits in absolute coordinates.
+	* @param[out] dMinX - Sets minimum laser X coordinate in mm.
+	* @param[out] dMinY - Sets minimum laser Y coordinate in mm.
+	* @param[out] dMaxX - Sets maximum laser X coordinate in mm.
+	* @param[out] dMaxY - Sets maximum laser Y coordinate in mm.
+	* @return Returns true if a laser field has been set.
+	*/
+	virtual bool GetLaserField(LibMCDriver_ScanLab_double & dMinX, LibMCDriver_ScanLab_double & dMinY, LibMCDriver_ScanLab_double & dMaxX, LibMCDriver_ScanLab_double & dMaxY) = 0;
+
+	/**
 	* IRTCContext::SetStartList - Opens the list to write
 	* @param[in] nListIndex - Index of List (1 or 2).
 	* @param[in] nPosition - Relative Position in List.
@@ -645,6 +693,45 @@ public:
 	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
+	* IRTCContext::AddJumpMovement - Adds a Jump movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	virtual void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) = 0;
+
+	/**
+	* IRTCContext::AddMarkMovement - Adds a Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	virtual void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) = 0;
+
+	/**
+	* IRTCContext::AddFreeVariable - Adds a free variable set to the open list
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @param[in] nValue - Value to set.
+	*/
+	virtual void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) = 0;
+
+	/**
+	* IRTCContext::GetCurrentFreeVariable - Returns the currently set free variable.
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @return Value to return.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo) = 0;
+
+	/**
+	* IRTCContext::GetTimeStamp - Returns the current RTC time stamp.
+	* @return TimeStamp Value.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetTimeStamp() = 0;
+
+	/**
+	* IRTCContext::StopExecution - Stops the execution of the current list immediately.
+	*/
+	virtual void StopExecution() = 0;
+
+	/**
 	* IRTCContext::DrawHatchesOIE - Writes a list of hatches into the open list with OIE Enabled.
 	* @param[in] nHatchesBufferSize - Number of elements in buffer
 	* @param[in] pHatchesBuffer - Hatches to draw.
@@ -655,6 +742,41 @@ public:
 	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
 	*/
 	virtual void DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex) = 0;
+
+	/**
+	* IRTCContext::AddLayerToList - Adds a layer instance to the current open list.
+	* @param[in] pLayer - Instance of the layer to add to the lists.
+	* @param[in] bFailIfNonAssignedDataExists - If true, fails if there is a laser index that does not match.
+	*/
+	virtual void AddLayerToList(LibMCEnv::PToolpathLayer pLayer, const bool bFailIfNonAssignedDataExists) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderX - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] dPositionInMM - Position Value to reach in mm.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+	*/
+	virtual void WaitForEncoderX(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderY - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] dPositionInMM - Position Value to reach in mm.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+	*/
+	virtual void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderXSteps - Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+	*/
+	virtual void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane) = 0;
+
+	/**
+	* IRTCContext::WaitForEncoderYSteps - Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+	* @param[in] nPositionInSteps - Position Value to reach in steps.
+	* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+	*/
+	virtual void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
@@ -750,9 +872,15 @@ public:
 	virtual void DisableOIE() = 0;
 
 	/**
-	* IRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list.
+	* IRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
 	*/
 	virtual void StartOIEMeasurement() = 0;
+
+	/**
+	* IRTCContext::StartOIEMeasurementEx - Writes an OIE measurement start command block to the open list, with parameterized LaserOn Trigger
+	* @param[in] bLaserOnTrigger - If true, only triggers a measurement, when the laser is on.
+	*/
+	virtual void StartOIEMeasurementEx(const bool bLaserOnTrigger) = 0;
 
 	/**
 	* IRTCContext::StopOIEMeasurement - Writes an OIE measurement start command block to the open list.
@@ -764,6 +892,16 @@ public:
 	* @param[in] nOIEPIDIndex - OIE PID Index. MUST be between 0 and 63. 0 means PID disabled.
 	*/
 	virtual void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) = 0;
+
+	/**
+	* IRTCContext::EnableOIEPIDControl - Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.
+	*/
+	virtual void EnableOIEPIDControl() = 0;
+
+	/**
+	* IRTCContext::DisableOIEPIDControl - Disables OIE PID Control.
+	*/
+	virtual void DisableOIEPIDControl() = 0;
 
 	/**
 	* IRTCContext::DisableSkyWriting - Disable skywriting.
@@ -797,6 +935,100 @@ public:
 	* @param[in] dLimit - Skywriting Angle limit
 	*/
 	virtual void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit) = 0;
+
+	/**
+	* IRTCContext::SetTransformationAngle - Sets the transformation angle of the scan field.
+	* @param[in] dAngleInDegrees - Angle in Degrees
+	*/
+	virtual void SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees) = 0;
+
+	/**
+	* IRTCContext::SetTransformationScale - Sets the transformation scale of the scan field.
+	* @param[in] dScaleFactor - Scale Factor (1.0 is no scaling). Allowed value is -16 to 16.
+	*/
+	virtual void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor) = 0;
+
+	/**
+	* IRTCContext::SetTransformationOffset - Sets the transformation offset of the scan field.
+	* @param[in] nOffsetX - Offset in X (in bits)
+	* @param[in] nOffsetY - Offset in X (in bits)
+	*/
+	virtual void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY) = 0;
+
+	/**
+	* IRTCContext::SetTransformationMatrix - Sets the transformation matrix of the scan field.
+	* @param[in] dM11 - Upper left field of the transformation matrix
+	* @param[in] dM12 - Upper right field of the transformation matrix
+	* @param[in] dM21 - Lower left field of the transformation matrix
+	* @param[in] dM22 - Lower right field of the transformation matrix
+	*/
+	virtual void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) = 0;
+
+	/**
+	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+	*/
+	virtual void PrepareRecording() = 0;
+
+	/**
+	* IRTCContext::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	*/
+	virtual void EnableRecording() = 0;
+
+	/**
+	* IRTCContext::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.
+	*/
+	virtual void DisableRecording() = 0;
+
+	/**
+	* IRTCContext::ExecuteListWithRecording - Executes the list with recording the position data from the RTC card.
+	* @param[in] nListIndex - Index of List (1 or 2).
+	* @param[in] nPosition - Relative Position in List.
+	*/
+	virtual void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) = 0;
+
+	/**
+	* IRTCContext::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	virtual void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) = 0;
+
+	/**
+	* IRTCContext::DisableTimelagCompensation - Disables timelag compensation.
+	*/
+	virtual void DisableTimelagCompensation() = 0;
+
+	/**
+	* IRTCContext::EnableMarkOnTheFly2D - Enables mark on the fly 2D. This is a list command.
+	* @param[in] dScaleXInMMperEncoderStep - Scale factor X in mm per encoder step
+	* @param[in] dScaleYInMMperEncoderStep - Scale factor Y in mm per encoder step
+	*/
+	virtual void EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep) = 0;
+
+	/**
+	* IRTCContext::DisableMarkOnTheFly2D - Disable mark on the fly 2D. This is a list command.
+	*/
+	virtual void DisableMarkOnTheFly2D() = 0;
+
+	/**
+	* IRTCContext::MarkOnTheFly2DIsEnabled - Returns if mark on the fly 2D has been enabled.
+	* @return Returns true if mark on the fly 2D is enabled.
+	*/
+	virtual bool MarkOnTheFly2DIsEnabled() = 0;
+
+	/**
+	* IRTCContext::Get2DMarkOnTheFlyPosition - Returns 2D mark on the fly position.
+	* @param[out] nPositionX - Mark on the fly position X
+	* @param[out] nPositionY - Mark on the fly position Y
+	*/
+	virtual void Get2DMarkOnTheFlyPosition(LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY) = 0;
+
+	/**
+	* IRTCContext::CheckOnTheFlyError - Checks mark on the fly error.
+	* @param[in] bFailIfError - If true, the call will fail in case of an error.
+	* @return Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 CheckOnTheFlyError(const bool bFailIfError) = 0;
 
 };
 
@@ -1009,7 +1241,7 @@ public:
 	virtual void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::ConfigureLaserMode - Configures the laser mode.
+	* IDriver_ScanLab_RTC6::ConfigureLaserMode - Configures the laser mode. MUST be called before any exposure.
 	* @param[in] eLaserMode - Laser Mode Enum
 	* @param[in] eLaserPort - Laser Port Enum
 	* @param[in] dMaxLaserPower - Maximum laser power.
@@ -1023,7 +1255,7 @@ public:
 	virtual void ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::ConfigureDelays - Configures the default laser and scanner delays.
+	* IDriver_ScanLab_RTC6::ConfigureDelays - Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 	* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
 	* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds
 	* @param[in] dMarkDelay - Mark delay in microseconds (will be rounded to a multiple of 10)
@@ -1045,6 +1277,19 @@ public:
 	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
 
 	/**
+	* IDriver_ScanLab_RTC6::EnableAttributeFilter - Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+	* @param[in] sNameSpace - Namespace of Attribute to filter for.
+	* @param[in] sAttributeName - Name of Attribute to filter for.
+	* @param[in] nAttributeValue - Attribute Value to filter for.
+	*/
+	virtual void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::DisableAttributeFilter - Disables filtering of the segments by segment attributes.
+	*/
+	virtual void DisableAttributeFilter() = 0;
+
+	/**
 	* IDriver_ScanLab_RTC6::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
@@ -1058,6 +1303,18 @@ public:
 	* @param[out] dMultiplier - Multiplier
 	*/
 	virtual void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	virtual void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::DisableTimelagCompensation - Disables timelag compensation.
+	*/
+	virtual void DisableTimelagCompensation() = 0;
 
 };
 
@@ -1208,7 +1465,7 @@ public:
 	virtual void ConfigureLaserMode(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::ConfigureDelays - Configures the default laser and scanner delays.
+	* IDriver_ScanLab_RTC6xN::ConfigureDelays - Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] dLaserOnDelay - Laser On Delay in Microseconds
 	* @param[in] dLaserOffDelay - Laser Off Delay in Microseconds
@@ -1229,6 +1486,19 @@ public:
 	* @return Recording mode enum
 	*/
 	virtual LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::EnableAttributeFilter - Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+	* @param[in] sNameSpace - Namespace of Attribute to filter for.
+	* @param[in] sAttributeName - Name of Attribute to filter for.
+	* @param[in] nAttributeValue - Attribute Value to filter for.
+	*/
+	virtual void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::DisableAttributeFilter - Disables filtering of the segments by segment attributes.
+	*/
+	virtual void DisableAttributeFilter() = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6xN::DrawLayer - Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
@@ -1255,6 +1525,20 @@ public:
 	* @param[out] dMultiplier - Multiplier
 	*/
 	virtual void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::EnableTimelagCompensation - Enables timelag compensation.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+	* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+	*/
+	virtual void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::DisableTimelagCompensation - Disables timelag compensation.
+	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+	*/
+	virtual void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
 
 };
 

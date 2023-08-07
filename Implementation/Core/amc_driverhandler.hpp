@@ -43,6 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define AMCPACKAGE_SCHEMANAMESPACE "http://schemas.autodesk.com/amc/resourcepackage/2020/07"
 
+namespace LibMCData {
+	class CBuildJobHandler;
+	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
+
+	class CStorage;
+	typedef std::shared_ptr<CStorage> PStorage;
+}
+
 namespace AMC {
 
 	typedef void* HDriverHandle;
@@ -67,6 +75,9 @@ namespace AMC {
 		std::string m_sTempBasePath;
 		PToolpathHandler m_pToolpathHandler;
 		PLogger m_pLogger;
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		LibMCData::PStorage m_pStorage;
+		std::string m_sSystemUserID;
 
 		// List and Map of registered drivers
 		std::list<PDriver> m_DriverList;
@@ -82,7 +93,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, std::string sSystemUserID);
 
 		virtual ~CDriverHandler();
 

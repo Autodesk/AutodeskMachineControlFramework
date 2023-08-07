@@ -38,12 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 
-	CToolpathHandler::CToolpathHandler(LibMCData::PStorage pStorage, LibMCData::PBuildJobHandler pBuildJobHandler)
-		: m_pStorage (pStorage), m_pBuildJobHandler (pBuildJobHandler)
+	CToolpathHandler::CToolpathHandler(LibMCData::PStorage pStorage)
+		: m_pStorage (pStorage)
 	{
 		LibMCAssertNotNull(pStorage.get());
-		LibMCAssertNotNull(pBuildJobHandler.get());
-
+	
 	}
 
 	CToolpathHandler::~CToolpathHandler()

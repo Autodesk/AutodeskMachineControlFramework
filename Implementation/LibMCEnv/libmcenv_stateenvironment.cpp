@@ -36,8 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_journalvariable.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
+#include "libmcenv_discretefielddata2d.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -143,12 +145,27 @@ ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& s
 
 }
 
+bool CStateEnvironment::HasBuildJob(const std::string& sBuildUUID)
+{
+	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	try {
+		pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+		return true;
+	}
+	catch (std::exception) {
+		return false;
+	}
+}
 
 IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
+	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
 	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
-	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
-	return new CBuild(pBuildJob, m_pSystemState);
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+	return new CBuild(pBuildJob, m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getStorageInstance(), m_pSystemState->getSystemUserID ());
 }
 
 
@@ -464,4 +481,19 @@ LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uin
 
 	return new CXMLDocument(pDocument);
 
+}
+
+IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+{
+	AMC::PDiscreteFieldData2DInstance pInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, true);
+	return new CDiscreteFieldData2D(pInstance);
+}
+
+IJournalVariable* CStateEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+{
+	uint64_t nStartTimeStamp = 0;
+	uint64_t nEndTimeStamp = 0;
+	auto pStateJournal = m_pSystemState->getStateJournalInstance();
+	pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
+	return new CJournalVariable(pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
 }

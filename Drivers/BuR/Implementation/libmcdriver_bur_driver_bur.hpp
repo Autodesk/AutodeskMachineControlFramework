@@ -70,13 +70,16 @@ protected:
 
     bool m_SimulationMode;
 
+    eDriver_BurProtocolVersion m_ProtocolVersion;
+    uint32_t m_nPacketSignature;
+
     uint32_t m_nWorkerThreadCount;
     uint32_t m_nMaxReceiveBufferSize;
 
     uint32_t m_nMajorVersion;
     uint32_t m_nMinorVersion;
     uint32_t m_nPatchVersion;
-    uint32_t m_nBuildVersion;
+    uint32_t m_nBuildVersion;   
 
     uint32_t m_nMaxPacketQueueSize;
     uint32_t m_InitMachineCommandID;

@@ -212,7 +212,34 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 
 	this->n_set_multi_mcbsp_in_list = (PScanLabPtr_n_set_multi_mcbsp_in_list)_loadScanLabAddress(hLibrary, "n_set_multi_mcbsp_in_list");
 	this->n_set_laser_power = (PScanLabPtr_n_set_laser_power)_loadScanLabAddress(hLibrary, "n_set_laser_power");
+	this->n_set_angle = (PScanLabPtr_n_set_angle)_loadScanLabAddress(hLibrary, "n_set_angle");
+	this->n_set_scale = (PScanLabPtr_n_set_scale)_loadScanLabAddress(hLibrary, "n_set_scale");
+	this->n_set_offset = (PScanLabPtr_n_set_offset)_loadScanLabAddress(hLibrary, "n_set_offset");
+	this->n_set_matrix = (PScanLabPtr_n_set_matrix)_loadScanLabAddress(hLibrary, "n_set_matrix");
 
+	this->n_get_waveform_offset = (PScanLabPtr_n_get_waveform_offset)_loadScanLabAddress(hLibrary, "n_get_waveform_offset");
+	this->n_measurement_status = (PScanLabPtr_n_measurement_status)_loadScanLabAddress(hLibrary, "n_measurement_status");
+	this->transform = (PScanLabPtr_transform)_loadScanLabAddress(hLibrary, "transform");
+	this->n_upload_transform = (PScanLabPtr_n_upload_transform)_loadScanLabAddress(hLibrary, "n_upload_transform");
+	this->n_set_timelag_compensation = (PScanLabPtr_n_set_timelag_compensation)_loadScanLabAddress(hLibrary, "n_set_timelag_compensation");
+
+	this->n_init_fly_2d = (PScanLabPtr_n_init_fly_2d)_loadScanLabAddress(hLibrary, "n_init_fly_2d");
+	this->n_activate_fly_2d = (PScanLabPtr_n_activate_fly_2d)_loadScanLabAddress(hLibrary, "n_activate_fly_2d");
+	this->n_activate_fly_2d_encoder = (PScanLabPtr_n_activate_fly_2d_encoder)_loadScanLabAddress(hLibrary, "n_activate_fly_2d_encoder");
+	this->n_set_fly_2d = (PScanLabPtr_n_set_fly_2d)_loadScanLabAddress(hLibrary, "n_set_fly_2d");
+	this->n_get_fly_2d_offset = (PScanLabPtr_n_get_fly_2d_offset)_loadScanLabAddress(hLibrary, "n_get_fly_2d_offset");
+	this->n_set_fly_x_pos = (PScanLabPtr_n_set_fly_x_pos)_loadScanLabAddress(hLibrary, "n_set_fly_x_pos");
+	this->n_set_fly_y_pos = (PScanLabPtr_n_set_fly_y_pos)_loadScanLabAddress(hLibrary, "n_set_fly_y_pos");
+	this->n_set_fly_x = (PScanLabPtr_n_set_fly_x)_loadScanLabAddress(hLibrary, "n_set_fly_x");
+	this->n_set_fly_y = (PScanLabPtr_n_set_fly_y)_loadScanLabAddress(hLibrary, "n_set_fly_y");	
+	this->n_get_encoder = (PScanLabPtr_n_get_encoder)_loadScanLabAddress(hLibrary, "n_get_encoder");
+	this->n_get_marking_info = (PScanLabPtr_n_get_marking_info)_loadScanLabAddress(hLibrary, "n_get_marking_info");
+	this->n_wait_for_encoder = (PScanLabPtr_n_wait_for_encoder)_loadScanLabAddress(hLibrary, "n_wait_for_encoder");
+	this->n_wait_for_encoder_mode = (PScanLabPtr_n_wait_for_encoder_mode)_loadScanLabAddress(hLibrary, "n_wait_for_encoder_mode");
+	this->n_set_fly_limits = (PScanLabPtr_n_set_fly_limits)_loadScanLabAddress(hLibrary, "n_set_fly_limits");
+	this->n_range_checking = (PScanLabPtr_n_range_checking)_loadScanLabAddress(hLibrary, "n_range_checking");
+	this->n_stop_execution = (PScanLabPtr_n_stop_execution)_loadScanLabAddress(hLibrary, "n_stop_execution");
+	
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -375,6 +402,37 @@ void CScanLabSDK::resetFunctionPtrs()
 
 	n_set_multi_mcbsp_in_list = nullptr;
 	n_set_laser_power = nullptr;
+
+	n_set_angle = nullptr;
+	n_set_scale = nullptr;
+	n_set_offset = nullptr;
+	n_set_matrix = nullptr;
+
+	n_get_waveform_offset = nullptr;
+	n_measurement_status = nullptr;
+	transform = nullptr;
+	n_upload_transform = nullptr;
+	n_set_timelag_compensation = nullptr;
+
+	n_init_fly_2d = nullptr;
+	n_activate_fly_2d = nullptr;
+	n_set_fly_2d = nullptr;
+	n_activate_fly_2d_encoder = nullptr;
+	n_get_fly_2d_offset = nullptr;
+
+	n_set_fly_x_pos = nullptr;
+	n_set_fly_y_pos = nullptr;
+	n_set_fly_x = nullptr;
+	n_set_fly_y = nullptr;
+	n_get_encoder = nullptr;
+
+	n_get_marking_info = nullptr;
+	n_wait_for_encoder = nullptr;
+	n_wait_for_encoder_mode = nullptr;
+	n_set_fly_limits = nullptr;
+	n_range_checking = nullptr;
+
+	n_stop_execution = nullptr;
 
 
 }

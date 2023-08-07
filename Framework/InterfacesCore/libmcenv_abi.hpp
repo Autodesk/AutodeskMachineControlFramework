@@ -125,6 +125,43 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_count(LibMCEnv_Iterator pIter
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_testenvironment_writetestoutput(LibMCEnv_TestEnvironment pTestEnvironment, const char * pOutputName, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer);
 
 /*************************************************************************************************************************
+ Class definition for PNGImageStoreOptions
+**************************************************************************************************************************/
+
+/**
+* Resets Options to default.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagestoreoptions_resettodefaults(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions);
+
+/*************************************************************************************************************************
+ Class definition for PNGImageData
+**************************************************************************************************************************/
+
+/**
+* Returns image pixel sizes.
+*
+* @param[in] pPNGImageData - PNGImageData instance.
+* @param[out] pPixelSizeX - Number of pixels in X
+* @param[out] pPixelSizeY - Number of pixels in Y
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagedata_getsizeinpixels(LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+
+/**
+* Retrieves encoded data stream of image object.
+*
+* @param[in] pPNGImageData - PNGImageData instance.
+* @param[in] nPNGDataBufferSize - Number of elements in buffer
+* @param[out] pPNGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pPNGDataBuffer - uint8  buffer of PNG Data stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagedata_getpngdatastream(LibMCEnv_PNGImageData pPNGImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for ImageData
 **************************************************************************************************************************/
 
@@ -201,14 +238,23 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageDa
 *
 * @param[in] pImageData - ImageData instance.
 * @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[out] pPNGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pPNGDataBuffer - uint8  buffer of PNG Data stream.
+* @param[in] pPNGDataBuffer - uint8 buffer of PNG Data stream.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_loadpng(LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_loadpng(LibMCEnv_ImageData pImageData, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer);
 
 /**
-* Encodes PNG and stores data stream in image object.
+* Creates PNG Image out of the pixel data.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] pPNGStorageOptions - Optional encoding options for the image.
+* @param[out] pPNGImage - Image data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_createpngimage(LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage);
+
+/**
+* Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
 *
 * @param[in] pImageData - ImageData instance.
 * @return error code or 0 (success)
@@ -216,7 +262,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_loadpng(LibMCEnv_ImageData p
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_encodepng(LibMCEnv_ImageData pImageData);
 
 /**
-* Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+* Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
 *
 * @param[in] pImageData - ImageData instance.
 * @param[in] nPNGDataBufferSize - Number of elements in buffer
@@ -227,7 +273,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_encodepng(LibMCEnv_ImageData
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_getencodedpngdata(LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
 
 /**
-* Releases encoded data stream of image object.
+* Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
 *
 * @param[in] pImageData - ImageData instance.
 * @return error code or 0 (success)
@@ -275,7 +321,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_setpixel(LibMCEnv_ImageData 
 * @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
 * @param[in] nValueBufferSize - Number of elements in buffer
 * @param[out] pValueNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pValueBuffer - uint8  buffer of Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+* @param[out] pValueBuffer - uint8  buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_getpixelrange(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer);
@@ -293,6 +339,266 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_getpixelrange(LibMCEnv_Image
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_setpixelrange(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
+
+/*************************************************************************************************************************
+ Class definition for DiscreteFieldData2DStoreOptions
+**************************************************************************************************************************/
+
+/**
+* Resets Options to default.
+*
+* @param[in] pDiscreteFieldData2DStoreOptions - DiscreteFieldData2DStoreOptions instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2dstoreoptions_resettodefaults(LibMCEnv_DiscreteFieldData2DStoreOptions pDiscreteFieldData2DStoreOptions);
+
+/*************************************************************************************************************************
+ Class definition for DiscreteFieldData2D
+**************************************************************************************************************************/
+
+/**
+* Returns DPI values in X and Y.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pDPIValueX - DPI value in X
+* @param[out] pDPIValueY - DPI value in Y
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_getdpi(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pDPIValueX, LibMCEnv_double * pDPIValueY);
+
+/**
+* Sets DPI values in X and Y.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dDPIValueX - new DPI value in X. MUST be positive.
+* @param[in] dDPIValueY - new DPI value in Y. MUST be positive.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_setdpi(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY);
+
+/**
+* Returns field origin in mm.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pOriginX - Origin in X in mm
+* @param[out] pOriginY - Origin in Y in mm
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_getorigininmm(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pOriginX, LibMCEnv_double * pOriginY);
+
+/**
+* Set field origin in mm.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dOriginX - Origin in X in mm
+* @param[in] dOriginY - Origin in Y in mm
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_setorigininmm(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY);
+
+/**
+* Returns field sizes in mm.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pSizeX - Size in X in mm
+* @param[out] pSizeY - Size in Y in mm
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_getsizeinmm(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double * pSizeX, LibMCEnv_double * pSizeY);
+
+/**
+* Returns field pixel sizes.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pPixelSizeX - Number of pixels in X
+* @param[out] pPixelSizeY - Number of pixels in Y
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_getsizeinpixels(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+
+/**
+* Resizes field pixel data.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nPixelSizeX - Number of pixels in X
+* @param[in] nPixelSizeY - Number of pixels in Y
+* @param[in] dDefaultValue - Default Pixel value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_resizefield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDefaultValue);
+
+/**
+* Sets all pixels to a single value.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dValue - Pixel value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_clear(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dValue);
+
+/**
+* Clamps all pixels to a certain interval.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dMinValue - Minimum value. MUST be smaller or equal than MaxValue.
+* @param[in] dMaxValue - Maximum value. MUST be larger or equal than MinValue.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_clamp(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue);
+
+/**
+* Returns one pixel of an field. Fails if outside of field size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nX - Pixel coordinate in X
+* @param[in] nY - Pixel coordinate in Y
+* @param[out] pValue - Pixel value at this position
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_getpixel(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_double * pValue);
+
+/**
+* Sets one pixel of an field. Fails if outside of field size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nX - Pixel coordinate in X
+* @param[in] nY - Pixel coordinate in Y
+* @param[in] dValue - New Pixel value at this position
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_setpixel(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_double dValue);
+
+/**
+* Returns a subset of an field or the whole field data.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[out] pValueNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValueBuffer - double  buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_getpixelrange(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_double * pValueBuffer);
+
+/**
+* Exchanges a subset of an field or the whole field data.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[in] pValueBuffer - double buffer of New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_setpixelrange(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_double * pValueBuffer);
+
+/**
+* Renders and array of average point values into the field. 
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dDefaultValue - If a pixel does not contain any value, fall back to this given value.
+* @param[in] eSamplingMode - Sampling mode of point values.
+* @param[in] dSampleSizeX - How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+* @param[in] dSampleSizeY - How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+* @param[in] nPointValuesBufferSize - Number of elements in buffer
+* @param[in] pPointValuesBuffer - FieldData2DPoint buffer of Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_renderaveragepointvalues(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dDefaultValue, LibMCEnv::eFieldSamplingMode eSamplingMode, LibMCEnv_double dSampleSizeX, LibMCEnv_double dSampleSizeY, LibMCEnv_uint64 nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint * pPointValuesBuffer);
+
+/**
+* Scales the field to a smaller size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nFactorX - The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX
+* @param[in] nFactorY - The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY
+* @param[out] pNewField - Scaled Field Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_scalefielddown(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nFactorX, LibMCEnv_uint32 nFactorY, LibMCEnv_DiscreteFieldData2D * pNewField);
+
+/**
+* Scales the field to a larger size.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nFactorX - The new field will be this factor larger in X. MUST be positive.
+* @param[in] nFactorY - The new field will be this factor larger in Y. MUST be positive.
+* @param[out] pNewField - Scaled Field Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_scalefieldup(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint32 nFactorX, LibMCEnv_uint32 nFactorY, LibMCEnv_DiscreteFieldData2D * pNewField);
+
+/**
+* Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+* @param[in] pDiscreteValuesBuffer - double buffer of An array of values. MUST NOT be empty.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_discretize(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer);
+
+/**
+* Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+* @param[in] pDiscreteValuesBuffer - double buffer of An array of values. MUST NOT be empty.  
+* @param[in] nNewValuesBufferSize - Number of elements in buffer
+* @param[in] pNewValuesBuffer - double buffer of An array of values. MUST have the same cardinality as DiscreteValues.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_discretizewithmapping(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer, LibMCEnv_uint64 nNewValuesBufferSize, const LibMCEnv_double * pNewValuesBuffer);
+
+/**
+* Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dMinValue - Min point value. Values smaller than MinValue will be clamped to MinValue.
+* @param[in] pMinColor - The color assigned to MinValue.
+* @param[in] dMidValue - Mid point value. MUST be at least 1E-6 larger than MinValue.
+* @param[in] pMidColor - The color assigned to MidValue
+* @param[in] dMaxValue - Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue.
+* @param[in] pMaxColor - The color assigned to MaxValue
+* @param[out] pNewImage - New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_rendertoimageraw(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dMinValue, const LibMCEnv::sColorRGB * pMinColor, LibMCEnv_double dMidValue, const LibMCEnv::sColorRGB * pMidColor, LibMCEnv_double dMaxValue, const LibMCEnv::sColorRGB * pMaxColor, LibMCEnv_ImageData * pNewImage);
+
+/**
+* Scales the field values with a factor and a translation.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] dScale - A scaling factor will be applied to all values in the field.
+* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_transformfield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_double dScale, LibMCEnv_double dOffset);
+
+/**
+* Adds another field to the field. Both fields MUST have the same pixel extensions.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[in] pOtherField - Field Instance to add
+* @param[in] dScale - A scaling factor will be applied to all values in the other field before adding.
+* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_addfield(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D pOtherField, LibMCEnv_double dScale, LibMCEnv_double dOffset);
+
+/**
+* Creates a copy of the field.
+*
+* @param[in] pDiscreteFieldData2D - DiscreteFieldData2D instance.
+* @param[out] pNewField - Scaled Field Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
  Class definition for ToolpathPart
@@ -384,6 +690,73 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentinfo(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmenttype(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType);
+
+/**
+* Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] nAttributeID - ID of the attribute.
+* @param[out] pValue - Attribute Value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentintegerattribute(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_int64 * pValue);
+
+/**
+* Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] nAttributeID - ID of the attribute.
+* @param[out] pValue - Attribute Value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentdoubleattribute(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_double * pValue);
+
+/**
+* Checks if a segment attribute is registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pValueExists - Flag if attribute is registered.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_hascustomsegmentattribute(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, bool * pValueExists);
+
+/**
+* Finds a segment attribute ID. Fails if attribute is not registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pAttributeID - ID of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributeid(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv_uint32 * pAttributeID);
+
+/**
+* Finds a segment attribute type. Fails if attribute is not registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pAttributeType - Type of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributetype(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv::eToolpathAttributeType * pAttributeType);
+
+/**
+* Finds a segment attribute ID and type. Fails if attribute is not registered.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the attribute.
+* @param[in] pAttributeName - Name of the attribute.
+* @param[out] pAttributeID - ID of the attribute.
+* @param[out] pAttributeType - Type of the attribute.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_findcustomsegmentattributeinfo(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pAttributeName, LibMCEnv_uint32 * pAttributeID, LibMCEnv::eToolpathAttributeType * pAttributeType);
 
 /**
 * Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
@@ -643,6 +1016,62 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getzvalueinmm(LibMCEnv_T
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getunits(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pUnits);
 
+/**
+* Retrieves the number of metadata nodes in the build file.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pMetaDataCount - Meta Data information.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getmetadatacount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 * pMetaDataCount);
+
+/**
+* Returns the namespace and identifier of the given metadata index.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[in] nNamespaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespaceBuffer -  buffer of Namespace of the metadata, may be NULL
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the metadata, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getmetadatainfo(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nMetaDataIndex, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the metadata XML content of the given metadata index.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getmetadatacontent(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nMetaDataIndex, LibMCEnv_XMLDocumentNode * pXMLNode);
+
+/**
+* Checks if a metadata exists in the build file.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pMetaDataExists - Returns true if metadata exists and is unique.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_hasuniquemetadata(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, bool * pMetaDataExists);
+
+/**
+* Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_finduniquemetadata(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
+
 /*************************************************************************************************************************
  Class definition for ToolpathAccessor
 **************************************************************************************************************************/
@@ -659,6 +1088,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getunits(LibMCEnv_Toolpa
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getstorageuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nStorageUUIDBufferSize, LibMCEnv_uint32* pStorageUUIDNeededChars, char * pStorageUUIDBuffer);
 
 /**
+* Returns UUID of the toolpath's build file.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of Returns build uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuilduuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
 * Returns layer count.
 *
 * @param[in] pToolpathAccessor - ToolpathAccessor instance.
@@ -666,6 +1106,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getstorageuuid(LibMCE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getlayercount(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pLayerCount);
+
+/**
+* Registers a new custom segment attribute to be read.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of the custom attribute.
+* @param[in] pAttributeName - Name of the custom attribute.
+* @param[in] eAttributeType - Attribute Type.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_registercustomsegmentattribute(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pAttributeName, LibMCEnv::eToolpathAttributeType eAttributeType);
 
 /**
 * Reads and returns a layer object.
@@ -685,43 +1136,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_loadlayer(LibMCEnv_To
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pUnits);
-
-/**
-* Checks if a metadata value exists for this toolpath model.
-*
-* @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pNameSpace - Namespace of metadata.
-* @param[in] pName - Name of metadata.
-* @param[out] pExists - Returns if metadata exists.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasmetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, bool * pExists);
-
-/**
-* Returns the value of a metadata for this toolpath model.
-*
-* @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pNameSpace - Namespace of metadata.
-* @param[in] pName - Name of metadata.
-* @param[in] nMetaDataValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pMetaDataValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pMetaDataValueBuffer -  buffer of Returns the value, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatavalue(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataValueBufferSize, LibMCEnv_uint32* pMetaDataValueNeededChars, char * pMetaDataValueBuffer);
-
-/**
-* Returns the type of a metadata for this toolpath model.
-*
-* @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pNameSpace - Namespace of metadata.
-* @param[in] pName - Name of metadata.
-* @param[in] nMetaDataTypeBufferSize - size of the buffer (including trailing 0)
-* @param[out] pMetaDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pMetaDataTypeBuffer -  buffer of Returns the type, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatatype(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataTypeBufferSize, LibMCEnv_uint32* pMetaDataTypeNeededChars, char * pMetaDataTypeBuffer);
 
 /**
 * Retrieves the number of parts in the toolpath.
@@ -789,6 +1203,62 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuildheightinmm(Li
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinmm(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue);
+
+/**
+* Retrieves the number of metadata nodes in the build file.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pMetaDataCount - Meta Data information.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatacount(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pMetaDataCount);
+
+/**
+* Returns the namespace and identifier of the given metadata index.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[in] nNamespaceBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNamespaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNamespaceBuffer -  buffer of Namespace of the metadata, may be NULL
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the metadata, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatainfo(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nMetaDataIndex, const LibMCEnv_uint32 nNamespaceBufferSize, LibMCEnv_uint32* pNamespaceNeededChars, char * pNamespaceBuffer, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the metadata XML content of the given metadata index.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatacontent(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nMetaDataIndex, LibMCEnv_XMLDocumentNode * pXMLNode);
+
+/**
+* Checks if a metadata exists in the build file.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pMetaDataExists - Returns true if metadata exists and is unique.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasuniquemetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, bool * pMetaDataExists);
+
+/**
+* Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNamespace - Namespace of the metadata
+* @param[in] pName - Name of the metadata
+* @param[out] pXMLNode - XML Metadata Object
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_finduniquemetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
 
 /*************************************************************************************************************************
  Class definition for Build
@@ -904,7 +1374,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_
 * Adds binary data to store with the build.
 *
 * @param[in] pBuild - Build instance.
-* @param[in] pName - Name of the attache data block.
+* @param[in] pName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
 * @param[in] pMIMEType - Mime type of the data.
 * @param[in] nContentBufferSize - Number of elements in buffer
 * @param[in] pContentBuffer - uint8 buffer of Stream content to store
@@ -914,6 +1384,74 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pFieldDataInstance - Loaded field instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddiscretefield2dbyname(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pFieldDataInstance - Loaded field instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddiscretefield2dbyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pFieldDataInstance - Field instance to store.
+* @param[in] pStoreOptions - Field Data Store Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pImageDataInstance - Image data instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyname(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pImageDataInstance - Image data instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* Stores a discrete field in the build job. MIME Type will be image/png
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pImageDataInstance - Image data instance.
+* @param[in] pStoreOptions - PNG Store Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /*************************************************************************************************************************
  Class definition for WorkingFileExecution
@@ -1215,6 +1753,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getname(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
+* Checks if the value is a valid UUID string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[out] pIsValid - returns if the value is a valid UUID string.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_isvaliduuid(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, bool * pIsValid);
+
+/**
+* Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of returns the value of the attribute as normalized UUID string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getuuidvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
 * Checks if the value is a valid integer in the given range.
 *
 * @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
@@ -1271,12 +1829,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_isvalidbool(LibMC
 * Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
 *
 * @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
-* @param[in] dMinValue - Minimum allowed value
-* @param[in] dMaxValue - Maximum allowed value
 * @param[out] pValue - returns the value .
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, bool * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, bool * pValue);
 
 /**
 * Sets the value of the attribute as string.
@@ -1286,6 +1842,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_getboolvalue(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_setvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const char * pValue);
+
+/**
+* Sets the value of the attribute as UUID string.
+*
+* @param[in] pXMLDocumentAttribute - XMLDocumentAttribute instance.
+* @param[in] pValue - new value of the attribute. Fails if Value is not a UUID.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_setuuidvalue(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute, const char * pValue);
 
 /**
 * Sets the value of the attribute as integer.
@@ -1389,6 +1954,137 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasattribute(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findattribute(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentAttribute * pAttributeInstance);
+
+/**
+* Returns string value of an attribute. Fails if attribute does not exist.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributevalue(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributeintegervalue(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] dMinValue - Minimum allowed value
+* @param[in] dMaxValue - Maximum allowed value
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributedoublevalue(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+
+/**
+* Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributeboolvalue(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool * pValue);
+
+/**
+* Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributeuuidvalue(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns string value of an attribute. Returns default value if attribute does not exist.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] pDefaultValue - Default value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributevaluedef(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[in] nDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributeintegervaluedef(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] dMinValue - Minimum allowed value
+* @param[in] dMaxValue - Maximum allowed value
+* @param[in] dDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributedoublevaluedef(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+
+/**
+* Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] bDefaultValue - Default value.
+* @param[out] pValue - Attribute value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributeboolvaluedef(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bDefaultValue, bool * pValue);
+
+/**
+* Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+* @param[in] pName - Name of the attribute.
+* @param[in] pDefaultValue - Attribute value. MUST be a valid UUID
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Attribute value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getattributeuuidvaluedef(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Removes the attribute with a specific name. Does nothing if attribute does not exist.
@@ -2503,6 +3199,42 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createemptyimage(Lib
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
+/**
+* Creates an empty discrete field.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[in] dDefaultValue - Default value of the field.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_hasbuildjob(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
+* Returns a instance of a build object. Fails if build uuid does not exist.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildInstance - Build instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getbuildjob(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -2821,6 +3553,132 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setintegerresult(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setboolresult(LibMCEnv_SignalHandler pSignalHandler, const char * pName, bool bValue);
 
 /*************************************************************************************************************************
+ Class definition for UniformJournalSampling
+**************************************************************************************************************************/
+
+/**
+* returns the name of the recorded variable.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Path or name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getvariablename(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the number of samples in the interval.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[out] pNumberOfSamples - Number of samples in the sampling.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getnumberofsamples(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint32 * pNumberOfSamples);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[out] pStartTimeStampInMS - Start Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getstarttimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pStartTimeStampInMS);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[out] pEndTimeStampInMS - End Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getendtimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pEndTimeStampInMS);
+
+/**
+* Returns the timestamp and value of the given sample.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
+* @param[out] pTimeStamp - TimeStamp of the sample in ms.
+* @param[out] pValue - Value of the sample in ms.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getsample(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint32 nIndex, LibMCEnv_uint64 * pTimeStamp, LibMCEnv_double * pValue);
+
+/**
+* Returns all timestamps and values of the sampling.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nTimeStampsBufferSize - Number of elements in buffer
+* @param[out] pTimeStampsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTimeStampsBuffer - uint64  buffer of Array of TimeStamps in ms, in increasing order.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - double  buffer of Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getallsamples(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer);
+
+/*************************************************************************************************************************
+ Class definition for JournalVariable
+**************************************************************************************************************************/
+
+/**
+* returns the name of the recorded variable.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Path or name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getvariablename(LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[out] pRecordingStartInMS - Start Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getstarttimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMS);
+
+/**
+* Returns the beginning time stamp of the available data point.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[out] pRecordingEndInMS - End Timestamp of Recording in ms.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMS);
+
+/**
+* Calculates the average value over a time interval. Fails if no data is available in this time interval.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+* @param[out] pAverageValue - Average value of the variable.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, bool bClampInterval, LibMCEnv_double * pAverageValue);
+
+/**
+* Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
+* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+* @param[out] pJournalSampling - Returns an instance with the sampling results.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
+
+/*************************************************************************************************************************
  Class definition for StateEnvironment
 **************************************************************************************************************************/
 
@@ -2904,7 +3762,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getdriverlibrary(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createdriveraccess(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDriverName, LibMCEnv_pvoid * pDriverHandle);
 
 /**
-* Returns a instance of a build object.
+* Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasbuildjob(LibMCEnv_StateEnvironment pStateEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
+* Returns a instance of a build object. Fails if build uuid does not exist.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pBuildUUID - UUID of the build entity.
@@ -3171,6 +4039,22 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createemptyimage(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
+* Creates an empty discrete field.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[in] dDefaultValue - Default value of the field.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
 * Returns the global timer in milliseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -3219,6 +4103,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_parsexmlstring(LibMCE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_parsexmldata(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* Retrieves the history of a given variable in the system journal.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
+* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+* @param[out] pJournalVariable - Journal Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievejournalvariable(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
 
 /*************************************************************************************************************************
  Class definition for UIEnvironment
@@ -3306,15 +4201,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hidehint(LibMCEnv_UIEnvi
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_showmessagedlg(LibMCEnv_UIEnvironment pUIEnvironment, const char * pCaption, const char * pTitle, LibMCEnv::eMessageDialogType eDialogType, const char * pYesEvent, const char * pNoEvent, const char * pCancelEvent, const LibMCEnv_uint32 nDialogUUIDBufferSize, LibMCEnv_uint32* pDialogUUIDNeededChars, char * pDialogUUIDBuffer);
 
 /**
-* returns name of the UI control that triggered the event.
+* returns path of the UI control that triggered the event.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] nSenderNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pSenderNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pSenderNameBuffer -  buffer of Name of the sender element., may be NULL
+* @param[in] nSenderPathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSenderPathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSenderPathBuffer -  buffer of Path of the sender element., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderPathBufferSize, LibMCEnv_uint32* pSenderPathNeededChars, char * pSenderPathBuffer);
+
+/**
+* returns name of the page of the UI control that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nPageNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pPageNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pPageNameBuffer -  buffer of Page of the sender element., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsenderpage(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nPageNameBufferSize, LibMCEnv_uint32* pPageNameNeededChars, char * pPageNameBuffer);
 
 /**
 * returns uuid of the UI control that triggered the event.
@@ -3632,6 +4538,53 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmlstring(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmldata(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildExists - Returns true if build exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasbuildjob(LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, bool * pBuildExists);
+
+/**
+* Returns a instance of a build object. Fails if build uuid does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildInstance - Build instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
+
+/**
+* Creates an empty discrete field.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[in] dDefaultValue - Default value of the field.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Retrieves the history of a given variable in the system journal.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
+* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+* @param[out] pJournalVariable - Journal Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrievejournalvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
 
 /*************************************************************************************************************************
  Global functions

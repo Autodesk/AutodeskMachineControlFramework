@@ -40,6 +40,7 @@ Abstract: This is the class declaration of CUIEnvironment
 #include "amc_statemachinedata.hpp"
 #include "amc_statesignalhandler.hpp"
 #include "amc_ui_clientaction.hpp"
+#include "amc_systemstate.hpp"
 
 #include <vector>
 
@@ -72,11 +73,18 @@ private:
 	AMC::PStateMachineData m_pStateMachineData;
 	AMC::PParameterHandler m_pClientVariableHandler;
 	AMC::PStateSignalHandler m_pSignalHandler;
+	AMC::PToolpathHandler m_pToolpathHandler;
+	AMC::PStateJournal m_pStateJournal;
 	AMC::CUIHandler * m_pUIHandler;
+
+	LibMCData::PStorage m_pStorage;
+	LibMCData::PBuildJobHandler m_pBuildJobHandler;
+
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
 	std::string m_sTestEnvironmentPath;
+	std::string m_sSystemUserID;
 
 	AMCCommon::CChrono m_Chrono;
 
@@ -86,7 +94,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string & sTestEnvironmentPath);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID);
 
 	virtual ~CUIEnvironment();
 
@@ -97,6 +105,8 @@ public:
 	void ActivatePage(const std::string& sPageName) override;
 
 	std::string RetrieveEventSender() override;
+
+	std::string RetrieveEventSenderPage() override;
 
 	std::string RetrieveEventSenderUUID() override;
 
@@ -167,6 +177,13 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
+	bool HasBuildJob(const std::string& sBuildUUID) override;
+
+	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
+
+	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
+
+	IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
 
 };
 

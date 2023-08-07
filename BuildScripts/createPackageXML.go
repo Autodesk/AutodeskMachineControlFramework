@@ -49,6 +49,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_demo\" import=\"%s_plugin_demo.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_scanner\" import=\"%s_plugin_scanner.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_mechanics\" import=\"%s_plugin_mechanics.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_plc\" import=\"%s_plugin_plc.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_buildprocess\" import=\"%s_plugin_buildprocess.%s\" />\n", gitHash, dllExtension);

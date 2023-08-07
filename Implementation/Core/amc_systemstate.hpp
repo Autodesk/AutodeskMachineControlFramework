@@ -68,6 +68,7 @@ namespace AMC {
 	class CDriverHandler;
 	class CToolpathHandler;
 	class CServiceHandler;
+	class CStateJournal;
 	class CUIHandler;
 	class CParameterHandler;
 	class CStateMachineData;
@@ -78,6 +79,7 @@ namespace AMC {
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
+	typedef std::shared_ptr<CStateJournal> PStateJournal;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
 	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
 
@@ -89,6 +91,7 @@ namespace AMC {
 		AMC::PToolpathHandler m_pToolpathHandler;
 		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
+		AMC::PStateJournal m_pStateJournal;
 		AMC::PStateMachineData m_pStateMachineData;
 
 		AMCCommon::PChrono m_pGlobalChrono;
@@ -107,7 +110,7 @@ namespace AMC {
 
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, const std::string & sTestEnvironmentPath);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath);
 
 		virtual ~CSystemState();
 
@@ -130,7 +133,9 @@ namespace AMC {
 		PDriverHandler getDriverHandlerInstance();
 		PToolpathHandler getToolpathHandlerInstance();
 		PStateMachineData getStateMachineData ();
+		PStateJournal getStateJournalInstance();
 
+		LibMCData::PStorage getStorageInstance();
 		LibMCData::PLoginHandler getLoginHandlerInstance();
 		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
 		LibMCData::PPersistencyHandler getPersistencyHandler();

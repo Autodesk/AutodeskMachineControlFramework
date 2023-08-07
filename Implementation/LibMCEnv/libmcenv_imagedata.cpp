@@ -39,6 +39,8 @@ Abstract: This is a stub class definition of CImageData
 
 using namespace LibMCEnv::Impl;
 
+#define IMAGEDATA_MAXPIXELCOUNT (1024ULL * 1024ULL * 32ULL)
+
 /*************************************************************************************************************************
  Class definition of CImageData 
 **************************************************************************************************************************/
@@ -61,11 +63,11 @@ CImageData* CImageData::createEmpty(const uint32_t nPixelCountX, const uint32_t 
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
 	}
 
-	return new CImageData(pixelBuffer.release(), nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, pixelFormat);
+	return new CImageData(pixelBuffer.release(), nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, pixelFormat, true);
 
 }
 
-CImageData::CImageData(std::vector<uint8_t>* pPixelData, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat)
+CImageData::CImageData(std::vector<uint8_t>* pPixelData, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat, bool bDoClear)
 	: m_PixelFormat (pixelFormat), m_nPixelCountX(nPixelCountX), m_nPixelCountY(nPixelCountY), m_dDPIValueX(dDPIValueX), m_dDPIValueY(dDPIValueY), m_PixelData (pPixelData),
 	m_dPositionX(0.0), m_dPositionY(0.0)
 {
@@ -80,14 +82,34 @@ CImageData::CImageData(std::vector<uint8_t>* pPixelData, const uint32_t nPixelCo
 	if (dDPIValueY <= 0.0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDPIVALUE);
 
-	
-	//m_PixelData->resize();
 
 	switch (pixelFormat) {
-		case eImagePixelFormat::GreyScale8bit: Clear(128); break;
-		case eImagePixelFormat::RGBA32bit: Clear(0xffffffffUL); break;
-		case eImagePixelFormat::RGB24bit: Clear(0xffffffUL); break;
-		default: Clear(0);
+		case eImagePixelFormat::GreyScale8bit: 
+			if (m_PixelData->size () != (size_t)nPixelCountX * (size_t)nPixelCountY)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE);
+
+			if (bDoClear)
+				Clear(128); 
+			break;
+
+		case eImagePixelFormat::RGBA32bit: 
+			if (m_PixelData->size() != (size_t)nPixelCountX * (size_t)nPixelCountY * 4)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE);
+			if (bDoClear)
+				Clear(0xffffffffUL);
+			break;
+
+		case eImagePixelFormat::RGB24bit: 
+			if (m_PixelData->size() != (size_t)nPixelCountX * (size_t)nPixelCountY * 3)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE);
+
+			if (bDoClear)
+				Clear(0x00ffffffUL);
+			break;
+
+		default: 
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
 	}
 	
 }
@@ -105,6 +127,9 @@ LibMCEnv::eImagePixelFormat CImageData::GetPixelFormat()
 
 void CImageData::ChangePixelFormat(const LibMCEnv::eImagePixelFormat ePixelFormat)
 {
+	if (ePixelFormat == m_PixelFormat)
+		return;
+
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
@@ -144,7 +169,13 @@ void CImageData::ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nP
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-void CImageData::LoadPNG(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer)
+IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+
+void CImageData::LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer) 
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
@@ -155,8 +186,24 @@ void CImageData::EncodePNG()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
 
 	m_EncodedPNGData.clear();
+	unsigned int error = 0;
 
-	unsigned int error = lodepng::encode(m_EncodedPNGData, *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
+	switch (m_PixelFormat) {
+		case eImagePixelFormat::GreyScale8bit:
+			error = lodepng::encode(m_EncodedPNGData, *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
+			break;
+		case eImagePixelFormat::RGB24bit:
+			error = lodepng::encode(m_EncodedPNGData, *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGB, 8);
+			break;
+		case eImagePixelFormat::RGBA32bit:
+			error = lodepng::encode(m_EncodedPNGData, *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGBA, 8);
+			break;
+
+		default:
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
+
 
 	if (error)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE);
@@ -202,8 +249,50 @@ void CImageData::Clear(const LibMCEnv_uint32 nValue)
 	if (m_PixelData.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
 
-	for (auto iter = m_PixelData->begin(); iter != m_PixelData->end(); iter++)
-		*iter = nValue;
+	switch (m_PixelFormat) {
+		case eImagePixelFormat::GreyScale8bit: {
+			if (nValue > 0x000000ff)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE);
+
+			for (auto iter = m_PixelData->begin(); iter != m_PixelData->end();) {
+				*iter = nValue;
+				iter++;
+			}
+
+			break;
+		}
+
+		case eImagePixelFormat::RGBA32bit: {
+			uint8_t nRed = (nValue & 0xff);
+			uint8_t nGreen = ((nValue >> 8) & 0xff);
+			uint8_t nBlue = ((nValue >> 16) & 0xff);
+			uint8_t nAlpha = ((nValue >> 24) & 0xff);
+
+			for (auto iter = m_PixelData->begin(); iter != m_PixelData->end();) {
+				*iter = nRed; iter++;
+				*iter = nGreen; iter++;
+				*iter = nBlue; iter++;
+				*iter = nAlpha; iter++;
+			}
+			break;
+		}
+
+		case eImagePixelFormat::RGB24bit: {
+			uint8_t nRed = (nValue & 0xff);
+			uint8_t nGreen = ((nValue >> 8) & 0xff);
+			uint8_t nBlue = ((nValue >> 16) & 0xff);
+
+			for (auto iter = m_PixelData->begin(); iter != m_PixelData->end();) {
+				*iter = nRed; iter++;
+				*iter = nGreen; iter++;
+				*iter = nBlue; iter++;
+			}
+			break;
+		}
+
+	}
+
+
 
 }
 
@@ -218,13 +307,43 @@ LibMCEnv_uint32 CImageData::GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_ui
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
 
 	size_t nAddress = (size_t)nX + (size_t)nY * (size_t)m_nPixelCountX;
-	return m_PixelData->at(nAddress);
+
+	switch (m_PixelFormat) {
+
+	case eImagePixelFormat::GreyScale8bit: {
+		return m_PixelData->at(nAddress);
+		break;
+	}
+
+	case eImagePixelFormat::RGB24bit: {
+		uint32_t nRed = m_PixelData->at(nAddress * 3);
+		uint32_t nGreen = m_PixelData->at(nAddress * 3 + 1);
+		uint32_t nBlue = m_PixelData->at(nAddress * 3 + 2);
+		return (nRed | (nGreen << 8) | (nBlue << 16));
+		break;
+	}
+
+	case eImagePixelFormat::RGBA32bit: {
+		uint32_t nRed = m_PixelData->at(nAddress * 4);
+		uint32_t nGreen = m_PixelData->at(nAddress * 4 + 1);
+		uint32_t nBlue = m_PixelData->at(nAddress * 4 + 2);
+		uint32_t nAlpha = m_PixelData->at(nAddress * 4 + 3);
+		return (nRed | (nGreen << 8) | (nBlue << 16) | (nAlpha << 24));
+		break;
+	}
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
+
+	
 }
 
 void CImageData::SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue)
 {
 	if (m_PixelData.get() == nullptr)
-		return;
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
 
 	if (nX >= m_nPixelCountX)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
@@ -232,7 +351,38 @@ void CImageData::SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, co
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
 
 	size_t nAddress = (size_t)nX + (size_t)nY * (size_t)m_nPixelCountX;
-	m_PixelData->at(nAddress) = nValue;
+
+	switch (m_PixelFormat) {
+	case eImagePixelFormat::GreyScale8bit: {
+		m_PixelData->at(nAddress) = nValue;
+		break;
+	}
+	case eImagePixelFormat::RGB24bit: {
+		uint32_t nRed = nValue & 0xff;
+		uint32_t nGreen = (nValue >> 8) & 0xff;
+		uint32_t nBlue = (nValue >> 16) & 0xff;
+		m_PixelData->at(nAddress * 3) = nRed;
+		m_PixelData->at(nAddress * 3 + 1) = nGreen;
+		m_PixelData->at(nAddress * 3 + 2) = nBlue;
+		break;
+	}
+	case eImagePixelFormat::RGBA32bit: {
+		uint32_t nRed = nValue & 0xff;
+		uint32_t nGreen = (nValue >> 8) & 0xff;
+		uint32_t nBlue = (nValue >> 16) & 0xff;
+		uint32_t nAlpha = (nValue >> 24) & 0xff;
+		m_PixelData->at(nAddress * 4) = nRed;
+		m_PixelData->at(nAddress * 4 + 1) = nGreen;
+		m_PixelData->at(nAddress * 4 + 2) = nBlue;
+		m_PixelData->at(nAddress * 4 + 3) = nAlpha;
+		break;
+	}
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
+	
 }
 
 void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer)
@@ -280,6 +430,24 @@ void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 	}
 }
 
+size_t CImageData::getBytesPerPixel()
+{
+	switch (m_PixelFormat) {
+	case eImagePixelFormat::GreyScale8bit:
+		return 1;
+	case eImagePixelFormat::RGB24bit: 
+		return 3;
+	case eImagePixelFormat::RGBA32bit: 
+		return 4;
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
+
+}
+
+
 void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer)
 {
 	if (m_PixelData.get() == nullptr)
@@ -299,10 +467,12 @@ void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATERANGE);
 	if (nYMin > nYMax)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATERANGE);
+	
+	size_t nSizeFactor = getBytesPerPixel ();
 
 	uint32_t nSizeX = nXMax - nXMin;
 	uint32_t nSizeY = nYMax - nYMin;
-	size_t nNeededSize = (size_t)nSizeX * (size_t)nSizeY;
+	size_t nNeededSize = (size_t)nSizeX * (size_t)nSizeY * nSizeFactor;
 	if (nValueBufferSize != nNeededSize)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELDATACOUNT);
 
@@ -310,9 +480,11 @@ void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 
 	const uint8_t* pSrcData = pValueBuffer;
 	for (uint32_t nY = 0; nY < nSizeY; nY++) {
-		uint8_t* pTargetData = &pPixelData[((uint64_t)nY + (uint64_t)nYMin) * m_nPixelCountX + nXMin];
+		uint8_t* pTargetData = &pPixelData[(((uint64_t)nY + (uint64_t)nYMin) * m_nPixelCountX + nXMin) * nSizeFactor];
 
-		for (uint32_t nX = 0; nX < nSizeX; nX++) {
+		size_t nCopyCount = nSizeX * nSizeFactor;
+
+		for (uint32_t nX = 0; nX < nCopyCount; nX++) {
 			*pTargetData = *pSrcData;
 			pTargetData++;
 			pSrcData++;

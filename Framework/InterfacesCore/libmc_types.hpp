@@ -507,6 +507,23 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGCOMPONENTNAME 490 /** missing component name. */
 #define LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING 491 /** custom page property name missing. */
 #define LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING 492 /** custom page property type missing. */
+#define LIBMC_ERROR_EMTPYEVENTNAME 493 /** empty event name. */
+#define LIBMC_ERROR_INVALIDEVENTNAME 494 /** invalid event name. */
+#define LIBMC_ERROR_INVALIDEVENTPATH 495 /** invalid event path. */
+#define LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING 496 /** custom page event name missing. */
+#define LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME 497 /** invalid custom page event name. */
+#define LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME 498 /** duplicate custom page event name. */
+#define LIBMC_ERROR_INVALIDEVENTPARAMETERNAME 499 /** invalid event parameter name. */
+#define LIBMC_ERROR_INVALIDMETADATAINDEX 500 /** invalid metadata index. */
+#define LIBMC_ERROR_METADATAISNOTUNIQUE 501 /** metadata is not unique. */
+#define LIBMC_ERROR_METADATANOTFOUND 502 /** metadata not found. */
+#define LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING 503 /** Time stamp is not incrementing. */
+#define LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL 504 /** Invalid time stamp interval. */
+#define LIBMC_ERROR_TIMESTREAMISEMPTY 505 /** Time stream is empty. */
+#define LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE 506 /** Invalid toolpath attribute type. */
+#define LIBMC_ERROR_INVALIDSEGMENTINDEX 507 /** Invalid segment index. */
+#define LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID 508 /** Invalid toolpath attribute ID. */
+#define LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE 509 /** Ambiguous segment attribute type. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -926,6 +943,23 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGCOMPONENTNAME: return "missing component name.";
     case LIBMC_ERROR_CUSTOMPAGEPROPERTYNAMEMISSING: return "custom page property name missing.";
     case LIBMC_ERROR_CUSTOMPAGEPROPERTYTYPEMISSING: return "custom page property type missing.";
+    case LIBMC_ERROR_EMTPYEVENTNAME: return "empty event name.";
+    case LIBMC_ERROR_INVALIDEVENTNAME: return "invalid event name.";
+    case LIBMC_ERROR_INVALIDEVENTPATH: return "invalid event path.";
+    case LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING: return "custom page event name missing.";
+    case LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME: return "invalid custom page event name.";
+    case LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME: return "duplicate custom page event name.";
+    case LIBMC_ERROR_INVALIDEVENTPARAMETERNAME: return "invalid event parameter name.";
+    case LIBMC_ERROR_INVALIDMETADATAINDEX: return "invalid metadata index.";
+    case LIBMC_ERROR_METADATAISNOTUNIQUE: return "metadata is not unique.";
+    case LIBMC_ERROR_METADATANOTFOUND: return "metadata not found.";
+    case LIBMC_ERROR_TIMESTAMPISNOTINCREMENTING: return "Time stamp is not incrementing.";
+    case LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL: return "Invalid time stamp interval.";
+    case LIBMC_ERROR_TIMESTREAMISEMPTY: return "Time stream is empty.";
+    case LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE: return "Invalid toolpath attribute type.";
+    case LIBMC_ERROR_INVALIDSEGMENTINDEX: return "Invalid segment index.";
+    case LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID: return "Invalid toolpath attribute ID.";
+    case LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE: return "Ambiguous segment attribute type.";
     default: return "unknown error";
   }
 }

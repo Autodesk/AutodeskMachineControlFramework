@@ -76,13 +76,16 @@ protected:
 	AMC::PResourcePackage m_pDriverResourcePackage;
 	AMC::PResourcePackage m_pMachineResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	LibMCData::PBuildJobHandler m_pBuildJobHandler;
+	LibMCData::PStorage m_pStorage;
+	std::string m_sSystemUserID;
 	AMC::PLogger m_pLogger;
 
 	AMCCommon::CChrono m_Chrono;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string & sBaseTempPath, AMC::PLogger pLogger, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, std::string sSystemUserID, const std::string& sDriverName);
 
 	virtual ~CDriverEnvironment();
 
@@ -152,6 +155,11 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
+	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
+
+	bool HasBuildJob(const std::string& sBuildUUID) override;
+
+	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
 };
 

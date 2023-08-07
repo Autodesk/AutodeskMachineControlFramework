@@ -74,6 +74,23 @@ std::string CXMLDocumentAttribute::GetValue()
 	return m_pAttributeInstance->getValue();
 }
 
+
+bool CXMLDocumentAttribute::IsValidUUID()
+{
+	try {
+		AMCCommon::CUtils::normalizeUUIDString(m_pAttributeInstance->getValue());
+		return true;
+	}
+	catch (std::exception) {
+		return false;
+	}
+}
+
+std::string CXMLDocumentAttribute::GetUUIDValue()
+{
+	return AMCCommon::CUtils::normalizeUUIDString(m_pAttributeInstance->getValue());
+}
+
 bool CXMLDocumentAttribute::IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
 {
 	std::string sValue = m_pAttributeInstance->getValue();
@@ -143,7 +160,7 @@ bool CXMLDocumentAttribute::IsValidBool()
 	return IsValidInteger(INT64_MIN, INT64_MAX);
 }
 
-bool CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+bool CXMLDocumentAttribute::GetBoolValue()
 {
 	std::string sValue = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(m_pAttributeInstance->getValue()));
 	if (sValue == "true")
@@ -157,6 +174,11 @@ bool CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const 
 void CXMLDocumentAttribute::SetValue(const std::string & sValue)
 {
 	m_pAttributeInstance->setValue (sValue);
+}
+
+void CXMLDocumentAttribute::SetUUIDValue(const std::string& sValue)
+{
+	m_pAttributeInstance->setValue(AMCCommon::CUtils::normalizeUUIDString (sValue));
 }
 
 void CXMLDocumentAttribute::SetIntegerValue(const LibMCEnv_int64 nValue)

@@ -61,7 +61,17 @@ namespace AMC {
 	class CStateJournalImpl;
 	typedef std::shared_ptr<CStateJournalImpl> PStateJournalImpl;
 
-	
+
+	typedef struct _sJournalTimeStreamDoubleEntry {
+		uint64_t m_nTimeStamp;
+		double m_dValue;
+	} sJournalTimeStreamDoubleEntry;
+
+	typedef struct _sJournalTimeStreamInt64Entry {
+		uint64_t m_nTimeStamp;
+		int64_t m_nValue;
+	} sJournalTimeStreamInt64Entry;
+
 	class CStateJournal {		
 	protected:
 		PStateJournalImpl m_pImpl;
@@ -85,6 +95,10 @@ namespace AMC {
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
 		uint32_t registerState (const std::string& sName);
+
+		void readDoubleTimeStream (const std::string & sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, double & dStartValue, std::vector<sJournalTimeStreamDoubleEntry> & timeStream);
+
+		void retrieveRecentInterval(uint64_t nLastMilliseconds, uint64_t& nStartTimeStamp, uint64_t& nEndTimeStamp);
 
 	};
 

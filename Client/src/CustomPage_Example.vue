@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<div style="width:100%; height:100%; display:block;">
 		<div>
 			Test1234: {{ customProperties.values.dummycounter }}
+			
+			<v-btn v-on:click="clickedOnTest">Testbutton</v-btn>
 		</div>
 	
 		<Module_Content :module="uploadModule" :Application="Application" />
@@ -64,7 +66,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		}),
 		
 		methods: {
-					   
+			clickedOnTest () {
+			
+				this.CustomPage.callEvent ("onchangeatmosphereclicked", { "new_atmosphere_value": 12.0 });
+			
+			}
 		},
 		
 		

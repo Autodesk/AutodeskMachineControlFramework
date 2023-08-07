@@ -43,8 +43,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab_RTC6::CDriver_ScanLab_RTC6(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f), m_SimulationMode (false),
-    m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled)
+	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_SimulationMode (false)    
 {
 }
 
@@ -110,6 +109,8 @@ void CDriver_ScanLab_RTC6::Configure(const std::string& sConfigurationString)
     m_pDriverEnvironment->RegisterIntegerParameter("dll_version", "Scanlab DLL Version", 0);
     m_pDriverEnvironment->RegisterIntegerParameter("hex_version", "Scanlab HEX Version", 0);
     m_pDriverEnvironment->RegisterIntegerParameter("bios_version", "Scanlab BIOS Version", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("encoder_position_x", "Encoder Position X", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("encoder_position_y", "Encoder Position Y", 0);
 }
 
 std::string CDriver_ScanLab_RTC6::GetName()
@@ -156,11 +157,11 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
     if (m_SimulationMode) {
         m_pDriverEnvironment->SetIntegerParameter("rtc_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("card_type", 1);
-        m_pDriverEnvironment->SetIntegerParameter("dll_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("hex_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("bios_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("serialnumber", 123456);
 
+        updateDLLVersionParameter(1);
 
     } else {
 
@@ -192,10 +193,11 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
         m_pRTCContext->GetRTCVersion(nRTCVersion, nRTCType, nDLLVersion, nHEXVersion, nBIOSVersion);
         m_pDriverEnvironment->SetIntegerParameter("rtc_version", nRTCVersion);
         m_pDriverEnvironment->SetIntegerParameter("card_type", nRTCType);
-        m_pDriverEnvironment->SetIntegerParameter("dll_version", nDLLVersion);
         m_pDriverEnvironment->SetIntegerParameter("hex_version", nHEXVersion);
         m_pDriverEnvironment->SetIntegerParameter("bios_version", nBIOSVersion);
         m_pDriverEnvironment->SetIntegerParameter("serialnumber", m_pRTCContext->GetSerialNumber ());
+
+        updateDLLVersionParameter(nDLLVersion);
     }
 
 }
@@ -348,7 +350,7 @@ void CDriver_ScanLab_RTC6::ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserM
         if (((float)dMaxLaserPower < RTC6_MIN_MAXLASERPOWER) || ((float)dMaxLaserPower > RTC6_MAX_MAXLASERPOWER))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
 
-        m_fMaxLaserPowerInWatts = (float)dMaxLaserPower;
+        m_pOwnerData->setMaxLaserPower(dMaxLaserPower);
 
         m_pRTCContext->ConfigureLists(1 << 22, 1 << 22);
         m_pRTCContext->SetLaserMode(eLaserMode, eLaserPort);
@@ -391,8 +393,11 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
         if (nIntPolygonDelay < 0)
             nIntPolygonDelay = 0;
 
+        m_pRTCContext->SetStartList(1, 0);
         m_pRTCContext->SetLaserDelaysInMicroseconds(dLaserOnDelay, dLaserOffDelay);
         m_pRTCContext->SetDelays(nIntMarkDelay, nIntJumpDelay, nIntPolygonDelay);
+        m_pRTCContext->SetEndOfList();
+        m_pRTCContext->ExecuteList(1, 0);
 
 
     }
@@ -401,12 +406,12 @@ void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLas
 
 void CDriver_ScanLab_RTC6::SetOIERecordingMode(const LibMCDriver_ScanLab::eOIERecordingMode eRecordingMode)
 {
-    m_OIERecordingMode = eRecordingMode;
+    m_pOwnerData->setOIERecordingMode(eRecordingMode);
 }
 
 LibMCDriver_ScanLab::eOIERecordingMode CDriver_ScanLab_RTC6::GetOIERecordingMode()
 {
-    return m_OIERecordingMode;
+    return m_pOwnerData->getOIERecordingMode ();
 }
 
 
@@ -416,140 +421,18 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         if (m_pRTCContext.get() == nullptr)
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-        if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
+        if ((m_pOwnerData->getMaxLaserPower () < RTC6_MIN_MAXLASERPOWER) || (m_pOwnerData->getMaxLaserPower() > RTC6_MAX_MAXLASERPOWER))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
 
         m_pRTCContext->SetStartList(1, 0);
 
-        bool bEnableOIEMeasurementPerHatch = (m_OIERecordingMode == eOIERecordingMode::OIELaserActiveMeasurement) || (m_OIERecordingMode == eOIERecordingMode::OIEEnableAndLaserActiveMeasurement);
-
-        switch (m_OIERecordingMode) {
-        case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
-        case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
-            m_pRTCContext->EnableOIE();
-            break;
-        }
-
-        switch (m_OIERecordingMode) {
-        case eOIERecordingMode::OIEContinuousMeasurement:
-        case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
-            m_pRTCContext->StartOIEMeasurement();
-            break;
-        }
-  
-
         auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
         auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
-        double dUnits = pToolpathAccessor->GetUnits();
+        m_pRTCContext->AddLayerToList(pLayer, true);
 
-        uint32_t nSegmentCount = pLayer->GetSegmentCount();
-        for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
-
-            LibMCEnv::eToolpathSegmentType eSegmentType;
-            uint32_t nPointCount;
-            pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
-
-            if (nPointCount >= 2) {
-
-                float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
-                float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
-                float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
-                float fPowerInPercent = (fPowerInWatts * 100.f) / m_fMaxLaserPowerInWatts;
-                float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
-
-                int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
-
-                if (nSkywritingMode != 0) {
-                    double dSkywritingTimeLag = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "timelag");
-                    int64_t nSkywritingLaserOnShift = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "laseronshift");
-                    int64_t nSkywritingPrev = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "nprev");
-                    int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
-
-                    double dSkywritingLimit = 0.0;
-                    if (nSkywritingMode == 3) {
-                        dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
-                    }
-
-
-                    switch (nSkywritingMode) {
-                    case 1:
-                        m_pRTCContext->EnableSkyWritingMode1(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
-                        break;
-                    case 2:
-                        m_pRTCContext->EnableSkyWritingMode2(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost);
-                        break;
-                    case 3:
-                        m_pRTCContext->EnableSkyWritingMode3(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
-                        break;
-                    default:
-                        m_pRTCContext->DisableSkyWriting();
-                    }
-
-                }
-
-                std::vector<LibMCEnv::sPosition2D> Points;
-                pLayer->GetSegmentPointData(nSegmentIndex, Points);
-
-                if (nPointCount != Points.size())
-                    throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
-
-                switch (eSegmentType) {
-                case LibMCEnv::eToolpathSegmentType::Loop:
-                case LibMCEnv::eToolpathSegmentType::Polyline:
-                {
-
-                    std::vector<sPoint2D> ContourPoints;
-                    ContourPoints.resize(nPointCount);
-
-                    for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
-                        auto pContourPoint = &ContourPoints.at(nPointIndex);
-                        pContourPoint->m_X = (float)(Points[nPointIndex].m_Coordinates[0] * dUnits);
-                        pContourPoint->m_Y = (float)(Points[nPointIndex].m_Coordinates[1] * dUnits);
-                    }
-
-                    m_pRTCContext->DrawPolylineOIE(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
-
-                    break;
-                }
-
-                case LibMCEnv::eToolpathSegmentType::Hatch:
-                {
-                    if (nPointCount % 2 == 1)
-                        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
-
-                    uint64_t nHatchCount = nPointCount / 2;
-                    std::vector<sHatch2D> Hatches;
-                    Hatches.resize(nHatchCount);
-
-                    for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
-                        auto pHatch = &Hatches.at(nHatchIndex);
-                        pHatch->m_X1 = (float)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
-                        pHatch->m_Y1 = (float)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
-                        pHatch->m_X2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
-                        pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
-                    }
-
-                    m_pRTCContext->DrawHatchesOIE(Hatches.size(), Hatches.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus, bEnableOIEMeasurementPerHatch);
-
-                    break;
-                }
-
-                }
-
-            }
-
-        }
-
-
-        if ((m_OIERecordingMode != eOIERecordingMode::OIERecordingDisabled))
+        if ((m_pOwnerData->getOIERecordingMode() != eOIERecordingMode::OIERecordingDisabled))
             m_pRTCContext->StopOIEMeasurement();
-
-        switch (m_OIERecordingMode) {
-        case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
-        case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
-            m_pRTCContext->DisableOIE();
-        }
 
         m_pRTCContext->SetEndOfList();
 
@@ -602,8 +485,11 @@ void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession
         int32_t nPositionX, nPositionY, nPositionZ;
         int32_t nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ;
         int32_t nFocusShift, nMarkSpeed;
+        int32_t nEncoderPositionX, nEncoderPositionY;
 
         m_pRTCContext->GetStateValues(bLaserIsOn, nPositionX, nPositionY, nPositionZ, nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ, nFocusShift, nMarkSpeed);
+        m_pRTCContext->Get2DMarkOnTheFlyPosition(nEncoderPositionX, nEncoderPositionY);
+
         pDriverUpdateInstance->SetBoolParameter("laser_on", bLaserIsOn);
         pDriverUpdateInstance->SetIntegerParameter("position_x", nPositionX);
         pDriverUpdateInstance->SetIntegerParameter("position_y", nPositionY);
@@ -613,6 +499,8 @@ void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession
         pDriverUpdateInstance->SetIntegerParameter("position_z_corrected", nCorrectedPositionZ);
         pDriverUpdateInstance->SetIntegerParameter("focus_shift", nFocusShift);
         pDriverUpdateInstance->SetIntegerParameter("mark_speed", nMarkSpeed);
+        pDriverUpdateInstance->SetIntegerParameter("encoder_position_x", nEncoderPositionX);
+        pDriverUpdateInstance->SetIntegerParameter("encoder_position_y", nEncoderPositionY);
 
     }
 
@@ -646,6 +534,47 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
 }
 
 
+void CDriver_ScanLab_RTC6::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->EnableTimelagCompensation(nTimeLagXYInMicroseconds, nTimeLagZInMicroseconds);
+
+    }
+
+}
+
+void CDriver_ScanLab_RTC6::DisableTimelagCompensation()
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->DisableTimelagCompensation();
+
+    }
+
+}
+
+void CDriver_ScanLab_RTC6::EnableAttributeFilter(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue)
+{
+    m_pOwnerData->setAttributeFilters(sNameSpace, sAttributeName, nAttributeValue);
+
+}
+
+void CDriver_ScanLab_RTC6::DisableAttributeFilter()
+{
+    m_pOwnerData->setAttributeFilters("", "", 0);
+}
+
+
+void CDriver_ScanLab_RTC6::updateDLLVersionParameter(uint32_t nDLLVersionParameter)
+{
+    m_pDriverEnvironment->SetIntegerParameter("dll_version", nDLLVersionParameter);
+}
+
 
 PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(const std::string& sPresetName, bool bMustExist)
 {
@@ -660,6 +589,3 @@ PDriver_ScanLab_RTC6ConfigurationPreset CDriver_ScanLab_RTC6::findPresetByName(c
         return nullptr;
     }
 }
-
-
-

@@ -62,7 +62,11 @@ class CWrapper;
 class CBase;
 class CIterator;
 class CTestEnvironment;
+class CPNGImageStoreOptions;
+class CPNGImageData;
 class CImageData;
+class CDiscreteFieldData2DStoreOptions;
+class CDiscreteFieldData2D;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
@@ -84,6 +88,8 @@ class CDriverStatusUpdateSession;
 class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
+class CUniformJournalSampling;
+class CJournalVariable;
 class CStateEnvironment;
 class CUIEnvironment;
 
@@ -94,7 +100,11 @@ typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
 typedef CTestEnvironment CLibMCEnvTestEnvironment;
+typedef CPNGImageStoreOptions CLibMCEnvPNGImageStoreOptions;
+typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
+typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
+typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
@@ -116,6 +126,8 @@ typedef CDriverStatusUpdateSession CLibMCEnvDriverStatusUpdateSession;
 typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
+typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
+typedef CJournalVariable CLibMCEnvJournalVariable;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
 typedef CUIEnvironment CLibMCEnvUIEnvironment;
 
@@ -126,7 +138,11 @@ typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CTestEnvironment> PTestEnvironment;
+typedef std::shared_ptr<CPNGImageStoreOptions> PPNGImageStoreOptions;
+typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
+typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
+typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
@@ -148,6 +164,8 @@ typedef std::shared_ptr<CDriverStatusUpdateSession> PDriverStatusUpdateSession;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
+typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
+typedef std::shared_ptr<CJournalVariable> PJournalVariable;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
 typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 
@@ -158,7 +176,11 @@ typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
 typedef PTestEnvironment PLibMCEnvTestEnvironment;
+typedef PPNGImageStoreOptions PLibMCEnvPNGImageStoreOptions;
+typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
+typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
+typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
@@ -180,6 +202,8 @@ typedef PDriverStatusUpdateSession PLibMCEnvDriverStatusUpdateSession;
 typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
+typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
+typedef PJournalVariable PLibMCEnvJournalVariable;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
 typedef PUIEnvironment PLibMCEnvUIEnvironment;
 
@@ -355,6 +379,27 @@ public:
 			case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "INTEGERVALUEATTRIBUTEOUTOFRANGE";
 			case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "INVALIDDOUBLEVALUEATTRIBUTE";
 			case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "DOUBLEVALUEATTRIBUTEOUTOFRANGE";
+			case LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE: return "INVALIDDEFAULTIMAGEVALUE";
+			case LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE: return "INVALIDPIXELMEMORYSIZE";
+			case LIBMCENV_ERROR_INVALIDFIELDBUFFER: return "INVALIDFIELDBUFFER";
+			case LIBMCENV_ERROR_INTERNALFIELDSIZEERROR: return "INTERNALFIELDSIZEERROR";
+			case LIBMCENV_ERROR_INVALIDFIELDSIZE: return "INVALIDFIELDSIZE";
+			case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "INVALIDFIELDSCALINGFACTOR";
+			case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "SCALINGEXCEEDSMAXIMUMPIXELCOUNT";
+			case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "INTERNALSCALINGERROR";
+			case LIBMCENV_ERROR_INVALIDCOLORRANGE: return "INVALIDCOLORRANGE";
+			case LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME: return "EMPTYJOURNALVARIABLENAME";
+			case LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL: return "INVALIDJOURNALVARIABLEINTERVAL";
+			case LIBMCENV_ERROR_JOURNALVARIABLENOTFOUND: return "JOURNALVARIABLENOTFOUND";
+			case LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA: return "COMPUTATIONOUTSIDEOFJOURNALDATA";
+			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "INVALIDJOURNALCOMPUTEINTERVAL";
+			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "INVALIDJOURNALCOMPUTEDATA";
+			case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "INVALIDSEGMENTATTRIBUTETYPE";
+			case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "SEGMENTATTRIBUTENOTFOUND";
+			case LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE: return "UNSUPPORTEDFIELDSAMPLINGMODE";
+			case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "SAMPLEPOINTCOUNTEXCEEDSMAXIMUM";
+			case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "INVALIDCLAMPINTERVAL";
+			case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "COULDNOTRETRIEVEPNGSTREAM";
 		}
 		return "UNKNOWN";
 	}
@@ -457,6 +502,27 @@ public:
 			case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "Integer value attribute out of range.";
 			case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "Invalid double value attribute.";
 			case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "Double value attribute out of range.";
+			case LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE: return "Invalid default image value.";
+			case LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE: return "Invalid pixel memory size.";
+			case LIBMCENV_ERROR_INVALIDFIELDBUFFER: return "Invalid field buffer.";
+			case LIBMCENV_ERROR_INTERNALFIELDSIZEERROR: return "Internal field size error.";
+			case LIBMCENV_ERROR_INVALIDFIELDSIZE: return "Invalid field size.";
+			case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "Invalid field scaling factor.";
+			case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "Scaling exceeds maximum pixel count.";
+			case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "Internal scaling error.";
+			case LIBMCENV_ERROR_INVALIDCOLORRANGE: return "Invalid color range.";
+			case LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name.";
+			case LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL: return "Invalid journal variable interval.";
+			case LIBMCENV_ERROR_JOURNALVARIABLENOTFOUND: return "Journal variable not found.";
+			case LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA: return "Computation outside of journal data.";
+			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid Journal compute interval.";
+			case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
+			case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "Invalid Segment Attribute Type.";
+			case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "Segment Attribute not Found.";
+			case LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE: return "Unsupported field sampling mode.";
+			case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
+			case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "Invalid clamp interval";
+			case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
 		}
 		return "unknown error";
 	}
@@ -576,7 +642,11 @@ private:
 	friend class CBase;
 	friend class CIterator;
 	friend class CTestEnvironment;
+	friend class CPNGImageStoreOptions;
+	friend class CPNGImageData;
 	friend class CImageData;
+	friend class CDiscreteFieldData2DStoreOptions;
+	friend class CDiscreteFieldData2D;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
@@ -598,6 +668,8 @@ private:
 	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
+	friend class CUniformJournalSampling;
+	friend class CJournalVariable;
 	friend class CStateEnvironment;
 	friend class CUIEnvironment;
 
@@ -699,6 +771,41 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CPNGImageStoreOptions 
+**************************************************************************************************************************/
+class CPNGImageStoreOptions : public CBase {
+public:
+	
+	/**
+	* CPNGImageStoreOptions::CPNGImageStoreOptions - Constructor for PNGImageStoreOptions class.
+	*/
+	CPNGImageStoreOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void ResetToDefaults();
+};
+	
+/*************************************************************************************************************************
+ Class CPNGImageData 
+**************************************************************************************************************************/
+class CPNGImageData : public CBase {
+public:
+	
+	/**
+	* CPNGImageData::CPNGImageData - Constructor for PNGImageData class.
+	*/
+	CPNGImageData(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CImageData 
 **************************************************************************************************************************/
 class CImageData : public CBase {
@@ -719,7 +826,8 @@ public:
 	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
-	inline void LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void LoadPNG(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline PPNGImageData CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions);
 	inline void EncodePNG();
 	inline void GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
 	inline void ClearEncodedPNGData();
@@ -728,6 +836,61 @@ public:
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
 	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer);
 	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CDiscreteFieldData2DStoreOptions 
+**************************************************************************************************************************/
+class CDiscreteFieldData2DStoreOptions : public CBase {
+public:
+	
+	/**
+	* CDiscreteFieldData2DStoreOptions::CDiscreteFieldData2DStoreOptions - Constructor for DiscreteFieldData2DStoreOptions class.
+	*/
+	CDiscreteFieldData2DStoreOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void ResetToDefaults();
+};
+	
+/*************************************************************************************************************************
+ Class CDiscreteFieldData2D 
+**************************************************************************************************************************/
+class CDiscreteFieldData2D : public CBase {
+public:
+	
+	/**
+	* CDiscreteFieldData2D::CDiscreteFieldData2D - Constructor for DiscreteFieldData2D class.
+	*/
+	CDiscreteFieldData2D(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY);
+	inline void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY);
+	inline void GetOriginInMM(LibMCEnv_double & dOriginX, LibMCEnv_double & dOriginY);
+	inline void SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
+	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void ResizeField(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue);
+	inline void Clear(const LibMCEnv_double dValue);
+	inline void Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline LibMCEnv_double GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
+	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue);
+	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_double> & ValueBuffer);
+	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_double> & ValueBuffer);
+	inline void RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const CInputVector<sFieldData2DPoint> & PointValuesBuffer);
+	inline PDiscreteFieldData2D ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY);
+	inline PDiscreteFieldData2D ScaleFieldUp(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY);
+	inline void Discretize(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer);
+	inline void DiscretizeWithMapping(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer, const CInputVector<LibMCEnv_double> & NewValuesBuffer);
+	inline PImageData RenderToImageRaw(const LibMCEnv_double dMinValue, const sColorRGB & MinColor, const LibMCEnv_double dMidValue, const sColorRGB & MidColor, const LibMCEnv_double dMaxValue, const sColorRGB & MaxColor);
+	inline void TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
+	inline void AddField(classParam<CDiscreteFieldData2D> pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
+	inline PDiscreteFieldData2D Duplicate();
 };
 	
 /*************************************************************************************************************************
@@ -768,6 +931,12 @@ public:
 	inline LibMCEnv_uint32 GetSegmentCount();
 	inline void GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount);
 	inline eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
+	inline LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
+	inline bool HasCustomSegmentAttribute(const std::string & sNamespace, const std::string & sAttributeName);
+	inline LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName);
+	inline eToolpathAttributeType FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName);
+	inline void FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, eToolpathAttributeType & eAttributeType);
 	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
 	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
@@ -790,6 +959,11 @@ public:
 	inline LibMCEnv_int32 GetZValue();
 	inline LibMCEnv_double GetZValueInMM();
 	inline LibMCEnv_double GetUnits();
+	inline LibMCEnv_uint32 GetMetaDataCount();
+	inline void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName);
+	inline PXMLDocumentNode GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex);
+	inline bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName);
+	inline PXMLDocumentNode FindUniqueMetaData(const std::string & sNamespace, const std::string & sName);
 };
 	
 /*************************************************************************************************************************
@@ -807,12 +981,11 @@ public:
 	}
 	
 	inline std::string GetStorageUUID();
+	inline std::string GetBuildUUID();
 	inline LibMCEnv_uint32 GetLayerCount();
+	inline void RegisterCustomSegmentAttribute(const std::string & sNameSpace, const std::string & sAttributeName, const eToolpathAttributeType eAttributeType);
 	inline PToolpathLayer LoadLayer(const LibMCEnv_uint32 nLayerIndex);
 	inline LibMCEnv_double GetUnits();
-	inline bool HasMetaData(const std::string & sNameSpace, const std::string & sName);
-	inline std::string GetMetaDataValue(const std::string & sNameSpace, const std::string & sName);
-	inline std::string GetMetaDataType(const std::string & sNameSpace, const std::string & sName);
 	inline LibMCEnv_uint32 GetPartCount();
 	inline PToolpathPart GetPart(const LibMCEnv_uint32 nPartIndex);
 	inline PToolpathPart FindPartByUUID(const std::string & sPartUUID);
@@ -820,6 +993,11 @@ public:
 	inline LibMCEnv_int32 GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex);
 	inline LibMCEnv_double GetBuildHeightInMM();
 	inline LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex);
+	inline LibMCEnv_uint32 GetMetaDataCount();
+	inline void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName);
+	inline PXMLDocumentNode GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex);
+	inline bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName);
+	inline PXMLDocumentNode FindUniqueMetaData(const std::string & sNamespace, const std::string & sName);
 };
 	
 /*************************************************************************************************************************
@@ -848,6 +1026,12 @@ public:
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
 	inline std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByName(const std::string & sName);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
+	inline std::string StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByName(const std::string & sName);
+	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
+	inline std::string StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 };
 	
 /*************************************************************************************************************************
@@ -956,13 +1140,16 @@ public:
 	inline std::string GetNameSpace();
 	inline std::string GetName();
 	inline std::string GetValue();
+	inline bool IsValidUUID();
+	inline std::string GetUUIDValue();
 	inline bool IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
 	inline LibMCEnv_int64 GetIntegerValue(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
 	inline bool IsValidDouble(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline LibMCEnv_double GetDoubleValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
 	inline bool IsValidBool();
-	inline bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool GetBoolValue();
 	inline void SetValue(const std::string & sValue);
+	inline void SetUUIDValue(const std::string & sValue);
 	inline void SetIntegerValue(const LibMCEnv_int64 nValue);
 	inline void SetDoubleValue(const LibMCEnv_double dValue);
 	inline void SetBoolValue(const bool bValue);
@@ -989,6 +1176,16 @@ public:
 	inline PXMLDocumentAttribute GetAttribute(const LibMCEnv_uint64 nIndex);
 	inline bool HasAttribute(const std::string & sNameSpace, const std::string & sName);
 	inline PXMLDocumentAttribute FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist);
+	inline std::string GetAttributeValue(const std::string & sNameSpace, const std::string & sName);
+	inline LibMCEnv_int64 GetAttributeIntegerValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
+	inline LibMCEnv_double GetAttributeDoubleValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool GetAttributeBoolValue(const std::string & sNameSpace, const std::string & sName);
+	inline std::string GetAttributeUUIDValue(const std::string & sNameSpace, const std::string & sName);
+	inline std::string GetAttributeValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue);
+	inline LibMCEnv_int64 GetAttributeIntegerValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue);
+	inline LibMCEnv_double GetAttributeDoubleValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue);
+	inline bool GetAttributeBoolValueDef(const std::string & sNameSpace, const std::string & sName, const bool bDefaultValue);
+	inline std::string GetAttributeUUIDValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue);
 	inline void RemoveAttribute(const std::string & sNameSpace, const std::string & sName);
 	inline void RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex);
 	inline void AddAttribute(const std::string & sNameSpace, const std::string & sName, const std::string & sValue);
@@ -1238,6 +1435,9 @@ public:
 	inline void LogInfo(const std::string & sLogString);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline bool HasBuildJob(const std::string & sBuildUUID);
+	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 };
 	
 /*************************************************************************************************************************
@@ -1303,6 +1503,49 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CUniformJournalSampling 
+**************************************************************************************************************************/
+class CUniformJournalSampling : public CBase {
+public:
+	
+	/**
+	* CUniformJournalSampling::CUniformJournalSampling - Constructor for UniformJournalSampling class.
+	*/
+	CUniformJournalSampling(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetVariableName();
+	inline LibMCEnv_uint32 GetNumberOfSamples();
+	inline LibMCEnv_uint64 GetStartTimeStamp();
+	inline LibMCEnv_uint64 GetEndTimeStamp();
+	inline void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue);
+	inline void GetAllSamples(std::vector<LibMCEnv_uint64> & TimeStampsBuffer, std::vector<LibMCEnv_double> & ValuesBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CJournalVariable 
+**************************************************************************************************************************/
+class CJournalVariable : public CBase {
+public:
+	
+	/**
+	* CJournalVariable::CJournalVariable - Constructor for JournalVariable class.
+	*/
+	CJournalVariable(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetVariableName();
+	inline LibMCEnv_uint64 GetStartTimeStamp();
+	inline LibMCEnv_uint64 GetEndTimeStamp();
+	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval);
+	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+};
+	
+/*************************************************************************************************************************
  Class CStateEnvironment 
 **************************************************************************************************************************/
 class CStateEnvironment : public CBase {
@@ -1323,6 +1566,7 @@ public:
 	inline PSignalHandler GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
+	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline void UnloadAllToolpathes();
 	inline void SetNextState(const std::string & sStateName);
@@ -1348,11 +1592,13 @@ public:
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
 };
 	
 /*************************************************************************************************************************
@@ -1378,6 +1624,7 @@ public:
 	inline void HideHint();
 	inline std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent);
 	inline std::string RetrieveEventSender();
+	inline std::string RetrieveEventSenderPage();
 	inline std::string RetrieveEventSenderUUID();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
@@ -1406,6 +1653,10 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline bool HasBuildJob(const std::string & sBuildUUID);
+	inline PBuild GetBuildJob(const std::string & sBuildUUID);
+	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
 };
 	
 	/**
@@ -1495,6 +1746,9 @@ public:
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
 		pWrapperTable->m_TestEnvironment_WriteTestOutput = nullptr;
+		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = nullptr;
+		pWrapperTable->m_PNGImageData_GetSizeInPixels = nullptr;
+		pWrapperTable->m_PNGImageData_GetPNGDataStream = nullptr;
 		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
 		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
 		pWrapperTable->m_ImageData_GetDPI = nullptr;
@@ -1503,6 +1757,7 @@ public:
 		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_ImageData_ResizeImage = nullptr;
 		pWrapperTable->m_ImageData_LoadPNG = nullptr;
+		pWrapperTable->m_ImageData_CreatePNGImage = nullptr;
 		pWrapperTable->m_ImageData_EncodePNG = nullptr;
 		pWrapperTable->m_ImageData_GetEncodedPNGData = nullptr;
 		pWrapperTable->m_ImageData_ClearEncodedPNGData = nullptr;
@@ -1511,6 +1766,29 @@ public:
 		pWrapperTable->m_ImageData_SetPixel = nullptr;
 		pWrapperTable->m_ImageData_GetPixelRange = nullptr;
 		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
+		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetDPI = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetDPI = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_ResizeField = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Clear = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Clamp = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetPixel = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetPixel = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_GetPixelRange = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_SetPixelRange = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Discretize = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_TransformField = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_AddField = nullptr;
+		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
@@ -1519,6 +1797,12 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentType = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = nullptr;
+		pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = nullptr;
@@ -1541,13 +1825,17 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValueInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetMetaDataCount = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetMetaDataInfo = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetMetaDataContent = nullptr;
+		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = nullptr;
+		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
+		pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute = nullptr;
 		pWrapperTable->m_ToolpathAccessor_LoadLayer = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetUnits = nullptr;
-		pWrapperTable->m_ToolpathAccessor_HasMetaData = nullptr;
-		pWrapperTable->m_ToolpathAccessor_GetMetaDataValue = nullptr;
-		pWrapperTable->m_ToolpathAccessor_GetMetaDataType = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetPartCount = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetPart = nullptr;
 		pWrapperTable->m_ToolpathAccessor_FindPartByUUID = nullptr;
@@ -1555,6 +1843,11 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetZValueInUnits = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetZValueInMM = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataCount = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataInfo = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataContent = nullptr;
+		pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData = nullptr;
+		pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
@@ -1567,6 +1860,12 @@ public:
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
+		pWrapperTable->m_Build_LoadDiscreteField2DByName = nullptr;
+		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = nullptr;
+		pWrapperTable->m_Build_StoreDiscreteField2D = nullptr;
+		pWrapperTable->m_Build_LoadPNGImageByName = nullptr;
+		pWrapperTable->m_Build_LoadPNGImageByUUID = nullptr;
+		pWrapperTable->m_Build_StorePNGImage = nullptr;
 		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
 		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = nullptr;
 		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = nullptr;
@@ -1595,6 +1894,8 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_GetNameSpace = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetName = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_IsValidUUID = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetIntegerValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_IsValidDouble = nullptr;
@@ -1602,6 +1903,7 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_IsValidBool = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_GetBoolValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetValue = nullptr;
+		pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetBoolValue = nullptr;
@@ -1612,6 +1914,16 @@ public:
 		pWrapperTable->m_XMLDocumentNode_GetAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_HasAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_FindAttribute = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveAttributeByIndex = nullptr;
 		pWrapperTable->m_XMLDocumentNode_AddAttribute = nullptr;
@@ -1717,6 +2029,9 @@ public:
 		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -1747,6 +2062,17 @@ public:
 		pWrapperTable->m_SignalHandler_SetDoubleResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetIntegerResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetBoolResult = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetVariableName = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetSample = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetAllSamples = nullptr;
+		pWrapperTable->m_JournalVariable_GetVariableName = nullptr;
+		pWrapperTable->m_JournalVariable_GetStartTimeStamp = nullptr;
+		pWrapperTable->m_JournalVariable_GetEndTimeStamp = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeAverage = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = nullptr;
 		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
@@ -1754,6 +2080,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
+		pWrapperTable->m_StateEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_StateEnvironment_UnloadAllToolpathes = nullptr;
 		pWrapperTable->m_StateEnvironment_SetNextState = nullptr;
@@ -1779,11 +2106,13 @@ public:
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -1793,6 +2122,7 @@ public:
 		pWrapperTable->m_UIEnvironment_HideHint = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowMessageDlg = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
@@ -1821,6 +2151,10 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_UIEnvironment_HasBuildJob = nullptr;
+		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_UIEnvironment_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1931,6 +2265,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = (PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_pngimagestoreoptions_resettodefaults");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = (PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) dlsym(hLibrary, "libmcenv_pngimagestoreoptions_resettodefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageData_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PNGImageData_GetPNGDataStream = (PLibMCEnvPNGImageData_GetPNGDataStreamPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_getpngdatastream");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageData_GetPNGDataStream = (PLibMCEnvPNGImageData_GetPNGDataStreamPtr) dlsym(hLibrary, "libmcenv_pngimagedata_getpngdatastream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixelformat");
 		#else // _WIN32
 		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixelformat");
@@ -2000,6 +2361,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_LoadPNG == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createpngimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) dlsym(hLibrary, "libmcenv_imagedata_createpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_CreatePNGImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2075,6 +2445,213 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = (PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2dstoreoptions_resettodefaults");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = (PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr) dlsym(hLibrary, "libmcenv_discretefielddata2dstoreoptions_resettodefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetDPI = (PLibMCEnvDiscreteFieldData2D_GetDPIPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getdpi");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetDPI = (PLibMCEnvDiscreteFieldData2D_GetDPIPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetDPI = (PLibMCEnvDiscreteFieldData2D_SetDPIPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setdpi");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetDPI = (PLibMCEnvDiscreteFieldData2D_SetDPIPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM = (PLibMCEnvDiscreteFieldData2D_GetOriginInMMPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getorigininmm");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM = (PLibMCEnvDiscreteFieldData2D_GetOriginInMMPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getorigininmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM = (PLibMCEnvDiscreteFieldData2D_SetOriginInMMPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setorigininmm");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM = (PLibMCEnvDiscreteFieldData2D_SetOriginInMMPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setorigininmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM = (PLibMCEnvDiscreteFieldData2D_GetSizeInMMPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getsizeinmm");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM = (PLibMCEnvDiscreteFieldData2D_GetSizeInMMPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getsizeinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels = (PLibMCEnvDiscreteFieldData2D_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels = (PLibMCEnvDiscreteFieldData2D_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ResizeField = (PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_resizefield");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ResizeField = (PLibMCEnvDiscreteFieldData2D_ResizeFieldPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_resizefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_ResizeField == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clear = (PLibMCEnvDiscreteFieldData2D_ClearPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_clear");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clear = (PLibMCEnvDiscreteFieldData2D_ClearPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_clear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Clear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clamp = (PLibMCEnvDiscreteFieldData2D_ClampPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_clamp");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Clamp = (PLibMCEnvDiscreteFieldData2D_ClampPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_clamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Clamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixel = (PLibMCEnvDiscreteFieldData2D_GetPixelPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getpixel");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixel = (PLibMCEnvDiscreteFieldData2D_GetPixelPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixel = (PLibMCEnvDiscreteFieldData2D_SetPixelPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setpixel");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixel = (PLibMCEnvDiscreteFieldData2D_SetPixelPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixelRange = (PLibMCEnvDiscreteFieldData2D_GetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_getpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_GetPixelRange = (PLibMCEnvDiscreteFieldData2D_GetPixelRangePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_getpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_GetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixelRange = (PLibMCEnvDiscreteFieldData2D_SetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_setpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_SetPixelRange = (PLibMCEnvDiscreteFieldData2D_SetPixelRangePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_setpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_SetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues = (PLibMCEnvDiscreteFieldData2D_RenderAveragePointValuesPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_renderaveragepointvalues");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues = (PLibMCEnvDiscreteFieldData2D_RenderAveragePointValuesPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_renderaveragepointvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown = (PLibMCEnvDiscreteFieldData2D_ScaleFieldDownPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_scalefielddown");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown = (PLibMCEnvDiscreteFieldData2D_ScaleFieldDownPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_scalefielddown");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp = (PLibMCEnvDiscreteFieldData2D_ScaleFieldUpPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_scalefieldup");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp = (PLibMCEnvDiscreteFieldData2D_ScaleFieldUpPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_scalefieldup");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Discretize = (PLibMCEnvDiscreteFieldData2D_DiscretizePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_discretize");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Discretize = (PLibMCEnvDiscreteFieldData2D_DiscretizePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_discretize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Discretize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping = (PLibMCEnvDiscreteFieldData2D_DiscretizeWithMappingPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_discretizewithmapping");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping = (PLibMCEnvDiscreteFieldData2D_DiscretizeWithMappingPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_discretizewithmapping");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw = (PLibMCEnvDiscreteFieldData2D_RenderToImageRawPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_rendertoimageraw");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw = (PLibMCEnvDiscreteFieldData2D_RenderToImageRawPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_rendertoimageraw");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_TransformField = (PLibMCEnvDiscreteFieldData2D_TransformFieldPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_transformfield");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_TransformField = (PLibMCEnvDiscreteFieldData2D_TransformFieldPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_transformfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_TransformField == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_AddField = (PLibMCEnvDiscreteFieldData2D_AddFieldPtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_addfield");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_AddField = (PLibMCEnvDiscreteFieldData2D_AddFieldPtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_addfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_AddField == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Duplicate = (PLibMCEnvDiscreteFieldData2D_DuplicatePtr) GetProcAddress(hLibrary, "libmcenv_discretefielddata2d_duplicate");
+		#else // _WIN32
+		pWrapperTable->m_DiscreteFieldData2D_Duplicate = (PLibMCEnvDiscreteFieldData2D_DuplicatePtr) dlsym(hLibrary, "libmcenv_discretefielddata2d_duplicate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathPart_GetName = (PLibMCEnvToolpathPart_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_getname");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathPart_GetName = (PLibMCEnvToolpathPart_GetNamePtr) dlsym(hLibrary, "libmcenv_toolpathpart_getname");
@@ -2144,6 +2721,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = (PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentintegerattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = (PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentintegerattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = (PLibMCEnvToolpathLayer_GetSegmentDoubleAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentdoubleattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = (PLibMCEnvToolpathLayer_GetSegmentDoubleAttributePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentdoubleattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute = (PLibMCEnvToolpathLayer_HasCustomSegmentAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_hascustomsegmentattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute = (PLibMCEnvToolpathLayer_HasCustomSegmentAttributePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_hascustomsegmentattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeIDPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeTypePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributetype");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeTypePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeInfoPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeinfo");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo = (PLibMCEnvToolpathLayer_FindCustomSegmentAttributeInfoPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_findcustomsegmentattributeinfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2345,6 +2976,51 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataCount = (PLibMCEnvToolpathLayer_GetMetaDataCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getmetadatacount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataCount = (PLibMCEnvToolpathLayer_GetMetaDataCountPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getmetadatacount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetMetaDataCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataInfo = (PLibMCEnvToolpathLayer_GetMetaDataInfoPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getmetadatainfo");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataInfo = (PLibMCEnvToolpathLayer_GetMetaDataInfoPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getmetadatainfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetMetaDataInfo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataContent = (PLibMCEnvToolpathLayer_GetMetaDataContentPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getmetadatacontent");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetMetaDataContent = (PLibMCEnvToolpathLayer_GetMetaDataContentPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getmetadatacontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetMetaDataContent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = (PLibMCEnvToolpathLayer_HasUniqueMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_hasuniquemetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = (PLibMCEnvToolpathLayer_HasUniqueMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_hasuniquemetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_HasUniqueMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = (PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_finduniquemetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = (PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_finduniquemetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_FindUniqueMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = (PLibMCEnvToolpathAccessor_GetStorageUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getstorageuuid");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = (PLibMCEnvToolpathAccessor_GetStorageUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getstorageuuid");
@@ -2354,12 +3030,30 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = (PLibMCEnvToolpathAccessor_GetBuildUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbuilduuid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = (PLibMCEnvToolpathAccessor_GetBuildUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbuilduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetBuildUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = (PLibMCEnvToolpathAccessor_GetLayerCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getlayercount");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = (PLibMCEnvToolpathAccessor_GetLayerCountPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getlayercount");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetLayerCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute = (PLibMCEnvToolpathAccessor_RegisterCustomSegmentAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_registercustomsegmentattribute");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute = (PLibMCEnvToolpathAccessor_RegisterCustomSegmentAttributePtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_registercustomsegmentattribute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2378,33 +3072,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetUnits == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathAccessor_HasMetaData = (PLibMCEnvToolpathAccessor_HasMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_hasmetadata");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathAccessor_HasMetaData = (PLibMCEnvToolpathAccessor_HasMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_hasmetadata");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathAccessor_HasMetaData == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetMetaDataValue = (PLibMCEnvToolpathAccessor_GetMetaDataValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getmetadatavalue");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetMetaDataValue = (PLibMCEnvToolpathAccessor_GetMetaDataValuePtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getmetadatavalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathAccessor_GetMetaDataValue == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetMetaDataType = (PLibMCEnvToolpathAccessor_GetMetaDataTypePtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getmetadatatype");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetMetaDataType = (PLibMCEnvToolpathAccessor_GetMetaDataTypePtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getmetadatatype");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathAccessor_GetMetaDataType == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2468,6 +3135,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetZValueInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataCount = (PLibMCEnvToolpathAccessor_GetMetaDataCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getmetadatacount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataCount = (PLibMCEnvToolpathAccessor_GetMetaDataCountPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getmetadatacount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetMetaDataCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataInfo = (PLibMCEnvToolpathAccessor_GetMetaDataInfoPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getmetadatainfo");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataInfo = (PLibMCEnvToolpathAccessor_GetMetaDataInfoPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getmetadatainfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetMetaDataInfo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataContent = (PLibMCEnvToolpathAccessor_GetMetaDataContentPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getmetadatacontent");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataContent = (PLibMCEnvToolpathAccessor_GetMetaDataContentPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getmetadatacontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetMetaDataContent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData = (PLibMCEnvToolpathAccessor_HasUniqueMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_hasuniquemetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData = (PLibMCEnvToolpathAccessor_HasUniqueMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_hasuniquemetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData = (PLibMCEnvToolpathAccessor_FindUniqueMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_finduniquemetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData = (PLibMCEnvToolpathAccessor_FindUniqueMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_finduniquemetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2576,6 +3288,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_AddBinaryData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = (PLibMCEnvBuild_LoadDiscreteField2DByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = (PLibMCEnvBuild_LoadDiscreteField2DByUUIDPtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadDiscreteField2DByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_StoreDiscreteField2D = (PLibMCEnvBuild_StoreDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_build_storediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_Build_StoreDiscreteField2D = (PLibMCEnvBuild_StoreDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_build_storediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyname");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadPNGImageByName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByUUID = (PLibMCEnvBuild_LoadPNGImageByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadPNGImageByUUID = (PLibMCEnvBuild_LoadPNGImageByUUIDPtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadPNGImageByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_StorePNGImage = (PLibMCEnvBuild_StorePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_build_storepngimage");
+		#else // _WIN32
+		pWrapperTable->m_Build_StorePNGImage = (PLibMCEnvBuild_StorePNGImagePtr) dlsym(hLibrary, "libmcenv_build_storepngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_StorePNGImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2831,6 +3597,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidUUID = (PLibMCEnvXMLDocumentAttribute_IsValidUUIDPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_isvaliduuid");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_IsValidUUID = (PLibMCEnvXMLDocumentAttribute_IsValidUUIDPtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_isvaliduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_IsValidUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue = (PLibMCEnvXMLDocumentAttribute_GetUUIDValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_getuuidvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue = (PLibMCEnvXMLDocumentAttribute_GetUUIDValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_getuuidvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = (PLibMCEnvXMLDocumentAttribute_IsValidIntegerPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_isvalidinteger");
 		#else // _WIN32
 		pWrapperTable->m_XMLDocumentAttribute_IsValidInteger = (PLibMCEnvXMLDocumentAttribute_IsValidIntegerPtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_isvalidinteger");
@@ -2891,6 +3675,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentAttribute_SetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue = (PLibMCEnvXMLDocumentAttribute_SetUUIDValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentattribute_setuuidvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue = (PLibMCEnvXMLDocumentAttribute_SetUUIDValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentattribute_setuuidvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2981,6 +3774,96 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentNode_FindAttribute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValue = (PLibMCEnvXMLDocumentNode_GetAttributeValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributevalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValue = (PLibMCEnvXMLDocumentNode_GetAttributeValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValuePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvalue");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValuePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributevaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributevaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeIntegerValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeintegervaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeDoubleValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributedoublevaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeBoolValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeboolvaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValueDefPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvaluedef");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef = (PLibMCEnvXMLDocumentNode_GetAttributeUUIDValueDefPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributeuuidvaluedef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3929,6 +4812,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_creatediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_driverenvironment_creatediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_HasBuildJob == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetBuildJob = (PLibMCEnvDriverEnvironment_GetBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetBuildJob = (PLibMCEnvDriverEnvironment_GetBuildJobPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetBuildJob == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) GetProcAddress(hLibrary, "libmcenv_signaltrigger_cantrigger");
 		#else // _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) dlsym(hLibrary, "libmcenv_signaltrigger_cantrigger");
@@ -4199,6 +5109,105 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetVariableName = (PLibMCEnvUniformJournalSampling_GetVariableNamePtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getvariablename");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetVariableName = (PLibMCEnvUniformJournalSampling_GetVariableNamePtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getvariablename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetVariableName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples = (PLibMCEnvUniformJournalSampling_GetNumberOfSamplesPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getnumberofsamples");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples = (PLibMCEnvUniformJournalSampling_GetNumberOfSamplesPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getnumberofsamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp = (PLibMCEnvUniformJournalSampling_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp = (PLibMCEnvUniformJournalSampling_GetStartTimeStampPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = (PLibMCEnvUniformJournalSampling_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = (PLibMCEnvUniformJournalSampling_GetEndTimeStampPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetSample = (PLibMCEnvUniformJournalSampling_GetSamplePtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getsample");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetSample = (PLibMCEnvUniformJournalSampling_GetSamplePtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getsample");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetSample == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamples = (PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getallsamples");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamples = (PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getallsamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetAllSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getvariablename");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) dlsym(hLibrary, "libmcenv_journalvariable_getvariablename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_GetVariableName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeaverage");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) dlsym(hLibrary, "libmcenv_journalvariable_computeaverage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getmachinestate");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getmachinestate");
@@ -4259,6 +5268,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_CreateDriverAccess == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasBuildJob = (PLibMCEnvStateEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasBuildJob = (PLibMCEnvStateEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasBuildJob == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4487,6 +5505,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = (PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_creatediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = (PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_stateenvironment_creatediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
@@ -4529,6 +5556,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = (PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievejournalvariable");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = (PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievejournalvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_RetrieveJournalVariable == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4610,6 +5646,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = (PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrieveeventsenderpage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = (PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr) dlsym(hLibrary, "libmcenv_uienvironment_retrieveeventsenderpage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4865,6 +5910,42 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasBuildJob == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetBuildJob = (PLibMCEnvUIEnvironment_GetBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getbuildjob");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetBuildJob = (PLibMCEnvUIEnvironment_GetBuildJobPtr) dlsym(hLibrary, "libmcenv_uienvironment_getbuildjob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetBuildJob == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = (PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_creatediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = (PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_uienvironment_creatediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveJournalVariable = (PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrievejournalvariable");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveJournalVariable = (PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_uienvironment_retrievejournalvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RetrieveJournalVariable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -4949,6 +6030,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_TestEnvironment_WriteTestOutput == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_pngimagestoreoptions_resettodefaults", (void**)&(pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_pngimagedata_getsizeinpixels", (void**)&(pWrapperTable->m_PNGImageData_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_pngimagedata_getpngdatastream", (void**)&(pWrapperTable->m_PNGImageData_GetPNGDataStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixelFormat == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4979,6 +6072,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_loadpng", (void**)&(pWrapperTable->m_ImageData_LoadPNG));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_LoadPNG == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_createpngimage", (void**)&(pWrapperTable->m_ImageData_CreatePNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreatePNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_encodepng", (void**)&(pWrapperTable->m_ImageData_EncodePNG));
@@ -5013,6 +6110,98 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelRange == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2dstoreoptions_resettodefaults", (void**)&(pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getdpi", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setdpi", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getorigininmm", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetOriginInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setorigininmm", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetOriginInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getsizeinmm", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetSizeInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getsizeinpixels", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_resizefield", (void**)&(pWrapperTable->m_DiscreteFieldData2D_ResizeField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_ResizeField == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_clear", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Clear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Clear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_clamp", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Clamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Clamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getpixel", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setpixel", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_getpixelrange", (void**)&(pWrapperTable->m_DiscreteFieldData2D_GetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_GetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_setpixelrange", (void**)&(pWrapperTable->m_DiscreteFieldData2D_SetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_SetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_renderaveragepointvalues", (void**)&(pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_RenderAveragePointValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_scalefielddown", (void**)&(pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldDown == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_scalefieldup", (void**)&(pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_ScaleFieldUp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_discretize", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Discretize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Discretize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_discretizewithmapping", (void**)&(pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_DiscretizeWithMapping == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_rendertoimageraw", (void**)&(pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_RenderToImageRaw == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_transformfield", (void**)&(pWrapperTable->m_DiscreteFieldData2D_TransformField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_TransformField == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_addfield", (void**)&(pWrapperTable->m_DiscreteFieldData2D_AddField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_AddField == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_duplicate", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Duplicate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5043,6 +6232,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenttype", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentType));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentintegerattribute", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentdoubleattribute", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_hascustomsegmentattribute", (void**)&(pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_findcustomsegmentattributeid", (void**)&(pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_findcustomsegmentattributetype", (void**)&(pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_findcustomsegmentattributeinfo", (void**)&(pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindCustomSegmentAttributeInfo == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointcount", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointCount));
@@ -5133,12 +6346,40 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetUnits == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getmetadatacount", (void**)&(pWrapperTable->m_ToolpathLayer_GetMetaDataCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetMetaDataCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getmetadatainfo", (void**)&(pWrapperTable->m_ToolpathLayer_GetMetaDataInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetMetaDataInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getmetadatacontent", (void**)&(pWrapperTable->m_ToolpathLayer_GetMetaDataContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetMetaDataContent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_hasuniquemetadata", (void**)&(pWrapperTable->m_ToolpathLayer_HasUniqueMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_HasUniqueMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_finduniquemetadata", (void**)&(pWrapperTable->m_ToolpathLayer_FindUniqueMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindUniqueMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getstorageuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetStorageUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetStorageUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbuilduuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBuildUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBuildUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getlayercount", (void**)&(pWrapperTable->m_ToolpathAccessor_GetLayerCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetLayerCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_registercustomsegmentattribute", (void**)&(pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_RegisterCustomSegmentAttribute == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_loadlayer", (void**)&(pWrapperTable->m_ToolpathAccessor_LoadLayer));
@@ -5147,18 +6388,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getunits", (void**)&(pWrapperTable->m_ToolpathAccessor_GetUnits));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetUnits == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_hasmetadata", (void**)&(pWrapperTable->m_ToolpathAccessor_HasMetaData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_HasMetaData == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getmetadatavalue", (void**)&(pWrapperTable->m_ToolpathAccessor_GetMetaDataValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetMetaDataValue == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getmetadatatype", (void**)&(pWrapperTable->m_ToolpathAccessor_GetMetaDataType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetMetaDataType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getpartcount", (void**)&(pWrapperTable->m_ToolpathAccessor_GetPartCount));
@@ -5187,6 +6416,26 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getzvalueinmm", (void**)&(pWrapperTable->m_ToolpathAccessor_GetZValueInMM));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetZValueInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getmetadatacount", (void**)&(pWrapperTable->m_ToolpathAccessor_GetMetaDataCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetMetaDataCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getmetadatainfo", (void**)&(pWrapperTable->m_ToolpathAccessor_GetMetaDataInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetMetaDataInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getmetadatacontent", (void**)&(pWrapperTable->m_ToolpathAccessor_GetMetaDataContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetMetaDataContent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_hasuniquemetadata", (void**)&(pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_finduniquemetadata", (void**)&(pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
@@ -5235,6 +6484,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_addbinarydata", (void**)&(pWrapperTable->m_Build_AddBinaryData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddBinaryData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyname", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyuuid", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_storediscretefield2d", (void**)&(pWrapperTable->m_Build_StoreDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyname", (void**)&(pWrapperTable->m_Build_LoadPNGImageByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyuuid", (void**)&(pWrapperTable->m_Build_LoadPNGImageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_storepngimage", (void**)&(pWrapperTable->m_Build_StorePNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StorePNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingfileexecution_getstatus", (void**)&(pWrapperTable->m_WorkingFileExecution_GetStatus));
@@ -5349,6 +6622,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_isvaliduuid", (void**)&(pWrapperTable->m_XMLDocumentAttribute_IsValidUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_IsValidUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_getuuidvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_GetUUIDValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_isvalidinteger", (void**)&(pWrapperTable->m_XMLDocumentAttribute_IsValidInteger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_IsValidInteger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5375,6 +6656,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetValue));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setuuidvalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_SetUUIDValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_setintegervalue", (void**)&(pWrapperTable->m_XMLDocumentAttribute_SetIntegerValue));
@@ -5415,6 +6700,46 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_findattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_FindAttribute));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_FindAttribute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributevalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeintegervalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributedoublevalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeboolvalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeuuidvalue", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributevaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeintegervaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeIntegerValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributedoublevaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeDoubleValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeboolvaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeBoolValueDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributeuuidvaluedef", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeUUIDValueDef == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removeattribute", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveAttribute));
@@ -5837,6 +7162,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_hasbuildjob", (void**)&(pWrapperTable->m_DriverEnvironment_HasBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_HasBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getbuildjob", (void**)&(pWrapperTable->m_DriverEnvironment_GetBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalTrigger_CanTrigger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5957,6 +7294,50 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_SetBoolResult == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getvariablename", (void**)&(pWrapperTable->m_UniformJournalSampling_GetVariableName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetVariableName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getnumberofsamples", (void**)&(pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getstarttimestamp", (void**)&(pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getendtimestamp", (void**)&(pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getsample", (void**)&(pWrapperTable->m_UniformJournalSampling_GetSample));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetSample == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getallsamples", (void**)&(pWrapperTable->m_UniformJournalSampling_GetAllSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetAllSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_getvariablename", (void**)&(pWrapperTable->m_JournalVariable_GetVariableName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetVariableName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_getstarttimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetStartTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_getendtimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetEndTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computeaverage", (void**)&(pWrapperTable->m_JournalVariable_ComputeAverage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computeuniformaveragesamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getmachinestate", (void**)&(pWrapperTable->m_StateEnvironment_GetMachineState));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetMachineState == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5983,6 +7364,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createdriveraccess", (void**)&(pWrapperTable->m_StateEnvironment_CreateDriverAccess));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDriverAccess == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasbuildjob", (void**)&(pWrapperTable->m_StateEnvironment_HasBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getbuildjob", (void**)&(pWrapperTable->m_StateEnvironment_GetBuildJob));
@@ -6085,6 +7470,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_StateEnvironment_CreateDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6103,6 +7492,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_parsexmldata", (void**)&(pWrapperTable->m_StateEnvironment_ParseXMLData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievejournalvariable", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveJournalVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
@@ -6139,6 +7532,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsender", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSender));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsenderpage", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsenderuuid", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID));
@@ -6251,6 +7648,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_parsexmldata", (void**)&(pWrapperTable->m_UIEnvironment_ParseXMLData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ParseXMLData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_HasBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_GetBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_retrievejournalvariable", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveJournalVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -6367,6 +7780,45 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CPNGImageStoreOptions
+	 */
+	
+	/**
+	* CPNGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	void CPNGImageStoreOptions::ResetToDefaults()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageStoreOptions_ResetToDefaults(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CPNGImageData
+	 */
+	
+	/**
+	* CPNGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CPNGImageData::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* @param[out] PNGDataBuffer - PNG Data stream.
+	*/
+	void CPNGImageData::GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPNGData = 0;
+		LibMCEnv_uint64 elementsWrittenPNGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, 0, &elementsNeededPNGData, nullptr));
+		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CImageData
 	 */
 	
@@ -6443,19 +7895,32 @@ public:
 	
 	/**
 	* CImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
-	* @param[out] PNGDataBuffer - PNG Data stream.
+	* @param[in] PNGDataBuffer - PNG Data stream.
 	*/
-	void CImageData::LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	void CImageData::LoadPNG(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer)
 	{
-		LibMCEnv_uint64 elementsNeededPNGData = 0;
-		LibMCEnv_uint64 elementsWrittenPNGData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, 0, &elementsNeededPNGData, nullptr));
-		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data()));
 	}
 	
 	/**
-	* CImageData::EncodePNG - Encodes PNG and stores data stream in image object.
+	* CImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
+	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
+	*/
+	PPNGImageData CImageData::CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions)
+	{
+		LibMCEnvHandle hPNGStorageOptions = pPNGStorageOptions.GetHandle();
+		LibMCEnvHandle hPNGImage = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreatePNGImage(m_pHandle, hPNGStorageOptions, &hPNGImage));
+		
+		if (!hPNGImage) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPNGImageData>(m_pWrapper, hPNGImage);
+	}
+	
+	/**
+	* CImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
 	*/
 	void CImageData::EncodePNG()
 	{
@@ -6463,7 +7928,7 @@ public:
 	}
 	
 	/**
-	* CImageData::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+	* CImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
 	* @param[out] PNGDataBuffer - PNG Data stream.
 	*/
 	void CImageData::GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
@@ -6476,7 +7941,7 @@ public:
 	}
 	
 	/**
-	* CImageData::ClearEncodedPNGData - Releases encoded data stream of image object.
+	* CImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
 	*/
 	void CImageData::ClearEncodedPNGData()
 	{
@@ -6523,7 +7988,7 @@ public:
 	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
 	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
 	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
 	*/
 	void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer)
 	{
@@ -6545,6 +8010,291 @@ public:
 	void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CDiscreteFieldData2DStoreOptions
+	 */
+	
+	/**
+	* CDiscreteFieldData2DStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	void CDiscreteFieldData2DStoreOptions::ResetToDefaults()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2DStoreOptions_ResetToDefaults(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CDiscreteFieldData2D
+	 */
+	
+	/**
+	* CDiscreteFieldData2D::GetDPI - Returns DPI values in X and Y.
+	* @param[out] dDPIValueX - DPI value in X
+	* @param[out] dDPIValueY - DPI value in Y
+	*/
+	void CDiscreteFieldData2D::GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetDPI(m_pHandle, &dDPIValueX, &dDPIValueY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetDPI - Sets DPI values in X and Y.
+	* @param[in] dDPIValueX - new DPI value in X. MUST be positive.
+	* @param[in] dDPIValueY - new DPI value in Y. MUST be positive.
+	*/
+	void CDiscreteFieldData2D::SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetDPI(m_pHandle, dDPIValueX, dDPIValueY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetOriginInMM - Returns field origin in mm.
+	* @param[out] dOriginX - Origin in X in mm
+	* @param[out] dOriginY - Origin in Y in mm
+	*/
+	void CDiscreteFieldData2D::GetOriginInMM(LibMCEnv_double & dOriginX, LibMCEnv_double & dOriginY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetOriginInMM(m_pHandle, &dOriginX, &dOriginY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetOriginInMM - Set field origin in mm.
+	* @param[in] dOriginX - Origin in X in mm
+	* @param[in] dOriginY - Origin in Y in mm
+	*/
+	void CDiscreteFieldData2D::SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetOriginInMM(m_pHandle, dOriginX, dOriginY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetSizeInMM - Returns field sizes in mm.
+	* @param[out] dSizeX - Size in X in mm
+	* @param[out] dSizeY - Size in Y in mm
+	*/
+	void CDiscreteFieldData2D::GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetSizeInMM(m_pHandle, &dSizeX, &dSizeY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetSizeInPixels - Returns field pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CDiscreteFieldData2D::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::ResizeField - Resizes field pixel data.
+	* @param[in] nPixelSizeX - Number of pixels in X
+	* @param[in] nPixelSizeY - Number of pixels in Y
+	* @param[in] dDefaultValue - Default Pixel value.
+	*/
+	void CDiscreteFieldData2D::ResizeField(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ResizeField(m_pHandle, nPixelSizeX, nPixelSizeY, dDefaultValue));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Clear - Sets all pixels to a single value.
+	* @param[in] dValue - Pixel value.
+	*/
+	void CDiscreteFieldData2D::Clear(const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Clear(m_pHandle, dValue));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Clamp - Clamps all pixels to a certain interval.
+	* @param[in] dMinValue - Minimum value. MUST be smaller or equal than MaxValue.
+	* @param[in] dMaxValue - Maximum value. MUST be larger or equal than MinValue.
+	*/
+	void CDiscreteFieldData2D::Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Clamp(m_pHandle, dMinValue, dMaxValue));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetPixel - Returns one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @return Pixel value at this position
+	*/
+	LibMCEnv_double CDiscreteFieldData2D::GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetPixel(m_pHandle, nX, nY, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetPixel - Sets one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @param[in] dValue - New Pixel value at this position
+	*/
+	void CDiscreteFieldData2D::SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetPixel(m_pHandle, nX, nY, dValue));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::GetPixelRange - Returns a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size.
+	*/
+	void CDiscreteFieldData2D::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_double> & ValueBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValue = 0;
+		LibMCEnv_uint64 elementsWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, 0, &elementsNeededValue, nullptr));
+		ValueBuffer.resize((size_t) elementsNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, elementsNeededValue, &elementsWrittenValue, ValueBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::SetPixelRange - Exchanges a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[in] ValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
+	*/
+	void CDiscreteFieldData2D::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_double> & ValueBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::RenderAveragePointValues - Renders and array of average point values into the field. 
+	* @param[in] dDefaultValue - If a pixel does not contain any value, fall back to this given value.
+	* @param[in] eSamplingMode - Sampling mode of point values.
+	* @param[in] dSampleSizeX - How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] dSampleSizeY - How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] PointValuesBuffer - Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels.
+	*/
+	void CDiscreteFieldData2D::RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const CInputVector<sFieldData2DPoint> & PointValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_RenderAveragePointValues(m_pHandle, dDefaultValue, eSamplingMode, dSampleSizeX, dSampleSizeY, (LibMCEnv_uint64)PointValuesBuffer.size(), PointValuesBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::ScaleFieldDown - Scales the field to a smaller size.
+	* @param[in] nFactorX - The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX
+	* @param[in] nFactorY - The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY
+	* @return Scaled Field Instance
+	*/
+	PDiscreteFieldData2D CDiscreteFieldData2D::ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY)
+	{
+		LibMCEnvHandle hNewField = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ScaleFieldDown(m_pHandle, nFactorX, nFactorY, &hNewField));
+		
+		if (!hNewField) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
+	}
+	
+	/**
+	* CDiscreteFieldData2D::ScaleFieldUp - Scales the field to a larger size.
+	* @param[in] nFactorX - The new field will be this factor larger in X. MUST be positive.
+	* @param[in] nFactorY - The new field will be this factor larger in Y. MUST be positive.
+	* @return Scaled Field Instance
+	*/
+	PDiscreteFieldData2D CDiscreteFieldData2D::ScaleFieldUp(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY)
+	{
+		LibMCEnvHandle hNewField = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_ScaleFieldUp(m_pHandle, nFactorX, nFactorY, &hNewField));
+		
+		if (!hNewField) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Discretize - Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.
+	* @param[in] DiscreteValuesBuffer - An array of values. MUST NOT be empty.
+	*/
+	void CDiscreteFieldData2D::Discretize(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Discretize(m_pHandle, (LibMCEnv_uint64)DiscreteValuesBuffer.size(), DiscreteValuesBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::DiscretizeWithMapping - Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.
+	* @param[in] DiscreteValuesBuffer - An array of values. MUST NOT be empty.  
+	* @param[in] NewValuesBuffer - An array of values. MUST have the same cardinality as DiscreteValues.
+	*/
+	void CDiscreteFieldData2D::DiscretizeWithMapping(const CInputVector<LibMCEnv_double> & DiscreteValuesBuffer, const CInputVector<LibMCEnv_double> & NewValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_DiscretizeWithMapping(m_pHandle, (LibMCEnv_uint64)DiscreteValuesBuffer.size(), DiscreteValuesBuffer.data(), (LibMCEnv_uint64)NewValuesBuffer.size(), NewValuesBuffer.data()));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::RenderToImageRaw - Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.
+	* @param[in] dMinValue - Min point value. Values smaller than MinValue will be clamped to MinValue.
+	* @param[in] MinColor - The color assigned to MinValue.
+	* @param[in] dMidValue - Mid point value. MUST be at least 1E-6 larger than MinValue.
+	* @param[in] MidColor - The color assigned to MidValue
+	* @param[in] dMaxValue - Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue.
+	* @param[in] MaxColor - The color assigned to MaxValue
+	* @return New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit.
+	*/
+	PImageData CDiscreteFieldData2D::RenderToImageRaw(const LibMCEnv_double dMinValue, const sColorRGB & MinColor, const LibMCEnv_double dMidValue, const sColorRGB & MidColor, const LibMCEnv_double dMaxValue, const sColorRGB & MaxColor)
+	{
+		LibMCEnvHandle hNewImage = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_RenderToImageRaw(m_pHandle, dMinValue, &MinColor, dMidValue, &MidColor, dMaxValue, &MaxColor, &hNewImage));
+		
+		if (!hNewImage) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hNewImage);
+	}
+	
+	/**
+	* CDiscreteFieldData2D::TransformField - Scales the field values with a factor and a translation.
+	* @param[in] dScale - A scaling factor will be applied to all values in the field.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	void CDiscreteFieldData2D::TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_TransformField(m_pHandle, dScale, dOffset));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::AddField - Adds another field to the field. Both fields MUST have the same pixel extensions.
+	* @param[in] pOtherField - Field Instance to add
+	* @param[in] dScale - A scaling factor will be applied to all values in the other field before adding.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	void CDiscreteFieldData2D::AddField(classParam<CDiscreteFieldData2D> pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset)
+	{
+		LibMCEnvHandle hOtherField = pOtherField.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_AddField(m_pHandle, hOtherField, dScale, dOffset));
+	}
+	
+	/**
+	* CDiscreteFieldData2D::Duplicate - Creates a copy of the field.
+	* @return Scaled Field Instance
+	*/
+	PDiscreteFieldData2D CDiscreteFieldData2D::Duplicate()
+	{
+		LibMCEnvHandle hNewField = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DiscreteFieldData2D_Duplicate(m_pHandle, &hNewField));
+		
+		if (!hNewField) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
 	}
 	
 	/**
@@ -6661,6 +8411,88 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentType(m_pHandle, nIndex, &resultType));
 		
 		return resultType;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentIntegerAttribute - Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	LibMCEnv_int64 CToolpathLayer::GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentIntegerAttribute(m_pHandle, nIndex, nAttributeID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentDoubleAttribute - Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	LibMCEnv_double CToolpathLayer::GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentDoubleAttribute(m_pHandle, nIndex, nAttributeID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CToolpathLayer::HasCustomSegmentAttribute - Checks if a segment attribute is registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Flag if attribute is registered.
+	*/
+	bool CToolpathLayer::HasCustomSegmentAttribute(const std::string & sNamespace, const std::string & sAttributeName)
+	{
+		bool resultValueExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_HasCustomSegmentAttribute(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &resultValueExists));
+		
+		return resultValueExists;
+	}
+	
+	/**
+	* CToolpathLayer::FindCustomSegmentAttributeID - Finds a segment attribute ID. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return ID of the attribute.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName)
+	{
+		LibMCEnv_uint32 resultAttributeID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindCustomSegmentAttributeID(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &resultAttributeID));
+		
+		return resultAttributeID;
+	}
+	
+	/**
+	* CToolpathLayer::FindCustomSegmentAttributeType - Finds a segment attribute type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Type of the attribute.
+	*/
+	eToolpathAttributeType CToolpathLayer::FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName)
+	{
+		eToolpathAttributeType resultAttributeType = (eToolpathAttributeType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindCustomSegmentAttributeType(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &resultAttributeType));
+		
+		return resultAttributeType;
+	}
+	
+	/**
+	* CToolpathLayer::FindCustomSegmentAttributeInfo - Finds a segment attribute ID and type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @param[out] nAttributeID - ID of the attribute.
+	* @param[out] eAttributeType - Type of the attribute.
+	*/
+	void CToolpathLayer::FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, eToolpathAttributeType & eAttributeType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindCustomSegmentAttributeInfo(m_pHandle, sNamespace.c_str(), sAttributeName.c_str(), &nAttributeID, &eAttributeType));
 	}
 	
 	/**
@@ -6988,6 +8820,85 @@ public:
 	}
 	
 	/**
+	* CToolpathLayer::GetMetaDataCount - Retrieves the number of metadata nodes in the build file.
+	* @return Meta Data information.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetMetaDataCount()
+	{
+		LibMCEnv_uint32 resultMetaDataCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataCount(m_pHandle, &resultMetaDataCount));
+		
+		return resultMetaDataCount;
+	}
+	
+	/**
+	* CToolpathLayer::GetMetaDataInfo - Returns the namespace and identifier of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @param[out] sNamespace - Namespace of the metadata
+	* @param[out] sName - Name of the metadata
+	*/
+	void CToolpathLayer::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededNamespace = 0;
+		LibMCEnv_uint32 bytesWrittenNamespace = 0;
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataInfo(m_pHandle, nMetaDataIndex, 0, &bytesNeededNamespace, nullptr, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferNamespace(bytesNeededNamespace);
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataInfo(m_pHandle, nMetaDataIndex, bytesNeededNamespace, &bytesWrittenNamespace, &bufferNamespace[0], bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		sNamespace = std::string(&bufferNamespace[0]);
+		sName = std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CToolpathLayer::GetMetaDataContent - Returns the metadata XML content of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @return XML Metadata Object
+	*/
+	PXMLDocumentNode CToolpathLayer::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
+	{
+		LibMCEnvHandle hXMLNode = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetMetaDataContent(m_pHandle, nMetaDataIndex, &hXMLNode));
+		
+		if (!hXMLNode) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
+	}
+	
+	/**
+	* CToolpathLayer::HasUniqueMetaData - Checks if a metadata exists in the build file.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return Returns true if metadata exists and is unique.
+	*/
+	bool CToolpathLayer::HasUniqueMetaData(const std::string & sNamespace, const std::string & sName)
+	{
+		bool resultMetaDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_HasUniqueMetaData(m_pHandle, sNamespace.c_str(), sName.c_str(), &resultMetaDataExists));
+		
+		return resultMetaDataExists;
+	}
+	
+	/**
+	* CToolpathLayer::FindUniqueMetaData - Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return XML Metadata Object
+	*/
+	PXMLDocumentNode CToolpathLayer::FindUniqueMetaData(const std::string & sNamespace, const std::string & sName)
+	{
+		LibMCEnvHandle hXMLNode = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_FindUniqueMetaData(m_pHandle, sNamespace.c_str(), sName.c_str(), &hXMLNode));
+		
+		if (!hXMLNode) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
+	}
+	
+	/**
 	 * Method definitions for class CToolpathAccessor
 	 */
 	
@@ -7007,6 +8918,21 @@ public:
 	}
 	
 	/**
+	* CToolpathAccessor::GetBuildUUID - Returns UUID of the toolpath's build file.
+	* @return Returns build uuid.
+	*/
+	std::string CToolpathAccessor::GetBuildUUID()
+	{
+		LibMCEnv_uint32 bytesNeededBuildUUID = 0;
+		LibMCEnv_uint32 bytesWrittenBuildUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildUUID(m_pHandle, 0, &bytesNeededBuildUUID, nullptr));
+		std::vector<char> bufferBuildUUID(bytesNeededBuildUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildUUID(m_pHandle, bytesNeededBuildUUID, &bytesWrittenBuildUUID, &bufferBuildUUID[0]));
+		
+		return std::string(&bufferBuildUUID[0]);
+	}
+	
+	/**
 	* CToolpathAccessor::GetLayerCount - Returns layer count.
 	* @return Returns layer count.
 	*/
@@ -7016,6 +8942,17 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetLayerCount(m_pHandle, &resultLayerCount));
 		
 		return resultLayerCount;
+	}
+	
+	/**
+	* CToolpathAccessor::RegisterCustomSegmentAttribute - Registers a new custom segment attribute to be read.
+	* @param[in] sNameSpace - Namespace of the custom attribute.
+	* @param[in] sAttributeName - Name of the custom attribute.
+	* @param[in] eAttributeType - Attribute Type.
+	*/
+	void CToolpathAccessor::RegisterCustomSegmentAttribute(const std::string & sNameSpace, const std::string & sAttributeName, const eToolpathAttributeType eAttributeType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_RegisterCustomSegmentAttribute(m_pHandle, sNameSpace.c_str(), sAttributeName.c_str(), eAttributeType));
 	}
 	
 	/**
@@ -7044,54 +8981,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetUnits(m_pHandle, &resultUnits));
 		
 		return resultUnits;
-	}
-	
-	/**
-	* CToolpathAccessor::HasMetaData - Checks if a metadata value exists for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns if metadata exists.
-	*/
-	bool CToolpathAccessor::HasMetaData(const std::string & sNameSpace, const std::string & sName)
-	{
-		bool resultExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_HasMetaData(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultExists));
-		
-		return resultExists;
-	}
-	
-	/**
-	* CToolpathAccessor::GetMetaDataValue - Returns the value of a metadata for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns the value
-	*/
-	std::string CToolpathAccessor::GetMetaDataValue(const std::string & sNameSpace, const std::string & sName)
-	{
-		LibMCEnv_uint32 bytesNeededMetaDataValue = 0;
-		LibMCEnv_uint32 bytesWrittenMetaDataValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededMetaDataValue, nullptr));
-		std::vector<char> bufferMetaDataValue(bytesNeededMetaDataValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededMetaDataValue, &bytesWrittenMetaDataValue, &bufferMetaDataValue[0]));
-		
-		return std::string(&bufferMetaDataValue[0]);
-	}
-	
-	/**
-	* CToolpathAccessor::GetMetaDataType - Returns the type of a metadata for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns the type
-	*/
-	std::string CToolpathAccessor::GetMetaDataType(const std::string & sNameSpace, const std::string & sName)
-	{
-		LibMCEnv_uint32 bytesNeededMetaDataType = 0;
-		LibMCEnv_uint32 bytesWrittenMetaDataType = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataType(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededMetaDataType, nullptr));
-		std::vector<char> bufferMetaDataType(bytesNeededMetaDataType);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataType(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededMetaDataType, &bytesWrittenMetaDataType, &bufferMetaDataType[0]));
-		
-		return std::string(&bufferMetaDataType[0]);
 	}
 	
 	/**
@@ -7187,6 +9076,85 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetZValueInMM(m_pHandle, nLayerIndex, &resultZValue));
 		
 		return resultZValue;
+	}
+	
+	/**
+	* CToolpathAccessor::GetMetaDataCount - Retrieves the number of metadata nodes in the build file.
+	* @return Meta Data information.
+	*/
+	LibMCEnv_uint32 CToolpathAccessor::GetMetaDataCount()
+	{
+		LibMCEnv_uint32 resultMetaDataCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataCount(m_pHandle, &resultMetaDataCount));
+		
+		return resultMetaDataCount;
+	}
+	
+	/**
+	* CToolpathAccessor::GetMetaDataInfo - Returns the namespace and identifier of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @param[out] sNamespace - Namespace of the metadata
+	* @param[out] sName - Name of the metadata
+	*/
+	void CToolpathAccessor::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededNamespace = 0;
+		LibMCEnv_uint32 bytesWrittenNamespace = 0;
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataInfo(m_pHandle, nMetaDataIndex, 0, &bytesNeededNamespace, nullptr, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferNamespace(bytesNeededNamespace);
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataInfo(m_pHandle, nMetaDataIndex, bytesNeededNamespace, &bytesWrittenNamespace, &bufferNamespace[0], bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		sNamespace = std::string(&bufferNamespace[0]);
+		sName = std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CToolpathAccessor::GetMetaDataContent - Returns the metadata XML content of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @return XML Metadata Object
+	*/
+	PXMLDocumentNode CToolpathAccessor::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
+	{
+		LibMCEnvHandle hXMLNode = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataContent(m_pHandle, nMetaDataIndex, &hXMLNode));
+		
+		if (!hXMLNode) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
+	}
+	
+	/**
+	* CToolpathAccessor::HasUniqueMetaData - Checks if a metadata exists in the build file.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return Returns true if metadata exists and is unique.
+	*/
+	bool CToolpathAccessor::HasUniqueMetaData(const std::string & sNamespace, const std::string & sName)
+	{
+		bool resultMetaDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_HasUniqueMetaData(m_pHandle, sNamespace.c_str(), sName.c_str(), &resultMetaDataExists));
+		
+		return resultMetaDataExists;
+	}
+	
+	/**
+	* CToolpathAccessor::FindUniqueMetaData - Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return XML Metadata Object
+	*/
+	PXMLDocumentNode CToolpathAccessor::FindUniqueMetaData(const std::string & sNamespace, const std::string & sName)
+	{
+		LibMCEnvHandle hXMLNode = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_FindUniqueMetaData(m_pHandle, sNamespace.c_str(), sName.c_str(), &hXMLNode));
+		
+		if (!hXMLNode) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
 	}
 	
 	/**
@@ -7335,7 +9303,7 @@ public:
 	
 	/**
 	* CBuild::AddBinaryData - Adds binary data to store with the build.
-	* @param[in] sName - Name of the attache data block.
+	* @param[in] sName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
 	* @param[in] sMIMEType - Mime type of the data.
 	* @param[in] ContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
@@ -7347,6 +9315,110 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::LoadDiscreteField2DByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByName(const std::string & sName)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByName(m_pHandle, sName.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuild::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByUUID(m_pHandle, sDataUUID.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuild::StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::LoadPNGImageByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuild::LoadPNGImageByName(const std::string & sName)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByName(m_pHandle, sName.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuild::LoadPNGImageByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuild::StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -7770,6 +9842,33 @@ public:
 	}
 	
 	/**
+	* CXMLDocumentAttribute::IsValidUUID - Checks if the value is a valid UUID string.
+	* @return returns if the value is a valid UUID string.
+	*/
+	bool CXMLDocumentAttribute::IsValidUUID()
+	{
+		bool resultIsValid = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_IsValidUUID(m_pHandle, &resultIsValid));
+		
+		return resultIsValid;
+	}
+	
+	/**
+	* CXMLDocumentAttribute::GetUUIDValue - Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.
+	* @return returns the value of the attribute as normalized UUID string.
+	*/
+	std::string CXMLDocumentAttribute::GetUUIDValue()
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetUUIDValue(m_pHandle, 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetUUIDValue(m_pHandle, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
 	* CXMLDocumentAttribute::IsValidInteger - Checks if the value is a valid integer in the given range.
 	* @param[in] nMinValue - Minimum allowed value
 	* @param[in] nMaxValue - Maximum allowed value
@@ -7839,14 +9938,12 @@ public:
 	
 	/**
 	* CXMLDocumentAttribute::GetBoolValue - Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
-	* @param[in] dMinValue - Minimum allowed value
-	* @param[in] dMaxValue - Maximum allowed value
 	* @return returns the value .
 	*/
-	bool CXMLDocumentAttribute::GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	bool CXMLDocumentAttribute::GetBoolValue()
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetBoolValue(m_pHandle, dMinValue, dMaxValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_GetBoolValue(m_pHandle, &resultValue));
 		
 		return resultValue;
 	}
@@ -7858,6 +9955,15 @@ public:
 	void CXMLDocumentAttribute::SetValue(const std::string & sValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetValue(m_pHandle, sValue.c_str()));
+	}
+	
+	/**
+	* CXMLDocumentAttribute::SetUUIDValue - Sets the value of the attribute as UUID string.
+	* @param[in] sValue - new value of the attribute. Fails if Value is not a UUID.
+	*/
+	void CXMLDocumentAttribute::SetUUIDValue(const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_SetUUIDValue(m_pHandle, sValue.c_str()));
 	}
 	
 	/**
@@ -7988,6 +10094,171 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeValue - Returns string value of an attribute. Fails if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeValue(const std::string & sNameSpace, const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeIntegerValue - Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Attribute value.
+	*/
+	LibMCEnv_int64 CXMLDocumentNode::GetAttributeIntegerValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeIntegerValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), nMinValue, nMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeDoubleValue - Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return Attribute value.
+	*/
+	LibMCEnv_double CXMLDocumentNode::GetAttributeDoubleValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeDoubleValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), dMinValue, dMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeBoolValue - Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	bool CXMLDocumentNode::GetAttributeBoolValue(const std::string & sNameSpace, const std::string & sName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeBoolValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeUUIDValue - Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeUUIDValue(const std::string & sNameSpace, const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeValueDef - Returns string value of an attribute. Returns default value if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeIntegerValueDef - Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	LibMCEnv_int64 CXMLDocumentNode::GetAttributeIntegerValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeIntegerValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), nMinValue, nMaxValue, nDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeDoubleValueDef - Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	LibMCEnv_double CXMLDocumentNode::GetAttributeDoubleValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeDoubleValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), dMinValue, dMaxValue, dDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeBoolValueDef - Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] bDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	bool CXMLDocumentNode::GetAttributeBoolValueDef(const std::string & sNameSpace, const std::string & sName, const bool bDefaultValue)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeBoolValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), bDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CXMLDocumentNode::GetAttributeUUIDValueDef - Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Attribute value. MUST be a valid UUID
+	* @return Attribute value.
+	*/
+	std::string CXMLDocumentNode::GetAttributeUUIDValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetAttributeUUIDValueDef(m_pHandle, sNameSpace.c_str(), sName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
 	}
 	
 	/**
@@ -9370,6 +11641,57 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDiscreteField2D(m_pHandle, nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	bool CDriverEnvironment::HasBuildJob(const std::string & sBuildUUID)
+	{
+		bool resultBuildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_HasBuildJob(m_pHandle, sBuildUUID.c_str(), &resultBuildExists));
+		
+		return resultBuildExists;
+	}
+	
+	/**
+	* CDriverEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
+	*/
+	PBuild CDriverEnvironment::GetBuildJob(const std::string & sBuildUUID)
+	{
+		LibMCEnvHandle hBuildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetBuildJob(m_pHandle, sBuildUUID.c_str(), &hBuildInstance));
+		
+		if (!hBuildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
 	 * Method definitions for class CSignalTrigger
 	 */
 	
@@ -9751,6 +12073,167 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CUniformJournalSampling
+	 */
+	
+	/**
+	* CUniformJournalSampling::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	std::string CUniformJournalSampling::GetVariableName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetVariableName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetVariableName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CUniformJournalSampling::GetNumberOfSamples - Returns the number of samples in the interval.
+	* @return Number of samples in the sampling.
+	*/
+	LibMCEnv_uint32 CUniformJournalSampling::GetNumberOfSamples()
+	{
+		LibMCEnv_uint32 resultNumberOfSamples = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetNumberOfSamples(m_pHandle, &resultNumberOfSamples));
+		
+		return resultNumberOfSamples;
+	}
+	
+	/**
+	* CUniformJournalSampling::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CUniformJournalSampling::GetStartTimeStamp()
+	{
+		LibMCEnv_uint64 resultStartTimeStampInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetStartTimeStamp(m_pHandle, &resultStartTimeStampInMS));
+		
+		return resultStartTimeStampInMS;
+	}
+	
+	/**
+	* CUniformJournalSampling::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CUniformJournalSampling::GetEndTimeStamp()
+	{
+		LibMCEnv_uint64 resultEndTimeStampInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetEndTimeStamp(m_pHandle, &resultEndTimeStampInMS));
+		
+		return resultEndTimeStampInMS;
+	}
+	
+	/**
+	* CUniformJournalSampling::GetSample - Returns the timestamp and value of the given sample.
+	* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
+	* @param[out] nTimeStamp - TimeStamp of the sample in ms.
+	* @param[out] dValue - Value of the sample in ms.
+	*/
+	void CUniformJournalSampling::GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetSample(m_pHandle, nIndex, &nTimeStamp, &dValue));
+	}
+	
+	/**
+	* CUniformJournalSampling::GetAllSamples - Returns all timestamps and values of the sampling.
+	* @param[out] TimeStampsBuffer - Array of TimeStamps in ms, in increasing order.
+	* @param[out] ValuesBuffer - Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+	*/
+	void CUniformJournalSampling::GetAllSamples(std::vector<LibMCEnv_uint64> & TimeStampsBuffer, std::vector<LibMCEnv_double> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTimeStamps = 0;
+		LibMCEnv_uint64 elementsWrittenTimeStamps = 0;
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, 0, &elementsNeededTimeStamps, nullptr, 0, &elementsNeededValues, nullptr));
+		TimeStampsBuffer.resize((size_t) elementsNeededTimeStamps);
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, elementsNeededTimeStamps, &elementsWrittenTimeStamps, TimeStampsBuffer.data(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CJournalVariable
+	 */
+	
+	/**
+	* CJournalVariable::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	std::string CJournalVariable::GetVariableName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetVariableName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetVariableName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CJournalVariable::GetStartTimeStamp()
+	{
+		LibMCEnv_uint64 resultRecordingStartInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetStartTimeStamp(m_pHandle, &resultRecordingStartInMS));
+		
+		return resultRecordingStartInMS;
+	}
+	
+	/**
+	* CJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in ms.
+	*/
+	LibMCEnv_uint64 CJournalVariable::GetEndTimeStamp()
+	{
+		LibMCEnv_uint64 resultRecordingEndInMS = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetEndTimeStamp(m_pHandle, &resultRecordingEndInMS));
+		
+		return resultRecordingEndInMS;
+	}
+	
+	/**
+	* CJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
+	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Average value of the variable.
+	*/
+	LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval)
+	{
+		LibMCEnv_double resultAverageValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeAverage(m_pHandle, nStartTimeInMS, nEndTimeInMS, bClampInterval, &resultAverageValue));
+		
+		return resultAverageValue;
+	}
+	
+	/**
+	* CJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
+	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Returns an instance with the sampling results.
+	*/
+	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+	{
+		LibMCEnvHandle hJournalSampling = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMS, nEndTimeInMS, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		
+		if (!hJournalSampling) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hJournalSampling);
+	}
+	
+	/**
 	 * Method definitions for class CStateEnvironment
 	 */
 	
@@ -9870,7 +12353,20 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* CStateEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	bool CStateEnvironment::HasBuildJob(const std::string & sBuildUUID)
+	{
+		bool resultBuildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasBuildJob(m_pHandle, sBuildUUID.c_str(), &resultBuildExists));
+		
+		return resultBuildExists;
+	}
+	
+	/**
+	* CStateEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Build instance
 	*/
@@ -10187,6 +12683,28 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDiscreteField2D(m_pHandle, nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
 	* CStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
@@ -10260,6 +12778,23 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CStateEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @return Journal Instance.
+	*/
+	PJournalVariable CStateEnvironment::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+	{
+		LibMCEnvHandle hJournalVariable = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMilliseconds, &hJournalVariable));
+		
+		if (!hJournalVariable) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
 	}
 	
 	/**
@@ -10352,18 +12887,33 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
-	* @return Name of the sender element.
+	* CUIEnvironment::RetrieveEventSender - returns path of the UI control that triggered the event.
+	* @return Path of the sender element.
 	*/
 	std::string CUIEnvironment::RetrieveEventSender()
 	{
-		LibMCEnv_uint32 bytesNeededSenderName = 0;
-		LibMCEnv_uint32 bytesWrittenSenderName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, 0, &bytesNeededSenderName, nullptr));
-		std::vector<char> bufferSenderName(bytesNeededSenderName);
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, bytesNeededSenderName, &bytesWrittenSenderName, &bufferSenderName[0]));
+		LibMCEnv_uint32 bytesNeededSenderPath = 0;
+		LibMCEnv_uint32 bytesWrittenSenderPath = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, 0, &bytesNeededSenderPath, nullptr));
+		std::vector<char> bufferSenderPath(bytesNeededSenderPath);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, bytesNeededSenderPath, &bytesWrittenSenderPath, &bufferSenderPath[0]));
 		
-		return std::string(&bufferSenderName[0]);
+		return std::string(&bufferSenderPath[0]);
+	}
+	
+	/**
+	* CUIEnvironment::RetrieveEventSenderPage - returns name of the page of the UI control that triggered the event.
+	* @return Page of the sender element.
+	*/
+	std::string CUIEnvironment::RetrieveEventSenderPage()
+	{
+		LibMCEnv_uint32 bytesNeededPageName = 0;
+		LibMCEnv_uint32 bytesWrittenPageName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSenderPage(m_pHandle, 0, &bytesNeededPageName, nullptr));
+		std::vector<char> bufferPageName(bytesNeededPageName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSenderPage(m_pHandle, bytesNeededPageName, &bytesWrittenPageName, &bufferPageName[0]));
+		
+		return std::string(&bufferPageName[0]);
 	}
 	
 	/**
@@ -10766,6 +13316,74 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CUIEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	bool CUIEnvironment::HasBuildJob(const std::string & sBuildUUID)
+	{
+		bool resultBuildExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasBuildJob(m_pHandle, sBuildUUID.c_str(), &resultBuildExists));
+		
+		return resultBuildExists;
+	}
+	
+	/**
+	* CUIEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
+	*/
+	PBuild CUIEnvironment::GetBuildJob(const std::string & sBuildUUID)
+	{
+		LibMCEnvHandle hBuildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetBuildJob(m_pHandle, sBuildUUID.c_str(), &hBuildInstance));
+		
+		if (!hBuildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDiscreteField2D(m_pHandle, nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CUIEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @return Journal Instance.
+	*/
+	PJournalVariable CUIEnvironment::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+	{
+		LibMCEnvHandle hJournalVariable = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMilliseconds, &hJournalVariable));
+		
+		if (!hJournalVariable) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
 	}
 
 } // namespace LibMCEnv

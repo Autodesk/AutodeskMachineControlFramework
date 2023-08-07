@@ -157,6 +157,14 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION 1050 /** No version definition. */
 #define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME 1051 /** Duplicate configuration preset name. */
 #define LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS 1052 /** OIE PID Variable out of bounds. */
+#define LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10 1053 /** Timelag must be a multiple of 10 microseconds. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX 1054 /** Invalid Encoder Scaling in X */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY 1055 /** Invalid Encoder Scaling in Y */
+#define LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR 1056 /** On the fly marking error */
+#define LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED 1057 /** Mark on the fly is disabled */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES 1058 /** Invalid laser field coordinates */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET 1059 /** No laser field has been set. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX 1060 /** Invalid free variable index. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -226,6 +234,14 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION: return "No version definition.";
     case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
     case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIE PID Variable out of bounds.";
+    case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "Invalid Encoder Scaling in X";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "Invalid Encoder Scaling in Y";
+    case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "On the fly marking error";
+    case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "Mark on the fly is disabled";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "Invalid laser field coordinates";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "Invalid free variable index.";
     default: return "unknown error";
   }
 }
@@ -262,7 +278,8 @@ namespace LibMCDriver_ScanLab {
     Port8bitDigital = 1,
     Port16bitDigital = 2,
     Port12BitAnalog1 = 3,
-    Port12BitAnalog2 = 4
+    Port12BitAnalog2 = 4,
+    Port12BitAnalog1andAnalog2 = 5
   };
   
   enum class eOIEOperationMode : LibMCDriver_ScanLab_int32 {

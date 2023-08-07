@@ -39,6 +39,8 @@ Abstract: This is the class declaration of CDriver_ScanLab
 
 // Parent classes
 #include "libmcdriver_scanlab_driver.hpp"
+#include "libmcdriver_scanlab_rtccontext.hpp"
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -47,8 +49,8 @@ Abstract: This is the class declaration of CDriver_ScanLab
 // Include custom headers here.
 #include "libmcdriver_scanlab_sdk.hpp"
 
-#define RTC6_MIN_MAXLASERPOWER 10.0f
-#define RTC6_MAX_MAXLASERPOWER 10000.0f
+#define RTC6_MIN_MAXLASERPOWER 10.0
+#define RTC6_MAX_MAXLASERPOWER 10000.0
 
 #define RTC6_MIN_LASER_DELAY -1000000.0f
 #define RTC6_MAX_LASER_DELAY 1000000.0f
@@ -81,6 +83,12 @@ protected:
     LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
     LibMCEnv::PWorkingFile m_pSDKLibraryFile;
 
+    PRTCContextOwnerData m_pOwnerData;
+
+    uint32_t m_nDLLVersion;
+
+    virtual void updateDLLVersionParameter(uint32_t nDLLVersionParameter) = 0;
+
 public:
 
     CDriver_ScanLab(LibMCEnv::PDriverEnvironment pDriverEnvironment);
@@ -90,6 +98,8 @@ public:
     void LoadSDK(const std::string& sResourceName) override;
 
     void LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8* pScanlabDLLBuffer) override;
+
+    uint32_t getDLLVersion();
 
 
 };

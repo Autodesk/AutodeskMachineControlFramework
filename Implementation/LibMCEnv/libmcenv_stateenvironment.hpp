@@ -81,6 +81,8 @@ public:
 
 	ISignalHandler* GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist) override;
 
+	bool HasBuildJob(const std::string& sBuildUUID) override;
+
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
 	void UnloadAllToolpathes() override;
@@ -146,6 +148,10 @@ public:
 	IXMLDocument* ParseXMLString(const std::string& sXMLString) override;
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
+
+	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
+
+	IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
 
 };
 

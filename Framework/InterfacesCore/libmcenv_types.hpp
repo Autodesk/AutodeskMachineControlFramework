@@ -190,6 +190,27 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE 10093 /** Integer value attribute out of range. */
 #define LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE 10094 /** Invalid double value attribute. */
 #define LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE 10095 /** Double value attribute out of range. */
+#define LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE 10096 /** Invalid default image value. */
+#define LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE 10097 /** Invalid pixel memory size. */
+#define LIBMCENV_ERROR_INVALIDFIELDBUFFER 10098 /** Invalid field buffer. */
+#define LIBMCENV_ERROR_INTERNALFIELDSIZEERROR 10099 /** Internal field size error. */
+#define LIBMCENV_ERROR_INVALIDFIELDSIZE 10100 /** Invalid field size. */
+#define LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR 10101 /** Invalid field scaling factor. */
+#define LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT 10102 /** Scaling exceeds maximum pixel count. */
+#define LIBMCENV_ERROR_INTERNALSCALINGERROR 10103 /** Internal scaling error. */
+#define LIBMCENV_ERROR_INVALIDCOLORRANGE 10104 /** Invalid color range. */
+#define LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME 10105 /** Empty journal variable name. */
+#define LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL 10106 /** Invalid journal variable interval. */
+#define LIBMCENV_ERROR_JOURNALVARIABLENOTFOUND 10107 /** Journal variable not found. */
+#define LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA 10108 /** Computation outside of journal data. */
+#define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL 10109 /** Invalid Journal compute interval. */
+#define LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA 10110 /** Invalid Journal compute data. */
+#define LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE 10111 /** Invalid Segment Attribute Type. */
+#define LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND 10112 /** Segment Attribute not Found. */
+#define LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE 10113 /** Unsupported field sampling mode. */
+#define LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM 10114 /** Sample point count exceeds maximum */
+#define LIBMCENV_ERROR_INVALIDCLAMPINTERVAL 10115 /** Invalid clamp interval */
+#define LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM 10116 /** Could not retrieve PNG stream */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -292,6 +313,27 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INTEGERVALUEATTRIBUTEOUTOFRANGE: return "Integer value attribute out of range.";
     case LIBMCENV_ERROR_INVALIDDOUBLEVALUEATTRIBUTE: return "Invalid double value attribute.";
     case LIBMCENV_ERROR_DOUBLEVALUEATTRIBUTEOUTOFRANGE: return "Double value attribute out of range.";
+    case LIBMCENV_ERROR_INVALIDDEFAULTIMAGEVALUE: return "Invalid default image value.";
+    case LIBMCENV_ERROR_INVALIDPIXELMEMORYSIZE: return "Invalid pixel memory size.";
+    case LIBMCENV_ERROR_INVALIDFIELDBUFFER: return "Invalid field buffer.";
+    case LIBMCENV_ERROR_INTERNALFIELDSIZEERROR: return "Internal field size error.";
+    case LIBMCENV_ERROR_INVALIDFIELDSIZE: return "Invalid field size.";
+    case LIBMCENV_ERROR_INVALIDFIELDSCALINGFACTOR: return "Invalid field scaling factor.";
+    case LIBMCENV_ERROR_SCALINGEXCEEDSMAXIMUMPIXELCOUNT: return "Scaling exceeds maximum pixel count.";
+    case LIBMCENV_ERROR_INTERNALSCALINGERROR: return "Internal scaling error.";
+    case LIBMCENV_ERROR_INVALIDCOLORRANGE: return "Invalid color range.";
+    case LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name.";
+    case LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL: return "Invalid journal variable interval.";
+    case LIBMCENV_ERROR_JOURNALVARIABLENOTFOUND: return "Journal variable not found.";
+    case LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA: return "Computation outside of journal data.";
+    case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid Journal compute interval.";
+    case LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid Journal compute data.";
+    case LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE: return "Invalid Segment Attribute Type.";
+    case LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND: return "Segment Attribute not Found.";
+    case LIBMCENV_ERROR_UNSUPPORTEDFIELDSAMPLINGMODE: return "Unsupported field sampling mode.";
+    case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
+    case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "Invalid clamp interval";
+    case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
     default: return "unknown error";
   }
 }
@@ -303,7 +345,11 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
 typedef LibMCEnvHandle LibMCEnv_TestEnvironment;
+typedef LibMCEnvHandle LibMCEnv_PNGImageStoreOptions;
+typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
+typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
+typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
@@ -325,6 +371,8 @@ typedef LibMCEnvHandle LibMCEnv_DriverStatusUpdateSession;
 typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
+typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
+typedef LibMCEnvHandle LibMCEnv_JournalVariable;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
 typedef LibMCEnvHandle LibMCEnv_UIEnvironment;
 
@@ -341,11 +389,25 @@ namespace LibMCEnv {
     RGBA32bit = 3
   };
   
+  enum class eFieldSamplingMode : LibMCEnv_int32 {
+    Unknown = 0, /** Field sampling mode is invalid. */
+    FloorCoordinate = 1, /** Point Coordinates are rounded down to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is nearer to the origin. */
+    CeilCoordinate = 2, /** Point Coordinates are rounded up to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is farer from the origin. */
+    WeightByRectangleArea = 3, /** Point values are valued by a rectangle shape area and its overlap with each pixel (with the center as the given coordinate). */
+    WeightByEllipseArea = 4 /** Point values are valued by a ellipse shape area that its overlap with each pixel (with the center as the given coordinate). */
+  };
+  
   enum class eToolpathSegmentType : LibMCEnv_int32 {
     Unknown = 0,
     Hatch = 1,
     Loop = 2,
     Polyline = 3
+  };
+  
+  enum class eToolpathAttributeType : LibMCEnv_int32 {
+    Unknown = 0,
+    Integer = 1,
+    Double = 2
   };
   
   enum class eToolpathProfileValueType : LibMCEnv_int32 {
@@ -394,6 +456,16 @@ namespace LibMCEnv {
       LibMCEnv_double m_Coordinates[2];
   } sFloatPosition2D;
   
+  typedef struct sFieldData2DPoint {
+      LibMCEnv_double m_Coordinates[2];
+      LibMCEnv_double m_Value;
+  } sFieldData2DPoint;
+  
+  typedef struct sFieldData3DPoint {
+      LibMCEnv_double m_Coordinates[3];
+      LibMCEnv_double m_Value;
+  } sFieldData3DPoint;
+  
   typedef struct sFloatHatch2D {
       LibMCEnv_double m_X1;
       LibMCEnv_double m_Y1;
@@ -418,12 +490,16 @@ namespace LibMCEnv {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
+typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
+typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;
+typedef LibMCEnv::sFieldData2DPoint sLibMCEnvFieldData2DPoint;
+typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;
 typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
 typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;

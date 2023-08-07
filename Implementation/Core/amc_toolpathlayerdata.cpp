@@ -34,6 +34,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+
+	CToolpathCustomSegmentAttribute::CToolpathCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, LibMCEnv::eToolpathAttributeType attributeType)
+		: m_sNameSpace (sNameSpace), m_sAttributeName (sAttributeName), m_AttributeType (attributeType), m_nAttributeID (0)
+	{
+
+	}
+
+	CToolpathCustomSegmentAttribute::~CToolpathCustomSegmentAttribute()
+	{
+
+	}
+
+	uint32_t CToolpathCustomSegmentAttribute::getAttributeID()
+	{
+		return m_nAttributeID;
+	}
+
+	void CToolpathCustomSegmentAttribute::setAttributeID(uint32_t nAttributeID)
+	{
+		m_nAttributeID = nAttributeID;
+	}
+
+	LibMCEnv::eToolpathAttributeType CToolpathCustomSegmentAttribute::getAttributeType()
+	{
+		return m_AttributeType;
+	}
+
+	std::string CToolpathCustomSegmentAttribute::getNameSpace()
+	{
+		return m_sNameSpace;
+	}
+
+	std::string CToolpathCustomSegmentAttribute::getAttributeName()
+	{
+		return m_sAttributeName;
+	}
+
 	CToolpathLayerProfile::CToolpathLayerProfile(const std::string& sUUID)
 		: m_sUUID (sUUID)
 	{
@@ -80,10 +117,8 @@ namespace AMC {
 
 	}
 
-
-
-	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName)
-		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName)
+	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName, std::vector<CToolpathCustomSegmentAttribute> customSegmentAttributes)
+		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName), m_CustomSegmentAttributes (customSegmentAttributes)
 	{
 		LibMCAssertNotNull(p3MFLayer.get());
 		LibMCAssertNotNull(pToolpath.get());
@@ -91,6 +126,15 @@ namespace AMC {
 		m_sUUID = p3MFLayer->GetLayerDataUUID();
 		uint32_t nSegmentCount = p3MFLayer->GetSegmentCount();
 		uint32_t nTotalPointCount = 0;
+
+		for (auto& attribute : m_CustomSegmentAttributes) {
+			std::string sNameSpace = attribute.getNameSpace();
+			std::string sAttributeName = attribute.getAttributeName();
+			attribute.setAttributeID (p3MFLayer->FindAttributeIDByName (sNameSpace, sAttributeName));
+			m_CustomSegmentAttributeMap.insert (std::make_pair (std::make_pair (sNameSpace, sAttributeName), &attribute));
+		}
+
+		m_SegmentAttributeData.resize((size_t)nSegmentCount * m_CustomSegmentAttributes.size());
 
 		// Read segment information
 		m_Segments.resize(nSegmentCount);
@@ -107,6 +151,27 @@ namespace AMC {
 			pSegment->m_Type = (LibMCEnv::eToolpathSegmentType) eType;
 			pSegment->m_ProfileID = registerUUID (sProfileUUID);
 			pSegment->m_PartID = registerUUID(sPartUUID);
+			if (m_CustomSegmentAttributes.size() > 0) {
+				pSegment->m_AttributeData = &m_SegmentAttributeData.at((size_t)nSegmentIndex * m_CustomSegmentAttributes.size());
+				int64_t* pAttributeData = pSegment->m_AttributeData;
+				for (auto& attribute : m_CustomSegmentAttributes) {
+					switch (attribute.getAttributeType()) {
+						case LibMCEnv::eToolpathAttributeType::Integer:
+							*pAttributeData = p3MFLayer->GetSegmentIntegerAttributeByID(nSegmentIndex, attribute.getAttributeID());
+							break;
+						case LibMCEnv::eToolpathAttributeType::Double:
+							*((double*)pAttributeData) = p3MFLayer->GetSegmentDoubleAttributeByID(nSegmentIndex, attribute.getAttributeID());
+							break;
+						default:
+							throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE, m_sDebugName);
+					}
+					pAttributeData++;
+				}
+
+			}
+			else {
+				pSegment->m_AttributeData = nullptr;
+			}
 
 			storeProfileData (pToolpath, sProfileUUID);
 
@@ -144,6 +209,15 @@ namespace AMC {
 			}
 		}
 
+		uint32_t nCustomDataCount = p3MFLayer->GetCustomDataCount();
+		for (uint32_t nCustomDataIndex = 0; nCustomDataIndex < nCustomDataCount; nCustomDataIndex++) {
+			auto pCustomData = p3MFLayer->GetCustomData(nCustomDataIndex);
+			std::string sNameSpace = pCustomData->GetNameSpace();
+			std::string sRootName = pCustomData->GetRootNode()->GetName();
+			auto sXMLString = pCustomData->SaveToString();
+
+			m_CustomData.push_back(std::make_pair (std::make_pair (sNameSpace, sRootName), sXMLString));
+		}
 		
 
 	}
@@ -166,7 +240,7 @@ namespace AMC {
 	uint32_t CToolpathLayerData::getSegmentPointCount(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		return m_Segments[nSegmentIndex].m_PointCount;
 	}
@@ -174,7 +248,7 @@ namespace AMC {
 	LibMCEnv::eToolpathSegmentType CToolpathLayerData::getSegmentType(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		return m_Segments[nSegmentIndex].m_Type;
 	}
@@ -183,7 +257,7 @@ namespace AMC {
 	{
 		LibMCAssertNotNull(pPositionData);
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		auto pSegment = &m_Segments[nSegmentIndex];
 		if (pSegment->m_PointCount > 0) {
@@ -202,7 +276,7 @@ namespace AMC {
 	{
 		LibMCAssertNotNull(pHatchData);
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		auto pSegment = &m_Segments[nSegmentIndex];
 		if (pSegment->m_PointCount > 0) {
@@ -227,7 +301,7 @@ namespace AMC {
 	{
 		LibMCAssertNotNull(pPositionData);
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		auto pSegment = &m_Segments[nSegmentIndex];
 		if (pSegment->m_PointCount > 0) {
@@ -246,7 +320,7 @@ namespace AMC {
 	{
 		LibMCAssertNotNull(pHatchData);
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		auto pSegment = &m_Segments[nSegmentIndex];
 		if (pSegment->m_PointCount > 0) {
@@ -291,7 +365,7 @@ namespace AMC {
 			return "";
 
 		if (nID > m_UUIDs.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		return m_UUIDs[nID - 1];
 	}
@@ -300,7 +374,7 @@ namespace AMC {
 	std::string CToolpathLayerData::getSegmentProfileUUID(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
 	}
@@ -308,7 +382,7 @@ namespace AMC {
 	std::string CToolpathLayerData::getSegmentPartUUID(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartID);
 	}
@@ -316,10 +390,57 @@ namespace AMC {
 	PToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
 		auto sProfileUUID = getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
 		return retrieveProfileData(sProfileUUID);
+	}
+
+	bool CToolpathLayerData::findCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, uint32_t& nAttributeID, LibMCEnv::eToolpathAttributeType& attributeType)
+	{
+		auto iIter = m_CustomSegmentAttributeMap.find(std::make_pair(sNameSpace, sAttributeName));
+		if (iIter != m_CustomSegmentAttributeMap.end()) {
+			nAttributeID = iIter->second->getAttributeID ();
+			attributeType = iIter->second->getAttributeType();
+			return true;
+		}
+		else {
+			nAttributeID = 0;
+			attributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+			return false;
+		}
+	}
+
+	int64_t CToolpathLayerData::getSegmentIntegerAttribute(const uint32_t nSegmentIndex, uint32_t nAttributeID)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
+
+		if ((nAttributeID < 1) || (nAttributeID > m_CustomSegmentAttributes.size ()))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID, m_sDebugName);
+
+		auto eAttributeType = m_CustomSegmentAttributes.at(nAttributeID - 1).getAttributeType();
+		if (eAttributeType != LibMCEnv::eToolpathAttributeType::Integer)
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE, m_sDebugName);
+
+		return m_Segments[nSegmentIndex].m_AttributeData[nAttributeID - 1];
+	}
+
+
+	double CToolpathLayerData::getSegmentDoubleAttribute(const uint32_t nSegmentIndex, uint32_t nAttributeID)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
+
+		if ((nAttributeID < 1) || (nAttributeID > m_CustomSegmentAttributes.size()))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID, m_sDebugName);
+
+		auto eAttributeType = m_CustomSegmentAttributes.at(nAttributeID - 1).getAttributeType();
+		if (eAttributeType != LibMCEnv::eToolpathAttributeType::Double)
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE, m_sDebugName);
+
+		double * pData = (double*) &m_Segments[nSegmentIndex].m_AttributeData[nAttributeID - 1];
+		return *pData;
 	}
 
 	double CToolpathLayerData::getUnits()
@@ -366,6 +487,71 @@ namespace AMC {
 			throw ELibMCCustomException(LIBMC_ERROR_PROFILENOTFOUND, m_sDebugName + "/" + sProfileUUID);
 
 		return iIter->second;
+	}
+
+	uint32_t CToolpathLayerData::getMetaDataCount()
+	{
+		return (uint32_t)m_CustomData.size();
+	}
+
+	void CToolpathLayerData::getMetaDataInfo(uint32_t nMetaDataIndex, std::string& sNameSpace, std::string& sName)
+	{
+		if (nMetaDataIndex >= m_CustomData.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		auto& entry = m_CustomData.at(nMetaDataIndex);
+		sNameSpace = entry.first.first;
+		sName = entry.first.second;
+	}
+
+	PXMLDocumentInstance CToolpathLayerData::getMetaData(uint32_t nMetaDataIndex)
+	{
+		if (nMetaDataIndex >= m_CustomData.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		auto& entry = m_CustomData.at(nMetaDataIndex);
+
+		PXMLDocumentInstance pXMLInstance = std::make_shared <CXMLDocumentInstance>();
+		pXMLInstance->parseXMLString(entry.second);
+
+		return pXMLInstance;
+
+	}
+
+	bool CToolpathLayerData::hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		uint32_t nFoundCount = 0;
+		for (auto& entry : m_CustomData) {
+			if ((entry.first.first == sNameSpace) && (entry.first.second == sName))
+				nFoundCount++;
+		}
+
+		return (nFoundCount == 1);
+	}
+
+	PXMLDocumentInstance CToolpathLayerData::findUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		uint32_t nFoundCount = 0;
+		std::pair<std::pair<std::string, std::string>, std::string> foundEntry;
+
+		for (auto& entry : m_CustomData) {
+			if ((entry.first.first == sNameSpace) && (entry.first.second == sName)) {
+				foundEntry = entry;
+				nFoundCount++;
+			}
+		}
+
+		if (nFoundCount == 0) 
+			throw ELibMCCustomException(LIBMC_ERROR_METADATANOTFOUND, sNameSpace + "/" + sName);
+	
+		if (nFoundCount > 1)
+			throw ELibMCCustomException(LIBMC_ERROR_METADATAISNOTUNIQUE, sNameSpace + "/" + sName);
+
+		PXMLDocumentInstance pXMLInstance = std::make_shared <CXMLDocumentInstance>();
+		pXMLInstance->parseXMLString(foundEntry.second);
+
+		return pXMLInstance;
+
 	}
 
 }

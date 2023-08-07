@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_toolpathentity.hpp"
 #include "libmc_exceptiontypes.hpp"
+#include "libmcenv_dynamic.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 namespace AMC {
 
@@ -121,7 +123,7 @@ namespace AMC {
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
 		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
-		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName);
+		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName, m_CustomSegmentAttributes);
 	}
 
 
@@ -133,36 +135,117 @@ namespace AMC {
 
 	}
 
+	uint32_t CToolpathEntity::getMetaDataCount()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		return m_pToolpath->GetCustomDataCount();
+
+	}
+	void CToolpathEntity::getMetaDataInfo(uint32_t nMetaDataIndex, std::string& sNameSpace, std::string& sName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+		if (nMetaDataIndex >= nDataCount)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		m_pToolpath->GetCustomDataName(nMetaDataIndex, sNameSpace, sName);
+	}
+
+
+	PXMLDocumentInstance CToolpathEntity::getMetaData(uint32_t nMetaDataIndex)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+		if (nMetaDataIndex >= nDataCount)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMETADATAINDEX);
+
+		auto pMetaData = m_pToolpath->GetCustomData(nMetaDataIndex);
+		auto pMetaDataRootNode = pMetaData->GetRootNode();
+
+		PXMLDocumentInstance pXMLDocument = std::make_shared<CXMLDocumentInstance>();
+		pXMLDocument->createEmptyDocument (pMetaDataRootNode->GetName (), pMetaData->GetNameSpace ());
+
+		copyMetaDataNode(pXMLDocument->GetRootNode(), pMetaDataRootNode);
+
+		return pXMLDocument;
+
+	}
+
+	void CToolpathEntity::copyMetaDataNode(AMC::PXMLDocumentNodeInstance pTargetNodeInstance, Lib3MF::PCustomXMLNode pSourceNodeInstance)
+	{
+		if (pTargetNodeInstance.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pSourceNodeInstance.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		size_t nAttributeCount = pSourceNodeInstance->GetAttributeCount();
+		for (size_t nAttributeIndex = 0; nAttributeIndex < nAttributeCount; nAttributeIndex++) {
+			auto pAttribute = pSourceNodeInstance->GetAttribute(nAttributeIndex);
+			pTargetNodeInstance->AddAttribute(pTargetNodeInstance->GetNameSpace(), pAttribute->GetName(), pAttribute->GetValue());
+		}
+
+		auto pSourceChildren = pSourceNodeInstance->GetChildren ();
+		size_t nChildCount = pSourceChildren->GetNodeCount();
+		for (size_t nChildIndex = 0; nChildIndex < nChildCount; nChildIndex++) {
+			auto pSourceChild = pSourceChildren->GetNode(nChildIndex);
+			auto pTargetChild = pTargetNodeInstance->AddChild(pTargetNodeInstance->GetNameSpace(), pSourceChild->GetName());
+
+			copyMetaDataNode(pTargetChild, pSourceChild);
+		}
+	}
+
+
+	bool CToolpathEntity::hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		uint32_t nFoundData = 0;
+		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+
+		for (uint32_t nMetaDataIndex = 0; nMetaDataIndex < nDataCount; nMetaDataIndex++) {
+			std::string sMetaDataNameSpace, sMetaDataName;
+			m_pToolpath->GetCustomDataName(nMetaDataIndex, sMetaDataNameSpace, sMetaDataName);
+			if ((sMetaDataNameSpace == sNameSpace) && (sMetaDataName == sName))
+				nFoundData++;
+		}
+
+		return (nFoundData == 1);
+	}
+
+	PXMLDocumentInstance CToolpathEntity::findUniqueMetaData(const std::string& sNameSpace, const std::string& sName)
+	{
+		int64_t nFoundIndex = -1;
+
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+			uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
+
+			for (uint32_t nMetaDataIndex = 0; nMetaDataIndex < nDataCount; nMetaDataIndex++) {
+				std::string sMetaDataNameSpace, sMetaDataName;
+				m_pToolpath->GetCustomDataName(nMetaDataIndex, sMetaDataNameSpace, sMetaDataName);
+				if ((sMetaDataNameSpace == sNameSpace) && (sMetaDataName == sName)) {
+					if (nFoundIndex != -1)
+						throw ELibMCCustomException(LIBMC_ERROR_METADATAISNOTUNIQUE, sNameSpace + "/" + sName);
+
+					nFoundIndex = nMetaDataIndex;
+				}
+			}
+		}
+
+		if (nFoundIndex < 0)
+			throw ELibMCCustomException(LIBMC_ERROR_METADATANOTFOUND, sNameSpace + "/" + sName);
+
+		return getMetaData ((uint32_t) nFoundIndex);
+	}
+
+
 	std::string CToolpathEntity::getDebugName()
 	{
 		return m_sDebugName;
-	}
-
-	bool CToolpathEntity::hasMetaData (const std::string& sNameSpace, const std::string& sName)
-	{
-		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
-		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
-		return (pMetaData.get() != nullptr);
-	}
-
-	std::string CToolpathEntity::getMetaDataValue(const std::string& sNameSpace, const std::string& sName)
-	{
-		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
-		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
-		if (pMetaData.get() == nullptr)
-			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHMETADATANOTFOUND, sNameSpace + "#" + sName);
-		
-		return pMetaData->GetValue();
-	}
-
-	std::string CToolpathEntity::getMetaDataType(const std::string& sNameSpace, const std::string& sName)
-	{
-		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
-		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
-		if (pMetaData.get() == nullptr)
-			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHMETADATANOTFOUND, sNameSpace + "#" + sName);
-
-		return pMetaData->GetType();
 	}
 
 
@@ -184,6 +267,41 @@ namespace AMC {
 
 		return iIter->second;
 	}
+
+	void CToolpathEntity::registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto key = std::make_pair(sNameSpace, sAttributeName);
+
+		auto iIter = m_CustomSegmentAttributeMap.find(key);
+		if (iIter != m_CustomSegmentAttributeMap.end()) {
+			if (iIter->second->getAttributeType () != eAttributeType)
+				throw ELibMCInterfaceException(LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE, "ambiguous segment attribute type of " + sNameSpace + "/" + sAttributeName);
+
+			return;
+		}
+
+
+		switch (eAttributeType) {
+		case LibMCEnv::eToolpathAttributeType::Integer: 
+			m_pToolpath->RegisterCustomIntegerAttribute (sNameSpace, sAttributeName);
+			break;
+		case LibMCEnv::eToolpathAttributeType::Double:
+			m_pToolpath->RegisterCustomDoubleAttribute (sNameSpace, sAttributeName);
+			break;
+		default: 
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE, "invalid segment attribute type of " + sNameSpace + "/" + sAttributeName);
+		}
+		
+		CToolpathCustomSegmentAttribute segmentAttribute(sNameSpace, sAttributeName, eAttributeType);
+		m_CustomSegmentAttributes.push_back(segmentAttribute);
+		auto pAttribute = &(*m_CustomSegmentAttributes.rbegin());
+
+		m_CustomSegmentAttributeMap.insert(std::make_pair (key, pAttribute));
+		
+	}
+
 
 }
 

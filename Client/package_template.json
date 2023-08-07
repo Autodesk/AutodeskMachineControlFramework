@@ -23,7 +23,8 @@
       "eslint:recommended"
     ],
     "parserOptions": {
-      "parser": "@babel/eslint-parser"
+      "parser": "@babel/eslint-parser",
+	  "vue/no-mutating-props": 0
     },
     "rules": {
       "no-mixed-spaces-and-tabs": 0

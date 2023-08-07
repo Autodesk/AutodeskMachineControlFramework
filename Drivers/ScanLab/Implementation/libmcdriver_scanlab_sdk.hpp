@@ -45,6 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
+#define SCANLAB_LASERFIELD_MINIMUMUNITS -524288
+#define SCANLAB_LASERFIELD_MAXIMUMUNITS 524287
+
 
 namespace LibMCDriver_ScanLab {
 	namespace Impl {
@@ -167,7 +170,36 @@ namespace LibMCDriver_ScanLab {
 
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_error) (uint32_t nCardNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_reset_error) (uint32_t nCardNo, uint32_t nCode);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_angle) (uint32_t nCardNo, uint32_t nHeadNo, double dAngle, uint32_t nAtOnce);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scale) (uint32_t nCardNo, uint32_t nHeadNo, double dScaleFactor, uint32_t nAtOnce);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_offset) (uint32_t nCardNo, uint32_t nHeadNo, int32_t nXOffset, int32_t nYOffset, uint32_t nAtOnce);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_matrix) (uint32_t nCardNo, uint32_t nHeadNo, double dM11, double dM12, double dM21, double dM22, uint32_t nAtOnce);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_waveform_offset) (uint32_t nCardNo, uint32_t nChannel, uint32_t nOffset, uint32_t nNumber, int32_t* pPtr);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_measurement_status) (uint32_t nCardNo, uint32_t* pnBusy, uint32_t* pnPos);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_transform) (int32_t * pSignal1, int32_t * pSignal2, uint8_t * pTransform, uint32_t nCode);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_upload_transform) (uint32_t nCardNo, uint32_t nHeadNo, uint8_t * pTransformData);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_timelag_compensation) (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nTimelagXY, uint32_t nTimelagZ);
 		
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_init_fly_2d) (uint32_t nCardNo, int32_t nOffsetX, int32_t nOffsetY, uint32_t nNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_activate_fly_2d) (uint32_t nCardNo, const double ScaleX, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_activate_fly_2d_encoder) (uint32_t nCardNo, const double ScaleX, const double ScaleY, int32_t nEncoderOffsetX, int32_t nEncoderOffsetY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_2d) (uint32_t nCardNo, const double ScaleX, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_fly_2d_offset) (uint32_t nCardNo, const int32_t * pOffsetX, const int32_t* pOffsetY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_x_pos) (uint32_t nCardNo, const double ScaleX);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y_pos) (uint32_t nCardNo, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_x) (uint32_t nCardNo, const double ScaleX);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y) (uint32_t nCardNo, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_encoder) (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_marking_info) (uint32_t nCardNo);		
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder_mode) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo, int32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_limits) (uint32_t nCardNo, int32_t nXMin, int32_t nXMax, int32_t nYMin, int32_t nYMax);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_range_checking) (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nMode, uint32_t nData);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_stop_execution) (uint32_t nCardNo);
+
 
 		class CScanLabSDK {
 		private:
@@ -283,6 +315,33 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_reset_error n_reset_error = nullptr;
 			PScanLabPtr_n_set_multi_mcbsp_in_list n_set_multi_mcbsp_in_list = nullptr;
 			PScanLabPtr_n_set_laser_power n_set_laser_power = nullptr;
+			PScanLabPtr_n_set_angle n_set_angle = nullptr;
+			PScanLabPtr_n_set_scale n_set_scale = nullptr;
+			PScanLabPtr_n_set_offset n_set_offset = nullptr;
+			PScanLabPtr_n_set_matrix n_set_matrix = nullptr;
+
+			PScanLabPtr_n_get_waveform_offset n_get_waveform_offset = nullptr;
+			PScanLabPtr_n_measurement_status n_measurement_status = nullptr;
+			PScanLabPtr_transform transform = nullptr;
+			PScanLabPtr_n_upload_transform n_upload_transform = nullptr;
+			PScanLabPtr_n_set_timelag_compensation n_set_timelag_compensation = nullptr;
+
+			PScanLabPtr_n_init_fly_2d n_init_fly_2d = nullptr;
+			PScanLabPtr_n_activate_fly_2d n_activate_fly_2d = nullptr;
+			PScanLabPtr_n_activate_fly_2d_encoder n_activate_fly_2d_encoder = nullptr;
+			PScanLabPtr_n_set_fly_2d n_set_fly_2d = nullptr;
+			PScanLabPtr_n_get_fly_2d_offset n_get_fly_2d_offset = nullptr;
+			PScanLabPtr_n_set_fly_x_pos n_set_fly_x_pos = nullptr;
+			PScanLabPtr_n_set_fly_y_pos n_set_fly_y_pos = nullptr;
+			PScanLabPtr_n_set_fly_x n_set_fly_x = nullptr;
+			PScanLabPtr_n_set_fly_y n_set_fly_y = nullptr;
+			PScanLabPtr_n_get_encoder n_get_encoder = nullptr;
+			PScanLabPtr_n_get_marking_info n_get_marking_info = nullptr;
+			PScanLabPtr_n_wait_for_encoder n_wait_for_encoder = nullptr;
+			PScanLabPtr_n_wait_for_encoder_mode n_wait_for_encoder_mode = nullptr;
+			PScanLabPtr_n_set_fly_limits n_set_fly_limits = nullptr;
+			PScanLabPtr_n_range_checking n_range_checking = nullptr;
+			PScanLabPtr_n_stop_execution n_stop_execution = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

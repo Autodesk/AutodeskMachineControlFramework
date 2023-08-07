@@ -132,8 +132,30 @@
 		<error name="INVALIDINTEGERVALUEATTRIBUTE" code="10092" description="Invalid integer value attribute." />				
 		<error name="INTEGERVALUEATTRIBUTEOUTOFRANGE" code="10093" description="Integer value attribute out of range." />				
 		<error name="INVALIDDOUBLEVALUEATTRIBUTE" code="10094" description="Invalid double value attribute." />				
-		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />				
-									
+		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />						
+		<error name="INVALIDDEFAULTIMAGEVALUE" code="10096" description="Invalid default image value." />
+		<error name="INVALIDPIXELMEMORYSIZE" code="10097" description="Invalid pixel memory size." />
+		<error name="INVALIDFIELDBUFFER" code="10098" description="Invalid field buffer." />
+		<error name="INTERNALFIELDSIZEERROR" code="10099" description="Internal field size error." />
+		<error name="INVALIDFIELDSIZE" code="10100" description="Invalid field size." />
+		<error name="INVALIDFIELDSCALINGFACTOR" code="10101" description="Invalid field scaling factor." />
+		<error name="SCALINGEXCEEDSMAXIMUMPIXELCOUNT" code="10102" description="Scaling exceeds maximum pixel count." />
+		<error name="INTERNALSCALINGERROR" code="10103" description="Internal scaling error." />
+		<error name="INVALIDCOLORRANGE" code="10104" description="Invalid color range." />
+		<error name="EMPTYJOURNALVARIABLENAME" code="10105" description="Empty journal variable name." />
+		<error name="INVALIDJOURNALVARIABLEINTERVAL" code="10106" description="Invalid journal variable interval." />
+		<error name="JOURNALVARIABLENOTFOUND" code="10107" description="Journal variable not found." />
+		<error name="COMPUTATIONOUTSIDEOFJOURNALDATA" code="10108" description="Computation outside of journal data." />
+		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="10109" description="Invalid Journal compute interval." />
+		<error name="INVALIDJOURNALCOMPUTEDATA" code="10110" description="Invalid Journal compute data." />
+		<error name="INVALIDSEGMENTATTRIBUTETYPE" code="10111" description="Invalid Segment Attribute Type." />
+		<error name="SEGMENTATTRIBUTENOTFOUND" code="10112" description="Segment Attribute not Found." />
+		<error name="UNSUPPORTEDFIELDSAMPLINGMODE" code="10113" description="Unsupported field sampling mode." />
+		<error name="SAMPLEPOINTCOUNTEXCEEDSMAXIMUM" code="10114" description="Sample point count exceeds maximum"/>
+		<error name="INVALIDCLAMPINTERVAL" code="10115" description="Invalid clamp interval"/>
+		<error name="COULDNOTRETRIEVEPNGSTREAM" code="10116" description="Could not retrieve PNG stream"/>
+		
+		
 	</errors>
 
 
@@ -144,6 +166,15 @@
 		<option name="RGBA32bit" value="3" />
 	</enum>
 	
+	<enum name="FieldSamplingMode">
+		<option name="Unknown" value="0" description="Field sampling mode is invalid." />
+		<option name="FloorCoordinate" value="1" description="Point Coordinates are rounded down to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is nearer to the origin." />
+		<option name="CeilCoordinate" value="2" description="Point Coordinates are rounded up to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is farer from the origin." />
+		<option name="WeightByRectangleArea" value="3" description="Point values are valued by a rectangle shape area and its overlap with each pixel (with the center as the given coordinate)." />
+		<option name="WeightByEllipseArea" value="4" description="Point values are valued by a ellipse shape area that its overlap with each pixel (with the center as the given coordinate)." />
+	</enum>
+	
+	
 	<enum name="ToolpathSegmentType">
 		<option name="Unknown" value="0" />
 		<option name="Hatch" value="1" />
@@ -151,6 +182,12 @@
 		<option name="Polyline" value="3" />
 	</enum>
 	
+	<enum name="ToolpathAttributeType">
+		<option name="Unknown" value="0" />
+		<option name="Integer" value="1" />
+		<option name="Double" value="2" />
+	</enum>
+
 	<enum name="ToolpathProfileValueType">
 		<option name="Custom" value="0" />
 		<option name="Speed" value="1" />
@@ -192,6 +229,16 @@
 		<member name="Coordinates" type="double" rows="2"/>
 	</struct>
 
+	<struct name="FieldData2DPoint">
+		<member name="Coordinates" type="double" rows="2"/>
+		<member name="Value" type="double" />
+	</struct>
+
+	<struct name="FieldData3DPoint">
+		<member name="Coordinates" type="double" rows="3"/>
+		<member name="Value" type="double" />
+	</struct>
+
 	<struct name="FloatHatch2D">
 		<member name="X1" type="double" />
 		<member name="Y1" type="double" />
@@ -206,9 +253,9 @@
 	</struct>
 
 	<struct name="ColorRGB">
-		<member name="Red" type="double" />
-		<member name="Green" type="double" />
-		<member name="Blue" type="double" />
+		<member name="Red" type="double" description="Red value of color (0..1)" />
+		<member name="Green" type="double" description="Green value of color (0..1)"/>
+		<member name="Blue" type="double" description="Blue value of color (0..1)" />
 	</struct>
 
 	
@@ -244,6 +291,27 @@
 		
 	</class>
 
+	
+	<class name="PNGImageStoreOptions" parent="Base" description="Option class to parametrize saving of PNG Images.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+	
+	
+	<class name="PNGImageData" parent="Base" description="Binary representation of PNG Data.">
+
+		<method name="GetSizeInPixels" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="GetPNGDataStream" description="Retrieves encoded data stream of image object.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>
+
+	</class>
 	
 	<class name="ImageData" parent="Base" description="In memory representation of an image.">
 
@@ -281,18 +349,23 @@
 		</method>		
 
 		<method name="LoadPNG" description="Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="PNG Data stream." />
 		</method>		
 
-		<method name="EncodePNG" description="Encodes PNG and stores data stream in image object.">
-		</method>		
+		<method name="CreatePNGImage" description="Creates PNG Image out of the pixel data.">		
+			<param name="PNGStorageOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
+			<param name="PNGImage" type="class" class="PNGImageData" pass="return" description="Image data." />		
+		</method>
 
-		<method name="GetEncodedPNGData" description="Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
+		<method name="EncodePNG" description="Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.">
+		</method>
+
+		<method name="GetEncodedPNGData" description="Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
 			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
-		</method>		
+		</method>
 		
-		<method name="ClearEncodedPNGData" description="Releases encoded data stream of image object.">
-		</method>		
+		<method name="ClearEncodedPNGData" description="Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.">
+		</method>
 		
 		<method name="Clear" description="Sets all pixels to a single value.">
 			<param name="Value" type="uint32" pass="in" description="Pixel value." />
@@ -315,7 +388,7 @@
 			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
 			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
 			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
-			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
 		</method>		
 
 		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
@@ -328,6 +401,144 @@
 	
 	</class>
 	
+	<class name="DiscreteFieldData2DStoreOptions" parent="Base" description="Option class to parametrize saving of Field Data.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+
+
+	<class name="DiscreteFieldData2D" parent="Base" description="In-memory representation of discrete field in space.">
+
+		<method name="GetDPI" description="Returns DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
+			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
+		</method>
+
+		<method name="SetDPI" description="Sets DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="in" description="new DPI value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="new DPI value in Y. MUST be positive." />
+		</method>
+
+		<method name="GetOriginInMM" description="Returns field origin in mm.">
+			<param name="OriginX" type="double" pass="out" description="Origin in X in mm" />
+			<param name="OriginY" type="double" pass="out" description="Origin in Y in mm" />
+		</method>
+
+		<method name="SetOriginInMM" description="Set field origin in mm.">
+			<param name="OriginX" type="double" pass="in" description="Origin in X in mm" />
+			<param name="OriginY" type="double" pass="in" description="Origin in Y in mm" />
+		</method>
+		
+		<method name="GetSizeInMM" description="Returns field sizes in mm.">
+			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
+			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
+		</method>
+
+		<method name="GetSizeInPixels" description="Returns field pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="ResizeField" description="Resizes field pixel data.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Number of pixels in Y" />
+			<param name="DefaultValue" type="double" pass="in" description="Default Pixel value." />
+		</method>
+
+		<method name="Clear" description="Sets all pixels to a single value.">
+			<param name="Value" type="double" pass="in" description="Pixel value." />
+		</method>		
+
+		<method name="Clamp" description="Clamps all pixels to a certain interval.">
+			<param name="MinValue" type="double" pass="in" description="Minimum value. MUST be smaller or equal than MaxValue." />
+			<param name="MaxValue" type="double" pass="in" description="Maximum value. MUST be larger or equal than MinValue." />
+		</method>		
+
+		<method name="GetPixel" description="Returns one pixel of an field. Fails if outside of field size.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="double" pass="return" description="Pixel value at this position" />
+		</method>		
+
+		<method name="SetPixel" description="Sets one pixel of an field. Fails if outside of field size.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="double" pass="in" description="New Pixel value at this position" />
+		</method>		
+
+		<method name="GetPixelRange" description="Returns a subset of an field or the whole field data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within field bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within field bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="double" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size." />
+		</method>		
+
+		<method name="SetPixelRange" description="Exchanges a subset of an field or the whole field data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within field bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within field bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="double" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size." />
+		</method>
+		
+		<method name="RenderAveragePointValues" description="Renders and array of average point values into the field. ">
+			<param name="DefaultValue" type="double" pass="in" description="If a pixel does not contain any value, fall back to this given value." />
+			<param name="SamplingMode" type="enum" class="FieldSamplingMode" pass="in" description="Sampling mode of point values." />
+			<param name="SampleSizeX" type="double" pass="in" description="How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise." />
+			<param name="SampleSizeY" type="double" pass="in" description="How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise." />
+			<param name="PointValues" type="structarray" class="FieldData2DPoint" pass="in" description="Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels." />
+		</method>
+		
+		<method name="ScaleFieldDown" description="Scales the field to a smaller size.">
+			<param name="FactorX" type="uint32" pass="in" description="The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX" />
+			<param name="FactorY" type="uint32" pass="in" description="The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY" />
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+		
+		<method name="ScaleFieldUp" description="Scales the field to a larger size.">
+			<param name="FactorX" type="uint32" pass="in" description="The new field will be this factor larger in X. MUST be positive." />
+			<param name="FactorY" type="uint32" pass="in" description="The new field will be this factor larger in Y. MUST be positive." />
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+
+		<method name="Discretize" description="Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.">
+			<param name="DiscreteValues" type="basicarray" class="double" pass="in" description="An array of values. MUST NOT be empty." />
+		</method>
+		
+		<method name="DiscretizeWithMapping" description="Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.">
+			<param name="DiscreteValues" type="basicarray" class="double" pass="in" description="An array of values. MUST NOT be empty.  " />
+			<param name="NewValues" type="basicarray" class="double" pass="in" description="An array of values. MUST have the same cardinality as DiscreteValues." />
+		</method>
+
+		<method name="RenderToImageRaw" description="Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.">
+			<param name="MinValue" type="double" pass="in" description="Min point value. Values smaller than MinValue will be clamped to MinValue." />
+			<param name="MinColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MinValue." />
+			<param name="MidValue" type="double" pass="in" description="Mid point value. MUST be at least 1E-6 larger than MinValue." />
+			<param name="MidColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MidValue" />
+			<param name="MaxValue" type="double" pass="in" description="Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue." />
+			<param name="MaxColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MaxValue" />
+			<param name="NewImage" type="class" class="ImageData" pass="return" description="New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit." />
+		</method>		
+		
+		<method name="TransformField" description="Scales the field values with a factor and a translation.">
+			<param name="Scale" type="double" pass="in" description="A scaling factor will be applied to all values in the field." />
+			<param name="Offset" type="double" pass="in" description="The offset will be applied to all values in the field after scaling." />
+		</method>		
+
+		<method name="AddField" description="Adds another field to the field. Both fields MUST have the same pixel extensions.">
+			<param name="OtherField" type="class" class="DiscreteFieldData2D" pass="in" description="Field Instance to add" />
+			<param name="Scale" type="double" pass="in" description="A scaling factor will be applied to all values in the other field before adding." />
+			<param name="Offset" type="double" pass="in" description="The offset will be applied to all values in the field after scaling." />
+		</method>		
+
+		<method name="Duplicate" description="Creates a copy of the field.">
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+
+	</class>
 
 	<class name="ToolpathPart" parent="Base">
 	
@@ -369,6 +580,43 @@
 		<method name="GetSegmentType" description="Retrieves the segment type.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Type" type="enum" class="ToolpathSegmentType" pass="return" description="Segment Type" />
+		</method>
+
+		<method name="GetSegmentIntegerAttribute" description="Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
+			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
+			<param name="Value" type="int64" pass="return" description="Attribute Value." />
+		</method>
+
+		<method name="GetSegmentDoubleAttribute" description="Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
+			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
+			<param name="Value" type="double" pass="return" description="Attribute Value." />
+		</method>
+
+		<method name="HasCustomSegmentAttribute" description="Checks if a segment attribute is registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="ValueExists" type="bool" pass="return" description="Flag if attribute is registered." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeID" description="Finds a segment attribute ID. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeID" type="uint32" pass="return" description="ID of the attribute." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeType" description="Finds a segment attribute type. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="return" description="Type of the attribute." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeInfo" description="Finds a segment attribute ID and type. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeID" type="uint32" pass="out" description="ID of the attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="out" description="Type of the attribute." />
 		</method>
 
 		<method name="GetSegmentPointCount" description="Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.">
@@ -504,6 +752,33 @@
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
+
+		<method name="GetMetaDataCount" description="Retrieves the number of metadata nodes in the build file.">
+			<param name="MetaDataCount" type="uint32" pass="return" description="Meta Data information." />
+		</method>		
+
+		<method name="GetMetaDataInfo" description="Returns the namespace and identifier of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="Namespace" type="string" pass="out" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="out" description="Name of the metadata" />
+		</method>		
+
+		<method name="GetMetaDataContent" description="Returns the metadata XML content of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
+		<method name="HasUniqueMetaData" description="Checks if a metadata exists in the build file.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="MetaDataExists" type="bool" pass="return" description="Returns true if metadata exists and is unique." />
+		</method>		
+
+		<method name="FindUniqueMetaData" description="Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
 		
 	</class>
 
@@ -514,8 +789,18 @@
 			<param name="StorageUUID" type="string" pass="return" description="Returns toolpath storage uuid." />
 		</method>
 	
+		<method name="GetBuildUUID" description="Returns UUID of the toolpath's build file.">
+			<param name="BuildUUID" type="string" pass="return" description="Returns build uuid." />
+		</method>
+
 		<method name="GetLayerCount" description="Returns layer count.">
 			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
+		</method>
+
+		<method name="RegisterCustomSegmentAttribute" description="Registers a new custom segment attribute to be read.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the custom attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the custom attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="in" description="Attribute Type." />
 		</method>
 
 		<method name="LoadLayer" description="Reads and returns a layer object.">
@@ -525,24 +810,6 @@
 		
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
-		</method>
-
-		<method name="HasMetaData" description="Checks if a metadata value exists for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="Exists" type="bool" pass="return" description="Returns if metadata exists." />
-		</method>
-
-		<method name="GetMetaDataValue" description="Returns the value of a metadata for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="MetaDataValue" type="string" pass="return" description="Returns the value" />
-		</method>
-			
-		<method name="GetMetaDataType" description="Returns the type of a metadata for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="MetaDataType" type="string" pass="return" description="Returns the type" />
 		</method>
 
 		<method name="GetPartCount" description="Retrieves the number of parts in the toolpath.">
@@ -576,6 +843,34 @@
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index to return." />
 			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
 		</method>		
+
+		<method name="GetMetaDataCount" description="Retrieves the number of metadata nodes in the build file.">
+			<param name="MetaDataCount" type="uint32" pass="return" description="Meta Data information." />
+		</method>		
+
+		<method name="GetMetaDataInfo" description="Returns the namespace and identifier of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="Namespace" type="string" pass="out" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="out" description="Name of the metadata" />
+		</method>		
+
+		<method name="GetMetaDataContent" description="Returns the metadata XML content of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
+		<method name="HasUniqueMetaData" description="Checks if a metadata exists in the build file.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="MetaDataExists" type="bool" pass="return" description="Returns true if metadata exists and is unique." />
+		</method>		
+
+		<method name="FindUniqueMetaData" description="Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
 
 	</class>
 
@@ -626,11 +921,45 @@
 		</method>
 
 		<method name="AddBinaryData" description="Adds binary data to store with the build.">
-			<param name="Name" type="string" pass="in" description="Name of the attache data block." />
+			<param name="Name" type="string" pass="in" description="Unique name of the attache data block. Fails if ther already exists a binary data with the equal name." />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
+		
+		<method name="LoadDiscreteField2DByName" description="Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+		
+		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+
+		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
+			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
+
+		<method name="LoadPNGImageByName" description="Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+		
+		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+
+		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
+			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
 
 				
 	</class>
@@ -780,6 +1109,14 @@
 			<param name="Value" type="string" pass="return" description="returns the value of the attribute." />
 		</method>
 
+		<method name="IsValidUUID" description="Checks if the value is a valid UUID string.">
+			<param name="IsValid" type="bool" pass="return" description="returns if the value is a valid UUID string." />
+		</method>
+		
+		<method name="GetUUIDValue" description="Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.">
+			<param name="Value" type="string" pass="return" description="returns the value of the attribute as normalized UUID string." />
+		</method>
+
 		<method name="IsValidInteger" description="Checks if the value is a valid integer in the given range.">
 			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value" />
 			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value" />
@@ -810,8 +1147,6 @@
 		</method>
 
 		<method name="GetBoolValue" description="Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.">
-			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
-			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
 			<param name="Value" type="bool" pass="return" description="returns the value ." />
 		</method>
 
@@ -819,6 +1154,10 @@
 			<param name="Value" type="string" pass="in" description="new value of the attribute." />
 		</method>
 		
+		<method name="SetUUIDValue" description="Sets the value of the attribute as UUID string.">
+			<param name="Value" type="string" pass="in" description="new value of the attribute. Fails if Value is not a UUID." />
+		</method>
+
 		<method name="SetIntegerValue" description="Sets the value of the attribute as integer.">
 			<param name="Value" type="int64" pass="in" description="new value of the attribute." />
 		</method>
@@ -867,6 +1206,79 @@
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist." />			
 			<param name="AttributeInstance" type="optionalclass" class="XMLDocumentAttribute" pass="return" description="XML Document attribute." />
+		</method>
+
+		<method name="GetAttributeValue" description="Returns string value of an attribute. Fails if attribute does not exist.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeIntegerValue" description="Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="Value" type="int64" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeDoubleValue" description="Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
+			<param name="Value" type="double" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeBoolValue" description="Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="bool" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeUUIDValue" description="Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeValueDef" description="Returns string value of an attribute. Returns default value if attribute does not exist.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="string" pass="in" description="Default value." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeIntegerValueDef" description="Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="DefaultValue" type="int64" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="int64" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeDoubleValueDef" description="Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
+			<param name="DefaultValue" type="double" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="double" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeBoolValueDef" description="Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="bool" pass="in" description="Default value." />
+			<param name="Value" type="bool" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeUUIDValueDef" description="Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="string" pass="in" description="Attribute value. MUST be a valid UUID" />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
 		</method>
 
 		<method name="RemoveAttribute" description="Removes the attribute with a specific name. Does nothing if attribute does not exist.">
@@ -1435,6 +1847,27 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
 		</method>
 
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
+
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
+		</method>
+
 	</class>
 	
 	
@@ -1589,6 +2022,69 @@
 
 	</class>
 
+	<class name="UniformJournalSampling" parent="Base" description="Result class for Journal Sampling">
+
+		<method name="GetVariableName" description="returns the name of the recorded variable.">
+			<param name="Name" type="string" pass="return" description="Path or name." />
+		</method>
+
+		<method name="GetNumberOfSamples" description="Returns the number of samples in the interval.">
+			<param name="NumberOfSamples" type="uint32" pass="return" description="Number of samples in the sampling." />
+		</method>
+
+		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="StartTimeStampInMS" type="uint64" pass="return" description="Start Timestamp of Recording in ms." />
+		</method>
+	
+		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="EndTimeStampInMS" type="uint64" pass="return" description="End Timestamp of Recording in ms." />
+		</method>
+
+		<method name="GetSample" description="Returns the timestamp and value of the given sample.">
+			<param name="Index" type="uint32" pass="in" description="Index of the sample. 0-based. MUST be smaller than NumberOfSamples." />
+			<param name="TimeStamp" type="uint64" pass="out" description="TimeStamp of the sample in ms." />
+			<param name="Value" type="double" pass="out" description="Value of the sample in ms." />
+		</method>
+
+		<method name="GetAllSamples" description="Returns all timestamps and values of the sampling.">
+			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Array of TimeStamps in ms, in increasing order." />
+			<param name="Values" type="basicarray" class="double" pass="out" description="Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array." />
+		</method>
+
+	</class>
+
+
+	<class name="JournalVariable" parent="Base" description="Class for accessing journal statistics">
+	
+		<method name="GetVariableName" description="returns the name of the recorded variable.">
+			<param name="Name" type="string" pass="return" description="Path or name." />
+		</method>
+		
+		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="RecordingStartInMS" type="uint64" pass="return" description="Start Timestamp of Recording in ms." />
+		</method>
+	
+		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="RecordingEndInMS" type="uint64" pass="return" description="End Timestamp of Recording in ms." />
+		</method>
+		
+		<method name="ComputeAverage" description="Calculates the average value over a time interval. Fails if no data is available in this time interval.">
+			<param name="StartTimeInMS" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
+			<param name="EndTimeInMS" type="uint64" pass="in" description="End Timestamp of the interval in ms. MUST be larger than Timestamp." />
+			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />
+			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
+		</method>
+		
+		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
+			<param name="StartTimeInMS" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
+			<param name="EndTimeInMS" type="uint64" pass="in" description="End Timestamp of the interval in ms." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples." />
+			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
+			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
+			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
+		</method>
+
+	</class>
 
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
 
@@ -1633,7 +2129,12 @@
 			<param name="DriverHandle" type="pointer" pass="out" description="Handle of the driver." />
 		</method>
 
-		<method name="GetBuildJob" description="Returns a instance of a build object.">
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
+
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
@@ -1771,6 +2272,18 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />	
 		</method>
 
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
@@ -1795,7 +2308,12 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 		
-
+		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
+			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
+			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
+		</method>
+		
 	</class>
 
 
@@ -1841,13 +2359,18 @@
 			<param name="DialogUUID" type="string" pass="return" description="Dialog UUID. Will be set as sender for triggered events." />
 		</method>
 
-		<method name="RetrieveEventSender" description="returns name of the UI control that triggered the event.">
-			<param name="SenderName" type="string" pass="return" description="Name of the sender element." />
+		<method name="RetrieveEventSender" description="returns path of the UI control that triggered the event.">
+			<param name="SenderPath" type="string" pass="return" description="Path of the sender element." />
+		</method>
+
+		<method name="RetrieveEventSenderPage" description="returns name of the page of the UI control that triggered the event.">
+			<param name="PageName" type="string" pass="return" description="Page of the sender element." />
 		</method>
 
 		<method name="RetrieveEventSenderUUID" description="returns uuid of the UI control that triggered the event.">
 			<param name="SenderUUID" type="string" pass="return" description="Name of the sender uuid." />
 		</method>
+				
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
@@ -2011,8 +2534,34 @@
 			<param name="XMLData" type="basicarray" class="uint8" pass="in" description="XML Binary data." />
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
+
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
 		
-		
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
+		</method>		
+	
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
+			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
+			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
+		</method>
+
 	</class>
 
 

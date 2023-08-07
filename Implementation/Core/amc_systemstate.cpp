@@ -51,12 +51,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, const std::string& sTestEnvironmentPath)
-		: m_sTestEnvironmentPath (sTestEnvironmentPath)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath)
+		: m_sTestEnvironmentPath (sTestEnvironmentPath), m_pStateJournal (pStateJournal)
 	{
 		LibMCAssertNotNull(pLogger.get());
 		LibMCAssertNotNull(pDataModel.get());
 		LibMCAssertNotNull(pEnvWrapper.get());
+		LibMCAssertNotNull(pStateJournal.get());
 
 		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
 
@@ -72,12 +73,12 @@ namespace AMC {
 		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
 		m_pPersistencyHandler = m_pDataModel->CreatePersistencyHandler();
 
-		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger);
+		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger, m_pBuildJobHandler, m_pStorage, getSystemUserID ());
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger, getTestEnvironmentPath ());
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID ());
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
 		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
@@ -93,6 +94,20 @@ namespace AMC {
 
 	CSystemState::~CSystemState()
 	{
+		m_pDriverHandler = nullptr;
+		m_pUIHandler = nullptr;
+		m_pStateMachineData = nullptr;
+		m_pToolpathHandler = nullptr;
+		m_pServiceHandler = nullptr;
+		m_pSignalHandler = nullptr;
+
+		m_pPersistencyHandler = nullptr;
+		m_pLoginHandler = nullptr;
+		m_pBuildJobHandler = nullptr;
+		m_pStorage = nullptr;
+		m_pDataModel = nullptr;
+
+		m_pLogger = nullptr;
 	}
 
 	CLogger* CSystemState::logger()
@@ -154,6 +169,12 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
+	PStateJournal CSystemState::getStateJournalInstance()
+	{
+		return m_pStateJournal;
+	}
+
+
 	PStateMachineData CSystemState::getStateMachineData()
 	{
 		return m_pStateMachineData;
@@ -163,6 +184,11 @@ namespace AMC {
 	LibMCData::PLoginHandler CSystemState::getLoginHandlerInstance()
 	{
 		return m_pLoginHandler;
+	}
+
+	LibMCData::PStorage CSystemState::getStorageInstance()
+	{
+		return m_pStorage;
 	}
 
 	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()

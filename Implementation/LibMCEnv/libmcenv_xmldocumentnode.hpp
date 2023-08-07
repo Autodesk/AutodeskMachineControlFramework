@@ -79,6 +79,26 @@ public:
 
 	IXMLDocumentAttribute* FindAttribute(const std::string& sNameSpace, const std::string& sName, const bool bMustExist) override;
 	
+	std::string GetAttributeValue(const std::string& sNameSpace, const std::string& sName) override;
+
+	LibMCEnv_int64 GetAttributeIntegerValue(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) override;
+
+	LibMCEnv_double GetAttributeDoubleValue(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) override;
+
+	bool GetAttributeBoolValue(const std::string& sNameSpace, const std::string& sName) override;
+
+	std::string GetAttributeUUIDValue(const std::string& sNameSpace, const std::string& sName) override;
+
+	std::string GetAttributeValueDef(const std::string& sNameSpace, const std::string& sName, const std::string& sDefaultValue) override;
+
+	LibMCEnv_int64 GetAttributeIntegerValueDef(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue) override;
+
+	LibMCEnv_double GetAttributeDoubleValueDef(const std::string& sNameSpace, const std::string& sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue) override;
+
+	bool GetAttributeBoolValueDef(const std::string& sNameSpace, const std::string& sName, const bool bDefaultValue) override;
+
+	std::string GetAttributeUUIDValueDef(const std::string& sNameSpace, const std::string& sName, const std::string& sDefaultValue) override;
+
 	void RemoveAttribute(const std::string& sNameSpace, const std::string& sName) override;
 
 	void RemoveAttributeByIndex(const LibMCEnv_uint64 nIndex) override;

@@ -75,6 +75,7 @@ namespace AMC {
 
 		std::mutex m_Mutex;
 
+		uint64_t m_nStartTimeStamp;
 		uint64_t m_nCurrentTimeStamp;
 
 	public:

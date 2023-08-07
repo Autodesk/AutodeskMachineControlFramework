@@ -71,6 +71,8 @@ private:
 
 	std::vector<uint8_t> m_EncodedPNGData;
 
+	size_t getBytesPerPixel();
+
 protected:
 
 public:
@@ -78,7 +80,7 @@ public:
 	static CImageData* createFromPNG(const uint8_t * pBuffer, uint64_t nBufferSize, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
 	static CImageData* createEmpty(const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
 
-	CImageData(std::vector<uint8_t> * pPixelData, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
+	CImageData(std::vector<uint8_t> * pPixelData, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat, bool bDoClear);
 	virtual ~CImageData();
 
 
@@ -96,7 +98,9 @@ public:
 
 	void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) override;
 
-	void LoadPNG(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) override;
+	void LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer) override;
+
+	IPNGImageData* CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) override;
 
 	void EncodePNG() override;
 

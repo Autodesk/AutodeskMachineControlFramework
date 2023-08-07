@@ -58,7 +58,7 @@ CUIModule_Custom::CUIModule_Custom(pugi::xml_node& xmlNode, const std::string& s
 	if (sPath.empty())
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULEPATH, m_sName);
 
-	m_sModulePath = sPath + "." + m_sName;
+	m_sModulePath = sPath;
 
 	m_pCustomItem = std::make_shared<CUIModuleCustomItem_Properties>(m_sUUID, m_sModulePath, pUIModuleEnvironment);
 
@@ -80,6 +80,44 @@ CUIModule_Custom::CUIModule_Custom(pugi::xml_node& xmlNode, const std::string& s
 			m_pCustomItem->registerProperty (sName, sType, valueExpression);
 		}
 	}
+
+	pugi::xml_node eventsNode = xmlNode.child("events");
+	if (!eventsNode.empty()) {
+		auto eventNodes = eventsNode.children("event");
+
+		for (auto eventNode : eventNodes) {
+			auto nameAttribute = eventNode.attribute("name");
+			if (nameAttribute.empty())
+				throw ELibMCCustomException(LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING, m_sName);
+
+			std::string sName = nameAttribute.as_string();
+			if (sName.empty ())
+				throw ELibMCCustomException(LIBMC_ERROR_CUSTOMPAGEVENTNAMEMISSING, m_sName);
+
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sName))
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDCUSTOMPAGEVENTNAME, m_sName + "/" + sName);
+
+			auto iIter = m_EventItemNameMap.find(sName);
+			if (iIter != m_EventItemNameMap.end ())
+				throw ELibMCCustomException(LIBMC_ERROR_DUPLICATECUSTOMPAGEVENTNAME, m_sName + "/" + sName);
+
+			auto pEventItem = std::make_shared<CUIModuleCustomItem_Event>(sName, m_sModulePath, pUIModuleEnvironment);
+
+			m_EventItemNameMap.insert(std::make_pair (pEventItem->getEventName (), pEventItem));
+			m_EventItemUUIDMap.insert(std::make_pair(pEventItem->getUUID(), pEventItem));
+
+			auto eventParameterNodes = eventNode.children("eventparameter");
+			for (auto eventParameterNode : eventParameterNodes) {
+				std::string sParameterName = eventParameterNode.attribute("name").as_string();
+				CUIExpression defaultValueExpression(eventParameterNode, "default");
+
+				pEventItem->registerParameter(sParameterName, defaultValueExpression);
+			}
+
+		}
+
+	}
+
 }
 
 
@@ -112,11 +150,25 @@ void CUIModule_Custom::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObj
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 
 	CJSONWriterArray itemsNode(writer);
-	CJSONWriterObject itemObject(writer);
-	itemObject.addString(AMC_API_KEY_UI_ITEMTYPE, "properties");
-	itemObject.addString(AMC_API_KEY_UI_ITEMUUID, m_pCustomItem->getUUID());
-	m_pCustomItem->addContentToJSON(writer, itemObject, pClientVariableHandler, 0);
-	itemsNode.addObject(itemObject);
+	{
+		CJSONWriterObject itemObject(writer);
+		itemObject.addString(AMC_API_KEY_UI_ITEMTYPE, "properties");
+		itemObject.addString(AMC_API_KEY_UI_ITEMUUID, m_pCustomItem->getUUID());
+		m_pCustomItem->addContentToJSON(writer, itemObject, pClientVariableHandler, 0);
+		itemsNode.addObject(itemObject);
+	}
+
+	for (auto eventItemIter : m_EventItemNameMap) {
+
+		auto eventItem = eventItemIter.second;
+		CJSONWriterObject itemObject(writer);
+		itemObject.addString(AMC_API_KEY_UI_ITEMTYPE, "event");
+		itemObject.addString(AMC_API_KEY_UI_ITEMUUID, eventItem->getUUID());
+		itemObject.addString(AMC_API_KEY_UI_ITEMNAME, eventItem->getEventName ());
+		eventItem->addContentToJSON(writer, itemObject, pClientVariableHandler, 0);
+		itemsNode.addObject(itemObject);
+
+	}
 
 	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);
 
@@ -127,6 +179,10 @@ PUIModuleItem CUIModule_Custom::findItem(const std::string& sUUID)
 	if (m_pCustomItem->getUUID() == sUUID)
 		return m_pCustomItem;
 
+	auto iEventIter = m_EventItemUUIDMap.find(sUUID);
+	if (iEventIter != m_EventItemUUIDMap.end())
+		return iEventIter->second;
+
 	return nullptr;
 
 }
@@ -135,6 +191,13 @@ PUIModuleItem CUIModule_Custom::findItem(const std::string& sUUID)
 void CUIModule_Custom::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
 {
 	itemMap.insert(std::make_pair(m_pCustomItem->getUUID(), m_pCustomItem));
+	for (auto iEventIter : m_EventItemNameMap) {
+		itemMap.insert(std::make_pair(iEventIter.second->getUUID(), iEventIter.second));
+		auto referencedUUIDs = iEventIter.second->getReferenceUUIDs();
+		for (auto sUUID : referencedUUIDs)
+			itemMap.insert(std::make_pair(sUUID, iEventIter.second));
+
+	}
 }
 
 void CUIModule_Custom::configurePostLoading()
@@ -147,5 +210,9 @@ void CUIModule_Custom::populateClientVariables(CParameterHandler* pParameterHand
 	LibMCAssertNotNull(pParameterHandler);
 
 	m_pCustomItem->populateClientVariables(pParameterHandler);
+	for (auto iEventIter : m_EventItemNameMap) {
+		iEventIter.second->populateClientVariables(pParameterHandler);
+	}
 
 }
+

@@ -74,6 +74,18 @@ public:
 
 	LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) override;
 
+	LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) override;
+
+	LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) override;
+
+	bool HasCustomSegmentAttribute(const std::string& sNamespace, const std::string& sAttributeName) override;
+
+	LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string& sNamespace, const std::string& sAttributeName) override;
+
+	LibMCEnv::eToolpathAttributeType FindCustomSegmentAttributeType(const std::string& sNamespace, const std::string& sAttributeName) override;
+
+	void FindCustomSegmentAttributeInfo(const std::string& sNamespace, const std::string& sAttributeName, LibMCEnv_uint32& nAttributeID, LibMCEnv::eToolpathAttributeType& eAttributeType) override;
+
 	LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex) override;
 
 	LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex) override;
@@ -117,6 +129,16 @@ public:
 	LibMCEnv_double GetZValueInMM() override;
 
 	LibMCEnv_double GetUnits() override;
+
+	LibMCEnv_uint32 GetMetaDataCount() override;
+
+	void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName) override;
+
+	IXMLDocumentNode* GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex) override;
+
+	bool HasUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
+
+	IXMLDocumentNode* FindUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
 
 };
 

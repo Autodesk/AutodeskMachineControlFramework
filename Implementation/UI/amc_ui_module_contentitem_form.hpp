@@ -112,6 +112,11 @@ namespace AMC {
 		CUIExpression m_PrefixExpression;
 		CUIExpression m_SuffixExpression;
 
+		CUIExpression m_ValidationExpression;
+		CUIExpression m_ValidationMessageExpression;
+		CUIExpression m_MinValueExpression;
+		CUIExpression m_MaxValueExpression;
+
 	public:
 
 		static PUIModule_ContentFormEdit makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
@@ -127,6 +132,8 @@ namespace AMC {
 		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
 
 		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+
+		virtual void setValidationExpressions(CUIExpression validationExpression, CUIExpression validationMessageExpression, CUIExpression minValueExpression, CUIExpression m_maxValueExpression);
 
 	};
 

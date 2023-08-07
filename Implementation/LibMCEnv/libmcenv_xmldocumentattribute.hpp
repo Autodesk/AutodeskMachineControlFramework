@@ -72,6 +72,10 @@ public:
 
 	std::string GetValue() override;
 
+	bool IsValidUUID() override;
+
+	std::string GetUUIDValue() override;
+
 	bool IsValidInteger(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) override;
 
 	LibMCEnv_int64 GetIntegerValue(const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) override;
@@ -82,9 +86,11 @@ public:
 
 	bool IsValidBool() override;
 
-	bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) override;
+	bool GetBoolValue() override;
 
 	void SetValue(const std::string & sValue) override;
+
+	void SetUUIDValue(const std::string& sValue) override;
 
 	void SetIntegerValue(const LibMCEnv_int64 nValue) override;
 

@@ -34,14 +34,20 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_uienvironment.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_xmldocument.hpp"
+#include "libmcenv_discretefielddata2d.hpp"
 
 #include "amc_systemstate.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
+#include "libmcenv_build.hpp"
+#include "libmcenv_journalvariable.hpp"
+
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
+#include "libmcdata_dynamic.hpp"
+#include "amc_systemstate.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -78,15 +84,20 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string& sTestEnvironmentPath)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
       m_pSignalHandler (pSignalHandler),
       m_pUIHandler (pUIHandler),
+      m_pToolpathHandler (pToolpathHandler),
+      m_pStorage (pStorage),
+      m_pStateJournal (pStateJournal),
+      m_sSystemUserID (sSystemUserID),
       m_sLogSubSystem ("ui"),
       m_sSenderName (sSenderName),
-      m_pClientVariableHandler (pClientVariableHandler)
+      m_pClientVariableHandler (pClientVariableHandler),
+      m_pBuildJobHandler (pBuildJobHandler)
 {
 
     if (pLogger.get() == nullptr)
@@ -95,10 +106,20 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pToolpathHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pStorage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pBuildJobHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pStateJournal.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
+    
     if (pUIHandler == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
 
     if (!sSenderUUID.empty()) {
         m_sSenderUUID = (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID));
@@ -133,6 +154,18 @@ std::string CUIEnvironment::RetrieveEventSender()
 {
     return m_sSenderName;
 }
+
+std::string CUIEnvironment::RetrieveEventSenderPage()
+{
+    std::vector<std::string> sPathNames;
+    AMCCommon::CUtils::splitString(m_sSenderName, ".", sPathNames);
+
+    if (sPathNames.empty())
+        return "";
+
+    return sPathNames.at(0);
+}
+
 
 std::string CUIEnvironment::RetrieveEventSenderUUID()
 {
@@ -422,4 +455,43 @@ LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64
     return new CXMLDocument(pDocument);
 
 }
+
+
+
+bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    try {
+        m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+        return true;
+    }
+    catch (std::exception) {
+        return false;
+    }
+}
+
+IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(pBuildJob, m_pToolpathHandler, m_pStorage, m_sSystemUserID);
+}
+
+
+IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+{
+    AMC::PDiscreteFieldData2DInstance pInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, true);
+    return new CDiscreteFieldData2D(pInstance);
+}
+
+IJournalVariable* CUIEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+{
+    uint64_t nStartTimeStamp = 0;
+    uint64_t nEndTimeStamp = 0;
+    m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
+    return new CJournalVariable (m_pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
+}
+
 

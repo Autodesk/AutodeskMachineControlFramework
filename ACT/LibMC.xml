@@ -514,8 +514,27 @@
 		<error name="CUSTOMPAGEPROPERTYNAMEMISSING" code="491" description="custom page property name missing." />
 		<error name="CUSTOMPAGEPROPERTYTYPEMISSING" code="492" description="custom page property type missing." />
 		
+		<error name="EMTPYEVENTNAME" code="493" description="empty event name." />
+		<error name="INVALIDEVENTNAME" code="494" description="invalid event name." />
+		<error name="INVALIDEVENTPATH" code="495" description="invalid event path." />
 		
-
+		<error name="CUSTOMPAGEVENTNAMEMISSING" code="496" description="custom page event name missing." />
+		<error name="INVALIDCUSTOMPAGEVENTNAME" code="497" description="invalid custom page event name." />
+		<error name="DUPLICATECUSTOMPAGEVENTNAME" code="498" description="duplicate custom page event name." />
+		<error name="INVALIDEVENTPARAMETERNAME" code="499" description="invalid event parameter name." />
+		<error name="INVALIDMETADATAINDEX" code="500" description="invalid metadata index." />
+		<error name="METADATAISNOTUNIQUE" code="501" description="metadata is not unique." />
+		<error name="METADATANOTFOUND" code="502" description="metadata not found." />
+		<error name="TIMESTAMPISNOTINCREMENTING" code="503" description="Time stamp is not incrementing." />
+		
+		<error name="INVALIDTIMESTAMPINTERVAL" code="504" description="Invalid time stamp interval." />
+		<error name="TIMESTREAMISEMPTY" code="505" description="Time stream is empty." />
+		<error name="INVALIDTOOLPATHATTRIBUTETYPE" code="506" description="Invalid toolpath attribute type." />
+		<error name="INVALIDSEGMENTINDEX" code="507" description="Invalid segment index." />
+		
+		<error name="INVALIDTOOLPATHATTRIBUTEID" code="508" description="Invalid toolpath attribute ID." />
+		<error name="AMBIGUOUSSEGMENTATTRIBUTETYPE" code="509" description="Ambiguous segment attribute type." />
+		
 	</errors>
 	
 	
