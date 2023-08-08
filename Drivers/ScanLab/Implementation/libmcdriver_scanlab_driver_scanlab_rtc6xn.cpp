@@ -451,6 +451,11 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 	if (!m_SimulationMode) {
 
 		auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+		if (GetOIERecordingMode() != LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled) {
+			pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "pidindex", LibMCEnv::eToolpathAttributeType::Integer);
+			pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "measurementtag", LibMCEnv::eToolpathAttributeType::Integer);
+		}
+
 		auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
 		if ((m_pOwnerData->getMaxLaserPower () < RTC6_MIN_MAXLASERPOWER) || (m_pOwnerData->getMaxLaserPower() > RTC6_MAX_MAXLASERPOWER))

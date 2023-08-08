@@ -427,6 +427,12 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
         m_pRTCContext->SetStartList(1, 0);
 
         auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+
+        if (GetOIERecordingMode() != LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled) {
+            pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "pidindex", LibMCEnv::eToolpathAttributeType::Integer);
+            pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "measurementtag", LibMCEnv::eToolpathAttributeType::Integer);
+        }
+
         auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
         m_pRTCContext->AddLayerToList(pLayer, true);
