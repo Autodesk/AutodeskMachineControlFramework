@@ -30,6 +30,7 @@ add_subdirectory(RayLase)
 add_subdirectory(S7Net)
 add_subdirectory(ScanLab)
 add_subdirectory(ScanLabOIE)
+add_subdirectory(ScanLabSMC)
 add_subdirectory(TCPIP)
 add_subdirectory(Ximc)
 
