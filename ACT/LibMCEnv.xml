@@ -154,6 +154,8 @@
 		<error name="SAMPLEPOINTCOUNTEXCEEDSMAXIMUM" code="10114" description="Sample point count exceeds maximum"/>
 		<error name="INVALIDCLAMPINTERVAL" code="10115" description="Invalid clamp interval"/>
 		<error name="COULDNOTRETRIEVEPNGSTREAM" code="10116" description="Could not retrieve PNG stream"/>
+		<error name="COULDNOTSTOREFIELDDATA" code="10117" description="Could not store field data"/>
+		<error name="DISCRETEFIELDDATANOTFOUND" code="10118" description="Discrete field data not found"/>
 		
 		
 	</errors>

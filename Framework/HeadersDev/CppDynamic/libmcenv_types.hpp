@@ -211,6 +211,8 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM 10114 /** Sample point count exceeds maximum */
 #define LIBMCENV_ERROR_INVALIDCLAMPINTERVAL 10115 /** Invalid clamp interval */
 #define LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM 10116 /** Could not retrieve PNG stream */
+#define LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA 10117 /** Could not store field data */
+#define LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND 10118 /** Discrete field data not found */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -334,6 +336,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
     case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "Invalid clamp interval";
     case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
+    case LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA: return "Could not store field data";
+    case LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND: return "Discrete field data not found";
     default: return "unknown error";
   }
 }
