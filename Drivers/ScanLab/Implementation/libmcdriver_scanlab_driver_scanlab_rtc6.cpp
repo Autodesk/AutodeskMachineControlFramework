@@ -435,7 +435,7 @@ void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
-        m_pRTCContext->AddLayerToList(pLayer, true);
+        m_pRTCContext->AddLayerToList(pLayer, false);
 
         if ((m_pOwnerData->getOIERecordingMode() != eOIERecordingMode::OIERecordingDisabled))
             m_pRTCContext->StopOIEMeasurement();
