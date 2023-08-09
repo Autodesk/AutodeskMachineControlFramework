@@ -48,6 +48,8 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		<error name="EMPTYCONFIGURATIONXML" code="9" description="empty configuration XML" />
+		
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
 								
@@ -271,6 +273,22 @@ Custom implementation
 		</method>
 		
 		
+	</class>
+
+
+
+	<class name="Driver_ScanLabSMC" parent="Driver" description="A LaserScanner Driver for a SCANLAB SCANmotionControl.">
+
+
+		<method name="LoadSDK" description="Initializes the SCANmotionControl SDK.">
+			<param name="SMCResourceName" type="string" pass="in" description="Resource name of SCANmotionControl DLL" />
+		</method>
+		
+		<method name="CreateContext" description="Creates and initializes a new SMC context. Fails if Configuration Data is invalid.">
+			<param name="ConfigurationXML" type="string" pass="in" description="XML Configuration Data." />
+			<param name="Instance" type="class" class="SMCContext" pass="return" description="New Context instance" />
+		</method>
+
 	</class>
 
 

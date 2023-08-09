@@ -64,6 +64,7 @@ class CBase;
 class CDriver;
 class CSMCJob;
 class CSMCContext;
+class CDriver_ScanLabSMC;
 
 /*************************************************************************************************************************
  Declaration of deprecated class types
@@ -73,6 +74,7 @@ typedef CBase CLibMCDriver_ScanLabSMCBase;
 typedef CDriver CLibMCDriver_ScanLabSMCDriver;
 typedef CSMCJob CLibMCDriver_ScanLabSMCSMCJob;
 typedef CSMCContext CLibMCDriver_ScanLabSMCSMCContext;
+typedef CDriver_ScanLabSMC CLibMCDriver_ScanLabSMCDriver_ScanLabSMC;
 
 /*************************************************************************************************************************
  Declaration of shared pointer types
@@ -82,6 +84,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CSMCJob> PSMCJob;
 typedef std::shared_ptr<CSMCContext> PSMCContext;
+typedef std::shared_ptr<CDriver_ScanLabSMC> PDriver_ScanLabSMC;
 
 /*************************************************************************************************************************
  Declaration of deprecated shared pointer types
@@ -91,6 +94,7 @@ typedef PBase PLibMCDriver_ScanLabSMCBase;
 typedef PDriver PLibMCDriver_ScanLabSMCDriver;
 typedef PSMCJob PLibMCDriver_ScanLabSMCSMCJob;
 typedef PSMCContext PLibMCDriver_ScanLabSMCSMCContext;
+typedef PDriver_ScanLabSMC PLibMCDriver_ScanLabSMCDriver_ScanLabSMC;
 
 
 /*************************************************************************************************************************
@@ -178,6 +182,7 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTLOADLIBRARY: return "COULDNOTLOADLIBRARY";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT: return "COULDNOTFINDLIBRARYEXPORT";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_INCOMPATIBLEBINARYVERSION: return "INCOMPATIBLEBINARYVERSION";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML: return "EMPTYCONFIGURATIONXML";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_DRIVERERROR: return "DRIVERERROR";
 		}
 		return "UNKNOWN";
@@ -195,6 +200,7 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML: return "empty configuration XML";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_DRIVERERROR: return "a driver error occured";
 		}
 		return "unknown error";
@@ -321,6 +327,7 @@ private:
 	friend class CDriver;
 	friend class CSMCJob;
 	friend class CSMCContext;
+	friend class CDriver_ScanLabSMC;
 
 };
 
@@ -460,6 +467,24 @@ public:
 	inline bool GetLaserField(LibMCDriver_ScanLabSMC_double & dMinX, LibMCDriver_ScanLabSMC_double & dMinY, LibMCDriver_ScanLabSMC_double & dMaxX, LibMCDriver_ScanLabSMC_double & dMaxY);
 	inline PSMCJob BeginJob(const LibMCDriver_ScanLabSMC_double dStartPositionX, const LibMCDriver_ScanLabSMC_double dStartPositionY, const eBlendMode eBlendMode);
 	inline PSMCJob GetUnfinishedJob();
+};
+	
+/*************************************************************************************************************************
+ Class CDriver_ScanLabSMC 
+**************************************************************************************************************************/
+class CDriver_ScanLabSMC : public CDriver {
+public:
+	
+	/**
+	* CDriver_ScanLabSMC::CDriver_ScanLabSMC - Constructor for Driver_ScanLabSMC class.
+	*/
+	CDriver_ScanLabSMC(CWrapper* pWrapper, LibMCDriver_ScanLabSMCHandle pHandle)
+		: CDriver(pWrapper, pHandle)
+	{
+	}
+	
+	inline void LoadSDK(const std::string & sSMCResourceName);
+	inline PSMCContext CreateContext(const std::string & sConfigurationXML);
 };
 	
 	/**
@@ -617,6 +642,8 @@ public:
 		pWrapperTable->m_SMCContext_GetLaserField = nullptr;
 		pWrapperTable->m_SMCContext_BeginJob = nullptr;
 		pWrapperTable->m_SMCContext_GetUnfinishedJob = nullptr;
+		pWrapperTable->m_Driver_ScanLabSMC_LoadSDK = nullptr;
+		pWrapperTable->m_Driver_ScanLabSMC_CreateContext = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -972,6 +999,24 @@ public:
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_LoadSDK = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_LoadSDKPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_loadsdk");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_LoadSDK = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_LoadSDKPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_loadsdk");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLabSMC_LoadSDK == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_CreateContext = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateContextPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_CreateContext = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateContextPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLabSMC_CreateContext == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_ScanLabSMCGetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_ScanLabSMCGetVersionPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_getversion");
@@ -1180,6 +1225,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_getunfinishedjob", (void**)&(pWrapperTable->m_SMCContext_GetUnfinishedJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_GetUnfinishedJob == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_loadsdk", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_LoadSDK));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLabSMC_LoadSDK == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_CreateContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLabSMC_CreateContext == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1620,6 +1673,35 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	 * Method definitions for class CDriver_ScanLabSMC
+	 */
+	
+	/**
+	* CDriver_ScanLabSMC::LoadSDK - Initializes the SCANmotionControl SDK.
+	* @param[in] sSMCResourceName - Resource name of SCANmotionControl DLL
+	*/
+	void CDriver_ScanLabSMC::LoadSDK(const std::string & sSMCResourceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLabSMC_LoadSDK(m_pHandle, sSMCResourceName.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLabSMC::CreateContext - Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
+	* @param[in] sConfigurationXML - XML Configuration Data.
+	* @return New Context instance
+	*/
+	PSMCContext CDriver_ScanLabSMC::CreateContext(const std::string & sConfigurationXML)
+	{
+		LibMCDriver_ScanLabSMCHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLabSMC_CreateContext(m_pHandle, sConfigurationXML.c_str(), &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CSMCContext>(m_pWrapper, hInstance);
 	}
 
 } // namespace LibMCDriver_ScanLabSMC

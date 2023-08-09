@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __LIBMCDRIVER_SCANLABSMC_SDK
 
 #include "libmcdriver_scanlabsmc_types.hpp"
+#include "libmcdriver_scanlabsmc_sdk.hpp"
 
 #include <memory>
 #include <string>
@@ -50,6 +51,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace LibMCDriver_ScanLabSMC {
 	namespace Impl {
 
+		typedef size_t slscHandle;
+		typedef size_t slscJobID;
+		typedef uint32_t slscReturnValue;
 
 		typedef uint32_t(SCANLABSMC_CALLINGCONVENTION *PScanLabPtr_init_rtc6_dll) ();
 

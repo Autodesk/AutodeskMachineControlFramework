@@ -39,6 +39,7 @@ Interface version: 2.0.0
 #include "libmcdriver_scanlabsmc_abi.hpp"
 #include "libmcdriver_scanlabsmc_interfaces.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
+#include "libmcdriver_scanlabsmc_driver_scanlabsmc.hpp"
 
 using namespace LibMCDriver_ScanLabSMC;
 using namespace LibMCDriver_ScanLabSMC::Impl;
@@ -74,7 +75,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	if (sType == "scanlab-smc-0.6")
+		return new CDriver_ScanLabSMC(sName, sType, pDriverEnvironment);
+
+	return nullptr;
 }
 
 

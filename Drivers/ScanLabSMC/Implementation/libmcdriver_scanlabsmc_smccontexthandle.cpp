@@ -27,11 +27,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CDriver
+Abstract: This is a stub class definition of CSMCContext
 
 */
 
-#include "libmcdriver_scanlabsmc_driver.hpp"
+#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -40,36 +40,30 @@ Abstract: This is a stub class definition of CDriver
 using namespace LibMCDriver_ScanLabSMC::Impl;
 
 /*************************************************************************************************************************
- Class definition of CDriver 
+ Class definition of CSMCContext 
 **************************************************************************************************************************/
 
-void CDriver::Configure(const std::string & sConfigurationString)
+
+CSMCContextHandle::CSMCContextHandle(PScanLabSMCSDK pSDK, slscHandle handle)
+    : m_Handle(handle), m_pSDK (pSDK)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+
 }
 
-std::string CDriver::GetName()
+CSMCContextHandle::~CSMCContextHandle()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    if (m_Handle != 0) {
+        //slsc_cfg_delete(m_Handle);
+        m_Handle = 0;
+    }
 }
 
-std::string CDriver::GetType()
+slscHandle CSMCContextHandle::getHandle()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    return m_Handle;
 }
 
-void CDriver::GetVersion(LibMCDriver_ScanLabSMC_uint32 & nMajor, LibMCDriver_ScanLabSMC_uint32 & nMinor, LibMCDriver_ScanLabSMC_uint32 & nMicro, std::string & sBuild)
+PScanLabSMCSDK CSMCContextHandle::getSDK()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    return m_pSDK;
 }
-
-void CDriver::QueryParameters()
-{
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
-{
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
-}
-

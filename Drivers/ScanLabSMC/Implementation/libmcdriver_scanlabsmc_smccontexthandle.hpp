@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver
+Abstract: This is the class declaration of CSMCContext
 
 */
 
 
-#ifndef __LIBMCDRIVER_SCANLABSMC_DRIVER
-#define __LIBMCDRIVER_SCANLABSMC_DRIVER
+#ifndef __LIBMCDRIVER_SCANLABSMC_SMCCONTEXTHANDLE
+#define __LIBMCDRIVER_SCANLABSMC_SMCCONTEXTHANDLE
 
 #include "libmcdriver_scanlabsmc_interfaces.hpp"
 
@@ -45,22 +45,31 @@ Abstract: This is the class declaration of CDriver
 #endif
 
 // Include custom headers here.
-
+#include "libmcdriver_scanlabsmc_sdk.hpp"
 
 namespace LibMCDriver_ScanLabSMC {
 namespace Impl {
 
 
-/*************************************************************************************************************************
- Class declaration of CDriver 
-**************************************************************************************************************************/
 
-class CDriver : public virtual IDriver, public virtual CBase {
+    class CSMCContextHandle {
+    private:
+        slscHandle m_Handle;
+        PScanLabSMCSDK m_pSDK;
 
-public:
+    public:
 
+        CSMCContextHandle(PScanLabSMCSDK pSDK, slscHandle handle);
 
-};
+        virtual ~CSMCContextHandle();
+
+        slscHandle getHandle();
+
+        PScanLabSMCSDK getSDK ();
+
+    };
+
+    typedef std::shared_ptr<CSMCContextHandle> PSMCContextHandle;
 
 } // namespace Impl
 } // namespace LibMCDriver_ScanLabSMC
@@ -68,4 +77,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_SCANLABSMC_DRIVER
+#endif // __LIBMCDRIVER_SCANLABSMC_SMCCONTEXTHANDLE

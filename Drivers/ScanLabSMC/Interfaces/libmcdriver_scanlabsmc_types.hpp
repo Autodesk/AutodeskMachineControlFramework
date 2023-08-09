@@ -104,6 +104,7 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTLOADLIBRARY 6 /** the library could not be loaded */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT 7 /** a required exported symbol could not be found in the library */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML 9 /** empty configuration XML */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_DRIVERERROR 1000 /** a driver error occured */
 
 /*************************************************************************************************************************
@@ -121,6 +122,7 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
     case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBMCDRIVER_SCANLABSMC_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML: return "empty configuration XML";
     case LIBMCDRIVER_SCANLABSMC_ERROR_DRIVERERROR: return "a driver error occured";
     default: return "unknown error";
   }
@@ -134,6 +136,7 @@ typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_Base;
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_Driver;
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_SMCJob;
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_SMCContext;
+typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_Driver_ScanLabSMC;
 
 namespace LibMCDriver_ScanLabSMC {
 

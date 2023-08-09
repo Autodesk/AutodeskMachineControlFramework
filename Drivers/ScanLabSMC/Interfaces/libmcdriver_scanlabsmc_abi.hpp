@@ -415,6 +415,29 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_getunfinishedjob(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_SMCJob * pJobInstance);
 
 /*************************************************************************************************************************
+ Class definition for Driver_ScanLabSMC
+**************************************************************************************************************************/
+
+/**
+* Initializes the SCANmotionControl SDK.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pSMCResourceName - Resource name of SCANmotionControl DLL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_loadsdk(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pSMCResourceName);
+
+/**
+* Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pConfigurationXML - XML Configuration Data.
+* @param[out] pInstance - New Context instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pConfigurationXML, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+
+/*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
 

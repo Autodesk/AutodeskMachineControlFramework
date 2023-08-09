@@ -39,6 +39,9 @@ Abstract: This is the class declaration of CSMCJob
 
 // Parent classes
 #include "libmcdriver_scanlabsmc_base.hpp"
+#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
+#include "libmcdriver_scanlabsmc_sdk.hpp"
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -57,27 +60,22 @@ namespace Impl {
 
 class CSMCJob : public virtual ISMCJob, public virtual CBase {
 private:
+private:
 
-	/**
-	* Put private members here.
-	*/
+	PSMCContextHandle m_pContextHandle;
+	PScanLabSMCSDK m_pSDK;
 
-protected:
+	slscJobID m_JobID;
+	bool m_bIsFinalized;
 
-	/**
-	* Put protected members here.
-	*/
+	void drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBufferSize, const LibMCDriver_ScanLabSMC::sPoint2D* pPointsBuffer, bool bIsClosed);
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CSMCJob(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode);
 
+	virtual ~CSMCJob();
 
-	/**
-	* Public member functions to implement.
-	*/
 
 	LibMCDriver_ScanLabSMC_uint64 GetJobID() override;
 

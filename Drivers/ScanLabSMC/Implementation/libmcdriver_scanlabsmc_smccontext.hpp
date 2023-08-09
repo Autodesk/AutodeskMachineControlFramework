@@ -45,6 +45,8 @@ Abstract: This is the class declaration of CSMCContext
 #endif
 
 // Include custom headers here.
+#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
+#include "libmcdriver_scanlabsmc_sdk.hpp"
 
 
 namespace LibMCDriver_ScanLabSMC {
@@ -58,26 +60,17 @@ namespace Impl {
 class CSMCContext : public virtual ISMCContext, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
+	PSMCContextHandle m_pContextHandle;
+	PScanLabSMCSDK m_pSDK;
 
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CSMCContext(const std::string& sConfigurationXML, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+	virtual ~CSMCContext();
 
 	void SetToSimulationMode() override;
 

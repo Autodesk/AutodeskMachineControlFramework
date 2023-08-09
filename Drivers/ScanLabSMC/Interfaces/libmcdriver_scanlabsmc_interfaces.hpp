@@ -59,6 +59,7 @@ class IBase;
 class IDriver;
 class ISMCJob;
 class ISMCContext;
+class IDriver_ScanLabSMC;
 
 
 
@@ -546,6 +547,30 @@ public:
 };
 
 typedef IBaseSharedPtr<ISMCContext> PISMCContext;
+
+
+/*************************************************************************************************************************
+ Class interface for Driver_ScanLabSMC 
+**************************************************************************************************************************/
+
+class IDriver_ScanLabSMC : public virtual IDriver {
+public:
+	/**
+	* IDriver_ScanLabSMC::LoadSDK - Initializes the SCANmotionControl SDK.
+	* @param[in] sSMCResourceName - Resource name of SCANmotionControl DLL
+	*/
+	virtual void LoadSDK(const std::string & sSMCResourceName) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::CreateContext - Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
+	* @param[in] sConfigurationXML - XML Configuration Data.
+	* @return New Context instance
+	*/
+	virtual ISMCContext * CreateContext(const std::string & sConfigurationXML) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriver_ScanLabSMC> PIDriver_ScanLabSMC;
 
 
 /*************************************************************************************************************************

@@ -27,18 +27,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver
+Abstract: This is the class declaration of CDriver_ScanLabSMC
 
 */
 
 
-#ifndef __LIBMCDRIVER_SCANLABSMC_DRIVER
-#define __LIBMCDRIVER_SCANLABSMC_DRIVER
+#ifndef __LIBMCDRIVER_SCANLABSMC_DRIVER_SCANLABSMC
+#define __LIBMCDRIVER_SCANLABSMC_DRIVER_SCANLABSMC
 
 #include "libmcdriver_scanlabsmc_interfaces.hpp"
+#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
 
 // Parent classes
-#include "libmcdriver_scanlabsmc_base.hpp"
+#include "libmcdriver_scanlabsmc_driver.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -52,13 +53,36 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver 
+ Class declaration of CDriver_ScanLabSMC 
 **************************************************************************************************************************/
 
-class CDriver : public virtual IDriver, public virtual CBase {
+class CDriver_ScanLabSMC : public virtual IDriver_ScanLabSMC, public virtual CDriver {
+private:
+    std::string m_sName;
+    std::string m_sType;
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 public:
 
+    CDriver_ScanLabSMC(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+    virtual ~CDriver_ScanLabSMC();
+
+	void LoadSDK(const std::string & sSMCResourceName) override;
+
+	ISMCContext * CreateContext(const std::string & sConfigurationXML) override;
+
+    void Configure(const std::string& sConfigurationString) override;
+
+    std::string GetName() override;
+
+    std::string GetType() override;
+
+    void GetVersion(LibMCDriver_ScanLabSMC_uint32& nMajor, LibMCDriver_ScanLabSMC_uint32& nMinor, LibMCDriver_ScanLabSMC_uint32& nMicro, std::string& sBuild) override;
+
+    void QueryParameters() override;
+
+    void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 };
 
@@ -68,4 +92,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_SCANLABSMC_DRIVER
+#endif // __LIBMCDRIVER_SCANLABSMC_DRIVER_SCANLABSMC

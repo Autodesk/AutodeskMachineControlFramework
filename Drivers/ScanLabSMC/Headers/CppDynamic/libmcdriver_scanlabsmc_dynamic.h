@@ -402,6 +402,29 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_BeginJo
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_GetUnfinishedJobPtr) (LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_SMCJob * pJobInstance);
 
 /*************************************************************************************************************************
+ Class definition for Driver_ScanLabSMC
+**************************************************************************************************************************/
+
+/**
+* Initializes the SCANmotionControl SDK.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pSMCResourceName - Resource name of SCANmotionControl DLL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_LoadSDKPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pSMCResourceName);
+
+/**
+* Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pConfigurationXML - XML Configuration Data.
+* @param[out] pInstance - New Context instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateContextPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pConfigurationXML, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+
+/*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
 
@@ -510,6 +533,8 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCContext_GetLaserFieldPtr m_SMCContext_GetLaserField;
 	PLibMCDriver_ScanLabSMCSMCContext_BeginJobPtr m_SMCContext_BeginJob;
 	PLibMCDriver_ScanLabSMCSMCContext_GetUnfinishedJobPtr m_SMCContext_GetUnfinishedJob;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_LoadSDKPtr m_Driver_ScanLabSMC_LoadSDK;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateContextPtr m_Driver_ScanLabSMC_CreateContext;
 	PLibMCDriver_ScanLabSMCGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabSMCGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabSMCReleaseInstancePtr m_ReleaseInstance;

@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CSMCContext
 
 #include "libmcdriver_scanlabsmc_smccontext.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
+#include "libmcdriver_scanlabsmc_smcjob.hpp"
 
 // Include custom headers here.
 
@@ -42,6 +43,36 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
 /*************************************************************************************************************************
  Class definition of CSMCContext 
 **************************************************************************************************************************/
+
+CSMCContext::CSMCContext(const std::string& sConfigurationXML, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_pSDK (pSDK), m_pDriverEnvironment (pDriverEnvironment)
+{
+	if (pSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+	if (pDriverEnvironment.get() == nullptr)
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+	if (sConfigurationXML.empty ())
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML);
+
+	m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory ();
+
+	std::vector<uint8_t> Buffer (sConfigurationXML.begin (), sConfigurationXML.end ());
+
+	auto pConfigurationFile = m_pWorkingDirectory->StoreCustomDataInTempFile("xml", Buffer);
+	std::string sConfigurationFilePath = pConfigurationFile->GetAbsoluteFileName ();
+
+	slscHandle newHandle = 0;
+	//m_pSDK->checkError(m_pSDK->slsc_cfg_initialize_from_file(&newHandle, sConfigurationFilePath.c_str()));
+
+	m_pContextHandle = std::make_shared<CSMCContextHandle>(m_pSDK, newHandle);
+
+}
+
+CSMCContext::~CSMCContext()
+{
+
+}
+
 
 void CSMCContext::SetToSimulationMode()
 {
@@ -53,12 +84,12 @@ bool CSMCContext::IsSimulationMode()
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
-void CSMCContext::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer)
+void CSMCContext::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer)
 {
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
-void CSMCContext::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pCorrectionFileDataBuffer)
+void CSMCContext::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer)
 {
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
@@ -93,7 +124,7 @@ void CSMCContext::SetLaserOrigin(const LibMCDriver_ScanLabSMC_double dOriginX, c
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
-void CSMCContext::GetLaserOrigin(LibMCDriver_ScanLabSMC_double & dOriginX, LibMCDriver_ScanLabSMC_double & dOriginY)
+void CSMCContext::GetLaserOrigin(LibMCDriver_ScanLabSMC_double& dOriginX, LibMCDriver_ScanLabSMC_double& dOriginY)
 {
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
@@ -108,17 +139,17 @@ void CSMCContext::ResetLaserField()
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
-bool CSMCContext::GetLaserField(LibMCDriver_ScanLabSMC_double & dMinX, LibMCDriver_ScanLabSMC_double & dMinY, LibMCDriver_ScanLabSMC_double & dMaxX, LibMCDriver_ScanLabSMC_double & dMaxY)
+bool CSMCContext::GetLaserField(LibMCDriver_ScanLabSMC_double& dMinX, LibMCDriver_ScanLabSMC_double& dMinY, LibMCDriver_ScanLabSMC_double& dMaxX, LibMCDriver_ScanLabSMC_double& dMaxY)
 {
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
-ISMCJob * CSMCContext::BeginJob(const LibMCDriver_ScanLabSMC_double dStartPositionX, const LibMCDriver_ScanLabSMC_double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode)
+ISMCJob* CSMCContext::BeginJob(const LibMCDriver_ScanLabSMC_double dStartPositionX, const LibMCDriver_ScanLabSMC_double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	return new CSMCJob(m_pContextHandle, dStartPositionX, dStartPositionY, eBlendMode);
 }
 
-ISMCJob * CSMCContext::GetUnfinishedJob()
+ISMCJob* CSMCContext::GetUnfinishedJob()
 {
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
