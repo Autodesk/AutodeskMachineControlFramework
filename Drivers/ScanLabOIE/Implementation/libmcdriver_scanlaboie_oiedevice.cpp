@@ -677,11 +677,11 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 		}
 
 	}
-	catch (std::exception & E)
+	/*catch (std::exception & E)
 	{
 		//std::cout << "error getting data:" << E.what () << std::endl;
 
-	}
+	}*/
 	catch (...) {
 		//std::cout << "error getting data" << std::endl;
 	}
