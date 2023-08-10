@@ -159,6 +159,15 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 * pSignalCount);
 
 /**
+* Returns the configured Additional signal count of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[out] pSignalCount - Additional Signal Count
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalcount(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 * pSignalCount);
+
+/**
 * Returns the configured RTC signal IDs of the configuration.
 *
 * @param[in] pDeviceConfiguration - DeviceConfiguration instance.
@@ -179,6 +188,30 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer);
+
+/**
+* Returns the configured Additional signal IDs of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nAdditionalIDsBufferSize - Number of elements in buffer
+* @param[out] pAdditionalIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pAdditionalIDsBuffer - uint32  buffer of Additional Signal IDs
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalids(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nAdditionalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pAdditionalIDsBuffer);
+
+/**
+* Returns the configured Additional signal information.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nIndex - Index of additional signal. 0-based.
+* @param[out] pSignalID - ID of additional signal.
+* @param[in] nSignalNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSignalNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSignalNameBuffer -  buffer of Name of additional signal., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalinfo(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pSignalID, const LibMCDriver_ScanLabOIE_uint32 nSignalNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pSignalNameNeededChars, char * pSignalNameBuffer);
 
 /**
 * Returns the device configuration string.

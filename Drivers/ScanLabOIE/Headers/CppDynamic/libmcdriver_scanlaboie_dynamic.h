@@ -146,6 +146,15 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguratio
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 * pSignalCount);
 
 /**
+* Returns the configured Additional signal count of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[out] pSignalCount - Additional Signal Count
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalCountPtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 * pSignalCount);
+
+/**
 * Returns the configured RTC signal IDs of the configuration.
 *
 * @param[in] pDeviceConfiguration - DeviceConfiguration instance.
@@ -166,6 +175,30 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguratio
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer);
+
+/**
+* Returns the configured Additional signal IDs of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nAdditionalIDsBufferSize - Number of elements in buffer
+* @param[out] pAdditionalIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pAdditionalIDsBuffer - uint32  buffer of Additional Signal IDs
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalIDsPtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nAdditionalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pAdditionalIDsBuffer);
+
+/**
+* Returns the configured Additional signal information.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nIndex - Index of additional signal. 0-based.
+* @param[out] pSignalID - ID of additional signal.
+* @param[in] nSignalNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSignalNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSignalNameBuffer -  buffer of Name of additional signal., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalInfoPtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pSignalID, const LibMCDriver_ScanLabOIE_uint32 nSignalNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pSignalNameNeededChars, char * pSignalNameBuffer);
 
 /**
 * Returns the device configuration string.
@@ -802,8 +835,11 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr m_DeviceConfiguration_GetDeviceType;
 	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalCountPtr m_DeviceConfiguration_GetRTCSignalCount;
 	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr m_DeviceConfiguration_GetSensorSignalCount;
+	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalCountPtr m_DeviceConfiguration_GetAdditionalSignalCount;
 	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr m_DeviceConfiguration_GetRTCSignalIDs;
 	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr m_DeviceConfiguration_GetSensorSignalIDs;
+	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalIDsPtr m_DeviceConfiguration_GetAdditionalSignalIDs;
+	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalInfoPtr m_DeviceConfiguration_GetAdditionalSignalInfo;
 	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceConfigurationStringPtr m_DeviceConfiguration_GetDeviceConfigurationString;
 	PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalCountPtr m_DataRecording_GetRTCSignalCount;
 	PLibMCDriver_ScanLabOIEDataRecording_GetSensorSignalCountPtr m_DataRecording_GetSensorSignalCount;

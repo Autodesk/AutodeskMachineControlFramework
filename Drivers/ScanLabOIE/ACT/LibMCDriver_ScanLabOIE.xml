@@ -105,6 +105,7 @@
 		<error name="INVALIDDEVICECONFIGURATION" code="1047" description="Invalid device configuration." />
 		<error name="OIESDKLIBRARYRETURNSINVALIDVERSION" code="1048" description="OIE SDK Library returns invalid version." />
 		
+		<error name="INVALIDADDITIONALSIGNALCOUNT" code="1049" description="Invalid Additional signal count." />	
 		
 		
 	</errors>
@@ -187,6 +188,10 @@ Custom implementation
 		<method name="GetSensorSignalCount" description="Returns the configured Sensor signal count of the configuration.">
 			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
 		</method>	
+
+		<method name="GetAdditionalSignalCount" description="Returns the configured Additional signal count of the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="Additional Signal Count" />
+		</method>	
 		
 		<method name="GetRTCSignalIDs" description="Returns the configured RTC signal IDs of the configuration.">
 			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="RTC Signal IDs" />
@@ -196,6 +201,16 @@ Custom implementation
 			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="Sensor Signal IDs" />
 		</method>	
 
+		<method name="GetAdditionalSignalIDs" description="Returns the configured Additional signal IDs of the configuration.">
+			<param name="AdditionalIDs" type="basicarray" class="uint32" pass="out" description="Additional Signal IDs" />
+		</method>	
+
+		<method name="GetAdditionalSignalInfo" description="Returns the configured Additional signal information.">
+			<param name="Index" type="uint32" pass="in" description="Index of additional signal. 0-based." />
+			<param name="SignalID" type="uint32" pass="out" description="ID of additional signal." />
+			<param name="SignalName" type="string" pass="out" description="Name of additional signal." />
+		</method>	
+		
 		<method name="GetDeviceConfigurationString" description="Returns the device configuration string.">
 			<param name="DeviceConfigurationString" type="string" pass="return" description="Device configuration string." />
 		</method>	

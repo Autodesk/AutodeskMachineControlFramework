@@ -37,7 +37,7 @@ Abstract: This is a stub class definition of COIEDevice
 
 #include <array>
 #include <algorithm>
-#include <iostream>
+//#include <iostream>
 #include <cstring>
 #include <sstream>
 
@@ -656,22 +656,34 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 					m_pCurrentDataRecording->recordValue(nValue);
 				}
 
+				uint32_t additionalSignalCount = m_pOIESDK->oie_pkt_get_app_data_count(pkt);
+				//std::cout << "Additional signal count" << rtcSignalCount << " (packetNr " << *pPacketNumber << ")" << std::endl;
+				for (uint32_t additionalSignalIndex = 0; additionalSignalIndex < additionalSignalCount; additionalSignalIndex++)
+				{
+					int32_t nValue = 0;
+					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_app_data(pkt, additionalSignalIndex, &nValue));
+					// std::cout << "   - index #" << additionalSignalIndex << ": " << nValue << std::endl;
+
+					//m_pCurrentDataRecording->recordValue(nValue);
+				}
+
+
 				m_pCurrentDataRecording->finishRecord();
 
 			}
 		}
 		else {
-			std::cout << "Packet event: with null" << std::endl;
+			//std::cout << "Packet event: with null" << std::endl;
 		}
 
 	}
 	catch (std::exception & E)
 	{
-		std::cout << "error getting data:" << E.what () << std::endl;
+		//std::cout << "error getting data:" << E.what () << std::endl;
 
 	}
 	catch (...) {
-		std::cout << "error getting data" << std::endl;
+		//std::cout << "error getting data" << std::endl;
 	}
 }
 
@@ -679,7 +691,7 @@ void COIEDeviceInstance::onErrorEvent(oie_device device, oie_error error, int32_
 {
 	try {
 		if (device == m_pDevice) {
-			std::cout << "Error event: " << error << " value: " << value << std::endl;
+			//std::cout << "Error event: " << error << " value: " << value << std::endl;
 		}
 	}
 	catch (...)

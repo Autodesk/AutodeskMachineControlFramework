@@ -395,6 +395,32 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getsenso
 	}
 }
 
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalcount(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 * pSignalCount)
+{
+	IBase* pIBaseClass = (IBase *)pDeviceConfiguration;
+
+	try {
+		if (pSignalCount == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		IDeviceConfiguration* pIDeviceConfiguration = dynamic_cast<IDeviceConfiguration*>(pIBaseClass);
+		if (!pIDeviceConfiguration)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		*pSignalCount = pIDeviceConfiguration->GetAdditionalSignalCount();
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDeviceConfiguration;
@@ -434,6 +460,82 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getsenso
 		
 		pIDeviceConfiguration->GetSensorSignalIDs(nSignalIDsBufferSize, pSignalIDsNeededCount, pSignalIDsBuffer);
 
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalids(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nAdditionalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pAdditionalIDsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDeviceConfiguration;
+
+	try {
+		if ((!pAdditionalIDsBuffer) && !(pAdditionalIDsNeededCount))
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		IDeviceConfiguration* pIDeviceConfiguration = dynamic_cast<IDeviceConfiguration*>(pIBaseClass);
+		if (!pIDeviceConfiguration)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDeviceConfiguration->GetAdditionalSignalIDs(nAdditionalIDsBufferSize, pAdditionalIDsNeededCount, pAdditionalIDsBuffer);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalinfo(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pSignalID, const LibMCDriver_ScanLabOIE_uint32 nSignalNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pSignalNameNeededChars, char * pSignalNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDeviceConfiguration;
+
+	try {
+		if (!pSignalID)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if ( (!pSignalNameBuffer) && !(pSignalNameNeededChars) )
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		std::string sSignalName("");
+		IDeviceConfiguration* pIDeviceConfiguration = dynamic_cast<IDeviceConfiguration*>(pIBaseClass);
+		if (!pIDeviceConfiguration)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSignalNameBuffer == nullptr);
+		if (isCacheCall) {
+			pIDeviceConfiguration->GetAdditionalSignalInfo(nIndex, *pSignalID, sSignalName);
+
+			pIDeviceConfiguration->_setCache (new ParameterCache_2<LibMCDriver_ScanLabOIE_uint32, std::string> (*pSignalID, sSignalName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_2<LibMCDriver_ScanLabOIE_uint32, std::string>*> (pIDeviceConfiguration->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+			cache->retrieveData (*pSignalID, sSignalName);
+			pIDeviceConfiguration->_setCache (nullptr);
+		}
+		
+		if (pSignalNameNeededChars)
+			*pSignalNameNeededChars = (LibMCDriver_ScanLabOIE_uint32) (sSignalName.size()+1);
+		if (pSignalNameBuffer) {
+			if (sSignalName.size() >= nSignalNameBufferSize)
+				throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+			for (size_t iSignalName = 0; iSignalName < sSignalName.size(); iSignalName++)
+				pSignalNameBuffer[iSignalName] = sSignalName[iSignalName];
+			pSignalNameBuffer[sSignalName.size()] = 0;
+		}
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
@@ -2084,10 +2186,16 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount;
 	if (sProcName == "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount;
+	if (sProcName == "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalcount") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalcount;
 	if (sProcName == "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids;
 	if (sProcName == "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids;
+	if (sProcName == "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalids") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalids;
+	if (sProcName == "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalinfo") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalinfo;
 	if (sProcName == "libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getrtcsignalcount") 

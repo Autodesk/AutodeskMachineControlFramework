@@ -153,6 +153,7 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION 1046 /** Unsupported OIE SDK Version. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION 1047 /** Invalid device configuration. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION 1048 /** OIE SDK Library returns invalid version. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALSIGNALCOUNT 1049 /** Invalid Additional signal count. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -218,6 +219,7 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION: return "Unsupported OIE SDK Version.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION: return "Invalid device configuration.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION: return "OIE SDK Library returns invalid version.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALSIGNALCOUNT: return "Invalid Additional signal count.";
     default: return "unknown error";
   }
 }

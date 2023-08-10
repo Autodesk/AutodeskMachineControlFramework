@@ -336,6 +336,12 @@ public:
 	virtual LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() = 0;
 
 	/**
+	* IDeviceConfiguration::GetAdditionalSignalCount - Returns the configured Additional signal count of the configuration.
+	* @return Additional Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetAdditionalSignalCount() = 0;
+
+	/**
 	* IDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
 	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
 	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
@@ -350,6 +356,22 @@ public:
 	* @param[out] pSignalIDsBuffer - uint32 buffer of Sensor Signal IDs
 	*/
 	virtual void GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
+
+	/**
+	* IDeviceConfiguration::GetAdditionalSignalIDs - Returns the configured Additional signal IDs of the configuration.
+	* @param[in] nAdditionalIDsBufferSize - Number of elements in buffer
+	* @param[out] pAdditionalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pAdditionalIDsBuffer - uint32 buffer of Additional Signal IDs
+	*/
+	virtual void GetAdditionalSignalIDs(LibMCDriver_ScanLabOIE_uint64 nAdditionalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pAdditionalIDsBuffer) = 0;
+
+	/**
+	* IDeviceConfiguration::GetAdditionalSignalInfo - Returns the configured Additional signal information.
+	* @param[in] nIndex - Index of additional signal. 0-based.
+	* @param[out] nSignalID - ID of additional signal.
+	* @param[out] sSignalName - Name of additional signal.
+	*/
+	virtual void GetAdditionalSignalInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nSignalID, std::string & sSignalName) = 0;
 
 	/**
 	* IDeviceConfiguration::GetDeviceConfigurationString - Returns the device configuration string.
