@@ -1258,20 +1258,21 @@ public:
 
 	/**
 	* IBuild::AddBinaryData - Adds binary data to store with the build.
-	* @param[in] sName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
 
 	/**
-	* IBuild::LoadDiscreteField2DByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* IBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
-	virtual IDiscreteFieldData2D * LoadDiscreteField2DByName(const std::string & sName) = 0;
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) = 0;
 
 	/**
 	* IBuild::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
@@ -1282,19 +1283,20 @@ public:
 
 	/**
 	* IBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StoreDiscreteField2D(const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+	virtual std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
 
 	/**
-	* IBuild::LoadPNGImageByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* IBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Image data instance.
 	*/
-	virtual IImageData * LoadPNGImageByName(const std::string & sName) = 0;
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
 
 	/**
 	* IBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
@@ -1305,12 +1307,13 @@ public:
 
 	/**
 	* IBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StorePNGImage(const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
 
 };
 

@@ -119,8 +119,8 @@ namespace AMC {
 
 		std::string m_sDebugName;
 
-		std::map<std::pair<std::string, std::string>, CToolpathCustomSegmentAttribute*> m_CustomSegmentAttributeMap;
-		std::vector<CToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
+		std::map<std::pair<std::string, std::string>, PToolpathCustomSegmentAttribute> m_CustomSegmentAttributeMap;
+		std::vector<PToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
 
 		uint32_t registerUUID(const std::string& sUUID);
 		std::string getRegisteredUUID(const uint32_t nID);
@@ -130,7 +130,7 @@ namespace AMC {
 
 	public:
 
-		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName, std::vector<CToolpathCustomSegmentAttribute> customSegmentAttributes);
+		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName, std::vector<PToolpathCustomSegmentAttribute> customSegmentAttributes);
 		virtual ~CToolpathLayerData();		
 
 		std::string getUUID ();

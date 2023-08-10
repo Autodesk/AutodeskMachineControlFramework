@@ -1029,13 +1029,13 @@ public:
 	inline void UnloadToolpath();
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
-	inline std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
-	inline PDiscreteFieldData2D LoadDiscreteField2DByName(const std::string & sName);
+	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
-	inline std::string StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
-	inline PImageData LoadPNGImageByName(const std::string & sName);
+	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
-	inline std::string StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 };
 	
 /*************************************************************************************************************************
@@ -1864,10 +1864,10 @@ public:
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
-		pWrapperTable->m_Build_LoadDiscreteField2DByName = nullptr;
+		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = nullptr;
 		pWrapperTable->m_Build_StoreDiscreteField2D = nullptr;
-		pWrapperTable->m_Build_LoadPNGImageByName = nullptr;
+		pWrapperTable->m_Build_LoadPNGImageByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadPNGImageByUUID = nullptr;
 		pWrapperTable->m_Build_StorePNGImage = nullptr;
 		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
@@ -3295,12 +3295,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuild_LoadDiscreteField2DByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyidentifier");
 		#else // _WIN32
-		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuild_LoadDiscreteField2DByIdentifierPtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyidentifier");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr)
+		if (pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3322,12 +3322,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyname");
+		pWrapperTable->m_Build_LoadPNGImageByIdentifier = (PLibMCEnvBuild_LoadPNGImageByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyidentifier");
 		#else // _WIN32
-		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyname");
+		pWrapperTable->m_Build_LoadPNGImageByIdentifier = (PLibMCEnvBuild_LoadPNGImageByIdentifierPtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyidentifier");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Build_LoadPNGImageByName == nullptr)
+		if (pWrapperTable->m_Build_LoadPNGImageByIdentifier == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6490,8 +6490,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddBinaryData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyname", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyidentifier", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyuuid", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByUUID));
@@ -6502,8 +6502,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyname", (void**)&(pWrapperTable->m_Build_LoadPNGImageByName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByName == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyidentifier", (void**)&(pWrapperTable->m_Build_LoadPNGImageByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyuuid", (void**)&(pWrapperTable->m_Build_LoadPNGImageByUUID));
@@ -9307,31 +9307,32 @@ public:
 	
 	/**
 	* CBuild::AddBinaryData - Adds binary data to store with the build.
-	* @param[in] sName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
 	* @param[in] ContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
+	std::string CBuild::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
 	{
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
-	* CBuild::LoadDiscreteField2DByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
-	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByName(const std::string & sName)
+	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByName(m_pHandle, sName.c_str(), &hFieldDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -9357,33 +9358,34 @@ public:
 	
 	/**
 	* CBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	std::string CBuild::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
-	* CBuild::LoadPNGImageByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Image data instance.
 	*/
-	PImageData CBuild::LoadPNGImageByName(const std::string & sName)
+	PImageData CBuild::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByName(m_pHandle, sName.c_str(), &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -9409,20 +9411,21 @@ public:
 	
 	/**
 	* CBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	std::string CBuild::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}

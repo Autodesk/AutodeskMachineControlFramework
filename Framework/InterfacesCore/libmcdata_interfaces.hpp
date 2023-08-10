@@ -432,7 +432,13 @@ public:
 	virtual std::string GetTimeStamp() = 0;
 
 	/**
-	* IStorageStream::GetName - returns the name of a storage stream.
+	* IStorageStream::GetContextIdentifier - returns the context identifier of a storage stream.
+	* @return Context Identifier String
+	*/
+	virtual std::string GetContextIdentifier() = 0;
+
+	/**
+	* IStorageStream::GetName - returns the name description of a storage stream.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
@@ -500,24 +506,26 @@ public:
 	* IStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
 	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
-	* @param[in] sName - Name of the stream.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Data of stream
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID) = 0;
+	virtual void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID) = 0;
 
 	/**
 	* IStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
 	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID) = 0;
+	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID) = 0;
 
 	/**
 	* IStorage::StorePartialStream - stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -586,13 +594,19 @@ public:
 	virtual std::string GetJobUUID() = 0;
 
 	/**
-	* IBuildJobData::GetName - returns the name of a build job uuid.
+	* IBuildJobData::GetName - returns the name of the job data.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
 
 	/**
-	* IBuildJobData::GetTimeStamp - returns the timestamp when the job was created.
+	* IBuildJobData::GetContextIdentifier - returns the unique context identifier of the job data.
+	* @return Context Identifier String
+	*/
+	virtual std::string GetContextIdentifier() = 0;
+
+	/**
+	* IBuildJobData::GetTimeStamp - returns the timestamp when the job data was created.
 	* @return Timestamp in ISO8601 UTC format
 	*/
 	virtual std::string GetTimeStamp() = 0;
@@ -743,12 +757,13 @@ public:
 
 	/**
 	* IBuildJob::AddJobData - Adds additional data to the Job. Job MUST be of state validated in order to add job data.
-	* @param[in] sName - Name of the job
+	* @param[in] sIdentifier - Unique identifier for the job data.
+	* @param[in] sName - Name of the job data
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void AddJobData(const std::string & sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string & sUserID) = 0;
+	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string & sUserID) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.

@@ -61,6 +61,8 @@ namespace AMC {
 
 	public:
 
+		static PDiscreteFieldData2DInstance createFromBuffer(const std::vector<uint8_t> & Buffer);
+
 		CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dDefaultValue, bool bDoClear);
 		
 		virtual ~CDiscreteFieldData2DInstance();
@@ -108,6 +110,8 @@ namespace AMC {
 		void renderRGBImage(std::vector<uint8_t>* pPixelData, double minValue, double minRed, double minGreen, double minBlue, double midValue, double midRed, double midGreen, double midBlue, double maxValue, double maxRed, double maxGreen, double maxBlue);
 
 		void renderAveragePointValues_FloorSampling(const LibMCEnv_double dDefaultValue, const uint64_t nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint* pPointValuesBuffer);
+
+		void saveToBuffer (std::vector<uint8_t> & Buffer);
 	};
 
 	

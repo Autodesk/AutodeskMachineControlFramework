@@ -117,7 +117,7 @@ namespace AMC {
 
 	}
 
-	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName, std::vector<CToolpathCustomSegmentAttribute> customSegmentAttributes)
+	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName, std::vector<PToolpathCustomSegmentAttribute> customSegmentAttributes)
 		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName), m_CustomSegmentAttributes (customSegmentAttributes)
 	{
 		LibMCAssertNotNull(p3MFLayer.get());
@@ -128,10 +128,10 @@ namespace AMC {
 		uint32_t nTotalPointCount = 0;
 
 		for (auto& attribute : m_CustomSegmentAttributes) {
-			std::string sNameSpace = attribute.getNameSpace();
-			std::string sAttributeName = attribute.getAttributeName();
-			attribute.setAttributeID (p3MFLayer->FindAttributeIDByName (sNameSpace, sAttributeName));
-			m_CustomSegmentAttributeMap.insert (std::make_pair (std::make_pair (sNameSpace, sAttributeName), &attribute));
+			std::string sNameSpace = attribute->getNameSpace();
+			std::string sAttributeName = attribute->getAttributeName();
+			attribute->setAttributeID (p3MFLayer->FindAttributeIDByName (sNameSpace, sAttributeName));
+			m_CustomSegmentAttributeMap.insert (std::make_pair (std::make_pair (sNameSpace, sAttributeName), attribute));
 		}
 
 		m_SegmentAttributeData.resize((size_t)nSegmentCount * m_CustomSegmentAttributes.size());
@@ -155,12 +155,12 @@ namespace AMC {
 				pSegment->m_AttributeData = &m_SegmentAttributeData.at((size_t)nSegmentIndex * m_CustomSegmentAttributes.size());
 				int64_t* pAttributeData = pSegment->m_AttributeData;
 				for (auto& attribute : m_CustomSegmentAttributes) {
-					switch (attribute.getAttributeType()) {
+					switch (attribute->getAttributeType()) {
 						case LibMCEnv::eToolpathAttributeType::Integer:
-							*pAttributeData = p3MFLayer->GetSegmentIntegerAttributeByID(nSegmentIndex, attribute.getAttributeID());
+							*pAttributeData = p3MFLayer->GetSegmentIntegerAttributeByID(nSegmentIndex, attribute->getAttributeID());
 							break;
 						case LibMCEnv::eToolpathAttributeType::Double:
-							*((double*)pAttributeData) = p3MFLayer->GetSegmentDoubleAttributeByID(nSegmentIndex, attribute.getAttributeID());
+							*((double*)pAttributeData) = p3MFLayer->GetSegmentDoubleAttributeByID(nSegmentIndex, attribute->getAttributeID());
 							break;
 						default:
 							throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE, m_sDebugName);
@@ -419,7 +419,7 @@ namespace AMC {
 		if ((nAttributeID < 1) || (nAttributeID > m_CustomSegmentAttributes.size ()))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID, m_sDebugName);
 
-		auto eAttributeType = m_CustomSegmentAttributes.at(nAttributeID - 1).getAttributeType();
+		auto eAttributeType = m_CustomSegmentAttributes.at(nAttributeID - 1)->getAttributeType();
 		if (eAttributeType != LibMCEnv::eToolpathAttributeType::Integer)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE, m_sDebugName);
 
@@ -435,7 +435,7 @@ namespace AMC {
 		if ((nAttributeID < 1) || (nAttributeID > m_CustomSegmentAttributes.size()))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID, m_sDebugName);
 
-		auto eAttributeType = m_CustomSegmentAttributes.at(nAttributeID - 1).getAttributeType();
+		auto eAttributeType = m_CustomSegmentAttributes.at(nAttributeID - 1)->getAttributeType();
 		if (eAttributeType != LibMCEnv::eToolpathAttributeType::Double)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTETYPE, m_sDebugName);
 

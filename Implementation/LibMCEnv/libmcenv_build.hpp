@@ -93,19 +93,19 @@ public:
 
 	IToolpathAccessor* CreateToolpathAccessor() override;
 
-	std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) override;
+	std::string AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer) override;
 
-	IDiscreteFieldData2D* LoadDiscreteField2DByName(const std::string& sName) override;
+	IDiscreteFieldData2D* LoadDiscreteField2DByIdentifier(const std::string& sContextIdentifier) override;
 
 	IDiscreteFieldData2D* LoadDiscreteField2DByUUID(const std::string& sDataUUID) override;
 
-	std::string StoreDiscreteField2D(const std::string& sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) override;
+	std::string StoreDiscreteField2D(const std::string& sContextIdentifier, const std::string& sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) override;
 
-	IImageData* LoadPNGImageByName(const std::string& sName) override;
+	IImageData* LoadPNGImageByIdentifier(const std::string& sContextIdentifier) override;
 
 	IImageData* LoadPNGImageByUUID(const std::string& sDataUUID) override;
 
-	std::string StorePNGImage(const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
+	std::string StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
 
 };
 
