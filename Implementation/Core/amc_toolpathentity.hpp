@@ -66,8 +66,8 @@ namespace AMC {
 		std::map<std::string, PToolpathPart> m_PartMap;
 		std::vector<PToolpathPart> m_PartList;
 
-		std::map<std::pair<std::string, std::string>, CToolpathCustomSegmentAttribute*> m_CustomSegmentAttributeMap;
-		std::vector<CToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
+		std::map<std::pair<std::string, std::string>, PToolpathCustomSegmentAttribute> m_CustomSegmentAttributeMap;
+		std::vector<PToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
 
 		std::string m_sDebugName;
 

@@ -42,6 +42,12 @@ using namespace AMC;
 #define DISCRETEFIELD_MINVALUEDISTANCE 1E-6
 #define DISCRETEFIELD_MAXPOINTVALUESCOUNT (1024ULL * 1024ULL * 1024ULL)
 
+PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::createFromBuffer(const std::vector<uint8_t>& Buffer)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
 CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dDefaultValue, bool bDoClear)
 	: m_nPixelCountX (nPixelCountX), m_nPixelCountY (nPixelCountY), m_dDPIX (dDPIX), m_dDPIY (dDPIY), m_dOriginX (dOriginX), m_dOriginY (dOriginY)
 {
@@ -470,6 +476,7 @@ void CDiscreteFieldData2DInstance::renderRGBImage(std::vector<uint8_t>* pPixelDa
 	
 }
 
+
 void CDiscreteFieldData2DInstance::renderAveragePointValues_FloorSampling(const LibMCEnv_double dDefaultValue, const uint64_t nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint* pPointValuesBuffer)
 {
 	if (nPointValuesBufferSize == 0) {
@@ -539,4 +546,11 @@ void CDiscreteFieldData2DInstance::renderAveragePointValues_FloorSampling(const 
 
 	}
 
+}
+
+void CDiscreteFieldData2DInstance::saveToBuffer(std::vector<uint8_t>& Buffer)
+{
+	Buffer.resize (m_nPixelCountX * m_nPixelCountY * sizeof (double));
+
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }

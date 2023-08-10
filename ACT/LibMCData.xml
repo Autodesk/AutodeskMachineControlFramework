@@ -486,7 +486,11 @@
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
 
-		<method name="GetName" description="returns the name of a storage stream.">
+		<method name="GetContextIdentifier" description="returns the context identifier of a storage stream.">
+			<param name="ContextIdentifier" type="string" pass="return" description="Context Identifier String" />	
+		</method>
+
+		<method name="GetName" description="returns the name description of a storage stream.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
@@ -530,7 +534,8 @@
 		<method name="StoreNewStream" description="stores a new stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. Must be unique and newly generated." />	
 			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
-			<param name="Name" type="string" pass="in" description="Name of the stream." />
+			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
+			<param name="Name" type="string" pass="in" description="Name Description of the stream." />
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Data of stream" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
@@ -539,6 +544,7 @@
 		<method name="BeginPartialStream" description="starts storing a stream with partial uploads.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
 			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
@@ -587,11 +593,15 @@
 			<param name="UUID" type="string" pass="return" description="UUID String" />	
 		</method>
 
-		<method name="GetName" description="returns the name of a build job uuid.">
+		<method name="GetName" description="returns the name of the job data.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
-		<method name="GetTimeStamp" description="returns the timestamp when the job was created.">
+		<method name="GetContextIdentifier" description="returns the unique context identifier of the job data.">
+			<param name="ContextIdentifier" type="string" pass="return" description="Context Identifier String" />	
+		</method>
+
+		<method name="GetTimeStamp" description="returns the timestamp when the job data was created.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
 				
@@ -683,7 +693,8 @@
 		</method>
 
 		<method name="AddJobData" description="Adds additional data to the Job. Job MUST be of state validated in order to add job data.">
-			<param name="Name" type="string" pass="in" description="Name of the job" />
+			<param name="Identifier" type="string" pass="in" description="Unique identifier for the job data." />
+			<param name="Name" type="string" pass="in" description="Name of the job data" />
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
 			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />

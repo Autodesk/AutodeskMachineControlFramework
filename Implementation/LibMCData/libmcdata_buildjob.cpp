@@ -272,7 +272,7 @@ bool CBuildJob::JobCanBeArchived()
 
 }
 
-void CBuildJob::AddJobData(const std::string& sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string& sUserID)
+void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string& sUserID)
 {
     if (pStream == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -283,7 +283,7 @@ void CBuildJob::AddJobData(const std::string& sName, IStorageStream* pStream, co
 
     AMCCommon::CChrono chrono;
     auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
-    std::unique_ptr<CBuildJobData> buildJobData (CBuildJobData::createInDatabase (sName, m_sUUID, eDataType, sTimeStamp, sStreamUUID, sUserID, sStreamSHA2, nStreamSize, m_pSQLHandler, m_pStoragePath));
+    std::unique_ptr<CBuildJobData> buildJobData (CBuildJobData::createInDatabase (sIdentifier, sName, m_sUUID, eDataType, sTimeStamp, sStreamUUID, sUserID, sStreamSHA2, nStreamSize, m_pSQLHandler, m_pStoragePath));
 }
 
 
@@ -294,15 +294,16 @@ CBuildJobData * CBuildJob::makeJobDataEx(AMCData::CSQLStatement* pStatement)
 
     std::string sDataUUID = pStatement->getColumnUUID(1);
     std::string sJobUUID = pStatement->getColumnString(2);
-    std::string sName = pStatement->getColumnString(3);
-    LibMCData::eBuildJobDataType eDataType = CBuildJobData::convertStringToBuildJobDataType(pStatement->getColumnString(4));
-    std::string sTimeStamp = pStatement->getColumnString(5);
-    std::string sStorageStreamUUID = pStatement->getColumnUUID(6);
-    std::string sUserID = pStatement->getColumnString(7);
-    std::string sSHA2 = pStatement->getColumnString(8);
-    uint64_t nStreamSize = pStatement->getColumnInt64(9);
+    std::string sIdentifier = pStatement->getColumnString(3);
+    std::string sName = pStatement->getColumnString(4);
+    LibMCData::eBuildJobDataType eDataType = CBuildJobData::convertStringToBuildJobDataType(pStatement->getColumnString(5));
+    std::string sTimeStamp = pStatement->getColumnString(6);
+    std::string sStorageStreamUUID = pStatement->getColumnUUID(7);
+    std::string sUserID = pStatement->getColumnString(8);
+    std::string sSHA2 = pStatement->getColumnString(9);
+    uint64_t nStreamSize = pStatement->getColumnInt64(10);
 
-    return CBuildJobData::make(sDataUUID, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, m_pSQLHandler, m_pStoragePath);
+    return CBuildJobData::make(sDataUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, m_pSQLHandler, m_pStoragePath);
 }
 
 
@@ -324,7 +325,7 @@ IBuildJobDataIterator* CBuildJob::listJobDataEx(AMCData::CSQLStatement* pStateme
 IBuildJobDataIterator* CBuildJob::ListJobDataByType(const LibMCData::eBuildJobDataType eDataType)
 {
 
-    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobdata.timestamp";
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobdata.timestamp";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString (1, m_sUUID);
     pStatement->setInt(2, 1);
@@ -349,7 +350,7 @@ IBuildJobData* CBuildJob::RetrieveJobData(const std::string& sDataUUID)
 {
     std::unique_ptr<CBuildJobDataIterator> buildJobIterator(new CBuildJobDataIterator());
 
-    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobdata.uuid=? AND active=?";
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobdata.uuid=? AND active=?";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, m_sUUID);
     pStatement->setString(2, sDataUUID);

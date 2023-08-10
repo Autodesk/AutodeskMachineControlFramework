@@ -235,7 +235,18 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagestream_getuuid(LibMCData_Sto
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagestream_gettimestamp(LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
 
 /**
-* returns the name of a storage stream.
+* returns the context identifier of a storage stream.
+*
+* @param[in] pStorageStream - StorageStream instance.
+* @param[in] nContextIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pContextIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pContextIdentifierBuffer -  buffer of Context Identifier String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagestream_getcontextidentifier(LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nContextIdentifierBufferSize, LibMCData_uint32* pContextIdentifierNeededChars, char * pContextIdentifierBuffer);
+
+/**
+* returns the name description of a storage stream.
 *
 * @param[in] pStorageStream - StorageStream instance.
 * @param[in] nNameBufferSize - size of the buffer (including trailing 0)
@@ -328,14 +339,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_retrievestream(LibMCData_St
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. Must be unique and newly generated.
 * @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
-* @param[in] pName - Name of the stream.
+* @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+* @param[in] pName - Name Description of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nContentBufferSize - Number of elements in buffer
 * @param[in] pContentBuffer - uint8 buffer of Data of stream
 * @param[in] pUserID - Currently authenticated user
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID);
 
 /**
 * starts storing a stream with partial uploads.
@@ -343,13 +355,14 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_St
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
 * @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+* @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nSize - Final size of the stream. MUST NOT be 0.
 * @param[in] pUserID - Currently authenticated user
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID);
 
 /**
 * stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -439,7 +452,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatauuid(LibMCData_
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getjobuuid(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
-* returns the name of a build job uuid.
+* returns the name of the job data.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
 * @param[in] nNameBufferSize - size of the buffer (including trailing 0)
@@ -450,7 +463,18 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getjobuuid(LibMCData_B
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getname(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
-* returns the timestamp when the job was created.
+* returns the unique context identifier of the job data.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nContextIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pContextIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pContextIdentifierBuffer -  buffer of Context Identifier String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getcontextidentifier(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nContextIdentifierBufferSize, LibMCData_uint32* pContextIdentifierNeededChars, char * pContextIdentifierBuffer);
+
+/**
+* returns the timestamp when the job data was created.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
 * @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
@@ -671,13 +695,14 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_jobcanbearchived(LibMCData
 * Adds additional data to the Job. Job MUST be of state validated in order to add job data.
 *
 * @param[in] pBuildJob - BuildJob instance.
-* @param[in] pName - Name of the job
+* @param[in] pIdentifier - Unique identifier for the job data.
+* @param[in] pName - Name of the job data
 * @param[in] pStream - Storage Stream Instance
 * @param[in] eDataType - Datatype of Job data
 * @param[in] pUserID - Currently authenticated user
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pName, LibMCData_StorageStream pStream, LibMCData::eBuildJobDataType eDataType, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eBuildJobDataType eDataType, const char * pUserID);
 
 /**
 * Retrieves a list of build job data objects, filtered by type.
