@@ -60,6 +60,7 @@ CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStor
     m_AcceptedContentTypes.insert("text/csv");
     m_AcceptedContentTypes.insert("image/png");
     m_AcceptedContentTypes.insert("image/jpeg");
+    m_AcceptedContentTypes.insert("application/amcf-discretefield2d");
 
     m_ImageContentTypes.insert("image/png");
     m_ImageContentTypes.insert("image/jpeg");
@@ -85,7 +86,7 @@ void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sConte
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM);
     pStatement = nullptr;
 
-    std::string sInsertQuery = "INSERT INTO storage_streams (uuid, identifier, name, mimetype, sha2, size, userid, timestamp, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    std::string sInsertQuery = "INSERT INTO storage_streams (uuid, identifier, name, mimetype, sha2, size, userid, timestamp, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     auto pInsertStatement = pTransaction->prepareStatement(sInsertQuery);
     pInsertStatement->setString(1, sParsedUUID);
     pInsertStatement->setString(2, sContextIdentifier);
