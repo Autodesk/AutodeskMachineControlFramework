@@ -53,7 +53,7 @@ CSMCContextHandle::CSMCContextHandle(PScanLabSMCSDK pSDK, slscHandle handle)
 CSMCContextHandle::~CSMCContextHandle()
 {
     if (m_Handle != 0) {
-        //slsc_cfg_delete(m_Handle);
+        m_pSDK->slsc_cfg_delete(m_Handle);
         m_Handle = 0;
     }
 }

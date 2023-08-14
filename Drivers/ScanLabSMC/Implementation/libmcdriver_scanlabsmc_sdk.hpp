@@ -54,9 +54,21 @@ namespace LibMCDriver_ScanLabSMC {
 		typedef size_t slscHandle;
 		typedef size_t slscJobID;
 		typedef uint32_t slscReturnValue;
+		typedef uint32_t slsc_PolylineOptions;
 
-		typedef uint32_t(SCANLABSMC_CALLINGCONVENTION *PScanLabPtr_init_rtc6_dll) ();
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION *PScanLabSMCPtr_slsc_cfg_initialize_from_file) (slscHandle * Handle, const char* XmlConfigFileName);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_cfg_delete) (size_t Handle);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_begin) (size_t Handle, size_t* JobID);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_end) (size_t Handle);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_jump) (size_t Handle, const double* Target);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_begin_polyline) (size_t Handle, const slsc_PolylineOptions Options);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_slsc_job_end_polyline) (size_t Handle);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_line) (size_t Handle, const double* Target);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_start_execution) (size_t Handle);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop) (size_t Handle);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop_controlled) (size_t Handle);
 
+	
 		class CScanLabSMCSDK {
 		private:
 			bool m_bIsInitialized;
@@ -65,7 +77,18 @@ namespace LibMCDriver_ScanLabSMC {
 			void resetFunctionPtrs ();
 		public:
 
-			PScanLabPtr_init_rtc6_dll init_rtc6_dll = nullptr;
+			PScanLabSMCPtr_slsc_cfg_initialize_from_file slsc_cfg_initialize_from_file = nullptr;
+			PScanLabSMCPtr_slsc_cfg_delete slsc_cfg_delete = nullptr;
+			PScanLabSMCPtr_slsc_job_begin slsc_job_begin = nullptr;
+			PScanLabSMCPtr_slsc_job_end slsc_job_end = nullptr;
+			PScanLabSMCPtr_slsc_job_jump slsc_job_jump = nullptr;
+			PScanLabSMCPtr_slsc_job_begin_polyline slsc_job_begin_polyline = nullptr;
+			PScanLabSMCPtr_slsc_slsc_job_end_polyline slsc_job_end_polyline = nullptr;
+			PScanLabSMCPtr_slsc_job_line slsc_job_line = nullptr;
+			PScanLabSMCPtr_slsc_ctrl_start_execution slsc_ctrl_start_execution = nullptr;
+			PScanLabSMCPtr_slsc_ctrl_stop slsc_ctrl_stop = nullptr;
+			PScanLabSMCPtr_slsc_ctrl_stop_controlled slsc_ctrl_stop_controlled = nullptr;
+
 			CScanLabSMCSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSMCSDK();
 

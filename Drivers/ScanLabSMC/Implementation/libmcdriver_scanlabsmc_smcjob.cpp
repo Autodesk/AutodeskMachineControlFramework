@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CSMCJob
 
 #include "libmcdriver_scanlabsmc_smcjob.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
+#include "libmcdriver_scanlabsmc_sdk.hpp"
 
 // Include custom headers here.
 
@@ -51,7 +52,7 @@ CSMCJob::CSMCJob(PSMCContextHandle pContextHandle, double dStartPositionX, doubl
 {
     m_pSDK = m_pContextHandle->getSDK();
 
-    //m_pSDK->checkError(m_pSDK->slsc_job_begin(m_pContextHandle->getHandle(), &m_JobID));
+    m_pSDK->checkError(m_pSDK->slsc_job_begin(m_pContextHandle->getHandle(), &m_JobID));
 }
 
 CSMCJob::~CSMCJob()
@@ -69,7 +70,7 @@ void CSMCJob::Finalize()
     if (m_bIsFinalized)
         throw std::runtime_error("Job is already finalized!");
 
-    //m_pSDK->checkError(m_pSDK->slsc_job_end(m_pContextHandle->getHandle()));
+    m_pSDK->checkError(m_pSDK->slsc_job_end(m_pContextHandle->getHandle()));
     m_bIsFinalized = true;
 }
 
@@ -86,7 +87,7 @@ void CSMCJob::drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBuf
     if (pPointsBuffer == nullptr)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
 
-    /*auto& startPoint = pPointsBuffer[0];
+    auto& startPoint = pPointsBuffer[0];
     std::array<double, 2> startPosition;
     startPosition[0] = startPoint.m_X;
     startPosition[1] = startPoint.m_Y;
@@ -94,12 +95,12 @@ void CSMCJob::drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBuf
 
     slsc_PolylineOptions polyLineOptions;
     if (bIsClosed) {
-        polyLineOptions.Geometry = slsc_Polyline_Closed;
+        //polyLineOptions.Geometry = slsc_Polyline_Closed;
     }
     else {
-        polyLineOptions.Geometry = slsc_Polyline_Open;
+        //polyLineOptions.Geometry = slsc_Polyline_Open;
     }
-    polyLineOptions.ProfileType = slsc_Maximize_Velocity;
+    //polyLineOptions.ProfileType = slsc_Maximize_Velocity;
     m_pSDK->checkError(m_pSDK->slsc_job_begin_polyline(contextHandle, polyLineOptions));
 
     for (size_t nPointIndex = 1; nPointIndex < nPointsBufferSize; nPointIndex++) {
@@ -110,7 +111,7 @@ void CSMCJob::drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBuf
         m_pSDK->checkError(m_pSDK->slsc_job_line(contextHandle, nextPosition.data()));
     }
 
-    m_pSDK->checkError(m_pSDK->slsc_job_end_polyline(contextHandle)); */
+    m_pSDK->checkError(m_pSDK->slsc_job_end_polyline(contextHandle)); 
 }
 
 
@@ -167,21 +168,21 @@ void CSMCJob::Execute(const bool bBlocking)
 {
     auto contextHandle = m_pContextHandle->getHandle();
 
-   /* std::cout << "Waiting for execution" << std::endl;
+    std::cout << "Waiting for execution" << std::endl;
 
-    slsc_ExecState execState1 = slsc_ExecState_NotInitOrError;
+    /*slsc_ExecState execState1 = slsc_ExecState_NotInitOrError;
     while (execState1 != slsc_ExecState_ReadyForExecution) {
         m_pSDK->checkError(m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState1));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+    } */
 
-    std::cout << "Starting execution" << std::endl;
+    //std::cout << "Starting execution" << std::endl;
 
     m_pSDK->checkError(m_pSDK->slsc_ctrl_start_execution(contextHandle));
 
-    std::cout << "Waiting for execution finished" << std::endl;
+    //std::cout << "Waiting for execution finished" << std::endl;
 
-    slsc_ExecState execState2 = slsc_ExecState_Executing;
+    /*slsc_ExecState execState2 = slsc_ExecState_Executing;
     while (execState2 == slsc_ExecState_Executing) {
         checkError(slsc_ctrl_get_exec_state(contextHandle, &execState2));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));

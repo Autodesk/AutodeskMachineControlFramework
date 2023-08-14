@@ -103,8 +103,18 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8)
 #endif // _WIN32
 
 
-	this->init_rtc6_dll = (PScanLabPtr_init_rtc6_dll)_loadScanLabSMCAddress(hLibrary, "init_rtc6_dll");
-	
+	this->slsc_cfg_initialize_from_file = (PScanLabSMCPtr_slsc_cfg_initialize_from_file)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_initialize_from_file");
+	this->slsc_cfg_delete = (PScanLabSMCPtr_slsc_cfg_delete)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_delete");
+	this->slsc_job_begin = (PScanLabSMCPtr_slsc_job_begin)_loadScanLabSMCAddress(hLibrary, "slsc_job_begin");
+	this->slsc_job_end = (PScanLabSMCPtr_slsc_job_end)_loadScanLabSMCAddress(hLibrary, "slsc_job_end");
+	this->slsc_job_jump = (PScanLabSMCPtr_slsc_job_jump)_loadScanLabSMCAddress(hLibrary, "slsc_job_jump");
+	this->slsc_job_begin_polyline = (PScanLabSMCPtr_slsc_job_begin_polyline)_loadScanLabSMCAddress(hLibrary, "slsc_job_begin_polyline");
+	this->slsc_job_end_polyline = (PScanLabSMCPtr_slsc_slsc_job_end_polyline)_loadScanLabSMCAddress(hLibrary, "slsc_job_end_polyline");
+	this->slsc_job_line = (PScanLabSMCPtr_slsc_job_line)_loadScanLabSMCAddress(hLibrary, "slsc_job_line");
+	this->slsc_ctrl_start_execution = (PScanLabSMCPtr_slsc_ctrl_start_execution)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_start_execution");
+	this->slsc_ctrl_stop = (PScanLabSMCPtr_slsc_ctrl_stop)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_stop");
+	this->slsc_ctrl_stop_controlled = (PScanLabSMCPtr_slsc_ctrl_stop_controlled)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_stop_controlled");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -129,10 +139,9 @@ void CScanLabSMCSDK::initDLL()
 {
 	if (!m_bIsInitialized) {
 
-		if (init_rtc6_dll == nullptr)
+		if (slsc_cfg_initialize_from_file == nullptr)
 			throw std::runtime_error("RTC DLL not loaded");
 
-		init_rtc6_dll();
 		m_bIsInitialized = true;
 
 	}
@@ -147,7 +156,17 @@ void CScanLabSMCSDK::checkError(uint32_t nRTCError)
 
 void CScanLabSMCSDK::resetFunctionPtrs()
 {
-	init_rtc6_dll = nullptr;
+	slsc_cfg_initialize_from_file = nullptr;
+	slsc_cfg_delete = nullptr;
+	slsc_job_begin = nullptr;
+	slsc_job_end = nullptr;
+	slsc_job_jump = nullptr;
+	slsc_job_begin_polyline = nullptr;
+	slsc_job_end_polyline = nullptr;
+	slsc_job_line = nullptr;
+	slsc_ctrl_start_execution = nullptr;
+	slsc_ctrl_stop = nullptr;
+	slsc_ctrl_stop_controlled = nullptr;
 
 }
 
