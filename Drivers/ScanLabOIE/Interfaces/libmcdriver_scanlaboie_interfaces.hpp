@@ -403,6 +403,12 @@ public:
 	virtual LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() = 0;
 
 	/**
+	* IDataRecording::GetAdditionalSignalCount - Returns the configured Additional data signal count of the configuration.
+	* @return Sensor Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetAdditionalSignalCount() = 0;
+
+	/**
 	* IDataRecording::GetRecordCount - Returns the number of records in the recording.
 	* @return Number of records in the recording
 	*/
@@ -434,6 +440,15 @@ public:
 	* @param[out] pSensorSignalsBuffer - int32 buffer of Recorded Sensor Signals
 	*/
 	virtual void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nSensorSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSensorSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSensorSignalsBuffer) = 0;
+
+	/**
+	* IDataRecording::GetAdditionalSignalsOfRecord - Returns the additional signals of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[in] nAdditionalSignalsBufferSize - Number of elements in buffer
+	* @param[out] pAdditionalSignalsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pAdditionalSignalsBuffer - int32 buffer of Recorded Additional Signals
+	*/
+	virtual void GetAdditionalSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nAdditionalSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pAdditionalSignalsBuffer) = 0;
 
 	/**
 	* IDataRecording::GetAllCoordinates - Returns an array of all coordinates.
@@ -471,6 +486,15 @@ public:
 	* @param[out] pSignalsBuffer - int32 buffer of Array of the Indexed RTC Signal of all records.
 	*/
 	virtual void GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) = 0;
+
+	/**
+	* IDataRecording::GetAllAdditionalSignals - Returns an array of all additional signals of a specific index.
+	* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+	* @param[in] nSignalsBufferSize - Number of elements in buffer
+	* @param[out] pSignalsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSignalsBuffer - int32 buffer of Array of the Indexed RTC Signal of all records.
+	*/
+	virtual void GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) = 0;
 
 	/**
 	* IDataRecording::StoreAsBuildData - Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.

@@ -86,6 +86,7 @@ protected:
 
 	uint32_t m_nRTCSignalCount;
 	uint32_t m_nSensorSignalCount;
+	uint32_t m_nAdditionalSignalCount;
 
 	oie_instance m_pInstance;
 	oie_device m_pDevice;

@@ -37,7 +37,7 @@ Abstract: This is a stub class definition of COIEDevice
 
 #include <array>
 #include <algorithm>
-//#include <iostream>
+#include <iostream>
 #include <cstring>
 #include <sstream>
 
@@ -111,7 +111,8 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	  m_nDeviceID (0),
 	  m_bHasCorrectionData (false),
 	  m_nRTCSignalCount (0),
-	  m_nSensorSignalCount (0)
+	  m_nSensorSignalCount (0),
+	  m_nAdditionalSignalCount (0)
 
 {
 	if ((pOIESDK.get() == nullptr) || (pInstance == nullptr) || (pWorkingDirectory.get () == nullptr) || (pDeviceConfiguration == nullptr))
@@ -127,6 +128,7 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 
 	m_nRTCSignalCount = pDeviceConfiguration->GetRTCSignalCount (); 
 	m_nSensorSignalCount = pDeviceConfiguration->GetSensorSignalCount();
+	m_nRTCSignalCount = pDeviceConfiguration->GetAdditionalSignalCount();
 
 
 	if (m_pConfigurationFile == nullptr)
@@ -449,7 +451,7 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 
 	{
 		std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
-		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(m_nRTCSignalCount + m_nSensorSignalCount, m_nRTCSignalCount, 1024);
+		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(m_nSensorSignalCount, m_nRTCSignalCount, m_nAdditionalSignalCount, 1024);
 	}
 
 }
@@ -657,14 +659,15 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 				}
 
 				uint32_t additionalSignalCount = m_pOIESDK->oie_pkt_get_app_data_count(pkt);
-				//std::cout << "Additional signal count" << rtcSignalCount << " (packetNr " << *pPacketNumber << ")" << std::endl;
+				//std::cout << "Additional signal count" << additionalSignalCount << " (packetNr " << *pPacketNumber << ")" << std::endl;
+
 				for (uint32_t additionalSignalIndex = 0; additionalSignalIndex < additionalSignalCount; additionalSignalIndex++)
 				{
 					int32_t nValue = 0;
 					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_app_data(pkt, additionalSignalIndex, &nValue));
-					// std::cout << "   - index #" << additionalSignalIndex << ": " << nValue << std::endl;
+					//std::cout << "   - index #" << additionalSignalIndex << ": " << nValue << std::endl;
 
-					//m_pCurrentDataRecording->recordValue(nValue);
+					m_pCurrentDataRecording->recordValue(nValue);
 				}
 
 
