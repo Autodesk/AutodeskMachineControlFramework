@@ -128,7 +128,7 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 
 	m_nRTCSignalCount = pDeviceConfiguration->GetRTCSignalCount (); 
 	m_nSensorSignalCount = pDeviceConfiguration->GetSensorSignalCount();
-	m_nRTCSignalCount = pDeviceConfiguration->GetAdditionalSignalCount();
+	m_nAdditionalSignalCount = pDeviceConfiguration->GetAdditionalSignalCount();
 
 
 	if (m_pConfigurationFile == nullptr)
@@ -638,16 +638,7 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 				m_pCurrentDataRecording->startRecord(*pPacketNumber, dX, dY);
 
-				uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
-				//std::cout << "RTC signal count" << rtcSignalCount << std::endl;
-				for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
-				{
-					int32_t nValue = 0;
-					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
-
-					m_pCurrentDataRecording->recordValue(nValue);
-				}
-
+				// Record sensor values first.
 				uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
 				//std::cout << "Sensor signal count" << sensorSignalCount << std::endl;
 
@@ -658,6 +649,18 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 					m_pCurrentDataRecording->recordValue(nValue);
 				}
 
+				// record RTC values second
+				uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
+				//std::cout << "RTC signal count" << rtcSignalCount << std::endl;
+				for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
+				{
+					int32_t nValue = 0;
+					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
+
+					m_pCurrentDataRecording->recordValue(nValue);
+				}
+
+				// Record additional values last
 				uint32_t additionalSignalCount = m_pOIESDK->oie_pkt_get_app_data_count(pkt);
 				//std::cout << "Additional signal count" << additionalSignalCount << " (packetNr " << *pPacketNumber << ")" << std::endl;
 
@@ -682,9 +685,9 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 	}
 	/*catch (std::exception & E)
 	{
-		//std::cout << "error getting data:" << E.what () << std::endl;
+		std::cout << "error getting data:" << E.what () << std::endl;
 
-	}*/
+	} */
 	catch (...) {
 		//std::cout << "error getting data" << std::endl;
 	}
