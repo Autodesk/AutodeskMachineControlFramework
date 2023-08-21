@@ -106,6 +106,20 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML 9 /** empty configuration XML */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_DRIVERERROR 1000 /** a driver error occured */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDPLATFORM 1001 /** Unsupported platform. SMC only works on Windows only for now. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_SDKALREADYLOADED 1002 /** SDK has already been loaded. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYSMCDLLRESOURCENAME 1003 /** Empty SMC DLL Resource Name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCDLLRESOURCENAME 1004 /** Empty RTC DLL Resource Name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_SMCSDKRESOURCENOTFOUND 1005 /** SMC SDK Resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTORESMCSDK 1006 /** Could not store SMC SDK. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_RTCSDKRESOURCENOTFOUND 1007 /** RTC SDK Resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTORERTCSDK 1008 /** Could not store RTC SDK. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYSMCDLLRESOURCEDATA 1009 /** Empty SMC DLL Resource Data. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCDLLRESOURCEDATA 1010 /** Empty RTC DLL Resource Data. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESDLLRESOURCENAME 1011 /** Empty Xerces Resource Name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_XERCESRESOURCENOTFOUND 1012 /** Xerces Resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOREXERCESDLL 1013 /** Could not store Xerces DLL. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESRESOURCEDATA 1014 /** Empty Xerces Resource Data. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -124,6 +138,20 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
     case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML: return "empty configuration XML";
     case LIBMCDRIVER_SCANLABSMC_ERROR_DRIVERERROR: return "a driver error occured";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDPLATFORM: return "Unsupported platform. SMC only works on Windows only for now.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_SDKALREADYLOADED: return "SDK has already been loaded.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYSMCDLLRESOURCENAME: return "Empty SMC DLL Resource Name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCDLLRESOURCENAME: return "Empty RTC DLL Resource Name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_SMCSDKRESOURCENOTFOUND: return "SMC SDK Resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTORESMCSDK: return "Could not store SMC SDK.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_RTCSDKRESOURCENOTFOUND: return "RTC SDK Resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTORERTCSDK: return "Could not store RTC SDK.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYSMCDLLRESOURCEDATA: return "Empty SMC DLL Resource Data.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCDLLRESOURCEDATA: return "Empty RTC DLL Resource Data.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESDLLRESOURCENAME: return "Empty Xerces Resource Name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_XERCESRESOURCENOTFOUND: return "Xerces Resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOREXERCESDLL: return "Could not store Xerces DLL.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESRESOURCEDATA: return "Empty Xerces Resource Data.";
     default: return "unknown error";
   }
 }
@@ -135,6 +163,7 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_Base;
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_Driver;
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_SMCJob;
+typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_SMCConfiguration;
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_SMCContext;
 typedef LibMCDriver_ScanLabSMCHandle LibMCDriver_ScanLabSMC_Driver_ScanLabSMC;
 
@@ -148,6 +177,20 @@ namespace LibMCDriver_ScanLabSMC {
     Deactivated = 0,
     MaxAccuracy = 1,
     Fast = 2
+  };
+  
+  enum class eDynamicViolationReaction : LibMCDriver_ScanLabSMC_int32 {
+    Unknown = 0,
+    WarningOnly = 1,
+    AbortImmediately = 2,
+    StopAndReport = 3
+  };
+  
+  enum class eWarnLevel : LibMCDriver_ScanLabSMC_int32 {
+    Unknown = 0,
+    Error = 1,
+    Warn = 2,
+    Info = 3
   };
   
   /*************************************************************************************************************************
@@ -174,6 +217,8 @@ namespace LibMCDriver_ScanLabSMC {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_ScanLabSMC::eBlendMode eLibMCDriver_ScanLabSMCBlendMode;
+typedef LibMCDriver_ScanLabSMC::eDynamicViolationReaction eLibMCDriver_ScanLabSMCDynamicViolationReaction;
+typedef LibMCDriver_ScanLabSMC::eWarnLevel eLibMCDriver_ScanLabSMCWarnLevel;
 typedef LibMCDriver_ScanLabSMC::sPoint2D sLibMCDriver_ScanLabSMCPoint2D;
 typedef LibMCDriver_ScanLabSMC::sHatch2D sLibMCDriver_ScanLabSMCHatch2D;
 

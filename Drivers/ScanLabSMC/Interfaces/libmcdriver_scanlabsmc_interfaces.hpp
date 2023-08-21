@@ -58,6 +58,7 @@ namespace Impl {
 class IBase;
 class IDriver;
 class ISMCJob;
+class ISMCConfiguration;
 class ISMCContext;
 class IDriver_ScanLabSMC;
 
@@ -428,6 +429,41 @@ typedef IBaseSharedPtr<ISMCJob> PISMCJob;
 
 
 /*************************************************************************************************************************
+ Class interface for SMCConfiguration 
+**************************************************************************************************************************/
+
+class ISMCConfiguration : public virtual IBase {
+public:
+	/**
+	* ISMCConfiguration::SetDynamicViolationReaction - Sets the response to a dynamic violation. Default is WarningOnly.
+	* @param[in] eValue - Value to set.
+	*/
+	virtual void SetDynamicViolationReaction(const LibMCDriver_ScanLabSMC::eDynamicViolationReaction eValue) = 0;
+
+	/**
+	* ISMCConfiguration::GetDynamicViolationReaction - Returns the response to a dynamic violation.
+	* @return Current Value.
+	*/
+	virtual LibMCDriver_ScanLabSMC::eDynamicViolationReaction GetDynamicViolationReaction() = 0;
+
+	/**
+	* ISMCConfiguration::SetWarnLevel - Sets the log warning level.
+	* @param[in] eValue - Value to set.
+	*/
+	virtual void SetWarnLevel(const LibMCDriver_ScanLabSMC::eWarnLevel eValue) = 0;
+
+	/**
+	* ISMCConfiguration::GetWarnLevel - Returns the log warning level.
+	* @return Current Value.
+	*/
+	virtual LibMCDriver_ScanLabSMC::eWarnLevel GetWarnLevel() = 0;
+
+};
+
+typedef IBaseSharedPtr<ISMCConfiguration> PISMCConfiguration;
+
+
+/*************************************************************************************************************************
  Class interface for SMCContext 
 **************************************************************************************************************************/
 
@@ -556,17 +592,58 @@ typedef IBaseSharedPtr<ISMCContext> PISMCContext;
 class IDriver_ScanLabSMC : public virtual IDriver {
 public:
 	/**
-	* IDriver_ScanLabSMC::LoadSDK - Initializes the SCANmotionControl SDK.
-	* @param[in] sSMCResourceName - Resource name of SCANmotionControl DLL
+	* IDriver_ScanLabSMC::SetDLLResources - Sets the default resource name of the SCANLAB DLLs. Overrides custom resource data if set before.
+	* @param[in] sSMCDLLResourceName - Resource name of SCANmotionControl DLL
+	* @param[in] sRTCDLLResourceName - Resource name of RTC DLL
 	*/
-	virtual void LoadSDK(const std::string & sSMCResourceName) = 0;
+	virtual void SetDLLResources(const std::string & sSMCDLLResourceName, const std::string & sRTCDLLResourceName) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::SetXercesDLLResource - Sets the default resource name of auxiliary resource DLLs. Overrides custom resource data if set before.
+	* @param[in] sXercesDLLResourceName - Resource name of the Xerces dependency DLL
+	*/
+	virtual void SetXercesDLLResource(const std::string & sXercesDLLResourceName) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::SetCustomDLLData - Sets custom binaries for the needed SCANLAB DLLs. Overrides custom resource data if set before.
+	* @param[in] nSMCDLLResourceDataBufferSize - Number of elements in buffer
+	* @param[in] pSMCDLLResourceDataBuffer - Resource data of SCANmotionControl DLL
+	* @param[in] nRTCDLLResourceDataBufferSize - Number of elements in buffer
+	* @param[in] pRTCDLLResourceDataBuffer - Resource data of RTC DLL
+	*/
+	virtual void SetCustomDLLData(const LibMCDriver_ScanLabSMC_uint64 nSMCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pSMCDLLResourceDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nRTCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pRTCDLLResourceDataBuffer) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::SetCustomXercesDLLData - Sets the custom binary for auxiliary resource DLLs. Overrides custom resource data if set before.
+	* @param[in] nXercesDLLResourceDataBufferSize - Number of elements in buffer
+	* @param[in] pXercesDLLResourceDataBuffer - Resource data of the Xerces dependency DLL
+	*/
+	virtual void SetCustomXercesDLLData(const LibMCDriver_ScanLabSMC_uint64 nXercesDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pXercesDLLResourceDataBuffer) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::LoadSDK - Initializes the SCANmotionControl SDK.
+	*/
+	virtual void LoadSDK() = 0;
 
 	/**
 	* IDriver_ScanLabSMC::CreateContext - Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
-	* @param[in] sConfigurationXML - XML Configuration Data.
+	* @param[in] pSMCConfiguration - SMC Configuration Data.
 	* @return New Context instance
 	*/
-	virtual ISMCContext * CreateContext(const std::string & sConfigurationXML) = 0;
+	virtual ISMCContext * CreateContext(ISMCConfiguration* pSMCConfiguration) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::CreateEmptyConfiguration - Creates and initializes a SMC configuration with default values.
+	* @return New Configuration instance
+	*/
+	virtual ISMCConfiguration * CreateEmptyConfiguration() = 0;
+
+	/**
+	* IDriver_ScanLabSMC::CreateTemplateConfiguration - Creates and initializes a SMC configuration with templated values.
+	* @param[in] sTemplateName - Name of SMC Template.
+	* @return New Configuration instance
+	*/
+	virtual ISMCConfiguration * CreateTemplateConfiguration(const std::string & sTemplateName) = 0;
 
 };
 

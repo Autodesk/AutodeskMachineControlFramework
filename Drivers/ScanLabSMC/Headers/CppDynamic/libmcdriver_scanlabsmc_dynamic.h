@@ -235,6 +235,46 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_WaitForExec
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_StopExecutionPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob);
 
 /*************************************************************************************************************************
+ Class definition for SMCConfiguration
+**************************************************************************************************************************/
+
+/**
+* Sets the response to a dynamic violation. Default is WarningOnly.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] eValue - Value to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetDynamicViolationReactionPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eDynamicViolationReaction eValue);
+
+/**
+* Returns the response to a dynamic violation.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[out] pValue - Current Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_GetDynamicViolationReactionPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eDynamicViolationReaction * pValue);
+
+/**
+* Sets the log warning level.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] eValue - Value to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetWarnLevelPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eWarnLevel eValue);
+
+/**
+* Returns the log warning level.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[out] pValue - Current Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_GetWarnLevelPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eWarnLevel * pValue);
+
+/*************************************************************************************************************************
  Class definition for SMCContext
 **************************************************************************************************************************/
 
@@ -406,23 +446,82 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_GetUnfi
 **************************************************************************************************************************/
 
 /**
+* Sets the default resource name of the SCANLAB DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pSMCDLLResourceName - Resource name of SCANmotionControl DLL
+* @param[in] pRTCDLLResourceName - Resource name of RTC DLL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetDLLResourcesPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pSMCDLLResourceName, const char * pRTCDLLResourceName);
+
+/**
+* Sets the default resource name of auxiliary resource DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pXercesDLLResourceName - Resource name of the Xerces dependency DLL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetXercesDLLResourcePtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pXercesDLLResourceName);
+
+/**
+* Sets custom binaries for the needed SCANLAB DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] nSMCDLLResourceDataBufferSize - Number of elements in buffer
+* @param[in] pSMCDLLResourceDataBuffer - uint8 buffer of Resource data of SCANmotionControl DLL
+* @param[in] nRTCDLLResourceDataBufferSize - Number of elements in buffer
+* @param[in] pRTCDLLResourceDataBuffer - uint8 buffer of Resource data of RTC DLL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetCustomDLLDataPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_uint64 nSMCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pSMCDLLResourceDataBuffer, LibMCDriver_ScanLabSMC_uint64 nRTCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pRTCDLLResourceDataBuffer);
+
+/**
+* Sets the custom binary for auxiliary resource DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] nXercesDLLResourceDataBufferSize - Number of elements in buffer
+* @param[in] pXercesDLLResourceDataBuffer - uint8 buffer of Resource data of the Xerces dependency DLL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetCustomXercesDLLDataPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_uint64 nXercesDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pXercesDLLResourceDataBuffer);
+
+/**
 * Initializes the SCANmotionControl SDK.
 *
 * @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
-* @param[in] pSMCResourceName - Resource name of SCANmotionControl DLL
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_LoadSDKPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pSMCResourceName);
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_LoadSDKPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC);
 
 /**
 * Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
 *
 * @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
-* @param[in] pConfigurationXML - XML Configuration Data.
+* @param[in] pSMCConfiguration - SMC Configuration Data.
 * @param[out] pInstance - New Context instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateContextPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pConfigurationXML, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateContextPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+
+/**
+* Creates and initializes a SMC configuration with default values.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[out] pInstance - New Configuration instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateEmptyConfigurationPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_SMCConfiguration * pInstance);
+
+/**
+* Creates and initializes a SMC configuration with templated values.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pTemplateName - Name of SMC Template.
+* @param[out] pInstance - New Configuration instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateTemplateConfigurationPtr) (LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pTemplateName, LibMCDriver_ScanLabSMC_SMCConfiguration * pInstance);
 
 /*************************************************************************************************************************
  Global functions
@@ -517,6 +616,10 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCJob_IsExecutingPtr m_SMCJob_IsExecuting;
 	PLibMCDriver_ScanLabSMCSMCJob_WaitForExecutionPtr m_SMCJob_WaitForExecution;
 	PLibMCDriver_ScanLabSMCSMCJob_StopExecutionPtr m_SMCJob_StopExecution;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetDynamicViolationReactionPtr m_SMCConfiguration_SetDynamicViolationReaction;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_GetDynamicViolationReactionPtr m_SMCConfiguration_GetDynamicViolationReaction;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetWarnLevelPtr m_SMCConfiguration_SetWarnLevel;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_GetWarnLevelPtr m_SMCConfiguration_GetWarnLevel;
 	PLibMCDriver_ScanLabSMCSMCContext_SetToSimulationModePtr m_SMCContext_SetToSimulationMode;
 	PLibMCDriver_ScanLabSMCSMCContext_IsSimulationModePtr m_SMCContext_IsSimulationMode;
 	PLibMCDriver_ScanLabSMCSMCContext_SetFirmwarePtr m_SMCContext_SetFirmware;
@@ -533,8 +636,14 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCContext_GetLaserFieldPtr m_SMCContext_GetLaserField;
 	PLibMCDriver_ScanLabSMCSMCContext_BeginJobPtr m_SMCContext_BeginJob;
 	PLibMCDriver_ScanLabSMCSMCContext_GetUnfinishedJobPtr m_SMCContext_GetUnfinishedJob;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetDLLResourcesPtr m_Driver_ScanLabSMC_SetDLLResources;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetXercesDLLResourcePtr m_Driver_ScanLabSMC_SetXercesDLLResource;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetCustomDLLDataPtr m_Driver_ScanLabSMC_SetCustomDLLData;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetCustomXercesDLLDataPtr m_Driver_ScanLabSMC_SetCustomXercesDLLData;
 	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_LoadSDKPtr m_Driver_ScanLabSMC_LoadSDK;
 	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateContextPtr m_Driver_ScanLabSMC_CreateContext;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateEmptyConfigurationPtr m_Driver_ScanLabSMC_CreateEmptyConfiguration;
+	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateTemplateConfigurationPtr m_Driver_ScanLabSMC_CreateTemplateConfiguration;
 	PLibMCDriver_ScanLabSMCGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabSMCGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabSMCReleaseInstancePtr m_ReleaseInstance;

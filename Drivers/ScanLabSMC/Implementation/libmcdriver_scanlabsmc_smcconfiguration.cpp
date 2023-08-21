@@ -27,11 +27,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CSMCContext
+Abstract: This is a stub class definition of CSMCConfiguration
 
 */
 
-#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
+#include "libmcdriver_scanlabsmc_smcconfiguration.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -40,30 +40,40 @@ Abstract: This is a stub class definition of CSMCContext
 using namespace LibMCDriver_ScanLabSMC::Impl;
 
 /*************************************************************************************************************************
- Class definition of CSMCContext 
+ Class definition of CSMCConfiguration 
 **************************************************************************************************************************/
 
-
-CSMCContextHandle::CSMCContextHandle(PScanLabSMCSDK pSDK, slscHandle handle)
-    : m_Handle(handle), m_pSDK (pSDK)
+CSMCConfiguration::CSMCConfiguration()
 {
 
 }
 
-CSMCContextHandle::~CSMCContextHandle()
+CSMCConfiguration::~CSMCConfiguration()
 {
-    if ((m_Handle != 0) && (m_pSDK.get () != nullptr)) {
-        m_pSDK->slsc_cfg_delete(m_Handle);
-        m_Handle = 0;
-    }
+
 }
 
-slscHandle CSMCContextHandle::getHandle()
+void CSMCConfiguration::SetDynamicViolationReaction(const LibMCDriver_ScanLabSMC::eDynamicViolationReaction eValue)
 {
-    return m_Handle;
+	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
-PScanLabSMCSDK CSMCContextHandle::getSDK()
+LibMCDriver_ScanLabSMC::eDynamicViolationReaction CSMCConfiguration::GetDynamicViolationReaction()
 {
-    return m_pSDK;
+	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+}
+
+void CSMCConfiguration::SetWarnLevel(const LibMCDriver_ScanLabSMC::eWarnLevel eValue)
+{
+	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+}
+
+LibMCDriver_ScanLabSMC::eWarnLevel CSMCConfiguration::GetWarnLevel()
+{
+	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory)
+{
+    return "";
 }

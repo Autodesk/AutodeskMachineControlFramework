@@ -248,6 +248,46 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_stopexecution(LibMCDriver_ScanLabSMC_SMCJob pSMCJob);
 
 /*************************************************************************************************************************
+ Class definition for SMCConfiguration
+**************************************************************************************************************************/
+
+/**
+* Sets the response to a dynamic violation. Default is WarningOnly.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] eValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setdynamicviolationreaction(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eDynamicViolationReaction eValue);
+
+/**
+* Returns the response to a dynamic violation.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[out] pValue - Current Value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getdynamicviolationreaction(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eDynamicViolationReaction * pValue);
+
+/**
+* Sets the log warning level.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] eValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setwarnlevel(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eWarnLevel eValue);
+
+/**
+* Returns the log warning level.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[out] pValue - Current Value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getwarnlevel(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eWarnLevel * pValue);
+
+/*************************************************************************************************************************
  Class definition for SMCContext
 **************************************************************************************************************************/
 
@@ -419,23 +459,82 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 **************************************************************************************************************************/
 
 /**
+* Sets the default resource name of the SCANLAB DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pSMCDLLResourceName - Resource name of SCANmotionControl DLL
+* @param[in] pRTCDLLResourceName - Resource name of RTC DLL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_setdllresources(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pSMCDLLResourceName, const char * pRTCDLLResourceName);
+
+/**
+* Sets the default resource name of auxiliary resource DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pXercesDLLResourceName - Resource name of the Xerces dependency DLL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_setxercesdllresource(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pXercesDLLResourceName);
+
+/**
+* Sets custom binaries for the needed SCANLAB DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] nSMCDLLResourceDataBufferSize - Number of elements in buffer
+* @param[in] pSMCDLLResourceDataBuffer - uint8 buffer of Resource data of SCANmotionControl DLL
+* @param[in] nRTCDLLResourceDataBufferSize - Number of elements in buffer
+* @param[in] pRTCDLLResourceDataBuffer - uint8 buffer of Resource data of RTC DLL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_setcustomdlldata(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_uint64 nSMCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pSMCDLLResourceDataBuffer, LibMCDriver_ScanLabSMC_uint64 nRTCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pRTCDLLResourceDataBuffer);
+
+/**
+* Sets the custom binary for auxiliary resource DLLs. Overrides custom resource data if set before.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] nXercesDLLResourceDataBufferSize - Number of elements in buffer
+* @param[in] pXercesDLLResourceDataBuffer - uint8 buffer of Resource data of the Xerces dependency DLL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_setcustomxercesdlldata(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_uint64 nXercesDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pXercesDLLResourceDataBuffer);
+
+/**
 * Initializes the SCANmotionControl SDK.
 *
 * @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
-* @param[in] pSMCResourceName - Resource name of SCANmotionControl DLL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_loadsdk(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pSMCResourceName);
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_loadsdk(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC);
 
 /**
 * Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
 *
 * @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
-* @param[in] pConfigurationXML - XML Configuration Data.
+* @param[in] pSMCConfiguration - SMC Configuration Data.
 * @param[out] pInstance - New Context instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pConfigurationXML, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+
+/**
+* Creates and initializes a SMC configuration with default values.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[out] pInstance - New Configuration instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_createemptyconfiguration(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_SMCConfiguration * pInstance);
+
+/**
+* Creates and initializes a SMC configuration with templated values.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pTemplateName - Name of SMC Template.
+* @param[out] pInstance - New Configuration instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_createtemplateconfiguration(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pTemplateName, LibMCDriver_ScanLabSMC_SMCConfiguration * pInstance);
 
 /*************************************************************************************************************************
  Global functions

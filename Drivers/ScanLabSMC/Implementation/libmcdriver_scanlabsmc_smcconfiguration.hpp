@@ -27,43 +27,61 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CSMCContext
+Abstract: This is the class declaration of CSMCConfiguration
 
 */
 
-#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
-#include "libmcdriver_scanlabsmc_interfaceexception.hpp"
+
+#ifndef __LIBMCDRIVER_SCANLABSMC_SMCCONFIGURATION
+#define __LIBMCDRIVER_SCANLABSMC_SMCCONFIGURATION
+
+#include "libmcdriver_scanlabsmc_interfaces.hpp"
+
+// Parent classes
+#include "libmcdriver_scanlabsmc_base.hpp"
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4250)
+#endif
 
 // Include custom headers here.
 
 
-using namespace LibMCDriver_ScanLabSMC::Impl;
+namespace LibMCDriver_ScanLabSMC {
+namespace Impl {
+
 
 /*************************************************************************************************************************
- Class definition of CSMCContext 
+ Class declaration of CSMCConfiguration 
 **************************************************************************************************************************/
 
+class CSMCConfiguration : public virtual ISMCConfiguration, public virtual CBase {
+private:
 
-CSMCContextHandle::CSMCContextHandle(PScanLabSMCSDK pSDK, slscHandle handle)
-    : m_Handle(handle), m_pSDK (pSDK)
-{
+protected:
 
-}
+public:
 
-CSMCContextHandle::~CSMCContextHandle()
-{
-    if ((m_Handle != 0) && (m_pSDK.get () != nullptr)) {
-        m_pSDK->slsc_cfg_delete(m_Handle);
-        m_Handle = 0;
-    }
-}
+    CSMCConfiguration();
 
-slscHandle CSMCContextHandle::getHandle()
-{
-    return m_Handle;
-}
+    virtual ~CSMCConfiguration();
 
-PScanLabSMCSDK CSMCContextHandle::getSDK()
-{
-    return m_pSDK;
-}
+	void SetDynamicViolationReaction(const LibMCDriver_ScanLabSMC::eDynamicViolationReaction eValue) override;
+
+	LibMCDriver_ScanLabSMC::eDynamicViolationReaction GetDynamicViolationReaction() override;
+
+	void SetWarnLevel(const LibMCDriver_ScanLabSMC::eWarnLevel eValue) override;
+
+	LibMCDriver_ScanLabSMC::eWarnLevel GetWarnLevel() override;
+
+    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory);
+
+};
+
+} // namespace Impl
+} // namespace LibMCDriver_ScanLabSMC
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#endif // __LIBMCDRIVER_SCANLABSMC_SMCCONFIGURATION

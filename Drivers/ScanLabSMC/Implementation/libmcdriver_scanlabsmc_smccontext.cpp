@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of CSMCContext
 */
 
 #include "libmcdriver_scanlabsmc_smccontext.hpp"
+#include "libmcdriver_scanlabsmc_smcconfiguration.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
 #include "libmcdriver_scanlabsmc_smcjob.hpp"
 
@@ -44,17 +45,23 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
  Class definition of CSMCContext 
 **************************************************************************************************************************/
 
-CSMCContext::CSMCContext(const std::string& sConfigurationXML, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+CSMCContext::CSMCContext(ISMCConfiguration* pSMCConfiguration, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: m_pSDK (pSDK), m_pDriverEnvironment (pDriverEnvironment)
 {
 	if (pSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
 	if (pDriverEnvironment.get() == nullptr)
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
-	if (sConfigurationXML.empty ())
+	if (pSMCConfiguration == nullptr)
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONXML);
 
+	auto pCastedConfiguration = dynamic_cast<CSMCConfiguration*> (pSMCConfiguration);
+	if (pCastedConfiguration == nullptr)
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+
 	m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory ();
+
+	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get ());
 
 	std::vector<uint8_t> Buffer (sConfigurationXML.begin (), sConfigurationXML.end ());
 
@@ -66,10 +73,16 @@ CSMCContext::CSMCContext(const std::string& sConfigurationXML, PScanLabSMCSDK pS
 
 	m_pContextHandle = std::make_shared<CSMCContextHandle>(m_pSDK, newHandle);
 
+	pConfigurationFile = nullptr;
+
 }
 
 CSMCContext::~CSMCContext()
 {
+	m_pContextHandle = nullptr;
+	m_pSDK = nullptr;
+
+	m_pWorkingDirectory = nullptr;
 
 }
 

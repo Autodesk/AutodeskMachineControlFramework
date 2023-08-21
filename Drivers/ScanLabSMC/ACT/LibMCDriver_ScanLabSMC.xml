@@ -52,6 +52,21 @@
 		
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+		<error name="UNSUPPORTEDPLATFORM" code="1001" description="Unsupported platform. SMC only works on Windows only for now." />
+		<error name="SDKALREADYLOADED" code="1002" description="SDK has already been loaded." />
+		<error name="EMPTYSMCDLLRESOURCENAME" code="1003" description="Empty SMC DLL Resource Name." />
+		<error name="EMPTYRTCDLLRESOURCENAME" code="1004" description="Empty RTC DLL Resource Name." />
+		<error name="SMCSDKRESOURCENOTFOUND" code="1005" description="SMC SDK Resource not found." />
+		<error name="COULDNOTSTORESMCSDK" code="1006" description="Could not store SMC SDK." />
+		<error name="RTCSDKRESOURCENOTFOUND" code="1007" description="RTC SDK Resource not found." />
+		<error name="COULDNOTSTORERTCSDK" code="1008" description="Could not store RTC SDK." />
+		<error name="EMPTYSMCDLLRESOURCEDATA" code="1009" description="Empty SMC DLL Resource Data." />		
+		<error name="EMPTYRTCDLLRESOURCEDATA" code="1010" description="Empty RTC DLL Resource Data." />		
+		<error name="EMPTYXERCESDLLRESOURCENAME" code="1011" description="Empty Xerces Resource Name." />		
+		<error name="XERCESRESOURCENOTFOUND" code="1012" description="Xerces Resource not found." />		
+		<error name="COULDNOTSTOREXERCESDLL" code="1013" description="Could not store Xerces DLL." />		
+		<error name="EMPTYXERCESRESOURCEDATA" code="1014" description="Empty Xerces Resource Data." />		
+		
 								
 	</errors>
 
@@ -71,6 +86,20 @@
 	   <option name="Deactivated" value="0" />
 	   <option name="MaxAccuracy" value="1" />
 	   <option name="Fast" value="2" />
+	</enum>
+	
+	<enum name="DynamicViolationReaction">
+	   <option name="Unknown" value="0" />
+	   <option name="WarningOnly" value="1" />
+	   <option name="AbortImmediately" value="2" />
+	   <option name="StopAndReport" value="3" />
+	</enum>
+
+	<enum name="WarnLevel">
+	   <option name="Unknown" value="0" />
+	   <option name="Error" value="1" />
+	   <option name="Warn" value="2" />
+	   <option name="Info" value="3" />
 	</enum>
 
 	
@@ -195,6 +224,27 @@ Custom implementation
 	</class>
 
 
+	<class name="SMCConfiguration" parent="Base" description="SMC Configuration">
+	
+		<method name="SetDynamicViolationReaction" description="Sets the response to a dynamic violation. Default is WarningOnly.">
+			<param name="Value" type="enum" class="DynamicViolationReaction" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetDynamicViolationReaction" description="Returns the response to a dynamic violation.">
+			<param name="Value" type="enum" class="DynamicViolationReaction" pass="return" description="Current Value." />
+		</method>	
+	
+		<method name="SetWarnLevel" description="Sets the log warning level.">
+			<param name="Value" type="enum" class="WarnLevel" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetWarnLevel" description="Returns the log warning level.">
+			<param name="Value" type="enum" class="WarnLevel" pass="return" description="Current Value." />
+		</method>		
+	
+	</class>
+
+
 	<class name="SMCContext" parent="Base" description="SMC Control Context">
 
 		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
@@ -279,14 +329,39 @@ Custom implementation
 
 	<class name="Driver_ScanLabSMC" parent="Driver" description="A LaserScanner Driver for a SCANLAB SCANmotionControl.">
 
+		<method name="SetDLLResources" description="Sets the default resource name of the SCANLAB DLLs. Overrides custom resource data if set before.">
+			<param name="SMCDLLResourceName" type="string" pass="in" description="Resource name of SCANmotionControl DLL" />
+			<param name="RTCDLLResourceName" type="string" pass="in" description="Resource name of RTC DLL" />
+		</method>
+
+		<method name="SetXercesDLLResource" description="Sets the default resource name of auxiliary resource DLLs. Overrides custom resource data if set before.">
+			<param name="XercesDLLResourceName" type="string" pass="in" description="Resource name of the Xerces dependency DLL" />
+		</method>
+
+		<method name="SetCustomDLLData" description="Sets custom binaries for the needed SCANLAB DLLs. Overrides custom resource data if set before.">
+			<param name="SMCDLLResourceData" type="basicarray" class="uint8" pass="in" description="Resource data of SCANmotionControl DLL" />
+			<param name="RTCDLLResourceData" type="basicarray" class="uint8" pass="in" description="Resource data of RTC DLL" />
+		</method>
+
+		<method name="SetCustomXercesDLLData" description="Sets the custom binary for auxiliary resource DLLs. Overrides custom resource data if set before.">
+			<param name="XercesDLLResourceData" type="basicarray" class="uint8" pass="in" description="Resource data of the Xerces dependency DLL" />
+		</method>
 
 		<method name="LoadSDK" description="Initializes the SCANmotionControl SDK.">
-			<param name="SMCResourceName" type="string" pass="in" description="Resource name of SCANmotionControl DLL" />
 		</method>
 		
 		<method name="CreateContext" description="Creates and initializes a new SMC context. Fails if Configuration Data is invalid.">
-			<param name="ConfigurationXML" type="string" pass="in" description="XML Configuration Data." />
+			<param name="SMCConfiguration" type="class" class="SMCConfiguration" pass="in" description="SMC Configuration Data." />
 			<param name="Instance" type="class" class="SMCContext" pass="return" description="New Context instance" />
+		</method>
+
+		<method name="CreateEmptyConfiguration" description="Creates and initializes a SMC configuration with default values.">
+			<param name="Instance" type="class" class="SMCConfiguration" pass="return" description="New Configuration instance" />
+		</method>
+
+		<method name="CreateTemplateConfiguration" description="Creates and initializes a SMC configuration with templated values.">
+			<param name="TemplateName" type="string" pass="in" description="Name of SMC Template." />
+			<param name="Instance" type="class" class="SMCConfiguration" pass="return" description="New Configuration instance" />
 		</method>
 
 	</class>
@@ -335,4 +410,5 @@ End of Custom implementation
 	
 	
 </component>
+
 

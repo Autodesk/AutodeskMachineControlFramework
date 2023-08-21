@@ -95,12 +95,12 @@ void CSMCJob::drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBuf
 
     slsc_PolylineOptions polyLineOptions;
     if (bIsClosed) {
-        //polyLineOptions.Geometry = slsc_Polyline_Closed;
+        polyLineOptions.Geometry = slsc_PolylineGeometry::slsc_Polyline_Closed;
     }
     else {
-        //polyLineOptions.Geometry = slsc_Polyline_Open;
+        polyLineOptions.Geometry = slsc_PolylineGeometry::slsc_Polyline_Open;
     }
-    //polyLineOptions.ProfileType = slsc_Maximize_Velocity;
+    polyLineOptions.ProfileType = slsc_PolylineProfile::slsc_Maximize_Velocity;
     m_pSDK->checkError(m_pSDK->slsc_job_begin_polyline(contextHandle, polyLineOptions));
 
     for (size_t nPointIndex = 1; nPointIndex < nPointsBufferSize; nPointIndex++) {
@@ -121,8 +121,6 @@ void CSMCJob::DrawPolyline(const LibMCDriver_ScanLabSMC_uint64 nPointsBufferSize
         throw std::runtime_error("Job is already finalized!");
 
     if (nPointsBufferSize >= 2) {
-
-
 
         auto contextHandle = m_pContextHandle->getHandle();
 

@@ -68,7 +68,7 @@ private:
 
 public:
 
-	CSMCContext(const std::string& sConfigurationXML, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CSMCContext(ISMCConfiguration * pSMCConfiguration, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CSMCContext();
 

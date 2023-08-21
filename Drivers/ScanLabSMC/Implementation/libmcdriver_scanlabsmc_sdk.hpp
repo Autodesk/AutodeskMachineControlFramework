@@ -54,7 +54,28 @@ namespace LibMCDriver_ScanLabSMC {
 		typedef size_t slscHandle;
 		typedef size_t slscJobID;
 		typedef uint32_t slscReturnValue;
-		typedef uint32_t slsc_PolylineOptions;
+
+		enum class slsc_PolylineGeometry : uint8_t
+		{
+			slsc_Polyline_Open = 0,
+			slsc_Polyline_Closed = 1
+		};
+		
+
+		enum class slsc_PolylineProfile : uint8_t
+		{
+			slsc_Maximize_Velocity = 0,
+			slsc_Constant_Velocity = 1
+									
+		};
+
+		struct _slsc_PolylineOptions
+		{
+			slsc_PolylineGeometry Geometry;
+			slsc_PolylineProfile ProfileType;
+		};
+
+		typedef struct _slsc_PolylineOptions slsc_PolylineOptions;
 
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION *PScanLabSMCPtr_slsc_cfg_initialize_from_file) (slscHandle * Handle, const char* XmlConfigFileName);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_cfg_delete) (size_t Handle);

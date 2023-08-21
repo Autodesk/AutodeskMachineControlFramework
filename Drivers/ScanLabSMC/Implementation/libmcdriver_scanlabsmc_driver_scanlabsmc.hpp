@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CDriver_ScanLabSMC
 #endif
 
 // Include custom headers here.
+#include "libmcdriver_scanlabsmc_sdk.hpp"
 
 
 namespace LibMCDriver_ScanLabSMC {
@@ -60,7 +61,18 @@ class CDriver_ScanLabSMC : public virtual IDriver_ScanLabSMC, public virtual CDr
 private:
     std::string m_sName;
     std::string m_sType;
+    
+    std::vector<uint8_t> m_SMCDLLResourceData;
+    std::vector<uint8_t> m_RTCDLLResourceData;
+    std::vector<uint8_t> m_XercesDLLResourceData;
+
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+    LibMCEnv::PWorkingDirectory m_pDLLDirectory;
+    LibMCEnv::PWorkingFile m_pSMCDLL;
+    LibMCEnv::PWorkingFile m_pRTCDLL;
+    LibMCEnv::PWorkingFile m_pXercesDLL;
+
+    PScanLabSMCSDK m_pSDK;
 
 public:
 
@@ -68,9 +80,21 @@ public:
 
     virtual ~CDriver_ScanLabSMC();
 
-	void LoadSDK(const std::string & sSMCResourceName) override;
+	void SetDLLResources(const std::string& sSMCDLLResourceName, const std::string& sRTCDLLResourceName) override;
 
-	ISMCContext * CreateContext(const std::string & sConfigurationXML) override;
+	void SetXercesDLLResource(const std::string& sXercesDLLResourceName) override;
+
+	void SetCustomDLLData(const LibMCDriver_ScanLabSMC_uint64 nSMCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pSMCDLLResourceDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nRTCDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pRTCDLLResourceDataBuffer) override;
+
+	void SetCustomXercesDLLData(const LibMCDriver_ScanLabSMC_uint64 nXercesDLLResourceDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pXercesDLLResourceDataBuffer) override;
+
+	void LoadSDK() override;
+	
+	ISMCContext* CreateContext(ISMCConfiguration* pSMCConfiguration) override;
+
+	ISMCConfiguration* CreateEmptyConfiguration() override;
+
+	ISMCConfiguration* CreateTemplateConfiguration(const std::string& sTemplateName) override;
 
     void Configure(const std::string& sConfigurationString) override;
 
