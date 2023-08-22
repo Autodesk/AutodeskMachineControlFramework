@@ -202,6 +202,9 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_XERCESRESOURCENOTFOUND: return "XERCESRESOURCENOTFOUND";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOREXERCESDLL: return "COULDNOTSTOREXERCESDLL";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESRESOURCEDATA: return "EMPTYXERCESRESOURCEDATA";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME: return "INVALIDCONTEXTNAME";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY: return "CONTEXTEXISTSALREADY";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND: return "CONTEXTNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -234,6 +237,9 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_XERCESRESOURCENOTFOUND: return "Xerces Resource not found.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOREXERCESDLL: return "Could not store Xerces DLL.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESRESOURCEDATA: return "Empty Xerces Resource Data.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME: return "Invalid context name.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY: return "Context exists already.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND: return "Context not found.";
 		}
 		return "unknown error";
 	}
@@ -541,7 +547,10 @@ public:
 	inline void SetCustomDLLData(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & SMCDLLResourceDataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & RTCDLLResourceDataBuffer);
 	inline void SetCustomXercesDLLData(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & XercesDLLResourceDataBuffer);
 	inline void LoadSDK();
-	inline PSMCContext CreateContext(classParam<CSMCConfiguration> pSMCConfiguration);
+	inline PSMCContext CreateContext(const std::string & sContextName, classParam<CSMCConfiguration> pSMCConfiguration);
+	inline bool ContextExists(const std::string & sContextName);
+	inline PSMCContext FindContext(const std::string & sContextName);
+	inline void ReleaseContext(const std::string & sContextName);
 	inline PSMCConfiguration CreateEmptyConfiguration();
 	inline PSMCConfiguration CreateTemplateConfiguration(const std::string & sTemplateName);
 };
@@ -711,6 +720,9 @@ public:
 		pWrapperTable->m_Driver_ScanLabSMC_SetCustomXercesDLLData = nullptr;
 		pWrapperTable->m_Driver_ScanLabSMC_LoadSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLabSMC_CreateContext = nullptr;
+		pWrapperTable->m_Driver_ScanLabSMC_ContextExists = nullptr;
+		pWrapperTable->m_Driver_ScanLabSMC_FindContext = nullptr;
+		pWrapperTable->m_Driver_ScanLabSMC_ReleaseContext = nullptr;
 		pWrapperTable->m_Driver_ScanLabSMC_CreateEmptyConfiguration = nullptr;
 		pWrapperTable->m_Driver_ScanLabSMC_CreateTemplateConfiguration = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -1158,6 +1170,33 @@ public:
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_ContextExists = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_ContextExistsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_contextexists");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_ContextExists = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_ContextExistsPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_contextexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLabSMC_ContextExists == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_FindContext = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_FindContextPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_findcontext");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_FindContext = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_FindContextPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_findcontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLabSMC_FindContext == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_ReleaseContext = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_ReleaseContextPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_releasecontext");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLabSMC_ReleaseContext = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_ReleaseContextPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_releasecontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLabSMC_ReleaseContext == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLabSMC_CreateEmptyConfiguration = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateEmptyConfigurationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_createemptyconfiguration");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLabSMC_CreateEmptyConfiguration = (PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_CreateEmptyConfigurationPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_driver_scanlabsmc_createemptyconfiguration");
@@ -1424,6 +1463,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_CreateContext));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLabSMC_CreateContext == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_contextexists", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_ContextExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLabSMC_ContextExists == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_findcontext", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_FindContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLabSMC_FindContext == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_releasecontext", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_ReleaseContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLabSMC_ReleaseContext == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_createemptyconfiguration", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_CreateEmptyConfiguration));
@@ -1971,20 +2022,59 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLabSMC::CreateContext - Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
+	* CDriver_ScanLabSMC::CreateContext - Creates and initializes a new SMC context. Fails if Configuration Data is invalid or context already exists.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
 	* @param[in] pSMCConfiguration - SMC Configuration Data.
 	* @return New Context instance
 	*/
-	PSMCContext CDriver_ScanLabSMC::CreateContext(classParam<CSMCConfiguration> pSMCConfiguration)
+	PSMCContext CDriver_ScanLabSMC::CreateContext(const std::string & sContextName, classParam<CSMCConfiguration> pSMCConfiguration)
 	{
 		LibMCDriver_ScanLabSMCHandle hSMCConfiguration = pSMCConfiguration.GetHandle();
 		LibMCDriver_ScanLabSMCHandle hInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLabSMC_CreateContext(m_pHandle, hSMCConfiguration, &hInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLabSMC_CreateContext(m_pHandle, sContextName.c_str(), hSMCConfiguration, &hInstance));
 		
 		if (!hInstance) {
 			CheckError(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CSMCContext>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CDriver_ScanLabSMC::ContextExists - Checks if a context identifier exists already.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
+	* @return Returns true if a context exists.
+	*/
+	bool CDriver_ScanLabSMC::ContextExists(const std::string & sContextName)
+	{
+		bool resultExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLabSMC_ContextExists(m_pHandle, sContextName.c_str(), &resultExists));
+		
+		return resultExists;
+	}
+	
+	/**
+	* CDriver_ScanLabSMC::FindContext - Retrieves an existing context by identifier. Fails if context does not exist.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
+	* @return New Context instance
+	*/
+	PSMCContext CDriver_ScanLabSMC::FindContext(const std::string & sContextName)
+	{
+		LibMCDriver_ScanLabSMCHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLabSMC_FindContext(m_pHandle, sContextName.c_str(), &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CSMCContext>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CDriver_ScanLabSMC::ReleaseContext - Releases an existing context by identifier. Fails if context does not exist.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
+	*/
+	void CDriver_ScanLabSMC::ReleaseContext(const std::string & sContextName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLabSMC_ReleaseContext(m_pHandle, sContextName.c_str()));
 	}
 	
 	/**

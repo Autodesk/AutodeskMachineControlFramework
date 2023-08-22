@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CDriver_ScanLabSMC
 
 #include "libmcdriver_scanlabsmc_interfaces.hpp"
 #include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
+#include "libmcdriver_scanlabsmc_smccontextinstance.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlabsmc_driver.hpp"
@@ -47,7 +48,7 @@ Abstract: This is the class declaration of CDriver_ScanLabSMC
 
 // Include custom headers here.
 #include "libmcdriver_scanlabsmc_sdk.hpp"
-
+#include <map>
 
 namespace LibMCDriver_ScanLabSMC {
 namespace Impl {
@@ -74,6 +75,8 @@ private:
 
     PScanLabSMCSDK m_pSDK;
 
+    std::map<std::string, PSMCContextInstance> m_pContextMap;
+
 public:
 
     CDriver_ScanLabSMC(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
@@ -90,7 +93,13 @@ public:
 
 	void LoadSDK() override;
 	
-	ISMCContext* CreateContext(ISMCConfiguration* pSMCConfiguration) override;
+    ISMCContext* CreateContext(const std::string& sContextName, ISMCConfiguration* pSMCConfiguration) override;
+
+    bool ContextExists(const std::string& sContextName) override;
+
+    ISMCContext* FindContext(const std::string& sContextName) override;
+
+    void ReleaseContext(const std::string& sContextName) override;
 
 	ISMCConfiguration* CreateEmptyConfiguration() override;
 

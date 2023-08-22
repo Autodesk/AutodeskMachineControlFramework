@@ -66,7 +66,9 @@
 		<error name="XERCESRESOURCENOTFOUND" code="1012" description="Xerces Resource not found." />		
 		<error name="COULDNOTSTOREXERCESDLL" code="1013" description="Could not store Xerces DLL." />		
 		<error name="EMPTYXERCESRESOURCEDATA" code="1014" description="Empty Xerces Resource Data." />		
-		
+		<error name="INVALIDCONTEXTNAME" code="1015" description="Invalid context name." />		
+		<error name="CONTEXTEXISTSALREADY" code="1016" description="Context exists already." />		
+		<error name="CONTEXTNOTFOUND" code="1017" description="Context not found." />				
 								
 	</errors>
 
@@ -350,11 +352,26 @@ Custom implementation
 		<method name="LoadSDK" description="Initializes the SCANmotionControl SDK.">
 		</method>
 		
-		<method name="CreateContext" description="Creates and initializes a new SMC context. Fails if Configuration Data is invalid.">
+		<method name="CreateContext" description="Creates and initializes a new SMC context. Fails if Configuration Data is invalid or context already exists.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
 			<param name="SMCConfiguration" type="class" class="SMCConfiguration" pass="in" description="SMC Configuration Data." />
 			<param name="Instance" type="class" class="SMCContext" pass="return" description="New Context instance" />
 		</method>
 
+		<method name="ContextExists" description="Checks if a context identifier exists already.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
+			<param name="Exists" type="bool" pass="return" description="Returns true if a context exists." />
+		</method>
+
+		<method name="FindContext" description="Retrieves an existing context by identifier. Fails if context does not exist.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
+			<param name="Instance" type="class" class="SMCContext" pass="return" description="New Context instance" />
+		</method>
+
+		<method name="ReleaseContext" description="Releases an existing context by identifier. Fails if context does not exist.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
+		</method>
+		
 		<method name="CreateEmptyConfiguration" description="Creates and initializes a SMC configuration with default values.">
 			<param name="Instance" type="class" class="SMCConfiguration" pass="return" description="New Configuration instance" />
 		</method>

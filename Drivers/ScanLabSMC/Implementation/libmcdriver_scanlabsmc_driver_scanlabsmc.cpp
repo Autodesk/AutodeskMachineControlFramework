@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CDriver_ScanLabSMC
 #include "libmcdriver_scanlabsmc_driver_scanlabsmc.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
 #include "libmcdriver_scanlabsmc_smccontext.hpp"
+#include "libmcdriver_scanlabsmc_smccontextinstance.hpp"
 #include "libmcdriver_scanlabsmc_smcconfiguration.hpp"
 
 // Include custom headers here.
@@ -225,15 +226,57 @@ ISMCConfiguration* CDriver_ScanLabSMC::CreateTemplateConfiguration(const std::st
     throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
-ISMCContext* CDriver_ScanLabSMC::CreateContext(ISMCConfiguration* pSMCConfiguration) 
+ISMCContext* CDriver_ScanLabSMC::CreateContext(const std::string& sContextName, ISMCConfiguration* pSMCConfiguration)
 {
+    if (sContextName.empty ())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME);
+
     if (pSMCConfiguration == nullptr)
-        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+    if (ContextExists (sContextName))
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY, "Context exists already: " + sContextName);
 
     if (m_pSDK.get() == nullptr)
         LoadSDK();
 
-    return new CSMCContext (pSMCConfiguration, m_pSDK, m_pDriverEnvironment);
+    auto pContextInstance = std::make_shared<CSMCContextInstance>(sContextName, pSMCConfiguration, m_pSDK, m_pDriverEnvironment);
+    m_pContextMap.insert(std::make_pair (sContextName, pContextInstance));
+
+    return new CSMCContext (pContextInstance);
+}
+
+bool CDriver_ScanLabSMC::ContextExists(const std::string& sContextName)
+{
+    if (sContextName.empty())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME);
+
+    auto iIter = m_pContextMap.find(sContextName);
+
+    return (iIter != m_pContextMap.end());
+}
+
+ISMCContext* CDriver_ScanLabSMC::FindContext(const std::string& sContextName)
+{
+    if (sContextName.empty())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME);
+
+    auto iIter = m_pContextMap.find(sContextName);
+
+    if (iIter == m_pContextMap.end())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND, "Context not found: " + sContextName);
+
+    return new CSMCContext(iIter->second);
+
+}
+
+void CDriver_ScanLabSMC::ReleaseContext(const std::string& sContextName)
+{
+    if (sContextName.empty())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME);
+
+    throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+
 }
 
 

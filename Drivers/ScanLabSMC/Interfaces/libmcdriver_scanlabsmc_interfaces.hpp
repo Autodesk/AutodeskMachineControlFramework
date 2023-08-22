@@ -626,11 +626,32 @@ public:
 	virtual void LoadSDK() = 0;
 
 	/**
-	* IDriver_ScanLabSMC::CreateContext - Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
+	* IDriver_ScanLabSMC::CreateContext - Creates and initializes a new SMC context. Fails if Configuration Data is invalid or context already exists.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
 	* @param[in] pSMCConfiguration - SMC Configuration Data.
 	* @return New Context instance
 	*/
-	virtual ISMCContext * CreateContext(ISMCConfiguration* pSMCConfiguration) = 0;
+	virtual ISMCContext * CreateContext(const std::string & sContextName, ISMCConfiguration* pSMCConfiguration) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::ContextExists - Checks if a context identifier exists already.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
+	* @return Returns true if a context exists.
+	*/
+	virtual bool ContextExists(const std::string & sContextName) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::FindContext - Retrieves an existing context by identifier. Fails if context does not exist.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
+	* @return New Context instance
+	*/
+	virtual ISMCContext * FindContext(const std::string & sContextName) = 0;
+
+	/**
+	* IDriver_ScanLabSMC::ReleaseContext - Releases an existing context by identifier. Fails if context does not exist.
+	* @param[in] sContextName - Unique context identifier. MUST NOT be empty.
+	*/
+	virtual void ReleaseContext(const std::string & sContextName) = 0;
 
 	/**
 	* IDriver_ScanLabSMC::CreateEmptyConfiguration - Creates and initializes a SMC configuration with default values.

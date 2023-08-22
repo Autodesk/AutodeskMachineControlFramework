@@ -508,14 +508,44 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_loadsdk(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC);
 
 /**
-* Creates and initializes a new SMC context. Fails if Configuration Data is invalid.
+* Creates and initializes a new SMC context. Fails if Configuration Data is invalid or context already exists.
 *
 * @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pContextName - Unique context identifier. MUST NOT be empty.
 * @param[in] pSMCConfiguration - SMC Configuration Data.
 * @param[out] pInstance - New Context instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_createcontext(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pContextName, LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+
+/**
+* Checks if a context identifier exists already.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pContextName - Unique context identifier. MUST NOT be empty.
+* @param[out] pExists - Returns true if a context exists.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_contextexists(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pContextName, bool * pExists);
+
+/**
+* Retrieves an existing context by identifier. Fails if context does not exist.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pContextName - Unique context identifier. MUST NOT be empty.
+* @param[out] pInstance - New Context instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_findcontext(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pContextName, LibMCDriver_ScanLabSMC_SMCContext * pInstance);
+
+/**
+* Releases an existing context by identifier. Fails if context does not exist.
+*
+* @param[in] pDriver_ScanLabSMC - Driver_ScanLabSMC instance.
+* @param[in] pContextName - Unique context identifier. MUST NOT be empty.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_driver_scanlabsmc_releasecontext(LibMCDriver_ScanLabSMC_Driver_ScanLabSMC pDriver_ScanLabSMC, const char * pContextName);
 
 /**
 * Creates and initializes a SMC configuration with default values.

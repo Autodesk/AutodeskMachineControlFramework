@@ -120,6 +120,9 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_XERCESRESOURCENOTFOUND 1012 /** Xerces Resource not found. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOREXERCESDLL 1013 /** Could not store Xerces DLL. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESRESOURCEDATA 1014 /** Empty Xerces Resource Data. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME 1015 /** Invalid context name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY 1016 /** Context exists already. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND 1017 /** Context not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -152,6 +155,9 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_XERCESRESOURCENOTFOUND: return "Xerces Resource not found.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOREXERCESDLL: return "Could not store Xerces DLL.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYXERCESRESOURCEDATA: return "Empty Xerces Resource Data.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME: return "Invalid context name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY: return "Context exists already.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND: return "Context not found.";
     default: return "unknown error";
   }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+	<driver name="scanlab_smc" library="driver_scanlabsmc" type="smc-0.6"/>
+
+	<statemachine name="scanlabsmctest" description="SMC Test" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_scanlabsmctest">
+	
+		<state name="init" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="success" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="100">
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+	<libraries>
+		<library name="plugin_scanlabsmctest" dll="%githash%_test_scanlabsmctest" />
+		<library name="driver_scanlabsmc" dll="%githash%_driver_scanlabsmc" />
+	</libraries>
+		
+	<test description="Test of SCANLAB SMC Driver">			
+	
+		<instance name="scanlabsmctest" />
+		
+	</test>
+	
+			
+
+</testdefinition>

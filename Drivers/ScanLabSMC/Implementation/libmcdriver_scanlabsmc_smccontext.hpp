@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CSMCContext
 #endif
 
 // Include custom headers here.
-#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
+#include "libmcdriver_scanlabsmc_smccontextinstance.hpp"
 #include "libmcdriver_scanlabsmc_sdk.hpp"
 
 
@@ -60,15 +60,11 @@ namespace Impl {
 class CSMCContext : public virtual ISMCContext, public virtual CBase {
 private:
 
-	PSMCContextHandle m_pContextHandle;
-	PScanLabSMCSDK m_pSDK;
-
-	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
-	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	PSMCContextInstance m_pContextInstance;
 
 public:
 
-	CSMCContext(ISMCConfiguration * pSMCConfiguration, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CSMCContext(PSMCContextInstance pContextInstance);
 
 	virtual ~CSMCContext();
 
