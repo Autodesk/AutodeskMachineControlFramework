@@ -43,9 +43,14 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
  Class definition of CSMCConfiguration 
 **************************************************************************************************************************/
 
-CSMCConfiguration::CSMCConfiguration()
-{
+CSMCConfiguration::CSMCConfiguration(LibMCEnv::PDriverEnvironment pDriverEnvironment)
+    : m_pDriverEnvironment (pDriverEnvironment),
+      m_DynamicViolationReaction (LibMCDriver_ScanLabSMC::eDynamicViolationReaction::WarningOnly),
+     m_WarnLevel (LibMCDriver_ScanLabSMC::eWarnLevel::Error)
 
+{
+    if (pDriverEnvironment.get() == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
 }
 
 CSMCConfiguration::~CSMCConfiguration()
@@ -55,25 +60,31 @@ CSMCConfiguration::~CSMCConfiguration()
 
 void CSMCConfiguration::SetDynamicViolationReaction(const LibMCDriver_ScanLabSMC::eDynamicViolationReaction eValue)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    m_DynamicViolationReaction = eValue;
 }
 
 LibMCDriver_ScanLabSMC::eDynamicViolationReaction CSMCConfiguration::GetDynamicViolationReaction()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    return m_DynamicViolationReaction;
 }
 
 void CSMCConfiguration::SetWarnLevel(const LibMCDriver_ScanLabSMC::eWarnLevel eValue)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    m_WarnLevel = eValue;
 }
 
 LibMCDriver_ScanLabSMC::eWarnLevel CSMCConfiguration::GetWarnLevel()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    return m_WarnLevel;
 }
 
 std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory)
 {
-    return "";
+    auto pXMLDocument = m_pDriverEnvironment->CreateXMLDocument("Configuration", "SCANmotionControl");
+    auto pConfigurationNode = pXMLDocument->GetRootNode();
+    pConfigurationNode->AddAttribute("", "Version", "0.6");
+
+    auto pGeneralConfigNode = pConfigurationNode->AddChild("", "GeneralConfig");
+    
+    return pXMLDocument->SaveToString (true);
 }

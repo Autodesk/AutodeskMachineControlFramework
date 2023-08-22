@@ -58,11 +58,13 @@ namespace Impl {
 class CSMCConfiguration : public virtual ISMCConfiguration, public virtual CBase {
 private:
 
-protected:
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+    LibMCDriver_ScanLabSMC::eDynamicViolationReaction m_DynamicViolationReaction;
+    LibMCDriver_ScanLabSMC::eWarnLevel m_WarnLevel;
 
 public:
 
-    CSMCConfiguration();
+    CSMCConfiguration(LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     virtual ~CSMCConfiguration();
 

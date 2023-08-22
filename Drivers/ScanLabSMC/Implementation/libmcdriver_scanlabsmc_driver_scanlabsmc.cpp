@@ -217,7 +217,7 @@ void CDriver_ScanLabSMC::LoadSDK()
 
 ISMCConfiguration* CDriver_ScanLabSMC::CreateEmptyConfiguration()
 {
-    return new CSMCConfiguration();
+    return new CSMCConfiguration(m_pDriverEnvironment);
 }
 
 ISMCConfiguration* CDriver_ScanLabSMC::CreateTemplateConfiguration(const std::string& sTemplateName)
