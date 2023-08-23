@@ -71,8 +71,29 @@ void* _loadScanLabSMCAddress(void * hLibrary, const char* pSymbolName, bool bMan
 }
 #endif
 
+CScanLabSMCSDK_DLLDirectoryCache::CScanLabSMCSDK_DLLDirectoryCache()
+{
+#ifdef _WIN32
+	std::vector<wchar_t> buffer;
+	buffer.resize(MAX_PATH + 1);
+	GetDllDirectoryW(MAX_PATH, buffer.data());
 
-CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8)
+	buffer.at(MAX_PATH) = 0;
+	m_sCachedDLLDirectoryW = std::wstring(buffer.data());
+#endif // _WIN32
+}
+
+CScanLabSMCSDK_DLLDirectoryCache::~CScanLabSMCSDK_DLLDirectoryCache()
+{
+#ifdef _WIN32
+	if (!m_sCachedDLLDirectoryW.empty()) {
+		SetDllDirectoryW(m_sCachedDLLDirectoryW.c_str());
+	}
+#endif // _WIN32
+}
+
+
+CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirectoryUTF8)
 	: m_LibraryHandle (nullptr), m_bIsInitialized (false)
 {
 
@@ -90,6 +111,17 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8)
 	int nResult = MultiByteToWideChar(CP_UTF8, 0, sDLLNameUTF8.c_str(), nLength, &wsLibraryFileName[0], nBufferSize);
 	if (nResult == 0)
 		throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTLOADLIBRARY);
+
+	int nPathLength = (int)sDLLDirectoryUTF8.length();
+	int nPathBufferSize = nPathLength * 2 + 2;
+	std::vector<wchar_t> wsDLLPath(nPathBufferSize);
+	int nPathResult = MultiByteToWideChar(CP_UTF8, 0, sDLLDirectoryUTF8.c_str(), nPathLength, &wsDLLPath[0], nPathBufferSize);
+	if (nPathResult == 0)
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTLOADLIBRARY);
+
+	m_sDLLDirectoryW = std::wstring(wsDLLPath.data());
+
+	auto pDirectoryCache = cacheDllDirectory();
 
 	HMODULE hLibrary = LoadLibraryW(wsLibraryFileName.data());
 	if (hLibrary == 0)
@@ -140,17 +172,17 @@ void CScanLabSMCSDK::initDLL()
 	if (!m_bIsInitialized) {
 
 		if (slsc_cfg_initialize_from_file == nullptr)
-			throw std::runtime_error("RTC DLL not loaded");
+			throw std::runtime_error("SMC DLL not loaded");
 
 		m_bIsInitialized = true;
 
 	}
 }
 
-void CScanLabSMCSDK::checkError(uint32_t nRTCError)
+void CScanLabSMCSDK::checkError(uint32_t nSMCError)
 {
-	if (nRTCError != 0)
-		throw std::runtime_error("RTC Error: " + std::to_string (nRTCError));
+	if (nSMCError != 0)
+		throw std::runtime_error("SMC Error: " + std::to_string (nSMCError));
 }
 
 
@@ -167,6 +199,20 @@ void CScanLabSMCSDK::resetFunctionPtrs()
 	slsc_ctrl_start_execution = nullptr;
 	slsc_ctrl_stop = nullptr;
 	slsc_ctrl_stop_controlled = nullptr;
+
+}
+
+
+PScanLabSMCSDK_DLLDirectoryCache CScanLabSMCSDK::cacheDllDirectory()
+{
+	auto pCache = std::make_shared<CScanLabSMCSDK_DLLDirectoryCache>();
+
+#ifdef _WIN32
+	SetDllDirectoryW(m_sDLLDirectoryW.c_str());
+	SetCurrentDirectoryW(m_sDLLDirectoryW.c_str());
+#endif // _WIN32
+
+	return pCache;
 
 }
 

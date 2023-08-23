@@ -93,7 +93,7 @@ public:
 		auto pConfiguration = pDriver->CreateEmptyConfiguration();
 
 
-
+		auto pContext = pDriver->CreateContext("smccontext", pConfiguration);
 
 		pStateEnvironment->SetNextState("success");
 	}

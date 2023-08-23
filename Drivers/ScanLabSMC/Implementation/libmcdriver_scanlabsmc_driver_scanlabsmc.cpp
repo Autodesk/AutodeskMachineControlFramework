@@ -42,7 +42,7 @@ Abstract: This is a stub class definition of CDriver_ScanLabSMC
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 #define SCANLABSMC_DEFAULT_SMCDLLRESOURCENAME "scanmotioncontrol_x64"
-#define SCANLABSMC_DEFAULT_RTCDLLRESOURCENAME "rtcdllx64"
+#define SCANLABSMC_DEFAULT_RTCDLLRESOURCENAME "rtc6dllx64"
 #define SCANLABSMC_DEFAULT_XERCESDLLRESOURCENAME "xerces-c_3_2"
 
 using namespace LibMCDriver_ScanLabSMC::Impl;
@@ -207,7 +207,7 @@ void CDriver_ScanLabSMC::LoadSDK()
     m_pRTCDLL = m_pDLLDirectory->StoreCustomData("RTC6DLLx64.dll", m_RTCDLLResourceData);
     m_pXercesDLL = m_pDLLDirectory->StoreCustomData("xerces-c_3_2.dll", m_XercesDLLResourceData);
 
-    m_pSDK = std::make_shared<CScanLabSMCSDK>(m_pSMCDLL->GetAbsoluteFileName ());
+    m_pSDK = std::make_shared<CScanLabSMCSDK>(m_pSMCDLL->GetAbsoluteFileName (), m_pDLLDirectory->GetAbsoluteFilePath ());
 
     // Free up resource data buffers
     m_SMCDLLResourceData.resize(0);
@@ -275,7 +275,12 @@ void CDriver_ScanLabSMC::ReleaseContext(const std::string& sContextName)
     if (sContextName.empty())
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME);
 
-    throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+    auto iIter = m_pContextMap.find(sContextName);
+
+    if (iIter == m_pContextMap.end())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND, "Context not found: " + sContextName);
+
+    m_pContextMap.erase(sContextName);
 
 }
 

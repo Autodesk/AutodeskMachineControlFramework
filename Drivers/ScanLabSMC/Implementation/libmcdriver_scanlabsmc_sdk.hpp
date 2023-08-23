@@ -89,13 +89,30 @@ namespace LibMCDriver_ScanLabSMC {
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop) (size_t Handle);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop_controlled) (size_t Handle);
 
-	
+
+		class CScanLabSMCSDK_DLLDirectoryCache {
+		private:
+#ifdef _WIN32
+			std::wstring m_sCachedDLLDirectoryW;
+#endif // _WIN32
+
+		public:
+			CScanLabSMCSDK_DLLDirectoryCache();
+			virtual ~CScanLabSMCSDK_DLLDirectoryCache();
+		};
+
+		typedef std::shared_ptr<CScanLabSMCSDK_DLLDirectoryCache> PScanLabSMCSDK_DLLDirectoryCache;
+
 		class CScanLabSMCSDK {
 		private:
 			bool m_bIsInitialized;
+			std::wstring m_sDLLDirectoryW;
 
 			void* m_LibraryHandle;
 			void resetFunctionPtrs ();
+
+			PScanLabSMCSDK_DLLDirectoryCache cacheDllDirectory();
+
 		public:
 
 			PScanLabSMCPtr_slsc_cfg_initialize_from_file slsc_cfg_initialize_from_file = nullptr;
@@ -110,7 +127,7 @@ namespace LibMCDriver_ScanLabSMC {
 			PScanLabSMCPtr_slsc_ctrl_stop slsc_ctrl_stop = nullptr;
 			PScanLabSMCPtr_slsc_ctrl_stop_controlled slsc_ctrl_stop_controlled = nullptr;
 
-			CScanLabSMCSDK(const std::string & sDLLNameUTF8);
+			CScanLabSMCSDK(const std::string & sDLLNameUTF8, const std::string& sDLLDirectoryUTF8);
 			~CScanLabSMCSDK();
 
 			void initDLL();

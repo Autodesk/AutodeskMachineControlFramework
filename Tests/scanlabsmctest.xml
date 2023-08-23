@@ -2,7 +2,7 @@
 
 <testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
 
-	<driver name="scanlab_smc" library="driver_scanlabsmc" type="smc-0.6"/>
+	<driver name="scanlab_smc" library="driver_scanlabsmc" type="scanlab-smc-0.6"/>
 
 	<statemachine name="scanlabsmctest" description="SMC Test" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_scanlabsmctest">
 	
@@ -22,7 +22,7 @@
 
 	<libraries>
 		<library name="plugin_scanlabsmctest" dll="%githash%_test_scanlabsmctest" />
-		<library name="driver_scanlabsmc" dll="%githash%_driver_scanlabsmc" />
+		<library name="driver_scanlabsmc" dll="%githash%_driver_scanlabsmc" resources="%githash%_driver_scanlabsmc" />
 	</libraries>
 		
 	<test description="Test of SCANLAB SMC Driver">			
