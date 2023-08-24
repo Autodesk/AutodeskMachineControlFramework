@@ -524,6 +524,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDSEGMENTINDEX 507 /** Invalid segment index. */
 #define LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID 508 /** Invalid toolpath attribute ID. */
 #define LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE 509 /** Ambiguous segment attribute type. */
+#define LIBMC_ERROR_XMLNODEHASCHILDREN 510 /** XML Node has children */
+#define LIBMC_ERROR_XMLNODEHASTEXTCONTENT 511 /** XML Node has text content */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -960,6 +962,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDSEGMENTINDEX: return "Invalid segment index.";
     case LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID: return "Invalid toolpath attribute ID.";
     case LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE: return "Ambiguous segment attribute type.";
+    case LIBMC_ERROR_XMLNODEHASCHILDREN: return "XML Node has children";
+    case LIBMC_ERROR_XMLNODEHASTEXTCONTENT: return "XML Node has text content";
     default: return "unknown error";
   }
 }

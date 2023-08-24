@@ -1917,6 +1917,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getname(LibMCEnv_XMLDo
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_getnamespace(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const LibMCEnv_uint32 nNameSpaceBufferSize, LibMCEnv_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer);
 
 /**
+* Retrieves the text content of the node. A node with text content MUST NOT have children.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] nTextContentBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTextContentNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTextContentBuffer -  buffer of returns the text content of the node., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_gettextcontent(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const LibMCEnv_uint32 nTextContentBufferSize, LibMCEnv_uint32* pTextContentNeededChars, char * pTextContentBuffer);
+
+/**
+* Sets the text content of the node. Call will fail if node has children.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pTextContent - the new text content of the node.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_settextcontent(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pTextContent);
+
+/**
 * Returns number of attributes.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
@@ -2218,7 +2238,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_hasuniquechild(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, bool bMustExist, LibMCEnv_XMLDocumentNode * pChildInstance);
 
 /**
-* Adds a new child with a specific name.
+* Adds a new child with a specific name. Fails if node has a non-empty text content.
 *
 * @param[in] pXMLDocumentNode - XMLDocumentNode instance.
 * @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
@@ -2227,6 +2247,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_findchild(LibMCEnv_XML
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addchild(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, LibMCEnv_XMLDocumentNode * pChildInstance);
+
+/**
+* Adds a new child with text content and a specific name. Fails if node has a non-empty text content.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+* @param[in] pName - Name of the child.
+* @param[in] pTextContent - Text content of the child.
+* @param[out] pChildInstance - returns child instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_addchildtext(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pTextContent, LibMCEnv_XMLDocumentNode * pChildInstance);
 
 /**
 * Removes a child with a specific name. All subsequent calls to the child will fail after the call.

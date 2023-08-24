@@ -1176,6 +1176,8 @@ public:
 	
 	inline std::string GetName();
 	inline std::string GetNameSpace();
+	inline std::string GetTextContent();
+	inline void SetTextContent(const std::string & sTextContent);
 	inline LibMCEnv_uint64 GetAttributeCount();
 	inline PXMLDocumentAttribute GetAttribute(const LibMCEnv_uint64 nIndex);
 	inline bool HasAttribute(const std::string & sNameSpace, const std::string & sName);
@@ -1203,6 +1205,7 @@ public:
 	inline bool HasUniqueChild(const std::string & sNameSpace, const std::string & sName);
 	inline PXMLDocumentNode FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist);
 	inline PXMLDocumentNode AddChild(const std::string & sNameSpace, const std::string & sName);
+	inline PXMLDocumentNode AddChildText(const std::string & sNameSpace, const std::string & sName, const std::string & sTextContent);
 	inline void RemoveChild(classParam<CXMLDocumentNode> pChildInstance);
 	inline void RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName);
 	inline void Remove();
@@ -1914,6 +1917,8 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_Remove = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetNameSpace = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetTextContent = nullptr;
+		pWrapperTable->m_XMLDocumentNode_SetTextContent = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_HasAttribute = nullptr;
@@ -1941,6 +1946,7 @@ public:
 		pWrapperTable->m_XMLDocumentNode_HasUniqueChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_FindChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_AddChild = nullptr;
+		pWrapperTable->m_XMLDocumentNode_AddChildText = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_Remove = nullptr;
@@ -3745,6 +3751,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetTextContent = (PLibMCEnvXMLDocumentNode_GetTextContentPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_gettextcontent");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetTextContent = (PLibMCEnvXMLDocumentNode_GetTextContentPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_gettextcontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetTextContent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_SetTextContent = (PLibMCEnvXMLDocumentNode_SetTextContentPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_settextcontent");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_SetTextContent = (PLibMCEnvXMLDocumentNode_SetTextContentPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_settextcontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_SetTextContent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = (PLibMCEnvXMLDocumentNode_GetAttributeCountPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributecount");
 		#else // _WIN32
 		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = (PLibMCEnvXMLDocumentNode_GetAttributeCountPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributecount");
@@ -3985,6 +4009,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentNode_AddChild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddChildText = (PLibMCEnvXMLDocumentNode_AddChildTextPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_addchildtext");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddChildText = (PLibMCEnvXMLDocumentNode_AddChildTextPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_addchildtext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_AddChildText == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6690,6 +6723,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetNameSpace == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_gettextcontent", (void**)&(pWrapperTable->m_XMLDocumentNode_GetTextContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetTextContent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_settextcontent", (void**)&(pWrapperTable->m_XMLDocumentNode_SetTextContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_SetTextContent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributecount", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6796,6 +6837,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addchild", (void**)&(pWrapperTable->m_XMLDocumentNode_AddChild));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddChild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addchildtext", (void**)&(pWrapperTable->m_XMLDocumentNode_AddChildText));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddChildText == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removechild", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveChild));
@@ -10043,6 +10088,30 @@ public:
 	}
 	
 	/**
+	* CXMLDocumentNode::GetTextContent - Retrieves the text content of the node. A node with text content MUST NOT have children.
+	* @return returns the text content of the node.
+	*/
+	std::string CXMLDocumentNode::GetTextContent()
+	{
+		LibMCEnv_uint32 bytesNeededTextContent = 0;
+		LibMCEnv_uint32 bytesWrittenTextContent = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetTextContent(m_pHandle, 0, &bytesNeededTextContent, nullptr));
+		std::vector<char> bufferTextContent(bytesNeededTextContent);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetTextContent(m_pHandle, bytesNeededTextContent, &bytesWrittenTextContent, &bufferTextContent[0]));
+		
+		return std::string(&bufferTextContent[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::SetTextContent - Sets the text content of the node. Call will fail if node has children.
+	* @param[in] sTextContent - the new text content of the node.
+	*/
+	void CXMLDocumentNode::SetTextContent(const std::string & sTextContent)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_SetTextContent(m_pHandle, sTextContent.c_str()));
+	}
+	
+	/**
 	* CXMLDocumentNode::GetAttributeCount - Returns number of attributes.
 	* @return returns the number of attributes.
 	*/
@@ -10425,7 +10494,7 @@ public:
 	}
 	
 	/**
-	* CXMLDocumentNode::AddChild - Adds a new child with a specific name.
+	* CXMLDocumentNode::AddChild - Adds a new child with a specific name. Fails if node has a non-empty text content.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns child instance.
@@ -10434,6 +10503,24 @@ public:
 	{
 		LibMCEnvHandle hChildInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddChild(m_pHandle, sNameSpace.c_str(), sName.c_str(), &hChildInstance));
+		
+		if (!hChildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hChildInstance);
+	}
+	
+	/**
+	* CXMLDocumentNode::AddChildText - Adds a new child with text content and a specific name. Fails if node has a non-empty text content.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @param[in] sTextContent - Text content of the child.
+	* @return returns child instance.
+	*/
+	PXMLDocumentNode CXMLDocumentNode::AddChildText(const std::string & sNameSpace, const std::string & sName, const std::string & sTextContent)
+	{
+		LibMCEnvHandle hChildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddChildText(m_pHandle, sNameSpace.c_str(), sName.c_str(), sTextContent.c_str(), &hChildInstance));
 		
 		if (!hChildInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

@@ -1666,6 +1666,18 @@ public:
 	virtual std::string GetNameSpace() = 0;
 
 	/**
+	* IXMLDocumentNode::GetTextContent - Retrieves the text content of the node. A node with text content MUST NOT have children.
+	* @return returns the text content of the node.
+	*/
+	virtual std::string GetTextContent() = 0;
+
+	/**
+	* IXMLDocumentNode::SetTextContent - Sets the text content of the node. Call will fail if node has children.
+	* @param[in] sTextContent - the new text content of the node.
+	*/
+	virtual void SetTextContent(const std::string & sTextContent) = 0;
+
+	/**
 	* IXMLDocumentNode::GetAttributeCount - Returns number of attributes.
 	* @return returns the number of attributes.
 	*/
@@ -1881,12 +1893,21 @@ public:
 	virtual IXMLDocumentNode * FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
 
 	/**
-	* IXMLDocumentNode::AddChild - Adds a new child with a specific name.
+	* IXMLDocumentNode::AddChild - Adds a new child with a specific name. Fails if node has a non-empty text content.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns child instance.
 	*/
 	virtual IXMLDocumentNode * AddChild(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::AddChildText - Adds a new child with text content and a specific name. Fails if node has a non-empty text content.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @param[in] sTextContent - Text content of the child.
+	* @return returns child instance.
+	*/
+	virtual IXMLDocumentNode * AddChildText(const std::string & sNameSpace, const std::string & sName, const std::string & sTextContent) = 0;
 
 	/**
 	* IXMLDocumentNode::RemoveChild - Removes a child with a specific name. All subsequent calls to the child will fail after the call.

@@ -534,6 +534,8 @@
 		
 		<error name="INVALIDTOOLPATHATTRIBUTEID" code="508" description="Invalid toolpath attribute ID." />
 		<error name="AMBIGUOUSSEGMENTATTRIBUTETYPE" code="509" description="Ambiguous segment attribute type." />
+		<error name="XMLNODEHASCHILDREN" code="510" description="XML Node has children"/>
+		<error name="XMLNODEHASTEXTCONTENT" code="511" description="XML Node has text content"/>
 		
 	</errors>
 	

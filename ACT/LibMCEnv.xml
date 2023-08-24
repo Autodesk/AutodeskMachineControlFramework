@@ -156,7 +156,7 @@
 		<error name="COULDNOTRETRIEVEPNGSTREAM" code="10116" description="Could not retrieve PNG stream"/>
 		<error name="COULDNOTSTOREFIELDDATA" code="10117" description="Could not store field data"/>
 		<error name="DISCRETEFIELDDATANOTFOUND" code="10118" description="Discrete field data not found"/>
-		
+
 		
 	</errors>
 
@@ -1191,6 +1191,14 @@
 			<param name="NameSpace" type="string" pass="return" description="returns the namespace of the node." />
 		</method>
 
+		<method name="GetTextContent" description="Retrieves the text content of the node. A node with text content MUST NOT have children.">
+			<param name="TextContent" type="string" pass="return" description="returns the text content of the node." />
+		</method>
+
+		<method name="SetTextContent" description="Sets the text content of the node. Call will fail if node has children.">
+			<param name="TextContent" type="string" pass="in" description="the new text content of the node." />
+		</method>
+
 		<method name="GetAttributeCount" description="Returns number of attributes.">
 			<param name="Count" type="uint64" pass="return" description="returns the number of attributes." />
 		</method>
@@ -1354,9 +1362,16 @@
 			<param name="ChildInstance" type="optionalclass" class="XMLDocumentNode" pass="return" description="returns child instance or null." />
 		</method>
 		
-		<method name="AddChild" description="Adds a new child with a specific name.">
+		<method name="AddChild" description="Adds a new child with a specific name. Fails if node has a non-empty text content.">
 			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the child." />
+			<param name="ChildInstance" type="class" class="XMLDocumentNode" pass="return" description="returns child instance." />
+		</method>
+
+		<method name="AddChildText" description="Adds a new child with text content and a specific name. Fails if node has a non-empty text content.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
+			<param name="Name" type="string" pass="in" description="Name of the child." />
+			<param name="TextContent" type="string" pass="in" description="Text content of the child." />
 			<param name="ChildInstance" type="class" class="XMLDocumentNode" pass="return" description="returns child instance." />
 		</method>
 

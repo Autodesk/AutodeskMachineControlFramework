@@ -234,7 +234,7 @@ std::string CXMLDocumentInstance::SaveToString(const bool bAddLineBreaks)
 
 	auto pDocument = std::make_shared<pugi::xml_document>();
 
-	auto rootNode = pDocument->append_child (m_pRootNodeInstance->GetName().c_str ());
+	auto rootNode = pDocument->append_child (m_pRootNodeInstance->getPrefixedName().c_str ());
 	m_pRootNodeInstance->storeToPugiNode(pDocument.get(), &rootNode);
 
 	pDocument->save(xmlWriter, "  ", nFormat, pugi::encoding_utf8);

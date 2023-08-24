@@ -71,6 +71,10 @@ public:
 
 	std::string GetNameSpace() override;
 
+	std::string GetTextContent() override;
+
+	void SetTextContent(const std::string& sTextContent) override;
+
 	LibMCEnv_uint64 GetAttributeCount() override;
 
 	IXMLDocumentAttribute* GetAttribute(const LibMCEnv_uint64 nIndex) override;
@@ -124,6 +128,8 @@ public:
 	IXMLDocumentNode* FindChild(const std::string& sNameSpace, const std::string& sName, const bool bMustExist) override;
 	
 	IXMLDocumentNode* AddChild(const std::string& sNameSpace, const std::string& sName) override;
+
+	IXMLDocumentNode* AddChildText(const std::string& sNameSpace, const std::string& sName, const std::string& sTextContent) override;
 
 	void RemoveChild(IXMLDocumentNode* pChildInstance) override;
 

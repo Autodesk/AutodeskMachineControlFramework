@@ -5477,6 +5477,81 @@ LibMCEnvResult libmcenv_xmldocumentnode_getnamespace(LibMCEnv_XMLDocumentNode pX
 	}
 }
 
+LibMCEnvResult libmcenv_xmldocumentnode_gettextcontent(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const LibMCEnv_uint32 nTextContentBufferSize, LibMCEnv_uint32* pTextContentNeededChars, char * pTextContentBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
+
+	try {
+		if ( (!pTextContentBuffer) && !(pTextContentNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sTextContent("");
+		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
+		if (!pIXMLDocumentNode)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTextContentBuffer == nullptr);
+		if (isCacheCall) {
+			sTextContent = pIXMLDocumentNode->GetTextContent();
+
+			pIXMLDocumentNode->_setCache (new ParameterCache_1<std::string> (sTextContent));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIXMLDocumentNode->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sTextContent);
+			pIXMLDocumentNode->_setCache (nullptr);
+		}
+		
+		if (pTextContentNeededChars)
+			*pTextContentNeededChars = (LibMCEnv_uint32) (sTextContent.size()+1);
+		if (pTextContentBuffer) {
+			if (sTextContent.size() >= nTextContentBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iTextContent = 0; iTextContent < sTextContent.size(); iTextContent++)
+				pTextContentBuffer[iTextContent] = sTextContent[iTextContent];
+			pTextContentBuffer[sTextContent.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_xmldocumentnode_settextcontent(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pTextContent)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
+
+	try {
+		if (pTextContent == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sTextContent(pTextContent);
+		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
+		if (!pIXMLDocumentNode)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIXMLDocumentNode->SetTextContent(sTextContent);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_xmldocumentnode_getattributecount(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_uint64 * pCount)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
@@ -6399,6 +6474,43 @@ LibMCEnvResult libmcenv_xmldocumentnode_addchild(LibMCEnv_XMLDocumentNode pXMLDo
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pBaseChildInstance = pIXMLDocumentNode->AddChild(sNameSpace, sName);
+
+		*pChildInstance = (IBase*)(pBaseChildInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_xmldocumentnode_addchildtext(LibMCEnv_XMLDocumentNode pXMLDocumentNode, const char * pNameSpace, const char * pName, const char * pTextContent, LibMCEnv_XMLDocumentNode * pChildInstance)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
+
+	try {
+		if (pNameSpace == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pTextContent == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pChildInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
+		std::string sName(pName);
+		std::string sTextContent(pTextContent);
+		IBase* pBaseChildInstance(nullptr);
+		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
+		if (!pIXMLDocumentNode)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseChildInstance = pIXMLDocumentNode->AddChildText(sNameSpace, sName, sTextContent);
 
 		*pChildInstance = (IBase*)(pBaseChildInstance);
 		return LIBMCENV_SUCCESS;
@@ -13762,6 +13874,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_getname;
 	if (sProcName == "libmcenv_xmldocumentnode_getnamespace") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_getnamespace;
+	if (sProcName == "libmcenv_xmldocumentnode_gettextcontent") 
+		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_gettextcontent;
+	if (sProcName == "libmcenv_xmldocumentnode_settextcontent") 
+		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_settextcontent;
 	if (sProcName == "libmcenv_xmldocumentnode_getattributecount") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_getattributecount;
 	if (sProcName == "libmcenv_xmldocumentnode_getattribute") 
@@ -13816,6 +13932,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_findchild;
 	if (sProcName == "libmcenv_xmldocumentnode_addchild") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_addchild;
+	if (sProcName == "libmcenv_xmldocumentnode_addchildtext") 
+		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_addchildtext;
 	if (sProcName == "libmcenv_xmldocumentnode_removechild") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_removechild;
 	if (sProcName == "libmcenv_xmldocumentnode_removechildrenwithname") 
