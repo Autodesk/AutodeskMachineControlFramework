@@ -73,7 +73,7 @@ void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName, bool bMandat
 
 
 CScanLabSDKJournal::CScanLabSDKJournal(const std::string& sDebugFileName)
-	: m_nVariableIndex (1)
+	
 {
 	m_CStream.open(sDebugFileName, std::ios::out);
 	if (!m_CStream.is_open())
@@ -96,10 +96,23 @@ void CScanLabSDKJournal::logCall(const std::string& sFunctionName, const std::st
 	writeCLine(sFunctionName + "(" + sCParameters + ");");
 }
 
+std::string CScanLabSDKJournal::getVariableSuffix(const std::string& sVariableBaseName)
+{
+	auto iIter = m_DefinedVariables.find(sVariableBaseName);
+	if (iIter == m_DefinedVariables.end()) {
+		m_DefinedVariables.insert(std::make_pair (sVariableBaseName, 1));
+		return "1";
+	}
+	else {
+		iIter->second++;
+		return std::to_string(iIter->second);
+	}
+}
+
+
 std::string CScanLabSDKJournal::defineDoubleVariable(const std::string& sVariableBaseName)
 {
-	std::string sVariableName = sVariableBaseName + std::to_string(m_nVariableIndex);
-	m_nVariableIndex++;
+	std::string sVariableName = sVariableBaseName + getVariableSuffix (sVariableBaseName);
 
 	writeCLine("double " + sVariableName + ";");
 	return sVariableName;
@@ -107,8 +120,7 @@ std::string CScanLabSDKJournal::defineDoubleVariable(const std::string& sVariabl
 
 std::string CScanLabSDKJournal::defineUint32Variable(const std::string& sVariableBaseName)
 {
-	std::string sVariableName = sVariableBaseName + std::to_string(m_nVariableIndex);
-	m_nVariableIndex++;
+	std::string sVariableName = sVariableBaseName + getVariableSuffix(sVariableBaseName);
 
 	writeCLine("uint32_t " + sVariableName + ";");
 	return sVariableName;
@@ -117,8 +129,7 @@ std::string CScanLabSDKJournal::defineUint32Variable(const std::string& sVariabl
 
 std::string CScanLabSDKJournal::defineInt32Variable(const std::string& sVariableBaseName)
 {
-	std::string sVariableName = sVariableBaseName + std::to_string(m_nVariableIndex);
-	m_nVariableIndex++;
+	std::string sVariableName = sVariableBaseName + getVariableSuffix(sVariableBaseName);
 
 	writeCLine("int32_t " + sVariableName + ";");
 	return sVariableName;

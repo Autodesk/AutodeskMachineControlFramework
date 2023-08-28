@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_types.hpp"
 
 #include <memory>
+#include <map>
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -202,7 +203,7 @@ namespace LibMCDriver_ScanLab {
 
 		class CScanLabSDKJournal {
 		private:
-			uint32_t m_nVariableIndex;
+			std::map<std::string, uint32_t> m_DefinedVariables;
 			std::ofstream m_CStream;
 
 			void writeCLine(const std::string & sLine);
@@ -217,6 +218,8 @@ namespace LibMCDriver_ScanLab {
 			std::string defineDoubleVariable(const std::string & sVariableBaseName);
 			std::string defineUint32Variable(const std::string& sVariableBaseName);
 			std::string defineInt32Variable(const std::string& sVariableBaseName);
+
+			std::string getVariableSuffix(const std::string& sVariableBaseName);
 
 			std::string escapeString(const std::string & sString);
 		};
