@@ -192,7 +192,7 @@ void CDriver_ScanLabSMC::SetCustomXercesDLLData(const LibMCDriver_ScanLabSMC_uin
 void CDriver_ScanLabSMC::LoadSDK()
 {
 #ifndef _WIN32
-    throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_SMCSDK_UNSUPPORTEDPLATFORM);
+    throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_SDKALREADYLOADED_UNSUPPORTEDPLATFORM);
 #endif
 
     if (m_pSDK.get() != nullptr)
