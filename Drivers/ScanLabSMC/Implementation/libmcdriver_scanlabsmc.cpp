@@ -111,18 +111,21 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 #endif
 
 #ifdef __GNUC__
-void libmcdriver_driver_configure (void) __attribute__((alias("libmcdriver_scanlabsmc_driver_configure")));
-void libmcdriver_driver_getname (void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getname")));
-void libmcdriver_driver_gettype(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_gettype")));
-void libmcdriver_driver_getversion(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getversion")));
-void libmcdriver_driver_queryparametersex(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_queryparametersex")));
-void libmcdriver_getversion(void) __attribute__((alias("libmcdriver_scanlabsmc_getversion")));
-void libmcdriver_getlasterror(void) __attribute__((alias("libmcdriver_scanlabsmc_getlasterror")));
-void libmcdriver_releaseinstance(void) __attribute__((alias("libmcdriver_scanlabsmc_releaseinstance")));
-void libmcdriver_acquireinstance(void) __attribute__((alias("libmcdriver_scanlabsmc_acquireinstance")));
-void libmcdriver_injectcomponent(void) __attribute__((alias("libmcdriver_scanlabsmc_injectcomponent")));
-void libmcdriver_createdriver(void) __attribute__((alias("libmcdriver_scanlabsmc_createdriver")));
-void libmcdriver_getsymbollookupmethod(void) __attribute__((alias("libmcdriver_scanlabsmc_getsymbollookupmethod")));
 
+extern "C" {
+
+	void libmcdriver_driver_configure(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_configure")));
+	void libmcdriver_driver_getname(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getname")));
+	void libmcdriver_driver_gettype(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_gettype")));
+	void libmcdriver_driver_getversion(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getversion")));
+	void libmcdriver_driver_queryparametersex(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_queryparametersex")));
+	void libmcdriver_getversion(void) __attribute__((alias("libmcdriver_scanlabsmc_getversion")));
+	void libmcdriver_getlasterror(void) __attribute__((alias("libmcdriver_scanlabsmc_getlasterror")));
+	void libmcdriver_releaseinstance(void) __attribute__((alias("libmcdriver_scanlabsmc_releaseinstance")));
+	void libmcdriver_acquireinstance(void) __attribute__((alias("libmcdriver_scanlabsmc_acquireinstance")));
+	void libmcdriver_injectcomponent(void) __attribute__((alias("libmcdriver_scanlabsmc_injectcomponent")));
+	void libmcdriver_createdriver(void) __attribute__((alias("libmcdriver_scanlabsmc_createdriver")));
+	void libmcdriver_getsymbollookupmethod(void) __attribute__((alias("libmcdriver_scanlabsmc_getsymbollookupmethod")));
+}
 
 #endif
