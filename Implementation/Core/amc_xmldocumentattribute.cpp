@@ -72,10 +72,15 @@ void CXMLDocumentAttributeInstance::setValue(const std::string& sValue)
 std::string CXMLDocumentAttributeInstance::getPrefixedName()
 {
 	std::string sNameSpacePrefix = m_pNameSpace->getPrefix();
-	if (!sNameSpacePrefix.empty())
-		return sNameSpacePrefix + ":" + m_sAttributeName;
-	else
-		return m_sAttributeName;
+	std::string sNodeNameSpacePrefix = m_pNode->GetNameSpace()->getPrefix();
+
+	if (sNameSpacePrefix != sNodeNameSpacePrefix) {
+		if (!sNameSpacePrefix.empty())
+			return sNameSpacePrefix + ":" + m_sAttributeName;
+	}
+	
+	return m_sAttributeName;
+
 }
 
 CXMLDocumentNodeInstance* CXMLDocumentAttributeInstance::getNode()

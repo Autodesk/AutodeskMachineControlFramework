@@ -1467,6 +1467,11 @@
 			<param name="Namespace" type="string" pass="in" description="name space to register" />
 			<param name="NamespacePrefix" type="string" pass="in" description="name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters." />
 		</method>	
+
+		<method name="ChangeNamespacePrefix" description="Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.">
+			<param name="OldNamespacePrefix" type="string" pass="in" description="name space prefix that is currently in use." />
+			<param name="NewNamespacePrefix" type="string" pass="in" description="name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters." />
+		</method>	
 			
 		<method name="GetRootNode" description="Returns root node of the document.">
 			<param name="RootNode" type="class" class="XMLDocumentNode" pass="return" description="Root node of the document." />

@@ -97,3 +97,9 @@ std::string CXMLDocument::SaveToString(const bool bAddLineBreaks)
 {
     return m_pXMLDocument->SaveToString(bAddLineBreaks);
 }
+
+void CXMLDocument::ChangeNamespacePrefix(const std::string& sOldNamespacePrefix, const std::string& sNewNamespacePrefix)
+{
+    m_pXMLDocument->ChangeNamespacePrefix(sOldNamespacePrefix, sNewNamespacePrefix);
+}
+

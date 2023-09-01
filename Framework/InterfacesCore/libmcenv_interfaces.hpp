@@ -2045,6 +2045,13 @@ public:
 	virtual void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix) = 0;
 
 	/**
+	* IXMLDocument::ChangeNamespacePrefix - Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.
+	* @param[in] sOldNamespacePrefix - name space prefix that is currently in use.
+	* @param[in] sNewNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+	*/
+	virtual void ChangeNamespacePrefix(const std::string & sOldNamespacePrefix, const std::string & sNewNamespacePrefix) = 0;
+
+	/**
 	* IXMLDocument::GetRootNode - Returns root node of the document.
 	* @return Root node of the document.
 	*/

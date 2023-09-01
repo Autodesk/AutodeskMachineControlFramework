@@ -2438,6 +2438,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_getnamespaceprefix(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_registernamespace(LibMCEnv_XMLDocument pXMLDocument, const char * pNamespace, const char * pNamespacePrefix);
 
 /**
+* Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] pOldNamespacePrefix - name space prefix that is currently in use.
+* @param[in] pNewNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocument_changenamespaceprefix(LibMCEnv_XMLDocument pXMLDocument, const char * pOldNamespacePrefix, const char * pNewNamespacePrefix);
+
+/**
 * Returns root node of the document.
 *
 * @param[in] pXMLDocument - XMLDocument instance.

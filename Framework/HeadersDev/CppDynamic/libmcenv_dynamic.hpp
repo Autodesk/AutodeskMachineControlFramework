@@ -1254,6 +1254,7 @@ public:
 	inline bool HasNamespace(const std::string & sNamespace);
 	inline std::string GetNamespacePrefix(const std::string & sNamespace);
 	inline void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
+	inline void ChangeNamespacePrefix(const std::string & sOldNamespacePrefix, const std::string & sNewNamespacePrefix);
 	inline PXMLDocumentNode GetRootNode();
 	inline std::string SaveToString(const bool bAddLineBreaks);
 };
@@ -1963,6 +1964,7 @@ public:
 		pWrapperTable->m_XMLDocument_HasNamespace = nullptr;
 		pWrapperTable->m_XMLDocument_GetNamespacePrefix = nullptr;
 		pWrapperTable->m_XMLDocument_RegisterNamespace = nullptr;
+		pWrapperTable->m_XMLDocument_ChangeNamespacePrefix = nullptr;
 		pWrapperTable->m_XMLDocument_GetRootNode = nullptr;
 		pWrapperTable->m_XMLDocument_SaveToString = nullptr;
 		pWrapperTable->m_TCPIPPacket_IsEmpty = nullptr;
@@ -4162,6 +4164,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocument_RegisterNamespace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_ChangeNamespacePrefix = (PLibMCEnvXMLDocument_ChangeNamespacePrefixPtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_changenamespaceprefix");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_ChangeNamespacePrefix = (PLibMCEnvXMLDocument_ChangeNamespacePrefixPtr) dlsym(hLibrary, "libmcenv_xmldocument_changenamespaceprefix");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_ChangeNamespacePrefix == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6905,6 +6916,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocument_registernamespace", (void**)&(pWrapperTable->m_XMLDocument_RegisterNamespace));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_RegisterNamespace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_changenamespaceprefix", (void**)&(pWrapperTable->m_XMLDocument_ChangeNamespacePrefix));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_ChangeNamespacePrefix == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocument_getrootnode", (void**)&(pWrapperTable->m_XMLDocument_GetRootNode));
@@ -10754,6 +10769,16 @@ public:
 	void CXMLDocument::RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_RegisterNamespace(m_pHandle, sNamespace.c_str(), sNamespacePrefix.c_str()));
+	}
+	
+	/**
+	* CXMLDocument::ChangeNamespacePrefix - Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.
+	* @param[in] sOldNamespacePrefix - name space prefix that is currently in use.
+	* @param[in] sNewNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+	*/
+	void CXMLDocument::ChangeNamespacePrefix(const std::string & sOldNamespacePrefix, const std::string & sNewNamespacePrefix)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_ChangeNamespacePrefix(m_pHandle, sOldNamespacePrefix.c_str(), sNewNamespacePrefix.c_str()));
 	}
 	
 	/**

@@ -7079,6 +7079,36 @@ LibMCEnvResult libmcenv_xmldocument_registernamespace(LibMCEnv_XMLDocument pXMLD
 	}
 }
 
+LibMCEnvResult libmcenv_xmldocument_changenamespaceprefix(LibMCEnv_XMLDocument pXMLDocument, const char * pOldNamespacePrefix, const char * pNewNamespacePrefix)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocument;
+
+	try {
+		if (pOldNamespacePrefix == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pNewNamespacePrefix == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sOldNamespacePrefix(pOldNamespacePrefix);
+		std::string sNewNamespacePrefix(pNewNamespacePrefix);
+		IXMLDocument* pIXMLDocument = dynamic_cast<IXMLDocument*>(pIBaseClass);
+		if (!pIXMLDocument)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIXMLDocument->ChangeNamespacePrefix(sOldNamespacePrefix, sNewNamespacePrefix);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_xmldocument_getrootnode(LibMCEnv_XMLDocument pXMLDocument, LibMCEnv_XMLDocumentNode * pRootNode)
 {
 	IBase* pIBaseClass = (IBase *)pXMLDocument;
@@ -13966,6 +13996,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_xmldocument_getnamespaceprefix;
 	if (sProcName == "libmcenv_xmldocument_registernamespace") 
 		*ppProcAddress = (void*) &libmcenv_xmldocument_registernamespace;
+	if (sProcName == "libmcenv_xmldocument_changenamespaceprefix") 
+		*ppProcAddress = (void*) &libmcenv_xmldocument_changenamespaceprefix;
 	if (sProcName == "libmcenv_xmldocument_getrootnode") 
 		*ppProcAddress = (void*) &libmcenv_xmldocument_getrootnode;
 	if (sProcName == "libmcenv_xmldocument_savetostring") 

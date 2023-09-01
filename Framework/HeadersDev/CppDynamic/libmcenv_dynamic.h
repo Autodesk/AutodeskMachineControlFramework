@@ -2425,6 +2425,16 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocument_GetNamespacePrefixPtr) (LibMCEnv_X
 typedef LibMCEnvResult (*PLibMCEnvXMLDocument_RegisterNamespacePtr) (LibMCEnv_XMLDocument pXMLDocument, const char * pNamespace, const char * pNamespacePrefix);
 
 /**
+* Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.
+*
+* @param[in] pXMLDocument - XMLDocument instance.
+* @param[in] pOldNamespacePrefix - name space prefix that is currently in use.
+* @param[in] pNewNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocument_ChangeNamespacePrefixPtr) (LibMCEnv_XMLDocument pXMLDocument, const char * pOldNamespacePrefix, const char * pNewNamespacePrefix);
+
+/**
 * Returns root node of the document.
 *
 * @param[in] pXMLDocument - XMLDocument instance.
@@ -4880,6 +4890,7 @@ typedef struct {
 	PLibMCEnvXMLDocument_HasNamespacePtr m_XMLDocument_HasNamespace;
 	PLibMCEnvXMLDocument_GetNamespacePrefixPtr m_XMLDocument_GetNamespacePrefix;
 	PLibMCEnvXMLDocument_RegisterNamespacePtr m_XMLDocument_RegisterNamespace;
+	PLibMCEnvXMLDocument_ChangeNamespacePrefixPtr m_XMLDocument_ChangeNamespacePrefix;
 	PLibMCEnvXMLDocument_GetRootNodePtr m_XMLDocument_GetRootNode;
 	PLibMCEnvXMLDocument_SaveToStringPtr m_XMLDocument_SaveToString;
 	PLibMCEnvTCPIPPacket_IsEmptyPtr m_TCPIPPacket_IsEmpty;
