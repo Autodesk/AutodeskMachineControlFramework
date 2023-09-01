@@ -243,7 +243,7 @@ std::string CXMLDocumentInstance::SaveToString(const bool bAddLineBreaks)
 		else
 			sNameSpaceAttrib = "xmlns";
 
-		auto& nameSpaceAttrib = rootNode.append_attribute(sNameSpaceAttrib.c_str());
+		auto nameSpaceAttrib = rootNode.append_attribute(sNameSpaceAttrib.c_str());
 		nameSpaceAttrib.set_value(pNameSpace->getNameSpaceName().c_str());
 	}
 
