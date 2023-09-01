@@ -114,8 +114,9 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 
 extern "C" {
 
-	void libmcdriver_driver_configure(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_configure")));
-	void libmcdriver_driver_getname(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getname")));
+	LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_driver_configure(LibMCDriver_ScanLabSMC_Driver pDriver, const char* pConfigurationString) __attribute__((alias("libmcdriver_scanlabsmc_driver_configure")));
+
+	/*void libmcdriver_driver_getname(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getname")));
 	void libmcdriver_driver_gettype(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_gettype")));
 	void libmcdriver_driver_getversion(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getversion")));
 	void libmcdriver_driver_queryparametersex(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_queryparametersex")));
@@ -125,7 +126,7 @@ extern "C" {
 	void libmcdriver_acquireinstance(void) __attribute__((alias("libmcdriver_scanlabsmc_acquireinstance")));
 	void libmcdriver_injectcomponent(void) __attribute__((alias("libmcdriver_scanlabsmc_injectcomponent")));
 	void libmcdriver_createdriver(void) __attribute__((alias("libmcdriver_scanlabsmc_createdriver")));
-	void libmcdriver_getsymbollookupmethod(void) __attribute__((alias("libmcdriver_scanlabsmc_getsymbollookupmethod")));
+	void libmcdriver_getsymbollookupmethod(void) __attribute__((alias("libmcdriver_scanlabsmc_getsymbollookupmethod"))); */
 }
 
 #endif
