@@ -235,6 +235,18 @@ std::string CXMLDocumentInstance::SaveToString(const bool bAddLineBreaks)
 	auto pDocument = std::make_shared<pugi::xml_document>();
 
 	auto rootNode = pDocument->append_child (m_pRootNodeInstance->getPrefixedName().c_str ());
+
+	for (auto pNameSpace : m_Namespaces) {
+		std::string sNameSpaceAttrib;
+		if (pNameSpace->hasPrefix())
+			sNameSpaceAttrib = "xmlns:" + pNameSpace->getPrefix();
+		else
+			sNameSpaceAttrib = "xmlns";
+
+		auto& nameSpaceAttrib = rootNode.append_attribute(sNameSpaceAttrib.c_str());
+		nameSpaceAttrib.set_value(pNameSpace->getNameSpaceName().c_str());
+	}
+
 	m_pRootNodeInstance->storeToPugiNode(pDocument.get(), &rootNode);
 
 	pDocument->save(xmlWriter, "  ", nFormat, pugi::encoding_utf8);
@@ -242,3 +254,24 @@ std::string CXMLDocumentInstance::SaveToString(const bool bAddLineBreaks)
 	return xmlWriter.m_Stream.str();
 }
 
+void CXMLDocumentInstance::ChangeNamespacePrefix(const std::string& sOldNamespacePrefix, const std::string& sNewNamespacePrefix)
+{
+
+	if (!CXMLDocumentNameSpace::checkXMLNameSpacePrefixName(sNewNamespacePrefix))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDNAMESPACEPREFIX, sNewNamespacePrefix);
+	auto iPrefixIter = m_PrefixToNamespaceMap.find(sNewNamespacePrefix);
+	if (iPrefixIter != m_PrefixToNamespaceMap.end())
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACEPREFIXALREADYREGISTERED, sNewNamespacePrefix);
+
+	auto iNamespaceIter = m_PrefixToNamespaceMap.find(sOldNamespacePrefix);
+	if (iNamespaceIter == m_PrefixToNamespaceMap.end())
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACENOTFOUND, sOldNamespacePrefix);
+
+	auto pNameSpace = iNamespaceIter->second;
+	m_PrefixToNamespaceMap.erase(iNamespaceIter);
+
+	pNameSpace->changePrefix(sNewNamespacePrefix);
+
+	m_PrefixToNamespaceMap.insert(std::make_pair(sNewNamespacePrefix, pNameSpace));
+
+}

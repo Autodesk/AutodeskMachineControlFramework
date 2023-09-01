@@ -35,7 +35,7 @@ Abstract: This is a stub class definition of CSMCConfiguration
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include <iostream>
 
 using namespace LibMCDriver_ScanLabSMC::Impl;
 
@@ -80,11 +80,134 @@ LibMCDriver_ScanLabSMC::eWarnLevel CSMCConfiguration::GetWarnLevel()
 
 std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory)
 {
+    std::string sBaseDirectoryPath = pWorkingDirectory->GetAbsoluteFilePath();
+
     auto pXMLDocument = m_pDriverEnvironment->CreateXMLDocument("Configuration", "SCANmotionControl");
+
+    pXMLDocument->ChangeNamespacePrefix("", "cfg");
+    pXMLDocument->RegisterNamespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+
     auto pConfigurationNode = pXMLDocument->GetRootNode();
     pConfigurationNode->AddAttribute("", "Version", "0.6");
+    pConfigurationNode->AddAttribute("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", "cfg SCANmotionControl_0_6.xsd");
 
     auto pGeneralConfigNode = pConfigurationNode->AddChild("", "GeneralConfig");
+    auto pDynamicViolationReaction = pGeneralConfigNode->AddChildText("", "DynamicViolationReaction", "WarningOnly");
     
-    return pXMLDocument->SaveToString (true);
+    auto pLogConfigNode = pGeneralConfigNode->AddChild("", "LogConfig");
+    pLogConfigNode->AddChildText("", "LogfilePath", "[BaseDirectoryPath]/Log/Log.txt");
+    pLogConfigNode->AddChildText("", "Loglevel", "Warn");
+    pLogConfigNode->AddChildText("", "EnableConsoleLogging", "false");
+    pLogConfigNode->AddChildText("", "EnableFilelogging", "false");
+    pLogConfigNode->AddChildText("", "MaxLogfileSize", "26214400");
+    pLogConfigNode->AddChildText("", "MaxBackupFileCount", "0");
+
+    pGeneralConfigNode->AddChildText("", "BaseDirectoryPath", sBaseDirectoryPath);
+
+    auto pSimulationConfigNode = pGeneralConfigNode->AddChild("", "SimulationConfig");
+    pSimulationConfigNode->AddChildText("", "SimulationMode", "true");
+    pSimulationConfigNode->AddChildText("", "SimOutputFileDirectory", "[BaseDirectoryPath]/Simulate/");
+    pSimulationConfigNode->AddChildText("", "BinaryOutput", "false");
+    pSimulationConfigNode->AddChildText("", "DisableFileOutput", "false");
+
+    auto pRTCConfigNode = pConfigurationNode->AddChild("", "RTCConfig");
+    pRTCConfigNode->AddChildText("", "BoardIdentificationMethod", "BySerialNumber");
+    pRTCConfigNode->AddChildText("", "ProgramFileDirectory", "[BaseDirectoryPath]/ProgramFiles");
+    auto pBoardsNode = pRTCConfigNode->AddChild("", "Boards");
+
+    auto pEthSearchNode = pRTCConfigNode->AddChild("", "EthSearch");
+    auto pIPListNode = pEthSearchNode->AddChild("", "IPList");
+    pIPListNode->AddChildText("", "IPAddress", "192.168.0.1");
+    pEthSearchNode->AddChildText("", "EthMaxTimeout", "2.0");
+
+
+    auto pScanDeviceConfigNode = pConfigurationNode->AddChild("", "ScanDeviceConfig");
+    auto pDynamicLimitsNode = pScanDeviceConfigNode->AddChild("", "DynamicLimits");
+    auto pDynamicLimitsVelocityNode = pDynamicLimitsNode->AddChildText("", "Velocity", "90");
+    pDynamicLimitsVelocityNode->AddAttribute("", "Unit", "rad/s");
+    auto pDynamicLimitsAccelerationNode = pDynamicLimitsNode->AddChildText("", "Acceleration", "113140");
+    pDynamicLimitsAccelerationNode->AddAttribute("", "Unit", "rad/s^2");
+    auto pDynamicLimitsJerkNode = pDynamicLimitsNode->AddChildText("", "Jerk", "4000000000");
+    pDynamicLimitsJerkNode->AddAttribute("", "Unit", "rad/s^3");
+
+    auto pCalculationDynamicsNode = pScanDeviceConfigNode->AddChild("", "CalculationDynamics");
+    auto pMarkDynamicsNode = pCalculationDynamicsNode->AddChild("", "MarkDynamics");
+    auto pMarkDynamicsAccelerationNode = pMarkDynamicsNode->AddChildText("", "Acceleration", "113140");
+    pMarkDynamicsAccelerationNode->AddAttribute("", "Unit", "rad/s^2");
+    auto pMarkDynamicsJerkNode = pMarkDynamicsNode->AddChildText("", "Jerk", "4000000000");
+    pMarkDynamicsJerkNode->AddAttribute("", "Unit", "rad/s^3");
+
+    auto pJumpDynamicsNode = pCalculationDynamicsNode->AddChild("", "JumpDynamics");
+    auto pJumpDynamicsAccelerationNode = pJumpDynamicsNode->AddChildText("", "Acceleration", "113140");
+    pJumpDynamicsAccelerationNode->AddAttribute("", "Unit", "rad/s^2");
+    auto pJumpDynamicsJerkNode = pJumpDynamicsNode->AddChildText("", "Jerk", "4000000000");
+    pJumpDynamicsJerkNode->AddAttribute("", "Unit", "rad/s^3");
+
+
+    auto pFieldLimitsNode = pScanDeviceConfigNode->AddChild("", "FieldLimits");
+    auto pXDirectionNode = pFieldLimitsNode->AddChild("", "XDirection");
+    pXDirectionNode->AddAttribute("", "Unit", "mm");
+    pXDirectionNode->AddAttribute("", "Max", "27");
+    pXDirectionNode->AddAttribute("", "Min", "-27");
+
+    auto pYDirectionNode = pFieldLimitsNode->AddChild("", "YDirection");
+    pYDirectionNode->AddAttribute("", "Unit", "mm");
+    pYDirectionNode->AddAttribute("", "Max", "27");
+    pYDirectionNode->AddAttribute("", "Min", "-27");
+
+    pScanDeviceConfigNode->AddChildText("", "MonitoringLevel", "Position");
+    auto pFocalLengthNode = pScanDeviceConfigNode->AddChildText("", "FocalLength", "100");
+    pFocalLengthNode->AddAttribute("", "Unit", "mm");
+
+    auto pDelayNode = pScanDeviceConfigNode->AddChildText("", "Delay", "0.00125");
+    pDelayNode->AddAttribute("", "Unit", "s");
+
+    auto pScanDeviceListNode = pScanDeviceConfigNode->AddChild("", "ScanDeviceList");
+
+    pScanDeviceConfigNode->AddChildText("", "DefaultCorrectionFile", "0");
+
+    auto pLaserConfigNode = pConfigurationNode->AddChild("", "LaserConfig");
+    pLaserConfigNode->AddChildText("", "LaserMode", "5");
+
+    auto pIOConfigNode = pConfigurationNode->AddChild("", "IOConfig");
+
+    auto pTrajectoryConfigNode = pConfigurationNode->AddChild("", "TrajectoryConfig");
+    auto pTrajectoryMarkConfigNode = pTrajectoryConfigNode->AddChild("", "MarkConfig");
+    pTrajectoryMarkConfigNode->AddAttribute("", "VelocityUnit", "mm/s");
+
+    auto pTrajectoryJumpSpeedNode = pTrajectoryMarkConfigNode->AddChildText("", "JumpSpeed", "400");
+    pTrajectoryJumpSpeedNode->AddAttribute("", "Unit", "mm/s");
+
+    auto pTrajectoryMarkSpeedNode = pTrajectoryMarkConfigNode->AddChildText("", "MarkSpeed", "400");
+    pTrajectoryMarkSpeedNode->AddAttribute("", "Unit", "mm/s");
+
+    auto pTrajectoryMinimalMarkSpeedNode = pTrajectoryMarkConfigNode->AddChildText("", "MinimalMarkSpeed", "50");
+    pTrajectoryMinimalMarkSpeedNode->AddAttribute("", "Unit", "mm/s");
+
+    auto pTrajectoryLaserSwitchConfigNode = pTrajectoryMarkConfigNode->AddChild("", "LaserSwitchConfig");
+    pTrajectoryLaserSwitchConfigNode->AddAttribute("", "Unit", "s");
+
+    auto pLaserPreTriggerTimeNode = pTrajectoryLaserSwitchConfigNode->AddChildText("", "LaserPreTriggerTime", "0");
+    pLaserPreTriggerTimeNode->AddAttribute("", "Unit", "s");
+    auto pLaserSwitchOffsetTimeNode = pTrajectoryLaserSwitchConfigNode->AddChildText("", "LaserSwitchOffsetTime", "-2E-05");
+    pLaserSwitchOffsetTimeNode->AddAttribute("", "Unit", "s");
+    auto pLaserMinOffTimeNode = pTrajectoryLaserSwitchConfigNode->AddChildText("", "LaserMinOffTime", "1.5625E-08");
+    pLaserMinOffTimeNode->AddAttribute("", "Unit", "s");
+
+    auto pTrajectoryGeometryConfigNode = pTrajectoryConfigNode->AddChild("", "GeometryConfig");
+    auto pTrajectoryCornerToleranceNode = pTrajectoryGeometryConfigNode->AddChildText("", "CornerTolerance", "0.5");
+    pTrajectoryCornerToleranceNode->AddAttribute("", "Unit", "mm");
+
+    auto pTrajectoryLineToleranceNode = pTrajectoryGeometryConfigNode->AddChildText("", "LineTolerance", "0.5");
+    pTrajectoryLineToleranceNode->AddAttribute("", "Unit", "mm");
+
+    pTrajectoryGeometryConfigNode->AddChildText("", "BlendMode", "SwiftBlending");
+
+    std::string sXMLString = pXMLDocument->SaveToString (true);
+
+    //std::cout << sXMLString << std::endl;
+    
+    //m_pDriverEnvironment->Sleep(100000);
+
+    return sXMLString;
 }

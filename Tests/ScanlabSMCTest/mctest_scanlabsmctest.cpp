@@ -92,8 +92,15 @@ public:
 
 		auto pConfiguration = pDriver->CreateEmptyConfiguration();
 
+		pConfiguration->SetDynamicViolationReaction(LibMCDriver_ScanLabSMC::eDynamicViolationReaction::StopAndReport);
+
 
 		auto pContext = pDriver->CreateContext("smccontext", pConfiguration);
+
+		pContext->BeginJob (0.0, 0.0, LibMCDriver_ScanLabSMC::eBlendMode::MaxAccuracy);
+
+
+
 
 		pStateEnvironment->SetNextState("success");
 	}
