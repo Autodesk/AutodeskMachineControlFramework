@@ -1833,3 +1833,52 @@ LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_createdriver(const char * pN
 }
 
 
+#ifdef _MSC_VER
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_configure")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_getname")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_gettype")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_getversion")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_queryparametersex")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_getversion")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_getlasterror")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_releaseinstance")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_acquireinstance")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_injectcomponent")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_createdriver")
+#pragma comment(linker, "/export:libmcdriver_scanlabsmc_getsymbollookupmethod")
+
+#pragma comment(linker, "/export:libmcdriver_driver_configure=libmcdriver_scanlabsmc_driver_configure")
+#pragma comment(linker, "/export:libmcdriver_driver_getname=libmcdriver_scanlabsmc_driver_getname")
+#pragma comment(linker, "/export:libmcdriver_driver_gettype=libmcdriver_scanlabsmc_driver_gettype")
+#pragma comment(linker, "/export:libmcdriver_driver_getversion=libmcdriver_scanlabsmc_driver_getversion")
+#pragma comment(linker, "/export:libmcdriver_driver_queryparametersex=libmcdriver_scanlabsmc_driver_queryparametersex")
+#pragma comment(linker, "/export:libmcdriver_getversion=libmcdriver_scanlabsmc_getversion")
+#pragma comment(linker, "/export:libmcdriver_getlasterror=libmcdriver_scanlabsmc_getlasterror")
+#pragma comment(linker, "/export:libmcdriver_releaseinstance=libmcdriver_scanlabsmc_releaseinstance")
+#pragma comment(linker, "/export:libmcdriver_acquireinstance=libmcdriver_scanlabsmc_acquireinstance")
+#pragma comment(linker, "/export:libmcdriver_injectcomponent=libmcdriver_scanlabsmc_injectcomponent")
+#pragma comment(linker, "/export:libmcdriver_createdriver=libmcdriver_scanlabsmc_createdriver")
+#pragma comment(linker, "/export:libmcdriver_getsymbollookupmethod=libmcdriver_scanlabsmc_getsymbollookupmethod")
+
+#endif
+
+#ifdef __GNUC__
+
+extern "C" {
+
+	LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_driver_configure(LibMCDriver_ScanLabSMC_Driver pDriver, const char* pConfigurationString) __attribute__((alias("libmcdriver_scanlabsmc_driver_configure")));
+
+	/*void libmcdriver_driver_getname(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getname")));
+	void libmcdriver_driver_gettype(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_gettype")));
+	void libmcdriver_driver_getversion(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_getversion")));
+	void libmcdriver_driver_queryparametersex(void) __attribute__((alias("libmcdriver_scanlabsmc_driver_queryparametersex")));
+	void libmcdriver_getversion(void) __attribute__((alias("libmcdriver_scanlabsmc_getversion")));
+	void libmcdriver_getlasterror(void) __attribute__((alias("libmcdriver_scanlabsmc_getlasterror")));
+	void libmcdriver_releaseinstance(void) __attribute__((alias("libmcdriver_scanlabsmc_releaseinstance")));
+	void libmcdriver_acquireinstance(void) __attribute__((alias("libmcdriver_scanlabsmc_acquireinstance")));
+	void libmcdriver_injectcomponent(void) __attribute__((alias("libmcdriver_scanlabsmc_injectcomponent")));
+	void libmcdriver_createdriver(void) __attribute__((alias("libmcdriver_scanlabsmc_createdriver")));
+	void libmcdriver_getsymbollookupmethod(void) __attribute__((alias("libmcdriver_scanlabsmc_getsymbollookupmethod"))); */
+}
+
+#endif
