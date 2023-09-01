@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <mutex>
 
 #ifdef _WIN32
 
@@ -205,6 +206,7 @@ namespace LibMCDriver_ScanLab {
 		private:
 			std::map<std::string, uint32_t> m_DefinedVariables;
 			std::ofstream m_CStream;
+			std::mutex m_Mutex;
 
 			void writeCLine(const std::string & sLine);
 

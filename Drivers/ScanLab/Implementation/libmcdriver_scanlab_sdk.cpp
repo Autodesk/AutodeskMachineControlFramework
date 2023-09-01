@@ -72,9 +72,10 @@ void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName, bool bMandat
 #endif
 
 
-CScanLabSDKJournal::CScanLabSDKJournal(const std::string& sDebugFileName)
-	
+CScanLabSDKJournal::CScanLabSDKJournal(const std::string& sDebugFileName)	
 {
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
 	m_CStream.open(sDebugFileName, std::ios::out);
 	if (!m_CStream.is_open())
 		throw std::runtime_error("could not create sdk debug log: " + sDebugFileName);
@@ -86,6 +87,7 @@ CScanLabSDKJournal::~CScanLabSDKJournal()
 
 void CScanLabSDKJournal::writeCLine(const std::string& sLine)
 {
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	m_CStream << sLine << std::endl;
 
 }
