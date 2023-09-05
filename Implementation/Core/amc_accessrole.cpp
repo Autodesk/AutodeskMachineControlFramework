@@ -90,8 +90,6 @@ namespace AMC {
 
 	void CAccessRole::addPermission(PAccessPermission pPermission)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-
 		if (pPermission.get() == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, "CAccessRole::addPermission");
 		
@@ -99,8 +97,11 @@ namespace AMC {
 		if (hasPermission (sIdentifier))
 			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEROLEPERMISSION, sIdentifier);
 
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		m_Permissions.insert(std::make_pair (sIdentifier, pPermission));
+			m_Permissions.insert(std::make_pair(sIdentifier, pPermission));
+		}
 	}
 
 	void CAccessRole::removePermission(const std::string& sPermissionIdentifier)

@@ -86,7 +86,6 @@ namespace AMC {
 
 	PAccessPermission CAccessControl::findPermission(const std::string& sIdentifier, bool bMustExist)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		auto iIter = m_Permissions.find(sIdentifier);
 		if (iIter == m_Permissions.end()) {
 			if (bMustExist)
@@ -100,7 +99,6 @@ namespace AMC {
 
 	PAccessRole CAccessControl::findRole(const std::string& sIdentifier, bool bMustExist)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		auto iIter = m_Roles.find(sIdentifier);
 		if (iIter == m_Roles.end()) {
 			if (bMustExist)
@@ -114,14 +112,12 @@ namespace AMC {
 
 	bool CAccessControl::hasPermission(const std::string& sIdentifier)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		auto iIter = m_Permissions.find(sIdentifier);
 		return iIter != m_Permissions.end();
 	}
 
 	bool CAccessControl::hasRole(const std::string& sIdentifier)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		auto iIter = m_Roles.find(sIdentifier);
 		return iIter != m_Roles.end();
 

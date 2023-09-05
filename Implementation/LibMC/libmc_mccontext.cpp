@@ -646,17 +646,17 @@ void CMCContext::loadAccessControl(const pugi::xml_node& xmlNode)
         auto pRole = accessControl->addRole(identifierAttrib.as_string(), displaynameAttrib, descriptionAttrib);
 
         auto rolePermissionsNodes = roleNode.children("permission");
-        if (rolePermissionsNodes.empty ())
-            throw ELibMCCustomException(LIBMC_ERROR_MISSINGACCESSCONTROLROLEPERMISSIONS, pRole->getIdentifier ());
+        if (!rolePermissionsNodes.empty()) {
 
-        for (auto rolePermissionNode : rolePermissionsNodes) {
-            auto rolePermissionIdentifier = rolePermissionNode.attribute("identifier");
+            for (auto rolePermissionNode : rolePermissionsNodes) {
+                auto rolePermissionIdentifier = rolePermissionNode.attribute("identifier");
 
-            if (rolePermissionIdentifier.empty())
-                throw ELibMCCustomException(LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER, pRole->getIdentifier());
+                if (rolePermissionIdentifier.empty())
+                    throw ELibMCCustomException(LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER, pRole->getIdentifier());
 
-            auto pPermission = accessControl->findPermission(rolePermissionIdentifier.as_string (), true);
-            pRole->addPermission(pPermission);
+                auto pPermission = accessControl->findPermission(rolePermissionIdentifier.as_string(), true);
+                pRole->addPermission(pPermission);
+            }
         }
     }
 
