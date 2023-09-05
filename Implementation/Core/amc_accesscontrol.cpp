@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_accesscontrol.hpp"
+#include "amc_accessrole.hpp"
 
 #include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
@@ -37,7 +38,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 namespace AMC {
-	
+
+
+	CAccessControl::CAccessControl()
+	{
+
+	}
+
+	CAccessControl::~CAccessControl()
+	{
+
+	}
+
+	PAccessPermission CAccessControl::addPermission(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (hasPermission(sIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPERMISSIONIDENTIFIER, sIdentifier);
+
+		auto pResult = std::make_shared<CAccessPermission>(sIdentifier, rDisplayName, rDescription);
+		m_Permissions.insert(std::make_pair (pResult->getIdentifier (), pResult));
+
+		return pResult;
+	}
+
+	PAccessRole CAccessControl::addRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (hasRole(sIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEROLEIDENTIFIER, sIdentifier);
+
+		auto pResult = std::make_shared<CAccessRole>(sIdentifier, rDisplayName, rDescription);
+		m_Roles.insert(std::make_pair(pResult->getIdentifier(), pResult));
+
+		return pResult;
+
+	}
+
+	PAccessPermission CAccessControl::findPermission(const std::string& sIdentifier, bool bMustExist)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_Permissions.find(sIdentifier);
+		if (iIter == m_Permissions.end()) {
+			if (bMustExist)
+				throw ELibMCCustomException(LIBMC_ERROR_PERMISSIONNOTFOUND, sIdentifier);
+			return nullptr;
+		}
+
+		return iIter->second;
+
+	}
+
+	PAccessRole CAccessControl::findRole(const std::string& sIdentifier, bool bMustExist)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_Roles.find(sIdentifier);
+		if (iIter == m_Roles.end()) {
+			if (bMustExist)
+				throw ELibMCCustomException(LIBMC_ERROR_ROLENOTFOUND, sIdentifier);
+			return nullptr;
+		}
+
+		return iIter->second;
+
+	}
+
+	bool CAccessControl::hasPermission(const std::string& sIdentifier)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_Permissions.find(sIdentifier);
+		return iIter != m_Permissions.end();
+	}
+
+	bool CAccessControl::hasRole(const std::string& sIdentifier)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_Roles.find(sIdentifier);
+		return iIter != m_Roles.end();
+
+	}
+
+	void CAccessControl::setDefaultRole(const std::string& sIdentifier)
+	{
+		m_pDefaultRole = findRole(sIdentifier, true);
+	}
+
 
 }
 

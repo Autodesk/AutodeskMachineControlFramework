@@ -32,12 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_ACCESSPERMISSION
 #define __AMC_ACCESSPERMISSION
 
-#include <memory>
-#include <string>
-#include <map>
-#include <list>
-#include <thread>
-#include <mutex>
+#include "amc_stringresource.hpp"
 
 namespace AMC {
 
@@ -47,12 +42,25 @@ namespace AMC {
 	class CAccessPermission {
 	private:
 
+		std::string m_sIdentifier;
+		CStringResource m_DisplayName;
+		CStringResource m_Description;
+
 	public:
 
-		CAccessPermission ();
+		CAccessPermission (const std::string & sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription);
 		
 		virtual ~CAccessPermission();
 
+		std::string getIdentifier ();
+
+		CStringResource getDescription();
+
+		std::string getDescriptionString(StringLanguageID languageID);
+
+		CStringResource getDisplayName();
+
+		std::string getDisplayNameString(StringLanguageID languageID);
 
 	};
 

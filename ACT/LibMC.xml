@@ -530,12 +530,29 @@
 		<error name="INVALIDTIMESTAMPINTERVAL" code="504" description="Invalid time stamp interval." />
 		<error name="TIMESTREAMISEMPTY" code="505" description="Time stream is empty." />
 		<error name="INVALIDTOOLPATHATTRIBUTETYPE" code="506" description="Invalid toolpath attribute type." />
-		<error name="INVALIDSEGMENTINDEX" code="507" description="Invalid segment index." />
-		
+		<error name="INVALIDSEGMENTINDEX" code="507" description="Invalid segment index." />		
 		<error name="INVALIDTOOLPATHATTRIBUTEID" code="508" description="Invalid toolpath attribute ID." />
 		<error name="AMBIGUOUSSEGMENTATTRIBUTETYPE" code="509" description="Ambiguous segment attribute type." />
 		<error name="XMLNODEHASCHILDREN" code="510" description="XML Node has children"/>
 		<error name="XMLNODEHASTEXTCONTENT" code="511" description="XML Node has text content"/>
+		<error name="STRINGHANDLERNOTAVAILABLE" code="512" description="String handler not available"/>
+		<error name="DUPLICATEROLEPERMISSION" code="513" description="Duplicate role permission"/>
+		<error name="EMPTYACCESSROLEIDENTIFIER" code="514" description="Empty access role identifier"/>
+		<error name="INVALIDACCESSROLEIDENTIFIER" code="515" description="Invalid access role identifier"/>
+		<error name="EMPTYACCESSROLEDISPLAYNAME" code="516" description="Empty access role display name"/>
+		<error name="EMPTYACCESSPERMISSIONIDENTIFIER" code="517" description="Empty access permission identifier"/>
+		<error name="INVALIDACCESSPERMISSIONIDENTIFIER" code="518" description="Invalid access permission identifier"/>
+		<error name="EMPTYACCESSPERMISSIONDISPLAYNAME" code="519" description="Empty access permission display name"/>
+		<error name="EMPTYSTRINGRESOURCENAME" code="520" description="Empty string resource name"/>
+		<error name="DUPLICATESTRINGRESOURCENAME" code="521" description="Duplicate string resource name"/>
+		<error name="INVALIDSTRINGRESOURCENAMEIDENTIFIER" code="522" description="Invalid string resource name identifier"/>
+		<error name="STRINGRESOURCENOTFOUND" code="523" description="String resource not found"/>
+		<error name="LANGUAGEIDNOTFOUND" code="524" description="Language ID not found"/>
+		<error name="DUPLICATEPERMISSIONIDENTIFIER" code="525" description="Duplicate Permission Identifier"/>
+		<error name="DUPLICATEROLEIDENTIFIER" code="526" description="Duplicate Role Identifier"/>
+		<error name="PERMISSIONNOTFOUND" code="527" description="Permission not found"/>
+		<error name="ROLENOTFOUND" code="528" description="Role not found"/>
+		
 		
 	</errors>
 	

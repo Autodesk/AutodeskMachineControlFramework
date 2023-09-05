@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,61 +29,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_ACCESSROLE
-#define __AMC_ACCESSROLE
+#include "amc_stringresourcetable.hpp"
 
-#include "amc_accesspermission.hpp"
+#include "common_utils.hpp"
+#include "libmc_exceptiontypes.hpp"
 
-#include <mutex>
-#include <map>
-#include <vector>
 
 namespace AMC {
-
-	class CAccessRole;
-	typedef std::shared_ptr<CAccessRole> PAccessRole;
-
-
-	class CAccessRole {
-	private:
-
-		std::string m_sIdentifier;
-		CStringResource m_DisplayName;
-		CStringResource m_Description;
-
-		std::mutex m_Mutex;
-
-		std::map<std::string, PAccessPermission> m_Permissions;
-
-	public:
-
-		CAccessRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription);
-		
-		virtual ~CAccessRole();
-
-		std::string getIdentifier ();
-
-		CStringResource getDisplayName();
-
-		std::string getDisplayNameString(StringLanguageID languageID);
-
-		CStringResource getDescription ();
-
-		std::string getDescriptionString(StringLanguageID languageID);
-
-		bool hasPermission (const std::string & sPermissionIdentifier);
-
-		void addPermission (PAccessPermission pPermission);
-
-		void removePermission (const std::string& sPermissionIdentifier);
-
-		std::vector<CAccessPermission*> getPermissions();
-
-	};
-
 	
+	CStringResourceTable::CStringResourceTable ()
+	{
+	}
+			
+	CStringResourceTable::~CStringResourceTable ()
+	{
+	}
+			
+	void CStringResourceTable::registerString (uint64_t nResourceID, const std::string & sStringValue)
+	{
+		m_Entries.insert(std::make_pair (nResourceID, sStringValue));
+	}
+			
+	bool CStringResourceTable::getEntry(uint64_t nResourceID, std::string& sString)
+	{
+		auto iIterator = m_Entries.find(nResourceID);
+		if (iIterator == m_Entries.end())
+			return false;
+
+		sString = iIterator->second;
+		return true;
+	}
+
 }
 
-
-#endif //__AMC_ACCESSROLE
 

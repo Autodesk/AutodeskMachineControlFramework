@@ -72,6 +72,12 @@ namespace AMCData {
 				break;
 			}
 
+			case 3: {
+				std::string sStreamsQuery = "ALTER TABLE `users` (";
+				sStreamsQuery += "ADD `role` varchar ( 256 ))";
+				pTransaction->executeStatement(sStreamsQuery);
+			}
+
 		}
 	}
 

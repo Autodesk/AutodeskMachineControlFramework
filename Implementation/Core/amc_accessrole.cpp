@@ -38,6 +38,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+	CAccessRole::CAccessRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
+		: m_sIdentifier (sIdentifier), m_DisplayName (rDisplayName), m_Description (rDescription)
+	{
+		if (sIdentifier.empty())
+			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYACCESSROLEIDENTIFIER);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDACCESSROLEIDENTIFIER, sIdentifier);
+
+
+	}
+
+	CAccessRole::~CAccessRole()
+	{
+
+	}
+
+	std::string CAccessRole::getIdentifier()
+	{
+		return m_sIdentifier;
+	}
+
+	CStringResource CAccessRole::getDisplayName()
+	{
+		return m_DisplayName;
+	}
+
+	std::string CAccessRole::getDisplayNameString(StringLanguageID languageID)
+	{
+		return m_DisplayName.get(languageID);
+	}
+
+	CStringResource CAccessRole::getDescription()
+	{
+		return m_Description;
+	}
+
+	std::string CAccessRole::getDescriptionString(StringLanguageID languageID)
+	{
+		return m_Description.get (languageID);
+	}
+
+	bool CAccessRole::hasPermission(const std::string& sPermissionIdentifier)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto iIter = m_Permissions.find(sPermissionIdentifier);
+		return iIter != m_Permissions.end();
+	}
+
+	void CAccessRole::addPermission(PAccessPermission pPermission)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (pPermission.get() == nullptr)
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, "CAccessRole::addPermission");
+		
+		std::string sIdentifier = pPermission->getIdentifier ();
+		if (hasPermission (sIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEROLEPERMISSION, sIdentifier);
+
+
+		m_Permissions.insert(std::make_pair (sIdentifier, pPermission));
+	}
+
+	void CAccessRole::removePermission(const std::string& sPermissionIdentifier)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		m_Permissions.erase(sPermissionIdentifier);
+	}
+
+	std::vector<CAccessPermission*> CAccessRole::getPermissions()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		std::vector<CAccessPermission*> resultVector;
+		for (auto iIter : m_Permissions)
+			resultVector.push_back(iIter.second.get());
+
+		return resultVector;
+	}
 
 }
 

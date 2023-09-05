@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,55 +29,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_ACCESSROLE
-#define __AMC_ACCESSROLE
+#ifndef __AMC_STRINGRESOURCEHANDLER
+#define __AMC_STRINGRESOURCEHANDLER
 
-#include "amc_accesspermission.hpp"
-
+#include "amc_stringresource.hpp"
+#include "amc_stringresourcetable.hpp"
 #include <mutex>
-#include <map>
-#include <vector>
 
 namespace AMC {
 
-	class CAccessRole;
-	typedef std::shared_ptr<CAccessRole> PAccessRole;
 
+	// https://en.cppreference.com/w/cpp/memory/enable_shared_from_this
 
-	class CAccessRole {
+	class CStringResourceHandler : public std::enable_shared_from_this<CStringResourceHandler>{
 	private:
+	
+		WStringResourceHandler m_pStringResourceHandler;
+		uint64_t m_nIDCounter;
 
-		std::string m_sIdentifier;
-		CStringResource m_DisplayName;
-		CStringResource m_Description;
+		PStringResourceTable m_pDefaultResourceTable;
+		std::map<StringLanguageID, PStringResourceTable> m_pLanguageResourceTables;
+
+		std::map<StringResourceID, std::string> m_ResourceIDMap;
+		std::map<std::string, StringResourceID> m_ResourceNameMap;
 
 		std::mutex m_Mutex;
-
-		std::map<std::string, PAccessPermission> m_Permissions;
-
+	
 	public:
 
-		CAccessRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription);
+		CStringResourceHandler ();
 		
-		virtual ~CAccessRole();
+		virtual ~CStringResourceHandler();
+		
+		CStringResource registerString (const std::string & sResourceName, const std::string & sDefaultValue);
 
-		std::string getIdentifier ();
-
-		CStringResource getDisplayName();
-
-		std::string getDisplayNameString(StringLanguageID languageID);
-
-		CStringResource getDescription ();
-
-		std::string getDescriptionString(StringLanguageID languageID);
-
-		bool hasPermission (const std::string & sPermissionIdentifier);
-
-		void addPermission (PAccessPermission pPermission);
-
-		void removePermission (const std::string& sPermissionIdentifier);
-
-		std::vector<CAccessPermission*> getPermissions();
+		std::string retrieveStringValue (const StringLanguageID nLanguageID, const StringResourceID nResourceID);
 
 	};
 
@@ -85,5 +71,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_ACCESSROLE
+#endif //__AMC_STRINGRESOURCEHANDLER
 

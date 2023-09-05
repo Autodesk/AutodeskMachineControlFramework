@@ -526,6 +526,23 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE 509 /** Ambiguous segment attribute type. */
 #define LIBMC_ERROR_XMLNODEHASCHILDREN 510 /** XML Node has children */
 #define LIBMC_ERROR_XMLNODEHASTEXTCONTENT 511 /** XML Node has text content */
+#define LIBMC_ERROR_STRINGHANDLERNOTAVAILABLE 512 /** String handler not available */
+#define LIBMC_ERROR_DUPLICATEROLEPERMISSION 513 /** Duplicate role permission */
+#define LIBMC_ERROR_EMPTYACCESSROLEIDENTIFIER 514 /** Empty access role identifier */
+#define LIBMC_ERROR_INVALIDACCESSROLEIDENTIFIER 515 /** Invalid access role identifier */
+#define LIBMC_ERROR_EMPTYACCESSROLEDISPLAYNAME 516 /** Empty access role display name */
+#define LIBMC_ERROR_EMPTYACCESSPERMISSIONIDENTIFIER 517 /** Empty access permission identifier */
+#define LIBMC_ERROR_INVALIDACCESSPERMISSIONIDENTIFIER 518 /** Invalid access permission identifier */
+#define LIBMC_ERROR_EMPTYACCESSPERMISSIONDISPLAYNAME 519 /** Empty access permission display name */
+#define LIBMC_ERROR_EMPTYSTRINGRESOURCENAME 520 /** Empty string resource name */
+#define LIBMC_ERROR_DUPLICATESTRINGRESOURCENAME 521 /** Duplicate string resource name */
+#define LIBMC_ERROR_INVALIDSTRINGRESOURCENAMEIDENTIFIER 522 /** Invalid string resource name identifier */
+#define LIBMC_ERROR_STRINGRESOURCENOTFOUND 523 /** String resource not found */
+#define LIBMC_ERROR_LANGUAGEIDNOTFOUND 524 /** Language ID not found */
+#define LIBMC_ERROR_DUPLICATEPERMISSIONIDENTIFIER 525 /** Duplicate Permission Identifier */
+#define LIBMC_ERROR_DUPLICATEROLEIDENTIFIER 526 /** Duplicate Role Identifier */
+#define LIBMC_ERROR_PERMISSIONNOTFOUND 527 /** Permission not found */
+#define LIBMC_ERROR_ROLENOTFOUND 528 /** Role not found */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -964,6 +981,23 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE: return "Ambiguous segment attribute type.";
     case LIBMC_ERROR_XMLNODEHASCHILDREN: return "XML Node has children";
     case LIBMC_ERROR_XMLNODEHASTEXTCONTENT: return "XML Node has text content";
+    case LIBMC_ERROR_STRINGHANDLERNOTAVAILABLE: return "String handler not available";
+    case LIBMC_ERROR_DUPLICATEROLEPERMISSION: return "Duplicate role permission";
+    case LIBMC_ERROR_EMPTYACCESSROLEIDENTIFIER: return "Empty access role identifier";
+    case LIBMC_ERROR_INVALIDACCESSROLEIDENTIFIER: return "Invalid access role identifier";
+    case LIBMC_ERROR_EMPTYACCESSROLEDISPLAYNAME: return "Empty access role display name";
+    case LIBMC_ERROR_EMPTYACCESSPERMISSIONIDENTIFIER: return "Empty access permission identifier";
+    case LIBMC_ERROR_INVALIDACCESSPERMISSIONIDENTIFIER: return "Invalid access permission identifier";
+    case LIBMC_ERROR_EMPTYACCESSPERMISSIONDISPLAYNAME: return "Empty access permission display name";
+    case LIBMC_ERROR_EMPTYSTRINGRESOURCENAME: return "Empty string resource name";
+    case LIBMC_ERROR_DUPLICATESTRINGRESOURCENAME: return "Duplicate string resource name";
+    case LIBMC_ERROR_INVALIDSTRINGRESOURCENAMEIDENTIFIER: return "Invalid string resource name identifier";
+    case LIBMC_ERROR_STRINGRESOURCENOTFOUND: return "String resource not found";
+    case LIBMC_ERROR_LANGUAGEIDNOTFOUND: return "Language ID not found";
+    case LIBMC_ERROR_DUPLICATEPERMISSIONIDENTIFIER: return "Duplicate Permission Identifier";
+    case LIBMC_ERROR_DUPLICATEROLEIDENTIFIER: return "Duplicate Role Identifier";
+    case LIBMC_ERROR_PERMISSIONNOTFOUND: return "Permission not found";
+    case LIBMC_ERROR_ROLENOTFOUND: return "Role not found";
     default: return "unknown error";
   }
 }

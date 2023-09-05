@@ -47,6 +47,8 @@ namespace AMC {
 	
 		std::map<std::string, PAccessPermission> m_Permissions;
 		std::map<std::string, PAccessRole> m_Roles;
+
+		std::mutex m_Mutex;
 		
 		PAccessRole m_pDefaultRole;
 
@@ -56,17 +58,19 @@ namespace AMC {
 		
 		virtual ~CAccessControl();
 
-		PAccessPermission addPermission (const std::string & sIdentifier, const std::string & sDescription);
+		PAccessPermission addPermission (const std::string & sIdentifier, const CStringResource & rDisplayName, const CStringResource & rDescription);
 		
-		PAccessRole addRole (const std::string & sName, const std::string & sDescription);
+		PAccessRole addRole (const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription);
 		
-		PAccessPermission findPermission (const std::string & sIdentifier);
+		PAccessPermission findPermission (const std::string & sIdentifier, bool bMustExist);
 		
-		PAccessRole findRole (const std::string & sName);
+		PAccessRole findRole (const std::string & sIdentifier, bool bMustExist);
 
 		bool hasPermission (const std::string & sIdentifier);
 		
-		bool hasRole (const std::string & sName);
+		bool hasRole (const std::string & sIdentifier);
+
+		void setDefaultRole (const std::string& sIdentifier);
 
 	};
 

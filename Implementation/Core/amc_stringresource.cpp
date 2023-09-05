@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,61 +29,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_ACCESSROLE
-#define __AMC_ACCESSROLE
+#include "amc_stringresource.hpp"
+#include "amc_stringresourcehandler.hpp"
 
-#include "amc_accesspermission.hpp"
+#include "common_utils.hpp"
+#include "libmc_exceptiontypes.hpp"
 
-#include <mutex>
-#include <map>
-#include <vector>
 
 namespace AMC {
-
-	class CAccessRole;
-	typedef std::shared_ptr<CAccessRole> PAccessRole;
-
-
-	class CAccessRole {
-	private:
-
-		std::string m_sIdentifier;
-		CStringResource m_DisplayName;
-		CStringResource m_Description;
-
-		std::mutex m_Mutex;
-
-		std::map<std::string, PAccessPermission> m_Permissions;
-
-	public:
-
-		CAccessRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription);
-		
-		virtual ~CAccessRole();
-
-		std::string getIdentifier ();
-
-		CStringResource getDisplayName();
-
-		std::string getDisplayNameString(StringLanguageID languageID);
-
-		CStringResource getDescription ();
-
-		std::string getDescriptionString(StringLanguageID languageID);
-
-		bool hasPermission (const std::string & sPermissionIdentifier);
-
-		void addPermission (PAccessPermission pPermission);
-
-		void removePermission (const std::string& sPermissionIdentifier);
-
-		std::vector<CAccessPermission*> getPermissions();
-
-	};
-
 	
+	CStringResource::CStringResource(WStringResourceHandler pStringResourceHandler, const StringResourceID nResourceID)
+		: m_pStringResourceHandler (pStringResourceHandler), m_nResourceID (nResourceID)
+	{
+	}
+
+	CStringResource::CStringResource(const std::string& sCustomString)
+		: m_nResourceID (0), m_sCustomString (sCustomString)
+	{
+
+	}
+
+
+	CStringResource::~CStringResource()
+	{
+
+	}
+
+	std::string CStringResource::get(StringLanguageID nLanguageID) const
+	{
+		if (m_nResourceID != 0) {
+			auto pHandler = m_pStringResourceHandler.lock();
+			if (pHandler.get() == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_STRINGHANDLERNOTAVAILABLE);
+
+			return pHandler->retrieveStringValue(nLanguageID, m_nResourceID);
+		}
+
+		return m_sCustomString;
+	}
+
+	bool CStringResource::empty(StringLanguageID nLanguageID) const
+	{
+		return get(nLanguageID).empty();
+	}
+
 }
 
-
-#endif //__AMC_ACCESSROLE
 
