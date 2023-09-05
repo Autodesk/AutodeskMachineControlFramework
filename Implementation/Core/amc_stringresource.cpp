@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
 
+#include "PugiXML/pugixml.hpp"
+
 
 namespace AMC {
 	
@@ -48,6 +50,19 @@ namespace AMC {
 	{
 
 	}
+
+	CStringResource::CStringResource(pugi::xml_node* pXMLNode, const std::string& sAttributeName)
+		: m_nResourceID(0)
+	{
+		if (pXMLNode == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM, "invalid param: pXMLNode");
+
+		auto attribute = pXMLNode->attribute (sAttributeName.c_str ());
+		if (!attribute.empty()) {
+			m_sCustomString = attribute.as_string();
+		}
+	}
+
 
 
 	CStringResource::~CStringResource()

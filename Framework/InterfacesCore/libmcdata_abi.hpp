@@ -830,7 +830,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertstringtobuil
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_LoginHandler pLoginHandler, const char * pUsername, bool * pUserExists);
 
 /**
-* Retrieves a users data.
+* Retrieves a users data. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.
 * @param[in] pUsername - User name
@@ -843,6 +843,30 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_L
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nSaltBufferSize, LibMCData_uint32* pSaltNeededChars, char * pSaltBuffer, const LibMCData_uint32 nHashedPasswordBufferSize, LibMCData_uint32* pHashedPasswordNeededChars, char * pHashedPasswordBuffer);
+
+/**
+* Retrieves a users role. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserrole(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nRoleBufferSize, LibMCData_uint32* pRoleNeededChars, char * pRoleBuffer);
+
+/**
+* Retrieves a users language preference. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of Language identifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserlanguage(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
 
 /*************************************************************************************************************************
  Class definition for PersistencyHandler

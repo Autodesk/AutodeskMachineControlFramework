@@ -552,6 +552,12 @@
 		<error name="DUPLICATEROLEIDENTIFIER" code="526" description="Duplicate Role Identifier"/>
 		<error name="PERMISSIONNOTFOUND" code="527" description="Permission not found"/>
 		<error name="ROLENOTFOUND" code="528" description="Role not found"/>
+		<error name="MISSINGACCESSCONTROLPERMISSIONS" code="529" description="Missing access control permissions"/>
+		<error name="MISSINGACCESSCONTROLROLES" code="530" description="Missing access control roles"/>
+		<error name="MISSINGACCESSCONTROLROLEPERMISSIONS" code="531" description="Missing access control role permissions"/>
+		<error name="MISSINGROLEPERMISSIONIDENTIFIER" code="532" description="Missing role permission identifier"/>
+				
+		
 		
 		
 	</errors>

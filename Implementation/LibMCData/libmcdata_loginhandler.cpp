@@ -47,14 +47,14 @@ CLoginHandler::CLoginHandler(AMCData::PSQLHandler pSQLHandler)
     : m_pSQLHandler (pSQLHandler)
 {
     if (pSQLHandler.get() == nullptr)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "invalid param: pSQLHandler");
 
 }
 
 
 bool CLoginHandler::UserExists(const std::string & sUsername)
 {
-    std::string sQuery = "SELECT uuid FROM users WHERE login=?";
+    std::string sQuery = "SELECT uuid FROM users WHERE login=? AND active=1";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sUsername);
     return pStatement->nextRow();
@@ -63,15 +63,43 @@ bool CLoginHandler::UserExists(const std::string & sUsername)
 
 void CLoginHandler::GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword)
 {
-    std::string sQuery = "SELECT salt, passwordhash FROM users WHERE login=?";
+    if (sUsername.empty ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+
+    std::string sQuery = "SELECT salt, passwordhash FROM users WHERE login=? AND active=1";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sUsername);
     if (!pStatement->nextRow ())
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND, "user not found: " + sUsername);
     
     sSalt = pStatement->getColumnString(1);
     sHashedPassword = pStatement->getColumnString(2);
 
     pStatement = nullptr;
+}
+
+std::string CLoginHandler::GetUserRole(const std::string& sUsername)
+{
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+
+    std::string sQuery = "SELECT role FROM users WHERE login=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUsername);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
+}
+
+std::string CLoginHandler::GetUserLanguage(const std::string& sUsername)
+{
+    std::string sQuery = "SELECT language FROM users WHERE login=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUsername);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
 }
 

@@ -877,12 +877,26 @@ public:
 	virtual bool UserExists(const std::string & sUsername) = 0;
 
 	/**
-	* ILoginHandler::GetUserDetails - Retrieves a users data.
+	* ILoginHandler::GetUserDetails - Retrieves a users data. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @param[out] sSalt - Salt of the user.
 	* @param[out] sHashedPassword - Hashed Password.
 	*/
 	virtual void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) = 0;
+
+	/**
+	* ILoginHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRole(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguage(const std::string & sUsername) = 0;
 
 };
 

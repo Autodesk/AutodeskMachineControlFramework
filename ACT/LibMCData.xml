@@ -331,6 +331,8 @@
 		<error name="COULDNOTFINDLOGENTRY" code="334" description="Could not find log entry" />			
 
 		<error name="NOLOGCALLBACK" code="335" description="No log callback" />			
+		<error name="EMPTYUSERNAME" code="336" description="Empty user name" />			
+		
 								
 	</errors>
 	
@@ -772,12 +774,22 @@
 			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
 		</method>
 	
-		<method name="GetUserDetails" description="Retrieves a users data.">
+		<method name="GetUserDetails" description="Retrieves a users data. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="Salt" type="string" pass="out" description="Salt of the user." />
 			<param name="HashedPassword" type="string" pass="out" description="Hashed Password." />
 		</method>
 	
+		<method name="GetUserRole" description="Retrieves a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserLanguage" description="Retrieves a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>
+		
 	</class>
 
 

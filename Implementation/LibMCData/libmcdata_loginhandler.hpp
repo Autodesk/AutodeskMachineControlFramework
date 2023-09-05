@@ -73,6 +73,10 @@ public:
 
 	void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) override;
 
+    std::string GetUserRole(const std::string& sUsername) override;
+
+    std::string GetUserLanguage(const std::string& sUsername) override;
+
 };
 
 } // namespace Impl

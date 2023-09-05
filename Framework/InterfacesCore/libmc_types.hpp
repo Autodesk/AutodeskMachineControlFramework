@@ -543,6 +543,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DUPLICATEROLEIDENTIFIER 526 /** Duplicate Role Identifier */
 #define LIBMC_ERROR_PERMISSIONNOTFOUND 527 /** Permission not found */
 #define LIBMC_ERROR_ROLENOTFOUND 528 /** Role not found */
+#define LIBMC_ERROR_MISSINGACCESSCONTROLPERMISSIONS 529 /** Missing access control permissions */
+#define LIBMC_ERROR_MISSINGACCESSCONTROLROLES 530 /** Missing access control roles */
+#define LIBMC_ERROR_MISSINGACCESSCONTROLROLEPERMISSIONS 531 /** Missing access control role permissions */
+#define LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER 532 /** Missing role permission identifier */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -998,6 +1002,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DUPLICATEROLEIDENTIFIER: return "Duplicate Role Identifier";
     case LIBMC_ERROR_PERMISSIONNOTFOUND: return "Permission not found";
     case LIBMC_ERROR_ROLENOTFOUND: return "Role not found";
+    case LIBMC_ERROR_MISSINGACCESSCONTROLPERMISSIONS: return "Missing access control permissions";
+    case LIBMC_ERROR_MISSINGACCESSCONTROLROLES: return "Missing access control roles";
+    case LIBMC_ERROR_MISSINGACCESSCONTROLROLEPERMISSIONS: return "Missing access control role permissions";
+    case LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER: return "Missing role permission identifier";
     default: return "unknown error";
   }
 }

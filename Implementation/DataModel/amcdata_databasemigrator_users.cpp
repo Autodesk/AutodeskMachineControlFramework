@@ -75,6 +75,8 @@ namespace AMCData {
 			case 3: {
 				std::string sRoleAddQuery = "ALTER TABLE `users` ADD `role` varchar ( 256 ) DEFAULT ``";
 				pTransaction->executeStatement(sRoleAddQuery);
+				std::string sLanguageAddQuery = "ALTER TABLE `users` ADD `language` varchar ( 256 ) DEFAULT ``";
+				pTransaction->executeStatement(sLanguageAddQuery);
 				std::string sActiveAddQuery = "ALTER TABLE `users` ADD `active` INTEGER DEFAULT 1";
 				pTransaction->executeStatement(sActiveAddQuery);
 			}

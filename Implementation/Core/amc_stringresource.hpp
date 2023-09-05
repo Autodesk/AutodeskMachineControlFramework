@@ -35,6 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 
+namespace pugi {
+	class xml_node;
+}
+
 namespace AMC {
 
 	class CStringResourceHandler;
@@ -55,6 +59,8 @@ namespace AMC {
 			CStringResource (WStringResourceHandler pStringResourceHandler, const StringResourceID nResourceID);
 			
 			CStringResource (const std::string & sCustomString);
+
+			CStringResource(pugi::xml_node* pXMLNode, const std::string& sAttributeName);
 
 			virtual ~CStringResource ();
 			

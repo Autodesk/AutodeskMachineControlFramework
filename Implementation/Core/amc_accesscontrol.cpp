@@ -122,7 +122,20 @@ namespace AMC {
 
 	void CAccessControl::setDefaultRole(const std::string& sIdentifier)
 	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		m_pDefaultRole = findRole(sIdentifier, true);
+	}
+
+	void CAccessControl::setToNoAccessControl()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		m_Permissions.clear();
+		m_Roles.clear();
+
+		auto pDefaultRole = std::make_shared<CAccessRole>("default", "Default Role", "");
+		m_Roles.insert(std::make_pair(pDefaultRole->getIdentifier(), pDefaultRole));
+
+		m_pDefaultRole = pDefaultRole;
 	}
 
 

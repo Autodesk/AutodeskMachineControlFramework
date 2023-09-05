@@ -72,6 +72,8 @@ namespace AMC {
 	class CUIHandler;
 	class CParameterHandler;
 	class CStateMachineData;
+	class CAccessControl;
+	class CStringResourceHandler;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -82,6 +84,8 @@ namespace AMC {
 	typedef std::shared_ptr<CStateJournal> PStateJournal;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
 	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
+	typedef std::shared_ptr<CAccessControl> PAccessControl;
+	typedef std::shared_ptr<CStringResourceHandler> PStringResourceHandler;
 
 	class CSystemState {
 	private:
@@ -93,6 +97,9 @@ namespace AMC {
 		AMC::PUIHandler m_pUIHandler;
 		AMC::PStateJournal m_pStateJournal;
 		AMC::PStateMachineData m_pStateMachineData;
+		AMC::PAccessControl m_pAccessControl;
+		AMC::PStringResourceHandler m_pStringResourceHandler;
+
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
@@ -121,6 +128,8 @@ namespace AMC {
 		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
 		CStateMachineData* stateMachineData();
+		AMC::CAccessControl * accessControl ();
+		AMC::CStringResourceHandler * stringResourceHandler ();
 
 		LibMCData::CStorage * storage();
 		LibMCData::CBuildJobHandler * buildJobHandler();

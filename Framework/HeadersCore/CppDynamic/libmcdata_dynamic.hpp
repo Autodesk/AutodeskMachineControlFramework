@@ -473,6 +473,7 @@ public:
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "DATATYPEMISMATCH";
 			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "COULDNOTFINDLOGENTRY";
 			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "NOLOGCALLBACK";
+			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "EMPTYUSERNAME";
 		}
 		return "UNKNOWN";
 	}
@@ -745,6 +746,7 @@ public:
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
 			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
 			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
+			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
 		}
 		return "unknown error";
 	}
@@ -1180,6 +1182,8 @@ public:
 	
 	inline bool UserExists(const std::string & sUsername);
 	inline void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword);
+	inline std::string GetUserRole(const std::string & sUsername);
+	inline std::string GetUserLanguage(const std::string & sUsername);
 };
 	
 /*************************************************************************************************************************
@@ -1408,6 +1412,8 @@ public:
 		pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus = nullptr;
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDetails = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserRole = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserLanguage = nullptr;
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = nullptr;
 		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = nullptr;
@@ -2123,6 +2129,24 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserRole = (PLibMCDataLoginHandler_GetUserRolePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserrole");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserRole = (PLibMCDataLoginHandler_GetUserRolePtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserRole == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserLanguage = (PLibMCDataLoginHandler_GetUserLanguagePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserLanguage = (PLibMCDataLoginHandler_GetUserLanguagePtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserLanguage == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
 		#else // _WIN32
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
@@ -2722,6 +2746,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserdetails", (void**)&(pWrapperTable->m_LoginHandler_GetUserDetails));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserDetails == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserrole", (void**)&(pWrapperTable->m_LoginHandler_GetUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserRole == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserlanguage", (void**)&(pWrapperTable->m_LoginHandler_GetUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserLanguage == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_persistencyhandler_haspersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_HasPersistentParameter));
@@ -3880,7 +3912,7 @@ public:
 	}
 	
 	/**
-	* CLoginHandler::GetUserDetails - Retrieves a users data.
+	* CLoginHandler::GetUserDetails - Retrieves a users data. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @param[out] sSalt - Salt of the user.
 	* @param[out] sHashedPassword - Hashed Password.
@@ -3897,6 +3929,38 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserDetails(m_pHandle, sUsername.c_str(), bytesNeededSalt, &bytesWrittenSalt, &bufferSalt[0], bytesNeededHashedPassword, &bytesWrittenHashedPassword, &bufferHashedPassword[0]));
 		sSalt = std::string(&bufferSalt[0]);
 		sHashedPassword = std::string(&bufferHashedPassword[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Role of the user.
+	*/
+	std::string CLoginHandler::GetUserRole(const std::string & sUsername)
+	{
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserRole(m_pHandle, sUsername.c_str(), 0, &bytesNeededRole, nullptr));
+		std::vector<char> bufferRole(bytesNeededRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserRole(m_pHandle, sUsername.c_str(), bytesNeededRole, &bytesWrittenRole, &bufferRole[0]));
+		
+		return std::string(&bufferRole[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Language identifier of the user.
+	*/
+	std::string CLoginHandler::GetUserLanguage(const std::string & sUsername)
+	{
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserLanguage(m_pHandle, sUsername.c_str(), 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserLanguage(m_pHandle, sUsername.c_str(), bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		
+		return std::string(&bufferLanguageIdentifier[0]);
 	}
 	
 	/**

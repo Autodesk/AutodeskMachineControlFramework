@@ -360,6 +360,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DATATYPEMISMATCH 333 /** Datatype mismatch */
 #define LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY 334 /** Could not find log entry */
 #define LIBMCDATA_ERROR_NOLOGCALLBACK 335 /** No log callback */
+#define LIBMCDATA_ERROR_EMPTYUSERNAME 336 /** Empty user name */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -632,6 +633,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
     case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
     case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
+    case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
     default: return "unknown error";
   }
 }
