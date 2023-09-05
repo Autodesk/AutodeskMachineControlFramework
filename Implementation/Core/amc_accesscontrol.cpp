@@ -52,26 +52,31 @@ namespace AMC {
 
 	PAccessPermission CAccessControl::addPermission(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 		if (hasPermission(sIdentifier))
 			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPERMISSIONIDENTIFIER, sIdentifier);
 
-		auto pResult = std::make_shared<CAccessPermission>(sIdentifier, rDisplayName, rDescription);
-		m_Permissions.insert(std::make_pair (pResult->getIdentifier (), pResult));
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+			auto pResult = std::make_shared<CAccessPermission>(sIdentifier, rDisplayName, rDescription);
+			m_Permissions.insert(std::make_pair(pResult->getIdentifier(), pResult));
+		}
 
 		return pResult;
 	}
 
 	PAccessRole CAccessControl::addRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-
 		if (hasRole(sIdentifier))
 			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEROLEIDENTIFIER, sIdentifier);
 
-		auto pResult = std::make_shared<CAccessRole>(sIdentifier, rDisplayName, rDescription);
-		m_Roles.insert(std::make_pair(pResult->getIdentifier(), pResult));
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+			auto pResult = std::make_shared<CAccessRole>(sIdentifier, rDisplayName, rDescription);
+			m_Roles.insert(std::make_pair(pResult->getIdentifier(), pResult));
+		}
 
 		return pResult;
 
@@ -122,8 +127,11 @@ namespace AMC {
 
 	void CAccessControl::setDefaultRole(const std::string& sIdentifier)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		m_pDefaultRole = findRole(sIdentifier, true);
+		PAccessRole pRole = findRole(sIdentifier, true);
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+			m_pDefaultRole = pRole;
+		}
 	}
 
 	void CAccessControl::setToNoAccessControl()
@@ -132,7 +140,10 @@ namespace AMC {
 		m_Permissions.clear();
 		m_Roles.clear();
 
-		auto pDefaultRole = std::make_shared<CAccessRole>("default", "Default Role", "");
+		CStringResource nameResource("Default Role");
+		CStringResource descriptionResource("");
+
+		auto pDefaultRole = std::make_shared<CAccessRole>("default", nameResource, descriptionResource);
 		m_Roles.insert(std::make_pair(pDefaultRole->getIdentifier(), pDefaultRole));
 
 		m_pDefaultRole = pDefaultRole;
