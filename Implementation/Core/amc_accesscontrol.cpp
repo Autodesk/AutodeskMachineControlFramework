@@ -61,9 +61,10 @@ namespace AMC {
 
 			auto pResult = std::make_shared<CAccessPermission>(sIdentifier, rDisplayName, rDescription);
 			m_Permissions.insert(std::make_pair(pResult->getIdentifier(), pResult));
+
+			return pResult;
 		}
 
-		return pResult;
 	}
 
 	PAccessRole CAccessControl::addRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
@@ -76,9 +77,10 @@ namespace AMC {
 
 			auto pResult = std::make_shared<CAccessRole>(sIdentifier, rDisplayName, rDescription);
 			m_Roles.insert(std::make_pair(pResult->getIdentifier(), pResult));
+
+			return pResult;
 		}
 
-		return pResult;
 
 	}
 
