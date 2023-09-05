@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02">
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02" xmlns:i18n="http://schemas.autodesk.com/amc/internationalization/2023/08">
 	<services threadcount="32"/>
+
+  <internationalization default="en">
+	<language identifier="en" name="English" resource="language_english" />
+	<language identifier="de" name="Deutsch" resource="language_german" />
+  </internationalization>
+
+  <accesscontrol>
+
+    <permissions>
+      <permission identifier="permission_view_builds" displayname="View Builds" description="Can view build files on machine." />
+      <permission identifier="permission_start_build" displayname="Start Build" description="Can start a new build on machine." />
+      <permission identifier="permission_user_management" displayname="User Management" description="Can create/edit local users." />
+    </permissions>
+    
+    
+    <roles default="operator">
+
+      <role identifier="observer" displayname="Observer" description="Machine Observer - can not change anything">
+        <permission identifier="permission_view_builds" />
+      </role>
+
+      <role identifier="oldrole" displayname="Depreciated role" description="Depreciated role - not possible to use anymore" migrateto="operator" />
+
+      <role identifier="operator" displayname="Operator" description="Machine Operator Access">
+        <permission identifier="permission_view_builds" />
+        <permission identifier="permission_start_build" />
+      </role>
+
+      <role identifier="administrator" displayname="Administrator" description="Machine Administration Access">
+        <permission identifier="permission_view_builds" />
+        <permission identifier="permission_start_build" />
+        <permission identifier="permission_user_management" />
+      </role>
+
+    </roles>
+    
+    
+  </accesscontrol>
 
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol"/>
 	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
@@ -30,7 +68,7 @@
 		</parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
-			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
+			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
 			<parameter name="simulateplc" description="Simulate PLC behaviour" default="1" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9"/>
 		</parametergroup>
 
@@ -111,7 +149,7 @@
 		<parametergroup name="cardconfig" description="Scanner Card Config">
 			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlab" type="string"/>
 			<parameter name="serial" description="Serial" default="341731" type="int"/>
-			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.10.2" type="string"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="" type="string"/>
 			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
 			<parameter name="port" description="Port" default="49374" type="int"/>
 			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
@@ -125,7 +163,7 @@
 		</parametergroup>
 
 		<parametergroup name="correction" description="Scanlab Correction Data">
-			<parameter name="resourcename" description="Correction resource name" default="d2_1987" type="string"/>
+			<parameter name="resourcename" description="Correction resource name" default="d2_1238" type="string"/>
 			<parameter name="tableindex" description="Correction table index" default="1" type="int"/>
 			<parameter name="dimension" description="Correction file dimension" default="3" type="int"/>
 			<parameter name="tablenumbera" description="Table number head A" default="1" type="int"/>
@@ -501,6 +539,15 @@
 
 		</page>
 
+
+
+    <page name="modelview">
+
+      <glscene name="glscene1">
+      </glscene>
+
+    </page>
+
 		<page name="settings">
 
 			<content name="settings" title="System Settings">
@@ -513,7 +560,8 @@
 			<item id="buildprocess" icon="mdi-printer-3d" caption="Build Process" description="Manage and monitor current build process" targetpage="buildstatus"/>
 			<item id="systemstatus" icon="mdi-factory" caption="Current Status" description="Display current machine status." targetpage="systemstatus"/>
 			<item id="systemlog" icon="mdi-book-open-variant" caption="System Logs" description="Browse and display stored system log files." targetpage="systemlog"/>
-		</menu>
+      <item id="modelview" icon="mdi-book-open-variant" caption="3D Model View" description="View Build Job in 3D." targetpage="modelview"/>
+    </menu>
 
 
 		<toolbar logoresource="ui_toolbarlogo">
