@@ -1507,7 +1507,11 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	switch (oieRecordingMode) {
 	case eOIERecordingMode::OIEContinuousMeasurement:
 	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
-		StartOIEMeasurement();
+		StartOIEMeasurementEx (false);
+		break;
+	case eOIERecordingMode::OIELaserActiveMeasurement:
+	case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
+		StartOIEMeasurementEx(true);
 		break;
 	}
 
