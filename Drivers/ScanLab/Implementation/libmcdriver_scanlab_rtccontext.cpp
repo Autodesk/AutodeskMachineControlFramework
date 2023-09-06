@@ -1486,15 +1486,6 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	if (pLayer.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-	uint32_t nPIDControlIndexAttributeID = 0; 
-	uint32_t nMeasurementTagAttributeID = 0;
-
-	if (pLayer->HasCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "pidindex")) 
-		nPIDControlIndexAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "pidindex");
-	if (pLayer->HasCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "measurementtag"))
-		nMeasurementTagAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "measurementtag");
-
-
 	double dUnits = pLayer->GetUnits();
 
 	switch (oieRecordingMode) {
@@ -1541,9 +1532,8 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 			float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
 
 			uint32_t nOIEPIDControlIndex = 0;
-			uint32_t nOIEPIDMeasurementTag = 0;
 			if (m_bEnableOIEPIDControl) {
-				nOIEPIDControlIndex = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nPIDControlIndexAttributeID);
+				nOIEPIDControlIndex = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "pidindex", 0);
 			}
 
 			int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
