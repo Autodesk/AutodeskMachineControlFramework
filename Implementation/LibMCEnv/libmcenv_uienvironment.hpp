@@ -41,6 +41,7 @@ Abstract: This is the class declaration of CUIEnvironment
 #include "amc_statesignalhandler.hpp"
 #include "amc_ui_clientaction.hpp"
 #include "amc_systemstate.hpp"
+#include "amc_userinformation.hpp"
 
 #include <vector>
 
@@ -85,6 +86,7 @@ private:
 	std::string m_sSenderName;
 	std::string m_sTestEnvironmentPath;
 	std::string m_sSystemUserID;
+	AMC::PUserInformation m_pUserInformation;
 
 	AMCCommon::CChrono m_Chrono;
 
@@ -94,7 +96,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID, AMC::PUserInformation pUserInformation);
 
 	virtual ~CUIEnvironment();
 
@@ -184,6 +186,18 @@ public:
 	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
 
 	IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
+
+	bool CheckPermission(const std::string& sPermissionIdentifier) override;
+
+	std::string GetCurrentUserLogin() override;
+
+	std::string GetCurrentUserDescription() override;
+
+	std::string GetCurrentUserRole() override;
+
+	std::string GetCurrentUserLanguage() override;
+
+	std::string GetCurrentUserUUID() override;
 
 };
 

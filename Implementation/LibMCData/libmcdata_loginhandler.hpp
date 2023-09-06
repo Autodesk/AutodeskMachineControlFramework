@@ -73,9 +73,23 @@ public:
 
 	void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) override;
 
-    std::string GetUserRole(const std::string& sUsername) override;
+	void GetUserProperties(const std::string& sUsername, std::string& sUUID, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier) override;
 
-    std::string GetUserLanguage(const std::string& sUsername) override;
+	std::string GetUsernameByUUID(const std::string& sUUID) override;
+
+	std::string GetUserUUID(const std::string& sUsername) override;
+
+	std::string GetUserDescription(const std::string& sUsername) override;
+
+	std::string GetUserDescriptionByUUID(const std::string& sUUID) override;
+
+	std::string GetUserRole(const std::string& sUsername) override;
+
+	std::string GetUserRoleByUUID(const std::string& sUUID) override;
+
+	std::string GetUserLanguage(const std::string& sUsername) override;
+
+	std::string GetUserLanguageByUUID(const std::string& sUUID) override;
 
 };
 

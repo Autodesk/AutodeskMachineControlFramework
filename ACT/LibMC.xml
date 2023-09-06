@@ -556,10 +556,15 @@
 		<error name="MISSINGACCESSCONTROLROLES" code="530" description="Missing access control roles"/>
 		<error name="MISSINGACCESSCONTROLROLEPERMISSIONS" code="531" description="Missing access control role permissions"/>
 		<error name="MISSINGROLEPERMISSIONIDENTIFIER" code="532" description="Missing role permission identifier"/>
-				
-		
-		
-		
+		<error name="INVALIDDISCRETEFIELDBUFFER" code="533" description="Invalid discrete field buffer"/>
+		<error name="INVALIDDISCRETEFIELDFILESIGN" code="534" description="Invalid discrete field file sign"/>
+		<error name="INCOMPATIBLEDISCRETEFIELDFILEVERSION" code="535" description="Incompatible discrete field file version"/>
+		<error name="TOONEWDISCRETEFIELDFILEVERSION" code="536" description="Too new discrete field file version"/>
+		<error name="TOONEWDISCRETEFIELDSTREAMTYPE" code="537" description="Too new discrete field stream type"/>
+		<error name="INVALIDDISCRETEFIELDDATAOFFSET" code="538" description="Invalid discrete field data offset"/>		
+		<error name="INVALIDDISCRETEFIELDSTREAMSIZE" code="539" description="Invalid discrete field stream size"/>		
+		<error name="INVALIDDISCRETEFIELDINTERNALDATA" code="540" description="Invalid discrete field internal data"/>		
+
 	</errors>
 	
 	

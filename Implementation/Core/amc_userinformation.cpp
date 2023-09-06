@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,56 +29,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_SESSIONHANDLER
-#define __AMC_API_SESSIONHANDLER
+#include "amc_userinformation.hpp"
 
-#include "header_protection.hpp"
-#include "amc_api_types.hpp"
+#include "common_utils.hpp"
+#include "libmc_exceptiontypes.hpp"
 
-#include <mutex>
-#include <map>
-#include <string>
+
 
 namespace AMC {
 
-	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
-	amcDeclareDependingClass(CAPISession, PAPISession);
-	amcDeclareDependingClass(CAPISessionHandler, PAPISessionHandler);
-	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	PUserInformation CUserInformation::makeEmpty()
+	{
+		return std::make_shared<CUserInformation>(AMCCommon::CUtils::createEmptyUUID (), "", "", "", "");
+	}
 
-	class CAPISessionHandler {
-	private:
-	
-		std::mutex m_Mutex;
+	CUserInformation::CUserInformation(const std::string& sUUID, const std::string& sLogin, const std::string& sDescription, const std::string& sRoleIdentifier, const std::string& sLanguageIdentifier)
+		: m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)),
+		m_sLogin (sLogin),
+		m_sDescription (sDescription),
+		m_sRoleIdentifier (sRoleIdentifier),
+		m_sLanguageIdentifier (sLanguageIdentifier)
+	{
 
-		std::map <std::string, PAPISession> m_SessionMap;
-			
-	protected:
-			
-	public:
+	}
 
-		CAPISessionHandler();
-		virtual ~CAPISessionHandler();
+	CUserInformation::~CUserInformation()
+	{
 
-		PAPIAuth createAuthentication(const std::string& sAuthorizationJSON);
+	}
 
-		PAPIAuth createNewAuthenticationSession();
+	std::string CUserInformation::getUUID()
+	{
+		return m_sUUID;
+	}
 
-		PAPIAuth createEmptyAuthenticationSession();
+	std::string CUserInformation::getLogin()
+	{
+		return m_sLogin;
+	}
 
-		void authorizeSession (const std::string & sSessionUUID, const std::string & sSaltedPassword, const std::string & sClientKey);
+	std::string CUserInformation::getDescription()
+	{
+		return m_sDescription;
+	}
 
-		void setUserDetailsForSession(const std::string& sSessionUUID, const std::string& sUsername, const std::string& sHashedPassword, const std::string & sUserUUID, const std::string & sUserDescription, const std::string& sUserRoleIdentifier, const std::string & sUserLanguageIdentifier);
+	std::string CUserInformation::getRoleIdentifier()
+	{
+		return m_sRoleIdentifier;
+	}
 
-		std::string getSessionToken(const std::string& sSessionUUID);
+	std::string CUserInformation::getLanguageIdentifier()
+	{
+		return m_sLanguageIdentifier;
+	}
 
-		bool sessionIsAuthenticated(const std::string& sSessionUUID);
-
-	};
-
-	
 }
 
-
-#endif //__AMC_API_SESSIONHANDLER
 

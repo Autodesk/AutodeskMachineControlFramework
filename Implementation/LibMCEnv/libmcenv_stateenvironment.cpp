@@ -497,3 +497,57 @@ IJournalVariable* CStateEnvironment::RetrieveJournalVariable(const std::string& 
 	pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
 	return new CJournalVariable(pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
 }
+
+
+bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CStateEnvironment::GetUserDescription(const std::string& sUserLogin)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CStateEnvironment::GetUserRole(const std::string& sUserLogin)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CStateEnvironment::GetUserLanguage(const std::string& sUserLogin)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CStateEnvironment::GetUserUUID(const std::string& sUserLogin)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+bool CStateEnvironment::CheckUserPermissionByUUID(const std::string& sUserUUID, const std::string& sPermissionIdentifier)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+
+std::string CStateEnvironment::GetUserLoginByUUID(const std::string& sUserUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+
+std::string CStateEnvironment::GetUserDescriptionByUUID(const std::string& sUserUUID) 
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CStateEnvironment::GetUserRoleByUUID(const std::string& sUserUUID) 
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+
+std::string CStateEnvironment::GetUserLanguageByUUID(const std::string& sUserUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}

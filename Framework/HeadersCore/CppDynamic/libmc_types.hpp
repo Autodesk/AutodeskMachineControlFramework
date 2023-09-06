@@ -547,6 +547,14 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGACCESSCONTROLROLES 530 /** Missing access control roles */
 #define LIBMC_ERROR_MISSINGACCESSCONTROLROLEPERMISSIONS 531 /** Missing access control role permissions */
 #define LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER 532 /** Missing role permission identifier */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDBUFFER 533 /** Invalid discrete field buffer */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDFILESIGN 534 /** Invalid discrete field file sign */
+#define LIBMC_ERROR_INCOMPATIBLEDISCRETEFIELDFILEVERSION 535 /** Incompatible discrete field file version */
+#define LIBMC_ERROR_TOONEWDISCRETEFIELDFILEVERSION 536 /** Too new discrete field file version */
+#define LIBMC_ERROR_TOONEWDISCRETEFIELDSTREAMTYPE 537 /** Too new discrete field stream type */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET 538 /** Invalid discrete field data offset */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE 539 /** Invalid discrete field stream size */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA 540 /** Invalid discrete field internal data */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1006,6 +1014,14 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGACCESSCONTROLROLES: return "Missing access control roles";
     case LIBMC_ERROR_MISSINGACCESSCONTROLROLEPERMISSIONS: return "Missing access control role permissions";
     case LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER: return "Missing role permission identifier";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDBUFFER: return "Invalid discrete field buffer";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDFILESIGN: return "Invalid discrete field file sign";
+    case LIBMC_ERROR_INCOMPATIBLEDISCRETEFIELDFILEVERSION: return "Incompatible discrete field file version";
+    case LIBMC_ERROR_TOONEWDISCRETEFIELDFILEVERSION: return "Too new discrete field file version";
+    case LIBMC_ERROR_TOONEWDISCRETEFIELDSTREAMTYPE: return "Too new discrete field stream type";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET: return "Invalid discrete field data offset";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE: return "Invalid discrete field stream size";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA: return "Invalid discrete field internal data";
     default: return "unknown error";
   }
 }

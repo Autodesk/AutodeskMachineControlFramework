@@ -153,6 +153,27 @@ public:
 
 	IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
 
+	bool CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier) override;
+
+	std::string GetUserDescription(const std::string& sUserLogin) override;
+
+	std::string GetUserRole(const std::string& sUserLogin) override;
+
+	std::string GetUserLanguage(const std::string& sUserLogin) override;
+
+	std::string GetUserUUID(const std::string& sUserLogin) override;
+
+	bool CheckUserPermissionByUUID(const std::string& sUserUUID, const std::string& sPermissionIdentifier) override;
+
+	std::string GetUserLoginByUUID(const std::string& sUserUUID) override;
+
+	std::string GetUserDescriptionByUUID(const std::string& sUserUUID) override;
+
+	std::string GetUserRoleByUUID(const std::string& sUserUUID) override;
+
+	std::string GetUserLanguageByUUID(const std::string& sUserUUID) override;
+
+
 };
 
 } // namespace Impl

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_session.hpp"
 #include "amc_parameterhandler.hpp"
 #include "common_utils.hpp"
+#include "amc_userinformation.hpp"
 
 #include "libmc_interfaceexception.hpp"
 
@@ -117,15 +118,25 @@ void CAPISession::authorizeSessionByPassword(const std::string& sSaltedPasswordH
 
 }
 
-void CAPISession::setUserDetails(const std::string& sUserName, const std::string& sHashedPassword)
+void CAPISession::setUserDetails(const std::string& sUserName, const std::string& sHashedPassword, const std::string& sUserUUID, const std::string& sUserDescription, const std::string& sUserRoleIdentifier, const std::string& sUserLanguageIdentifier)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	m_sUserName = sUserName;
 	m_sHashedPassword = sHashedPassword;
+	m_sUserUUID = sUserUUID;
+	m_sUserDescription = sUserDescription;
+	m_sUserRoleIdentifier = sUserRoleIdentifier;
+	m_sUserLanguageIdentifier = sUserLanguageIdentifier;
 }
 
 PParameterHandler CAPISession::getClientVariableHandler()
 {
 	return m_pClientVariableHandler;
+}
+
+PUserInformation CAPISession::createUserInformation()
+{
+	m_sUserUUID = AMCCommon::CUtils::createUUID();
+	return std::make_shared<CUserInformation> (m_sUserUUID, m_sUserName, m_sUserDescription, m_sUserLanguageIdentifier, m_sUserRoleIdentifier);
 }

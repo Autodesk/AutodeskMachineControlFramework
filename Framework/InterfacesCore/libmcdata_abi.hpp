@@ -830,7 +830,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertstringtobuil
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_LoginHandler pLoginHandler, const char * pUsername, bool * pUserExists);
 
 /**
-* Retrieves a users data. Fails if user does not exist.
+* Retrieves login relevant users data. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.
 * @param[in] pUsername - User name
@@ -845,6 +845,75 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_L
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nSaltBufferSize, LibMCData_uint32* pSaltNeededChars, char * pSaltBuffer, const LibMCData_uint32 nHashedPasswordBufferSize, LibMCData_uint32* pHashedPasswordNeededChars, char * pHashedPasswordBuffer);
 
 /**
+* Retrieves all users data with one Transaction. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the user., may be NULL
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of LanguageIdentifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserproperties(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCData_uint32 nRoleBufferSize, LibMCData_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
+* Retrieves a users name with a given UUID. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nUsernameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsernameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsernameBuffer -  buffer of User name, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getusernamebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const LibMCData_uint32 nUsernameBufferSize, LibMCData_uint32* pUsernameNeededChars, char * pUsernameBuffer);
+
+/**
+* Retrieves a users UUID. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuseruuid(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Retrieves a users description. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdescription(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Retrieves a users description by the user UUID. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdescriptionbyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
 * Retrieves a users role. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.
@@ -857,6 +926,18 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserrole(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nRoleBufferSize, LibMCData_uint32* pRoleNeededChars, char * pRoleBuffer);
 
 /**
+* Retrieves a users role by the user UUID. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserrolebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const LibMCData_uint32 nRoleBufferSize, LibMCData_uint32* pRoleNeededChars, char * pRoleBuffer);
+
+/**
 * Retrieves a users language preference. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.
@@ -867,6 +948,18 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserrole(LibMCData_
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserlanguage(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
+* Retrieves a users language preference by user UUID. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of Language identifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserlanguagebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
 
 /*************************************************************************************************************************
  Class definition for PersistencyHandler

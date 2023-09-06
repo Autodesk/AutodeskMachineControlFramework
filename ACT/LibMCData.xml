@@ -332,6 +332,7 @@
 
 		<error name="NOLOGCALLBACK" code="335" description="No log callback" />			
 		<error name="EMPTYUSERNAME" code="336" description="Empty user name" />			
+		<error name="EMPTYUSERUUID" code="337" description="Empty user UUID" />			
 		
 								
 	</errors>
@@ -774,14 +775,47 @@
 			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
 		</method>
 	
-		<method name="GetUserDetails" description="Retrieves a users data. Fails if user does not exist.">
+		<method name="GetUserDetails" description="Retrieves login relevant users data. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="Salt" type="string" pass="out" description="Salt of the user." />
 			<param name="HashedPassword" type="string" pass="out" description="Hashed Password." />
 		</method>
-	
+
+		<method name="GetUserProperties" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+		<method name="GetUsernameByUUID" description="Retrieves a users name with a given UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="return" description="User name" />
+		</method>
+
+		<method name="GetUserUUID" description="Retrieves a users UUID. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="return" description="UUID of the user." />
+		</method>
+
+		<method name="GetUserDescription" description="Retrieves a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetUserDescriptionByUUID" description="Retrieves a users description by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
 		<method name="GetUserRole" description="Retrieves a users role. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserRoleByUUID" description="Retrieves a users role by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
 			<param name="Role" type="string" pass="return" description="Role of the user." />
 		</method>
 
@@ -789,6 +823,11 @@
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
 		</method>
+		
+		<method name="GetUserLanguageByUUID" description="Retrieves a users language preference by user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>		
 		
 	</class>
 

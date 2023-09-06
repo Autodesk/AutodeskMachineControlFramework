@@ -877,12 +877,50 @@ public:
 	virtual bool UserExists(const std::string & sUsername) = 0;
 
 	/**
-	* ILoginHandler::GetUserDetails - Retrieves a users data. Fails if user does not exist.
+	* ILoginHandler::GetUserDetails - Retrieves login relevant users data. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @param[out] sSalt - Salt of the user.
 	* @param[out] sHashedPassword - Hashed Password.
 	*/
 	virtual void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) = 0;
+
+	/**
+	* ILoginHandler::GetUserProperties - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return User name
+	*/
+	virtual std::string GetUsernameByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* ILoginHandler::GetUserUUID - Retrieves a users UUID. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return UUID of the user.
+	*/
+	virtual std::string GetUserUUID(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserDescription - Retrieves a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescription(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserDescriptionByUUID - Retrieves a users description by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescriptionByUUID(const std::string & sUUID) = 0;
 
 	/**
 	* ILoginHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
@@ -892,11 +930,25 @@ public:
 	virtual std::string GetUserRole(const std::string & sUsername) = 0;
 
 	/**
+	* ILoginHandler::GetUserRoleByUUID - Retrieves a users role by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRoleByUUID(const std::string & sUUID) = 0;
+
+	/**
 	* ILoginHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @return Language identifier of the user.
 	*/
 	virtual std::string GetUserLanguage(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserLanguageByUUID - Retrieves a users language preference by user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguageByUUID(const std::string & sUUID) = 0;
 
 };
 

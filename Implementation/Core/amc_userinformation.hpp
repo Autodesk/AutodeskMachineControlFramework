@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,66 +29,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_SESSION
-#define __AMC_API_SESSION
+#ifndef __AMC_USERINFORMATION
+#define __AMC_USERINFORMATION
 
-#ifndef __AMCIMPL_API_SESSION
-#error this header is protected and should only be included in the corresponding implementation CPP files.
-#endif
-
-#include "header_protection.hpp"
-#include "amc_api_types.hpp"
-
-#include <mutex>
+#include <memory>
+#include <string>
 
 namespace AMC {
 
-	amcDeclareDependingClass(CAPISession, PAPISession);
-	amcDeclareDependingClass(CUserInformation, PUserInformation);
-	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	class CUserInformation;
+	typedef std::shared_ptr<CUserInformation> PUserInformation;
 
-	class CAPISession {
+
+	class CUserInformation {
 	private:
-	
-		std::mutex m_Mutex;
-	
+
 		std::string m_sUUID;
-		std::string m_sKey;
-		std::string m_sUserName;
-		std::string m_sHashedPassword;
-		std::string m_sToken;
-		PParameterHandler m_pClientVariableHandler;
-
-		std::string m_sUserUUID;
-		std::string m_sUserDescription;
-		std::string m_sUserLanguageIdentifier;
-		std::string m_sUserRoleIdentifier;
-
-		bool m_bAuthenticated;		
-					
+		std::string m_sLogin;
+		std::string m_sDescription;
+		std::string m_sRoleIdentifier;
+		std::string m_sLanguageIdentifier;
+	
 	public:
 
-		CAPISession();
-		virtual ~CAPISession();
+		static PUserInformation makeEmpty();
 
-		std::string getUUID ();		
-		std::string getKey ();
-		std::string getUserName ();
-		std::string getToken ();
-		bool isAuthenticated ();
+		CUserInformation(const std::string& sUUID, const std::string& sLogin, const std::string& sDescription, const std::string& sRoleIdentifier, const std::string& sLanguageIdentifier);
 		
-		void authorizeSessionByPassword(const std::string & sSaltedPasswordHash, const std::string & sClientKey);
-		void setUserDetails(const std::string& sUserName, const std::string & sHashedPassword, const std::string& sUserUUID, const std::string& sUserDescription, const std::string& sUserRoleIdentifier, const std::string& sUserLanguageIdentifier);
+		virtual ~CUserInformation();
+		
+		std::string getUUID ();
+		
+		std::string getLogin ();
 
-		PParameterHandler getClientVariableHandler();
+		std::string getDescription();
 
-		PUserInformation createUserInformation();
-								
+		std::string getRoleIdentifier ();
+
+		std::string getLanguageIdentifier ();
+
 	};
 
 	
 }
 
 
-#endif //__AMC_API
+#endif //__AMC_USERINFORMATION
 

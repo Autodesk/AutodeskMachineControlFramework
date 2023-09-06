@@ -142,9 +142,16 @@ void CAPIHandler_Auth::handleNewSessionRequest(const uint8_t* pBodyData, const s
 	std::string sLoginSalt;
 	if (m_pLoginHandler->UserExists (sUserName)) {
 		std::string sHashedPassword;
+		std::string sUserUUID;
+		std::string sUserDescription;
+		std::string sUserRoleIdentifier;
+		std::string sUserLanguageIdentifier;
+
 		// password hash is calculateSHA256FromString(sLoginSalt + "password"); 
 		m_pLoginHandler->GetUserDetails(sUserName, sLoginSalt, sHashedPassword);
-		m_pSessionHandler->setUserDetailsForSession(pAuth->getSessionUUID(), sUserName, sHashedPassword);
+		m_pLoginHandler->GetUserProperties(sUserName, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
+		
+		m_pSessionHandler->setUserDetailsForSession(pAuth->getSessionUUID(), sUserName, sHashedPassword, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
 	}
 	else {
 		// If user has not been found, then generate a repeatable salt to not show that the user is not existing.

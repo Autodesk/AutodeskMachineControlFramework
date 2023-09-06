@@ -3328,6 +3328,78 @@ public:
 	*/
 	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
 
+	/**
+	* IStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+	* @param[in] sUserLogin - Login of user to check
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	virtual bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier) = 0;
+
+	/**
+	* IStateEnvironment::GetUserDescription - Returns a users description.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the users description. Fails if user is not known to the system.
+	*/
+	virtual std::string GetUserDescription(const std::string & sUserLogin) = 0;
+
+	/**
+	* IStateEnvironment::GetUserRole - Returns a users role identifier.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the users role identifier. Fails if user is not known to the system.
+	*/
+	virtual std::string GetUserRole(const std::string & sUserLogin) = 0;
+
+	/**
+	* IStateEnvironment::GetUserLanguage - Returns a users language identifier.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the users language identifier. Fails if user is not known to the system.
+	*/
+	virtual std::string GetUserLanguage(const std::string & sUserLogin) = 0;
+
+	/**
+	* IStateEnvironment::GetUserUUID - Returns a users UUID.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the user UUID. Fails if user is not known to the system.
+	*/
+	virtual std::string GetUserUUID(const std::string & sUserLogin) = 0;
+
+	/**
+	* IStateEnvironment::CheckUserPermissionByUUID - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+	* @param[in] sUserUUID - UUID of user
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	virtual bool CheckUserPermissionByUUID(const std::string & sUserUUID, const std::string & sPermissionIdentifier) = 0;
+
+	/**
+	* IStateEnvironment::GetUserLoginByUUID - Returns the a users login name. Fails if user is not known to the system.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users login name.
+	*/
+	virtual std::string GetUserLoginByUUID(const std::string & sUserUUID) = 0;
+
+	/**
+	* IStateEnvironment::GetUserDescriptionByUUID - Returns a users description.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users description. Fails if user is not known to the system.
+	*/
+	virtual std::string GetUserDescriptionByUUID(const std::string & sUserUUID) = 0;
+
+	/**
+	* IStateEnvironment::GetUserRoleByUUID - Returns a users role identifier.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users role identifier. Fails if user is not known to the system.
+	*/
+	virtual std::string GetUserRoleByUUID(const std::string & sUserUUID) = 0;
+
+	/**
+	* IStateEnvironment::GetUserLanguageByUUID - Returns a users language identifier.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users language identifier. Fails if user is not known to the system.
+	*/
+	virtual std::string GetUserLanguageByUUID(const std::string & sUserUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
@@ -3661,6 +3733,43 @@ public:
 	* @return Journal Instance.
 	*/
 	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
+
+	/**
+	* IUIEnvironment::CheckPermission - Returns if the current user has a certain permission. Fails if permission is not known to the system.
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	virtual bool CheckPermission(const std::string & sPermissionIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserLogin - Returns the current user login name.
+	* @return Returns the current users login name.
+	*/
+	virtual std::string GetCurrentUserLogin() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserDescription - Returns the current user description.
+	* @return Returns the current users description.
+	*/
+	virtual std::string GetCurrentUserDescription() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserRole - Returns the current user role identifier.
+	* @return Returns the current users role identifier.
+	*/
+	virtual std::string GetCurrentUserRole() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserLanguage - Returns the current users language identifier.
+	* @return Returns the current users language identifier.
+	*/
+	virtual std::string GetCurrentUserLanguage() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserUUID - Returns the current user UUID.
+	* @return Returns the current user UUID.
+	*/
+	virtual std::string GetCurrentUserUUID() = 0;
 
 };
 

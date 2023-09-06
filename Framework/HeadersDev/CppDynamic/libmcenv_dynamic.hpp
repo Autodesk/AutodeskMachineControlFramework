@@ -1607,6 +1607,16 @@ public:
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
+	inline bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier);
+	inline std::string GetUserDescription(const std::string & sUserLogin);
+	inline std::string GetUserRole(const std::string & sUserLogin);
+	inline std::string GetUserLanguage(const std::string & sUserLogin);
+	inline std::string GetUserUUID(const std::string & sUserLogin);
+	inline bool CheckUserPermissionByUUID(const std::string & sUserUUID, const std::string & sPermissionIdentifier);
+	inline std::string GetUserLoginByUUID(const std::string & sUserUUID);
+	inline std::string GetUserDescriptionByUUID(const std::string & sUserUUID);
+	inline std::string GetUserRoleByUUID(const std::string & sUserUUID);
+	inline std::string GetUserLanguageByUUID(const std::string & sUserUUID);
 };
 	
 /*************************************************************************************************************************
@@ -1665,6 +1675,12 @@ public:
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
+	inline bool CheckPermission(const std::string & sPermissionIdentifier);
+	inline std::string GetCurrentUserLogin();
+	inline std::string GetCurrentUserDescription();
+	inline std::string GetCurrentUserRole();
+	inline std::string GetCurrentUserLanguage();
+	inline std::string GetCurrentUserUUID();
 };
 	
 	/**
@@ -2125,6 +2141,16 @@ public:
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLData = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = nullptr;
+		pWrapperTable->m_StateEnvironment_CheckUserPermission = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserDescription = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserRole = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserLanguage = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserUUID = nullptr;
+		pWrapperTable->m_StateEnvironment_CheckUserPermissionByUUID = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserLoginByUUID = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserDescriptionByUUID = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserRoleByUUID = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUserLanguageByUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -2167,6 +2193,12 @@ public:
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveJournalVariable = nullptr;
+		pWrapperTable->m_UIEnvironment_CheckPermission = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLogin = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserDescription = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserRole = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -5616,6 +5648,96 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CheckUserPermission == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserDescription = (PLibMCEnvStateEnvironment_GetUserDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserDescription = (PLibMCEnvStateEnvironment_GetUserDescriptionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserRole = (PLibMCEnvStateEnvironment_GetUserRolePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuserrole");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserRole = (PLibMCEnvStateEnvironment_GetUserRolePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserRole == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserLanguage = (PLibMCEnvStateEnvironment_GetUserLanguagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserLanguage = (PLibMCEnvStateEnvironment_GetUserLanguagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserLanguage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserUUID = (PLibMCEnvStateEnvironment_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserUUID = (PLibMCEnvStateEnvironment_GetUserUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CheckUserPermissionByUUID = (PLibMCEnvStateEnvironment_CheckUserPermissionByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_checkuserpermissionbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CheckUserPermissionByUUID = (PLibMCEnvStateEnvironment_CheckUserPermissionByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_checkuserpermissionbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CheckUserPermissionByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserLoginByUUID = (PLibMCEnvStateEnvironment_GetUserLoginByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuserloginbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserLoginByUUID = (PLibMCEnvStateEnvironment_GetUserLoginByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuserloginbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserLoginByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserDescriptionByUUID = (PLibMCEnvStateEnvironment_GetUserDescriptionByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuserdescriptionbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserDescriptionByUUID = (PLibMCEnvStateEnvironment_GetUserDescriptionByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuserdescriptionbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserDescriptionByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserRoleByUUID = (PLibMCEnvStateEnvironment_GetUserRoleByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuserrolebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserRoleByUUID = (PLibMCEnvStateEnvironment_GetUserRoleByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuserrolebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserRoleByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserLanguageByUUID = (PLibMCEnvStateEnvironment_GetUserLanguageByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getuserlanguagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUserLanguageByUUID = (PLibMCEnvStateEnvironment_GetUserLanguageByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getuserlanguagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUserLanguageByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
@@ -5991,6 +6113,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_RetrieveJournalVariable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CheckPermission = (PLibMCEnvUIEnvironment_CheckPermissionPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_checkpermission");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CheckPermission = (PLibMCEnvUIEnvironment_CheckPermissionPtr) dlsym(hLibrary, "libmcenv_uienvironment_checkpermission");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CheckPermission == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLogin = (PLibMCEnvUIEnvironment_GetCurrentUserLoginPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserlogin");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLogin = (PLibMCEnvUIEnvironment_GetCurrentUserLoginPtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserlogin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserLogin == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserDescription = (PLibMCEnvUIEnvironment_GetCurrentUserDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserDescription = (PLibMCEnvUIEnvironment_GetCurrentUserDescriptionPtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserRole = (PLibMCEnvUIEnvironment_GetCurrentUserRolePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserrole");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserRole = (PLibMCEnvUIEnvironment_GetCurrentUserRolePtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserRole == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage = (PLibMCEnvUIEnvironment_GetCurrentUserLanguagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage = (PLibMCEnvUIEnvironment_GetCurrentUserLanguagePtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = (PLibMCEnvUIEnvironment_GetCurrentUserUUIDPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = (PLibMCEnvUIEnvironment_GetCurrentUserUUIDPtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7562,6 +7738,46 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_checkuserpermission", (void**)&(pWrapperTable->m_StateEnvironment_CheckUserPermission));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckUserPermission == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuserdescription", (void**)&(pWrapperTable->m_StateEnvironment_GetUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuserrole", (void**)&(pWrapperTable->m_StateEnvironment_GetUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserRole == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuserlanguage", (void**)&(pWrapperTable->m_StateEnvironment_GetUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserLanguage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuseruuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_checkuserpermissionbyuuid", (void**)&(pWrapperTable->m_StateEnvironment_CheckUserPermissionByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckUserPermissionByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuserloginbyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUserLoginByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserLoginByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuserdescriptionbyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUserDescriptionByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserDescriptionByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuserrolebyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUserRoleByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserRoleByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getuserlanguagebyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUserLanguageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUserLanguageByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -7728,6 +7944,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_retrievejournalvariable", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveJournalVariable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveJournalVariable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_checkpermission", (void**)&(pWrapperTable->m_UIEnvironment_CheckPermission));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CheckPermission == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserlogin", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserLogin));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserLogin == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserdescription", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserrole", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserRole == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserlanguage", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuseruuid", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -12917,6 +13157,162 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+	* @param[in] sUserLogin - Login of user to check
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	bool CStateEnvironment::CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier)
+	{
+		bool resultUserHasPermission = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CheckUserPermission(m_pHandle, sUserLogin.c_str(), sPermissionIdentifier.c_str(), &resultUserHasPermission));
+		
+		return resultUserHasPermission;
+	}
+	
+	/**
+	* CStateEnvironment::GetUserDescription - Returns a users description.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the users description. Fails if user is not known to the system.
+	*/
+	std::string CStateEnvironment::GetUserDescription(const std::string & sUserLogin)
+	{
+		LibMCEnv_uint32 bytesNeededUserDescription = 0;
+		LibMCEnv_uint32 bytesWrittenUserDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserDescription(m_pHandle, sUserLogin.c_str(), 0, &bytesNeededUserDescription, nullptr));
+		std::vector<char> bufferUserDescription(bytesNeededUserDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserDescription(m_pHandle, sUserLogin.c_str(), bytesNeededUserDescription, &bytesWrittenUserDescription, &bufferUserDescription[0]));
+		
+		return std::string(&bufferUserDescription[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetUserRole - Returns a users role identifier.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the users role identifier. Fails if user is not known to the system.
+	*/
+	std::string CStateEnvironment::GetUserRole(const std::string & sUserLogin)
+	{
+		LibMCEnv_uint32 bytesNeededUserRole = 0;
+		LibMCEnv_uint32 bytesWrittenUserRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserRole(m_pHandle, sUserLogin.c_str(), 0, &bytesNeededUserRole, nullptr));
+		std::vector<char> bufferUserRole(bytesNeededUserRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserRole(m_pHandle, sUserLogin.c_str(), bytesNeededUserRole, &bytesWrittenUserRole, &bufferUserRole[0]));
+		
+		return std::string(&bufferUserRole[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetUserLanguage - Returns a users language identifier.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the users language identifier. Fails if user is not known to the system.
+	*/
+	std::string CStateEnvironment::GetUserLanguage(const std::string & sUserLogin)
+	{
+		LibMCEnv_uint32 bytesNeededUserLanguage = 0;
+		LibMCEnv_uint32 bytesWrittenUserLanguage = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserLanguage(m_pHandle, sUserLogin.c_str(), 0, &bytesNeededUserLanguage, nullptr));
+		std::vector<char> bufferUserLanguage(bytesNeededUserLanguage);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserLanguage(m_pHandle, sUserLogin.c_str(), bytesNeededUserLanguage, &bytesWrittenUserLanguage, &bufferUserLanguage[0]));
+		
+		return std::string(&bufferUserLanguage[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetUserUUID - Returns a users UUID.
+	* @param[in] sUserLogin - Login of user
+	* @return Returns the user UUID. Fails if user is not known to the system.
+	*/
+	std::string CStateEnvironment::GetUserUUID(const std::string & sUserLogin)
+	{
+		LibMCEnv_uint32 bytesNeededUserUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserUUID(m_pHandle, sUserLogin.c_str(), 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserUUID(m_pHandle, sUserLogin.c_str(), bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CStateEnvironment::CheckUserPermissionByUUID - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+	* @param[in] sUserUUID - UUID of user
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	bool CStateEnvironment::CheckUserPermissionByUUID(const std::string & sUserUUID, const std::string & sPermissionIdentifier)
+	{
+		bool resultUserHasPermission = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CheckUserPermissionByUUID(m_pHandle, sUserUUID.c_str(), sPermissionIdentifier.c_str(), &resultUserHasPermission));
+		
+		return resultUserHasPermission;
+	}
+	
+	/**
+	* CStateEnvironment::GetUserLoginByUUID - Returns the a users login name. Fails if user is not known to the system.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users login name.
+	*/
+	std::string CStateEnvironment::GetUserLoginByUUID(const std::string & sUserUUID)
+	{
+		LibMCEnv_uint32 bytesNeededUserLogin = 0;
+		LibMCEnv_uint32 bytesWrittenUserLogin = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserLoginByUUID(m_pHandle, sUserUUID.c_str(), 0, &bytesNeededUserLogin, nullptr));
+		std::vector<char> bufferUserLogin(bytesNeededUserLogin);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserLoginByUUID(m_pHandle, sUserUUID.c_str(), bytesNeededUserLogin, &bytesWrittenUserLogin, &bufferUserLogin[0]));
+		
+		return std::string(&bufferUserLogin[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetUserDescriptionByUUID - Returns a users description.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users description. Fails if user is not known to the system.
+	*/
+	std::string CStateEnvironment::GetUserDescriptionByUUID(const std::string & sUserUUID)
+	{
+		LibMCEnv_uint32 bytesNeededUserDescription = 0;
+		LibMCEnv_uint32 bytesWrittenUserDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserDescriptionByUUID(m_pHandle, sUserUUID.c_str(), 0, &bytesNeededUserDescription, nullptr));
+		std::vector<char> bufferUserDescription(bytesNeededUserDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserDescriptionByUUID(m_pHandle, sUserUUID.c_str(), bytesNeededUserDescription, &bytesWrittenUserDescription, &bufferUserDescription[0]));
+		
+		return std::string(&bufferUserDescription[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetUserRoleByUUID - Returns a users role identifier.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users role identifier. Fails if user is not known to the system.
+	*/
+	std::string CStateEnvironment::GetUserRoleByUUID(const std::string & sUserUUID)
+	{
+		LibMCEnv_uint32 bytesNeededUserRole = 0;
+		LibMCEnv_uint32 bytesWrittenUserRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserRoleByUUID(m_pHandle, sUserUUID.c_str(), 0, &bytesNeededUserRole, nullptr));
+		std::vector<char> bufferUserRole(bytesNeededUserRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserRoleByUUID(m_pHandle, sUserUUID.c_str(), bytesNeededUserRole, &bytesWrittenUserRole, &bufferUserRole[0]));
+		
+		return std::string(&bufferUserRole[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetUserLanguageByUUID - Returns a users language identifier.
+	* @param[in] sUserUUID - UUID of user
+	* @return Returns the users language identifier. Fails if user is not known to the system.
+	*/
+	std::string CStateEnvironment::GetUserLanguageByUUID(const std::string & sUserUUID)
+	{
+		LibMCEnv_uint32 bytesNeededUserLanguage = 0;
+		LibMCEnv_uint32 bytesWrittenUserLanguage = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserLanguageByUUID(m_pHandle, sUserUUID.c_str(), 0, &bytesNeededUserLanguage, nullptr));
+		std::vector<char> bufferUserLanguage(bytesNeededUserLanguage);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUserLanguageByUUID(m_pHandle, sUserUUID.c_str(), bytesNeededUserLanguage, &bytesWrittenUserLanguage, &bufferUserLanguage[0]));
+		
+		return std::string(&bufferUserLanguage[0]);
+	}
+	
+	/**
 	 * Method definitions for class CUIEnvironment
 	 */
 	
@@ -13503,6 +13899,94 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
+	}
+	
+	/**
+	* CUIEnvironment::CheckPermission - Returns if the current user has a certain permission. Fails if permission is not known to the system.
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	bool CUIEnvironment::CheckPermission(const std::string & sPermissionIdentifier)
+	{
+		bool resultUserHasPermission = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CheckPermission(m_pHandle, sPermissionIdentifier.c_str(), &resultUserHasPermission));
+		
+		return resultUserHasPermission;
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserLogin - Returns the current user login name.
+	* @return Returns the current users login name.
+	*/
+	std::string CUIEnvironment::GetCurrentUserLogin()
+	{
+		LibMCEnv_uint32 bytesNeededUserLogin = 0;
+		LibMCEnv_uint32 bytesWrittenUserLogin = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLogin(m_pHandle, 0, &bytesNeededUserLogin, nullptr));
+		std::vector<char> bufferUserLogin(bytesNeededUserLogin);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLogin(m_pHandle, bytesNeededUserLogin, &bytesWrittenUserLogin, &bufferUserLogin[0]));
+		
+		return std::string(&bufferUserLogin[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserDescription - Returns the current user description.
+	* @return Returns the current users description.
+	*/
+	std::string CUIEnvironment::GetCurrentUserDescription()
+	{
+		LibMCEnv_uint32 bytesNeededUserDescription = 0;
+		LibMCEnv_uint32 bytesWrittenUserDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserDescription(m_pHandle, 0, &bytesNeededUserDescription, nullptr));
+		std::vector<char> bufferUserDescription(bytesNeededUserDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserDescription(m_pHandle, bytesNeededUserDescription, &bytesWrittenUserDescription, &bufferUserDescription[0]));
+		
+		return std::string(&bufferUserDescription[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserRole - Returns the current user role identifier.
+	* @return Returns the current users role identifier.
+	*/
+	std::string CUIEnvironment::GetCurrentUserRole()
+	{
+		LibMCEnv_uint32 bytesNeededUserRole = 0;
+		LibMCEnv_uint32 bytesWrittenUserRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserRole(m_pHandle, 0, &bytesNeededUserRole, nullptr));
+		std::vector<char> bufferUserRole(bytesNeededUserRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserRole(m_pHandle, bytesNeededUserRole, &bytesWrittenUserRole, &bufferUserRole[0]));
+		
+		return std::string(&bufferUserRole[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserLanguage - Returns the current users language identifier.
+	* @return Returns the current users language identifier.
+	*/
+	std::string CUIEnvironment::GetCurrentUserLanguage()
+	{
+		LibMCEnv_uint32 bytesNeededUserLanguage = 0;
+		LibMCEnv_uint32 bytesWrittenUserLanguage = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLanguage(m_pHandle, 0, &bytesNeededUserLanguage, nullptr));
+		std::vector<char> bufferUserLanguage(bytesNeededUserLanguage);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLanguage(m_pHandle, bytesNeededUserLanguage, &bytesWrittenUserLanguage, &bufferUserLanguage[0]));
+		
+		return std::string(&bufferUserLanguage[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserUUID - Returns the current user UUID.
+	* @return Returns the current user UUID.
+	*/
+	std::string CUIEnvironment::GetCurrentUserUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUserUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserUUID(m_pHandle, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
 	}
 
 } // namespace LibMCEnv

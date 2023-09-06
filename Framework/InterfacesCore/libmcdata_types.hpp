@@ -361,6 +361,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY 334 /** Could not find log entry */
 #define LIBMCDATA_ERROR_NOLOGCALLBACK 335 /** No log callback */
 #define LIBMCDATA_ERROR_EMPTYUSERNAME 336 /** Empty user name */
+#define LIBMCDATA_ERROR_EMPTYUSERUUID 337 /** Empty user UUID */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -634,6 +635,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
     case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
     case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
+    case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
     default: return "unknown error";
   }
 }

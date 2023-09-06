@@ -35,7 +35,7 @@ Abstract: This is a stub class definition of CLoginHandler
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include "common_utils.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -78,6 +78,82 @@ void CLoginHandler::GetUserDetails(const std::string & sUsername, std::string & 
     pStatement = nullptr;
 }
 
+
+void CLoginHandler::GetUserProperties(const std::string& sUsername, std::string& sUUID, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier)
+{
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+
+    std::string sQuery = "SELECT uuid, description, role, language FROM users WHERE login=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUsername);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND, "user not found: " + sUsername);
+
+    sUUID = pStatement->getColumnString(1);
+    sDescription = pStatement->getColumnString(2);
+    sRole = pStatement->getColumnString(3);
+    sLanguageIdentifier = pStatement->getColumnString(4);
+
+    pStatement = nullptr;
+}
+
+std::string CLoginHandler::GetUsernameByUUID(const std::string& sUUID)
+{
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+
+    std::string sQuery = "SELECT login FROM users WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString (sUUID));
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
+}
+
+std::string CLoginHandler::GetUserUUID(const std::string& sUsername)
+{
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+
+    std::string sQuery = "SELECT uuid FROM users WHERE login=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUsername);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
+}
+
+std::string CLoginHandler::GetUserDescription(const std::string& sUsername)
+{
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+
+    std::string sQuery = "SELECT description FROM users WHERE login=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUsername);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
+}
+
+std::string CLoginHandler::GetUserDescriptionByUUID(const std::string& sUUID)
+{
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+
+    std::string sQuery = "SELECT description FROM users WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString(sUUID));
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
+}
+
 std::string CLoginHandler::GetUserRole(const std::string& sUsername)
 {
     if (sUsername.empty())
@@ -92,8 +168,25 @@ std::string CLoginHandler::GetUserRole(const std::string& sUsername)
     return pStatement->getColumnString(1);
 }
 
+std::string CLoginHandler::GetUserRoleByUUID(const std::string& sUUID)
+{
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+
+    std::string sQuery = "SELECT role FROM users WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString(sUUID));
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
+}
+
 std::string CLoginHandler::GetUserLanguage(const std::string& sUsername)
 {
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+
     std::string sQuery = "SELECT language FROM users WHERE login=? AND active=1";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sUsername);
@@ -102,4 +195,22 @@ std::string CLoginHandler::GetUserLanguage(const std::string& sUsername)
 
     return pStatement->getColumnString(1);
 }
+
+std::string CLoginHandler::GetUserLanguageByUUID(const std::string& sUUID)
+{
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+
+    std::string sQuery = "SELECT language FROM users WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString(sUUID));
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND);
+
+    return pStatement->getColumnString(1);
+}
+
+
+
+
 

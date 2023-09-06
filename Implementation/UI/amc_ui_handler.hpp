@@ -80,6 +80,7 @@ namespace AMC {
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
 	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
+	amcDeclareDependingClass(CUserInformation, PUserInformation);
 
 
 	class CUIHandleEventResponse {
@@ -172,7 +173,7 @@ namespace AMC {
 
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler);
+		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler, PUserInformation pUserInformation);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 

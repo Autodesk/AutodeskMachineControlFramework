@@ -2338,7 +2338,61 @@
 			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
+				
+		<method name="CheckUserPermission" description="Returns if the a user has a certain permission. Fails if user or permission is not known to the system.">
+			<param name="UserLogin" type="string" pass="in" description="Login of user to check" />
+			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
+			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
+		</method>
 		
+
+		<method name="GetUserDescription" description="Returns a users description.">
+			<param name="UserLogin" type="string" pass="in" description="Login of user" />
+			<param name="UserDescription" type="string" pass="return" description="Returns the users description. Fails if user is not known to the system." />
+		</method>	
+
+		<method name="GetUserRole" description="Returns a users role identifier.">
+			<param name="UserLogin" type="string" pass="in" description="Login of user" />
+			<param name="UserRole" type="string" pass="return" description="Returns the users role identifier. Fails if user is not known to the system." />
+		</method>		
+
+		<method name="GetUserLanguage" description="Returns a users language identifier.">
+			<param name="UserLogin" type="string" pass="in" description="Login of user" />
+			<param name="UserLanguage" type="string" pass="return" description="Returns the users language identifier. Fails if user is not known to the system." />
+		</method>		
+
+		<method name="GetUserUUID" description="Returns a users UUID.">
+			<param name="UserLogin" type="string" pass="in" description="Login of user" />
+			<param name="UserUUID" type="string" pass="return" description="Returns the user UUID. Fails if user is not known to the system." />
+		</method>		
+		
+		<method name="CheckUserPermissionByUUID" description="Returns if the a user has a certain permission. Fails if user or permission is not known to the system.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
+			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
+			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
+		</method>
+				
+		<method name="GetUserLoginByUUID" description="Returns the a users login name. Fails if user is not known to the system.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
+			<param name="UserLogin" type="string" pass="return" description="Returns the users login name." />
+		</method>	
+		
+		<method name="GetUserDescriptionByUUID" description="Returns a users description.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
+			<param name="UserDescription" type="string" pass="return" description="Returns the users description. Fails if user is not known to the system." />
+		</method>	
+
+		<method name="GetUserRoleByUUID" description="Returns a users role identifier.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
+			<param name="UserRole" type="string" pass="return" description="Returns the users role identifier. Fails if user is not known to the system." />
+		</method>		
+
+		<method name="GetUserLanguageByUUID" description="Returns a users language identifier.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
+			<param name="UserLanguage" type="string" pass="return" description="Returns the users language identifier. Fails if user is not known to the system." />
+		</method>		
+		
+
 	</class>
 
 
@@ -2586,6 +2640,31 @@
 			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
+		
+		<method name="CheckPermission" description="Returns if the current user has a certain permission. Fails if permission is not known to the system.">
+			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
+			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
+		</method>		
+		
+		<method name="GetCurrentUserLogin" description="Returns the current user login name.">
+			<param name="UserLogin" type="string" pass="return" description="Returns the current users login name." />
+		</method>	
+
+		<method name="GetCurrentUserDescription" description="Returns the current user description.">
+			<param name="UserDescription" type="string" pass="return" description="Returns the current users description." />
+		</method>	
+
+		<method name="GetCurrentUserRole" description="Returns the current user role identifier.">
+			<param name="UserRole" type="string" pass="return" description="Returns the current users role identifier." />
+		</method>		
+
+		<method name="GetCurrentUserLanguage" description="Returns the current users language identifier.">
+			<param name="UserLanguage" type="string" pass="return" description="Returns the current users language identifier." />
+		</method>		
+
+		<method name="GetCurrentUserUUID" description="Returns the current user UUID.">
+			<param name="UserUUID" type="string" pass="return" description="Returns the current user UUID." />
+		</method>		
 
 	</class>
 

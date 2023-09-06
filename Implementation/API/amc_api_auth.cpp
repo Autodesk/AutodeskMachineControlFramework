@@ -31,19 +31,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_auth.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_userinformation.hpp"
 
 #include "common_utils.hpp"
 
 using namespace AMC;
 
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string& sUserName, bool bIsAuthorized, PParameterHandler pClientVariableHandler)
+CAPIAuth::CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, PUserInformation pUserInformation, bool bIsAuthorized, PParameterHandler pClientVariableHandler)
 	: m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)), 
 	m_sSessionKey (AMCCommon::CUtils::normalizeSHA256String(sSessionKey)),
-	m_sUserName (sUserName),
+	m_pUserInformation(pUserInformation),
 	m_bIsAuthorized (bIsAuthorized)
 
 {
+	if (pUserInformation.get() == nullptr)
+		throw ELibMCCustomException (LIBMC_ERROR_INVALIDPARAM, "CAPIAuth::CAPIAuth - pUserInformation is null");
+
 	if (pClientVariableHandler.get () != nullptr) {
 		m_pClientVariableHandler = pClientVariableHandler;
 	}
@@ -80,9 +84,15 @@ bool CAPIAuth::userIsAuthorized()
 	return m_bIsAuthorized;
 }
 
-std::string CAPIAuth::getUserName()
+PUserInformation CAPIAuth::getUserInformation()
 {
-	return m_sUserName;
+	return m_pUserInformation;
+}
+
+std::string CAPIAuth::getUserName() 
+{
+	return m_pUserInformation->getLogin();
+
 }
 
 PParameterHandler CAPIAuth::getClientVariableHandler()

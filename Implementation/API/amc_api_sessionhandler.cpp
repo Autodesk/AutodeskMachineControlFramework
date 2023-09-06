@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_sessionhandler.hpp"
 #include "amc_api_session.hpp"
 #include "amc_api_auth.hpp"
+#include "amc_userinformation.hpp"
 
 #include "libmc_interfaceexception.hpp"
 
@@ -73,7 +74,7 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 		if (pSession->getToken () != sToken)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONTOKEN);
 
-		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->getUserName(), pSession->isAuthenticated(), pSession->getClientVariableHandler ());
+		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getClientVariableHandler ());
 	}
 	else {
 		return nullptr;
@@ -89,7 +90,7 @@ PAPIAuth CAPISessionHandler::createNewAuthenticationSession()
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	m_SessionMap.insert (std::make_pair (pSession->getUUID(), pSession));
 
-	return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->getUserName(), pSession->isAuthenticated(), pSession->getClientVariableHandler());
+	return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getClientVariableHandler());
 
 }
 
@@ -100,7 +101,7 @@ PAPIAuth CAPISessionHandler::createEmptyAuthenticationSession()
 	std::string sEmptyUUID = "00000000-0000-0000-0000-000000000000";
 	std::string sEmptyKey = "0000000000000000000000000000000000000000000000000000000000000000";
 	
-	return std::make_shared<CAPIAuth>(sEmptyUUID, sEmptyKey, "", false, nullptr);
+	return std::make_shared<CAPIAuth>(sEmptyUUID, sEmptyKey, CUserInformation::makeEmpty (), false, nullptr);
 }
 
 
@@ -117,7 +118,7 @@ void CAPISessionHandler::authorizeSession(const std::string& sSessionUUID, const
 }
 
 
-void CAPISessionHandler::setUserDetailsForSession(const std::string& sSessionUUID, const std::string& sUsername, const std::string& sHashedPassword)
+void CAPISessionHandler::setUserDetailsForSession(const std::string& sSessionUUID, const std::string& sUsername, const std::string& sHashedPassword, const std::string& sUserUUID, const std::string& sUserDescription, const std::string& sUserRoleIdentifier, const std::string& sUserLanguageIdentifier)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	auto iIterator = m_SessionMap.find(sSessionUUID);
@@ -125,7 +126,7 @@ void CAPISessionHandler::setUserDetailsForSession(const std::string& sSessionUUI
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONUUID);
 
 	auto pSession = iIterator->second;
-	pSession->setUserDetails(sUsername, sHashedPassword);
+	pSession->setUserDetails(sUsername, sHashedPassword, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
 }
 
 std::string CAPISessionHandler::getSessionToken(const std::string& sSessionUUID)

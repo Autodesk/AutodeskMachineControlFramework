@@ -42,10 +42,77 @@ using namespace AMC;
 #define DISCRETEFIELD_MINVALUEDISTANCE 1E-6
 #define DISCRETEFIELD_MAXPOINTVALUESCOUNT (1024ULL * 1024ULL * 1024ULL)
 
+#define DISCRETEFIELD2D_STREAMFILESIGN 0x17AE971A
+#define DISCRETEFIELD2D_STREAMFILEMAJORVERSION 1
+#define DISCRETEFIELD2D_STREAMFILEMINORVERSION 0
+#define DISCRETEFIELD2D_STREAMFILEPATCHVERSION 0
+
+#define DISCRETEFIELD2D_STREAMSTORAGETYPE_RAWDATA 1
+
+#pragma pack(push)
+#pragma pack(1)
+typedef struct _sDiscreteField2DStreamHeader {
+	uint32_t m_nFileSign;
+	uint8_t m_nMajorVersion;
+	uint8_t m_nMinorVersion;
+	uint8_t m_nPatchVersion;
+	uint8_t m_nStreamStorageType;
+	uint32_t m_nPixelCountX;
+	uint32_t m_nPixelCountY;
+	double m_dDPIX;
+	double m_dDPIY;
+	double m_dOriginX;
+	double m_dOriginY;
+	uint64_t m_nDataOffset;
+	uint32_t m_nReserved[32];
+} sDiscreteField2DStreamHeader;
+#pragma pack(pop)
+
+
 PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::createFromBuffer(const std::vector<uint8_t>& Buffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (Buffer.size () < sizeof (sDiscreteField2DStreamHeader))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDBUFFER);
 
+	sDiscreteField2DStreamHeader* header = (sDiscreteField2DStreamHeader*)Buffer.data();
+
+	if (header->m_nFileSign != DISCRETEFIELD2D_STREAMFILESIGN)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDFILESIGN);
+
+	if (header->m_nMajorVersion != DISCRETEFIELD2D_STREAMFILEMAJORVERSION)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INCOMPATIBLEDISCRETEFIELDFILEVERSION);
+
+	if (header->m_nMinorVersion > DISCRETEFIELD2D_STREAMFILEMINORVERSION)
+		throw ELibMCInterfaceException(LIBMC_ERROR_TOONEWDISCRETEFIELDFILEVERSION);
+
+	if (header->m_nStreamStorageType != DISCRETEFIELD2D_STREAMSTORAGETYPE_RAWDATA)
+		throw ELibMCInterfaceException(LIBMC_ERROR_TOONEWDISCRETEFIELDSTREAMTYPE);
+
+	if (header->m_nDataOffset < sizeof(sDiscreteField2DStreamHeader))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET);
+
+	auto pInstance = std::make_shared<CDiscreteFieldData2DInstance>(header->m_nPixelCountX, header->m_nPixelCountY, header->m_dDPIX, header->m_dOriginX, header->m_dOriginX, header->m_dOriginY, 0.0, false);
+
+	uint64_t nPixelCount = (uint64_t)header->m_nPixelCountX * (uint64_t)header->m_nPixelCountY;
+	if (header->m_nDataOffset + nPixelCount > Buffer.size ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE);
+
+	auto * pDataVector = pInstance->m_Data.get ();
+	if (pDataVector == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA);
+	if (pDataVector->size () != nPixelCount)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA);
+
+	double * pTargetPtr = pDataVector->data();
+	double * pSourcePtr = &pDataVector->at(header->m_nDataOffset);
+	for (uint64_t nIndex = 0; nIndex < nPixelCount; nIndex++) {
+		*pTargetPtr = *pSourcePtr;
+		pTargetPtr++;
+		pSourcePtr++;
+	}
+
+
+	return pInstance;
 }
 
 CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dDefaultValue, bool bDoClear)

@@ -84,7 +84,7 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID, AMC::PUserInformation pUserInformation)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
@@ -97,7 +97,8 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
       m_sLogSubSystem ("ui"),
       m_sSenderName (sSenderName),
       m_pClientVariableHandler (pClientVariableHandler),
-      m_pBuildJobHandler (pBuildJobHandler)
+      m_pBuildJobHandler (pBuildJobHandler), 
+      m_pUserInformation (pUserInformation)
 {
 
     if (pLogger.get() == nullptr)
@@ -114,7 +115,9 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pStateJournal.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
-    
+    if (pUserInformation.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
     if (pUIHandler == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
@@ -494,4 +497,36 @@ IJournalVariable* CUIEnvironment::RetrieveJournalVariable(const std::string& sVa
     return new CJournalVariable (m_pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
 }
 
+bool CUIEnvironment::CheckPermission(const std::string& sPermissionIdentifier)
+{
+    return false;
+}
+
+std::string CUIEnvironment::GetCurrentUserLogin()
+{
+    return m_pUserInformation->getLogin();
+}
+
+std::string CUIEnvironment::GetCurrentUserDescription()
+{
+    return m_pUserInformation->getDescription();
+}
+
+std::string CUIEnvironment::GetCurrentUserRole()
+{
+    return m_pUserInformation->getRoleIdentifier();
+
+}
+
+std::string CUIEnvironment::GetCurrentUserLanguage()
+{
+    return m_pUserInformation->getLanguageIdentifier();
+
+}
+
+std::string CUIEnvironment::GetCurrentUserUUID()
+{
+    return m_pUserInformation->getUUID();
+
+}
 

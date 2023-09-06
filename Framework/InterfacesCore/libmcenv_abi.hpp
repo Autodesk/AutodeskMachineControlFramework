@@ -4160,6 +4160,124 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_parsexmldata(LibMCEnv
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievejournalvariable(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
 
+/**
+* Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserLogin - Login of user to check
+* @param[in] pPermissionIdentifier - Permission identifier
+* @param[out] pUserHasPermission - Returns if the user has permission
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkuserpermission(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const char * pPermissionIdentifier, bool * pUserHasPermission);
+
+/**
+* Returns a users description.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserLogin - Login of user
+* @param[in] nUserDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserDescriptionBuffer -  buffer of Returns the users description. Fails if user is not known to the system., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuserdescription(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserDescriptionBufferSize, LibMCEnv_uint32* pUserDescriptionNeededChars, char * pUserDescriptionBuffer);
+
+/**
+* Returns a users role identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserLogin - Login of user
+* @param[in] nUserRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserRoleBuffer -  buffer of Returns the users role identifier. Fails if user is not known to the system., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuserrole(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserRoleBufferSize, LibMCEnv_uint32* pUserRoleNeededChars, char * pUserRoleBuffer);
+
+/**
+* Returns a users language identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserLogin - Login of user
+* @param[in] nUserLanguageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserLanguageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserLanguageBuffer -  buffer of Returns the users language identifier. Fails if user is not known to the system., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuserlanguage(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserLanguageBufferSize, LibMCEnv_uint32* pUserLanguageNeededChars, char * pUserLanguageBuffer);
+
+/**
+* Returns a users UUID.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserLogin - Login of user
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of Returns the user UUID. Fails if user is not known to the system., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuseruuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+
+/**
+* Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserUUID - UUID of user
+* @param[in] pPermissionIdentifier - Permission identifier
+* @param[out] pUserHasPermission - Returns if the user has permission
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkuserpermissionbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const char * pPermissionIdentifier, bool * pUserHasPermission);
+
+/**
+* Returns the a users login name. Fails if user is not known to the system.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserUUID - UUID of user
+* @param[in] nUserLoginBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserLoginNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserLoginBuffer -  buffer of Returns the users login name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuserloginbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserLoginBufferSize, LibMCEnv_uint32* pUserLoginNeededChars, char * pUserLoginBuffer);
+
+/**
+* Returns a users description.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserUUID - UUID of user
+* @param[in] nUserDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserDescriptionBuffer -  buffer of Returns the users description. Fails if user is not known to the system., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuserdescriptionbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserDescriptionBufferSize, LibMCEnv_uint32* pUserDescriptionNeededChars, char * pUserDescriptionBuffer);
+
+/**
+* Returns a users role identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserUUID - UUID of user
+* @param[in] nUserRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserRoleBuffer -  buffer of Returns the users role identifier. Fails if user is not known to the system., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuserrolebyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserRoleBufferSize, LibMCEnv_uint32* pUserRoleNeededChars, char * pUserRoleBuffer);
+
+/**
+* Returns a users language identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUserUUID - UUID of user
+* @param[in] nUserLanguageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserLanguageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserLanguageBuffer -  buffer of Returns the users language identifier. Fails if user is not known to the system., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuserlanguagebyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserLanguageBufferSize, LibMCEnv_uint32* pUserLanguageNeededChars, char * pUserLanguageBuffer);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -4630,6 +4748,71 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(Li
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrievejournalvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
+
+/**
+* Returns if the current user has a certain permission. Fails if permission is not known to the system.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pPermissionIdentifier - Permission identifier
+* @param[out] pUserHasPermission - Returns if the user has permission
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_checkpermission(LibMCEnv_UIEnvironment pUIEnvironment, const char * pPermissionIdentifier, bool * pUserHasPermission);
+
+/**
+* Returns the current user login name.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nUserLoginBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserLoginNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserLoginBuffer -  buffer of Returns the current users login name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentuserlogin(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nUserLoginBufferSize, LibMCEnv_uint32* pUserLoginNeededChars, char * pUserLoginBuffer);
+
+/**
+* Returns the current user description.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nUserDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserDescriptionBuffer -  buffer of Returns the current users description., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentuserdescription(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nUserDescriptionBufferSize, LibMCEnv_uint32* pUserDescriptionNeededChars, char * pUserDescriptionBuffer);
+
+/**
+* Returns the current user role identifier.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nUserRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserRoleBuffer -  buffer of Returns the current users role identifier., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentuserrole(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nUserRoleBufferSize, LibMCEnv_uint32* pUserRoleNeededChars, char * pUserRoleBuffer);
+
+/**
+* Returns the current users language identifier.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nUserLanguageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserLanguageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserLanguageBuffer -  buffer of Returns the current users language identifier., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentuserlanguage(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nUserLanguageBufferSize, LibMCEnv_uint32* pUserLanguageNeededChars, char * pUserLanguageBuffer);
+
+/**
+* Returns the current user UUID.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of Returns the current user UUID., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentuseruuid(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
 
 /*************************************************************************************************************************
  Global functions
