@@ -99,6 +99,12 @@ protected:
 
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
 
+	void writeJumpSpeed (float jumpSpeed);
+
+	void writeMarkSpeed(float markSpeed);
+
+	void writePower(float powerInPercent, bool bOIEPIDControlFlag);
+
 	void writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, bool bOIEPIDControlFlag);
 
 	uint32_t getCurrentFreeVariable0 ();
@@ -281,6 +287,14 @@ public:
 	void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) override;
 
 	void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) override;
+
+	void AddSetPower(const LibMCDriver_ScanLab_single fPower) override;
+
+	void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeed) override;
+
+	void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeed) override;
+
+	void AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDuration) override;
 
 	LibMCDriver_ScanLab_uint32 GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo) override;
 

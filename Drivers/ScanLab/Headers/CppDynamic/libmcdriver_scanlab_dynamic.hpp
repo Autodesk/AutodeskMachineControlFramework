@@ -584,8 +584,12 @@ public:
 	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent);
+	inline void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
+	inline void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
 	inline void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
 	inline void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
+	inline void AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds);
 	inline void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue);
 	inline LibMCDriver_ScanLab_uint32 GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo);
 	inline LibMCDriver_ScanLab_uint32 GetTimeStamp();
@@ -921,8 +925,12 @@ public:
 		pWrapperTable->m_RTCContext_DrawPolyline = nullptr;
 		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
+		pWrapperTable->m_RTCContext_AddSetPower = nullptr;
+		pWrapperTable->m_RTCContext_AddSetJumpSpeed = nullptr;
+		pWrapperTable->m_RTCContext_AddSetMarkSpeed = nullptr;
 		pWrapperTable->m_RTCContext_AddJumpMovement = nullptr;
 		pWrapperTable->m_RTCContext_AddMarkMovement = nullptr;
+		pWrapperTable->m_RTCContext_AddTimedMarkMovement = nullptr;
 		pWrapperTable->m_RTCContext_AddFreeVariable = nullptr;
 		pWrapperTable->m_RTCContext_GetCurrentFreeVariable = nullptr;
 		pWrapperTable->m_RTCContext_GetTimeStamp = nullptr;
@@ -1432,6 +1440,33 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetPower = (PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpower");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetPower = (PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetPower == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetJumpSpeed = (PLibMCDriver_ScanLabRTCContext_AddSetJumpSpeedPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetjumpspeed");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetJumpSpeed = (PLibMCDriver_ScanLabRTCContext_AddSetJumpSpeedPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetjumpspeed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetJumpSpeed == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetMarkSpeed = (PLibMCDriver_ScanLabRTCContext_AddSetMarkSpeedPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetmarkspeed");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetMarkSpeed = (PLibMCDriver_ScanLabRTCContext_AddSetMarkSpeedPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetmarkspeed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetMarkSpeed == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_AddJumpMovement = (PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addjumpmovement");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_AddJumpMovement = (PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addjumpmovement");
@@ -1447,6 +1482,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_AddMarkMovement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddTimedMarkMovement = (PLibMCDriver_ScanLabRTCContext_AddTimedMarkMovementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addtimedmarkmovement");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddTimedMarkMovement = (PLibMCDriver_ScanLabRTCContext_AddTimedMarkMovementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addtimedmarkmovement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddTimedMarkMovement == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2661,12 +2705,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DrawHatches == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetpower", (void**)&(pWrapperTable->m_RTCContext_AddSetPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPower == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetjumpspeed", (void**)&(pWrapperTable->m_RTCContext_AddSetJumpSpeed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetJumpSpeed == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetmarkspeed", (void**)&(pWrapperTable->m_RTCContext_AddSetMarkSpeed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetMarkSpeed == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addjumpmovement", (void**)&(pWrapperTable->m_RTCContext_AddJumpMovement));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddJumpMovement == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addmarkmovement", (void**)&(pWrapperTable->m_RTCContext_AddMarkMovement));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddMarkMovement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addtimedmarkmovement", (void**)&(pWrapperTable->m_RTCContext_AddTimedMarkMovement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddTimedMarkMovement == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addfreevariable", (void**)&(pWrapperTable->m_RTCContext_AddFreeVariable));
@@ -3537,7 +3597,7 @@ public:
 	* CRTCContext::DrawPolyline - Writes a polyline into the open list
 	* @param[in] PointsBuffer - Points of polyline to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	*/
@@ -3550,7 +3610,7 @@ public:
 	* CRTCContext::DrawPolylineOIE - Writes a polyline into the open list with OIE Enabled.
 	* @param[in] PointsBuffer - Points of polyline to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
@@ -3564,13 +3624,40 @@ public:
 	* CRTCContext::DrawHatches - Writes a list of hatches into the open list
 	* @param[in] HatchesBuffer - Hatches to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	*/
 	void CRTCContext::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
+	}
+	
+	/**
+	* CRTCContext::AddSetPower - adds a power change to the open list
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetPower(m_pHandle, fPowerInPercent));
+	}
+	
+	/**
+	* CRTCContext::AddSetJumpSpeed - adds a jump speed change to the open list
+	* @param[in] fJumpSpeedInMMPerSecond - Jump speed in mm/s
+	*/
+	void CRTCContext::AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetJumpSpeed(m_pHandle, fJumpSpeedInMMPerSecond));
+	}
+	
+	/**
+	* CRTCContext::AddSetMarkSpeed - adds a mark speed change to the open list
+	* @param[in] fMarkSpeedInMMPerSecond - Mark speed in mm/s
+	*/
+	void CRTCContext::AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetMarkSpeed(m_pHandle, fMarkSpeedInMMPerSecond));
 	}
 	
 	/**
@@ -3591,6 +3678,17 @@ public:
 	void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddMarkMovement(m_pHandle, dTargetX, dTargetY));
+	}
+	
+	/**
+	* CRTCContext::AddTimedMarkMovement - Adds a timed Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	* @param[in] dDurationInMicroseconds - Duration of mark movement in Microseconds.
+	*/
+	void CRTCContext::AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddTimedMarkMovement(m_pHandle, dTargetX, dTargetY, dDurationInMicroseconds));
 	}
 	
 	/**
@@ -3640,7 +3738,7 @@ public:
 	* CRTCContext::DrawHatchesOIE - Writes a list of hatches into the open list with OIE Enabled.
 	* @param[in] HatchesBuffer - Hatches to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.

@@ -309,7 +309,8 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_set_fly_limits = (PScanLabPtr_n_set_fly_limits)_loadScanLabAddress(hLibrary, "n_set_fly_limits");
 	this->ptr_n_range_checking = (PScanLabPtr_n_range_checking)_loadScanLabAddress(hLibrary, "n_range_checking");
 	this->ptr_n_stop_execution = (PScanLabPtr_n_stop_execution)_loadScanLabAddress(hLibrary, "n_stop_execution");
-	
+	this->ptr_n_timed_mark_abs = (PScanLabPtr_n_timed_mark_abs)_loadScanLabAddress(hLibrary, "n_timed_mark_abs");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -501,7 +502,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_range_checking = nullptr;
 
 	ptr_n_stop_execution = nullptr;
-
+	ptr_n_timed_mark_abs = nullptr;
 
 }
 
@@ -1546,6 +1547,15 @@ void CScanLabSDK::n_stop_execution(uint32_t nCardNo)
 
 	ptr_n_stop_execution(nCardNo);
 }
+
+void CScanLabSDK::n_timed_mark_abs(uint32_t nCardNo, int32_t nX, int32_t nY, double dTime)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_timed_mark_abs", std::to_string(nCardNo) + ", " + std::to_string(nX) + ", " + std::to_string(nY) + ", " + std::to_string(dTime));
+
+	ptr_n_timed_mark_abs(nCardNo, nX, nY, dTime);
+}
+
 
 void CScanLabSDK::setJournal(PScanLabSDKJournal pLogJournal)
 {

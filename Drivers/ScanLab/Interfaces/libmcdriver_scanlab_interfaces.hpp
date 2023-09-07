@@ -663,7 +663,7 @@ public:
 	* @param[in] nPointsBufferSize - Number of elements in buffer
 	* @param[in] pPointsBuffer - Points of polyline to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	*/
@@ -674,7 +674,7 @@ public:
 	* @param[in] nPointsBufferSize - Number of elements in buffer
 	* @param[in] pPointsBuffer - Points of polyline to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
@@ -686,11 +686,29 @@ public:
 	* @param[in] nHatchesBufferSize - Number of elements in buffer
 	* @param[in] pHatchesBuffer - Hatches to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	*/
 	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
+
+	/**
+	* IRTCContext::AddSetPower - adds a power change to the open list
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	virtual void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent) = 0;
+
+	/**
+	* IRTCContext::AddSetJumpSpeed - adds a jump speed change to the open list
+	* @param[in] fJumpSpeedInMMPerSecond - Jump speed in mm/s
+	*/
+	virtual void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond) = 0;
+
+	/**
+	* IRTCContext::AddSetMarkSpeed - adds a mark speed change to the open list
+	* @param[in] fMarkSpeedInMMPerSecond - Mark speed in mm/s
+	*/
+	virtual void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond) = 0;
 
 	/**
 	* IRTCContext::AddJumpMovement - Adds a Jump movement to the open list
@@ -705,6 +723,14 @@ public:
 	* @param[in] dTargetY - Y Position.
 	*/
 	virtual void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) = 0;
+
+	/**
+	* IRTCContext::AddTimedMarkMovement - Adds a timed Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	* @param[in] dDurationInMicroseconds - Duration of mark movement in Microseconds.
+	*/
+	virtual void AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds) = 0;
 
 	/**
 	* IRTCContext::AddFreeVariable - Adds a free variable set to the open list
@@ -736,7 +762,7 @@ public:
 	* @param[in] nHatchesBufferSize - Number of elements in buffer
 	* @param[in] pHatchesBuffer - Hatches to draw.
 	* @param[in] fMarkSpeed - Mark speed in mm/s
-	* @param[in] fJumpSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
 	* @param[in] fPower - Laser power in percent
 	* @param[in] fZValue - Focus Z Value
 	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.

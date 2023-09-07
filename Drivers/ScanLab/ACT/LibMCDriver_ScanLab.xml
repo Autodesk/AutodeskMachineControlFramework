@@ -389,6 +389,18 @@ Custom implementation
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 		
+		<method name="AddSetPower" description="adds a power change to the open list">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+		
+		<method name="AddSetJumpSpeed" description="adds a jump speed change to the open list">
+			<param name="JumpSpeedInMMPerSecond" type="single" pass="in" description="Jump speed in mm/s" />
+		</method>
+
+		<method name="AddSetMarkSpeed" description="adds a mark speed change to the open list">
+			<param name="MarkSpeedInMMPerSecond" type="single" pass="in" description="Mark speed in mm/s" />
+		</method>
+
 		<method name="AddJumpMovement" description="Adds a Jump movement to the open list">
 			<param name="TargetX" type="double" pass="in" description="X Position." />
 			<param name="TargetY" type="double" pass="in" description="Y Position." />
@@ -397,6 +409,12 @@ Custom implementation
 		<method name="AddMarkMovement" description="Adds a Mark movement to the open list">
 			<param name="TargetX" type="double" pass="in" description="X Position." />
 			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddTimedMarkMovement" description="Adds a timed Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+			<param name="DurationInMicroseconds" type="double" pass="in" description="Duration of mark movement in Microseconds." />
 		</method>		
 
 		<method name="AddFreeVariable" description="Adds a free variable set to the open list">

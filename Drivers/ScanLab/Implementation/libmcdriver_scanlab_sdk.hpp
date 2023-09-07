@@ -201,6 +201,8 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_limits) (uint32_t nCardNo, int32_t nXMin, int32_t nXMax, int32_t nYMin, int32_t nYMax);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_range_checking) (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nMode, uint32_t nData);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_stop_execution) (uint32_t nCardNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_timed_mark_abs) (uint32_t nCardNo, int32_t nX, int32_t nY, double dTime);
+		
 
 		class CScanLabSDKJournal {
 		private:
@@ -368,7 +370,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_fly_limits ptr_n_set_fly_limits = nullptr;
 			PScanLabPtr_n_range_checking ptr_n_range_checking = nullptr;
 			PScanLabPtr_n_stop_execution ptr_n_stop_execution = nullptr;
-
+			PScanLabPtr_n_timed_mark_abs ptr_n_timed_mark_abs = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -527,6 +529,7 @@ namespace LibMCDriver_ScanLab {
 			void n_set_fly_limits (uint32_t nCardNo, int32_t nXMin, int32_t nXMax, int32_t nYMin, int32_t nYMax);
 			void n_range_checking (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nMode, uint32_t nData);
 			void n_stop_execution (uint32_t nCardNo);
+			void n_timed_mark_abs (uint32_t nCardNo, int32_t nX, int32_t nY, double dTime);
 
 		};
 

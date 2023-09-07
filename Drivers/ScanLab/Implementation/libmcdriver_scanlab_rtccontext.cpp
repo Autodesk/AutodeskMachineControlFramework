@@ -440,29 +440,37 @@ void CRTCContext::SetLaserDelaysInBits(const LibMCDriver_ScanLab_int32 nLaserOnD
 }
 
 
-void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, bool bOIEPIDControlFlag)
+void CRTCContext::writeJumpSpeed(float jumpSpeedinMMPerSecond)
 {
-
 	double dBitsPerMM = m_dCorrectionFactor;
 
-	double dMarkSpeedInMMPerMilliSecond = (double)fMarkSpeed / 1000.0;
-	double dMarkSpeedInBits = dMarkSpeedInMMPerMilliSecond * dBitsPerMM;
-	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInBits);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
-	double dJumpSpeedInMMPerMilliSecond = (double)fJumpSpeed / 1000.0;
+	double dJumpSpeedInMMPerMilliSecond = (double)jumpSpeedinMMPerSecond / 1000.0;
 	double dJumpSpeedInBits = dJumpSpeedInMMPerMilliSecond * dBitsPerMM;
 	m_pScanLabSDK->n_set_jump_speed(m_CardNo, dJumpSpeedInBits);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+}
 
-	double fClippedPowerFactor = fPower / 100.0f;
+void CRTCContext::writeMarkSpeed(float markSpeedinMMPerSecond)
+{
+	double dBitsPerMM = m_dCorrectionFactor;
+
+	double dMarkSpeedInMMPerMilliSecond = (double)markSpeedinMMPerSecond / 1000.0;
+	double dMarkSpeedInBits = dMarkSpeedInMMPerMilliSecond * dBitsPerMM;
+	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInBits);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+}
+
+void CRTCContext::writePower(float powerInPercent, bool bOIEPIDControlFlag)
+{
+
+	double fClippedPowerFactor = powerInPercent / 100.0f;
 	if (fClippedPowerFactor > 1.0f)
 		fClippedPowerFactor = 1.0f;
 	if (fClippedPowerFactor < 0.0f)
 		fClippedPowerFactor = 0.0f;
 
 	int digitalPowerValue = 0;
-	
+
 
 	if (bOIEPIDControlFlag) {
 
@@ -493,7 +501,7 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
 			break;
 		}
-	
+
 		// See documentation what 1 means.
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
@@ -533,30 +541,41 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 		/*
-		
-		RTC5 Compatibility mode:
-		
-		switch (m_LaserPort) {
-		case eLaserPort::Port16bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
-			// m_pScanLabSDK->n_write_io_port_list(m_CardNo, digitalPowerValue);
-			break;
-		case eLaserPort::Port8bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
-			m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, digitalPowerValue);
-			break;
-		case eLaserPort::Port12BitAnalog1:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			m_pScanLabSDK->n_write_da_1_list(m_CardNo, digitalPowerValue);
-			break;
-		case eLaserPort::Port12BitAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			m_pScanLabSDK->n_write_da_2_list(m_CardNo, digitalPowerValue);
-			break;
 
-		} */
+RTC5 Compatibility mode:
+
+switch (m_LaserPort) {
+case eLaserPort::Port16bitDigital:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+	// m_pScanLabSDK->n_write_io_port_list(m_CardNo, digitalPowerValue);
+	break;
+case eLaserPort::Port8bitDigital:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+	m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, digitalPowerValue);
+	break;
+case eLaserPort::Port12BitAnalog1:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+	m_pScanLabSDK->n_write_da_1_list(m_CardNo, digitalPowerValue);
+	break;
+case eLaserPort::Port12BitAnalog2:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+	m_pScanLabSDK->n_write_da_2_list(m_CardNo, digitalPowerValue);
+	break;
+
+} */
 
 	}
+}
+
+
+void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, bool bOIEPIDControlFlag)
+{
+
+	writeMarkSpeed(fMarkSpeed);
+	writeJumpSpeed(fJumpSpeed);
+	writePower(fPower, bOIEPIDControlFlag);
+
+
 
 }
 
@@ -703,6 +722,36 @@ void CRTCContext::StopExecution()
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 }
+
+void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
+{
+	writePower(fPowerInPercent, false);
+}
+
+void CRTCContext::AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond)
+{
+	writeJumpSpeed(fJumpSpeedInMMPerSecond);
+}
+
+void CRTCContext::AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond)
+{
+	writeMarkSpeed(fMarkSpeedInMMPerSecond);
+}
+
+void CRTCContext::AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	double dX = round((dTargetX - m_dLaserOriginX) * m_dCorrectionFactor);
+	double dY = round((dTargetY - m_dLaserOriginY) * m_dCorrectionFactor);
+
+	int32_t intX = (int32_t)dX;
+	int32_t intY = (int32_t)dY;
+
+	m_pScanLabSDK->n_timed_mark_abs(m_CardNo, intX, intY, dDurationInMicroseconds);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
 
 LibMCDriver_ScanLab_uint32 CRTCContext::GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo)
 {

@@ -421,7 +421,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserDelay
 * @param[in] nPointsBufferSize - Number of elements in buffer
 * @param[in] pPointsBuffer - Point2D buffer of Points of polyline to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
@@ -435,7 +435,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineP
 * @param[in] nPointsBufferSize - Number of elements in buffer
 * @param[in] pPointsBuffer - Point2D buffer of Points of polyline to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
@@ -450,12 +450,39 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineO
 * @param[in] nHatchesBufferSize - Number of elements in buffer
 * @param[in] pHatchesBuffer - Hatch2D buffer of Hatches to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
+
+/**
+* adds a power change to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fPowerInPercent - Laser power in percent
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent);
+
+/**
+* adds a jump speed change to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fJumpSpeedInMMPerSecond - Jump speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetJumpSpeedPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
+
+/**
+* adds a mark speed change to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fMarkSpeedInMMPerSecond - Mark speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetMarkSpeedPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
 
 /**
 * Adds a Jump movement to the open list
@@ -476,6 +503,17 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddJumpMoveme
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY);
+
+/**
+* Adds a timed Mark movement to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @param[in] dDurationInMicroseconds - Duration of mark movement in Microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddTimedMarkMovementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY, LibMCDriver_ScanLab_double dDurationInMicroseconds);
 
 /**
 * Adds a free variable set to the open list
@@ -521,7 +559,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StopExecution
 * @param[in] nHatchesBufferSize - Number of elements in buffer
 * @param[in] pHatchesBuffer - Hatch2D buffer of Hatches to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
@@ -1732,8 +1770,12 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DrawPolylinePtr m_RTCContext_DrawPolyline;
 	PLibMCDriver_ScanLabRTCContext_DrawPolylineOIEPtr m_RTCContext_DrawPolylineOIE;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr m_RTCContext_DrawHatches;
+	PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr m_RTCContext_AddSetPower;
+	PLibMCDriver_ScanLabRTCContext_AddSetJumpSpeedPtr m_RTCContext_AddSetJumpSpeed;
+	PLibMCDriver_ScanLabRTCContext_AddSetMarkSpeedPtr m_RTCContext_AddSetMarkSpeed;
 	PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr m_RTCContext_AddJumpMovement;
 	PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr m_RTCContext_AddMarkMovement;
+	PLibMCDriver_ScanLabRTCContext_AddTimedMarkMovementPtr m_RTCContext_AddTimedMarkMovement;
 	PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr m_RTCContext_AddFreeVariable;
 	PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr m_RTCContext_GetCurrentFreeVariable;
 	PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr m_RTCContext_GetTimeStamp;

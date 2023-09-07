@@ -1165,6 +1165,78 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatches(LibMCDriver
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetpower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->AddSetPower(fPowerInPercent);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetjumpspeed(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->AddSetJumpSpeed(fJumpSpeedInMMPerSecond);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetmarkspeed(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->AddSetMarkSpeed(fMarkSpeedInMMPerSecond);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addjumpmovement(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -1199,6 +1271,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addmarkmovement(LibMCDr
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		pIRTCContext->AddMarkMovement(dTargetX, dTargetY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addtimedmarkmovement(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY, LibMCDriver_ScanLab_double dDurationInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->AddTimedMarkMovement(dTargetX, dTargetY, dDurationInMicroseconds);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -4268,10 +4364,18 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_drawpolylineoie;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_drawhatches") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_drawhatches;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetpower") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addsetpower;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetjumpspeed") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addsetjumpspeed;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetmarkspeed") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addsetmarkspeed;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addjumpmovement") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addjumpmovement;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addmarkmovement") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addmarkmovement;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_addtimedmarkmovement") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addtimedmarkmovement;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addfreevariable") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addfreevariable;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_getcurrentfreevariable") 
