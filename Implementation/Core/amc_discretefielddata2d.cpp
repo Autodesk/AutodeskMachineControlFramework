@@ -94,7 +94,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::createFromBuffer(cons
 	auto pInstance = std::make_shared<CDiscreteFieldData2DInstance>(header->m_nPixelCountX, header->m_nPixelCountY, header->m_dDPIX, header->m_dOriginX, header->m_dOriginX, header->m_dOriginY, 0.0, false);
 
 	uint64_t nPixelCount = (uint64_t)header->m_nPixelCountX * (uint64_t)header->m_nPixelCountY;
-	if (header->m_nDataOffset + nPixelCount > Buffer.size ())
+	if (header->m_nDataOffset + nPixelCount * sizeof (double) > Buffer.size ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE);
 
 	auto * pDataVector = pInstance->m_Data.get ();
@@ -104,7 +104,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::createFromBuffer(cons
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA);
 
 	double * pTargetPtr = pDataVector->data();
-	double * pSourcePtr = &pDataVector->at(header->m_nDataOffset);
+	double * pSourcePtr = (double*)&Buffer.at(header->m_nDataOffset);
 	for (uint64_t nIndex = 0; nIndex < nPixelCount; nIndex++) {
 		*pTargetPtr = *pSourcePtr;
 		pTargetPtr++;
@@ -335,7 +335,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::ScaleFieldDown(const 
 			uint32_t nCount = 0;
 
 			for (uint32_t dY = 0; dY < nFactorY; dY++) {
-				size_t nTargetY = (nY + dY);
+				size_t nTargetY = ((uint64_t)nY + dY);
 
 				if (nTargetY < m_nPixelCountY) {
 
@@ -617,7 +617,29 @@ void CDiscreteFieldData2DInstance::renderAveragePointValues_FloorSampling(const 
 
 void CDiscreteFieldData2DInstance::saveToBuffer(std::vector<uint8_t>& Buffer)
 {
-	Buffer.resize (m_nPixelCountX * m_nPixelCountY * sizeof (double));
+	uint64_t nPixelCount = m_nPixelCountX * m_nPixelCountY;
+	Buffer.resize (sizeof (sDiscreteField2DStreamHeader) + nPixelCount * sizeof (double));
+	sDiscreteField2DStreamHeader* header = (sDiscreteField2DStreamHeader*)Buffer.data();
 
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	memset((void*)header, 0, sizeof(sDiscreteField2DStreamHeader));
+	header->m_nFileSign = DISCRETEFIELD2D_STREAMFILESIGN;
+	header->m_nMajorVersion = DISCRETEFIELD2D_STREAMFILEMAJORVERSION;
+	header->m_nMinorVersion = DISCRETEFIELD2D_STREAMFILEMINORVERSION;
+	header->m_nPatchVersion = DISCRETEFIELD2D_STREAMFILEPATCHVERSION;
+	header->m_nStreamStorageType = DISCRETEFIELD2D_STREAMSTORAGETYPE_RAWDATA;
+	header->m_nPixelCountX = (uint32_t) m_nPixelCountX;
+	header->m_nPixelCountY = (uint32_t) m_nPixelCountY;
+	header->m_dDPIX = m_dDPIX;
+	header->m_dDPIY = m_dDPIY;
+	header->m_dOriginX = m_dOriginX;
+	header->m_dOriginY = m_dOriginY;
+	header->m_nDataOffset = sizeof(sDiscreteField2DStreamHeader);
+
+	double* pSourcePtr = m_Data.get()->data();
+	double* pTargetPtr = (double*)&Buffer.at(header->m_nDataOffset);
+	for (uint64_t nIndex = 0; nIndex < nPixelCount; nIndex++) {
+		*pTargetPtr = *pSourcePtr;
+		pTargetPtr++;
+		pSourcePtr++;
+	}
 }
