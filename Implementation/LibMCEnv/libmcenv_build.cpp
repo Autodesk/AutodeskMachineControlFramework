@@ -186,7 +186,8 @@ IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByUUID(const std::string& sData
 
 	std::vector<uint8_t> Buffer;
 
-	auto pStorageStream = m_pStorage->RetrieveStream(sDataUUID);
+	auto pJobData = m_pBuildJob->RetrieveJobData(sDataUUID);
+	auto pStorageStream = pJobData->GetStorageStream ();
 	pStorageStream->GetContent(Buffer);
 
 	auto pFieldData2D = AMC::CDiscreteFieldData2DInstance::createFromBuffer (Buffer);

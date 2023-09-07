@@ -338,7 +338,7 @@ IBuildJobDataIterator* CBuildJob::ListJobData()
 {
     std::unique_ptr<CBuildJobDataIterator> buildJobIterator (new CBuildJobDataIterator ());
 
-    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier,buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? ORDER BY buildjobdata.timestamp";
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? ORDER BY buildjobdata.timestamp";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, m_sUUID);
     pStatement->setInt(2, 1);

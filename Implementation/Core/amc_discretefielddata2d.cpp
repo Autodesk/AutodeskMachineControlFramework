@@ -91,7 +91,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::createFromBuffer(cons
 	if (header->m_nDataOffset < sizeof(sDiscreteField2DStreamHeader))
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET);
 
-	auto pInstance = std::make_shared<CDiscreteFieldData2DInstance>(header->m_nPixelCountX, header->m_nPixelCountY, header->m_dDPIX, header->m_dOriginX, header->m_dOriginX, header->m_dOriginY, 0.0, false);
+	auto pInstance = std::make_shared<CDiscreteFieldData2DInstance>(header->m_nPixelCountX, header->m_nPixelCountY, header->m_dDPIX, header->m_dDPIY, header->m_dOriginX, header->m_dOriginY, 0.0, false);
 
 	uint64_t nPixelCount = (uint64_t)header->m_nPixelCountX * (uint64_t)header->m_nPixelCountY;
 	if (header->m_nDataOffset + nPixelCount * sizeof (double) > Buffer.size ())
