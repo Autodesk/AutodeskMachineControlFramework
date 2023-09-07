@@ -217,7 +217,7 @@ LibMCData::eBuildJobDataType CBuildJobData::convertStringToBuildJobDataType(cons
     if (sValue == "thumbnail")
         return LibMCData::eBuildJobDataType::Thumbnail;
 
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDDATATYPE);
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDDATATYPE, "invalid data type: " + sValue);
 
 }
 
