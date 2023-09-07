@@ -555,6 +555,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET 538 /** Invalid discrete field data offset */
 #define LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE 539 /** Invalid discrete field stream size */
 #define LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA 540 /** Invalid discrete field internal data */
+#define LIBMC_ERROR_DEFAULTROLEHASNOTBEENSET 541 /** Default role has not been set */
+#define LIBMC_ERROR_EMPTYROLEIDENTIFIER 542 /** Empty role identifier */
+#define LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER 543 /** Empty permission identifier */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1022,6 +1025,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET: return "Invalid discrete field data offset";
     case LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE: return "Invalid discrete field stream size";
     case LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA: return "Invalid discrete field internal data";
+    case LIBMC_ERROR_DEFAULTROLEHASNOTBEENSET: return "Default role has not been set";
+    case LIBMC_ERROR_EMPTYROLEIDENTIFIER: return "Empty role identifier";
+    case LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
     default: return "unknown error";
   }
 }

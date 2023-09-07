@@ -147,6 +147,28 @@ namespace AMC {
 		m_pDefaultRole = pDefaultRole;
 	}
 
+	PAccessRole CAccessControl::getDefaultRole()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_pDefaultRole.get () == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_DEFAULTROLEHASNOTBEENSET);
+
+		return m_pDefaultRole;
+	}
+
+
+	bool CAccessControl::checkPermissionInRole(const std::string& sRoleIdentifier, const std::string& sPermissionIdentifier)
+	{
+		if (sRoleIdentifier.empty ())
+			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYROLEIDENTIFIER);
+		if (sPermissionIdentifier.empty ())
+			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER);
+
+		PAccessRole pRole = findRole (sRoleIdentifier, true);
+		return pRole->hasPermission(sPermissionIdentifier);
+	}
+
 
 }
 

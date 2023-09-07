@@ -72,7 +72,11 @@ namespace AMC {
 
 		void setDefaultRole (const std::string& sIdentifier);
 
+		PAccessRole getDefaultRole();
+
 		void setToNoAccessControl ();
+
+		bool checkPermissionInRole (const std::string & sRoleIdentifier, const std::string & sPermissionIdentifier);
 
 	};
 

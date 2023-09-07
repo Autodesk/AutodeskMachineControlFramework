@@ -564,6 +564,10 @@
 		<error name="INVALIDDISCRETEFIELDDATAOFFSET" code="538" description="Invalid discrete field data offset"/>		
 		<error name="INVALIDDISCRETEFIELDSTREAMSIZE" code="539" description="Invalid discrete field stream size"/>		
 		<error name="INVALIDDISCRETEFIELDINTERNALDATA" code="540" description="Invalid discrete field internal data"/>		
+		<error name="DEFAULTROLEHASNOTBEENSET" code="541" description="Default role has not been set"/>		
+		<error name="EMPTYROLEIDENTIFIER" code="542" description="Empty role identifier"/>		
+		<error name="EMPTYPERMISSIONIDENTIFIER" code="543" description="Empty permission identifier"/>		
+		
 
 	</errors>
 	

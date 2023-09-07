@@ -81,6 +81,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
 	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
 	amcDeclareDependingClass(CUserInformation, PUserInformation);
+	amcDeclareDependingClass(CAccessControl, PAccessControl);
 
 
 	class CUIHandleEventResponse {
@@ -121,6 +122,7 @@ namespace AMC {
 		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
 		PStateJournal m_pStateJournal;
+		PAccessControl m_pAccessControl;
 		PLogger m_pLogger;
 
 		std::vector <PUIMenuItem> m_MenuItems;
@@ -153,7 +155,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string & sTestOutputPath, const std::string & sSystemUserID);
+		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string & sTestOutputPath, const std::string & sSystemUserID, PAccessControl pAccessControl);
 		
 		virtual ~CUIHandler();
 		

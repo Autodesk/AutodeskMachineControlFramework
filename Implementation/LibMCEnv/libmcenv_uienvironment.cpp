@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_discretefielddata2d.hpp"
 
 #include "amc_systemstate.hpp"
+#include "amc_accesscontrol.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
@@ -47,7 +48,6 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
 #include "libmcdata_dynamic.hpp"
-#include "amc_systemstate.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -84,7 +84,7 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID, AMC::PUserInformation pUserInformation)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
@@ -98,7 +98,8 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
       m_sSenderName (sSenderName),
       m_pClientVariableHandler (pClientVariableHandler),
       m_pBuildJobHandler (pBuildJobHandler), 
-      m_pUserInformation (pUserInformation)
+      m_pUserInformation (pUserInformation),
+      m_pAccessControl (pAccessControl)
 {
 
     if (pLogger.get() == nullptr)
@@ -116,6 +117,8 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
     if (pStateJournal.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
     if (pUserInformation.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pAccessControl.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
     if (pUIHandler == nullptr)
@@ -499,7 +502,7 @@ IJournalVariable* CUIEnvironment::RetrieveJournalVariable(const std::string& sVa
 
 bool CUIEnvironment::CheckPermission(const std::string& sPermissionIdentifier)
 {
-    return false;
+    return m_pAccessControl->checkPermissionInRole(m_pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
 }
 
 std::string CUIEnvironment::GetCurrentUserLogin()
