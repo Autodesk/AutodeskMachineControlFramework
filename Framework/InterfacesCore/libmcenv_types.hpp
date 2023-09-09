@@ -213,6 +213,10 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM 10116 /** Could not retrieve PNG stream */
 #define LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA 10117 /** Could not store field data */
 #define LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND 10118 /** Discrete field data not found */
+#define LIBMCENV_ERROR_EMPTYUSERLOGIN 10119 /** Empty user login */
+#define LIBMCENV_ERROR_INVALIDUSERLOGIN 10120 /** Invalid user login */
+#define LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER 10121 /** Empty permission identifier */
+#define LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER 10122 /** Invalid permission identifier */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -338,6 +342,10 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
     case LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA: return "Could not store field data";
     case LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND: return "Discrete field data not found";
+    case LIBMCENV_ERROR_EMPTYUSERLOGIN: return "Empty user login";
+    case LIBMCENV_ERROR_INVALIDUSERLOGIN: return "Invalid user login";
+    case LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
+    case LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER: return "Invalid permission identifier";
     default: return "unknown error";
   }
 }

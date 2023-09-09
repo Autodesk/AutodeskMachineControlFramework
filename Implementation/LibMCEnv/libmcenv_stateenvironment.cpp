@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_handler.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_xmldocument.hpp"
+#include "amc_accesscontrol.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -501,53 +502,147 @@ IJournalVariable* CStateEnvironment::RetrieveJournalVariable(const std::string& 
 
 bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sUserLogin.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sUserLogin))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
+
+	if (sPermissionIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPermissionIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER, sPermissionIdentifier);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pAccessControl = m_pSystemState->accessControl();
+
+	std::string sUserRole = pLoginHandler->GetUserRole (sUserLogin);
+	AMC::PAccessRole pRole;
+	if (sUserRole.empty())
+		pRole = pAccessControl->findRole(sUserRole, true);
+	else
+		pRole = pAccessControl->getDefaultRole();
+
+	return pRole->hasPermission(sPermissionIdentifier);
 }
 
 std::string CStateEnvironment::GetUserDescription(const std::string& sUserLogin)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sUserLogin.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	return pLoginHandler->GetUserDescription(sUserLogin);
 }
 
 std::string CStateEnvironment::GetUserRole(const std::string& sUserLogin)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sUserLogin.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pAccessControl = m_pSystemState->accessControl();
+
+	std::string sUserRole = pLoginHandler->GetUserRole(sUserLogin);
+	AMC::PAccessRole pRole;
+	if (sUserRole.empty())
+		pRole = pAccessControl->findRole(sUserRole, true);
+	else
+		pRole = pAccessControl->getDefaultRole();
+
+	return pRole->getIdentifier();
 }
 
 std::string CStateEnvironment::GetUserLanguage(const std::string& sUserLogin)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sUserLogin.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	return pLoginHandler->GetUserLanguage(sUserLogin);
 }
 
 std::string CStateEnvironment::GetUserUUID(const std::string& sUserLogin)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sUserLogin.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	return pLoginHandler->GetUserUUID(sUserLogin);
 }
 
 bool CStateEnvironment::CheckUserPermissionByUUID(const std::string& sUserUUID, const std::string& sPermissionIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+	if (sPermissionIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPermissionIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER, sPermissionIdentifier);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pAccessControl = m_pSystemState->accessControl();
+
+	std::string sUserRole = pLoginHandler->GetUserRoleByUUID(sNormalizedUUID);
+	AMC::PAccessRole pRole;
+	if (sUserRole.empty())
+		pRole = pAccessControl->findRole(sUserRole, true);
+	else
+		pRole = pAccessControl->getDefaultRole();
+
+	return pRole->hasPermission(sPermissionIdentifier);
 }
 
 
 std::string CStateEnvironment::GetUserLoginByUUID(const std::string& sUserUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+
+	return pLoginHandler->GetUsernameByUUID(sNormalizedUUID);
 }
 
 
 std::string CStateEnvironment::GetUserDescriptionByUUID(const std::string& sUserUUID) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+
+	return pLoginHandler->GetUserDescriptionByUUID(sNormalizedUUID);
 }
 
 std::string CStateEnvironment::GetUserRoleByUUID(const std::string& sUserUUID) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pAccessControl = m_pSystemState->accessControl();
+
+	std::string sUserRole = pLoginHandler->GetUserRoleByUUID(sNormalizedUUID);
+	AMC::PAccessRole pRole;
+	if (sUserRole.empty())
+		pRole = pAccessControl->findRole(sUserRole, true);
+	else
+		pRole = pAccessControl->getDefaultRole();
+
+	return pRole->getIdentifier();
 }
 
 
 std::string CStateEnvironment::GetUserLanguageByUUID(const std::string& sUserUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+
+	return pLoginHandler->GetUserLanguageByUUID(sNormalizedUUID);
 }

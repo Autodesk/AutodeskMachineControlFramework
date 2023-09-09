@@ -156,7 +156,10 @@
 		<error name="COULDNOTRETRIEVEPNGSTREAM" code="10116" description="Could not retrieve PNG stream"/>
 		<error name="COULDNOTSTOREFIELDDATA" code="10117" description="Could not store field data"/>
 		<error name="DISCRETEFIELDDATANOTFOUND" code="10118" description="Discrete field data not found"/>
-
+		<error name="EMPTYUSERLOGIN" code="10119" description="Empty user login"/>
+		<error name="INVALIDUSERLOGIN" code="10120" description="Invalid user login"/>
+		<error name="EMPTYPERMISSIONIDENTIFIER" code="10121" description="Empty permission identifier"/>
+		<error name="INVALIDPERMISSIONIDENTIFIER" code="10122" description="Invalid permission identifier"/>
 		
 	</errors>
 
