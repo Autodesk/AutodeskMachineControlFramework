@@ -558,6 +558,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DEFAULTROLEHASNOTBEENSET 541 /** Default role has not been set */
 #define LIBMC_ERROR_EMPTYROLEIDENTIFIER 542 /** Empty role identifier */
 #define LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER 543 /** Empty permission identifier */
+#define LIBMC_ERROR_USERHASUNKNOWNROLE 544 /** User has unknown role */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1028,6 +1029,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DEFAULTROLEHASNOTBEENSET: return "Default role has not been set";
     case LIBMC_ERROR_EMPTYROLEIDENTIFIER: return "Empty role identifier";
     case LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
+    case LIBMC_ERROR_USERHASUNKNOWNROLE: return "User has unknown role";
     default: return "unknown error";
   }
 }

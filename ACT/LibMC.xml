@@ -567,6 +567,8 @@
 		<error name="DEFAULTROLEHASNOTBEENSET" code="541" description="Default role has not been set"/>		
 		<error name="EMPTYROLEIDENTIFIER" code="542" description="Empty role identifier"/>		
 		<error name="EMPTYPERMISSIONIDENTIFIER" code="543" description="Empty permission identifier"/>		
+		<error name="USERHASUNKNOWNROLE" code="544" description="User has unknown role"/>		
+		
 		
 
 	</errors>

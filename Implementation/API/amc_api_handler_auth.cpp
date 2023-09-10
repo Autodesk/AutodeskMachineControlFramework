@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
 
+#include "amc_userinformation.hpp"
 #include "common_utils.hpp"
 
 #include <vector>
@@ -44,10 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash)
-	: CAPIHandler (sClientHash), m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash)
+CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash, PAccessControl pAccessControl)
+	: CAPIHandler (sClientHash), m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash), m_pAccessControl (pAccessControl)
 {
 
+	if (pAccessControl.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pSessionHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pLoginHandler.get() == nullptr)
@@ -150,7 +153,10 @@ void CAPIHandler_Auth::handleNewSessionRequest(const uint8_t* pBodyData, const s
 		// password hash is calculateSHA256FromString(sLoginSalt + "password"); 
 		m_pLoginHandler->GetUserDetails(sUserName, sLoginSalt, sHashedPassword);
 		m_pLoginHandler->GetUserProperties(sUserName, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
-		
+				
+		if (sUserRoleIdentifier.empty())
+			sUserRoleIdentifier = m_pAccessControl->getDefaultRole()->getIdentifier();
+
 		m_pSessionHandler->setUserDetailsForSession(pAuth->getSessionUUID(), sUserName, sHashedPassword, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
 	}
 	else {
@@ -173,6 +179,11 @@ void CAPIHandler_Auth::handleAuthorizeRequest(const uint8_t* pBodyData, const si
 
 	if (pAuth->userIsAuthorized())
 		throw ELibMCInterfaceException(LIBMC_ERROR_USERALREADYAUTHORIZED);
+
+	auto pUserInformation = pAuth->getUserInformation();
+	if (!m_pAccessControl->hasRole(pUserInformation->getRoleIdentifier())) {
+		throw ELibMCInterfaceException(LIBMC_ERROR_USERHASUNKNOWNROLE, sSessionUUID);
+	}
 
 	auto sSaltedPassword = pRequest.getSHA256(AMC_API_KEY_AUTH_SALTEDPASSWORD, LIBMC_ERROR_INVALIDPASSWORD);
 	auto sClientKey = pRequest.getSHA256(AMC_API_KEY_AUTH_CLIENTKEY, LIBMC_ERROR_INVALIDCLIENTKEY);	
