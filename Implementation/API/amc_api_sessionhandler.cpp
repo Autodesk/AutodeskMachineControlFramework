@@ -129,6 +129,22 @@ void CAPISessionHandler::setUserDetailsForSession(const std::string& sSessionUUI
 	pSession->setUserDetails(sUsername, sHashedPassword, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
 }
 
+void CAPISessionHandler::getUserDetailsForSession(const std::string& sSessionUUID, std::string& sUsername, std::string& sUserUUID, std::string& sUserDescription, std::string& sUserRoleIdentifier, std::string& sUserLanguageIdentifier)
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+	auto iIterator = m_SessionMap.find(sSessionUUID);
+	if (iIterator == m_SessionMap.end())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONUUID);
+
+	auto pSession = iIterator->second;
+	sUsername = pSession->getUserName();
+	sUserUUID = pSession->getUserUUID();
+	sUserDescription = pSession->getUserDescription();
+	sUserRoleIdentifier = pSession->getUserRoleIdentifier();
+	sUserLanguageIdentifier = pSession->getUserLanguageIdentifier();
+
+}
+
 std::string CAPISessionHandler::getSessionToken(const std::string& sSessionUUID)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);

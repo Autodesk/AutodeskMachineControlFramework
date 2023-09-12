@@ -74,6 +74,10 @@ namespace AMC {
 		std::string getUUID ();		
 		std::string getKey ();
 		std::string getUserName ();
+		std::string getUserUUID();
+		std::string getUserDescription();
+		std::string getUserLanguageIdentifier();
+		std::string getUserRoleIdentifier();
 		std::string getToken ();
 		bool isAuthenticated ();
 		

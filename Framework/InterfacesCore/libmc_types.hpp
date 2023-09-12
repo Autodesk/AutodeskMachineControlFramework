@@ -559,6 +559,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EMPTYROLEIDENTIFIER 542 /** Empty role identifier */
 #define LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER 543 /** Empty permission identifier */
 #define LIBMC_ERROR_USERHASUNKNOWNROLE 544 /** User has unknown role */
+#define LIBMC_ERROR_MISSINGDEFAULTACCESSROLE 545 /** Missing default access role */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1030,6 +1031,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EMPTYROLEIDENTIFIER: return "Empty role identifier";
     case LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
     case LIBMC_ERROR_USERHASUNKNOWNROLE: return "User has unknown role";
+    case LIBMC_ERROR_MISSINGDEFAULTACCESSROLE: return "Missing default access role";
     default: return "unknown error";
   }
 }

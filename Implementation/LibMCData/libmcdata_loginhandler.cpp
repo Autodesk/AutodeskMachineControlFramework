@@ -210,6 +210,50 @@ std::string CLoginHandler::GetUserLanguageByUUID(const std::string& sUUID)
     return pStatement->getColumnString(1);
 }
 
+std::string CLoginHandler::CreateUser(const std::string& sUsername, const std::string& sRole, const std::string& sSalt, const std::string& sHashedPassword, const std::string& sDescription)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+void CLoginHandler::SetUserLanguage(const std::string& sUsername, const std::string& sLanguageIdentifier)
+{
+
+}
+
+void CLoginHandler::SetUserRole(const std::string& sUsername, const std::string& sLanguageIdentifier)
+{
+
+}
+
+void CLoginHandler::SetUserDescription(const std::string& sUsername, const std::string& sDescription)
+{
+
+}
+
+void CLoginHandler::SetUserPassword(const std::string& sUsername, const std::string& sSalt, const std::string& sHashedPassword)
+{
+
+}
+
+void CLoginHandler::SetUserLanguageByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier)
+{
+
+}
+
+void CLoginHandler::SetUserRoleByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier)
+{
+
+}
+
+void CLoginHandler::SetUserDescriptionByUUID(const std::string& sUUID, const std::string& sDescription)
+{
+
+}
+
+void CLoginHandler::SetUserPasswordByUUID(const std::string& sUUID, const std::string& sSalt, const std::string& sHashedPassword)
+{
+
+}
 
 
 

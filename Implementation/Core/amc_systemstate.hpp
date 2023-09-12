@@ -143,6 +143,7 @@ namespace AMC {
 		PToolpathHandler getToolpathHandlerInstance();
 		PStateMachineData getStateMachineData ();
 		PStateJournal getStateJournalInstance();
+		PAccessControl getAccessControlInstance();
 
 		LibMCData::PStorage getStorageInstance();
 		LibMCData::PLoginHandler getLoginHandlerInstance();

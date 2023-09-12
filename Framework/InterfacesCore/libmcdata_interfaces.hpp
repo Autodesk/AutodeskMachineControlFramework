@@ -950,6 +950,75 @@ public:
 	*/
 	virtual std::string GetUserLanguageByUUID(const std::string & sUUID) = 0;
 
+	/**
+	* ILoginHandler::CreateUser - Creates a new user. Fails if the user already exists.
+	* @param[in] sUsername - User name to create. MUST be alphanumeric and not empty.
+	* @param[in] sRole - Role of the new user. MUST NOT be empty.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	* @param[in] sDescription - Description of the new user.
+	* @return UUID of the new user.
+	*/
+	virtual std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription) = 0;
+
+	/**
+	* ILoginHandler::SetUserLanguage - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::SetUserRole - Updates a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserRole(const std::string & sUsername, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sDescription - New Language identifier of the user.
+	*/
+	virtual void SetUserDescription(const std::string & sUsername, const std::string & sDescription) = 0;
+
+	/**
+	* ILoginHandler::SetUserPassword - Updates a users password. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* ILoginHandler::SetUserLanguageByUUID - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserRoleByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sDescription - New Language identifier of the user.
+	*/
+	virtual void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription) = 0;
+
+	/**
+	* ILoginHandler::SetUserPasswordByUUID - Updates a users password. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
 };
 
 typedef IBaseSharedPtr<ILoginHandler> PILoginHandler;

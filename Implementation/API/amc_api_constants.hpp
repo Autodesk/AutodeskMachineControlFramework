@@ -279,5 +279,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_TOKEN_SESSION "session"
 #define AMC_API_KEY_TOKEN_TOKEN "token"
 
+#define AMC_API_KEY_USERUUID "useruuid"
+#define AMC_API_KEY_USERLOGIN "userlogin"
+#define AMC_API_KEY_USERDESCRIPTION "userdescription"
+#define AMC_API_KEY_USERROLE "userrole"
+#define AMC_API_KEY_USERLANGUAGE "userlanguage"
+#define AMC_API_KEY_USERPERMISSIONS "userpermissions"
+
 #endif //__AMC_API_CONSTANTS
 

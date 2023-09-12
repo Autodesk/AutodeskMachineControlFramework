@@ -169,7 +169,13 @@ namespace AMC {
 		return pRole->hasPermission(sPermissionIdentifier);
 	}
 
-
+	void CAccessControl::getPermissionsForRole(const std::string& sRoleIdentifier, std::set<std::string>& permissionStrings)
+	{
+		PAccessRole pRole = findRole(sRoleIdentifier, true);
+		auto pPermissions = pRole->getPermissions();
+		for (auto pPermission : pPermissions)
+			permissionStrings.insert(pPermission->getIdentifier ());
+	}
 }
 
 

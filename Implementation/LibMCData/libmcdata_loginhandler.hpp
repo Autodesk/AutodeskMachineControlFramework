@@ -91,6 +91,25 @@ public:
 
 	std::string GetUserLanguageByUUID(const std::string& sUUID) override;
 
+	std::string CreateUser(const std::string& sUsername, const std::string& sRole, const std::string& sSalt, const std::string& sHashedPassword, const std::string& sDescription) override;
+
+	void SetUserLanguage(const std::string& sUsername, const std::string& sLanguageIdentifier) override;
+
+	void SetUserRole(const std::string& sUsername, const std::string& sLanguageIdentifier) override;
+
+	void SetUserDescription(const std::string& sUsername, const std::string& sDescription) override;
+
+	void SetUserPassword(const std::string& sUsername, const std::string& sSalt, const std::string& sHashedPassword) override;
+
+	void SetUserLanguageByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier) override;
+
+	void SetUserRoleByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier) override;
+
+	void SetUserDescriptionByUUID(const std::string& sUUID, const std::string& sDescription) override;
+
+	void SetUserPasswordByUUID(const std::string& sUUID, const std::string& sSalt, const std::string& sHashedPassword) override;
+
+
 };
 
 } // namespace Impl

@@ -828,7 +828,58 @@
 			<param name="UUID" type="string" pass="in" description="UUID of the user." />
 			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
 		</method>		
+
+		<method name="CreateUser" description="Creates a new user. Fails if the user already exists.">
+			<param name="Username" type="string" pass="in" description="User name to create. MUST be alphanumeric and not empty." />
+			<param name="Role" type="string" pass="in" description="Role of the new user. MUST NOT be empty." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+			<param name="Description" type="string" pass="in" description="Description of the new user." />
+			<param name="UUID" type="string" pass="return" description="UUID of the new user." />
+		</method>
+
+		<method name="SetUserLanguage" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
 		
+		<method name="SetUserRole" description="Updates a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+
+		<method name="SetUserDescription" description="Updates a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserPassword" description="Updates a users password. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
+		<method name="SetUserLanguageByUUID" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserRoleByUUID" description="Updates a users role. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+
+		<method name="SetUserDescriptionByUUID" description="Updates a users description. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserPasswordByUUID" description="Updates a users password. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
 	</class>
 
 

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_handler.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include "libmcdata_dynamic.hpp"
 
 #include "amc_userinformation.hpp"
@@ -180,16 +181,23 @@ void CAPIHandler_Auth::handleAuthorizeRequest(const uint8_t* pBodyData, const si
 	if (pAuth->userIsAuthorized())
 		throw ELibMCInterfaceException(LIBMC_ERROR_USERALREADYAUTHORIZED);
 
-	auto pUserInformation = pAuth->getUserInformation();
-	if (!m_pAccessControl->hasRole(pUserInformation->getRoleIdentifier())) {
-		throw ELibMCInterfaceException(LIBMC_ERROR_USERHASUNKNOWNROLE, sSessionUUID);
-	}
-
 	auto sSaltedPassword = pRequest.getSHA256(AMC_API_KEY_AUTH_SALTEDPASSWORD, LIBMC_ERROR_INVALIDPASSWORD);
 	auto sClientKey = pRequest.getSHA256(AMC_API_KEY_AUTH_CLIENTKEY, LIBMC_ERROR_INVALIDCLIENTKEY);	
 	m_pSessionHandler->authorizeSession (sSessionUUID, sSaltedPassword, sClientKey);
 
 	if (m_pSessionHandler->sessionIsAuthenticated(sSessionUUID)) {
+
+	
+
+		std::string sUsername;
+		std::string sUserUUID;
+		std::string sUserDescription;
+		std::string sUserRoleIdentifier;
+		std::string sUserLanguageIdentifier;
+		m_pSessionHandler->getUserDetailsForSession(sSessionUUID, sUsername, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
+		
+		if (!m_pAccessControl->hasRole(sUserRoleIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_USERHASUNKNOWNROLE, sSessionUUID);
 		
 		CJSONWriter tokenWriter;
 		tokenWriter.addString(AMC_API_KEY_TOKEN_SESSION, sSessionUUID);
@@ -198,6 +206,22 @@ void CAPIHandler_Auth::handleAuthorizeRequest(const uint8_t* pBodyData, const si
 		// Create Base64 token
 		std::string sToken = AMCCommon::CUtils::encodeBase64(tokenWriter.saveToString(), AMCCommon::eBase64Type::URL);
 		writer.addString(AMC_API_KEY_AUTH_TOKEN, sToken);
+
+		writer.addString(AMC_API_KEY_USERUUID, sUserUUID);
+		writer.addString(AMC_API_KEY_USERLOGIN, sUsername);
+		writer.addString(AMC_API_KEY_USERDESCRIPTION, sUserDescription);
+		writer.addString(AMC_API_KEY_USERROLE, sUserRoleIdentifier);
+		writer.addString(AMC_API_KEY_USERLANGUAGE, sUserLanguageIdentifier);
+
+		CJSONWriterArray permissionsArray(writer);	
+		std::set<std::string> permissionStrings;
+		m_pAccessControl->getPermissionsForRole(sUserRoleIdentifier, permissionStrings);
+
+		for (auto sPermission : permissionStrings)
+			permissionsArray.addString(sPermission);
+
+		writer.addArray(AMC_API_KEY_USERPERMISSIONS, permissionsArray);
+
 	}
 	else {
 		// this should not happen, but we want to be double sure here!

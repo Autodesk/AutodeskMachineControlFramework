@@ -43,9 +43,10 @@ using namespace AMC;
 
 CAPISession::CAPISession()
 	: m_sUUID(AMCCommon::CUtils::createUUID()),
-	m_sKey(AMCCommon::CUtils::calculateRandomSHA256String (APISESSION_RANDOMKEYITERATIONS)),
+	m_sKey(AMCCommon::CUtils::calculateRandomSHA256String(APISESSION_RANDOMKEYITERATIONS)),
 	m_sToken(AMCCommon::CUtils::calculateRandomSHA256String(APISESSION_RANDOMKEYITERATIONS)),
 	m_sUserName(""),
+	m_sUserUUID(AMCCommon::CUtils::createUUID ()),
 	m_bAuthenticated(false)
 {
 
@@ -78,6 +79,34 @@ std::string CAPISession::getUserName()
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	return m_sUserName;
+}
+
+std::string CAPISession::getUserUUID()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserUUID;
+}
+
+std::string CAPISession::getUserDescription()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserDescription;
+}
+
+std::string CAPISession::getUserLanguageIdentifier()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserLanguageIdentifier;
+}
+
+std::string CAPISession::getUserRoleIdentifier()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserRoleIdentifier;
 }
 
 bool CAPISession::isAuthenticated()
@@ -124,7 +153,8 @@ void CAPISession::setUserDetails(const std::string& sUserName, const std::string
 
 	m_sUserName = sUserName;
 	m_sHashedPassword = sHashedPassword;
-	m_sUserUUID = sUserUUID;
+	m_sUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+		
 	m_sUserDescription = sUserDescription;
 	m_sUserRoleIdentifier = sUserRoleIdentifier;
 	m_sUserLanguageIdentifier = sUserLanguageIdentifier;
@@ -137,6 +167,5 @@ PParameterHandler CAPISession::getClientVariableHandler()
 
 PUserInformation CAPISession::createUserInformation()
 {
-	m_sUserUUID = AMCCommon::CUtils::createUUID();
-	return std::make_shared<CUserInformation> (m_sUserUUID, m_sUserName, m_sUserDescription, m_sUserLanguageIdentifier, m_sUserRoleIdentifier);
+	return std::make_shared<CUserInformation> (m_sUserUUID, m_sUserName, m_sUserDescription, m_sUserRoleIdentifier, m_sUserLanguageIdentifier);
 }

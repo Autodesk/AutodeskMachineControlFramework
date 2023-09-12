@@ -961,6 +961,104 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserlanguage(LibMCD
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserlanguagebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
 
+/**
+* Creates a new user. Fails if the user already exists.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name to create. MUST be alphanumeric and not empty.
+* @param[in] pRole - Role of the new user. MUST NOT be empty.
+* @param[in] pSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+* @param[in] pHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+* @param[in] pDescription - Description of the new user.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the new user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_createuser(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pRole, const char * pSalt, const char * pHashedPassword, const char * pDescription, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Updates a users language preference. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserlanguage(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pLanguageIdentifier);
+
+/**
+* Updates a users role. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserrole(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pLanguageIdentifier);
+
+/**
+* Updates a users description. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pDescription - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserdescription(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pDescription);
+
+/**
+* Updates a users password. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+* @param[in] pHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserpassword(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pSalt, const char * pHashedPassword);
+
+/**
+* Updates a users language preference. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserlanguagebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const char * pLanguageIdentifier);
+
+/**
+* Updates a users role. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserrolebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const char * pLanguageIdentifier);
+
+/**
+* Updates a users description. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pDescription - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserdescriptionbyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const char * pDescription);
+
+/**
+* Updates a users password. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+* @param[in] pHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserpasswordbyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const char * pSalt, const char * pHashedPassword);
+
 /*************************************************************************************************************************
  Class definition for PersistencyHandler
 **************************************************************************************************************************/

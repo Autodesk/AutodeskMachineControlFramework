@@ -188,6 +188,10 @@ namespace AMC {
 		return m_pStateJournal;
 	}
 
+	PAccessControl CSystemState::getAccessControlInstance()
+	{
+		return m_pAccessControl;
+	}
 
 	PStateMachineData CSystemState::getStateMachineData()
 	{

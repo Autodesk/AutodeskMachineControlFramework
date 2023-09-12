@@ -619,6 +619,8 @@ void CMCContext::loadAccessControl(const pugi::xml_node& xmlNode)
 {
     auto accessControl = m_pSystemState->accessControl();
 
+
+
     auto permissionsNode = xmlNode.child("permissions");
     if (permissionsNode.empty ())
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGACCESSCONTROLPERMISSIONS);
@@ -636,6 +638,13 @@ void CMCContext::loadAccessControl(const pugi::xml_node& xmlNode)
     auto rolesNode = xmlNode.child("roles");
     if (rolesNode.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGACCESSCONTROLROLES);
+
+    auto defaultRoleAttrib = rolesNode.attribute("default");
+    if (defaultRoleAttrib.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGDEFAULTACCESSROLE);
+    std::string sDefaultRole = defaultRoleAttrib.as_string();
+    if (sDefaultRole.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGDEFAULTACCESSROLE);
 
     auto roleNodes = rolesNode.children("role");
     for (pugi::xml_node roleNode : roleNodes) {
@@ -660,6 +669,8 @@ void CMCContext::loadAccessControl(const pugi::xml_node& xmlNode)
         }
     }
 
+
+    accessControl->setDefaultRole(sDefaultRole);
 
 }
 

@@ -62,7 +62,13 @@ export default class AMCApplication extends Common.AMCObject {
         this.API = {
             baseURL: apiBaseURL,
             authToken: Common.nullToken (),
-            unsuccessfulUpdateCounter: 0
+            unsuccessfulUpdateCounter: 0,
+			userUUID: Common.nullUUID (),
+			userLogin: "",
+			userDescription: "",
+			userRole: "",
+			userLanguage: "",
+			userPermissions: new Set ()
         }
 
         this.AppState = {
@@ -210,9 +216,17 @@ export default class AMCApplication extends Common.AMCObject {
     performLogout() {
         this.API.authToken = Common.nullToken ();
         this.API.unsuccessfulUpdateCounter = 0;
+		this.API.userUUID = Common.nullUUID ();
+		this.API.userLogin = "";
+		this.API.userDescription = "";
+		this.API.userRole = "";
+		this.API.userLanguage = "";
+		this.API.userPermissions = new Set ();
     }
 
     requestLogin(userName, userPassword) {
+
+		this.performLogout ();
 
         this.axiosPostRequest("/auth/", {
             "username": userName
@@ -234,7 +248,19 @@ export default class AMCApplication extends Common.AMCObject {
             })
 
             .then(resultAuthenticate => {
-                this.API.authToken = resultAuthenticate.data.token;
+                this.API.authToken = Assert.SHA256Value (resultAuthenticate.data.token);
+				this.API.userUUID = Assert.UUIDValue (resultAuthenticate.data.useruuid);
+				this.API.userLogin = Assert.IdentifierString (resultAuthenticate.data.userlogin);
+				this.API.userDescription = Assert.StringValue (resultAuthenticate.data.userdescription);
+				this.API.userRole = Assert.IdentifierString (resultAuthenticate.data.userrole);
+				this.API.userLanguage = Assert.IdentifierString (resultAuthenticate.data.userlanguage);
+				this.API.userPermissions = new Set ();
+				
+				let permissionArray = Assert.ArrayValue (resultAuthenticate.data.userpermissions);
+				for (let permission of permissionArray) {
+					this.API.userPermissions.add (permission);
+				}
+				
                 this.setStatus("ready");
 
                 this.retrieveStateUpdate();
@@ -690,5 +716,67 @@ export default class AMCApplication extends Common.AMCObject {
 		return null;
 		
 	}
+	
+	userIsLoggedIn ()
+	{
+		return (this.API.authToken !== Common.nullToken ());
+	}
+
+	userUUID ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user UUID: user is not logged in";
+			
+		return this.API.userUUID;
+	}
+
+	userLogin ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user login: user is not logged in";
+
+		return this.API.userLogin;
+	}
+
+	userDescription ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user description: user is not logged in";
+
+		return this.API.userDescription;
+	}
+
+	userRole ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user role: user is not logged in";
+		
+		return this.API.userRole;
+	}
+
+	userLanguage ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user language: user is not logged in";
+		
+		return this.API.userLanguage;
+	}
+
+	userPermissions ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user permissions: user is not logged in";
+		
+		return new Set(this.API.userPermissions);
+	}
+	
+	checkPermission (permissionIdentifier)
+	{
+		if (!this.userIsLoggedIn ())
+			return false;
+		
+		return this.API.userPermissions.has (Assert.IdentifierString (permissionIdentifier));
+	}
+
 
 }

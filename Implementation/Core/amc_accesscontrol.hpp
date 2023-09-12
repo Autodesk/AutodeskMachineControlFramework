@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_accessrole.hpp"
 #include "amc_accesspermission.hpp"
+#include <set>
 
 namespace AMC {
 
@@ -77,6 +78,8 @@ namespace AMC {
 		void setToNoAccessControl ();
 
 		bool checkPermissionInRole (const std::string & sRoleIdentifier, const std::string & sPermissionIdentifier);
+
+		void getPermissionsForRole(const std::string & sRoleIdentifier, std::set<std::string> & permissionStrings);
 
 	};
 

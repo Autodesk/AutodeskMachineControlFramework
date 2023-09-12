@@ -1193,6 +1193,15 @@ public:
 	inline std::string GetUserRoleByUUID(const std::string & sUUID);
 	inline std::string GetUserLanguage(const std::string & sUsername);
 	inline std::string GetUserLanguageByUUID(const std::string & sUUID);
+	inline std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription);
+	inline void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier);
+	inline void SetUserRole(const std::string & sUsername, const std::string & sLanguageIdentifier);
+	inline void SetUserDescription(const std::string & sUsername, const std::string & sDescription);
+	inline void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword);
+	inline void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier);
+	inline void SetUserRoleByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier);
+	inline void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription);
+	inline void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword);
 };
 	
 /*************************************************************************************************************************
@@ -1430,6 +1439,15 @@ public:
 		pWrapperTable->m_LoginHandler_GetUserRoleByUUID = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserLanguage = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserLanguageByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_CreateUser = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserLanguage = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserRole = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserDescription = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserPassword = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserLanguageByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserRoleByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = nullptr;
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = nullptr;
 		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = nullptr;
@@ -2226,6 +2244,87 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_CreateUser = (PLibMCDataLoginHandler_CreateUserPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_createuser");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_CreateUser = (PLibMCDataLoginHandler_CreateUserPtr) dlsym(hLibrary, "libmcdata_loginhandler_createuser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_CreateUser == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguage = (PLibMCDataLoginHandler_SetUserLanguagePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguage = (PLibMCDataLoginHandler_SetUserLanguagePtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserLanguage == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRole = (PLibMCDataLoginHandler_SetUserRolePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserrole");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRole = (PLibMCDataLoginHandler_SetUserRolePtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserRole == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescription = (PLibMCDataLoginHandler_SetUserDescriptionPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescription = (PLibMCDataLoginHandler_SetUserDescriptionPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserDescription == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPassword = (PLibMCDataLoginHandler_SetUserPasswordPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserpassword");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPassword = (PLibMCDataLoginHandler_SetUserPasswordPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserpassword");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserPassword == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguageByUUID = (PLibMCDataLoginHandler_SetUserLanguageByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserlanguagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguageByUUID = (PLibMCDataLoginHandler_SetUserLanguageByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserlanguagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserLanguageByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRoleByUUID = (PLibMCDataLoginHandler_SetUserRoleByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserrolebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRoleByUUID = (PLibMCDataLoginHandler_SetUserRoleByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserrolebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserRoleByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = (PLibMCDataLoginHandler_SetUserDescriptionByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserdescriptionbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = (PLibMCDataLoginHandler_SetUserDescriptionByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserdescriptionbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = (PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserpasswordbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = (PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserpasswordbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserPasswordByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
 		#else // _WIN32
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
@@ -2861,6 +2960,42 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserlanguagebyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUserLanguageByUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserLanguageByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_createuser", (void**)&(pWrapperTable->m_LoginHandler_CreateUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_CreateUser == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserlanguage", (void**)&(pWrapperTable->m_LoginHandler_SetUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserLanguage == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserrole", (void**)&(pWrapperTable->m_LoginHandler_SetUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserRole == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserdescription", (void**)&(pWrapperTable->m_LoginHandler_SetUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserDescription == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserpassword", (void**)&(pWrapperTable->m_LoginHandler_SetUserPassword));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserPassword == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserlanguagebyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserLanguageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserLanguageByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserrolebyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserRoleByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserRoleByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserdescriptionbyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserpasswordbyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserPasswordByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserPasswordByUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_persistencyhandler_haspersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_HasPersistentParameter));
@@ -4194,6 +4329,108 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserLanguageByUUID(m_pHandle, sUUID.c_str(), bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
 		
 		return std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CLoginHandler::CreateUser - Creates a new user. Fails if the user already exists.
+	* @param[in] sUsername - User name to create. MUST be alphanumeric and not empty.
+	* @param[in] sRole - Role of the new user. MUST NOT be empty.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	* @param[in] sDescription - Description of the new user.
+	* @return UUID of the new user.
+	*/
+	std::string CLoginHandler::CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription)
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_CreateUser(m_pHandle, sUsername.c_str(), sRole.c_str(), sSalt.c_str(), sHashedPassword.c_str(), sDescription.c_str(), 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_CreateUser(m_pHandle, sUsername.c_str(), sRole.c_str(), sSalt.c_str(), sHashedPassword.c_str(), sDescription.c_str(), bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CLoginHandler::SetUserLanguage - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserLanguage(m_pHandle, sUsername.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserRole - Updates a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserRole(const std::string & sUsername, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRole(m_pHandle, sUsername.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sDescription - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserDescription(const std::string & sUsername, const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserDescription(m_pHandle, sUsername.c_str(), sDescription.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserPassword - Updates a users password. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	void CLoginHandler::SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserPassword(m_pHandle, sUsername.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserLanguageByUUID - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserLanguageByUUID(m_pHandle, sUUID.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserRoleByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRoleByUUID(m_pHandle, sUUID.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sDescription - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserDescriptionByUUID(m_pHandle, sUUID.c_str(), sDescription.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserPasswordByUUID - Updates a users password. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	void CLoginHandler::SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserPasswordByUUID(m_pHandle, sUUID.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
 	}
 	
 	/**

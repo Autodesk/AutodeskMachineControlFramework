@@ -629,6 +629,7 @@ public:
 			case LIBMC_ERROR_EMPTYROLEIDENTIFIER: return "EMPTYROLEIDENTIFIER";
 			case LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER: return "EMPTYPERMISSIONIDENTIFIER";
 			case LIBMC_ERROR_USERHASUNKNOWNROLE: return "USERHASUNKNOWNROLE";
+			case LIBMC_ERROR_MISSINGDEFAULTACCESSROLE: return "MISSINGDEFAULTACCESSROLE";
 		}
 		return "UNKNOWN";
 	}
@@ -1100,6 +1101,7 @@ public:
 			case LIBMC_ERROR_EMPTYROLEIDENTIFIER: return "Empty role identifier";
 			case LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
 			case LIBMC_ERROR_USERHASUNKNOWNROLE: return "User has unknown role";
+			case LIBMC_ERROR_MISSINGDEFAULTACCESSROLE: return "Missing default access role";
 		}
 		return "unknown error";
 	}
