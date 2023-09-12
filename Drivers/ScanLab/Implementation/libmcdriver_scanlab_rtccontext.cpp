@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <thread>
 #include <fstream>
+#include <algorithm>
 
 #include <chrono>
 #include <ctime>
@@ -467,12 +468,62 @@ void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
 {
 
 	double dAdjustedPowerInPercent = dPowerInPercent;
-	if (m_LaserPowerCalibration.size() == 1) {
-		auto& calibration = m_LaserPowerCalibration.begin()->second;
-		dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, calibration);
+	if (m_LaserPowerCalibrationList.size() == 1) {
+		auto& calibration = m_LaserPowerCalibrationList.at (0);
+		dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, calibration.m_PowerOffsetInPercent, calibration.m_PowerOutputScaling);
 	}
 
-	if (m_LaserPowerCalibration.size() >= 2) {
+	if (m_LaserPowerCalibrationList.size() >= 2) {
+		size_t nMinIndex = 0;
+		size_t nMaxIndex = m_LaserPowerCalibrationList.size() - 1;
+		auto& minCalibration = m_LaserPowerCalibrationList.at(nMinIndex);
+		auto& maxCalibration = m_LaserPowerCalibrationList.at(nMaxIndex);
+
+		if (dPowerInPercent < minCalibration.m_PowerOffsetInPercent) {
+			dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, minCalibration.m_PowerOffsetInPercent, minCalibration.m_PowerOutputScaling);
+		} 
+		else if (dPowerInPercent > maxCalibration.m_PowerOffsetInPercent) {
+			dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, maxCalibration.m_PowerOffsetInPercent, maxCalibration.m_PowerOutputScaling);
+		}
+		else {
+			// Binary search of calibration values
+			while ((nMinIndex + 1) < nMaxIndex) {
+				size_t nMidIndex = (nMinIndex + nMaxIndex) / 2;
+				auto& calibration = m_LaserPowerCalibrationList.at(nMidIndex);
+
+				if (dPowerInPercent < calibration.m_PowerOffsetInPercent) {
+					nMaxIndex = nMidIndex;
+					maxCalibration = calibration;
+				}
+				else {
+					nMinIndex = nMidIndex;
+					minCalibration = calibration;
+				}
+			}
+
+			if ((nMinIndex + 1) != nMaxIndex)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+			
+			double dAdjustedMinPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, minCalibration.m_PowerOffsetInPercent, minCalibration.m_PowerOutputScaling);
+			double dAdjustedMaxPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, maxCalibration.m_PowerOffsetInPercent, maxCalibration.m_PowerOutputScaling);
+			double dDelta = (maxCalibration.m_PowerSetPointInPercent - minCalibration.m_PowerSetPointInPercent);
+			// dDelta should be larger than any arbitrary fraction of units.
+			if (dDelta < m_dLaserPowerCalibrationUnits * 0.1)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+
+			double dFactor = (dPowerInPercent - minCalibration.m_PowerSetPointInPercent) / dDelta;
+			if (dFactor < 0.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+			if (dFactor > 1.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+
+			// Linear interpolation between factors
+			dAdjustedPowerInPercent = (1.0 - dFactor) * dAdjustedMinPowerInPercent + dFactor * dAdjustedMaxPowerInPercent;
+
+		}
+
+
+
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED, "multiple power calibration values not implemented");
 	}
 
@@ -739,76 +790,90 @@ void CRTCContext::StopExecution()
 
 bool CRTCContext::LaserPowerCalibrationIsEnabled()
 {
-	return m_LaserPowerCalibration.size() > 0;
+	return m_LaserPowerCalibrationList.size() > 0;
 }
 
 bool CRTCContext::LaserPowerCalibrationIsLinear()
 {
-	return m_LaserPowerCalibration.size() == 1;
+	return m_LaserPowerCalibrationList.size() == 1;
 }
 
 void CRTCContext::ClearLaserPowerCalibration()
 {
-	m_LaserPowerCalibration.clear();
+	m_LaserPowerCalibrationList.clear();
 }
 
 void CRTCContext::GetLaserPowerCalibration(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer)
 {
 	if (pCalibrationPointsNeededCount != nullptr)
-		*pCalibrationPointsNeededCount = m_LaserPowerCalibration.size();
+		*pCalibrationPointsNeededCount = m_LaserPowerCalibrationList.size();
 
 	if (pCalibrationPointsBuffer != nullptr) {
-		if (nCalibrationPointsBufferSize < m_LaserPowerCalibration.size())
+		if (nCalibrationPointsBufferSize < m_LaserPowerCalibrationList.size())
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_BUFFERTOOSMALL);
 
 		auto pTarget = pCalibrationPointsBuffer;
-		for (auto iIter = m_LaserPowerCalibration.begin(); iIter != m_LaserPowerCalibration.end(); iIter++) {
-			*pTarget = iIter->second;
+		for (auto iIter = m_LaserPowerCalibrationList.begin(); iIter != m_LaserPowerCalibrationList.end(); iIter++) {
+			*pTarget = *iIter;
 			pTarget++;
 		}
 	}
 }
 
-void CRTCContext::SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerSetPointInPercent, const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling)
+void CRTCContext::SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling) 
 {
-	m_LaserPowerCalibration.clear();
-	addLaserPowerCalibrationPoint (dPowerSetPointInPercent, dPowerOffsetInPercent, dPowerOutputScaling);
+	if (dPowerOutputScaling < 0.0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING);
+
+	m_LaserPowerCalibrationList.clear();
+	sLaserCalibrationPoint calibration;
+	calibration.m_PowerSetPointInPercent = 0.0;
+	calibration.m_PowerOffsetInPercent = dPowerOffsetInPercent;
+	calibration.m_PowerOutputScaling = dPowerOutputScaling;
+	m_LaserPowerCalibrationList.push_back(calibration);
+
+}
+
+bool calibrationPointCompare (LibMCDriver_ScanLab::sLaserCalibrationPoint point1, LibMCDriver_ScanLab::sLaserCalibrationPoint point2) {
+	return (point1.m_PowerSetPointInPercent < point2.m_PowerSetPointInPercent); 
 }
 
 void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer)
 {
-	m_LaserPowerCalibration.clear();
+	m_LaserPowerCalibrationList.clear();
 	if (nCalibrationPointsBufferSize > 0) {
 		if (pCalibrationPointsBuffer == nullptr)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 		for (size_t nIndex = 0; nIndex < nCalibrationPointsBufferSize; nIndex++) {
 			auto point = pCalibrationPointsBuffer[nIndex];
-			addLaserPowerCalibrationPoint (point.m_PowerSetPointInPercent, point.m_PowerOffsetInPercent, point.m_PowerOutputScaling);
+			if (point.m_PowerSetPointInPercent < 0.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT);
+			if (point.m_PowerOutputScaling < 0.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING);
+
+			m_LaserPowerCalibrationList.push_back(point);
+		}
+
+		std::sort(m_LaserPowerCalibrationList.begin(), m_LaserPowerCalibrationList.end(), calibrationPointCompare);
+
+		// Make sure List is strictly ascending in Power!
+		int64_t nOldDiscretePower = -1;
+		for (auto point : m_LaserPowerCalibrationList) {
+			int64_t nDiscreteLaserPower = (int64_t) round (point.m_PowerSetPointInPercent / m_dLaserPowerCalibrationUnits);
+			if (nDiscreteLaserPower <= nOldDiscretePower)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT);
+			nOldDiscretePower = nDiscreteLaserPower;
 		}
 
 	}
-}
-
-void CRTCContext::addLaserPowerCalibrationPoint(double dPowerSetPointInPercent, double dPowerOffsetInPercent, double dPowerOutputScaling)
-{
-	int64_t nDiscretePowerInUnits = (int64_t)round ((dPowerSetPointInPercent / m_dLaserPowerCalibrationUnits));
-	sLaserCalibrationPoint laserPoint;
-	laserPoint.m_PowerSetPointInPercent = dPowerSetPointInPercent;
-	laserPoint.m_PowerOffsetInPercent = dPowerOffsetInPercent;
-	laserPoint.m_PowerOutputScaling = dPowerOutputScaling;
-
-	auto iIter = m_LaserPowerCalibration.find(nDiscretePowerInUnits);
-	if (iIter != m_LaserPowerCalibration.end ())
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT);
-
-	m_LaserPowerCalibration.insert (std::make_pair (nDiscretePowerInUnits, laserPoint));
 
 }
 
-double CRTCContext::adjustLaserPowerCalibration(double dLaserPowerInPercent, sLaserCalibrationPoint calibrationPoint)
+
+double CRTCContext::adjustLaserPowerCalibration(double dLaserPowerInPercent, double dPowerOffsetInPercent, double dPowerOutputScaling)
 {
-	return ((dLaserPowerInPercent + calibrationPoint.m_PowerOffsetInPercent) * calibrationPoint.m_PowerOutputScaling);
+	return ((dLaserPowerInPercent + dPowerOffsetInPercent) * dPowerOutputScaling);
 }
 
 

@@ -252,6 +252,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "NOLASERFIELDSET";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "INVALIDFREEVARIABLEINDEX";
 			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT: return "DUPLICATELASERPOWERCALIBRATIONSETPOINT";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT: return "INVALIDPOWERCALIBRATIONSETPOINT";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING: return "INVALIDPOWERCALIBRATIONOUTPUTSCALING";
+			case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "POWERCALIBRATIONLOOKUPFAILED";
 		}
 		return "UNKNOWN";
 	}
@@ -330,6 +333,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "Invalid free variable index.";
 			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT: return "Duplicate laser power calibration set point.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT: return "Invalid power calibration set point.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING: return "Invalid power calibration output scaling.";
+			case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "Power calibration lookup failed.";
 		}
 		return "unknown error";
 	}
@@ -643,7 +649,7 @@ public:
 	inline bool LaserPowerCalibrationIsLinear();
 	inline void ClearLaserPowerCalibration();
 	inline void GetLaserPowerCalibration(std::vector<sLaserCalibrationPoint> & CalibrationPointsBuffer);
-	inline void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerSetPointInPercent, const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling);
+	inline void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling);
 	inline void SetPiecewiseLinearLaserPowerCalibration(const CInputVector<sLaserCalibrationPoint> & CalibrationPointsBuffer);
 };
 	
@@ -4312,18 +4318,17 @@ public:
 	
 	/**
 	* CRTCContext::SetLinearLaserPowerCalibration - Enables the laser power calibration with an affine linear tranformation.
-	* @param[in] dPowerSetPointInPercent - Set point of the power in percent.
 	* @param[in] dPowerOffsetInPercent - Additional offset of the Power value.
 	* @param[in] dPowerOutputScaling - Scaling factor of the laser output.
 	*/
-	void CRTCContext::SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerSetPointInPercent, const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling)
+	void CRTCContext::SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLinearLaserPowerCalibration(m_pHandle, dPowerSetPointInPercent, dPowerOffsetInPercent, dPowerOutputScaling));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLinearLaserPowerCalibration(m_pHandle, dPowerOffsetInPercent, dPowerOutputScaling));
 	}
 	
 	/**
 	* CRTCContext::SetPiecewiseLinearLaserPowerCalibration - Enables the laser power calibration with multiple calibration point values. Table MUST NOT have negative power entries. Laser Power Output will be linear scaled with the given values within their respective intervals. Any laser power outside of the minimum or maximum Power values will be scaled according to the respective minimum or maximum scaling value.
-	* @param[in] CalibrationPointsBuffer - Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Watts).
+	* @param[in] CalibrationPointsBuffer - Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Percent).
 	*/
 	void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const CInputVector<sLaserCalibrationPoint> & CalibrationPointsBuffer)
 	{

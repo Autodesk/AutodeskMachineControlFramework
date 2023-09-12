@@ -111,8 +111,10 @@
 		<error name="NOLASERFIELDSET" code="1059" description="No laser field has been set." />
 		<error name="INVALIDFREEVARIABLEINDEX" code="1060" description="Invalid free variable index." />		
 		<error name="DUPLICATELASERPOWERCALIBRATIONSETPOINT" code="1061" description="Duplicate laser power calibration set point." />		
-		
-		
+		<error name="INVALIDPOWERCALIBRATIONSETPOINT" code="1062" description="Invalid power calibration set point." />		
+		<error name="INVALIDPOWERCALIBRATIONOUTPUTSCALING" code="1063" description="Invalid power calibration output scaling." />		
+		<error name="POWERCALIBRATIONLOOKUPFAILED" code="1064" description="Power calibration lookup failed." />		
+					
 						
 	</errors>
 
@@ -668,7 +670,6 @@ Custom implementation
 		</method>
 				
 		<method name="SetLinearLaserPowerCalibration" description="Enables the laser power calibration with an affine linear tranformation.">
-			<param name="PowerSetPointInPercent" type="double" pass="in" description="Set point of the power in percent." />
 			<param name="PowerOffsetInPercent" type="double" pass="in" description="Additional offset of the Power value." />
 			<param name="PowerOutputScaling" type="double" pass="in" description="Scaling factor of the laser output." />			
 		</method>

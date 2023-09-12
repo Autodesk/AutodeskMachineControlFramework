@@ -2610,7 +2610,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserpowercalibratio
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlinearlaserpowercalibration(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPowerSetPointInPercent, LibMCDriver_ScanLab_double dPowerOffsetInPercent, LibMCDriver_ScanLab_double dPowerOutputScaling)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlinearlaserpowercalibration(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPowerOffsetInPercent, LibMCDriver_ScanLab_double dPowerOutputScaling)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -2619,7 +2619,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlinearlaserpowercali
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->SetLinearLaserPowerCalibration(dPowerSetPointInPercent, dPowerOffsetInPercent, dPowerOutputScaling);
+		pIRTCContext->SetLinearLaserPowerCalibration(dPowerOffsetInPercent, dPowerOutputScaling);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}

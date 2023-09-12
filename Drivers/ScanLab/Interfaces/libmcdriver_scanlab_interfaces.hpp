@@ -1083,16 +1083,15 @@ public:
 
 	/**
 	* IRTCContext::SetLinearLaserPowerCalibration - Enables the laser power calibration with an affine linear tranformation.
-	* @param[in] dPowerSetPointInPercent - Set point of the power in percent.
 	* @param[in] dPowerOffsetInPercent - Additional offset of the Power value.
 	* @param[in] dPowerOutputScaling - Scaling factor of the laser output.
 	*/
-	virtual void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerSetPointInPercent, const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling) = 0;
+	virtual void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling) = 0;
 
 	/**
 	* IRTCContext::SetPiecewiseLinearLaserPowerCalibration - Enables the laser power calibration with multiple calibration point values. Table MUST NOT have negative power entries. Laser Power Output will be linear scaled with the given values within their respective intervals. Any laser power outside of the minimum or maximum Power values will be scaled according to the respective minimum or maximum scaling value.
 	* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
-	* @param[in] pCalibrationPointsBuffer - Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Watts).
+	* @param[in] pCalibrationPointsBuffer - Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Percent).
 	*/
 	virtual void SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer) = 0;
 

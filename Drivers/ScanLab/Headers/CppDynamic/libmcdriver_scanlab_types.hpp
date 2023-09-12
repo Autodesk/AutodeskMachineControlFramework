@@ -166,6 +166,9 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET 1059 /** No laser field has been set. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX 1060 /** Invalid free variable index. */
 #define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT 1061 /** Duplicate laser power calibration set point. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT 1062 /** Invalid power calibration set point. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING 1063 /** Invalid power calibration output scaling. */
+#define LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED 1064 /** Power calibration lookup failed. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -244,6 +247,9 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "Invalid free variable index.";
     case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT: return "Duplicate laser power calibration set point.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT: return "Invalid power calibration set point.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING: return "Invalid power calibration output scaling.";
+    case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "Power calibration lookup failed.";
     default: return "unknown error";
   }
 }

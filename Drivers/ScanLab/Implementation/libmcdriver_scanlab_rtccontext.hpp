@@ -100,8 +100,8 @@ protected:
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
 
 	double m_dLaserPowerCalibrationUnits;
-	std::map<int64_t, sLaserCalibrationPoint> m_LaserPowerCalibration;
-
+	std::vector<sLaserCalibrationPoint> m_LaserPowerCalibrationList;
+	
 	void writeJumpSpeed (float jumpSpeed);
 
 	void writeMarkSpeed(float markSpeed);
@@ -122,9 +122,7 @@ protected:
 	
 	void clearLaserField();
 
-	void addLaserPowerCalibrationPoint(double dPowerSetPointInPercent, double dPowerOffsetInPercent, double dPowerOutputScaling);
-
-	double adjustLaserPowerCalibration(double dLaserPowerInPercent, sLaserCalibrationPoint calibrationPoint);
+	double adjustLaserPowerCalibration(double dLaserPowerInPercent, double dPowerOffsetInPercent, double ddPowerOutputScaling);
 
 public:
 
@@ -317,7 +315,7 @@ public:
 
 	void GetLaserPowerCalibration(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer) override;
 
-	void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerSetPointInPercent, const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling) override;
+	void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling) override;
 
 	void SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer) override;
 
