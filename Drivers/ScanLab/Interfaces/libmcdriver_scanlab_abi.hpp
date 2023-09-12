@@ -993,6 +993,64 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_checkontheflyerror(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bFailIfError, LibMCDriver_ScanLab_uint32 * pErrorCode);
 
+/**
+* Returns if the laser power calibration table is non-empty.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pCalibrationEnabled - Laser Calibration Is Enabled
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_laserpowercalibrationisenabled(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pCalibrationEnabled);
+
+/**
+* Returns if the laser power calibration table has one entry.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pCalibrationIsLinear - Laser Calibration Is Affine Linear
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_laserpowercalibrationislinear(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pCalibrationIsLinear);
+
+/**
+* Clears the laser power calibration table.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_clearlaserpowercalibration(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns the laser power calibration table. Fails if laser calibration is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[out] pCalibrationPointsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pCalibrationPointsBuffer - LaserCalibrationPoint  buffer of Laser Calibration Points
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserpowercalibration(LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer);
+
+/**
+* Enables the laser power calibration with an affine linear tranformation.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dPowerSetPointInPercent - Set point of the power in percent.
+* @param[in] dPowerOffsetInPercent - Additional offset of the Power value.
+* @param[in] dPowerOutputScaling - Scaling factor of the laser output.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlinearlaserpowercalibration(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPowerSetPointInPercent, LibMCDriver_ScanLab_double dPowerOffsetInPercent, LibMCDriver_ScanLab_double dPowerOutputScaling);
+
+/**
+* Enables the laser power calibration with multiple calibration point values. Table MUST NOT have negative power entries. Laser Power Output will be linear scaled with the given values within their respective intervals. Any laser power outside of the minimum or maximum Power values will be scaled according to the respective minimum or maximum scaling value.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[in] pCalibrationPointsBuffer - LaserCalibrationPoint buffer of Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Watts).
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setpiecewiselinearlaserpowercalibration(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/

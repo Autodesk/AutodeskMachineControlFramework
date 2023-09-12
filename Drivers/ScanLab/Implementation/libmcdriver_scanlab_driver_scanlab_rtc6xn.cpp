@@ -191,7 +191,7 @@ void CDriver_ScanLab_RTC6xN::InitialiseScanner(const LibMCDriver_ScanLab_uint32 
 	std::string sPrefix = "scanner" + std::to_string(nScannerIndex) + "_";
 
 	if (m_SimulationMode) {
-		m_pDriverEnvironment->LogMessage("Registering Scanner " + std::to_string (nScannerIndex) + " in Simulatoion mode for laser " + std::to_string (nLaserIndex) + "..");
+		m_pDriverEnvironment->LogMessage("Registering Scanner " + std::to_string (nScannerIndex) + " in Simulation mode for laser " + std::to_string (nLaserIndex) + "..");
 
 		m_pDriverEnvironment->SetIntegerParameter(sPrefix + "laserindex", nLaserIndex);
 		m_pDriverEnvironment->SetIntegerParameter(sPrefix + "rtc_version", 1);

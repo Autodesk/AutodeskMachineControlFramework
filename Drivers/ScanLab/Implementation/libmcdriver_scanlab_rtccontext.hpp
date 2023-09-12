@@ -23,7 +23,7 @@ Abstract: This is the class declaration of CRTCContext
 #endif
 
 // Include custom headers here.
-
+#include <set>
 
 namespace LibMCDriver_ScanLab {
 namespace Impl {
@@ -99,11 +99,14 @@ protected:
 
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
 
+	double m_dLaserPowerCalibrationUnits;
+	std::map<int64_t, sLaserCalibrationPoint> m_LaserPowerCalibration;
+
 	void writeJumpSpeed (float jumpSpeed);
 
 	void writeMarkSpeed(float markSpeed);
 
-	void writePower(float powerInPercent, bool bOIEPIDControlFlag);
+	void writePower(double dPowerInPercent, bool bOIEPIDControlFlag);
 
 	void writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, bool bOIEPIDControlFlag);
 
@@ -118,6 +121,10 @@ protected:
 	void updateLaserField(double dMinXInMM, double dMaxXInMM, double dMinYInMM, double dMaxYInMM);
 	
 	void clearLaserField();
+
+	void addLaserPowerCalibrationPoint(double dPowerSetPointInPercent, double dPowerOffsetInPercent, double dPowerOutputScaling);
+
+	double adjustLaserPowerCalibration(double dLaserPowerInPercent, sLaserCalibrationPoint calibrationPoint);
 
 public:
 
@@ -301,6 +308,19 @@ public:
 	LibMCDriver_ScanLab_uint32 GetTimeStamp() override;
 
 	void StopExecution() override;
+
+	bool LaserPowerCalibrationIsEnabled() override;
+
+	bool LaserPowerCalibrationIsLinear() override;
+
+	void ClearLaserPowerCalibration() override;
+
+	void GetLaserPowerCalibration(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer) override;
+
+	void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerSetPointInPercent, const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling) override;
+
+	void SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer) override;
+
 
 };
 

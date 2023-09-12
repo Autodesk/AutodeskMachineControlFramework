@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCDriver_ScanLab::Impl;
 
+#define RTCCONTEXT_LASERPOWERCALIBRATIONUNITS 0.005
+
 CRTCContextOwnerData::CRTCContextOwnerData()
 	: m_nAttributeFilterValue (0), m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled), m_dMaxLaserPowerInWatts (100.0)
 {
@@ -135,7 +137,8 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_b2DMarkOnTheFlyEnabled (false),
 	m_dScaleXInBitsPerEncoderStep (1.0),
 	m_dScaleYInBitsPerEncoderStep (1.0),
-	m_bEnableOIEPIDControl (false)
+	m_bEnableOIEPIDControl (false),
+	m_dLaserPowerCalibrationUnits (RTCCONTEXT_LASERPOWERCALIBRATIONUNITS)
 
 {
 	if (pOwnerData.get() == nullptr)
@@ -460,43 +463,54 @@ void CRTCContext::writeMarkSpeed(float markSpeedinMMPerSecond)
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
 
-void CRTCContext::writePower(float powerInPercent, bool bOIEPIDControlFlag)
+void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
 {
 
-	double fClippedPowerFactor = powerInPercent / 100.0f;
-	if (fClippedPowerFactor > 1.0f)
-		fClippedPowerFactor = 1.0f;
-	if (fClippedPowerFactor < 0.0f)
-		fClippedPowerFactor = 0.0f;
+	double dAdjustedPowerInPercent = dPowerInPercent;
+	if (m_LaserPowerCalibration.size() == 1) {
+		auto& calibration = m_LaserPowerCalibration.begin()->second;
+		dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, calibration);
+	}
 
-	int digitalPowerValue = 0;
+	if (m_LaserPowerCalibration.size() >= 2) {
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED, "multiple power calibration values not implemented");
+	}
+
+
+	double dClippedPowerFactor = dPowerInPercent / 100.0f;
+	if (dClippedPowerFactor > 1.0f)
+		dClippedPowerFactor = 1.0f;
+	if (dClippedPowerFactor < 0.0f)
+		dClippedPowerFactor = 0.0f;
+
+	int32_t digitalPowerValue = 0;
 
 
 	if (bOIEPIDControlFlag) {
 
 		switch (m_LaserPort) {
 		case eLaserPort::Port16bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 65535.0);
 			//nPortIndex = 6;  See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 6, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port8bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 255.0);
 			//nPortIndex = 3;  See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 3, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog1:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 1; // See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 1, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 2; // See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog1andAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 1, digitalPowerValue, 1);
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
 			break;
@@ -511,28 +525,28 @@ void CRTCContext::writePower(float powerInPercent, bool bOIEPIDControlFlag)
 
 		switch (m_LaserPort) {
 		case eLaserPort::Port16bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 65535.0);
 			//nPortIndex = 3;  See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 3, digitalPowerValue);
 
 			break;
 		case eLaserPort::Port8bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 255.0);
 			//nPortIndex = 2; See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 2, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog1:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 0;  See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 1; // See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog1andAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
 			break;
@@ -722,6 +736,81 @@ void CRTCContext::StopExecution()
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 }
+
+bool CRTCContext::LaserPowerCalibrationIsEnabled()
+{
+	return m_LaserPowerCalibration.size() > 0;
+}
+
+bool CRTCContext::LaserPowerCalibrationIsLinear()
+{
+	return m_LaserPowerCalibration.size() == 1;
+}
+
+void CRTCContext::ClearLaserPowerCalibration()
+{
+	m_LaserPowerCalibration.clear();
+}
+
+void CRTCContext::GetLaserPowerCalibration(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer)
+{
+	if (pCalibrationPointsNeededCount != nullptr)
+		*pCalibrationPointsNeededCount = m_LaserPowerCalibration.size();
+
+	if (pCalibrationPointsBuffer != nullptr) {
+		if (nCalibrationPointsBufferSize < m_LaserPowerCalibration.size())
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_BUFFERTOOSMALL);
+
+		auto pTarget = pCalibrationPointsBuffer;
+		for (auto iIter = m_LaserPowerCalibration.begin(); iIter != m_LaserPowerCalibration.end(); iIter++) {
+			*pTarget = iIter->second;
+			pTarget++;
+		}
+	}
+}
+
+void CRTCContext::SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerSetPointInPercent, const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling)
+{
+	m_LaserPowerCalibration.clear();
+	addLaserPowerCalibrationPoint (dPowerSetPointInPercent, dPowerOffsetInPercent, dPowerOutputScaling);
+}
+
+void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer)
+{
+	m_LaserPowerCalibration.clear();
+	if (nCalibrationPointsBufferSize > 0) {
+		if (pCalibrationPointsBuffer == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+		for (size_t nIndex = 0; nIndex < nCalibrationPointsBufferSize; nIndex++) {
+			auto point = pCalibrationPointsBuffer[nIndex];
+			addLaserPowerCalibrationPoint (point.m_PowerSetPointInPercent, point.m_PowerOffsetInPercent, point.m_PowerOutputScaling);
+		}
+
+	}
+}
+
+void CRTCContext::addLaserPowerCalibrationPoint(double dPowerSetPointInPercent, double dPowerOffsetInPercent, double dPowerOutputScaling)
+{
+	int64_t nDiscretePowerInUnits = (int64_t)round ((dPowerSetPointInPercent / m_dLaserPowerCalibrationUnits));
+	sLaserCalibrationPoint laserPoint;
+	laserPoint.m_PowerSetPointInPercent = dPowerSetPointInPercent;
+	laserPoint.m_PowerOffsetInPercent = dPowerOffsetInPercent;
+	laserPoint.m_PowerOutputScaling = dPowerOutputScaling;
+
+	auto iIter = m_LaserPowerCalibration.find(nDiscretePowerInUnits);
+	if (iIter != m_LaserPowerCalibration.end ())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT);
+
+	m_LaserPowerCalibration.insert (std::make_pair (nDiscretePowerInUnits, laserPoint));
+
+}
+
+double CRTCContext::adjustLaserPowerCalibration(double dLaserPowerInPercent, sLaserCalibrationPoint calibrationPoint)
+{
+	return ((dLaserPowerInPercent + calibrationPoint.m_PowerOffsetInPercent) * calibrationPoint.m_PowerOutputScaling);
+}
+
 
 void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
 {

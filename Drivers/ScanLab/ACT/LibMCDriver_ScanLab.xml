@@ -110,6 +110,8 @@
 		<error name="INVALIDLASERFIELDCOORDINATES" code="1058" description="Invalid laser field coordinates" />		
 		<error name="NOLASERFIELDSET" code="1059" description="No laser field has been set." />
 		<error name="INVALIDFREEVARIABLEINDEX" code="1060" description="Invalid free variable index." />		
+		<error name="DUPLICATELASERPOWERCALIBRATIONSETPOINT" code="1061" description="Duplicate laser power calibration set point." />		
+		
 		
 						
 	</errors>
@@ -162,6 +164,11 @@
 		<member name="Y2" type="single" />
 	</struct>
 
+	<struct name="LaserCalibrationPoint" description="The laser output calibration at a point will be calculated by ((PowerSetPointInPercent + PowerOffsetInPercent) * PowerOutputScaling). The result is clamped to [0, 100]">
+		<member name="PowerSetPointInPercent" type="double" description="Set point of the power in Percent." />
+		<member name="PowerOffsetInPercent" type="double" description="Additional offset of the Power value. ." />
+		<member name="PowerOutputScaling" type="double" description="Scaling factor of the laser output. MUST be positive." />
+	</struct>
 	
 <!--
 
@@ -644,8 +651,32 @@ Custom implementation
 			<param name="FailIfError" type="bool" pass="in" description="If true, the call will fail in case of an error." />
 			<param name="ErrorCode" type="uint32" pass="return" description="Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation." />
 		</method>
+
+		<method name="LaserPowerCalibrationIsEnabled" description="Returns if the laser power calibration table is non-empty.">
+			<param name="CalibrationEnabled" type="bool" pass="return" description="Laser Calibration Is Enabled" />			
+		</method>
 		
+		<method name="LaserPowerCalibrationIsLinear" description="Returns if the laser power calibration table has one entry.">
+			<param name="CalibrationIsLinear" type="bool" pass="return" description="Laser Calibration Is Affine Linear" />			
+		</method>
+
+		<method name="ClearLaserPowerCalibration" description="Clears the laser power calibration table.">
+		</method>
+
+		<method name="GetLaserPowerCalibration" description="Returns the laser power calibration table. Fails if laser calibration is not enabled.">
+			<param name="CalibrationPoints" type="structarray" class="LaserCalibrationPoint" pass="out" description="Laser Calibration Points" />			
+		</method>
+				
+		<method name="SetLinearLaserPowerCalibration" description="Enables the laser power calibration with an affine linear tranformation.">
+			<param name="PowerSetPointInPercent" type="double" pass="in" description="Set point of the power in percent." />
+			<param name="PowerOffsetInPercent" type="double" pass="in" description="Additional offset of the Power value." />
+			<param name="PowerOutputScaling" type="double" pass="in" description="Scaling factor of the laser output." />			
+		</method>
 		
+		<method name="SetPiecewiseLinearLaserPowerCalibration" description="Enables the laser power calibration with multiple calibration point values. Table MUST NOT have negative power entries. Laser Power Output will be linear scaled with the given values within their respective intervals. Any laser power outside of the minimum or maximum Power values will be scaled according to the respective minimum or maximum scaling value.">
+			<param name="CalibrationPoints" type="structarray" class="LaserCalibrationPoint" pass="in" description="Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Percent)." />
+		</method>
+				
 	</class>
 
 	

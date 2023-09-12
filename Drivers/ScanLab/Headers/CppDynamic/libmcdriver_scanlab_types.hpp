@@ -165,6 +165,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES 1058 /** Invalid laser field coordinates */
 #define LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET 1059 /** No laser field has been set. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX 1060 /** Invalid free variable index. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT 1061 /** Duplicate laser power calibration set point. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -242,6 +243,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "Invalid laser field coordinates";
     case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "Invalid free variable index.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT: return "Duplicate laser power calibration set point.";
     default: return "unknown error";
   }
 }
@@ -315,6 +317,12 @@ namespace LibMCDriver_ScanLab {
       LibMCDriver_ScanLab_single m_Y2;
   } sHatch2D;
   
+  typedef struct sLaserCalibrationPoint {
+      LibMCDriver_ScanLab_double m_PowerSetPointInPercent;
+      LibMCDriver_ScanLab_double m_PowerOffsetInPercent;
+      LibMCDriver_ScanLab_double m_PowerOutputScaling;
+  } sLaserCalibrationPoint;
+  
   #pragma pack ()
   
 } // namespace LibMCDriver_ScanLab;
@@ -326,5 +334,6 @@ typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationM
 typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;
+typedef LibMCDriver_ScanLab::sLaserCalibrationPoint sLibMCDriver_ScanLabLaserCalibrationPoint;
 
 #endif // __LIBMCDRIVER_SCANLAB_TYPES_HEADER_CPP
