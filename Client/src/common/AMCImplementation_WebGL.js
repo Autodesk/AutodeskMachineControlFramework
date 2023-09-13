@@ -162,6 +162,29 @@ class WebGLLinesElement extends WebGLElement {
 
 }
 
+
+class WebGLBoxElement extends WebGLElement {
+
+    constructor(paramWidth, paramHeight, paramDepth) {
+        super();
+
+		let dWidth = Assert.NumberValue (paramWidth);
+		let dHeight = Assert.NumberValue (paramHeight);
+		let dDepth = Assert.NumberValue (paramDepth);
+		
+		this.material = new THREE.MeshPhongMaterial( {
+			color: 0xff0000,
+			shininess: 150,
+			specular: 0x222222
+		} );
+
+		this.geometry = new THREE.BoxGeometry( dWidth, dHeight, dDepth );
+		this.glelement = new THREE.Mesh( this.geometry, this.material );
+		this.glelement.receiveShadow = true;
+    }
+
+}
+
 class WebGLGridElement extends WebGLElement {
 
     constructor(width, height, zValue, factor) {
@@ -225,6 +248,7 @@ class WebGLGridElement extends WebGLElement {
         group.add(this.lineElement3.glelement);
 
         this.glelement = group;
+		this.glelement.receiveShadow = true;
 
     }
 
@@ -318,6 +342,22 @@ class WebGLSVGElement extends WebGLElement {
 
 }
 
+
+class WebGLAmbientLight extends WebGLElement {
+
+    constructor (paramColor, paramIntensity) {
+        super();
+
+		let dColor = Assert.NumberValue (paramColor);
+		let dIntensity = Assert.NumberValue (paramIntensity);
+
+        this.glelement = new THREE.AmbientLight( dColor, dIntensity );
+
+    }
+
+}
+
+
 class WebGLImpl {
 
     constructor() {
@@ -335,6 +375,7 @@ class WebGLImpl {
         this.renderElements = new Map();
 		
 		this.camera = null;
+		this.hasPerspectiveView = false;
     }
 
     setup2DView(paramSizeX, paramSizeY, paramNear, paramFar) 
@@ -370,6 +411,8 @@ class WebGLImpl {
 		let dFar = Assert.NumberValue (paramFar);
 		
         this.camera = new THREE.PerspectiveCamera( dFieldOfView, dAspectRatio, dNear, dFar );
+		this.camera.up.set (0, 0, 1); // Set Z up
+		this.hasPerspectiveView = true;
 	}
 
 	setCameraPosition (paramX, paramY, paramZ) 
@@ -396,6 +439,15 @@ class WebGLImpl {
         if (this.renderer) {
             this.renderer.setSize(sizex, sizey);
         }
+		
+		if (this.camera && this.hasPerspectiveView) {
+			if ((sizex > 0) && (sizey > 0)) {
+				this.camera.aspect = sizex / sizey;
+				this.camera.updateProjectionMatrix ();
+			}
+			
+		}
+		
     }
 
     renderScene() {
@@ -511,6 +563,29 @@ class WebGLImpl {
 
     }
 	
+	addAmbientLight (identifier, color, intensity)
+	{
+        if (!identifier)
+            return;
+		
+		let lightElement = new WebGLAmbientLight (color, intensity);
+				
+		this.addElement(identifier, lightElement);
+		
+		return lightElement;
+	}
+	
+	addBoxElement (identifier, width, height, depth)
+	{
+        if (!identifier)
+            return;
+		
+		let boxElement = new WebGLBoxElement (width, height, depth);
+				
+		this.addElement(identifier, boxElement);
+		
+		return boxElement;
+	}
 	
 	pick2DElement (x, y)
 	{		
@@ -537,13 +612,13 @@ class WebGLImpl {
 
 		// Lights
 
-		this.scene.add( new THREE.AmbientLight( 0x404040, 3 ) );
+		//this.scene.add(  );
 
 		this.spotLight = new THREE.SpotLight( 0xffffff, 500 );
 		this.spotLight.name = 'Spot Light';
 		this.spotLight.angle = Math.PI / 5;
 		this.spotLight.penumbra = 0.3;
-		this.spotLight.position.set( 10, 10, 5 );
+		this.spotLight.position.set( 10, 5, 10 );
 		this.spotLight.castShadow = true;
 		this.spotLight.shadow.camera.near = 8;
 		this.spotLight.shadow.camera.far = 30;
@@ -551,11 +626,10 @@ class WebGLImpl {
 		this.spotLight.shadow.mapSize.height = 1024;
 		this.scene.add( this.spotLight );
 
-		//scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
 
 		this.dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 		this.dirLight.name = 'Dir. Light';
-		this.dirLight.position.set( 0, 10, 0 );
+		this.dirLight.position.set( 0, 0, 10 );
 		this.dirLight.castShadow = true;
 		this.dirLight.shadow.camera.near = 1;
 		this.dirLight.shadow.camera.far = 10;
@@ -567,7 +641,6 @@ class WebGLImpl {
 		this.dirLight.shadow.mapSize.height = 1024;
 		this.scene.add( this.dirLight );
 
-		//scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 		// Geometry
 		let geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
@@ -579,19 +652,19 @@ class WebGLImpl {
 
 		this.torusKnot = new THREE.Mesh( geometry, material );
 		this.torusKnot.scale.multiplyScalar( 1 / 18 );
-		this.torusKnot.position.y = 3;
+		this.torusKnot.position.z = 3;
 		this.torusKnot.castShadow = true;
 		this.torusKnot.receiveShadow = true;
 		this.scene.add( this.torusKnot );
 
-		geometry = new THREE.BoxGeometry( 3, 3, 3 );
+		/*geometry = new THREE.BoxGeometry( 3, 3, 3 );
 		this.cube = new THREE.Mesh( geometry, material );
 		this.cube.position.set( 8, 3, 8 );
 		this.cube.castShadow = true;
 		this.cube.receiveShadow = true;
-		this.scene.add( this.cube );
+		this.scene.add( this.cube ); */
 
-		geometry = new THREE.BoxGeometry( 10, 0.15, 10 );
+		geometry = new THREE.BoxGeometry( 30, 30, 0.15 );
 		material = new THREE.MeshPhongMaterial( {
 			color: 0xa0adaf,
 			shininess: 150,
@@ -599,7 +672,6 @@ class WebGLImpl {
 		} );
 
 		const ground = new THREE.Mesh( geometry, material );
-		ground.scale.multiplyScalar( 3 );
 		ground.castShadow = false;
 		ground.receiveShadow = true;
 		this.scene.add( ground );
@@ -609,7 +681,7 @@ class WebGLImpl {
 
 		// Mouse control
 		const controls = new OrbitControls( this.camera, this.renderer.domElement );
-		controls.target.set( 0, 2, 0 );
+		controls.target.set( 0, 0, 2 );
 		controls.update();
 
 		this.clock = new THREE.Clock();

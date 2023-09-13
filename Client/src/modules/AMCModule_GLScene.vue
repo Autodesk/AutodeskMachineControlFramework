@@ -69,7 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					if (!this.glInstance) 
 						return;
 						
-					this.glInstance.updateSize (domelement.clientWidth, domelement.clientHeight);
+					this.glInstance.resizeTo (domelement.clientWidth, domelement.clientHeight);
 				},
 		},
 		
@@ -92,10 +92,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				var height = glDiv.clientHeight;
 				if ((width > 0) && (height > 0)) {
 					this.glInstance.setupPerspectiveView (45, width / height, 1, 1000);
-					this.glInstance.setCameraPosition (0, 15, 35);
+					this.glInstance.setCameraPosition (15, 15, 15);
 					this.glInstance.resizeTo (width, height);
 					this.glInstance.setupDOMElement (glDiv);														
-					this.mesh = this.glInstance.setupDemoScene ();
+					
+					
+					this.glInstance.addAmbientLight ("ambientlight", 0x404040, 3);
+					let box1 = this.glInstance.addBoxElement ("box1", 3, 3, 3);
+					box1.setPosition (8, 8, 3);
+					
+					let grid = this.glInstance.add2DGridGeometry ("grid", 30, 30, 0.08, 1);
+					grid.setPosition (-15, -15, 0);
+					
+					this.glInstance.setupDemoScene ();
 					this.animate();
 				}
 				
