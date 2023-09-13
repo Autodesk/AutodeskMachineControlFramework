@@ -253,7 +253,7 @@ export default class AMCApplication extends Common.AMCObject {
 				this.API.userLogin = Assert.IdentifierString (resultAuthenticate.data.userlogin);
 				this.API.userDescription = Assert.StringValue (resultAuthenticate.data.userdescription);
 				this.API.userRole = Assert.IdentifierString (resultAuthenticate.data.userrole);
-				this.API.userLanguage = Assert.IdentifierString (resultAuthenticate.data.userlanguage);
+				//this.API.userLanguage = Assert.IdentifierString (resultAuthenticate.data.userlanguage);
 				this.API.userPermissions = new Set ();
 				
 				let permissionArray = Assert.ArrayValue (resultAuthenticate.data.userpermissions);
