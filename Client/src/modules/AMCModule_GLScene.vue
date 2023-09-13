@@ -58,6 +58,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 									
 					if (this.glInstance)
 						this.glInstance.renderScene ();
+						
+					const delta = this.glInstance.clock.getDelta();
+
+					this.box1.glelement.rotation.z += 2.25 * delta;
+
 
 				},
 				
@@ -97,9 +102,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					this.glInstance.setupDOMElement (glDiv);														
 					
 					
-					this.glInstance.addAmbientLight ("ambientlight", 0x404040, 3);
-					let box1 = this.glInstance.addBoxElement ("box1", 3, 3, 3);
-					box1.setPosition (8, 8, 3);
+					this.glInstance.addAmbientLight ("ambientlight", 0x808080, 3);
+					this.box1 = this.glInstance.addBoxElement ("box1", 4, 3, 2);
+					this.box1.setPosition (2, 3, 0.0);
 					
 					let grid = this.glInstance.add2DGridGeometry ("grid", 30, 30, 0.08, 1);
 					grid.setPosition (-15, -15, 0);

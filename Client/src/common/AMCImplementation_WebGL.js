@@ -173,14 +173,141 @@ class WebGLBoxElement extends WebGLElement {
 		let dDepth = Assert.NumberValue (paramDepth);
 		
 		this.material = new THREE.MeshPhongMaterial( {
-			color: 0xff0000,
-			shininess: 150,
-			specular: 0x222222
+			color: 0x808080,
+			shininess: 50,
+			specular: 0x111111
 		} );
 
-		this.geometry = new THREE.BoxGeometry( dWidth, dHeight, dDepth );
-		this.glelement = new THREE.Mesh( this.geometry, this.material );
-		this.glelement.receiveShadow = true;
+
+        const meshpositions = [];
+        meshpositions.push (0.0, 0.0, 0.0);
+        meshpositions.push (dWidth, 0.0, 0.0);
+        meshpositions.push (dWidth, dHeight, 0.0);		
+        meshpositions.push (0.0, dHeight, 0.0);
+		
+        meshpositions.push (0.0, 0.0, dDepth);
+        meshpositions.push (dWidth, 0.0, dDepth);
+        meshpositions.push (dWidth, dHeight, dDepth);
+        meshpositions.push (0.0, dHeight, dDepth);
+
+		meshpositions.push (0.0, 0.0, 0.0);
+        meshpositions.push (dWidth, 0.0, 0.0);
+        meshpositions.push (dWidth, 0.0, dDepth);		
+        meshpositions.push (0.0, 0.0, dDepth);
+
+        meshpositions.push (dWidth, 0.0, 0.0);
+        meshpositions.push (dWidth, dHeight, 0.0);
+        meshpositions.push (dWidth, dHeight, dDepth);		
+        meshpositions.push (dWidth, 0.0, dDepth);
+
+        meshpositions.push (dWidth, dHeight, 0.0);
+        meshpositions.push (0.0, dHeight, 0.0);
+        meshpositions.push (0.0, dHeight, dDepth);		
+        meshpositions.push (dWidth, dHeight, dDepth);
+
+        meshpositions.push (0.0, dHeight, 0.0);
+        meshpositions.push (0.0, 0.0, 0.0);
+        meshpositions.push (0.0, 0.0, dDepth);		
+        meshpositions.push (0.0, dHeight, dDepth);
+
+
+		const meshindices = [];
+		meshindices.push (2, 1, 0);
+		meshindices.push (0, 3, 2);
+		meshindices.push (4, 5, 6);
+		meshindices.push (6, 7, 4);
+		meshindices.push (8, 9, 10);
+		meshindices.push (10, 11, 8);
+		meshindices.push (12, 13, 14);
+		meshindices.push (14, 15, 12);
+		meshindices.push (16, 17, 18);
+		meshindices.push (18, 19, 16);
+		meshindices.push (20, 21, 22);
+		meshindices.push (22, 23, 20); 
+		
+		const meshnormals = [];
+		meshnormals.push (0, 0, -1);
+		meshnormals.push (0, 0, -1);
+		meshnormals.push (0, 0, -1);
+		meshnormals.push (0, 0, -1);
+		meshnormals.push (0, 0, 1);
+		meshnormals.push (0, 0, 1);
+		meshnormals.push (0, 0, 1);
+		meshnormals.push (0, 0, 1);
+		meshnormals.push (0, -1, 0);
+		meshnormals.push (0, -1, 0);
+		meshnormals.push (0, -1, 0);
+		meshnormals.push (0, -1, 0);		
+		meshnormals.push (1, 0, 0);
+		meshnormals.push (1, 0, 0);
+		meshnormals.push (1, 0, 0);
+		meshnormals.push (1, 0, 0);		
+		meshnormals.push (0, 1, 0);
+		meshnormals.push (0, 1, 0);
+		meshnormals.push (0, 1, 0);
+		meshnormals.push (0, 1, 0);		
+		meshnormals.push (-1, 0, 0);
+		meshnormals.push (-1, 0, 0);
+		meshnormals.push (-1, 0, 0);
+		meshnormals.push (-1, 0, 0);				 
+		
+        this.meshgeometry = new THREE.BufferGeometry();
+		this.meshgeometry.setIndex (meshindices);
+		this.meshgeometry.setAttribute('position', new THREE.Float32BufferAttribute(meshpositions, 3));
+		this.meshgeometry.setAttribute('normal', new THREE.Float32BufferAttribute(meshnormals, 3));
+		//this.meshgeometry.computeVertexNormals ();
+		this.meshelement = new THREE.Mesh( this.meshgeometry, this.material );
+		this.meshelement.castShadow = true;
+		this.meshelement.receiveShadow = true;
+		
+        let linegeometry = new THREE.BufferGeometry();
+        const linematerial = new THREE.LineBasicMaterial({
+            linewidth: 1,
+            color: 0x000000,
+			transparent: true,
+			opacity: 0.5
+        })
+
+        const positions = [];
+
+        positions.push (0.0, 0.0, 0.0);
+        positions.push (dWidth, 0.0, 0.0);
+        positions.push (dWidth, 0.0, 0.0);
+        positions.push (dWidth, dHeight, 0.0);
+        positions.push (dWidth, dHeight, 0.0);
+        positions.push (0.0, dHeight, 0.0);
+        positions.push (0.0, dHeight, 0.0);
+        positions.push (0.0, 0.0, 0.0);
+		
+        positions.push (0.0, 0.0, dDepth);
+        positions.push (dWidth, 0.0, dDepth);
+        positions.push (dWidth, 0.0, dDepth);
+        positions.push (dWidth, dHeight, dDepth);
+        positions.push (dWidth, dHeight, dDepth);
+        positions.push (0.0, dHeight, dDepth);
+        positions.push (0.0, dHeight, dDepth);
+        positions.push (0.0, 0.0, dDepth);
+		
+		positions.push (0.0, 0.0, 0.0);
+		positions.push (0.0, 0.0, dDepth);
+		positions.push (dWidth, 0.0, 0.0);
+		positions.push (dWidth, 0.0, dDepth);
+		positions.push (dWidth, dHeight, 0.0);
+		positions.push (dWidth, dHeight, dDepth);
+		positions.push (0.0, dHeight, 0.0);
+		positions.push (0.0, dHeight, dDepth);
+
+        linegeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        linegeometry.computeBoundingSphere();
+
+		let group = new THREE.Group()
+        this.edgeselement = new THREE.LineSegments(linegeometry, linematerial);
+
+        group.add(this.edgeselement);
+		group.add(this.meshelement);
+
+        this.glelement = group;
+		
     }
 
 }
@@ -248,8 +375,7 @@ class WebGLGridElement extends WebGLElement {
         group.add(this.lineElement3.glelement);
 
         this.glelement = group;
-		this.glelement.receiveShadow = true;
-
+	
     }
 
 }
@@ -629,7 +755,7 @@ class WebGLImpl {
 
 		this.dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 		this.dirLight.name = 'Dir. Light';
-		this.dirLight.position.set( 0, 0, 10 );
+		this.dirLight.position.set( 10, 0, 10 );
 		this.dirLight.castShadow = true;
 		this.dirLight.shadow.camera.near = 1;
 		this.dirLight.shadow.camera.far = 10;
@@ -650,19 +776,13 @@ class WebGLImpl {
 			specular: 0x222222
 		} );
 
-		this.torusKnot = new THREE.Mesh( geometry, material );
+		/*this.torusKnot = new THREE.Mesh( geometry, material );
 		this.torusKnot.scale.multiplyScalar( 1 / 18 );
 		this.torusKnot.position.z = 3;
 		this.torusKnot.castShadow = true;
 		this.torusKnot.receiveShadow = true;
-		this.scene.add( this.torusKnot );
+		this.scene.add( this.torusKnot ); */
 
-		/*geometry = new THREE.BoxGeometry( 3, 3, 3 );
-		this.cube = new THREE.Mesh( geometry, material );
-		this.cube.position.set( 8, 3, 8 );
-		this.cube.castShadow = true;
-		this.cube.receiveShadow = true;
-		this.scene.add( this.cube ); */
 
 		geometry = new THREE.BoxGeometry( 30, 30, 0.15 );
 		material = new THREE.MeshPhongMaterial( {
