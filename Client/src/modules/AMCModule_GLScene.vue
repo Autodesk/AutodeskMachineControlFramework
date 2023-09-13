@@ -55,13 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		methods: {
 			    animate: function () {
 					requestAnimationFrame(this.animate);
-					
-					if (this.mesh) {
-						const time = Date.now() * 0.001;
-
-						this.mesh.rotation.y = time * 0.4;
-					}
-
+									
 					if (this.glInstance)
 						this.glInstance.renderScene ();
 
@@ -72,10 +66,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					if (!domelement) 
 						return;	
 						
-					if (!this.LayerViewerInstance) 
+					if (!this.glInstance) 
 						return;
 						
-					this.LayerViewerInstance.updateSize (domelement.clientWidth, domelement.clientHeight);
+					this.glInstance.updateSize (domelement.clientWidth, domelement.clientHeight);
 				},
 		},
 		
@@ -97,7 +91,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				var width = glDiv.clientWidth;
 				var height = glDiv.clientHeight;
 				if ((width > 0) && (height > 0)) {
-					this.glInstance.setup2DView (width, height, 0.1, 100);					
+					this.glInstance.setupPerspectiveView (45, width / height, 1, 1000);
+					this.glInstance.setCameraPosition (0, 15, 35);
 					this.glInstance.resizeTo (width, height);
 					this.glInstance.setupDOMElement (glDiv);														
 					this.mesh = this.glInstance.setupDemoScene ();
