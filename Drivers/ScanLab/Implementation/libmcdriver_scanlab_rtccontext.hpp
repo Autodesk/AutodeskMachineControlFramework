@@ -49,7 +49,6 @@ public:
 
 	void getAttributeFilters(std::string& sAttributeFilterNameSpace, std::string& sAttributeFilterName, int64_t& nAttributeFilterValue);
 	void setAttributeFilters(const std::string& sAttributeFilterNameSpace, const std::string& sAttributeFilterName, const int64_t sAttributeFilterValue);
-	void getExposureParameters(double & dMaxLaserPowerInWatts, eOIERecordingMode & oieRecordingMode);
 	void setMaxLaserPower(double dMaxLaserPowerInWatts);
 	double getMaxLaserPower();
 	void setOIERecordingMode(eOIERecordingMode oieRecordingMode);

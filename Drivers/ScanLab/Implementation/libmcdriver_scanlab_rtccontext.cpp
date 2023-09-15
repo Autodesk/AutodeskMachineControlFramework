@@ -73,12 +73,6 @@ void CRTCContextOwnerData::setAttributeFilters(const std::string& sAttributeFilt
 	m_nAttributeFilterValue = nAttributeFilterValue;
 }
 
-void CRTCContextOwnerData::getExposureParameters(double& dMaxLaserPowerInWatts, LibMCDriver_ScanLab::eOIERecordingMode& oieRecordingMode)
-{
-	dMaxLaserPowerInWatts = dMaxLaserPowerInWatts;
-	oieRecordingMode = m_OIERecordingMode;
-}
-
 void CRTCContextOwnerData::setMaxLaserPower(double dMaxLaserPowerInWatts)
 {
 	m_dMaxLaserPowerInWatts = dMaxLaserPowerInWatts;
@@ -1666,9 +1660,6 @@ void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNo
 	if (pLayer.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-	LibMCDriver_ScanLab::eOIERecordingMode oieRecordingMode = LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled;
-	double dMaxLaserPowerInWatts = 100.0;
-
 	int64_t nAttributeFilterValue = 0;
 	std::string sAttributeFilterNameSpace;
 	std::string sAttributeFilterName;
@@ -1678,7 +1669,8 @@ void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNo
 		nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(sAttributeFilterNameSpace, sAttributeFilterName);
 	}
 
-	m_pOwnerData->getExposureParameters(dMaxLaserPowerInWatts, oieRecordingMode);
+	LibMCDriver_ScanLab::eOIERecordingMode oieRecordingMode = m_pOwnerData->getOIERecordingMode ();
+	double dMaxLaserPowerInWatts = m_pOwnerData->getMaxLaserPower();
 
 	addLayerToListEx(pLayer, oieRecordingMode, nAttributeFilterID, nAttributeFilterValue, (float)dMaxLaserPowerInWatts, bFailIfNonAssignedDataExists);
 }
