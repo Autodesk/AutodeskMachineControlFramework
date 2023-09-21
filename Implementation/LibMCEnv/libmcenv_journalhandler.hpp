@@ -27,50 +27,63 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CUniformJournalSampling
+Abstract: This is the class declaration of CJournalHandler
 
 */
 
-#include "libmcenv_uniformjournalsampling.hpp"
-#include "libmcenv_interfaceexception.hpp"
+
+#ifndef __LIBMCENV_JOURNALHANDLER
+#define __LIBMCENV_JOURNALHANDLER
+
+#include "libmcenv_interfaces.hpp"
+
+// Parent classes
+#include "libmcenv_base.hpp"
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4250)
+#endif
 
 // Include custom headers here.
+#include "amc_statejournal.hpp"
 
+namespace LibMCEnv {
+namespace Impl {
 
-using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class definition of CUniformJournalSampling 
+ Class declaration of CJournalHandler 
 **************************************************************************************************************************/
 
-std::string CUniformJournalSampling::GetVariableName()
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
+class CJournalHandler : public virtual IJournalHandler, public virtual CBase {
+protected:
 
-LibMCEnv_uint32 CUniformJournalSampling::GetNumberOfSamples()
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
+    AMC::PStateJournal m_pStateJournal;
 
-LibMCEnv_uint64 CUniformJournalSampling::GetStartTimeStamp()
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
+public:
 
-LibMCEnv_uint64 CUniformJournalSampling::GetEndTimeStamp()
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
+    CJournalHandler(AMC::PStateJournal pStateJournal);
 
-void CUniformJournalSampling::GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue)
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
+    virtual ~CJournalHandler();
 
-void CUniformJournalSampling::GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry* pSamplesBuffer)
-{
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
+	IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
 
+	IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds) override;
 
+	LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) override;
+
+	bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName) override;
+
+	LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) override;
+
+	void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer) override;
+
+};
+
+} // namespace Impl
+} // namespace LibMCEnv
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#endif // __LIBMCENV_JOURNALHANDLER

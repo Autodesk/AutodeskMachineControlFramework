@@ -77,10 +77,12 @@ private:
 	AMC::PToolpathHandler m_pToolpathHandler;
 	AMC::PStateJournal m_pStateJournal;
 	AMC::PAccessControl m_pAccessControl;
+	AMC::PLanguageHandler m_pLanguageHandler;
 	AMC::CUIHandler * m_pUIHandler;
 
 	LibMCData::PStorage m_pStorage;
 	LibMCData::PBuildJobHandler m_pBuildJobHandler;
+	LibMCData::PLoginHandler m_pLoginHandler;
 
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
@@ -97,7 +99,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl, LibMCData::PLoginHandler pLoginHandler, AMC::PLanguageHandler pLanguageHandler);
 
 	virtual ~CUIEnvironment();
 
@@ -186,8 +188,6 @@ public:
 
 	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
 
-	IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
-
 	bool CheckPermission(const std::string& sPermissionIdentifier) override;
 
 	std::string GetCurrentUserLogin() override;
@@ -199,6 +199,10 @@ public:
 	std::string GetCurrentUserLanguage() override;
 
 	std::string GetCurrentUserUUID() override;
+	
+	IUserManagementHandler* CreateUserManagement() override;
+
+	IJournalHandler* GetCurrentJournal() override;
 
 };
 

@@ -85,6 +85,8 @@ class ISignalTrigger;
 class ISignalHandler;
 class IUniformJournalSampling;
 class IJournalVariable;
+class IJournalHandler;
+class IUserManagementHandler;
 class IStateEnvironment;
 class IUIEnvironment;
 
@@ -147,6 +149,27 @@ template <class T1, class T2, class T3> class ParameterCache_3 : public Paramete
 			param1 = m_param1;
 			param2 = m_param2;
 			param3 = m_param3;
+		}
+};
+
+template <class T1, class T2, class T3, class T4> class ParameterCache_4 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+	public:
+		ParameterCache_4 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
 		}
 };
 
@@ -2956,14 +2979,11 @@ public:
 
 	/**
 	* IUniformJournalSampling::GetAllSamples - Returns all timestamps and values of the sampling.
-	* @param[in] nTimeStampsBufferSize - Number of elements in buffer
-	* @param[out] pTimeStampsNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pTimeStampsBuffer - uint64 buffer of Array of TimeStamps in ms, in increasing order.
-	* @param[in] nValuesBufferSize - Number of elements in buffer
-	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pValuesBuffer - double buffer of Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+	* @param[in] nSamplesBufferSize - Number of elements in buffer
+	* @param[out] pSamplesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSamplesBuffer - TimeStreamEntry buffer of Array of Timestream entries, in increasing order.
 	*/
-	virtual void GetAllSamples(LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer) = 0;
+	virtual void GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry * pSamplesBuffer) = 0;
 
 };
 
@@ -2995,6 +3015,12 @@ public:
 	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
 
 	/**
+	* IJournalVariable::ComputeFullAverage - Calculates the average value over the full available time interval.
+	* @return Average value of the variable.
+	*/
+	virtual LibMCEnv_double ComputeFullAverage() = 0;
+
+	/**
 	* IJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
 	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
 	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
@@ -3014,9 +3040,244 @@ public:
 	*/
 	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
 
+	/**
+	* IJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
+	* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
+	* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry buffer of All change events of the variable in the accessed interval.
+	*/
+	virtual void ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer) = 0;
+
 };
 
 typedef IBaseSharedPtr<IJournalVariable> PIJournalVariable;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalHandler 
+**************************************************************************************************************************/
+
+class IJournalHandler : public virtual IBase {
+public:
+	/**
+	* IJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @return Journal Instance.
+	*/
+	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
+
+	/**
+	* IJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nStartTimeInMilliseconds - Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMilliseconds - End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval.
+	* @return Journal Instance.
+	*/
+	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds) = 0;
+
+	/**
+	* IJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
+	* @return Returns the stored time stamp in milliseconds.
+	*/
+	virtual LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
+
+	/**
+	* IJournalHandler::HasJournalMarker - Checks if a journal marker tag exists.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @return Returns true if the marker exists.
+	*/
+	virtual bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName) = 0;
+
+	/**
+	* IJournalHandler::RetrieveJournalMarker - Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
+	* @return Returns the time stamp in milliseconds.
+	*/
+	virtual LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
+
+	/**
+	* IJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] nTimeStampsBufferSize - Number of elements in buffer
+	* @param[out] pTimeStampsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTimeStampsBuffer - uint64 buffer of Returns an array of time stamps in milliseconds.
+	*/
+	virtual void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalHandler> PIJournalHandler;
+
+
+/*************************************************************************************************************************
+ Class interface for UserManagementHandler 
+**************************************************************************************************************************/
+
+class IUserManagementHandler : public virtual IBase {
+public:
+	/**
+	* IUserManagementHandler::UserExists - Checks if a user exist.
+	* @param[in] sUsername - User name
+	* @return Flag if users exists
+	*/
+	virtual bool UserExists(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserProperties - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserPropertiesByUUID - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[out] sUsername - User name
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return User name
+	*/
+	virtual std::string GetUsernameByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserUUID - Retrieves a users UUID. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return UUID of the user.
+	*/
+	virtual std::string GetUserUUID(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserDescription - Retrieves a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescription(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserDescriptionByUUID - Retrieves a users description by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescriptionByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRole(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserRoleByUUID - Retrieves a users role by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRoleByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguage(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserLanguageByUUID - Retrieves a users language preference by user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguageByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::CreateUser - Creates a new user. Fails if the user already exists.
+	* @param[in] sUsername - User name to create. MUST be alphanumeric and not empty.
+	* @param[in] sRole - Role of the new user. MUST NOT be empty.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	* @param[in] sDescription - Description of the new user.
+	* @return UUID of the new user.
+	*/
+	virtual std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserLanguage - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserRole - Updates a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sUserRole - New Role identifier of the user.
+	*/
+	virtual void SetUserRole(const std::string & sUsername, const std::string & sUserRole) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sDescription - New Description of the user.
+	*/
+	virtual void SetUserDescription(const std::string & sUsername, const std::string & sDescription) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserPassword - Updates a users password. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserLanguageByUUID - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sUserRole - New Role identifier of the user.
+	*/
+	virtual void SetUserRoleByUUID(const std::string & sUUID, const std::string & sUserRole) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sDescription - New Description identifier of the user.
+	*/
+	virtual void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserPasswordByUUID - Updates a users password. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUserManagementHandler> PIUserManagementHandler;
 
 
 /*************************************************************************************************************************
@@ -3321,14 +3582,6 @@ public:
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 	/**
-	* IStateEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
-	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
-	* @return Journal Instance.
-	*/
-	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
-
-	/**
 	* IStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 	* @param[in] sUserLogin - Login of user to check
 	* @param[in] sPermissionIdentifier - Permission identifier
@@ -3337,68 +3590,16 @@ public:
 	virtual bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier) = 0;
 
 	/**
-	* IStateEnvironment::GetUserDescription - Returns a users description.
-	* @param[in] sUserLogin - Login of user
-	* @return Returns the users description. Fails if user is not known to the system.
+	* IStateEnvironment::CreateUserManagement - Returns a user management handler instance.
+	* @return Returns a user management handler.
 	*/
-	virtual std::string GetUserDescription(const std::string & sUserLogin) = 0;
+	virtual IUserManagementHandler * CreateUserManagement() = 0;
 
 	/**
-	* IStateEnvironment::GetUserRole - Returns a users role identifier.
-	* @param[in] sUserLogin - Login of user
-	* @return Returns the users role identifier. Fails if user is not known to the system.
+	* IStateEnvironment::GetCurrentJournal - Returns the journal instance of the current session.
+	* @return Journal instance.
 	*/
-	virtual std::string GetUserRole(const std::string & sUserLogin) = 0;
-
-	/**
-	* IStateEnvironment::GetUserLanguage - Returns a users language identifier.
-	* @param[in] sUserLogin - Login of user
-	* @return Returns the users language identifier. Fails if user is not known to the system.
-	*/
-	virtual std::string GetUserLanguage(const std::string & sUserLogin) = 0;
-
-	/**
-	* IStateEnvironment::GetUserUUID - Returns a users UUID.
-	* @param[in] sUserLogin - Login of user
-	* @return Returns the user UUID. Fails if user is not known to the system.
-	*/
-	virtual std::string GetUserUUID(const std::string & sUserLogin) = 0;
-
-	/**
-	* IStateEnvironment::CheckUserPermissionByUUID - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
-	* @param[in] sUserUUID - UUID of user
-	* @param[in] sPermissionIdentifier - Permission identifier
-	* @return Returns if the user has permission
-	*/
-	virtual bool CheckUserPermissionByUUID(const std::string & sUserUUID, const std::string & sPermissionIdentifier) = 0;
-
-	/**
-	* IStateEnvironment::GetUserLoginByUUID - Returns the a users login name. Fails if user is not known to the system.
-	* @param[in] sUserUUID - UUID of user
-	* @return Returns the users login name.
-	*/
-	virtual std::string GetUserLoginByUUID(const std::string & sUserUUID) = 0;
-
-	/**
-	* IStateEnvironment::GetUserDescriptionByUUID - Returns a users description.
-	* @param[in] sUserUUID - UUID of user
-	* @return Returns the users description. Fails if user is not known to the system.
-	*/
-	virtual std::string GetUserDescriptionByUUID(const std::string & sUserUUID) = 0;
-
-	/**
-	* IStateEnvironment::GetUserRoleByUUID - Returns a users role identifier.
-	* @param[in] sUserUUID - UUID of user
-	* @return Returns the users role identifier. Fails if user is not known to the system.
-	*/
-	virtual std::string GetUserRoleByUUID(const std::string & sUserUUID) = 0;
-
-	/**
-	* IStateEnvironment::GetUserLanguageByUUID - Returns a users language identifier.
-	* @param[in] sUserUUID - UUID of user
-	* @return Returns the users language identifier. Fails if user is not known to the system.
-	*/
-	virtual std::string GetUserLanguageByUUID(const std::string & sUserUUID) = 0;
+	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 };
 
@@ -3727,14 +3928,6 @@ public:
 	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
-	* IUIEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
-	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
-	* @return Journal Instance.
-	*/
-	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
-
-	/**
 	* IUIEnvironment::CheckPermission - Returns if the current user has a certain permission. Fails if permission is not known to the system.
 	* @param[in] sPermissionIdentifier - Permission identifier
 	* @return Returns if the user has permission
@@ -3770,6 +3963,18 @@ public:
 	* @return Returns the current user UUID.
 	*/
 	virtual std::string GetCurrentUserUUID() = 0;
+
+	/**
+	* IUIEnvironment::CreateUserManagement - Returns a user management handler instance.
+	* @return Returns a user management handler.
+	*/
+	virtual IUserManagementHandler * CreateUserManagement() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentJournal - Returns the journal instance of the current session.
+	* @return Journal instance.
+	*/
+	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 };
 

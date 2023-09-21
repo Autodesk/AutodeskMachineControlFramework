@@ -362,6 +362,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_NOLOGCALLBACK 335 /** No log callback */
 #define LIBMCDATA_ERROR_EMPTYUSERNAME 336 /** Empty user name */
 #define LIBMCDATA_ERROR_EMPTYUSERUUID 337 /** Empty user UUID */
+#define LIBMCDATA_ERROR_USERNOTUNIQUE 338 /** User not unique */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -636,6 +637,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
     case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
     case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
+    case LIBMCDATA_ERROR_USERNOTUNIQUE: return "User not unique";
     default: return "unknown error";
   }
 }

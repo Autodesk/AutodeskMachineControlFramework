@@ -149,29 +149,13 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
-	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
-
-	IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
+	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;	
 
 	bool CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier) override;
 
-	std::string GetUserDescription(const std::string& sUserLogin) override;
+	IUserManagementHandler * CreateUserManagement() override;
 
-	std::string GetUserRole(const std::string& sUserLogin) override;
-
-	std::string GetUserLanguage(const std::string& sUserLogin) override;
-
-	std::string GetUserUUID(const std::string& sUserLogin) override;
-
-	bool CheckUserPermissionByUUID(const std::string& sUserUUID, const std::string& sPermissionIdentifier) override;
-
-	std::string GetUserLoginByUUID(const std::string& sUserUUID) override;
-
-	std::string GetUserDescriptionByUUID(const std::string& sUserUUID) override;
-
-	std::string GetUserRoleByUUID(const std::string& sUserUUID) override;
-
-	std::string GetUserLanguageByUUID(const std::string& sUserUUID) override;
+	IJournalHandler* GetCurrentJournal() override;
 
 
 };

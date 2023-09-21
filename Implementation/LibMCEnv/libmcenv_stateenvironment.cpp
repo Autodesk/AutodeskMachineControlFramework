@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_usermanagementhandler.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -490,15 +492,6 @@ IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_ui
 	return new CDiscreteFieldData2D(pInstance);
 }
 
-IJournalVariable* CStateEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
-{
-	uint64_t nStartTimeStamp = 0;
-	uint64_t nEndTimeStamp = 0;
-	auto pStateJournal = m_pSystemState->getStateJournalInstance();
-	pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
-	return new CJournalVariable(pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
-}
-
 
 bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier)
 {
@@ -525,124 +518,13 @@ bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const
 	return pRole->hasPermission(sPermissionIdentifier);
 }
 
-std::string CStateEnvironment::GetUserDescription(const std::string& sUserLogin)
+IUserManagementHandler* CStateEnvironment::CreateUserManagement()
 {
-	if (sUserLogin.empty())
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
-	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-	return pLoginHandler->GetUserDescription(sUserLogin);
+	return new CUserManagementHandler (m_pSystemState->getLoginHandlerInstance (), m_pSystemState->getAccessControlInstance (), m_pSystemState->getLanguageHandlerInstance ());
 }
 
-std::string CStateEnvironment::GetUserRole(const std::string& sUserLogin)
+IJournalHandler* CStateEnvironment::GetCurrentJournal()
 {
-	if (sUserLogin.empty())
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
-	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-	auto pAccessControl = m_pSystemState->accessControl();
-
-	std::string sUserRole = pLoginHandler->GetUserRole(sUserLogin);
-	AMC::PAccessRole pRole;
-	if (sUserRole.empty())
-		pRole = pAccessControl->findRole(sUserRole, true);
-	else
-		pRole = pAccessControl->getDefaultRole();
-
-	return pRole->getIdentifier();
+	return new CJournalHandler(m_pSystemState->getStateJournalInstance());
 }
 
-std::string CStateEnvironment::GetUserLanguage(const std::string& sUserLogin)
-{
-	if (sUserLogin.empty())
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
-	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-	return pLoginHandler->GetUserLanguage(sUserLogin);
-}
-
-std::string CStateEnvironment::GetUserUUID(const std::string& sUserLogin)
-{
-	if (sUserLogin.empty())
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
-	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUserLogin))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-	return pLoginHandler->GetUserUUID(sUserLogin);
-}
-
-bool CStateEnvironment::CheckUserPermissionByUUID(const std::string& sUserUUID, const std::string& sPermissionIdentifier)
-{
-	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
-
-	if (sPermissionIdentifier.empty())
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER);
-	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPermissionIdentifier))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER, sPermissionIdentifier);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-	auto pAccessControl = m_pSystemState->accessControl();
-
-	std::string sUserRole = pLoginHandler->GetUserRoleByUUID(sNormalizedUUID);
-	AMC::PAccessRole pRole;
-	if (sUserRole.empty())
-		pRole = pAccessControl->findRole(sUserRole, true);
-	else
-		pRole = pAccessControl->getDefaultRole();
-
-	return pRole->hasPermission(sPermissionIdentifier);
-}
-
-
-std::string CStateEnvironment::GetUserLoginByUUID(const std::string& sUserUUID)
-{
-	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-
-	return pLoginHandler->GetUsernameByUUID(sNormalizedUUID);
-}
-
-
-std::string CStateEnvironment::GetUserDescriptionByUUID(const std::string& sUserUUID) 
-{
-	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-
-	return pLoginHandler->GetUserDescriptionByUUID(sNormalizedUUID);
-}
-
-std::string CStateEnvironment::GetUserRoleByUUID(const std::string& sUserUUID) 
-{
-	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-	auto pAccessControl = m_pSystemState->accessControl();
-
-	std::string sUserRole = pLoginHandler->GetUserRoleByUUID(sNormalizedUUID);
-	AMC::PAccessRole pRole;
-	if (sUserRole.empty())
-		pRole = pAccessControl->findRole(sUserRole, true);
-	else
-		pRole = pAccessControl->getDefaultRole();
-
-	return pRole->getIdentifier();
-}
-
-
-std::string CStateEnvironment::GetUserLanguageByUUID(const std::string& sUserUUID)
-{
-	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
-
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
-
-	return pLoginHandler->GetUserLanguageByUUID(sNormalizedUUID);
-}

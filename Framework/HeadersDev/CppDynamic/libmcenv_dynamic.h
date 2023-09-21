@@ -3641,15 +3641,12 @@ typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetSamplePtr) (LibMCEnv
 * Returns all timestamps and values of the sampling.
 *
 * @param[in] pUniformJournalSampling - UniformJournalSampling instance.
-* @param[in] nTimeStampsBufferSize - Number of elements in buffer
-* @param[out] pTimeStampsNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pTimeStampsBuffer - uint64  buffer of Array of TimeStamps in ms, in increasing order.
-* @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pValuesBuffer - double  buffer of Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+* @param[in] nSamplesBufferSize - Number of elements in buffer
+* @param[out] pSamplesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pSamplesBuffer - TimeStreamEntry  buffer of Array of Timestream entries, in increasing order.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer);
+typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) (LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry * pSamplesBuffer);
 
 /*************************************************************************************************************************
  Class definition for JournalVariable
@@ -3685,6 +3682,15 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetStartTimeStampPtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetEndTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMS);
 
 /**
+* Calculates the average value over the full available time interval.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[out] pAverageValue - Average value of the variable.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeFullAveragePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_double * pAverageValue);
+
+/**
 * Calculates the average value over a time interval. Fails if no data is available in this time interval.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
@@ -3709,6 +3715,342 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeAveragePtr) (LibMCEnv_J
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
+
+/**
+* Retrieves the raw timestream data of the variable.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
+* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry  buffer of All change events of the variable in the accessed interval.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) (LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer);
+
+/*************************************************************************************************************************
+ Class definition for JournalHandler
+**************************************************************************************************************************/
+
+/**
+* Retrieves the history of a given variable in the system journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
+* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+* @param[out] pJournalVariable - Journal Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
+
+/**
+* Retrieves the history of a given variable in the system journal for an arbitrary time interval.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
+* @param[in] nStartTimeInMilliseconds - Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval.
+* @param[in] nEndTimeInMilliseconds - End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval.
+* @param[out] pJournalVariable - Journal Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMilliseconds, LibMCEnv_uint64 nEndTimeInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
+
+/**
+* Stores a journal marker tag at the current time stamp.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
+* @param[out] pTimeStamp - Returns the stored time stamp in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_StoreJournalMarkerPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp);
+
+/**
+* Checks if a journal marker tag exists.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[out] pMarkerExists - Returns true if the marker exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_HasJournalMarkerPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool * pMarkerExists);
+
+/**
+* Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
+* @param[out] pTimeStamp - Returns the time stamp in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp);
+
+/**
+* Retrieves all existing journal marker time stamps. Fails if no marker exists.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+* @param[in] nTimeStampsBufferSize - Number of elements in buffer
+* @param[out] pTimeStampsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTimeStampsBuffer - uint64  buffer of Returns an array of time stamps in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer);
+
+/*************************************************************************************************************************
+ Class definition for UserManagementHandler
+**************************************************************************************************************************/
+
+/**
+* Checks if a user exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[out] pUserExists - Flag if users exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_UserExistsPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, bool * pUserExists);
+
+/**
+* Retrieves all users data with one Transaction. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the user., may be NULL
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of LanguageIdentifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserPropertiesPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
+* Retrieves all users data with one Transaction. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nUsernameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsernameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsernameBuffer -  buffer of User name, may be NULL
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of LanguageIdentifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserPropertiesByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nUsernameBufferSize, LibMCEnv_uint32* pUsernameNeededChars, char * pUsernameBuffer, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
+* Retrieves a users name with a given UUID. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nUsernameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsernameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsernameBuffer -  buffer of User name, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUsernameByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nUsernameBufferSize, LibMCEnv_uint32* pUsernameNeededChars, char * pUsernameBuffer);
+
+/**
+* Retrieves a users UUID. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Retrieves a users description. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserDescriptionPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Retrieves a users description by the user UUID. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserDescriptionByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Retrieves a users role. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserRolePtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer);
+
+/**
+* Retrieves a users role by the user UUID. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserRoleByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer);
+
+/**
+* Retrieves a users language preference. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of Language identifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserLanguagePtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
+* Retrieves a users language preference by user UUID. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of Language identifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetUserLanguageByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
+* Creates a new user. Fails if the user already exists.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name to create. MUST be alphanumeric and not empty.
+* @param[in] pRole - Role of the new user. MUST NOT be empty.
+* @param[in] pSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+* @param[in] pHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+* @param[in] pDescription - Description of the new user.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the new user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_CreateUserPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pRole, const char * pSalt, const char * pHashedPassword, const char * pDescription, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Updates a users language preference. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserLanguagePtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pLanguageIdentifier);
+
+/**
+* Updates a users role. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pUserRole - New Role identifier of the user.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserRolePtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pUserRole);
+
+/**
+* Updates a users description. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pDescription - New Description of the user.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserDescriptionPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pDescription);
+
+/**
+* Updates a users password. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUsername - User name
+* @param[in] pSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+* @param[in] pHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserPasswordPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pSalt, const char * pHashedPassword);
+
+/**
+* Updates a users language preference. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserLanguageByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pLanguageIdentifier);
+
+/**
+* Updates a users role. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pUserRole - New Role identifier of the user.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserRoleByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pUserRole);
+
+/**
+* Updates a users description. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pDescription - New Description identifier of the user.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserDescriptionByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pDescription);
+
+/**
+* Updates a users password. Fails if user does not exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] pSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+* @param[in] pHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserPasswordByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pSalt, const char * pHashedPassword);
 
 /*************************************************************************************************************************
  Class definition for StateEnvironment
@@ -4137,17 +4479,6 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ParseXMLStringPtr) (LibMCEnv_
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ParseXMLDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
-* Retrieves the history of a given variable in the system journal.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
-* @param[out] pJournalVariable - Journal Instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
-
-/**
 * Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -4159,111 +4490,22 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) (
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CheckUserPermissionPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const char * pPermissionIdentifier, bool * pUserHasPermission);
 
 /**
-* Returns a users description.
+* Returns a user management handler instance.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserLogin - Login of user
-* @param[in] nUserDescriptionBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserDescriptionBuffer -  buffer of Returns the users description. Fails if user is not known to the system., may be NULL
+* @param[out] pUserManagementInstance - Returns a user management handler.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserDescriptionPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserDescriptionBufferSize, LibMCEnv_uint32* pUserDescriptionNeededChars, char * pUserDescriptionBuffer);
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateUserManagementPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_UserManagementHandler * pUserManagementInstance);
 
 /**
-* Returns a users role identifier.
+* Returns the journal instance of the current session.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserLogin - Login of user
-* @param[in] nUserRoleBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserRoleBuffer -  buffer of Returns the users role identifier. Fails if user is not known to the system., may be NULL
+* @param[out] pJournalHandler - Journal instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserRolePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserRoleBufferSize, LibMCEnv_uint32* pUserRoleNeededChars, char * pUserRoleBuffer);
-
-/**
-* Returns a users language identifier.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserLogin - Login of user
-* @param[in] nUserLanguageBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserLanguageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserLanguageBuffer -  buffer of Returns the users language identifier. Fails if user is not known to the system., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserLanguagePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserLanguageBufferSize, LibMCEnv_uint32* pUserLanguageNeededChars, char * pUserLanguageBuffer);
-
-/**
-* Returns a users UUID.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserLogin - Login of user
-* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserUUIDBuffer -  buffer of Returns the user UUID. Fails if user is not known to the system., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
-
-/**
-* Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserUUID - UUID of user
-* @param[in] pPermissionIdentifier - Permission identifier
-* @param[out] pUserHasPermission - Returns if the user has permission
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CheckUserPermissionByUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const char * pPermissionIdentifier, bool * pUserHasPermission);
-
-/**
-* Returns the a users login name. Fails if user is not known to the system.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserUUID - UUID of user
-* @param[in] nUserLoginBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserLoginNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserLoginBuffer -  buffer of Returns the users login name., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserLoginByUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserLoginBufferSize, LibMCEnv_uint32* pUserLoginNeededChars, char * pUserLoginBuffer);
-
-/**
-* Returns a users description.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserUUID - UUID of user
-* @param[in] nUserDescriptionBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserDescriptionBuffer -  buffer of Returns the users description. Fails if user is not known to the system., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserDescriptionByUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserDescriptionBufferSize, LibMCEnv_uint32* pUserDescriptionNeededChars, char * pUserDescriptionBuffer);
-
-/**
-* Returns a users role identifier.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserUUID - UUID of user
-* @param[in] nUserRoleBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserRoleBuffer -  buffer of Returns the users role identifier. Fails if user is not known to the system., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserRoleByUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserRoleBufferSize, LibMCEnv_uint32* pUserRoleNeededChars, char * pUserRoleBuffer);
-
-/**
-* Returns a users language identifier.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pUserUUID - UUID of user
-* @param[in] nUserLanguageBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserLanguageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserLanguageBuffer -  buffer of Returns the users language identifier. Fails if user is not known to the system., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUserLanguageByUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserLanguageBufferSize, LibMCEnv_uint32* pUserLanguageNeededChars, char * pUserLanguageBuffer);
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetCurrentJournalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
 
 /*************************************************************************************************************************
  Class definition for UIEnvironment
@@ -4726,17 +4968,6 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildJobPtr) (LibMCEnv_UIEnvi
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
-* Retrieves the history of a given variable in the system journal.
-*
-* @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
-* @param[out] pJournalVariable - Journal Instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
-
-/**
 * Returns if the current user has a certain permission. Fails if permission is not known to the system.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -4800,6 +5031,24 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetCurrentUserLanguagePtr) (LibM
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetCurrentUserUUIDPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+
+/**
+* Returns a user management handler instance.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pUserManagementInstance - Returns a user management handler.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateUserManagementPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_UserManagementHandler * pUserManagementInstance);
+
+/**
+* Returns the journal instance of the current session.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pJournalHandler - Journal instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetCurrentJournalPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
 
 /*************************************************************************************************************************
  Global functions
@@ -5192,8 +5441,36 @@ typedef struct {
 	PLibMCEnvJournalVariable_GetVariableNamePtr m_JournalVariable_GetVariableName;
 	PLibMCEnvJournalVariable_GetStartTimeStampPtr m_JournalVariable_GetStartTimeStamp;
 	PLibMCEnvJournalVariable_GetEndTimeStampPtr m_JournalVariable_GetEndTimeStamp;
+	PLibMCEnvJournalVariable_ComputeFullAveragePtr m_JournalVariable_ComputeFullAverage;
 	PLibMCEnvJournalVariable_ComputeAveragePtr m_JournalVariable_ComputeAverage;
 	PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr m_JournalVariable_ComputeUniformAverageSamples;
+	PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr m_JournalVariable_ReceiveRawTimeStream;
+	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
+	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
+	PLibMCEnvJournalHandler_StoreJournalMarkerPtr m_JournalHandler_StoreJournalMarker;
+	PLibMCEnvJournalHandler_HasJournalMarkerPtr m_JournalHandler_HasJournalMarker;
+	PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr m_JournalHandler_RetrieveJournalMarker;
+	PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr m_JournalHandler_RetrieveJournalMarkers;
+	PLibMCEnvUserManagementHandler_UserExistsPtr m_UserManagementHandler_UserExists;
+	PLibMCEnvUserManagementHandler_GetUserPropertiesPtr m_UserManagementHandler_GetUserProperties;
+	PLibMCEnvUserManagementHandler_GetUserPropertiesByUUIDPtr m_UserManagementHandler_GetUserPropertiesByUUID;
+	PLibMCEnvUserManagementHandler_GetUsernameByUUIDPtr m_UserManagementHandler_GetUsernameByUUID;
+	PLibMCEnvUserManagementHandler_GetUserUUIDPtr m_UserManagementHandler_GetUserUUID;
+	PLibMCEnvUserManagementHandler_GetUserDescriptionPtr m_UserManagementHandler_GetUserDescription;
+	PLibMCEnvUserManagementHandler_GetUserDescriptionByUUIDPtr m_UserManagementHandler_GetUserDescriptionByUUID;
+	PLibMCEnvUserManagementHandler_GetUserRolePtr m_UserManagementHandler_GetUserRole;
+	PLibMCEnvUserManagementHandler_GetUserRoleByUUIDPtr m_UserManagementHandler_GetUserRoleByUUID;
+	PLibMCEnvUserManagementHandler_GetUserLanguagePtr m_UserManagementHandler_GetUserLanguage;
+	PLibMCEnvUserManagementHandler_GetUserLanguageByUUIDPtr m_UserManagementHandler_GetUserLanguageByUUID;
+	PLibMCEnvUserManagementHandler_CreateUserPtr m_UserManagementHandler_CreateUser;
+	PLibMCEnvUserManagementHandler_SetUserLanguagePtr m_UserManagementHandler_SetUserLanguage;
+	PLibMCEnvUserManagementHandler_SetUserRolePtr m_UserManagementHandler_SetUserRole;
+	PLibMCEnvUserManagementHandler_SetUserDescriptionPtr m_UserManagementHandler_SetUserDescription;
+	PLibMCEnvUserManagementHandler_SetUserPasswordPtr m_UserManagementHandler_SetUserPassword;
+	PLibMCEnvUserManagementHandler_SetUserLanguageByUUIDPtr m_UserManagementHandler_SetUserLanguageByUUID;
+	PLibMCEnvUserManagementHandler_SetUserRoleByUUIDPtr m_UserManagementHandler_SetUserRoleByUUID;
+	PLibMCEnvUserManagementHandler_SetUserDescriptionByUUIDPtr m_UserManagementHandler_SetUserDescriptionByUUID;
+	PLibMCEnvUserManagementHandler_SetUserPasswordByUUIDPtr m_UserManagementHandler_SetUserPasswordByUUID;
 	PLibMCEnvStateEnvironment_GetMachineStatePtr m_StateEnvironment_GetMachineState;
 	PLibMCEnvStateEnvironment_PrepareSignalPtr m_StateEnvironment_PrepareSignal;
 	PLibMCEnvStateEnvironment_WaitForSignalPtr m_StateEnvironment_WaitForSignal;
@@ -5233,17 +5510,9 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateXMLDocumentPtr m_StateEnvironment_CreateXMLDocument;
 	PLibMCEnvStateEnvironment_ParseXMLStringPtr m_StateEnvironment_ParseXMLString;
 	PLibMCEnvStateEnvironment_ParseXMLDataPtr m_StateEnvironment_ParseXMLData;
-	PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr m_StateEnvironment_RetrieveJournalVariable;
 	PLibMCEnvStateEnvironment_CheckUserPermissionPtr m_StateEnvironment_CheckUserPermission;
-	PLibMCEnvStateEnvironment_GetUserDescriptionPtr m_StateEnvironment_GetUserDescription;
-	PLibMCEnvStateEnvironment_GetUserRolePtr m_StateEnvironment_GetUserRole;
-	PLibMCEnvStateEnvironment_GetUserLanguagePtr m_StateEnvironment_GetUserLanguage;
-	PLibMCEnvStateEnvironment_GetUserUUIDPtr m_StateEnvironment_GetUserUUID;
-	PLibMCEnvStateEnvironment_CheckUserPermissionByUUIDPtr m_StateEnvironment_CheckUserPermissionByUUID;
-	PLibMCEnvStateEnvironment_GetUserLoginByUUIDPtr m_StateEnvironment_GetUserLoginByUUID;
-	PLibMCEnvStateEnvironment_GetUserDescriptionByUUIDPtr m_StateEnvironment_GetUserDescriptionByUUID;
-	PLibMCEnvStateEnvironment_GetUserRoleByUUIDPtr m_StateEnvironment_GetUserRoleByUUID;
-	PLibMCEnvStateEnvironment_GetUserLanguageByUUIDPtr m_StateEnvironment_GetUserLanguageByUUID;
+	PLibMCEnvStateEnvironment_CreateUserManagementPtr m_StateEnvironment_CreateUserManagement;
+	PLibMCEnvStateEnvironment_GetCurrentJournalPtr m_StateEnvironment_GetCurrentJournal;
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
@@ -5285,13 +5554,14 @@ typedef struct {
 	PLibMCEnvUIEnvironment_HasBuildJobPtr m_UIEnvironment_HasBuildJob;
 	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;
-	PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr m_UIEnvironment_RetrieveJournalVariable;
 	PLibMCEnvUIEnvironment_CheckPermissionPtr m_UIEnvironment_CheckPermission;
 	PLibMCEnvUIEnvironment_GetCurrentUserLoginPtr m_UIEnvironment_GetCurrentUserLogin;
 	PLibMCEnvUIEnvironment_GetCurrentUserDescriptionPtr m_UIEnvironment_GetCurrentUserDescription;
 	PLibMCEnvUIEnvironment_GetCurrentUserRolePtr m_UIEnvironment_GetCurrentUserRole;
 	PLibMCEnvUIEnvironment_GetCurrentUserLanguagePtr m_UIEnvironment_GetCurrentUserLanguage;
 	PLibMCEnvUIEnvironment_GetCurrentUserUUIDPtr m_UIEnvironment_GetCurrentUserUUID;
+	PLibMCEnvUIEnvironment_CreateUserManagementPtr m_UIEnvironment_CreateUserManagement;
+	PLibMCEnvUIEnvironment_GetCurrentJournalPtr m_UIEnvironment_GetCurrentJournal;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

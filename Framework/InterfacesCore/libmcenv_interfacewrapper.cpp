@@ -10597,20 +10597,18 @@ LibMCEnvResult libmcenv_uniformjournalsampling_getsample(LibMCEnv_UniformJournal
 	}
 }
 
-LibMCEnvResult libmcenv_uniformjournalsampling_getallsamples(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer)
+LibMCEnvResult libmcenv_uniformjournalsampling_getallsamples(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, sLibMCEnvTimeStreamEntry * pSamplesBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUniformJournalSampling;
 
 	try {
-		if ((!pTimeStampsBuffer) && !(pTimeStampsNeededCount))
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ((!pValuesBuffer) && !(pValuesNeededCount))
+		if ((!pSamplesBuffer) && !(pSamplesNeededCount))
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IUniformJournalSampling* pIUniformJournalSampling = dynamic_cast<IUniformJournalSampling*>(pIBaseClass);
 		if (!pIUniformJournalSampling)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUniformJournalSampling->GetAllSamples(nTimeStampsBufferSize, pTimeStampsNeededCount, pTimeStampsBuffer, nValuesBufferSize, pValuesNeededCount, pValuesBuffer);
+		pIUniformJournalSampling->GetAllSamples(nSamplesBufferSize, pSamplesNeededCount, pSamplesBuffer);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -10729,6 +10727,32 @@ LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable
 	}
 }
 
+LibMCEnvResult libmcenv_journalvariable_computefullaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_double * pAverageValue)
+{
+	IBase* pIBaseClass = (IBase *)pJournalVariable;
+
+	try {
+		if (pAverageValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
+		if (!pIJournalVariable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAverageValue = pIJournalVariable->ComputeFullAverage();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, bool bClampInterval, LibMCEnv_double * pAverageValue)
 {
 	IBase* pIBaseClass = (IBase *)pJournalVariable;
@@ -10770,6 +10794,1150 @@ LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_Jo
 		pBaseJournalSampling = pIJournalVariable->ComputeUniformAverageSamples(nStartTimeInMS, nEndTimeInMS, nNumberOfSamples, dMovingAverageDelta, bClampInterval);
 
 		*pJournalSampling = (IBase*)(pBaseJournalSampling);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalvariable_receiverawtimestream(LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, sLibMCEnvTimeStreamEntry * pTimeStreamEntriesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pJournalVariable;
+
+	try {
+		if ((!pTimeStreamEntriesBuffer) && !(pTimeStreamEntriesNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
+		if (!pIJournalVariable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIJournalVariable->ReceiveRawTimeStream(nTimeStreamEntriesBufferSize, pTimeStreamEntriesNeededCount, pTimeStreamEntriesBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for JournalHandler
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pVariableName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pJournalVariable == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sVariableName(pVariableName);
+		IBase* pBaseJournalVariable(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseJournalVariable = pIJournalHandler->RetrieveJournalVariable(sVariableName, nTimeDeltaInMilliseconds);
+
+		*pJournalVariable = (IBase*)(pBaseJournalVariable);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMilliseconds, LibMCEnv_uint64 nEndTimeInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pVariableName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pJournalVariable == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sVariableName(pVariableName);
+		IBase* pBaseJournalVariable(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseJournalVariable = pIJournalHandler->RetrieveJournalVariableFromTimeInterval(sVariableName, nStartTimeInMilliseconds, nEndTimeInMilliseconds);
+
+		*pJournalVariable = (IBase*)(pBaseJournalVariable);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_storejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pMarkerType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMarkerName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pTimeStamp == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMarkerType(pMarkerType);
+		std::string sMarkerName(pMarkerName);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimeStamp = pIJournalHandler->StoreJournalMarker(sMarkerType, sMarkerName, bMustBeUnique);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_hasjournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool * pMarkerExists)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pMarkerType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMarkerName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMarkerExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMarkerType(pMarkerType);
+		std::string sMarkerName(pMarkerName);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMarkerExists = pIJournalHandler->HasJournalMarker(sMarkerType, sMarkerName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pMarkerType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMarkerName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pTimeStamp == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMarkerType(pMarkerType);
+		std::string sMarkerName(pMarkerName);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimeStamp = pIJournalHandler->RetrieveJournalMarker(sMarkerType, sMarkerName, bMustBeUnique);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_retrievejournalmarkers(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pMarkerType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMarkerName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ((!pTimeStampsBuffer) && !(pTimeStampsNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMarkerType(pMarkerType);
+		std::string sMarkerName(pMarkerName);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIJournalHandler->RetrieveJournalMarkers(sMarkerType, sMarkerName, nTimeStampsBufferSize, pTimeStampsNeededCount, pTimeStampsBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for UserManagementHandler
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_usermanagementhandler_userexists(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, bool * pUserExists)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pUserExists = pIUserManagementHandler->UserExists(sUsername);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserproperties(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pRoleBuffer) && !(pRoleNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pLanguageIdentifierBuffer) && !(pLanguageIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sUUID("");
+		std::string sDescription("");
+		std::string sRole("");
+		std::string sLanguageIdentifier("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr) || (pDescriptionBuffer == nullptr) || (pRoleBuffer == nullptr) || (pLanguageIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			pIUserManagementHandler->GetUserProperties(sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_4<std::string, std::string, std::string, std::string> (sUUID, sDescription, sRole, sLanguageIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_4<std::string, std::string, std::string, std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID, sDescription, sRole, sLanguageIdentifier);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		if (pDescriptionNeededChars)
+			*pDescriptionNeededChars = (LibMCEnv_uint32) (sDescription.size()+1);
+		if (pDescriptionBuffer) {
+			if (sDescription.size() >= nDescriptionBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
+				pDescriptionBuffer[iDescription] = sDescription[iDescription];
+			pDescriptionBuffer[sDescription.size()] = 0;
+		}
+		if (pRoleNeededChars)
+			*pRoleNeededChars = (LibMCEnv_uint32) (sRole.size()+1);
+		if (pRoleBuffer) {
+			if (sRole.size() >= nRoleBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iRole = 0; iRole < sRole.size(); iRole++)
+				pRoleBuffer[iRole] = sRole[iRole];
+			pRoleBuffer[sRole.size()] = 0;
+		}
+		if (pLanguageIdentifierNeededChars)
+			*pLanguageIdentifierNeededChars = (LibMCEnv_uint32) (sLanguageIdentifier.size()+1);
+		if (pLanguageIdentifierBuffer) {
+			if (sLanguageIdentifier.size() >= nLanguageIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iLanguageIdentifier = 0; iLanguageIdentifier < sLanguageIdentifier.size(); iLanguageIdentifier++)
+				pLanguageIdentifierBuffer[iLanguageIdentifier] = sLanguageIdentifier[iLanguageIdentifier];
+			pLanguageIdentifierBuffer[sLanguageIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserpropertiesbyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nUsernameBufferSize, LibMCEnv_uint32* pUsernameNeededChars, char * pUsernameBuffer, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pUsernameBuffer) && !(pUsernameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pRoleBuffer) && !(pRoleNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pLanguageIdentifierBuffer) && !(pLanguageIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sUsername("");
+		std::string sDescription("");
+		std::string sRole("");
+		std::string sLanguageIdentifier("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUsernameBuffer == nullptr) || (pDescriptionBuffer == nullptr) || (pRoleBuffer == nullptr) || (pLanguageIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			pIUserManagementHandler->GetUserPropertiesByUUID(sUUID, sUsername, sDescription, sRole, sLanguageIdentifier);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_4<std::string, std::string, std::string, std::string> (sUsername, sDescription, sRole, sLanguageIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_4<std::string, std::string, std::string, std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUsername, sDescription, sRole, sLanguageIdentifier);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pUsernameNeededChars)
+			*pUsernameNeededChars = (LibMCEnv_uint32) (sUsername.size()+1);
+		if (pUsernameBuffer) {
+			if (sUsername.size() >= nUsernameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUsername = 0; iUsername < sUsername.size(); iUsername++)
+				pUsernameBuffer[iUsername] = sUsername[iUsername];
+			pUsernameBuffer[sUsername.size()] = 0;
+		}
+		if (pDescriptionNeededChars)
+			*pDescriptionNeededChars = (LibMCEnv_uint32) (sDescription.size()+1);
+		if (pDescriptionBuffer) {
+			if (sDescription.size() >= nDescriptionBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
+				pDescriptionBuffer[iDescription] = sDescription[iDescription];
+			pDescriptionBuffer[sDescription.size()] = 0;
+		}
+		if (pRoleNeededChars)
+			*pRoleNeededChars = (LibMCEnv_uint32) (sRole.size()+1);
+		if (pRoleBuffer) {
+			if (sRole.size() >= nRoleBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iRole = 0; iRole < sRole.size(); iRole++)
+				pRoleBuffer[iRole] = sRole[iRole];
+			pRoleBuffer[sRole.size()] = 0;
+		}
+		if (pLanguageIdentifierNeededChars)
+			*pLanguageIdentifierNeededChars = (LibMCEnv_uint32) (sLanguageIdentifier.size()+1);
+		if (pLanguageIdentifierBuffer) {
+			if (sLanguageIdentifier.size() >= nLanguageIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iLanguageIdentifier = 0; iLanguageIdentifier < sLanguageIdentifier.size(); iLanguageIdentifier++)
+				pLanguageIdentifierBuffer[iLanguageIdentifier] = sLanguageIdentifier[iLanguageIdentifier];
+			pLanguageIdentifierBuffer[sLanguageIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getusernamebyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nUsernameBufferSize, LibMCEnv_uint32* pUsernameNeededChars, char * pUsernameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pUsernameBuffer) && !(pUsernameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sUsername("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUsernameBuffer == nullptr);
+		if (isCacheCall) {
+			sUsername = pIUserManagementHandler->GetUsernameByUUID(sUUID);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sUsername));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUsername);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pUsernameNeededChars)
+			*pUsernameNeededChars = (LibMCEnv_uint32) (sUsername.size()+1);
+		if (pUsernameBuffer) {
+			if (sUsername.size() >= nUsernameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUsername = 0; iUsername < sUsername.size(); iUsername++)
+				pUsernameBuffer[iUsername] = sUsername[iUsername];
+			pUsernameBuffer[sUsername.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuseruuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sUUID("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIUserManagementHandler->GetUserUUID(sUsername);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserdescription(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sDescription("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDescriptionBuffer == nullptr);
+		if (isCacheCall) {
+			sDescription = pIUserManagementHandler->GetUserDescription(sUsername);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sDescription));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sDescription);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pDescriptionNeededChars)
+			*pDescriptionNeededChars = (LibMCEnv_uint32) (sDescription.size()+1);
+		if (pDescriptionBuffer) {
+			if (sDescription.size() >= nDescriptionBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
+				pDescriptionBuffer[iDescription] = sDescription[iDescription];
+			pDescriptionBuffer[sDescription.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserdescriptionbyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sDescription("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDescriptionBuffer == nullptr);
+		if (isCacheCall) {
+			sDescription = pIUserManagementHandler->GetUserDescriptionByUUID(sUUID);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sDescription));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sDescription);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pDescriptionNeededChars)
+			*pDescriptionNeededChars = (LibMCEnv_uint32) (sDescription.size()+1);
+		if (pDescriptionBuffer) {
+			if (sDescription.size() >= nDescriptionBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
+				pDescriptionBuffer[iDescription] = sDescription[iDescription];
+			pDescriptionBuffer[sDescription.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserrole(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pRoleBuffer) && !(pRoleNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sRole("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pRoleBuffer == nullptr);
+		if (isCacheCall) {
+			sRole = pIUserManagementHandler->GetUserRole(sUsername);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sRole));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sRole);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pRoleNeededChars)
+			*pRoleNeededChars = (LibMCEnv_uint32) (sRole.size()+1);
+		if (pRoleBuffer) {
+			if (sRole.size() >= nRoleBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iRole = 0; iRole < sRole.size(); iRole++)
+				pRoleBuffer[iRole] = sRole[iRole];
+			pRoleBuffer[sRole.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserrolebyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pRoleBuffer) && !(pRoleNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sRole("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pRoleBuffer == nullptr);
+		if (isCacheCall) {
+			sRole = pIUserManagementHandler->GetUserRoleByUUID(sUUID);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sRole));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sRole);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pRoleNeededChars)
+			*pRoleNeededChars = (LibMCEnv_uint32) (sRole.size()+1);
+		if (pRoleBuffer) {
+			if (sRole.size() >= nRoleBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iRole = 0; iRole < sRole.size(); iRole++)
+				pRoleBuffer[iRole] = sRole[iRole];
+			pRoleBuffer[sRole.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserlanguage(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pLanguageIdentifierBuffer) && !(pLanguageIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sLanguageIdentifier("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pLanguageIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sLanguageIdentifier = pIUserManagementHandler->GetUserLanguage(sUsername);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sLanguageIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sLanguageIdentifier);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pLanguageIdentifierNeededChars)
+			*pLanguageIdentifierNeededChars = (LibMCEnv_uint32) (sLanguageIdentifier.size()+1);
+		if (pLanguageIdentifierBuffer) {
+			if (sLanguageIdentifier.size() >= nLanguageIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iLanguageIdentifier = 0; iLanguageIdentifier < sLanguageIdentifier.size(); iLanguageIdentifier++)
+				pLanguageIdentifierBuffer[iLanguageIdentifier] = sLanguageIdentifier[iLanguageIdentifier];
+			pLanguageIdentifierBuffer[sLanguageIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_getuserlanguagebyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pLanguageIdentifierBuffer) && !(pLanguageIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sLanguageIdentifier("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pLanguageIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sLanguageIdentifier = pIUserManagementHandler->GetUserLanguageByUUID(sUUID);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sLanguageIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sLanguageIdentifier);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pLanguageIdentifierNeededChars)
+			*pLanguageIdentifierNeededChars = (LibMCEnv_uint32) (sLanguageIdentifier.size()+1);
+		if (pLanguageIdentifierBuffer) {
+			if (sLanguageIdentifier.size() >= nLanguageIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iLanguageIdentifier = 0; iLanguageIdentifier < sLanguageIdentifier.size(); iLanguageIdentifier++)
+				pLanguageIdentifierBuffer[iLanguageIdentifier] = sLanguageIdentifier[iLanguageIdentifier];
+			pLanguageIdentifierBuffer[sLanguageIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_createuser(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pRole, const char * pSalt, const char * pHashedPassword, const char * pDescription, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pRole == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pSalt == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHashedPassword == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sRole(pRole);
+		std::string sSalt(pSalt);
+		std::string sHashedPassword(pHashedPassword);
+		std::string sDescription(pDescription);
+		std::string sUUID("");
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIUserManagementHandler->CreateUser(sUsername, sRole, sSalt, sHashedPassword, sDescription);
+
+			pIUserManagementHandler->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserManagementHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIUserManagementHandler->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserlanguage(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pLanguageIdentifier)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pLanguageIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sLanguageIdentifier(pLanguageIdentifier);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserLanguage(sUsername, sLanguageIdentifier);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserrole(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pUserRole)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserRole == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sUserRole(pUserRole);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserRole(sUsername, sUserRole);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserdescription(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pDescription)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sDescription(pDescription);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserDescription(sUsername, sDescription);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserpassword(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const char * pSalt, const char * pHashedPassword)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUsername == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pSalt == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHashedPassword == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUsername(pUsername);
+		std::string sSalt(pSalt);
+		std::string sHashedPassword(pHashedPassword);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserPassword(sUsername, sSalt, sHashedPassword);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserlanguagebyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pLanguageIdentifier)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pLanguageIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sLanguageIdentifier(pLanguageIdentifier);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserLanguageByUUID(sUUID, sLanguageIdentifier);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserrolebyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pUserRole)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserRole == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sUserRole(pUserRole);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserRoleByUUID(sUUID, sUserRole);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserdescriptionbyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pDescription)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sDescription(pDescription);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserDescriptionByUUID(sUUID, sDescription);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_usermanagementhandler_setuserpasswordbyuuid(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pSalt, const char * pHashedPassword)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pSalt == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHashedPassword == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sSalt(pSalt);
+		std::string sHashedPassword(pHashedPassword);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUserManagementHandler->SetUserPasswordByUUID(sUUID, sSalt, sHashedPassword);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -12056,37 +13224,6 @@ LibMCEnvResult libmcenv_stateenvironment_parsexmldata(LibMCEnv_StateEnvironment 
 	}
 }
 
-LibMCEnvResult libmcenv_stateenvironment_retrievejournalvariable(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pJournalVariable == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IBase* pBaseJournalVariable(nullptr);
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pBaseJournalVariable = pIStateEnvironment->RetrieveJournalVariable(sVariableName, nTimeDeltaInMilliseconds);
-
-		*pJournalVariable = (IBase*)(pBaseJournalVariable);
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCEnvResult libmcenv_stateenvironment_checkuserpermission(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const char * pPermissionIdentifier, bool * pUserHasPermission)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -12119,44 +13256,21 @@ LibMCEnvResult libmcenv_stateenvironment_checkuserpermission(LibMCEnv_StateEnvir
 	}
 }
 
-LibMCEnvResult libmcenv_stateenvironment_getuserdescription(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserDescriptionBufferSize, LibMCEnv_uint32* pUserDescriptionNeededChars, char * pUserDescriptionBuffer)
+LibMCEnvResult libmcenv_stateenvironment_createusermanagement(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_UserManagementHandler * pUserManagementInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
 
 	try {
-		if (pUserLogin == nullptr)
+		if (pUserManagementInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserDescriptionBuffer) && !(pUserDescriptionNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserLogin(pUserLogin);
-		std::string sUserDescription("");
+		IBase* pBaseUserManagementInstance(nullptr);
 		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
 		if (!pIStateEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pUserDescriptionBuffer == nullptr);
-		if (isCacheCall) {
-			sUserDescription = pIStateEnvironment->GetUserDescription(sUserLogin);
+		pBaseUserManagementInstance = pIStateEnvironment->CreateUserManagement();
 
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserDescription));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserDescription);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserDescriptionNeededChars)
-			*pUserDescriptionNeededChars = (LibMCEnv_uint32) (sUserDescription.size()+1);
-		if (pUserDescriptionBuffer) {
-			if (sUserDescription.size() >= nUserDescriptionBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserDescription = 0; iUserDescription < sUserDescription.size(); iUserDescription++)
-				pUserDescriptionBuffer[iUserDescription] = sUserDescription[iUserDescription];
-			pUserDescriptionBuffer[sUserDescription.size()] = 0;
-		}
+		*pUserManagementInstance = (IBase*)(pBaseUserManagementInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -12170,382 +13284,21 @@ LibMCEnvResult libmcenv_stateenvironment_getuserdescription(LibMCEnv_StateEnviro
 	}
 }
 
-LibMCEnvResult libmcenv_stateenvironment_getuserrole(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserRoleBufferSize, LibMCEnv_uint32* pUserRoleNeededChars, char * pUserRoleBuffer)
+LibMCEnvResult libmcenv_stateenvironment_getcurrentjournal(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_JournalHandler * pJournalHandler)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
 
 	try {
-		if (pUserLogin == nullptr)
+		if (pJournalHandler == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserRoleBuffer) && !(pUserRoleNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserLogin(pUserLogin);
-		std::string sUserRole("");
+		IBase* pBaseJournalHandler(nullptr);
 		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
 		if (!pIStateEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pUserRoleBuffer == nullptr);
-		if (isCacheCall) {
-			sUserRole = pIStateEnvironment->GetUserRole(sUserLogin);
+		pBaseJournalHandler = pIStateEnvironment->GetCurrentJournal();
 
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserRole));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserRole);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserRoleNeededChars)
-			*pUserRoleNeededChars = (LibMCEnv_uint32) (sUserRole.size()+1);
-		if (pUserRoleBuffer) {
-			if (sUserRole.size() >= nUserRoleBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserRole = 0; iUserRole < sUserRole.size(); iUserRole++)
-				pUserRoleBuffer[iUserRole] = sUserRole[iUserRole];
-			pUserRoleBuffer[sUserRole.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_getuserlanguage(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserLanguageBufferSize, LibMCEnv_uint32* pUserLanguageNeededChars, char * pUserLanguageBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pUserLogin == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserLanguageBuffer) && !(pUserLanguageNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserLogin(pUserLogin);
-		std::string sUserLanguage("");
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pUserLanguageBuffer == nullptr);
-		if (isCacheCall) {
-			sUserLanguage = pIStateEnvironment->GetUserLanguage(sUserLogin);
-
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserLanguage));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserLanguage);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserLanguageNeededChars)
-			*pUserLanguageNeededChars = (LibMCEnv_uint32) (sUserLanguage.size()+1);
-		if (pUserLanguageBuffer) {
-			if (sUserLanguage.size() >= nUserLanguageBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserLanguage = 0; iUserLanguage < sUserLanguage.size(); iUserLanguage++)
-				pUserLanguageBuffer[iUserLanguage] = sUserLanguage[iUserLanguage];
-			pUserLanguageBuffer[sUserLanguage.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_getuseruuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserLogin, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pUserLogin == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserUUIDBuffer) && !(pUserUUIDNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserLogin(pUserLogin);
-		std::string sUserUUID("");
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pUserUUIDBuffer == nullptr);
-		if (isCacheCall) {
-			sUserUUID = pIStateEnvironment->GetUserUUID(sUserLogin);
-
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserUUID));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserUUID);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserUUIDNeededChars)
-			*pUserUUIDNeededChars = (LibMCEnv_uint32) (sUserUUID.size()+1);
-		if (pUserUUIDBuffer) {
-			if (sUserUUID.size() >= nUserUUIDBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserUUID = 0; iUserUUID < sUserUUID.size(); iUserUUID++)
-				pUserUUIDBuffer[iUserUUID] = sUserUUID[iUserUUID];
-			pUserUUIDBuffer[sUserUUID.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_checkuserpermissionbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const char * pPermissionIdentifier, bool * pUserHasPermission)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pUserUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pPermissionIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pUserHasPermission == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserUUID(pUserUUID);
-		std::string sPermissionIdentifier(pPermissionIdentifier);
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pUserHasPermission = pIStateEnvironment->CheckUserPermissionByUUID(sUserUUID, sPermissionIdentifier);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_getuserloginbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserLoginBufferSize, LibMCEnv_uint32* pUserLoginNeededChars, char * pUserLoginBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pUserUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserLoginBuffer) && !(pUserLoginNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserUUID(pUserUUID);
-		std::string sUserLogin("");
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pUserLoginBuffer == nullptr);
-		if (isCacheCall) {
-			sUserLogin = pIStateEnvironment->GetUserLoginByUUID(sUserUUID);
-
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserLogin));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserLogin);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserLoginNeededChars)
-			*pUserLoginNeededChars = (LibMCEnv_uint32) (sUserLogin.size()+1);
-		if (pUserLoginBuffer) {
-			if (sUserLogin.size() >= nUserLoginBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserLogin = 0; iUserLogin < sUserLogin.size(); iUserLogin++)
-				pUserLoginBuffer[iUserLogin] = sUserLogin[iUserLogin];
-			pUserLoginBuffer[sUserLogin.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_getuserdescriptionbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserDescriptionBufferSize, LibMCEnv_uint32* pUserDescriptionNeededChars, char * pUserDescriptionBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pUserUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserDescriptionBuffer) && !(pUserDescriptionNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserUUID(pUserUUID);
-		std::string sUserDescription("");
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pUserDescriptionBuffer == nullptr);
-		if (isCacheCall) {
-			sUserDescription = pIStateEnvironment->GetUserDescriptionByUUID(sUserUUID);
-
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserDescription));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserDescription);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserDescriptionNeededChars)
-			*pUserDescriptionNeededChars = (LibMCEnv_uint32) (sUserDescription.size()+1);
-		if (pUserDescriptionBuffer) {
-			if (sUserDescription.size() >= nUserDescriptionBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserDescription = 0; iUserDescription < sUserDescription.size(); iUserDescription++)
-				pUserDescriptionBuffer[iUserDescription] = sUserDescription[iUserDescription];
-			pUserDescriptionBuffer[sUserDescription.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_getuserrolebyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserRoleBufferSize, LibMCEnv_uint32* pUserRoleNeededChars, char * pUserRoleBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pUserUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserRoleBuffer) && !(pUserRoleNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserUUID(pUserUUID);
-		std::string sUserRole("");
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pUserRoleBuffer == nullptr);
-		if (isCacheCall) {
-			sUserRole = pIStateEnvironment->GetUserRoleByUUID(sUserUUID);
-
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserRole));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserRole);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserRoleNeededChars)
-			*pUserRoleNeededChars = (LibMCEnv_uint32) (sUserRole.size()+1);
-		if (pUserRoleBuffer) {
-			if (sUserRole.size() >= nUserRoleBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserRole = 0; iUserRole < sUserRole.size(); iUserRole++)
-				pUserRoleBuffer[iUserRole] = sUserRole[iUserRole];
-			pUserRoleBuffer[sUserRole.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_getuserlanguagebyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUserUUID, const LibMCEnv_uint32 nUserLanguageBufferSize, LibMCEnv_uint32* pUserLanguageNeededChars, char * pUserLanguageBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pUserUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pUserLanguageBuffer) && !(pUserLanguageNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sUserUUID(pUserUUID);
-		std::string sUserLanguage("");
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pUserLanguageBuffer == nullptr);
-		if (isCacheCall) {
-			sUserLanguage = pIStateEnvironment->GetUserLanguageByUUID(sUserUUID);
-
-			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sUserLanguage));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sUserLanguage);
-			pIStateEnvironment->_setCache (nullptr);
-		}
-		
-		if (pUserLanguageNeededChars)
-			*pUserLanguageNeededChars = (LibMCEnv_uint32) (sUserLanguage.size()+1);
-		if (pUserLanguageBuffer) {
-			if (sUserLanguage.size() >= nUserLanguageBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iUserLanguage = 0; iUserLanguage < sUserLanguage.size(); iUserLanguage++)
-				pUserLanguageBuffer[iUserLanguage] = sUserLanguage[iUserLanguage];
-			pUserLanguageBuffer[sUserLanguage.size()] = 0;
-		}
+		*pJournalHandler = (IBase*)(pBaseJournalHandler);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -13990,37 +14743,6 @@ LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironme
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_retrievejournalvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pJournalVariable == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IBase* pBaseJournalVariable(nullptr);
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pBaseJournalVariable = pIUIEnvironment->RetrieveJournalVariable(sVariableName, nTimeDeltaInMilliseconds);
-
-		*pJournalVariable = (IBase*)(pBaseJournalVariable);
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCEnvResult libmcenv_uienvironment_checkpermission(LibMCEnv_UIEnvironment pUIEnvironment, const char * pPermissionIdentifier, bool * pUserHasPermission)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -14277,6 +14999,62 @@ LibMCEnvResult libmcenv_uienvironment_getcurrentuseruuid(LibMCEnv_UIEnvironment 
 				pUserUUIDBuffer[iUserUUID] = sUserUUID[iUserUUID];
 			pUserUUIDBuffer[sUserUUID.size()] = 0;
 		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_createusermanagement(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_UserManagementHandler * pUserManagementInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pUserManagementInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseUserManagementInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseUserManagementInstance = pIUIEnvironment->CreateUserManagement();
+
+		*pUserManagementInstance = (IBase*)(pBaseUserManagementInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_getcurrentjournal(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JournalHandler * pJournalHandler)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pJournalHandler == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseJournalHandler(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseJournalHandler = pIUIEnvironment->GetCurrentJournal();
+
+		*pJournalHandler = (IBase*)(pBaseJournalHandler);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -14975,10 +15753,66 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_journalvariable_getstarttimestamp;
 	if (sProcName == "libmcenv_journalvariable_getendtimestamp") 
 		*ppProcAddress = (void*) &libmcenv_journalvariable_getendtimestamp;
+	if (sProcName == "libmcenv_journalvariable_computefullaverage") 
+		*ppProcAddress = (void*) &libmcenv_journalvariable_computefullaverage;
 	if (sProcName == "libmcenv_journalvariable_computeaverage") 
 		*ppProcAddress = (void*) &libmcenv_journalvariable_computeaverage;
 	if (sProcName == "libmcenv_journalvariable_computeuniformaveragesamples") 
 		*ppProcAddress = (void*) &libmcenv_journalvariable_computeuniformaveragesamples;
+	if (sProcName == "libmcenv_journalvariable_receiverawtimestream") 
+		*ppProcAddress = (void*) &libmcenv_journalvariable_receiverawtimestream;
+	if (sProcName == "libmcenv_journalhandler_retrievejournalvariable") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariable;
+	if (sProcName == "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariablefromtimeinterval;
+	if (sProcName == "libmcenv_journalhandler_storejournalmarker") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_storejournalmarker;
+	if (sProcName == "libmcenv_journalhandler_hasjournalmarker") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_hasjournalmarker;
+	if (sProcName == "libmcenv_journalhandler_retrievejournalmarker") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalmarker;
+	if (sProcName == "libmcenv_journalhandler_retrievejournalmarkers") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalmarkers;
+	if (sProcName == "libmcenv_usermanagementhandler_userexists") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_userexists;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserproperties") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserproperties;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserpropertiesbyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserpropertiesbyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_getusernamebyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getusernamebyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_getuseruuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuseruuid;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserdescription") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserdescription;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserdescriptionbyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserdescriptionbyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserrole") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserrole;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserrolebyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserrolebyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserlanguage") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserlanguage;
+	if (sProcName == "libmcenv_usermanagementhandler_getuserlanguagebyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserlanguagebyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_createuser") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_createuser;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserlanguage") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserlanguage;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserrole") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserrole;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserdescription") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserdescription;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserpassword") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserpassword;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserlanguagebyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserlanguagebyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserrolebyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserrolebyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserdescriptionbyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserdescriptionbyuuid;
+	if (sProcName == "libmcenv_usermanagementhandler_setuserpasswordbyuuid") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_setuserpasswordbyuuid;
 	if (sProcName == "libmcenv_stateenvironment_getmachinestate") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getmachinestate;
 	if (sProcName == "libmcenv_stateenvironment_preparesignal") 
@@ -15057,28 +15891,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_parsexmlstring;
 	if (sProcName == "libmcenv_stateenvironment_parsexmldata") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_parsexmldata;
-	if (sProcName == "libmcenv_stateenvironment_retrievejournalvariable") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_retrievejournalvariable;
 	if (sProcName == "libmcenv_stateenvironment_checkuserpermission") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_checkuserpermission;
-	if (sProcName == "libmcenv_stateenvironment_getuserdescription") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuserdescription;
-	if (sProcName == "libmcenv_stateenvironment_getuserrole") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuserrole;
-	if (sProcName == "libmcenv_stateenvironment_getuserlanguage") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuserlanguage;
-	if (sProcName == "libmcenv_stateenvironment_getuseruuid") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuseruuid;
-	if (sProcName == "libmcenv_stateenvironment_checkuserpermissionbyuuid") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_checkuserpermissionbyuuid;
-	if (sProcName == "libmcenv_stateenvironment_getuserloginbyuuid") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuserloginbyuuid;
-	if (sProcName == "libmcenv_stateenvironment_getuserdescriptionbyuuid") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuserdescriptionbyuuid;
-	if (sProcName == "libmcenv_stateenvironment_getuserrolebyuuid") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuserrolebyuuid;
-	if (sProcName == "libmcenv_stateenvironment_getuserlanguagebyuuid") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_getuserlanguagebyuuid;
+	if (sProcName == "libmcenv_stateenvironment_createusermanagement") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_createusermanagement;
+	if (sProcName == "libmcenv_stateenvironment_getcurrentjournal") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getcurrentjournal;
 	if (sProcName == "libmcenv_uienvironment_activatemodaldialog") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_activatemodaldialog;
 	if (sProcName == "libmcenv_uienvironment_closemodaldialog") 
@@ -15161,8 +15979,6 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getbuildjob;
 	if (sProcName == "libmcenv_uienvironment_creatediscretefield2d") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_creatediscretefield2d;
-	if (sProcName == "libmcenv_uienvironment_retrievejournalvariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_retrievejournalvariable;
 	if (sProcName == "libmcenv_uienvironment_checkpermission") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_checkpermission;
 	if (sProcName == "libmcenv_uienvironment_getcurrentuserlogin") 
@@ -15175,6 +15991,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getcurrentuserlanguage;
 	if (sProcName == "libmcenv_uienvironment_getcurrentuseruuid") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getcurrentuseruuid;
+	if (sProcName == "libmcenv_uienvironment_createusermanagement") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_createusermanagement;
+	if (sProcName == "libmcenv_uienvironment_getcurrentjournal") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getcurrentjournal;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

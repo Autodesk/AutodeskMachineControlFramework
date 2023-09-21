@@ -333,6 +333,7 @@
 		<error name="NOLOGCALLBACK" code="335" description="No log callback" />			
 		<error name="EMPTYUSERNAME" code="336" description="Empty user name" />			
 		<error name="EMPTYUSERUUID" code="337" description="Empty user UUID" />			
+		<error name="USERNOTUNIQUE" code="338" description="User not unique" />
 		
 								
 	</errors>
@@ -789,6 +790,14 @@
 			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
 		</method>
 
+		<method name="GetUserPropertiesByUUID" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
 		<method name="GetUsernameByUUID" description="Retrieves a users name with a given UUID. Fails if user does not exist.">
 			<param name="UUID" type="string" pass="in" description="UUID of the user." />
 			<param name="Username" type="string" pass="return" description="User name" />
@@ -845,12 +854,12 @@
 		
 		<method name="SetUserRole" description="Updates a users role. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
-			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+			<param name="Role" type="string" pass="in" description="New Role identifier of the user." />
 		</method>
 
 		<method name="SetUserDescription" description="Updates a users description. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
-			<param name="Description" type="string" pass="in" description="New Language identifier of the user." />
+			<param name="Description" type="string" pass="in" description="New Description of the user." />
 		</method>
 		
 		<method name="SetUserPassword" description="Updates a users password. Fails if user does not exist.">
@@ -866,7 +875,7 @@
 		
 		<method name="SetUserRoleByUUID" description="Updates a users role. Fails if user does not exist.">
 			<param name="UUID" type="string" pass="in" description="UUID of the user." />
-			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+			<param name="Role" type="string" pass="in" description="New Role identifier of the user." />
 		</method>
 
 		<method name="SetUserDescriptionByUUID" description="Updates a users description. Fails if user does not exist.">

@@ -475,6 +475,7 @@ public:
 			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "NOLOGCALLBACK";
 			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "EMPTYUSERNAME";
 			case LIBMCDATA_ERROR_EMPTYUSERUUID: return "EMPTYUSERUUID";
+			case LIBMCDATA_ERROR_USERNOTUNIQUE: return "USERNOTUNIQUE";
 		}
 		return "UNKNOWN";
 	}
@@ -749,6 +750,7 @@ public:
 			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
 			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
 			case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
+			case LIBMCDATA_ERROR_USERNOTUNIQUE: return "User not unique";
 		}
 		return "unknown error";
 	}
@@ -1185,6 +1187,7 @@ public:
 	inline bool UserExists(const std::string & sUsername);
 	inline void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword);
 	inline void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+	inline void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
 	inline std::string GetUsernameByUUID(const std::string & sUUID);
 	inline std::string GetUserUUID(const std::string & sUsername);
 	inline std::string GetUserDescription(const std::string & sUsername);
@@ -1195,11 +1198,11 @@ public:
 	inline std::string GetUserLanguageByUUID(const std::string & sUUID);
 	inline std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription);
 	inline void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier);
-	inline void SetUserRole(const std::string & sUsername, const std::string & sLanguageIdentifier);
+	inline void SetUserRole(const std::string & sUsername, const std::string & sRole);
 	inline void SetUserDescription(const std::string & sUsername, const std::string & sDescription);
 	inline void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword);
 	inline void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier);
-	inline void SetUserRoleByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier);
+	inline void SetUserRoleByUUID(const std::string & sUUID, const std::string & sRole);
 	inline void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription);
 	inline void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword);
 };
@@ -1431,6 +1434,7 @@ public:
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDetails = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserProperties = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = nullptr;
 		pWrapperTable->m_LoginHandler_GetUsernameByUUID = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserUUID = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDescription = nullptr;
@@ -2169,6 +2173,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LoginHandler_GetUserProperties == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = (PLibMCDataLoginHandler_GetUserPropertiesByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserpropertiesbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = (PLibMCDataLoginHandler_GetUserPropertiesByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserpropertiesbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2928,6 +2941,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserproperties", (void**)&(pWrapperTable->m_LoginHandler_GetUserProperties));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserProperties == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserpropertiesbyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getusernamebyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUsernameByUUID));
@@ -4204,6 +4221,36 @@ public:
 	}
 	
 	/**
+	* CLoginHandler::GetUserPropertiesByUUID - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[out] sUsername - User name
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CLoginHandler::GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCData_uint32 bytesNeededUsername = 0;
+		LibMCData_uint32 bytesWrittenUsername = 0;
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserPropertiesByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededUsername, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserPropertiesByUUID(m_pHandle, sUUID.c_str(), bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUsername = std::string(&bufferUsername[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
 	* CLoginHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
 	* @param[in] sUUID - UUID of the user.
 	* @return User name
@@ -4364,17 +4411,17 @@ public:
 	/**
 	* CLoginHandler::SetUserRole - Updates a users role. Fails if user does not exist.
 	* @param[in] sUsername - User name
-	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	* @param[in] sRole - New Role identifier of the user.
 	*/
-	void CLoginHandler::SetUserRole(const std::string & sUsername, const std::string & sLanguageIdentifier)
+	void CLoginHandler::SetUserRole(const std::string & sUsername, const std::string & sRole)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRole(m_pHandle, sUsername.c_str(), sLanguageIdentifier.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRole(m_pHandle, sUsername.c_str(), sRole.c_str()));
 	}
 	
 	/**
 	* CLoginHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
 	* @param[in] sUsername - User name
-	* @param[in] sDescription - New Language identifier of the user.
+	* @param[in] sDescription - New Description of the user.
 	*/
 	void CLoginHandler::SetUserDescription(const std::string & sUsername, const std::string & sDescription)
 	{
@@ -4405,11 +4452,11 @@ public:
 	/**
 	* CLoginHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
 	* @param[in] sUUID - UUID of the user.
-	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	* @param[in] sRole - New Role identifier of the user.
 	*/
-	void CLoginHandler::SetUserRoleByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier)
+	void CLoginHandler::SetUserRoleByUUID(const std::string & sUUID, const std::string & sRole)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRoleByUUID(m_pHandle, sUUID.c_str(), sLanguageIdentifier.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRoleByUUID(m_pHandle, sUUID.c_str(), sRole.c_str()));
 	}
 	
 	/**

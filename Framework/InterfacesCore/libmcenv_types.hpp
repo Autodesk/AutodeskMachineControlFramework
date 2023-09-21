@@ -217,6 +217,10 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDUSERLOGIN 10120 /** Invalid user login */
 #define LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER 10121 /** Empty permission identifier */
 #define LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER 10122 /** Invalid permission identifier */
+#define LIBMCENV_ERROR_EMPTYUSERROLE 10123 /** Empty user role */
+#define LIBMCENV_ERROR_INVALIDUSERROLE 10124 /** Invalid user role */
+#define LIBMCENV_ERROR_EMPTYUSERLANGUAGE 10125 /** Empty user language */
+#define LIBMCENV_ERROR_INVALIDUSERLANGUAGE 10126 /** Invalid user language */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -346,6 +350,10 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDUSERLOGIN: return "Invalid user login";
     case LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
     case LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER: return "Invalid permission identifier";
+    case LIBMCENV_ERROR_EMPTYUSERROLE: return "Empty user role";
+    case LIBMCENV_ERROR_INVALIDUSERROLE: return "Invalid user role";
+    case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "Empty user language";
+    case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
     default: return "unknown error";
   }
 }
@@ -385,6 +393,8 @@ typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;
+typedef LibMCEnvHandle LibMCEnv_JournalHandler;
+typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
 typedef LibMCEnvHandle LibMCEnv_UIEnvironment;
 
@@ -496,6 +506,11 @@ namespace LibMCEnv {
       LibMCEnv_double m_Blue;
   } sColorRGB;
   
+  typedef struct sTimeStreamEntry {
+      LibMCEnv_uint64 m_TimestampInMS;
+      LibMCEnv_double m_Value;
+  } sTimeStreamEntry;
+  
   #pragma pack ()
   
 } // namespace LibMCEnv;
@@ -515,5 +530,6 @@ typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;
 typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
 typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
+typedef LibMCEnv::sTimeStreamEntry sLibMCEnvTimeStreamEntry;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP

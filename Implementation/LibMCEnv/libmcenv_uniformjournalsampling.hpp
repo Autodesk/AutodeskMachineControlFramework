@@ -89,7 +89,7 @@ public:
 
 	void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue) override;
 
-	void GetAllSamples(LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer) override;
+	void GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry* pSamplesBuffer) override;
 
 };
 

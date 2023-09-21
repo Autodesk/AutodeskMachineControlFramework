@@ -866,6 +866,27 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserproperties(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCData_uint32 nRoleBufferSize, LibMCData_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
 
 /**
+* Retrieves all users data with one Transaction. Fails if user does not exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[in] nUsernameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsernameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsernameBuffer -  buffer of User name, may be NULL
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of LanguageIdentifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserpropertiesbyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const LibMCData_uint32 nUsernameBufferSize, LibMCData_uint32* pUsernameNeededChars, char * pUsernameBuffer, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCData_uint32 nRoleBufferSize, LibMCData_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
 * Retrieves a users name with a given UUID. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.
@@ -992,17 +1013,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserlanguage(LibMCD
 *
 * @param[in] pLoginHandler - LoginHandler instance.
 * @param[in] pUsername - User name
-* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @param[in] pRole - New Role identifier of the user.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserrole(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pLanguageIdentifier);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserrole(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pRole);
 
 /**
 * Updates a users description. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.
 * @param[in] pUsername - User name
-* @param[in] pDescription - New Language identifier of the user.
+* @param[in] pDescription - New Description of the user.
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserdescription(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const char * pDescription);
@@ -1033,10 +1054,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserlanguagebyuuid(
 *
 * @param[in] pLoginHandler - LoginHandler instance.
 * @param[in] pUUID - UUID of the user.
-* @param[in] pLanguageIdentifier - New Language identifier of the user.
+* @param[in] pRole - New Role identifier of the user.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserrolebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const char * pLanguageIdentifier);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserrolebyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const char * pRole);
 
 /**
 * Updates a users description. Fails if user does not exist.

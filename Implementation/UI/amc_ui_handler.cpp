@@ -95,7 +95,7 @@ std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
 
 
 
-CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl)
+CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler)
     : m_dLogoAspectRatio (1.0), 
     m_pStateMachineData(pStateMachineData),
     m_pEnvironmentWrapper (pEnvironmentWrapper),
@@ -107,7 +107,9 @@ CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandle
     m_sTestOutputPath (sTestOutputPath),
     m_pLogger(pLogger),
     m_sSystemUserID (sSystemUserID),
-    m_pAccessControl (pAccessControl)
+    m_pAccessControl (pAccessControl),
+    m_pLanguageHandler (pLanguageHandler),
+    m_pLoginHandler (pLoginHandler)
 {
     if (pStateMachineData.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -126,6 +128,10 @@ CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandle
     if (pStateJournal.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pAccessControl.get () == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pLanguageHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pLoginHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 
@@ -724,7 +730,7 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 
     auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, "", pDummyClientVariableHandler, m_pStateJournal, m_sTestOutputPath, m_sSystemUserID, CUserInformation::makeEmpty (), m_pAccessControl);
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, "", pDummyClientVariableHandler, m_pStateJournal, m_sTestOutputPath, m_sSystemUserID, CUserInformation::makeEmpty (), m_pAccessControl, m_pLoginHandler, m_pLanguageHandler);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -792,7 +798,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         }
 
-        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pStateJournal, m_sTestOutputPath, m_sSystemUserID, pUserInformation, m_pAccessControl);
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pStateJournal, m_sTestOutputPath, m_sSystemUserID, pUserInformation, m_pAccessControl, m_pLoginHandler, m_pLanguageHandler);
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);

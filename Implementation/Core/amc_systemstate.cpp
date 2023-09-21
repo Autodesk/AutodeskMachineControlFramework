@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statemachinedata.hpp"
 #include "amc_accesscontrol.hpp"
 #include "amc_stringresourcehandler.hpp"
+#include "amc_languagehandler.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -83,7 +84,8 @@ namespace AMC {
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID (), m_pAccessControl);
+		m_pLanguageHandler = std::make_shared<CLanguageHandler>();
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID (), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler);
 
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
@@ -192,6 +194,12 @@ namespace AMC {
 	{
 		return m_pAccessControl;
 	}
+
+	PLanguageHandler CSystemState::getLanguageHandlerInstance()
+	{
+		return m_pLanguageHandler;
+	}
+
 
 	PStateMachineData CSystemState::getStateMachineData()
 	{

@@ -75,6 +75,8 @@ public:
 
 	void GetUserProperties(const std::string& sUsername, std::string& sUUID, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier) override;
 
+	void GetUserPropertiesByUUID(const std::string& sUUID, std::string& sUsername, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier) override;
+
 	std::string GetUsernameByUUID(const std::string& sUUID) override;
 
 	std::string GetUserUUID(const std::string& sUsername) override;

@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_usermanagementhandler.hpp"
+#include "libmcenv_journalhandler.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -84,7 +86,7 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl, LibMCData::PLoginHandler pLoginHandler, AMC::PLanguageHandler pLanguageHandler)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
@@ -99,7 +101,9 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
       m_pClientVariableHandler (pClientVariableHandler),
       m_pBuildJobHandler (pBuildJobHandler), 
       m_pUserInformation (pUserInformation),
-      m_pAccessControl (pAccessControl)
+      m_pAccessControl (pAccessControl),
+      m_pLoginHandler (pLoginHandler),
+      m_pLanguageHandler (pLanguageHandler)
 {
 
     if (pLogger.get() == nullptr)
@@ -119,6 +123,10 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
     if (pUserInformation.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pAccessControl.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pLoginHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pLanguageHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
     if (pUIHandler == nullptr)
@@ -492,14 +500,6 @@ IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint3
     return new CDiscreteFieldData2D(pInstance);
 }
 
-IJournalVariable* CUIEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
-{
-    uint64_t nStartTimeStamp = 0;
-    uint64_t nEndTimeStamp = 0;
-    m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
-    return new CJournalVariable (m_pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
-}
-
 bool CUIEnvironment::CheckPermission(const std::string& sPermissionIdentifier)
 {
     return m_pAccessControl->checkPermissionInRole(m_pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
@@ -531,5 +531,15 @@ std::string CUIEnvironment::GetCurrentUserUUID()
 {
     return m_pUserInformation->getUUID();
 
+}
+
+IUserManagementHandler* CUIEnvironment::CreateUserManagement()
+{
+    return new CUserManagementHandler(m_pLoginHandler, m_pAccessControl, m_pLanguageHandler);
+}
+
+IJournalHandler* CUIEnvironment::GetCurrentJournal()
+{
+    return new CJournalHandler(m_pStateJournal);
 }
 

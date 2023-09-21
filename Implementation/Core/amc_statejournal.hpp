@@ -94,8 +94,6 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		uint32_t registerState (const std::string& sName);
-
 		void readDoubleTimeStream (const std::string & sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, double & dStartValue, std::vector<sJournalTimeStreamDoubleEntry> & timeStream);
 
 		void retrieveRecentInterval(uint64_t nLastMilliseconds, uint64_t& nStartTimeStamp, uint64_t& nEndTimeStamp);

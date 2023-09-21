@@ -95,8 +95,34 @@ void CLoginHandler::GetUserProperties(const std::string& sUsername, std::string&
     sRole = pStatement->getColumnString(3);
     sLanguageIdentifier = pStatement->getColumnString(4);
 
+    if (pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTUNIQUE, "user not unique: " + sUsername);
+
     pStatement = nullptr;
 }
+
+void CLoginHandler::GetUserPropertiesByUUID(const std::string& sUUID, std::string& sUsername, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier)
+{
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+
+    std::string sQuery = "SELECT login, description, role, language FROM users WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUUID);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND, "user uuid not found: " + sUUID);
+
+    sUsername = pStatement->getColumnString(1);
+    sDescription = pStatement->getColumnString(2);
+    sRole = pStatement->getColumnString(3);
+    sLanguageIdentifier = pStatement->getColumnString(4);
+
+    if (pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTUNIQUE, "user uuid not unique: " + sUUID);
+
+    pStatement = nullptr;
+}
+
 
 std::string CLoginHandler::GetUsernameByUUID(const std::string& sUUID)
 {

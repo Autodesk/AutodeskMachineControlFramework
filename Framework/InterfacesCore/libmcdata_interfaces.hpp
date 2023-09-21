@@ -895,6 +895,16 @@ public:
 	virtual void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
 
 	/**
+	* ILoginHandler::GetUserPropertiesByUUID - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[out] sUsername - User name
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
 	* ILoginHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
 	* @param[in] sUUID - UUID of the user.
 	* @return User name
@@ -971,14 +981,14 @@ public:
 	/**
 	* ILoginHandler::SetUserRole - Updates a users role. Fails if user does not exist.
 	* @param[in] sUsername - User name
-	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	* @param[in] sRole - New Role identifier of the user.
 	*/
-	virtual void SetUserRole(const std::string & sUsername, const std::string & sLanguageIdentifier) = 0;
+	virtual void SetUserRole(const std::string & sUsername, const std::string & sRole) = 0;
 
 	/**
 	* ILoginHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
 	* @param[in] sUsername - User name
-	* @param[in] sDescription - New Language identifier of the user.
+	* @param[in] sDescription - New Description of the user.
 	*/
 	virtual void SetUserDescription(const std::string & sUsername, const std::string & sDescription) = 0;
 
@@ -1000,9 +1010,9 @@ public:
 	/**
 	* ILoginHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
 	* @param[in] sUUID - UUID of the user.
-	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	* @param[in] sRole - New Role identifier of the user.
 	*/
-	virtual void SetUserRoleByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier) = 0;
+	virtual void SetUserRoleByUUID(const std::string & sUUID, const std::string & sRole) = 0;
 
 	/**
 	* ILoginHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.

@@ -160,6 +160,10 @@
 		<error name="INVALIDUSERLOGIN" code="10120" description="Invalid user login"/>
 		<error name="EMPTYPERMISSIONIDENTIFIER" code="10121" description="Empty permission identifier"/>
 		<error name="INVALIDPERMISSIONIDENTIFIER" code="10122" description="Invalid permission identifier"/>
+		<error name="EMPTYUSERROLE" code="10123" description="Empty user role"/>
+		<error name="INVALIDUSERROLE" code="10124" description="Invalid user role"/>
+		<error name="EMPTYUSERLANGUAGE" code="10125" description="Empty user language"/>
+		<error name="INVALIDUSERLANGUAGE" code="10126" description="Invalid user language"/>
 		
 	</errors>
 
@@ -261,6 +265,11 @@
 		<member name="Red" type="double" description="Red value of color (0..1)" />
 		<member name="Green" type="double" description="Green value of color (0..1)"/>
 		<member name="Blue" type="double" description="Blue value of color (0..1)" />
+	</struct>
+
+	<struct name="TimeStreamEntry" description="Entry of a time stream.">
+		<member name="TimestampInMS" type="uint64" />
+		<member name="Value" type="double" />
 	</struct>
 
 	
@@ -2075,8 +2084,7 @@
 		</method>
 
 		<method name="GetAllSamples" description="Returns all timestamps and values of the sampling.">
-			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Array of TimeStamps in ms, in increasing order." />
-			<param name="Values" type="basicarray" class="double" pass="out" description="Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array." />
+			<param name="Samples" type="structarray" class="TimeStreamEntry" pass="out" description="Array of Timestream entries, in increasing order." />
 		</method>
 
 	</class>
@@ -2095,6 +2103,10 @@
 		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
 			<param name="RecordingEndInMS" type="uint64" pass="return" description="End Timestamp of Recording in ms." />
 		</method>
+
+		<method name="ComputeFullAverage" description="Calculates the average value over the full available time interval.">
+			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
+		</method>
 		
 		<method name="ComputeAverage" description="Calculates the average value over a time interval. Fails if no data is available in this time interval.">
 			<param name="StartTimeInMS" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
@@ -2112,7 +2124,172 @@
 			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
 		</method>
 
+		<method name="ReceiveRawTimeStream" description="Retrieves the raw timestream data of the variable.">
+			<param name="TimeStreamEntries" type="structarray" class="TimeStreamEntry" pass="out" description="All change events of the variable in the accessed interval." />
+		</method>
+		
 	</class>
+
+	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
+
+		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
+			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
+			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
+		</method>
+				
+		<method name="RetrieveJournalVariableFromTimeInterval" description = "Retrieves the history of a given variable in the system journal for an arbitrary time interval.">
+			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
+			<param name="StartTimeInMilliseconds" type="uint64" pass="in" description="Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval." />
+			<param name="EndTimeInMilliseconds" type="uint64" pass="in" description="End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval." />
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
+		</method>
+
+		<method name="StoreJournalMarker" description="Stores a journal marker tag at the current time stamp.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal." />
+			<param name="TimeStamp" type="uint64" pass="return" description="Returns the stored time stamp in milliseconds." />
+		</method>
+
+		<method name="HasJournalMarker" description="Checks if a journal marker tag exists.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerExists" type="bool" pass="return" description="Returns true if the marker exists." />
+		</method>
+
+		<method name="RetrieveJournalMarker" description="Retrieves the first existing journal marker time stamp. Fails if marker does not exist.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple." />
+			<param name="TimeStamp" type="uint64" pass="return" description="Returns the time stamp in milliseconds." />
+		</method>
+		
+		<method name="RetrieveJournalMarkers" description="Retrieves all existing journal marker time stamps. Fails if no marker exists.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Returns an array of time stamps in milliseconds." />
+		</method>
+		
+	
+	</class>
+
+	
+	<class name="UserManagementHandler" parent="Base" description="Login handler instance">
+	
+		<method name="UserExists" description="Checks if a user exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
+		</method>
+	
+		<method name="GetUserProperties" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+		<method name="GetUserPropertiesByUUID" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+		<method name="GetUsernameByUUID" description="Retrieves a users name with a given UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="return" description="User name" />
+		</method>
+
+		<method name="GetUserUUID" description="Retrieves a users UUID. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="return" description="UUID of the user." />
+		</method>
+
+		<method name="GetUserDescription" description="Retrieves a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetUserDescriptionByUUID" description="Retrieves a users description by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetUserRole" description="Retrieves a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserRoleByUUID" description="Retrieves a users role by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserLanguage" description="Retrieves a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>
+		
+		<method name="GetUserLanguageByUUID" description="Retrieves a users language preference by user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>		
+
+		<method name="CreateUser" description="Creates a new user. Fails if the user already exists.">
+			<param name="Username" type="string" pass="in" description="User name to create. MUST be alphanumeric and not empty." />
+			<param name="Role" type="string" pass="in" description="Role of the new user. MUST NOT be empty." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+			<param name="Description" type="string" pass="in" description="Description of the new user." />
+			<param name="UUID" type="string" pass="return" description="UUID of the new user." />
+		</method>
+
+		<method name="SetUserLanguage" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserRole" description="Updates a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UserRole" type="string" pass="in" description="New Role identifier of the user." />
+		</method>
+
+		<method name="SetUserDescription" description="Updates a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="in" description="New Description of the user." />
+		</method>
+		
+		<method name="SetUserPassword" description="Updates a users password. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
+		<method name="SetUserLanguageByUUID" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserRoleByUUID" description="Updates a users role. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="UserRole" type="string" pass="in" description="New Role identifier of the user." />
+		</method>
+
+		<method name="SetUserDescriptionByUUID" description="Updates a users description. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="in" description="New Description identifier of the user." />
+		</method>
+		
+		<method name="SetUserPasswordByUUID" description="Updates a users password. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
+	</class>	
 
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
 
@@ -2336,68 +2513,22 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 		
-		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
-			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
-			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
-		</method>
-				
+
 		<method name="CheckUserPermission" description="Returns if the a user has a certain permission. Fails if user or permission is not known to the system.">
 			<param name="UserLogin" type="string" pass="in" description="Login of user to check" />
 			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
 			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
 		</method>
 		
-
-		<method name="GetUserDescription" description="Returns a users description.">
-			<param name="UserLogin" type="string" pass="in" description="Login of user" />
-			<param name="UserDescription" type="string" pass="return" description="Returns the users description. Fails if user is not known to the system." />
-		</method>	
-
-		<method name="GetUserRole" description="Returns a users role identifier.">
-			<param name="UserLogin" type="string" pass="in" description="Login of user" />
-			<param name="UserRole" type="string" pass="return" description="Returns the users role identifier. Fails if user is not known to the system." />
-		</method>		
-
-		<method name="GetUserLanguage" description="Returns a users language identifier.">
-			<param name="UserLogin" type="string" pass="in" description="Login of user" />
-			<param name="UserLanguage" type="string" pass="return" description="Returns the users language identifier. Fails if user is not known to the system." />
-		</method>		
-
-		<method name="GetUserUUID" description="Returns a users UUID.">
-			<param name="UserLogin" type="string" pass="in" description="Login of user" />
-			<param name="UserUUID" type="string" pass="return" description="Returns the user UUID. Fails if user is not known to the system." />
-		</method>		
-		
-		<method name="CheckUserPermissionByUUID" description="Returns if the a user has a certain permission. Fails if user or permission is not known to the system.">
-			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
-			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
-			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
-		</method>
-				
-		<method name="GetUserLoginByUUID" description="Returns the a users login name. Fails if user is not known to the system.">
-			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
-			<param name="UserLogin" type="string" pass="return" description="Returns the users login name." />
+		<method name="CreateUserManagement" description="Returns a user management handler instance.">
+			<param name="UserManagementInstance" type="class" class="UserManagementHandler" pass="return" description="Returns a user management handler." />
 		</method>	
 		
-		<method name="GetUserDescriptionByUUID" description="Returns a users description.">
-			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
-			<param name="UserDescription" type="string" pass="return" description="Returns the users description. Fails if user is not known to the system." />
+		<method name="GetCurrentJournal" description="Returns the journal instance of the current session.">
+			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
-
-		<method name="GetUserRoleByUUID" description="Returns a users role identifier.">
-			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
-			<param name="UserRole" type="string" pass="return" description="Returns the users role identifier. Fails if user is not known to the system." />
-		</method>		
-
-		<method name="GetUserLanguageByUUID" description="Returns a users language identifier.">
-			<param name="UserUUID" type="string" pass="in" description="UUID of user" />
-			<param name="UserLanguage" type="string" pass="return" description="Returns the users language identifier. Fails if user is not known to the system." />
-		</method>		
-		
-
+			
 	</class>
-
 
 
 	<class name="UIEnvironment" parent="Base" description="Environment of the UI">
@@ -2637,13 +2768,7 @@
 			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
 		</method>	
-
-		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
-			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
-			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
-		</method>
-		
+						
 		<method name="CheckPermission" description="Returns if the current user has a certain permission. Fails if permission is not known to the system.">
 			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
 			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
@@ -2668,6 +2793,14 @@
 		<method name="GetCurrentUserUUID" description="Returns the current user UUID.">
 			<param name="UserUUID" type="string" pass="return" description="Returns the current user UUID." />
 		</method>		
+
+		<method name="CreateUserManagement" description="Returns a user management handler instance.">
+			<param name="UserManagementInstance" type="class" class="UserManagementHandler" pass="return" description="Returns a user management handler." />
+		</method>	
+		
+		<method name="GetCurrentJournal" description="Returns the journal instance of the current session.">
+			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
+		</method>	
 
 	</class>
 
