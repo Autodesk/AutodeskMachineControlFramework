@@ -92,6 +92,11 @@ protected:
 	double m_dLaserFieldMaxY;
 	bool m_bHasLaserField;
 
+	SpatialPowerModulationCallback m_pModulationCallback;
+	void* m_pModulationCallbackUserData;
+	bool m_bEnableLineSubdivision;
+	double m_dLineSubdivisionThreshold;
+
 	std::vector<uint8_t> m_HeadTransform;
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
@@ -122,6 +127,10 @@ protected:
 	void clearLaserField();
 
 	double adjustLaserPowerCalibration(double dLaserPowerInPercent, double dPowerOffsetInPercent, double ddPowerOutputScaling);
+
+	// Performs a marking with the settings given by modulation and subdivision
+	void jumpAbsoluteEx (double dTargetXInMM, double dTargetYInMM);
+	void markAbsoluteEx (double dStartXInMM, double dStartYInMM, double dTargetXInMM, double dTargetYInMM, double dLaserPowerInPercent, bool bOIEControlFlag);
 
 public:
 
@@ -318,6 +327,13 @@ public:
 
 	void SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer) override;
 
+	void EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData) override;
+
+	void DisablePowerModulation() override;
+
+	void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold) override;
+
+	void DisableLineSubdivision() override;
 
 };
 

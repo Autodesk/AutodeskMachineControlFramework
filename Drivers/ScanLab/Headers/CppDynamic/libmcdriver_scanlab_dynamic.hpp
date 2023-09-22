@@ -255,6 +255,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT: return "INVALIDPOWERCALIBRATIONSETPOINT";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING: return "INVALIDPOWERCALIBRATIONOUTPUTSCALING";
 			case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "POWERCALIBRATIONLOOKUPFAILED";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK: return "INVALIDMODULATIONCALLBACK";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "INVALIDSUBDIVISIONTHRESHOLD";
 		}
 		return "UNKNOWN";
 	}
@@ -336,6 +338,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT: return "Invalid power calibration set point.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING: return "Invalid power calibration output scaling.";
 			case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "Power calibration lookup failed.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK: return "Invalid modulation callback.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "Invalid subdivision threshold.";
 		}
 		return "unknown error";
 	}
@@ -651,6 +655,10 @@ public:
 	inline void GetLaserPowerCalibration(std::vector<sLaserCalibrationPoint> & CalibrationPointsBuffer);
 	inline void SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling);
 	inline void SetPiecewiseLinearLaserPowerCalibration(const CInputVector<sLaserCalibrationPoint> & CalibrationPointsBuffer);
+	inline void EnableSpatialLaserPowerModulation(const SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData);
+	inline void DisablePowerModulation();
+	inline void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold);
+	inline void DisableLineSubdivision();
 };
 	
 /*************************************************************************************************************************
@@ -998,6 +1006,10 @@ public:
 		pWrapperTable->m_RTCContext_GetLaserPowerCalibration = nullptr;
 		pWrapperTable->m_RTCContext_SetLinearLaserPowerCalibration = nullptr;
 		pWrapperTable->m_RTCContext_SetPiecewiseLinearLaserPowerCalibration = nullptr;
+		pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation = nullptr;
+		pWrapperTable->m_RTCContext_DisablePowerModulation = nullptr;
+		pWrapperTable->m_RTCContext_EnableLineSubdivision = nullptr;
+		pWrapperTable->m_RTCContext_DisableLineSubdivision = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1988,6 +2000,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_SetPiecewiseLinearLaserPowerCalibration == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation = (PLibMCDriver_ScanLabRTCContext_EnableSpatialLaserPowerModulationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation = (PLibMCDriver_ScanLabRTCContext_EnableSpatialLaserPowerModulationPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisablePowerModulation = (PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablepowermodulation");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisablePowerModulation = (PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablepowermodulation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisablePowerModulation == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableLineSubdivision = (PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablelinesubdivision");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableLineSubdivision = (PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablelinesubdivision");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableLineSubdivision == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableLineSubdivision = (PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablelinesubdivision");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableLineSubdivision = (PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablelinesubdivision");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableLineSubdivision == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3013,6 +3061,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setpiecewiselinearlaserpowercalibration", (void**)&(pWrapperTable->m_RTCContext_SetPiecewiseLinearLaserPowerCalibration));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetPiecewiseLinearLaserPowerCalibration == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation", (void**)&(pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablepowermodulation", (void**)&(pWrapperTable->m_RTCContext_DisablePowerModulation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisablePowerModulation == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablelinesubdivision", (void**)&(pWrapperTable->m_RTCContext_EnableLineSubdivision));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableLineSubdivision == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablelinesubdivision", (void**)&(pWrapperTable->m_RTCContext_DisableLineSubdivision));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableLineSubdivision == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -4333,6 +4397,41 @@ public:
 	void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const CInputVector<sLaserCalibrationPoint> & CalibrationPointsBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetPiecewiseLinearLaserPowerCalibration(m_pHandle, (LibMCDriver_ScanLab_uint64)CalibrationPointsBuffer.size(), CalibrationPointsBuffer.data()));
+	}
+	
+	/**
+	* CRTCContext::EnableSpatialLaserPowerModulation - Enables a spatial laser power modulation via callback.
+	* @param[in] pModulationCallback - Callback to call for modulating the laser power.
+	* @param[in] pUserData - Userdata that is passed to the callback function
+	*/
+	void CRTCContext::EnableSpatialLaserPowerModulation(const SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableSpatialLaserPowerModulation(m_pHandle, pModulationCallback, pUserData));
+	}
+	
+	/**
+	* CRTCContext::DisablePowerModulation - Disables all power modulation functions.
+	*/
+	void CRTCContext::DisablePowerModulation()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisablePowerModulation(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::EnableLineSubdivision - If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.
+	* @param[in] dLengthThreshold - Length threshold in mm.
+	*/
+	void CRTCContext::EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableLineSubdivision(m_pHandle, dLengthThreshold));
+	}
+	
+	/**
+	* CRTCContext::DisableLineSubdivision - Disables the subdivision of mark lines.
+	*/
+	void CRTCContext::DisableLineSubdivision()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableLineSubdivision(m_pHandle));
 	}
 	
 	/**

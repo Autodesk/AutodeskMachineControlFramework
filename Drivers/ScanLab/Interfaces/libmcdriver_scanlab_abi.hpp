@@ -1050,6 +1050,41 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setpiecewiselinearlaserpowercalibration(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer);
 
+/**
+* Enables a spatial laser power modulation via callback.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pModulationCallback - Callback to call for modulating the laser power.
+* @param[in] pUserData - Userdata that is passed to the callback function
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, LibMCDriver_ScanLab_pvoid pUserData);
+
+/**
+* Disables all power modulation functions.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablepowermodulation(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLengthThreshold - Length threshold in mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablelinesubdivision(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLengthThreshold);
+
+/**
+* Disables the subdivision of mark lines.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablelinesubdivision(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/

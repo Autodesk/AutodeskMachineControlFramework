@@ -169,6 +169,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT 1062 /** Invalid power calibration set point. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING 1063 /** Invalid power calibration output scaling. */
 #define LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED 1064 /** Power calibration lookup failed. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK 1065 /** Invalid modulation callback. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD 1066 /** Invalid subdivision threshold. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -250,6 +252,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT: return "Invalid power calibration set point.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING: return "Invalid power calibration output scaling.";
     case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "Power calibration lookup failed.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK: return "Invalid modulation callback.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "Invalid subdivision threshold.";
     default: return "unknown error";
   }
 }
@@ -331,6 +335,24 @@ namespace LibMCDriver_ScanLab {
   
   #pragma pack ()
   
+  /*************************************************************************************************************************
+   Declaration of function pointers 
+  **************************************************************************************************************************/
+  
+  /**
+  * SpatialPowerModulationCallback - A callback function to modulate laser power depending on the position of the laser.
+  *
+  * @param[in] dStartX - The X start position of the marking in mm
+  * @param[in] dStartY - The Y start position of the marking in mm
+  * @param[in] dTargetX - The X target position of the marking in mm
+  * @param[in] dTargetY - The Y target position of the marking in mm
+  * @param[in] dLaserPowerInPercent - The nominal laser power to be used in percent.
+  * @param[in] nModulationType - A type ID from the build file that specifies the modulation type to use.
+  * @param[in] pUserData - Userdata that is passed to the callback function
+  * @param[out] pAdjustedLaserPowerInPercent - Returns the adjusted laser power in percent.
+  */
+  typedef void(*SpatialPowerModulationCallback)(LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_int32, LibMCDriver_ScanLab_pvoid, LibMCDriver_ScanLab_double *);
+  
 } // namespace LibMCDriver_ScanLab;
 
 // define legacy C-names for enums, structs and function types
@@ -341,5 +363,6 @@ typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingM
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;
 typedef LibMCDriver_ScanLab::sLaserCalibrationPoint sLibMCDriver_ScanLabLaserCalibrationPoint;
+typedef LibMCDriver_ScanLab::SpatialPowerModulationCallback LibMCDriver_ScanLabSpatialPowerModulationCallback;
 
 #endif // __LIBMCDRIVER_SCANLAB_TYPES_HEADER_CPP

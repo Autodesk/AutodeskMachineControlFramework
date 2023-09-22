@@ -1037,6 +1037,41 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLinearLase
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearLaserPowerCalibrationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer);
 
+/**
+* Enables a spatial laser power modulation via callback.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pModulationCallback - Callback to call for modulating the laser power.
+* @param[in] pUserData - Userdata that is passed to the callback function
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSpatialLaserPowerModulationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, LibMCDriver_ScanLab_pvoid pUserData);
+
+/**
+* Disables all power modulation functions.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLengthThreshold - Length threshold in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLengthThreshold);
+
+/**
+* Disables the subdivision of mark lines.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -1886,6 +1921,10 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_GetLaserPowerCalibrationPtr m_RTCContext_GetLaserPowerCalibration;
 	PLibMCDriver_ScanLabRTCContext_SetLinearLaserPowerCalibrationPtr m_RTCContext_SetLinearLaserPowerCalibration;
 	PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearLaserPowerCalibrationPtr m_RTCContext_SetPiecewiseLinearLaserPowerCalibration;
+	PLibMCDriver_ScanLabRTCContext_EnableSpatialLaserPowerModulationPtr m_RTCContext_EnableSpatialLaserPowerModulation;
+	PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr m_RTCContext_DisablePowerModulation;
+	PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr m_RTCContext_EnableLineSubdivision;
+	PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr m_RTCContext_DisableLineSubdivision;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;

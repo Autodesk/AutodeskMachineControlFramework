@@ -48,6 +48,10 @@ using namespace LibMCDriver_ScanLab::Impl;
 
 #define RTCCONTEXT_LASERPOWERCALIBRATIONUNITS 0.005
 
+
+#define RTCCONTEXT_MIN_LINESUBDIVISIONTHRESHOLD 0.001
+#define RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD 1000000.0
+
 CRTCContextOwnerData::CRTCContextOwnerData()
 	: m_nAttributeFilterValue (0), m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled), m_dMaxLaserPowerInWatts (100.0)
 {
@@ -133,7 +137,11 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_dScaleXInBitsPerEncoderStep (1.0),
 	m_dScaleYInBitsPerEncoderStep (1.0),
 	m_bEnableOIEPIDControl (false),
-	m_dLaserPowerCalibrationUnits (RTCCONTEXT_LASERPOWERCALIBRATIONUNITS)
+	m_dLaserPowerCalibrationUnits (RTCCONTEXT_LASERPOWERCALIBRATIONUNITS),
+	m_pModulationCallback (nullptr),
+	m_pModulationCallbackUserData (nullptr),
+	m_bEnableLineSubdivision (false),
+	m_dLineSubdivisionThreshold (RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD)
 
 {
 	if (pOwnerData.get() == nullptr)
@@ -638,6 +646,53 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 
 }
 
+void CRTCContext::jumpAbsoluteEx(double dTargetXInMM, double dTargetYInMM)
+{
+	double dTargetXInUnits = round((dTargetXInMM - m_dLaserOriginX) * m_dCorrectionFactor);
+	double dTargetYInUnits = round((dTargetYInMM - m_dLaserOriginY) * m_dCorrectionFactor);
+
+	m_pScanLabSDK->n_jump_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
+void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double dTargetXInMM, double dTargetYInMM, double dLaserPowerInPercent, bool bOIEControlFlag)
+{
+	int32_t nSubdivisionCount = 1;
+	double dDeltaX = dTargetXInMM - dStartXInMM;
+	double dDeltaY = dTargetYInMM - dStartYInMM;
+
+	int32_t nModulationType = 0; // TODO
+
+	if (m_bEnableLineSubdivision) {
+		double dLen = sqrt(dDeltaX * dDeltaX + dDeltaY * dDeltaY);
+		if (dLen > RTCCONTEXT_MIN_LINESUBDIVISIONTHRESHOLD) {
+			nSubdivisionCount = (int32_t) ceil(dLen / m_dLineSubdivisionThreshold);
+			dDeltaX /= nSubdivisionCount;
+			dDeltaY /= nSubdivisionCount;
+		}
+	}
+
+	if (m_pModulationCallback != nullptr) {
+		double dNewPowerInPercent = dLaserPowerInPercent;
+		m_pModulationCallback(dStartXInMM, dStartYInMM, dTargetXInMM, dTargetYInMM, dLaserPowerInPercent, nModulationType, m_pModulationCallbackUserData, &dNewPowerInPercent);
+		writePower(dNewPowerInPercent, bOIEControlFlag);
+	}
+
+	for (int32_t nSubdivisionIndex = 1; nSubdivisionIndex <= nSubdivisionCount; nSubdivisionIndex++) {
+
+		double dMarkToX = dStartXInMM + nSubdivisionIndex * dDeltaX;
+		double dMarkToY = dStartYInMM + nSubdivisionIndex * dDeltaY;
+
+		double dTargetXInUnits = round((dMarkToX - m_dLaserOriginX) * m_dCorrectionFactor);
+		double dTargetYInUnits = round((dMarkToY - m_dLaserOriginY) * m_dCorrectionFactor);
+
+		m_pScanLabSDK->n_mark_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
+		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+	}
+
+
+}
 
 void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D* pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
@@ -653,7 +708,8 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	if (nPointsBufferSize == 0)
 		return;
 
-	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, nOIEPIDControlIndex != 0);
+	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
+	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
 	// Z Plane
 	double defocusZ = round(fZValue * m_dZCorrectionFactor);
@@ -661,29 +717,17 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
 
 	const sPoint2D* pPoint = pPointsBuffer;
-	double dX = round((pPoint->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
-	double dY = round((pPoint->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
-	pPoint++;
+	jumpAbsoluteEx(pPoint->m_X, pPoint->m_Y);
+	auto pPrevPoint = pPoint;
 
-	int intX = (int)dX;
-	int intY = (int)dY;
-
-	if (nOIEPIDControlIndex != 0)
+	if (bOIEControlFlag)
 		SetOIEPIDMode(nOIEPIDControlIndex);
 
-	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
-		dX = round((pPoint->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
-		dY = round((pPoint->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
-		pPoint++;
 
-		intX = (int)dX;
-		intY = (int)dY;
-
-		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		markAbsoluteEx(pPrevPoint->m_X, pPrevPoint->m_Y, pPoint->m_X, pPoint->m_Y, fPower, bOIEControlFlag);
+		pPrevPoint = pPoint;
+		pPoint++;		
 
 	}
 
@@ -697,34 +741,22 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 	if (nHatchesBufferSize == 0)
 		return;
 
-	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, (nOIEPIDControlIndex != 0));
+	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
+	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
 	// Z Plane
 	double defocusZ = round(fZValue * m_dZCorrectionFactor);
 	int intDefocusZ = (int)defocusZ;
 	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
 
-	if (nOIEPIDControlIndex != 0)
+	if (bOIEControlFlag)
 		SetOIEPIDMode(nOIEPIDControlIndex);
 
 	const sHatch2D* pHatch = pHatchesBuffer;
 
 	for (uint64_t index = 0; index < nHatchesBufferSize; index++) {
-		double dX = round((pHatch->m_X1 - m_dLaserOriginX) * m_dCorrectionFactor);
-		double dY = round((pHatch->m_Y1 - m_dLaserOriginY) * m_dCorrectionFactor);
-	
-		int intX = (int)dX;
-		int intY = (int)dY;
-		m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
-		dX = round((pHatch->m_X2 - m_dLaserOriginX) * m_dCorrectionFactor);
-		dY = round((pHatch->m_Y2 - m_dLaserOriginY) * m_dCorrectionFactor);
-		
-		intX = (int)dX;
-		intY = (int)dY;
-		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		jumpAbsoluteEx(pHatch->m_X1, pHatch->m_Y1);
+		markAbsoluteEx(pHatch->m_X1, pHatch->m_Y1, pHatch->m_X2, pHatch->m_Y2, fPower, bOIEControlFlag);
 
 		pHatch++;
 	}
@@ -739,15 +771,7 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 void CRTCContext::AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	double dX = round((dTargetX - m_dLaserOriginX) * m_dCorrectionFactor);
-	double dY = round((dTargetY - m_dLaserOriginY) * m_dCorrectionFactor);
-
-	int32_t intX = (int32_t)dX;
-	int32_t intY = (int32_t)dY;
-
-	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
+	jumpAbsoluteEx(dTargetX, dTargetY);
 }
 
 void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
@@ -861,6 +885,39 @@ void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_Scan
 		}
 
 	}
+
+}
+
+void CRTCContext::EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData)
+{
+	if (pModulationCallback == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK);
+
+	m_pModulationCallback = pModulationCallback;
+	m_pModulationCallbackUserData = pUserData;
+}
+
+void CRTCContext::DisablePowerModulation()
+{
+	m_pModulationCallback = nullptr;
+	m_pModulationCallbackUserData = nullptr;
+}
+
+void CRTCContext::EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold)
+{
+	if (dLengthThreshold < RTCCONTEXT_MIN_LINESUBDIVISIONTHRESHOLD)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD);
+	if (dLengthThreshold > RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD);
+
+	m_dLineSubdivisionThreshold = dLengthThreshold;
+	m_bEnableLineSubdivision = true;
+}
+
+void CRTCContext::DisableLineSubdivision()
+{
+	m_dLineSubdivisionThreshold = RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD;
+	m_bEnableLineSubdivision = false;
 
 }
 
@@ -1728,7 +1785,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 			uint32_t nOIEPIDControlIndex = 0;
 			if (m_bEnableOIEPIDControl) {
-				nOIEPIDControlIndex = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "pidindex", 0);
+				nOIEPIDControlIndex = (uint32_t) pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "pidindex", 0);
 			}
 
 			int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);

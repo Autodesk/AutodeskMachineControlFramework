@@ -1095,6 +1095,29 @@ public:
 	*/
 	virtual void SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer) = 0;
 
+	/**
+	* IRTCContext::EnableSpatialLaserPowerModulation - Enables a spatial laser power modulation via callback.
+	* @param[in] pModulationCallback - callback function
+	* @param[in] nUserData - Userdata that is passed to the callback function
+	*/
+	virtual void EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData) = 0;
+
+	/**
+	* IRTCContext::DisablePowerModulation - Disables all power modulation functions.
+	*/
+	virtual void DisablePowerModulation() = 0;
+
+	/**
+	* IRTCContext::EnableLineSubdivision - If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.
+	* @param[in] dLengthThreshold - Length threshold in mm.
+	*/
+	virtual void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold) = 0;
+
+	/**
+	* IRTCContext::DisableLineSubdivision - Disables the subdivision of mark lines.
+	*/
+	virtual void DisableLineSubdivision() = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;

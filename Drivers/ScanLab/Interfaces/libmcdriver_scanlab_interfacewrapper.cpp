@@ -2660,6 +2660,102 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setpiecewiselinearlaser
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLabSpatialPowerModulationCallback pModulationCallback, LibMCDriver_ScanLab_pvoid pUserData)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->EnableSpatialLaserPowerModulation(pModulationCallback, pUserData);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablepowermodulation(LibMCDriver_ScanLab_RTCContext pRTCContext)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->DisablePowerModulation();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablelinesubdivision(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLengthThreshold)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->EnableLineSubdivision(dLengthThreshold);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablelinesubdivision(LibMCDriver_ScanLab_RTCContext pRTCContext)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->DisableLineSubdivision();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for RTCSelector
@@ -4634,6 +4730,14 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlinearlaserpowercalibration;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setpiecewiselinearlaserpowercalibration") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setpiecewiselinearlaserpowercalibration;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_disablepowermodulation") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disablepowermodulation;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_enablelinesubdivision") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enablelinesubdivision;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_disablelinesubdivision") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disablelinesubdivision;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcards") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_searchcards;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcardsbyrange") 
