@@ -3248,6 +3248,20 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LoadPNGImagePtr) (LibMCEnv_D
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
+* Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pImageDataInstance - Image instance containing the pixel data.
+* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_double dBlackValue, LibMCEnv_double dWhiteValue, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
 * Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -4429,6 +4443,20 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadPNGImagePtr) (LibMCEnv_St
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
+* Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pImageDataInstance - Image instance containing the pixel data.
+* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_double dBlackValue, LibMCEnv_double dWhiteValue, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
 * Returns the global timer in milliseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -4968,6 +4996,20 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildJobPtr) (LibMCEnv_UIEnvi
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
+* Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pImageDataInstance - Image instance containing the pixel data.
+* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+* @param[in] dOriginX - Origin X of the field in mm.
+* @param[in] dOriginY - Origin Y of the field in mm.
+* @param[out] pFieldDataInstance - Empty field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_double dBlackValue, LibMCEnv_double dWhiteValue, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
 * Returns if the current user has a certain permission. Fails if permission is not known to the system.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -5400,6 +5442,7 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_CreateEmptyImagePtr m_DriverEnvironment_CreateEmptyImage;
 	PLibMCEnvDriverEnvironment_LoadPNGImagePtr m_DriverEnvironment_LoadPNGImage;
 	PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr m_DriverEnvironment_CreateDiscreteField2D;
+	PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr m_DriverEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvDriverEnvironment_HasBuildJobPtr m_DriverEnvironment_HasBuildJob;
 	PLibMCEnvDriverEnvironment_GetBuildJobPtr m_DriverEnvironment_GetBuildJob;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
@@ -5505,6 +5548,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateEmptyImagePtr m_StateEnvironment_CreateEmptyImage;
 	PLibMCEnvStateEnvironment_LoadPNGImagePtr m_StateEnvironment_LoadPNGImage;
 	PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr m_StateEnvironment_CreateDiscreteField2D;
+	PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr m_StateEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr m_StateEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvStateEnvironment_GetTestEnvironmentPtr m_StateEnvironment_GetTestEnvironment;
 	PLibMCEnvStateEnvironment_CreateXMLDocumentPtr m_StateEnvironment_CreateXMLDocument;
@@ -5554,6 +5598,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_HasBuildJobPtr m_UIEnvironment_HasBuildJob;
 	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;
+	PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr m_UIEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvUIEnvironment_CheckPermissionPtr m_UIEnvironment_CheckPermission;
 	PLibMCEnvUIEnvironment_GetCurrentUserLoginPtr m_UIEnvironment_GetCurrentUserLogin;
 	PLibMCEnvUIEnvironment_GetCurrentUserDescriptionPtr m_UIEnvironment_GetCurrentUserDescription;

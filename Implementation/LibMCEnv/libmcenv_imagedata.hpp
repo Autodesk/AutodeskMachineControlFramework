@@ -118,6 +118,7 @@ public:
 
 	void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) override;
 
+	std::vector <uint8_t> & getPixelData ();
 };
 
 } // namespace Impl

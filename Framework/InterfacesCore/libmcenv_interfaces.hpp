@@ -2700,6 +2700,17 @@ public:
 	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
+	* IDriverEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
+
+	/**
 	* IDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
@@ -3547,6 +3558,17 @@ public:
 	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
+	* IStateEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
+
+	/**
 	* IStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
@@ -3926,6 +3948,17 @@ public:
 	* @return Empty field instance.
 	*/
 	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IUIEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
 
 	/**
 	* IUIEnvironment::CheckPermission - Returns if the current user has a certain permission. Fails if permission is not known to the system.

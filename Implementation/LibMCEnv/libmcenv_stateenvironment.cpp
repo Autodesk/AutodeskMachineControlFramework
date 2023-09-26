@@ -492,6 +492,31 @@ IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_ui
 	return new CDiscreteFieldData2D(pInstance);
 }
 
+IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+{
+	if (pImageDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto pImageDataImpl = dynamic_cast<CImageData*> (pImageDataInstance);
+	if (pImageDataImpl == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+	uint32_t nPixelSizeX, nPixelSizeY;
+	pImageDataImpl->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
+
+	double dDPIValueX, dDPIValueY;
+	pImageDataImpl->GetDPI(dDPIValueX, dDPIValueY);
+
+	AMC::PDiscreteFieldData2DInstance pFieldInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, 0.0, false);
+
+	auto pixelFormat = pImageDataImpl->GetPixelFormat();
+	auto& rawPixelData = pImageDataImpl->getPixelData();
+	// TODO: 
+	// pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
+
+	return new CDiscreteFieldData2D(pFieldInstance);
+
+}
 
 bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier)
 {

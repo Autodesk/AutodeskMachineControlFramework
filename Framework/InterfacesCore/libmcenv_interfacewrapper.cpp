@@ -9323,6 +9323,39 @@ LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverE
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2dfromimage(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_double dBlackValue, LibMCEnv_double dWhiteValue, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassImageDataInstance = (IBase *)pImageDataInstance;
+		IImageData* pIImageDataInstance = dynamic_cast<IImageData*>(pIBaseClassImageDataInstance);
+		if (!pIImageDataInstance)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseFieldDataInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIDriverEnvironment->CreateDiscreteField2DFromImage(pIImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_hasbuildjob(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, bool * pBuildExists)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -13075,6 +13108,39 @@ LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d(LibMCEnv_StateEnv
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2dfromimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_double dBlackValue, LibMCEnv_double dWhiteValue, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassImageDataInstance = (IBase *)pImageDataInstance;
+		IImageData* pIImageDataInstance = dynamic_cast<IImageData*>(pIBaseClassImageDataInstance);
+		if (!pIImageDataInstance)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseFieldDataInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIStateEnvironment->CreateDiscreteField2DFromImage(pIImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -14743,6 +14809,39 @@ LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironme
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_creatediscretefield2dfromimage(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_double dBlackValue, LibMCEnv_double dWhiteValue, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pFieldDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassImageDataInstance = (IBase *)pImageDataInstance;
+		IImageData* pIImageDataInstance = dynamic_cast<IImageData*>(pIBaseClassImageDataInstance);
+		if (!pIImageDataInstance)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseFieldDataInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseFieldDataInstance = pIUIEnvironment->CreateDiscreteField2DFromImage(pIImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY);
+
+		*pFieldDataInstance = (IBase*)(pBaseFieldDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_checkpermission(LibMCEnv_UIEnvironment pUIEnvironment, const char * pPermissionIdentifier, bool * pUserHasPermission)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -15671,6 +15770,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_loadpngimage;
 	if (sProcName == "libmcenv_driverenvironment_creatediscretefield2d") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_creatediscretefield2d;
+	if (sProcName == "libmcenv_driverenvironment_creatediscretefield2dfromimage") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_creatediscretefield2dfromimage;
 	if (sProcName == "libmcenv_driverenvironment_hasbuildjob") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_hasbuildjob;
 	if (sProcName == "libmcenv_driverenvironment_getbuildjob") 
@@ -15881,6 +15982,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadpngimage;
 	if (sProcName == "libmcenv_stateenvironment_creatediscretefield2d") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_creatediscretefield2d;
+	if (sProcName == "libmcenv_stateenvironment_creatediscretefield2dfromimage") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_creatediscretefield2dfromimage;
 	if (sProcName == "libmcenv_stateenvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getglobaltimerinmilliseconds;
 	if (sProcName == "libmcenv_stateenvironment_gettestenvironment") 
@@ -15979,6 +16082,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getbuildjob;
 	if (sProcName == "libmcenv_uienvironment_creatediscretefield2d") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_creatediscretefield2d;
+	if (sProcName == "libmcenv_uienvironment_creatediscretefield2dfromimage") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_creatediscretefield2dfromimage;
 	if (sProcName == "libmcenv_uienvironment_checkpermission") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_checkpermission;
 	if (sProcName == "libmcenv_uienvironment_getcurrentuserlogin") 

@@ -43,6 +43,8 @@ using namespace AMC;
 #define DISCRETEFIELD_MINVALUEDISTANCE 1E-6
 #define DISCRETEFIELD_MAXPOINTVALUESCOUNT (1024ULL * 1024ULL * 1024ULL)
 
+#define DISCRETEFIELD_MAXORIGINCOORDINATE 1.0e9
+
 #define DISCRETEFIELD2D_STREAMFILESIGN 0x17AE971A
 #define DISCRETEFIELD2D_STREAMFILEMAJORVERSION 1
 #define DISCRETEFIELD2D_STREAMFILEMINORVERSION 0
@@ -131,6 +133,10 @@ CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, 
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDPIVALUE);
 	if (dDPIY <= 0.0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDPIVALUE);
+	if (abs (dOriginX) > DISCRETEFIELD_MAXORIGINCOORDINATE)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ORIGINOUTOFRANGE);
+	if (abs(dOriginY) > DISCRETEFIELD_MAXORIGINCOORDINATE)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ORIGINOUTOFRANGE);
 
 	m_Data = std::make_unique<std::vector<double>> ();
 
@@ -165,8 +171,8 @@ void CDiscreteFieldData2DInstance::SetDPI(const double dDPIValueX, const double 
 
 void CDiscreteFieldData2DInstance::GetOriginInMM(double& dOriginX, double& dOriginY)
 {
-	m_dOriginX = dOriginX;
-	m_dOriginY = dOriginY;
+	dOriginX = m_dOriginX;
+	dOriginY = m_dOriginY;
 }
 
 void CDiscreteFieldData2DInstance::SetOriginInMM(const double dOriginX, const double dOriginY)

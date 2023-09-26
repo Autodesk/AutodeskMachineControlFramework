@@ -164,6 +164,8 @@
 		<error name="INVALIDUSERROLE" code="10124" description="Invalid user role"/>
 		<error name="EMPTYUSERLANGUAGE" code="10125" description="Empty user language"/>
 		<error name="INVALIDUSERLANGUAGE" code="10126" description="Invalid user language"/>
+		<error name="ORIGINOUTOFRANGE" code="10127" description="Origin out of range"/>
+		
 		
 	</errors>
 
@@ -1895,6 +1897,15 @@
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
 		</method>	
 
+		<method name="CreateDiscreteField2DFromImage" description="Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.">
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image instance containing the pixel data." />
+			<param name="BlackValue" type="double" pass="in" description="Value that the minimum color (black) shall be mapped to." />
+			<param name="WhiteValue" type="double" pass="in" description="Value that the maximum color (white) shall be mapped to." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
 		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
@@ -2488,7 +2499,15 @@
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
 		</method>	
 
-
+		<method name="CreateDiscreteField2DFromImage" description="Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.">
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image instance containing the pixel data." />
+			<param name="BlackValue" type="double" pass="in" description="Value that the minimum color (black) shall be mapped to." />
+			<param name="WhiteValue" type="double" pass="in" description="Value that the maximum color (white) shall be mapped to." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>
+		
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
@@ -2768,7 +2787,16 @@
 			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
 		</method>	
-						
+
+		<method name="CreateDiscreteField2DFromImage" description="Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.">
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image instance containing the pixel data." />
+			<param name="BlackValue" type="double" pass="in" description="Value that the minimum color (black) shall be mapped to." />
+			<param name="WhiteValue" type="double" pass="in" description="Value that the maximum color (white) shall be mapped to." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>
+		
 		<method name="CheckPermission" description="Returns if the current user has a certain permission. Fails if permission is not known to the system.">
 			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
 			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />

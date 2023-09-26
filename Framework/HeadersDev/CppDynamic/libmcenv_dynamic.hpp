@@ -418,6 +418,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDUSERROLE: return "INVALIDUSERROLE";
 			case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "EMPTYUSERLANGUAGE";
 			case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "INVALIDUSERLANGUAGE";
+			case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "ORIGINOUTOFRANGE";
 		}
 		return "UNKNOWN";
 	}
@@ -551,6 +552,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDUSERROLE: return "Invalid user role";
 			case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "Empty user language";
 			case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
+			case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "Origin out of range";
 		}
 		return "unknown error";
 	}
@@ -1470,6 +1472,7 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 };
@@ -1687,6 +1690,7 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
@@ -1752,6 +1756,7 @@ public:
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool CheckPermission(const std::string & sPermissionIdentifier);
 	inline std::string GetCurrentUserLogin();
 	inline std::string GetCurrentUserDescription();
@@ -2137,6 +2142,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
@@ -2242,6 +2248,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
@@ -2291,6 +2298,7 @@ public:
 		pWrapperTable->m_UIEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_UIEnvironment_CheckPermission = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCurrentUserLogin = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCurrentUserDescription = nullptr;
@@ -5001,6 +5009,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_creatediscretefield2dfromimage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_creatediscretefield2dfromimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
@@ -5946,6 +5963,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_creatediscretefield2dfromimage");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_creatediscretefield2dfromimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
@@ -6384,6 +6410,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_CreateDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_creatediscretefield2dfromimage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_creatediscretefield2dfromimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7695,6 +7730,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2dfromimage", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_hasbuildjob", (void**)&(pWrapperTable->m_DriverEnvironment_HasBuildJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_HasBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8115,6 +8154,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_creatediscretefield2dfromimage", (void**)&(pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8309,6 +8352,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2D));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2dfromimage", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_checkpermission", (void**)&(pWrapperTable->m_UIEnvironment_CheckPermission));
@@ -12395,6 +12442,27 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CDriverEnvironment::CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDiscreteField2DFromImage(m_pHandle, hImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
 	* CDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
@@ -13863,6 +13931,27 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CStateEnvironment::CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDiscreteField2DFromImage(m_pHandle, hImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
 	* CStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
@@ -14547,6 +14636,27 @@ public:
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDiscreteField2D(m_pHandle, nPixelCountX, nPixelCountY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CUIEnvironment::CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDiscreteField2DFromImage(m_pHandle, hImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY, &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

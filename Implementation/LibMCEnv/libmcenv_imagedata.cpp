@@ -492,3 +492,7 @@ void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 	}
 }
 
+std::vector <uint8_t>& CImageData::getPixelData()
+{
+	return *m_PixelData.get ();
+}
