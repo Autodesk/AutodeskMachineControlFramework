@@ -114,6 +114,10 @@
 		<error name="INVALIDPOWERCALIBRATIONSETPOINT" code="1062" description="Invalid power calibration set point." />		
 		<error name="INVALIDPOWERCALIBRATIONOUTPUTSCALING" code="1063" description="Invalid power calibration output scaling." />		
 		<error name="POWERCALIBRATIONLOOKUPFAILED" code="1064" description="Power calibration lookup failed." />		
+		<error name="INVALIDMODULATIONCALLBACK" code="1065" description="Invalid modulation callback." />		
+		<error name="INVALIDSUBDIVISIONTHRESHOLD" code="1066" description="Invalid subdivision threshold." />		
+		
+		
 					
 						
 	</errors>
@@ -171,6 +175,18 @@
 		<member name="PowerOffsetInPercent" type="double" description="Additional offset of the Power value. ." />
 		<member name="PowerOutputScaling" type="double" description="Scaling factor of the laser output. MUST be positive." />
 	</struct>
+
+	<functiontype name="SpatialPowerModulationCallback" description="A callback function to modulate laser power depending on the position of the laser.">
+		<param name="StartX" type="double" pass="in" description="The X start position of the marking in mm"/>
+		<param name="StartY" type="double" pass="in" description="The Y start position of the marking in mm"/>
+		<param name="TargetX" type="double" pass="in" description="The X target position of the marking in mm"/>
+		<param name="TargetY" type="double" pass="in" description="The Y target position of the marking in mm"/>	
+		<param name="LaserPowerInPercent" type="double" pass="in" description="The nominal laser power to be used in percent."/>
+		<param name="ModulationType" type="int32" pass="in" description="A type ID from the build file that specifies the modulation type to use."/>	
+		<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+		<param name="AdjustedLaserPowerInPercent" type="double" pass="return" description="Returns the adjusted laser power in percent."/>
+	</functiontype>
+
 	
 <!--
 
@@ -678,6 +694,21 @@ Custom implementation
 			<param name="CalibrationPoints" type="structarray" class="LaserCalibrationPoint" pass="in" description="Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Percent)." />
 		</method>
 				
+		<method name="EnableSpatialLaserPowerModulation" description="Enables a spatial laser power modulation via callback.">
+			<param name="ModulationCallback" type="functiontype" class="SpatialPowerModulationCallback" pass="in" description="Callback to call for modulating the laser power."/>			
+			<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+		</method>
+
+		<method name="DisablePowerModulation" description="Disables all power modulation functions.">
+		</method>
+		
+		<method name="EnableLineSubdivision" description="If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.">
+			<param name="LengthThreshold" type="double" pass="in" description="Length threshold in mm." />			
+		</method>
+		
+		<method name="DisableLineSubdivision" description="Disables the subdivision of mark lines.">
+		</method>
+		
 	</class>
 
 	
