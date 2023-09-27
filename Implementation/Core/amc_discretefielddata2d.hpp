@@ -112,6 +112,8 @@ namespace AMC {
 		void renderAveragePointValues_FloorSampling(const LibMCEnv_double dDefaultValue, const uint64_t nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint* pPointValuesBuffer);
 
 		void saveToBuffer (std::vector<uint8_t> & Buffer);
+
+		void loadFromRawPixelData (const std::vector<uint8_t>& pixelData, LibMCEnv::eImagePixelFormat pixelFormat, double dBlackValue, double dWhiteValue);
 		
 	};
 

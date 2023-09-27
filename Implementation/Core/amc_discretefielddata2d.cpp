@@ -397,7 +397,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::ScaleFieldUp(const ui
 		double* pSource = &m_Data->at(nY * m_nPixelCountX);
 		for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
 			double dValue = *pSource;
-			dValue++;
+			pSource++;
 
 			for (uint32_t dY = 0; dY < nFactorY; dY++) {
 				double* pTarget = &pNewField->m_Data->at(((size_t)nY * nFactorY + dY) * nNewPixelCountX);
@@ -649,4 +649,102 @@ void CDiscreteFieldData2DInstance::saveToBuffer(std::vector<uint8_t>& Buffer)
 		pTargetPtr++;
 		pSourcePtr++;
 	}
+}
+
+void CDiscreteFieldData2DInstance::loadFromRawPixelData(const std::vector<uint8_t>& pixelData, LibMCEnv::eImagePixelFormat pixelFormat, double dBlackValue, double dWhiteValue)
+{
+
+	switch (pixelFormat) {
+	case LibMCEnv::eImagePixelFormat::GreyScale8bit:
+		if (pixelData.size() != (m_nPixelCountX * m_nPixelCountY))
+			throw eLibMCEnvImagePixelFormat(LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH);
+
+		for (uint32_t nY = 0; nY < m_nPixelCountY; nY++) {
+
+			double* pTarget = &m_Data->at(nY * m_nPixelCountX);
+			const uint8_t* pSource = &pixelData.at (nY * m_nPixelCountX);
+			for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
+				double dGreyScale = (*pSource) / 255.0;
+				pSource++;
+
+				double dValue = (1.0 - dGreyScale) * dBlackValue + dGreyScale * dWhiteValue;
+				*pTarget = dValue;
+				pTarget++;
+
+			}
+		}
+
+
+
+		break;
+
+	case LibMCEnv::eImagePixelFormat::RGB24bit:
+		if (pixelData.size() != (m_nPixelCountX * m_nPixelCountY * 3))
+			throw eLibMCEnvImagePixelFormat(LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH);
+
+		for (uint32_t nY = 0; nY < m_nPixelCountY; nY++) {
+
+			double* pTarget = &m_Data->at(nY * m_nPixelCountX);
+			const uint8_t* pSource = &pixelData.at(nY * m_nPixelCountX * 3);
+			for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
+				int64_t nRed = *pSource; 
+				pSource++;
+
+				int64_t nGreen = *pSource;
+				pSource++;
+
+				int64_t nBlue = *pSource;
+				pSource++;
+
+				double dGreyScale = (nRed + nGreen + nBlue) / (255.0 * 3);
+
+				double dValue = (1.0 - dGreyScale) * dBlackValue + dGreyScale * dWhiteValue;
+				*pTarget = dValue;
+				pTarget++;
+
+			}
+		}
+
+
+
+		break;
+
+	case LibMCEnv::eImagePixelFormat::RGBA32bit:
+		if (pixelData.size() != (m_nPixelCountX * m_nPixelCountY * 4))
+			throw eLibMCEnvImagePixelFormat(LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH);
+
+		for (uint32_t nY = 0; nY < m_nPixelCountY; nY++) {
+
+			double* pTarget = &m_Data->at(nY * m_nPixelCountX);
+			const uint8_t* pSource = &pixelData.at(nY * m_nPixelCountX * 4);
+			for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
+				int64_t nRed = *pSource;
+				pSource++;
+
+				int64_t nGreen = *pSource;
+				pSource++;
+
+				int64_t nBlue = *pSource;
+				pSource++;
+
+				// Skip Alpha
+				pSource++;
+
+				double dGreyScale = (nRed + nGreen + nBlue) / (255.0 * 3);
+
+				double dValue = (1.0 - dGreyScale) * dBlackValue + dGreyScale * dWhiteValue;
+				*pTarget = dValue;
+				pTarget++;
+
+			}
+		}
+
+
+
+		break;
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+	}
+
 }

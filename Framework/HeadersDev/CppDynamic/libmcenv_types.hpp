@@ -222,6 +222,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_EMPTYUSERLANGUAGE 10125 /** Empty user language */
 #define LIBMCENV_ERROR_INVALIDUSERLANGUAGE 10126 /** Invalid user language */
 #define LIBMCENV_ERROR_ORIGINOUTOFRANGE 10127 /** Origin out of range */
+#define LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH 10128 /** Raw pixel data size mismatch */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -356,6 +357,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "Empty user language";
     case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
     case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "Origin out of range";
+    case LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH: return "Raw pixel data size mismatch";
     default: return "unknown error";
   }
 }

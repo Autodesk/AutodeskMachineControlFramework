@@ -511,8 +511,8 @@ IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2DFromImage(IImageDa
 
 	auto pixelFormat = pImageDataImpl->GetPixelFormat();
 	auto& rawPixelData = pImageDataImpl->getPixelData();
-	// TODO: 
-	// pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
+	
+	pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
 
 	return new CDiscreteFieldData2D(pFieldInstance);
 

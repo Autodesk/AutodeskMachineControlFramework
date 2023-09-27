@@ -419,6 +419,7 @@ public:
 			case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "EMPTYUSERLANGUAGE";
 			case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "INVALIDUSERLANGUAGE";
 			case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "ORIGINOUTOFRANGE";
+			case LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH: return "RAWPIXELDATASIZEMISMATCH";
 		}
 		return "UNKNOWN";
 	}
@@ -553,6 +554,7 @@ public:
 			case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "Empty user language";
 			case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
 			case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "Origin out of range";
+			case LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH: return "Raw pixel data size mismatch";
 		}
 		return "unknown error";
 	}
