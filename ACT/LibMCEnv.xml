@@ -165,7 +165,7 @@
 		<error name="EMPTYUSERLANGUAGE" code="10125" description="Empty user language"/>
 		<error name="INVALIDUSERLANGUAGE" code="10126" description="Invalid user language"/>
 		<error name="ORIGINOUTOFRANGE" code="10127" description="Origin out of range"/>
-		
+		<error name="RAWPIXELDATASIZEMISMATCH" code="10128" description="Raw pixel data size mismatch"/>		
 		
 	</errors>
 
