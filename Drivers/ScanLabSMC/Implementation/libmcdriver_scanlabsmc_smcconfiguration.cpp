@@ -46,7 +46,8 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
 CSMCConfiguration::CSMCConfiguration(LibMCEnv::PDriverEnvironment pDriverEnvironment)
     : m_pDriverEnvironment (pDriverEnvironment),
       m_DynamicViolationReaction (LibMCDriver_ScanLabSMC::eDynamicViolationReaction::WarningOnly),
-     m_WarnLevel (LibMCDriver_ScanLabSMC::eWarnLevel::Error)
+     m_WarnLevel (LibMCDriver_ScanLabSMC::eWarnLevel::Error),
+    m_nSerialNumber (123456)
 
 {
     if (pDriverEnvironment.get() == nullptr)
@@ -78,9 +79,18 @@ LibMCDriver_ScanLabSMC::eWarnLevel CSMCConfiguration::GetWarnLevel()
     return m_WarnLevel;
 }
 
-std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory)
+std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::CWorkingFile* pCorrectionFile)
 {
+    if (pWorkingDirectory == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+    if (pCorrectionFile == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+    if (m_nSerialNumber == 0)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER);
+
     std::string sBaseDirectoryPath = pWorkingDirectory->GetAbsoluteFilePath();
+    std::string sCorrectionFilePath = pWorkingDirectory->GetAbsoluteFilePath();
+    std::string sLogFilePath = pWorkingDirectory->GetAbsoluteFilePath() + "/log.txt";
 
     auto pXMLDocument = m_pDriverEnvironment->CreateXMLDocument("Configuration", "SCANmotionControl");
 
@@ -95,10 +105,10 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     auto pDynamicViolationReaction = pGeneralConfigNode->AddChildText("", "DynamicViolationReaction", "WarningOnly");
     
     auto pLogConfigNode = pGeneralConfigNode->AddChild("", "LogConfig");
-    pLogConfigNode->AddChildText("", "LogfilePath", "[BaseDirectoryPath]/Log/Log.txt");
+    pLogConfigNode->AddChildText("", "LogfilePath", sLogFilePath);
     pLogConfigNode->AddChildText("", "Loglevel", "Warn");
-    pLogConfigNode->AddChildText("", "EnableConsoleLogging", "false");
-    pLogConfigNode->AddChildText("", "EnableFilelogging", "false");
+    pLogConfigNode->AddChildText("", "EnableConsoleLogging", "true");
+    pLogConfigNode->AddChildText("", "EnableFilelogging", "true");
     pLogConfigNode->AddChildText("", "MaxLogfileSize", "26214400");
     pLogConfigNode->AddChildText("", "MaxBackupFileCount", "0");
 
@@ -112,8 +122,13 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     auto pRTCConfigNode = pConfigurationNode->AddChild("", "RTCConfig");
     pRTCConfigNode->AddChildText("", "BoardIdentificationMethod", "BySerialNumber");
-    pRTCConfigNode->AddChildText("", "ProgramFileDirectory", "[BaseDirectoryPath]/ProgramFiles");
+    pRTCConfigNode->AddChildText("", "ProgramFileDirectory", "[BaseDirectoryPath]");
     auto pBoardsNode = pRTCConfigNode->AddChild("", "Boards");
+
+    auto pRTC6Node = pBoardsNode->AddChild("", "RTC6");
+    pRTC6Node->AddChildText("", "SerialNumber", std::to_string (m_nSerialNumber));
+    pRTC6Node->AddChildText("", "HeadA", "ScanDevice1");
+    pRTC6Node->AddChildText("", "HeadB", "None");
 
     auto pEthSearchNode = pRTCConfigNode->AddChild("", "EthSearch");
     auto pIPListNode = pEthSearchNode->AddChild("", "IPList");
@@ -163,13 +178,147 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     pDelayNode->AddAttribute("", "Unit", "s");
 
     auto pScanDeviceListNode = pScanDeviceConfigNode->AddChild("", "ScanDeviceList");
+    auto pScanDeviceNode = pScanDeviceListNode->AddChild("", "ScanDevice");
+    pScanDeviceNode->AddAttribute("", "Name", "ScanDevice1");
+
+    auto pCorrectionFileListNode = pScanDeviceNode->AddChild("", "CorrectionFileList");
+    auto pCorrectionFilePathNode = pCorrectionFileListNode->AddChildText("", "CorrectionFilePath", sCorrectionFilePath);
+    pCorrectionFilePathNode->AddAttribute("", "CalibrationFactor", "-1");
+
+    auto pAlignmentNode = pScanDeviceNode->AddChild("", "Alignment");
+    auto pAlignmentMatrixNode = pAlignmentNode->AddChild("", "Matrix");
+    pAlignmentMatrixNode->AddChildText("", "T11", "1.0000");
+    pAlignmentMatrixNode->AddChildText("", "T12", "0.0000");
+    pAlignmentMatrixNode->AddChildText("", "T21", "0.0000");
+    pAlignmentMatrixNode->AddChildText("", "T22", "1.0000");
+
+    auto pAlignmentOffsetNode = pAlignmentNode->AddChild("", "Offset");
+    pAlignmentOffsetNode->AddAttribute("", "X", "0.0000");
+    pAlignmentOffsetNode->AddAttribute("", "Y", "0.0000");
+    pAlignmentOffsetNode->AddAttribute("", "Unit", "mm");
+
+
+    auto pBasePartDisplacementNode = pScanDeviceNode->AddChild("", "BasePartDisplacement");
+    auto pBasePartDisplacementMatrixNode = pBasePartDisplacementNode->AddChild("", "Matrix");
+    pBasePartDisplacementMatrixNode->AddChildText("", "T11", "1.0000");
+    pBasePartDisplacementMatrixNode->AddChildText("", "T12", "0.0000");
+    pBasePartDisplacementMatrixNode->AddChildText("", "T21", "0.0000");
+    pBasePartDisplacementMatrixNode->AddChildText("", "T22", "1.0000");
+
+    auto pBasePartDisplacementOffsetNode = pBasePartDisplacementNode->AddChild("", "Offset");
+    pBasePartDisplacementOffsetNode->AddAttribute("", "X", "0.0000");
+    pBasePartDisplacementOffsetNode->AddAttribute("", "Y", "0.0000");
+    pBasePartDisplacementOffsetNode->AddAttribute("", "Unit", "mm");
 
     pScanDeviceConfigNode->AddChildText("", "DefaultCorrectionFile", "0");
 
     auto pLaserConfigNode = pConfigurationNode->AddChild("", "LaserConfig");
     pLaserConfigNode->AddChildText("", "LaserMode", "5");
 
+    auto pLaserPortConfigNode = pLaserConfigNode->AddChild("", "LaserPortCfg");
+    pLaserPortConfigNode->AddChildText("", "LaserOn", "LaserOnSignal");
+    pLaserPortConfigNode->AddChildText("", "Laser1", "Laser1Signal");
+    pLaserPortConfigNode->AddChildText("", "Laser2", "Laser2Signal");
+
+    auto pLaserOutputNode = pLaserConfigNode->AddChild("", "LaserOutput");
+    pLaserOutputNode->AddAttribute("", "Unit", "s");
+    pLaserOutputNode->AddAttribute("", "HalfPeriod", "5E-06");
+    pLaserOutputNode->AddAttribute("", "PulseLength", "1E-06");
+
+    auto pLaserStandbyNode = pLaserConfigNode->AddChild("", "LaserStandby");
+    pLaserStandbyNode->AddAttribute("", "Unit", "s");
+    pLaserStandbyNode->AddAttribute("", "HalfPeriod", "5E-06");
+    pLaserStandbyNode->AddAttribute("", "PulseLength", "1E-06");
+
+    auto pQSwitchDelayNode = pLaserConfigNode->AddChildText("", "QSwitchDelay", "0");
+    pQSwitchDelayNode->AddAttribute("", "Unit", "s");
+
+    auto pFPulseKillerLengthNode = pLaserConfigNode->AddChildText("", "FPulseKillerLength", "0");
+    pFPulseKillerLengthNode->AddAttribute("", "Unit", "s");
+
+    auto pLaserControlFlagsNode = pLaserConfigNode->AddChild("", "LaserControlFlags");
+    pLaserControlFlagsNode->AddChildText("", "LaserDisable", "false");
+    pLaserControlFlagsNode->AddChildText("", "PulseSwitchSetting", "false");
+    pLaserControlFlagsNode->AddChildText("", "LaserSignalPhaseShift", "false");
+    pLaserControlFlagsNode->AddChildText("", "LaserOnSignalActiveLow", "false");
+    pLaserControlFlagsNode->AddChildText("", "Laser1Laser2SignalActiveLow", "false");
+    pLaserControlFlagsNode->AddChildText("", "LaserPulsesAtRisingEdge", "false");
+    pLaserControlFlagsNode->AddChildText("", "OutputSynchronizationOn", "false");
+
+    auto pAutomaticLaserControlNode = pLaserConfigNode->AddChild("", "AutomaticLaserControl");
+    pAutomaticLaserControlNode->AddChild("", "ActiveChannel");
+
+    /*
+        
+        
+        <cfg:AutomaticLaserControl>
+        <cfg:ActiveChannel / >
+        <cfg:AnalogOut1 DefaultOutput = "0.5" Format = "Factor">
+        <cfg:Shift Unit = "s">-0.001 < / cfg:Shift >
+        <cfg:RadiusFactor Enabled = "false" RadiusUnit = "mm" / >
+        <cfg:VelocityFactor Enabled = "true" VelocityUnit = "mm/s">
+        <cfg:DataPoint Velocity = "0" Factor = "0" / >
+        <cfg:DataPoint Velocity = "400" Factor = "1" / >
+        <cfg:DataPoint Velocity = "4000" Factor = "2" / >
+        < / cfg:VelocityFactor>
+        < / cfg:AnalogOut1>
+        <cfg:AnalogOut2 DefaultOutput = "0" Format = "Factor">
+        < cfg:Shift Unit = "s">0 < / cfg:Shift >
+        <cfg:RadiusFactor Enabled = "false" RadiusUnit = "mm" / >
+        <cfg:VelocityFactor Enabled = "false" VelocityUnit = "mm/s" / >
+        < / cfg:AnalogOut2>
+        <cfg:PulseLength DefaultOutput = "0" Unit = "s">
+        < cfg:Shift Unit = "s">0 < / cfg:Shift >
+        <cfg:RadiusFactor Enabled = "false" RadiusUnit = "mm" / >
+        <cfg:VelocityFactor Enabled = "false" VelocityUnit = "mm/s" / >
+        < / cfg:PulseLength>
+        <cfg:HalfPeriod DefaultOutput = "0" Unit = "s">
+        < cfg:Shift Unit = "s">0 < / cfg:Shift >
+        <cfg:RadiusFactor Enabled = "false" RadiusUnit = "mm" / >
+        <cfg:VelocityFactor Enabled = "false" VelocityUnit = "mm/s" / >
+        < / cfg:HalfPeriod>
+        <cfg:SpotDistance DefaultOutput = "0.005" Unit = "mm">
+        <cfg:RadiusFactor Enabled = "false" RadiusUnit = "mm" / >
+        <cfg:VelocityFactor Enabled = "false" VelocityUnit = "mm/s" / >
+        < / cfg:SpotDistance>
+        < / cfg:AutomaticLaserControl>
+*/
+
     auto pIOConfigNode = pConfigurationNode->AddChild("", "IOConfig");
+
+    auto pDefaultOutputsNode = pIOConfigNode->AddChild("", "DefaultOutputs");
+    auto pDefaultOutputsLaserPinOutNode = pDefaultOutputsNode->AddChild("", "LaserPinOut");
+    pDefaultOutputsLaserPinOutNode->AddAttribute("", "Format", "Bitpattern");
+    pDefaultOutputsLaserPinOutNode->AddAttribute("", "Value", "1");
+    auto pDefaultOutputsAnalogOut1Node = pDefaultOutputsNode->AddChild("", "AnalogOut1");
+    pDefaultOutputsAnalogOut1Node->AddAttribute("", "Format", "Factor");
+    pDefaultOutputsAnalogOut1Node->AddAttribute("", "Value", "0.5");
+    auto pDefaultOutputsAnalogOut2Node = pDefaultOutputsNode->AddChild("", "AnalogOut2");
+    pDefaultOutputsAnalogOut2Node->AddAttribute("", "Format", "Factor");
+    pDefaultOutputsAnalogOut2Node->AddAttribute("", "Value", "0.5"); 
+
+    auto pLaserInitSequenceNode = pIOConfigNode->AddChild("", "LaserInitSequence");
+    auto pLaserInitSequenceAnalogOut1Node = pLaserInitSequenceNode->AddChild("", "SetAnalogOut1");
+    pLaserInitSequenceAnalogOut1Node->AddAttribute("", "Format", "Factor");
+    pLaserInitSequenceAnalogOut1Node->AddAttribute("", "Value", "0.5");
+    auto pLaserInitSequenceAnalogOut2Node = pLaserInitSequenceNode->AddChild("", "SetAnalogOut2");
+    pLaserInitSequenceAnalogOut2Node->AddAttribute("", "Format", "Factor");
+    pLaserInitSequenceAnalogOut2Node->AddAttribute("", "Value", "0.5");
+    auto pLaserInitSequencePinOutNode = pLaserInitSequenceNode->AddChild("", "SetLaserPinOut");
+    pLaserInitSequencePinOutNode->AddAttribute("", "Format", "Bitpattern");
+    pLaserInitSequencePinOutNode->AddAttribute("", "Value", "1");
+
+    auto pLaserShutdownSequenceNode = pIOConfigNode->AddChild("", "LaserShutdownSequence");
+    auto pLaserShutdownSequencePinOutNode = pLaserShutdownSequenceNode->AddChild("", "SetLaserPinOut");
+    pLaserShutdownSequencePinOutNode->AddAttribute("", "Format", "Bitpattern");
+    pLaserShutdownSequencePinOutNode->AddAttribute("", "Value", "0");
+    auto pLaserShutdownSequenceAnalogOut2Node = pLaserShutdownSequenceNode->AddChild("", "SetAnalogOut2");
+    pLaserShutdownSequenceAnalogOut2Node->AddAttribute("", "Format", "Factor");
+    pLaserShutdownSequenceAnalogOut2Node->AddAttribute("", "Value", "0");
+    auto pLaserShutdownSequenceAnalogOut1Node = pLaserShutdownSequenceNode->AddChild("", "SetAnalogOut1");
+    pLaserShutdownSequenceAnalogOut1Node->AddAttribute("", "Format", "Factor");
+    pLaserShutdownSequenceAnalogOut1Node->AddAttribute("", "Value", "0");
+
 
     auto pTrajectoryConfigNode = pConfigurationNode->AddChild("", "TrajectoryConfig");
     auto pTrajectoryMarkConfigNode = pTrajectoryConfigNode->AddChild("", "MarkConfig");
@@ -198,7 +347,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     auto pTrajectoryCornerToleranceNode = pTrajectoryGeometryConfigNode->AddChildText("", "CornerTolerance", "0.5");
     pTrajectoryCornerToleranceNode->AddAttribute("", "Unit", "mm");
 
-    auto pTrajectoryLineToleranceNode = pTrajectoryGeometryConfigNode->AddChildText("", "LineTolerance", "0.5");
+    auto pTrajectoryLineToleranceNode = pTrajectoryGeometryConfigNode->AddChildText("", "LineTolerance", "0.0125");
     pTrajectoryLineToleranceNode->AddAttribute("", "Unit", "mm");
 
     pTrajectoryGeometryConfigNode->AddChildText("", "BlendMode", "SwiftBlending");

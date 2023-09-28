@@ -1834,6 +1834,7 @@ LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_createdriver(const char * pN
 
 
 #ifdef _MSC_VER
+/*
 #pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_configure")
 #pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_getname")
 #pragma comment(linker, "/export:libmcdriver_scanlabsmc_driver_gettype")
@@ -1859,6 +1860,7 @@ LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_createdriver(const char * pN
 #pragma comment(linker, "/export:libmcdriver_injectcomponent=libmcdriver_scanlabsmc_injectcomponent")
 #pragma comment(linker, "/export:libmcdriver_createdriver=libmcdriver_scanlabsmc_createdriver")
 #pragma comment(linker, "/export:libmcdriver_getsymbollookupmethod=libmcdriver_scanlabsmc_getsymbollookupmethod")
+*/
 
 #endif
 

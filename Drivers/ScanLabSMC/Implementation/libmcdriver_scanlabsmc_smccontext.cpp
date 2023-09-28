@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CSMCContext
 #include "libmcdriver_scanlabsmc_smcconfiguration.hpp"
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
 #include "libmcdriver_scanlabsmc_smcjob.hpp"
+#include "libmcdriver_scanlabsmc_smcjobinstance.hpp"
 
 // Include custom headers here.
 
@@ -105,36 +106,40 @@ LibMCDriver_ScanLabSMC_uint32 CSMCContext::GetLaserIndex()
 
 void CSMCContext::SetLaserOrigin(const LibMCDriver_ScanLabSMC_double dOriginX, const LibMCDriver_ScanLabSMC_double dOriginY)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
 void CSMCContext::GetLaserOrigin(LibMCDriver_ScanLabSMC_double& dOriginX, LibMCDriver_ScanLabSMC_double& dOriginY)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	dOriginX = 0.0;
+	dOriginY = 0.0;
 }
 
 void CSMCContext::SetLaserField(const LibMCDriver_ScanLabSMC_double dMinX, const LibMCDriver_ScanLabSMC_double dMinY, const LibMCDriver_ScanLabSMC_double dMaxX, const LibMCDriver_ScanLabSMC_double dMaxY)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
 void CSMCContext::ResetLaserField()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
 bool CSMCContext::GetLaserField(LibMCDriver_ScanLabSMC_double& dMinX, LibMCDriver_ScanLabSMC_double& dMinY, LibMCDriver_ScanLabSMC_double& dMaxX, LibMCDriver_ScanLabSMC_double& dMaxY)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	dMinX = 0.0;
+	dMinY = 0.0;
+	dMaxX = 0.0;
+	dMaxY = 0.0;
+	return false;
 }
 
 ISMCJob* CSMCContext::BeginJob(const LibMCDriver_ScanLabSMC_double dStartPositionX, const LibMCDriver_ScanLabSMC_double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	auto pJobInstance = m_pContextInstance->BeginJob(dStartPositionX, dStartPositionY, eBlendMode);
+	return new CSMCJob (pJobInstance);
 }
 
 ISMCJob* CSMCContext::GetUnfinishedJob()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	auto pJobInstance = m_pContextInstance->GetUnfinishedJob();
+	return new CSMCJob(pJobInstance);
 }
 

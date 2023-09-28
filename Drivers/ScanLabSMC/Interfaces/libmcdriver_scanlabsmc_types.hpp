@@ -123,6 +123,7 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME 1015 /** Invalid context name. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY 1016 /** Context exists already. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND 1017 /** Context not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER 1018 /** Invalid RTC Serial Number. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -158,6 +159,7 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCONTEXTNAME: return "Invalid context name.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY: return "Context exists already.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND: return "Context not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER: return "Invalid RTC Serial Number.";
     default: return "unknown error";
   }
 }

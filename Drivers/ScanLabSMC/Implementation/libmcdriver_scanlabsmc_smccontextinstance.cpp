@@ -63,7 +63,9 @@ CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCCo
 
 	m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory ();
 
-	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get ());
+	auto pCorrectionFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ct5", "");
+
+	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get (), pCorrectionFile.get ());
 
 	std::vector<uint8_t> Buffer (sConfigurationXML.begin (), sConfigurationXML.end ());
 
@@ -91,47 +93,54 @@ CSMCContextInstance::~CSMCContextInstance()
 
 void CSMCContextInstance::SetToSimulationMode()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
 bool CSMCContextInstance::IsSimulationMode()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	return false;
 }
 
 void CSMCContextInstance::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
 void CSMCContextInstance::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer)
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
 void CSMCContextInstance::ReinitializeInstance()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
 
 std::string CSMCContextInstance::GetIPAddress()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	return "";
 }
 
 std::string CSMCContextInstance::GetNetmask()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	return "";
 }
 
 LibMCDriver_ScanLabSMC_uint32 CSMCContextInstance::GetSerialNumber()
 {
-	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
+	return 12345;
 }
 
 LibMCDriver_ScanLabSMC_uint32 CSMCContextInstance::GetLaserIndex()
 {
+	return 1;
+}
+
+PSMCJobInstance CSMCContextInstance::BeginJob(const double dStartPositionX, const double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode)
+{
+	return std::make_shared<CSMCJobInstance> (m_pContextHandle, dStartPositionX, dStartPositionY, eBlendMode);
+}
+
+PSMCJobInstance CSMCContextInstance::GetUnfinishedJob()
+{
 	throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_NOTIMPLEMENTED);
 }
+
 
 

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Include custom headers here.
 #include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
 #include "libmcdriver_scanlabsmc_sdk.hpp"
+#include "libmcdriver_scanlabsmc_smcjobinstance.hpp"
 
 
 namespace LibMCDriver_ScanLabSMC {
@@ -81,8 +82,9 @@ public:
 
 	LibMCDriver_ScanLabSMC_uint32 GetLaserIndex();
 
-	ISMCJob * BeginJob(const double dStartPositionX, const double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode);
+	PSMCJobInstance BeginJob(const double dStartPositionX, const double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode);
 
+	PSMCJobInstance GetUnfinishedJob();
 
 };
 

@@ -39,8 +39,7 @@ Abstract: This is the class declaration of CSMCJob
 
 // Parent classes
 #include "libmcdriver_scanlabsmc_base.hpp"
-#include "libmcdriver_scanlabsmc_smccontexthandle.hpp"
-#include "libmcdriver_scanlabsmc_sdk.hpp"
+#include "libmcdriver_scanlabsmc_smcjobinstance.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -62,17 +61,11 @@ class CSMCJob : public virtual ISMCJob, public virtual CBase {
 private:
 private:
 
-	PSMCContextHandle m_pContextHandle;
-	PScanLabSMCSDK m_pSDK;
-
-	slscJobID m_JobID;
-	bool m_bIsFinalized;
-
-	void drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBufferSize, const LibMCDriver_ScanLabSMC::sPoint2D* pPointsBuffer, bool bIsClosed);
-
+	PSMCJobInstance m_pJobInstance;
+	
 public:
 
-	CSMCJob(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode);
+	CSMCJob(PSMCJobInstance pJobInstance);
 
 	virtual ~CSMCJob();
 

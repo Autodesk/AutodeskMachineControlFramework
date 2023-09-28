@@ -61,6 +61,7 @@ private:
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
     LibMCDriver_ScanLabSMC::eDynamicViolationReaction m_DynamicViolationReaction;
     LibMCDriver_ScanLabSMC::eWarnLevel m_WarnLevel;
+    uint32_t m_nSerialNumber;
 
 public:
 
@@ -76,7 +77,7 @@ public:
 
 	LibMCDriver_ScanLabSMC::eWarnLevel GetWarnLevel() override;
 
-    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory);
+    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::CWorkingFile * pCorrectionFile);
 
 };
 

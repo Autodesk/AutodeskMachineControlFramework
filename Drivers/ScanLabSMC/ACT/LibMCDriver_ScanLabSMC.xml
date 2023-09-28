@@ -69,6 +69,7 @@
 		<error name="INVALIDCONTEXTNAME" code="1015" description="Invalid context name." />		
 		<error name="CONTEXTEXISTSALREADY" code="1016" description="Context exists already." />		
 		<error name="CONTEXTNOTFOUND" code="1017" description="Context not found." />				
+		<error name="INVALIDRTCSERIALNUMBER" code="1018" description="Invalid RTC Serial Number." />						
 								
 	</errors>
 
