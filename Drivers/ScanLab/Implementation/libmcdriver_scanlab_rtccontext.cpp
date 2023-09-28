@@ -673,11 +673,8 @@ void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double 
 		}
 	}
 
-	if (m_pModulationCallback != nullptr) {
-		double dNewPowerInPercent = dLaserPowerInPercent;
-		m_pModulationCallback(dStartXInMM, dStartYInMM, dTargetXInMM, dTargetYInMM, dLaserPowerInPercent, nModulationType, m_pModulationCallbackUserData, &dNewPowerInPercent);
-		writePower(dNewPowerInPercent, bOIEControlFlag);
-	}
+	double dOldX = dStartXInMM;
+	double dOldY = dStartYInMM;
 
 	for (int32_t nSubdivisionIndex = 1; nSubdivisionIndex <= nSubdivisionCount; nSubdivisionIndex++) {
 
@@ -687,8 +684,17 @@ void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double 
 		double dTargetXInUnits = round((dMarkToX - m_dLaserOriginX) * m_dCorrectionFactor);
 		double dTargetYInUnits = round((dMarkToY - m_dLaserOriginY) * m_dCorrectionFactor);
 
+		if (m_pModulationCallback != nullptr) {
+			double dNewPowerInPercent = dLaserPowerInPercent;
+			m_pModulationCallback(dOldX, dOldY, dMarkToX, dMarkToY, dLaserPowerInPercent, nModulationType, m_pModulationCallbackUserData, &dNewPowerInPercent);
+			writePower(dNewPowerInPercent, bOIEControlFlag);
+		}
+
 		m_pScanLabSDK->n_mark_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		
+		dOldX = dMarkToX;
+		dOldY = dMarkToY;
 	}
 
 
