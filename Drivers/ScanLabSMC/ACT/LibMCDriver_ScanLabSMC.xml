@@ -72,7 +72,16 @@
 		<error name="INVALIDRTCSERIALNUMBER" code="1018" description="Invalid RTC Serial Number." />						
 		<error name="EMPTYRTCCORRECTIONRESOURCENAME" code="1019" description="Empty RTC correction resource." />				
 		<error name="RTCCORRECTIONRESOURCENOTFOUND" code="1020" description="RTC correction resource not found." />		
-		<error name="EMPTYRTCCORRECTIONFILE" code="1021" description="Empty RTC Correction File." />		
+		<error name="EMPTYRTCCORRECTIONFILE" code="1021" description="Empty RTC Correction File." />				
+		<error name="EMPTYIPADDRESS" code="1022" description="Empty IP Address." />		
+		<error name="INVALIDIPADDRESS" code="1023" description="Invalid IP Address." />		
+		<error name="EMPTYRTCFIRMWARERESOURCENAME" code="1024" description="Empty RTC firmware resource name." />		
+		<error name="RTCFIRMWARERESOURCENOTFOUND" code="1025" description="RTC firmware resource not found." />
+		<error name="EMPTYRTCFPGARESOURCENAME" code="1026" description="Empty RTC FPGA resource name." />
+		<error name="RTCFPGARESOURCENOTFOUND" code="1027" description="RTC FPGA resource not found." />		
+		<error name="EMPTYRTCAUXILIARYRESOURCENAME" code="1028" description="Empty RTC auxiliary resource name" />		
+		<error name="RTCAUXILIARYRESOURCENOTFOUND" code="1029" description="RTC auxiliary resource not found." />				
+		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count." />		
 									
 	</errors>
 
@@ -255,12 +264,32 @@ Custom implementation
 			<param name="Value" type="uint32" class="WarnLevel" pass="return" description="Current Value." />
 		</method>		
 
+		<method name="SetIPAddress" description="Sets the RTC IP Address.">
+			<param name="Value" type="string" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetIPAddress" description="Returns the RTC IP Address.">
+			<param name="Value" type="string" class="WarnLevel" pass="return" description="Current Value." />
+		</method>		
+
 		<method name="SetCorrectionFile" description="Sets correction file as binary data.">
 			<param name="CorrectionFileData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
 		</method>
 
 		<method name="SetCorrectionFileResource" description="Sets correction file as resource data. Fails if resource name does not exist.">
 			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+		</method>
+
+		<method name="SetFirmware" description="Sets card firmware from binary data.">
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
+		</method>
+
+		<method name="SetFirmwareResources" description="Sets card firmware as resource data. Fails if resource name does not exist.">
+			<param name="FirmwareDataResource" type="string" pass="in" description="Resource name of the firmware program file." />
+			<param name="FPGADataResource" type="string" pass="in" description="Resource name of the firmware FPGA file." />
+			<param name="AuxiliaryDataResource" type="string" pass="in" description="Resource name of the binary auxiliary file." />
 		</method>
 
 	</class>
@@ -274,12 +303,6 @@ Custom implementation
 		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
 			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
 		</method>		
-
-		<method name="SetFirmware" description="Sets card firmware from binary data.">
-			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
-			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
-			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
-		</method>
 				
 		<method name="ReinitializeInstance" description="Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.">
 		</method>
@@ -339,7 +362,11 @@ Custom implementation
 			<param name="JobInstance" type="optionalclass" class="SMCJob" pass="return" description="SMC Job Instance." />
 		</method>
 		
-		
+		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+				
 	</class>
 
 

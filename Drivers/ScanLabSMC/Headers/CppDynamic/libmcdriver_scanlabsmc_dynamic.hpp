@@ -209,6 +209,15 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONRESOURCENAME: return "EMPTYRTCCORRECTIONRESOURCENAME";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND: return "RTCCORRECTIONRESOURCENOTFOUND";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE: return "EMPTYRTCCORRECTIONFILE";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYIPADDRESS: return "EMPTYIPADDRESS";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDIPADDRESS: return "INVALIDIPADDRESS";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFIRMWARERESOURCENAME: return "EMPTYRTCFIRMWARERESOURCENAME";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCFIRMWARERESOURCENOTFOUND: return "RTCFIRMWARERESOURCENOTFOUND";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFPGARESOURCENAME: return "EMPTYRTCFPGARESOURCENAME";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCFPGARESOURCENOTFOUND: return "RTCFPGARESOURCENOTFOUND";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME: return "EMPTYRTCAUXILIARYRESOURCENAME";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND: return "RTCAUXILIARYRESOURCENOTFOUND";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT: return "INVALIDPOINTCOUNT";
 		}
 		return "UNKNOWN";
 	}
@@ -248,6 +257,15 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONRESOURCENAME: return "Empty RTC correction resource.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND: return "RTC correction resource not found.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE: return "Empty RTC Correction File.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYIPADDRESS: return "Empty IP Address.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDIPADDRESS: return "Invalid IP Address.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFIRMWARERESOURCENAME: return "Empty RTC firmware resource name.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCFIRMWARERESOURCENOTFOUND: return "RTC firmware resource not found.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFPGARESOURCENAME: return "Empty RTC FPGA resource name.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCFPGARESOURCENOTFOUND: return "RTC FPGA resource not found.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME: return "Empty RTC auxiliary resource name";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND: return "RTC auxiliary resource not found.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT: return "Invalid point count.";
 		}
 		return "unknown error";
 	}
@@ -505,8 +523,12 @@ public:
 	inline eWarnLevel GetWarnLevel();
 	inline void SetSerialNumber(const LibMCDriver_ScanLabSMC_uint32 nValue);
 	inline LibMCDriver_ScanLabSMC_uint32 GetSerialNumber();
+	inline void SetIPAddress(const std::string & sValue);
+	inline std::string GetIPAddress();
 	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & CorrectionFileDataBuffer);
 	inline void SetCorrectionFileResource(const std::string & sResourceName);
+	inline void SetFirmware(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & AuxiliaryDataBuffer);
+	inline void SetFirmwareResources(const std::string & sFirmwareDataResource, const std::string & sFPGADataResource, const std::string & sAuxiliaryDataResource);
 };
 	
 /*************************************************************************************************************************
@@ -525,7 +547,6 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
-	inline void SetFirmware(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & AuxiliaryDataBuffer);
 	inline void ReinitializeInstance();
 	inline std::string GetIPAddress();
 	inline std::string GetNetmask();
@@ -538,6 +559,7 @@ public:
 	inline bool GetLaserField(LibMCDriver_ScanLabSMC_double & dMinX, LibMCDriver_ScanLabSMC_double & dMinY, LibMCDriver_ScanLabSMC_double & dMaxX, LibMCDriver_ScanLabSMC_double & dMaxY);
 	inline PSMCJob BeginJob(const LibMCDriver_ScanLabSMC_double dStartPositionX, const LibMCDriver_ScanLabSMC_double dStartPositionY, const eBlendMode eBlendMode);
 	inline PSMCJob GetUnfinishedJob();
+	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLabSMC_uint32 nLayerIndex);
 };
 	
 /*************************************************************************************************************************
@@ -713,11 +735,14 @@ public:
 		pWrapperTable->m_SMCConfiguration_GetWarnLevel = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetSerialNumber = nullptr;
 		pWrapperTable->m_SMCConfiguration_GetSerialNumber = nullptr;
+		pWrapperTable->m_SMCConfiguration_SetIPAddress = nullptr;
+		pWrapperTable->m_SMCConfiguration_GetIPAddress = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetCorrectionFile = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetCorrectionFileResource = nullptr;
+		pWrapperTable->m_SMCConfiguration_SetFirmware = nullptr;
+		pWrapperTable->m_SMCConfiguration_SetFirmwareResources = nullptr;
 		pWrapperTable->m_SMCContext_SetToSimulationMode = nullptr;
 		pWrapperTable->m_SMCContext_IsSimulationMode = nullptr;
-		pWrapperTable->m_SMCContext_SetFirmware = nullptr;
 		pWrapperTable->m_SMCContext_ReinitializeInstance = nullptr;
 		pWrapperTable->m_SMCContext_GetIPAddress = nullptr;
 		pWrapperTable->m_SMCContext_GetNetmask = nullptr;
@@ -730,6 +755,7 @@ public:
 		pWrapperTable->m_SMCContext_GetLaserField = nullptr;
 		pWrapperTable->m_SMCContext_BeginJob = nullptr;
 		pWrapperTable->m_SMCContext_GetUnfinishedJob = nullptr;
+		pWrapperTable->m_SMCContext_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLabSMC_SetDLLResources = nullptr;
 		pWrapperTable->m_Driver_ScanLabSMC_SetXercesDLLResource = nullptr;
 		pWrapperTable->m_Driver_ScanLabSMC_SetCustomDLLData = nullptr;
@@ -1015,6 +1041,24 @@ public:
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_SMCConfiguration_SetIPAddress = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetIPAddressPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setipaddress");
+		#else // _WIN32
+		pWrapperTable->m_SMCConfiguration_SetIPAddress = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetIPAddressPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setipaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCConfiguration_SetIPAddress == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCConfiguration_GetIPAddress = (PLibMCDriver_ScanLabSMCSMCConfiguration_GetIPAddressPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_getipaddress");
+		#else // _WIN32
+		pWrapperTable->m_SMCConfiguration_GetIPAddress = (PLibMCDriver_ScanLabSMCSMCConfiguration_GetIPAddressPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_getipaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCConfiguration_GetIPAddress == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SMCConfiguration_SetCorrectionFile = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFilePtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfile");
 		#else // _WIN32
 		pWrapperTable->m_SMCConfiguration_SetCorrectionFile = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFilePtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfile");
@@ -1033,6 +1077,24 @@ public:
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_SMCConfiguration_SetFirmware = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setfirmware");
+		#else // _WIN32
+		pWrapperTable->m_SMCConfiguration_SetFirmware = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setfirmware");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCConfiguration_SetFirmware == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCConfiguration_SetFirmwareResources = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwareResourcesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setfirmwareresources");
+		#else // _WIN32
+		pWrapperTable->m_SMCConfiguration_SetFirmwareResources = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwareResourcesPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setfirmwareresources");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCConfiguration_SetFirmwareResources == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SMCContext_SetToSimulationMode = (PLibMCDriver_ScanLabSMCSMCContext_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smccontext_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_SMCContext_SetToSimulationMode = (PLibMCDriver_ScanLabSMCSMCContext_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smccontext_settosimulationmode");
@@ -1048,15 +1110,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_SMCContext_IsSimulationMode == nullptr)
-			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_SMCContext_SetFirmware = (PLibMCDriver_ScanLabSMCSMCContext_SetFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smccontext_setfirmware");
-		#else // _WIN32
-		pWrapperTable->m_SMCContext_SetFirmware = (PLibMCDriver_ScanLabSMCSMCContext_SetFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smccontext_setfirmware");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_SMCContext_SetFirmware == nullptr)
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1165,6 +1218,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_SMCContext_GetUnfinishedJob == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCContext_DrawLayer = (PLibMCDriver_ScanLabSMCSMCContext_DrawLayerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smccontext_drawlayer");
+		#else // _WIN32
+		pWrapperTable->m_SMCContext_DrawLayer = (PLibMCDriver_ScanLabSMCSMCContext_DrawLayerPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smccontext_drawlayer");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCContext_DrawLayer == nullptr)
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1441,6 +1503,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_GetSerialNumber == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_setipaddress", (void**)&(pWrapperTable->m_SMCConfiguration_SetIPAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetIPAddress == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_getipaddress", (void**)&(pWrapperTable->m_SMCConfiguration_GetIPAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_GetIPAddress == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfile", (void**)&(pWrapperTable->m_SMCConfiguration_SetCorrectionFile));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetCorrectionFile == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1449,16 +1519,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetCorrectionFileResource == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_setfirmware", (void**)&(pWrapperTable->m_SMCConfiguration_SetFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetFirmware == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_setfirmwareresources", (void**)&(pWrapperTable->m_SMCConfiguration_SetFirmwareResources));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetFirmwareResources == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_settosimulationmode", (void**)&(pWrapperTable->m_SMCContext_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_issimulationmode", (void**)&(pWrapperTable->m_SMCContext_IsSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_IsSimulationMode == nullptr) )
-			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_setfirmware", (void**)&(pWrapperTable->m_SMCContext_SetFirmware));
-		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_SetFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_reinitializeinstance", (void**)&(pWrapperTable->m_SMCContext_ReinitializeInstance));
@@ -1507,6 +1581,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_getunfinishedjob", (void**)&(pWrapperTable->m_SMCContext_GetUnfinishedJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_GetUnfinishedJob == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_drawlayer", (void**)&(pWrapperTable->m_SMCContext_DrawLayer));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_DrawLayer == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_driver_scanlabsmc_setdllresources", (void**)&(pWrapperTable->m_Driver_ScanLabSMC_SetDLLResources));
@@ -1875,6 +1953,30 @@ public:
 	}
 	
 	/**
+	* CSMCConfiguration::SetIPAddress - Sets the RTC IP Address.
+	* @param[in] sValue - Value to set.
+	*/
+	void CSMCConfiguration::SetIPAddress(const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_SetIPAddress(m_pHandle, sValue.c_str()));
+	}
+	
+	/**
+	* CSMCConfiguration::GetIPAddress - Returns the RTC IP Address.
+	* @return Current Value.
+	*/
+	std::string CSMCConfiguration::GetIPAddress()
+	{
+		LibMCDriver_ScanLabSMC_uint32 bytesNeededValue = 0;
+		LibMCDriver_ScanLabSMC_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_GetIPAddress(m_pHandle, 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_GetIPAddress(m_pHandle, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
 	* CSMCConfiguration::SetCorrectionFile - Sets correction file as binary data.
 	* @param[in] CorrectionFileDataBuffer - byte array of the firmware program file.
 	*/
@@ -1890,6 +1992,28 @@ public:
 	void CSMCConfiguration::SetCorrectionFileResource(const std::string & sResourceName)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_SetCorrectionFileResource(m_pHandle, sResourceName.c_str()));
+	}
+	
+	/**
+	* CSMCConfiguration::SetFirmware - Sets card firmware from binary data.
+	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	void CSMCConfiguration::SetFirmware(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & AuxiliaryDataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_SetFirmware(m_pHandle, (LibMCDriver_ScanLabSMC_uint64)FirmwareDataBuffer.size(), FirmwareDataBuffer.data(), (LibMCDriver_ScanLabSMC_uint64)FPGADataBuffer.size(), FPGADataBuffer.data(), (LibMCDriver_ScanLabSMC_uint64)AuxiliaryDataBuffer.size(), AuxiliaryDataBuffer.data()));
+	}
+	
+	/**
+	* CSMCConfiguration::SetFirmwareResources - Sets card firmware as resource data. Fails if resource name does not exist.
+	* @param[in] sFirmwareDataResource - Resource name of the firmware program file.
+	* @param[in] sFPGADataResource - Resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryDataResource - Resource name of the binary auxiliary file.
+	*/
+	void CSMCConfiguration::SetFirmwareResources(const std::string & sFirmwareDataResource, const std::string & sFPGADataResource, const std::string & sAuxiliaryDataResource)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_SetFirmwareResources(m_pHandle, sFirmwareDataResource.c_str(), sFPGADataResource.c_str(), sAuxiliaryDataResource.c_str()));
 	}
 	
 	/**
@@ -1914,17 +2038,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_SMCContext_IsSimulationMode(m_pHandle, &resultSimulationModeEnabled));
 		
 		return resultSimulationModeEnabled;
-	}
-	
-	/**
-	* CSMCContext::SetFirmware - Sets card firmware from binary data.
-	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
-	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
-	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
-	*/
-	void CSMCContext::SetFirmware(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & AuxiliaryDataBuffer)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_SMCContext_SetFirmware(m_pHandle, (LibMCDriver_ScanLabSMC_uint64)FirmwareDataBuffer.size(), FirmwareDataBuffer.data(), (LibMCDriver_ScanLabSMC_uint64)FPGADataBuffer.size(), FPGADataBuffer.data(), (LibMCDriver_ScanLabSMC_uint64)AuxiliaryDataBuffer.size(), AuxiliaryDataBuffer.data()));
 	}
 	
 	/**
@@ -2077,6 +2190,16 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	* CSMCContext::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	*/
+	void CSMCContext::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLabSMC_uint32 nLayerIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCContext_DrawLayer(m_pHandle, sStreamUUID.c_str(), nLayerIndex));
 	}
 	
 	/**

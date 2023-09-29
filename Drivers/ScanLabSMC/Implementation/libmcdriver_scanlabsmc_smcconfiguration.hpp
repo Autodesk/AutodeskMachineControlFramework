@@ -63,6 +63,10 @@ private:
     LibMCDriver_ScanLabSMC::eWarnLevel m_WarnLevel;
     uint32_t m_nSerialNumber;
     std::vector<uint8_t> m_CorrectionFileData;
+    std::vector<uint8_t> m_FirmwareData;
+    std::vector<uint8_t> m_FPGAData;
+    std::vector<uint8_t> m_AuxiliaryData;
+    std::string m_sIPAddress;
 
 public:
 
@@ -82,9 +86,17 @@ public:
 
 	LibMCDriver_ScanLabSMC_uint32 GetSerialNumber() override;
 
+	void SetIPAddress(const std::string& sValue) override;
+
+	std::string GetIPAddress() override;
+
 	void SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer) override;
 
 	void SetCorrectionFileResource(const std::string& sResourceName) override;
+    
+    void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer) override;
+
+    void SetFirmwareResources(const std::string& sFirmwareDataResource, const std::string& sFPGADataResource, const std::string& sAuxiliaryDataResource) override;
 
     std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile);
 

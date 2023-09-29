@@ -127,6 +127,15 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONRESOURCENAME 1019 /** Empty RTC correction resource. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND 1020 /** RTC correction resource not found. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE 1021 /** Empty RTC Correction File. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYIPADDRESS 1022 /** Empty IP Address. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDIPADDRESS 1023 /** Invalid IP Address. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFIRMWARERESOURCENAME 1024 /** Empty RTC firmware resource name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_RTCFIRMWARERESOURCENOTFOUND 1025 /** RTC firmware resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFPGARESOURCENAME 1026 /** Empty RTC FPGA resource name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_RTCFPGARESOURCENOTFOUND 1027 /** RTC FPGA resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME 1028 /** Empty RTC auxiliary resource name */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND 1029 /** RTC auxiliary resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT 1030 /** Invalid point count. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -166,6 +175,15 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONRESOURCENAME: return "Empty RTC correction resource.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND: return "RTC correction resource not found.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE: return "Empty RTC Correction File.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYIPADDRESS: return "Empty IP Address.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDIPADDRESS: return "Invalid IP Address.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFIRMWARERESOURCENAME: return "Empty RTC firmware resource name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_RTCFIRMWARERESOURCENOTFOUND: return "RTC firmware resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFPGARESOURCENAME: return "Empty RTC FPGA resource name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_RTCFPGARESOURCENOTFOUND: return "RTC FPGA resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME: return "Empty RTC auxiliary resource name";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND: return "RTC auxiliary resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT: return "Invalid point count.";
     default: return "unknown error";
   }
 }

@@ -477,6 +477,18 @@ public:
 	virtual LibMCDriver_ScanLabSMC_uint32 GetSerialNumber() = 0;
 
 	/**
+	* ISMCConfiguration::SetIPAddress - Sets the RTC IP Address.
+	* @param[in] sValue - Value to set.
+	*/
+	virtual void SetIPAddress(const std::string & sValue) = 0;
+
+	/**
+	* ISMCConfiguration::GetIPAddress - Returns the RTC IP Address.
+	* @return Current Value.
+	*/
+	virtual std::string GetIPAddress() = 0;
+
+	/**
 	* ISMCConfiguration::SetCorrectionFile - Sets correction file as binary data.
 	* @param[in] nCorrectionFileDataBufferSize - Number of elements in buffer
 	* @param[in] pCorrectionFileDataBuffer - byte array of the firmware program file.
@@ -488,6 +500,25 @@ public:
 	* @param[in] sResourceName - Resource name to load.
 	*/
 	virtual void SetCorrectionFileResource(const std::string & sResourceName) = 0;
+
+	/**
+	* ISMCConfiguration::SetFirmware - Sets card firmware from binary data.
+	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] nFPGADataBufferSize - Number of elements in buffer
+	* @param[in] pFPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+	* @param[in] pAuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	virtual void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer) = 0;
+
+	/**
+	* ISMCConfiguration::SetFirmwareResources - Sets card firmware as resource data. Fails if resource name does not exist.
+	* @param[in] sFirmwareDataResource - Resource name of the firmware program file.
+	* @param[in] sFPGADataResource - Resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryDataResource - Resource name of the binary auxiliary file.
+	*/
+	virtual void SetFirmwareResources(const std::string & sFirmwareDataResource, const std::string & sFPGADataResource, const std::string & sAuxiliaryDataResource) = 0;
 
 };
 
@@ -510,17 +541,6 @@ public:
 	* @return Flag if driver is in simulation mode.
 	*/
 	virtual bool IsSimulationMode() = 0;
-
-	/**
-	* ISMCContext::SetFirmware - Sets card firmware from binary data.
-	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
-	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
-	* @param[in] nFPGADataBufferSize - Number of elements in buffer
-	* @param[in] pFPGADataBuffer - byte array of the firmware FPGA file.
-	* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
-	* @param[in] pAuxiliaryDataBuffer - byte array of the binary auxiliary file.
-	*/
-	virtual void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer) = 0;
 
 	/**
 	* ISMCContext::ReinitializeInstance - Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.
@@ -603,6 +623,13 @@ public:
 	* @return SMC Job Instance.
 	*/
 	virtual ISMCJob * GetUnfinishedJob() = 0;
+
+	/**
+	* ISMCContext::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	*/
+	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLabSMC_uint32 nLayerIndex) = 0;
 
 };
 

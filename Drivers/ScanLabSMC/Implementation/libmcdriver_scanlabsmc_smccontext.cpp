@@ -46,10 +46,12 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
  Class definition of CSMCContext 
 **************************************************************************************************************************/
 
-CSMCContext::CSMCContext(PSMCContextInstance pContextInstance)
-	: m_pContextInstance(pContextInstance)
+CSMCContext::CSMCContext(PSMCContextInstance pContextInstance, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_pContextInstance(pContextInstance), m_pDriverEnvironment (pDriverEnvironment)
 {
 	if (pContextInstance.get() == nullptr)
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
 }
 
@@ -67,11 +69,6 @@ void CSMCContext::SetToSimulationMode()
 bool CSMCContext::IsSimulationMode()
 {
 	return m_pContextInstance->IsSimulationMode();
-}
-
-void CSMCContext::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer)
-{
-	m_pContextInstance->SetFirmware(nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer);
 }
 
 
@@ -137,5 +134,19 @@ ISMCJob* CSMCContext::GetUnfinishedJob()
 {
 	auto pJobInstance = m_pContextInstance->GetUnfinishedJob();
 	return new CSMCJob(pJobInstance);
+}
+
+
+void CSMCContext::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLabSMC_uint32 nLayerIndex)
+{
+	auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+
+	auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+
+	auto pJob = m_pContextInstance->BeginJob(0.0, 0.0, eBlendMode::MaxAccuracy);
+	pJob->AddLayerToList(pLayer);
+	pJob->Finalize();
+	pJob->Execute(true);
+
 }
 

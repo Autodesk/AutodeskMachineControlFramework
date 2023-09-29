@@ -61,18 +61,17 @@ class CSMCContext : public virtual ISMCContext, public virtual CBase {
 private:
 
 	PSMCContextInstance m_pContextInstance;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 public:
 
-	CSMCContext(PSMCContextInstance pContextInstance);
+	CSMCContext(PSMCContextInstance pContextInstance, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CSMCContext();
 
 	void SetToSimulationMode() override;
 
 	bool IsSimulationMode() override;
-
-	void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer) override;
 
 	void ReinitializeInstance() override;
 
@@ -97,6 +96,8 @@ public:
 	ISMCJob * BeginJob(const LibMCDriver_ScanLabSMC_double dStartPositionX, const LibMCDriver_ScanLabSMC_double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode) override;
 
 	ISMCJob * GetUnfinishedJob() override;
+
+	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLabSMC_uint32 nLayerIndex) override;
 
 };
 

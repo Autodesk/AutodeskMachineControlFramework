@@ -129,6 +129,7 @@ void CSMCJobInstance::DrawPolyline(const LibMCDriver_ScanLabSMC_uint64 nPointsBu
 
         m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
         m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
+        m_pSDK->checkError(m_pSDK->slsc_job_set_min_mark_speed(contextHandle, dMinimalMarkSpeed));
 
         drawPolylineEx(contextHandle, nPointsBufferSize, pPointsBuffer, false);
 
@@ -148,6 +149,7 @@ void CSMCJobInstance::DrawLoop(const LibMCDriver_ScanLabSMC_uint64 nPointsBuffer
 
         m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
         m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
+        m_pSDK->checkError(m_pSDK->slsc_job_set_min_mark_speed(contextHandle, dMinimalMarkSpeed));
         drawPolylineEx(contextHandle, nPointsBufferSize, pPointsBuffer, true);
 
 
@@ -231,6 +233,98 @@ void CSMCJobInstance::WaitForExecution(const LibMCDriver_ScanLabSMC_uint32 nTime
 
 void CSMCJobInstance::StopExecution()
 {
+
+}
+
+void CSMCJobInstance::AddLayerToList(LibMCEnv::PToolpathLayer pLayer)
+{
+    if (pLayer.get() == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+    double dUnits = pLayer->GetUnits();
+    double dZValue = 0.0;
+    double dMinimalMarkSpeed = 0.0;
+    double dCornerTolerance = 0.1;
+
+    uint32_t nSegmentCount = pLayer->GetSegmentCount();
+    for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
+
+        LibMCEnv::eToolpathSegmentType eSegmentType;
+        uint32_t nPointCount;
+        pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
+
+        bool bDrawSegment = true;
+        if (bDrawSegment && (nPointCount >= 2)) {
+
+            double dJumpSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+            double dMarkSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
+            double dPowerInWatts = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
+            double dPowerFactor = dPowerInWatts / 400.0;
+            //int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
+
+                std::vector<LibMCEnv::sPosition2D> Points;
+                pLayer->GetSegmentPointData(nSegmentIndex, Points);
+
+                if (nPointCount != Points.size())
+                    throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT);
+
+                switch (eSegmentType) {
+                case LibMCEnv::eToolpathSegmentType::Loop:
+                case LibMCEnv::eToolpathSegmentType::Polyline:
+                {
+
+                    std::vector<LibMCDriver_ScanLabSMC::sPoint2D> ContourPoints;
+                    ContourPoints.resize(nPointCount);
+
+                    for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+                        auto pContourPoint = &ContourPoints.at(nPointIndex);
+                        pContourPoint->m_X = (double)(Points[nPointIndex].m_Coordinates[0] * dUnits);
+                        pContourPoint->m_Y = (double)(Points[nPointIndex].m_Coordinates[1] * dUnits);
+                    } 
+
+                    if (ContourPoints.size() > 0) {
+                        if (eSegmentType == LibMCEnv::eToolpathSegmentType::Loop) {
+                            this->DrawLoop(ContourPoints.size(), ContourPoints.data(), dMarkSpeedInMMPerSecond, dMinimalMarkSpeed, dJumpSpeedInMMPerSecond, dPowerFactor, dCornerTolerance, dZValue);
+                        }
+                        else {
+                            this->DrawPolyline(ContourPoints.size(), ContourPoints.data(), dMarkSpeedInMMPerSecond, dMinimalMarkSpeed, dJumpSpeedInMMPerSecond, dPowerFactor, dCornerTolerance, dZValue);
+                        }
+                        
+                    }
+
+                    break;
+                }
+
+                case LibMCEnv::eToolpathSegmentType::Hatch:
+                {
+                    if (nPointCount % 2 == 1)
+                        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT);
+
+                    uint64_t nHatchCount = nPointCount / 2;
+                    std::vector<LibMCDriver_ScanLabSMC::sHatch2D> Hatches;
+                    Hatches.resize(nHatchCount);
+
+                    for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+                        auto pHatch = &Hatches.at(nHatchIndex);
+                        pHatch->m_X1 = (double)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
+                        pHatch->m_Y1 = (double)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
+                        pHatch->m_X2 = (double)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
+                        pHatch->m_Y2 = (double)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
+                    }
+
+                    if (Hatches.size() > 0) {
+                        this->DrawHatches(Hatches.size(), Hatches.data(), dMarkSpeedInMMPerSecond, dJumpSpeedInMMPerSecond, dPowerFactor, dZValue);
+                    }
+
+                    break;
+                }
+
+                
+            }
+
+        }
+
+    }
 
 }
 

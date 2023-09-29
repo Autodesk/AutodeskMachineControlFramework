@@ -243,7 +243,7 @@ ISMCContext* CDriver_ScanLabSMC::CreateContext(const std::string& sContextName, 
     auto pContextInstance = std::make_shared<CSMCContextInstance>(sContextName, pSMCConfiguration, m_pSDK, m_pDriverEnvironment);
     m_pContextMap.insert(std::make_pair (sContextName, pContextInstance));
 
-    return new CSMCContext (pContextInstance);
+    return new CSMCContext (pContextInstance, m_pDriverEnvironment);
 }
 
 bool CDriver_ScanLabSMC::ContextExists(const std::string& sContextName)
@@ -266,7 +266,7 @@ ISMCContext* CDriver_ScanLabSMC::FindContext(const std::string& sContextName)
     if (iIter == m_pContextMap.end())
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND, "Context not found: " + sContextName);
 
-    return new CSMCContext(iIter->second);
+    return new CSMCContext(iIter->second, m_pDriverEnvironment);
 
 }
 

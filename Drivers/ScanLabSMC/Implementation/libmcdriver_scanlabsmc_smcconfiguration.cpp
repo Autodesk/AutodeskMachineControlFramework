@@ -95,6 +95,16 @@ LibMCDriver_ScanLabSMC_uint32 CSMCConfiguration::GetSerialNumber()
     return m_nSerialNumber;
 }
 
+void CSMCConfiguration::SetIPAddress(const std::string& sValue)
+{
+    m_sIPAddress = sValue;
+}
+
+std::string CSMCConfiguration::GetIPAddress()
+{
+    return m_sIPAddress;
+}
+
 void CSMCConfiguration::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer)
 {
     m_CorrectionFileData.resize(0);
@@ -131,6 +141,95 @@ void CSMCConfiguration::SetCorrectionFileResource(const std::string& sResourceNa
 
 }
 
+void CSMCConfiguration::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer)
+{
+    m_FirmwareData.resize (0);
+    m_FPGAData.resize (0);
+    m_AuxiliaryData.resize (0);
+
+    if (nFirmwareDataBufferSize > 0) {
+        if (pFirmwareDataBuffer == nullptr)
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+        m_FirmwareData.resize(nFirmwareDataBufferSize);
+        for (uint64_t nIndex = 0; nIndex < nFirmwareDataBufferSize; nIndex++)
+            m_FirmwareData.at(nIndex) = pFirmwareDataBuffer[nIndex];
+
+    }
+
+
+    if (nFPGADataBufferSize > 0) {
+        if (pFPGADataBuffer == nullptr)
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+        m_FPGAData.resize(nFPGADataBufferSize);
+        for (uint64_t nIndex = 0; nIndex < nFPGADataBufferSize; nIndex++)
+            m_FPGAData.at(nIndex) = pFPGADataBuffer[nIndex];
+
+    }
+
+    if (nAuxiliaryDataBufferSize > 0) {
+        if (pAuxiliaryDataBuffer == nullptr)
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+        m_AuxiliaryData.resize(nAuxiliaryDataBufferSize);
+        for (uint64_t nIndex = 0; nIndex < nAuxiliaryDataBufferSize; nIndex++)
+            m_AuxiliaryData.at(nIndex) = pAuxiliaryDataBuffer[nIndex];
+
+    }
+
+}
+
+void CSMCConfiguration::SetFirmwareResources(const std::string& sFirmwareDataResource, const std::string& sFPGADataResource, const std::string& sAuxiliaryDataResource)
+{
+    m_FirmwareData.resize(0);
+    m_FPGAData.resize(0);
+    m_AuxiliaryData.resize(0);
+
+    if (sFirmwareDataResource.empty())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFIRMWARERESOURCENAME);
+
+    if (m_pDriverEnvironment->MachineHasResourceData(sFirmwareDataResource)) {
+        m_pDriverEnvironment->RetrieveMachineResourceData(sFirmwareDataResource, m_FirmwareData);
+    }
+    else if (m_pDriverEnvironment->DriverHasResourceData(sFirmwareDataResource))
+    {
+        m_pDriverEnvironment->RetrieveDriverResourceData(sFirmwareDataResource, m_FirmwareData);
+    }
+    else {
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_RTCFIRMWARERESOURCENOTFOUND, "RTC firmware resource not found: " + sFirmwareDataResource);
+    }
+
+
+    if (sFPGADataResource.empty())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCFPGARESOURCENAME);
+
+    if (m_pDriverEnvironment->MachineHasResourceData(sFPGADataResource)) {
+        m_pDriverEnvironment->RetrieveMachineResourceData(sFPGADataResource, m_FPGAData);
+    }
+    else if (m_pDriverEnvironment->DriverHasResourceData(sFPGADataResource))
+    {
+        m_pDriverEnvironment->RetrieveDriverResourceData(sFPGADataResource, m_FPGAData);
+    }
+    else {
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_RTCFPGARESOURCENOTFOUND, "RTC FPGA resource not found: " + sFPGADataResource);
+    }
+
+    if (sAuxiliaryDataResource.empty())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME);
+
+    if (m_pDriverEnvironment->MachineHasResourceData(sAuxiliaryDataResource)) {
+        m_pDriverEnvironment->RetrieveMachineResourceData(sAuxiliaryDataResource, m_AuxiliaryData);
+    }
+    else if (m_pDriverEnvironment->DriverHasResourceData(sAuxiliaryDataResource))
+    {
+        m_pDriverEnvironment->RetrieveDriverResourceData(sAuxiliaryDataResource, m_AuxiliaryData);
+    }
+    else {
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND, "RTC auxiliary resource not found: " + sAuxiliaryDataResource);
+    }
+
+}
 
 std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::PWorkingFile& newCorrectionFile)
 {
@@ -140,6 +239,12 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER);
     if (m_CorrectionFileData.size () == 0)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE);
+
+    if (m_sIPAddress.empty ())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYIPADDRESS);
+    for (auto ch : m_sIPAddress)
+        if (!( ((ch >= '0') && (ch <= '9')) || (ch == '.') ))
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDIPADDRESS, "invalid RTC IP Address: " + m_sIPAddress);
 
     newCorrectionFile = pWorkingDirectory->StoreCustomDataInTempFile("ct5", m_CorrectionFileData);
 
@@ -187,7 +292,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     auto pEthSearchNode = pRTCConfigNode->AddChild("", "EthSearch");
     auto pIPListNode = pEthSearchNode->AddChild("", "IPList");
-    pIPListNode->AddChildText("", "IPAddress", "192.168.0.1");
+    pIPListNode->AddChildText("", "IPAddress", m_sIPAddress);
     pEthSearchNode->AddChildText("", "EthMaxTimeout", "2.0");
 
 

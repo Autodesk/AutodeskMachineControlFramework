@@ -58,6 +58,8 @@ private:
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 
+	uint32_t m_nSerialNumber;
+
 public:
 
 	CSMCContextInstance(const std::string & sContextName, ISMCConfiguration* pSMCConfiguration, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment);
@@ -67,10 +69,6 @@ public:
 	void SetToSimulationMode();
 
 	bool IsSimulationMode();
-
-	void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer);
-
-	void SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pCorrectionFileDataBuffer);
 
 	void ReinitializeInstance();
 

@@ -149,6 +149,9 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::strin
 	this->slsc_ctrl_get_exec_state = (PScanLabSMCPtr_slsc_ctrl_get_exec_state)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_exec_state");
 	this->slsc_job_set_jump_speed = (PScanLabSMCPtr_slsc_job_set_jump_speed)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_jump_speed");
 	this->slsc_job_set_mark_speed = (PScanLabSMCPtr_slsc_job_set_mark_speed)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_mark_speed");
+	this->slsc_job_set_min_mark_speed = (PScanLabSMCPtr_slsc_job_set_min_mark_speed)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_min_mark_speed");
+	this->slsc_job_jump_min_time = (PScanLabSMCPtr_slsc_job_jump_min_time)_loadScanLabSMCAddress(hLibrary, "slsc_job_jump_min_time");
+	this->slsc_job_set_corner_tolerance = (PScanLabSMCPtr_slsc_job_set_corner_tolerance)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_corner_tolerance");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -205,6 +208,9 @@ void CScanLabSMCSDK::resetFunctionPtrs()
 	slsc_ctrl_get_exec_state = nullptr;
 	slsc_job_set_jump_speed = nullptr;
 	slsc_job_set_mark_speed = nullptr;
+	slsc_job_set_min_mark_speed = nullptr;
+	slsc_job_jump_min_time = nullptr;
+	slsc_job_set_corner_tolerance = nullptr;
 
 }
 

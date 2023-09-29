@@ -87,6 +87,8 @@ public:
 
 	void StopExecution();
 
+	void AddLayerToList(LibMCEnv::PToolpathLayer pLayer);
+
 };
 
 typedef std::shared_ptr<CSMCJobInstance> PSMCJobInstance;

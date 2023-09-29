@@ -302,6 +302,26 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_S
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_GetSerialNumberPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_uint32 * pValue);
 
 /**
+* Sets the RTC IP Address.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pValue - Value to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetIPAddressPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pValue);
+
+/**
+* Returns the RTC IP Address.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer - WarnLevel buffer of Current Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_GetIPAddressPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nValueBufferSize, LibMCDriver_ScanLabSMC_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
 * Sets correction file as binary data.
 *
 * @param[in] pSMCConfiguration - SMCConfiguration instance.
@@ -319,6 +339,31 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_S
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFileResourcePtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
+/**
+* Sets card firmware from binary data.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
+* @param[in] nFPGADataBufferSize - Number of elements in buffer
+* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
+* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer);
+
+/**
+* Sets card firmware as resource data. Fails if resource name does not exist.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pFirmwareDataResource - Resource name of the firmware program file.
+* @param[in] pFPGADataResource - Resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryDataResource - Resource name of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwareResourcesPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pFirmwareDataResource, const char * pFPGADataResource, const char * pAuxiliaryDataResource);
 
 /*************************************************************************************************************************
  Class definition for SMCContext
@@ -340,20 +385,6 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_SetToSi
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_IsSimulationModePtr) (LibMCDriver_ScanLabSMC_SMCContext pSMCContext, bool * pSimulationModeEnabled);
-
-/**
-* Sets card firmware from binary data.
-*
-* @param[in] pSMCContext - SMCContext instance.
-* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
-* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
-* @param[in] nFPGADataBufferSize - Number of elements in buffer
-* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
-* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
-* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_SetFirmwarePtr) (LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer);
 
 /**
 * Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.
@@ -476,6 +507,16 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_BeginJo
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_GetUnfinishedJobPtr) (LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_SMCJob * pJobInstance);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn.
+*
+* @param[in] pSMCContext - SMCContext instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_DrawLayerPtr) (LibMCDriver_ScanLabSMC_SMCContext pSMCContext, const char * pStreamUUID, LibMCDriver_ScanLabSMC_uint32 nLayerIndex);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLabSMC
@@ -689,11 +730,14 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCConfiguration_GetWarnLevelPtr m_SMCConfiguration_GetWarnLevel;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetSerialNumberPtr m_SMCConfiguration_SetSerialNumber;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_GetSerialNumberPtr m_SMCConfiguration_GetSerialNumber;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetIPAddressPtr m_SMCConfiguration_SetIPAddress;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_GetIPAddressPtr m_SMCConfiguration_GetIPAddress;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFilePtr m_SMCConfiguration_SetCorrectionFile;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFileResourcePtr m_SMCConfiguration_SetCorrectionFileResource;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr m_SMCConfiguration_SetFirmware;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwareResourcesPtr m_SMCConfiguration_SetFirmwareResources;
 	PLibMCDriver_ScanLabSMCSMCContext_SetToSimulationModePtr m_SMCContext_SetToSimulationMode;
 	PLibMCDriver_ScanLabSMCSMCContext_IsSimulationModePtr m_SMCContext_IsSimulationMode;
-	PLibMCDriver_ScanLabSMCSMCContext_SetFirmwarePtr m_SMCContext_SetFirmware;
 	PLibMCDriver_ScanLabSMCSMCContext_ReinitializeInstancePtr m_SMCContext_ReinitializeInstance;
 	PLibMCDriver_ScanLabSMCSMCContext_GetIPAddressPtr m_SMCContext_GetIPAddress;
 	PLibMCDriver_ScanLabSMCSMCContext_GetNetmaskPtr m_SMCContext_GetNetmask;
@@ -706,6 +750,7 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCContext_GetLaserFieldPtr m_SMCContext_GetLaserField;
 	PLibMCDriver_ScanLabSMCSMCContext_BeginJobPtr m_SMCContext_BeginJob;
 	PLibMCDriver_ScanLabSMCSMCContext_GetUnfinishedJobPtr m_SMCContext_GetUnfinishedJob;
+	PLibMCDriver_ScanLabSMCSMCContext_DrawLayerPtr m_SMCContext_DrawLayer;
 	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetDLLResourcesPtr m_Driver_ScanLabSMC_SetDLLResources;
 	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetXercesDLLResourcePtr m_Driver_ScanLabSMC_SetXercesDLLResource;
 	PLibMCDriver_ScanLabSMCDriver_ScanLabSMC_SetCustomDLLDataPtr m_Driver_ScanLabSMC_SetCustomDLLData;

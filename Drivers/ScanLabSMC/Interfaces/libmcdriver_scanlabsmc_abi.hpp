@@ -315,6 +315,26 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getserialnumber(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_uint32 * pValue);
 
 /**
+* Sets the RTC IP Address.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setipaddress(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pValue);
+
+/**
+* Returns the RTC IP Address.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer - WarnLevel buffer of Current Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getipaddress(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nValueBufferSize, LibMCDriver_ScanLabSMC_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
 * Sets correction file as binary data.
 *
 * @param[in] pSMCConfiguration - SMCConfiguration instance.
@@ -332,6 +352,31 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfileresource(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
+/**
+* Sets card firmware from binary data.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
+* @param[in] nFPGADataBufferSize - Number of elements in buffer
+* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
+* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setfirmware(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer);
+
+/**
+* Sets card firmware as resource data. Fails if resource name does not exist.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pFirmwareDataResource - Resource name of the firmware program file.
+* @param[in] pFPGADataResource - Resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryDataResource - Resource name of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setfirmwareresources(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pFirmwareDataResource, const char * pFPGADataResource, const char * pAuxiliaryDataResource);
 
 /*************************************************************************************************************************
  Class definition for SMCContext
@@ -353,20 +398,6 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_issimulationmode(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, bool * pSimulationModeEnabled);
-
-/**
-* Sets card firmware from binary data.
-*
-* @param[in] pSMCContext - SMCContext instance.
-* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
-* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
-* @param[in] nFPGADataBufferSize - Number of elements in buffer
-* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
-* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
-* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_setfirmware(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer);
 
 /**
 * Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.
@@ -489,6 +520,16 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_getunfinishedjob(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_SMCJob * pJobInstance);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn.
+*
+* @param[in] pSMCContext - SMCContext instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_drawlayer(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, const char * pStreamUUID, LibMCDriver_ScanLabSMC_uint32 nLayerIndex);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLabSMC

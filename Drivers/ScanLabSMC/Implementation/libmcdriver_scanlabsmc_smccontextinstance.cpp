@@ -46,7 +46,7 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
 **************************************************************************************************************************/
 
 CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCConfiguration* pSMCConfiguration, PScanLabSMCSDK pSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: m_pSDK (pSDK), m_pDriverEnvironment (pDriverEnvironment), m_sContextName (sContextName)
+	: m_pSDK (pSDK), m_pDriverEnvironment (pDriverEnvironment), m_sContextName (sContextName), m_nSerialNumber (0)
 {
 	if (pSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
@@ -60,6 +60,8 @@ CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCCo
 	auto pCastedConfiguration = dynamic_cast<CSMCConfiguration*> (pSMCConfiguration);
 	if (pCastedConfiguration == nullptr)
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+
+	m_nSerialNumber = pSMCConfiguration->GetSerialNumber();
 
 	m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory ();
 
@@ -100,9 +102,6 @@ bool CSMCContextInstance::IsSimulationMode()
 	return false;
 }
 
-void CSMCContextInstance::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer)
-{
-}
 
 void CSMCContextInstance::ReinitializeInstance()
 {
@@ -120,7 +119,7 @@ std::string CSMCContextInstance::GetNetmask()
 
 LibMCDriver_ScanLabSMC_uint32 CSMCContextInstance::GetSerialNumber()
 {
-	return 12345;
+	return m_nSerialNumber;
 }
 
 LibMCDriver_ScanLabSMC_uint32 CSMCContextInstance::GetLaserIndex()
