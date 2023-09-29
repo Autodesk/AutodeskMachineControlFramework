@@ -94,11 +94,45 @@ public:
 
 		pConfiguration->SetDynamicViolationReaction(LibMCDriver_ScanLabSMC::eDynamicViolationReaction::StopAndReport);
 
+		pConfiguration->SetSerialNumber(1234);
+		pConfiguration->SetIPAddress("192.168.0.1");
+		pConfiguration->SetCorrectionFileResource("d2_1238");
+		//pConfiguration->SetFirmwareResources("rtc6eth", "rtc6rbf", "rtc6dat");
 
 		auto pContext = pDriver->CreateContext("smccontext", pConfiguration);
 
-		pContext->BeginJob (0.0, 0.0, LibMCDriver_ScanLabSMC::eBlendMode::MaxAccuracy);
+		std::vector<LibMCDriver_ScanLabSMC::sHatch2D> Hatches;
 
+		for (uint32_t nIndex = 0; nIndex < 10; nIndex++) {
+			Hatches.push_back({ 10.0, nIndex + 10.0f, 50.0f, nIndex + 10.0f });
+		}
+
+		for (uint32_t nIndex = 0; nIndex < 10; nIndex++) {
+			Hatches.push_back({ nIndex + 10.0f, 10.0f, nIndex + 10.0f, 110.0f });
+		}
+
+		auto pJob = pContext->BeginJob (0.0, 0.0, LibMCDriver_ScanLabSMC::eBlendMode::MaxAccuracy);
+		pJob->DrawHatches(Hatches, 2000.0, 2000.0, 10.0, 0.0);
+
+		std::vector <LibMCDriver_ScanLabSMC::sPoint2D> polyLine;
+		polyLine.push_back(LibMCDriver_ScanLabSMC::sPoint2D{ 10.0, 10.0 });
+		polyLine.push_back(LibMCDriver_ScanLabSMC::sPoint2D{ 100.0, 10.0 });
+		polyLine.push_back(LibMCDriver_ScanLabSMC::sPoint2D{ 100.0, 100.0 });
+		polyLine.push_back(LibMCDriver_ScanLabSMC::sPoint2D{ 10.0, 100.0 });
+		polyLine.push_back(LibMCDriver_ScanLabSMC::sPoint2D{ 10.0, 10.0 });
+
+		pStateEnvironment->LogMessage("DrawLoop");
+
+		pJob->DrawLoop(polyLine, 2000.0, 20.0, 10000.0, 10.0, 0.1, 0.0);
+
+		pStateEnvironment->LogMessage("Finalize");
+
+		pJob->Finalize();
+
+		pStateEnvironment->LogMessage("Execute");
+		pJob->Execute (true);
+
+		pStateEnvironment->LogMessage("Execute done");
 
 
 
