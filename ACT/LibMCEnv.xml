@@ -166,7 +166,10 @@
 		<error name="INVALIDUSERLANGUAGE" code="10126" description="Invalid user language"/>
 		<error name="ORIGINOUTOFRANGE" code="10127" description="Origin out of range"/>
 		<error name="RAWPIXELDATASIZEMISMATCH" code="10128" description="Raw pixel data size mismatch"/>		
-		
+		<error name="EMPTYPNGSTREAM" code="10129" description="Empty PNG Stream"/>
+		<error name="COULDNOTLOADPNGIMAGE" code="10130" description="Could not load PNG image"/>
+		<error name="INVALIDPIXELSIZE" code="10131" description="Invalid pixel size"/>
+
 	</errors>
 
 

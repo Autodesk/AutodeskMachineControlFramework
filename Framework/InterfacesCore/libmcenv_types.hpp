@@ -223,6 +223,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDUSERLANGUAGE 10126 /** Invalid user language */
 #define LIBMCENV_ERROR_ORIGINOUTOFRANGE 10127 /** Origin out of range */
 #define LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH 10128 /** Raw pixel data size mismatch */
+#define LIBMCENV_ERROR_EMPTYPNGSTREAM 10129 /** Empty PNG Stream */
+#define LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE 10130 /** Could not load PNG image */
+#define LIBMCENV_ERROR_INVALIDPIXELSIZE 10131 /** Invalid pixel size */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -358,6 +361,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
     case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "Origin out of range";
     case LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH: return "Raw pixel data size mismatch";
+    case LIBMCENV_ERROR_EMPTYPNGSTREAM: return "Empty PNG Stream";
+    case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "Could not load PNG image";
+    case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
     default: return "unknown error";
   }
 }
