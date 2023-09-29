@@ -395,6 +395,12 @@ public:
 	virtual void DrawHatches(const LibMCDriver_ScanLabSMC_uint64 nHatchesBufferSize, const LibMCDriver_ScanLabSMC::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLabSMC_double dMarkSpeed, const LibMCDriver_ScanLabSMC_double dJumpSpeed, const LibMCDriver_ScanLabSMC_double dPower, const LibMCDriver_ScanLabSMC_double dZValue) = 0;
 
 	/**
+	* ISMCJob::AddLayerToList - Adds a layer instance to the current open list.
+	* @param[in] pLayer - Instance of the layer to add to the lists.
+	*/
+	virtual void AddLayerToList(LibMCEnv::PToolpathLayer pLayer) = 0;
+
+	/**
 	* ISMCJob::IsReady - Returns if the scanner is ready for execution.
 	* @return Returns true if the scanner is executing.
 	*/
@@ -458,6 +464,31 @@ public:
 	*/
 	virtual LibMCDriver_ScanLabSMC::eWarnLevel GetWarnLevel() = 0;
 
+	/**
+	* ISMCConfiguration::SetSerialNumber - Sets the RTC Serial number. MUST be larger than 0.
+	* @param[in] nValue - Value to set.
+	*/
+	virtual void SetSerialNumber(const LibMCDriver_ScanLabSMC_uint32 nValue) = 0;
+
+	/**
+	* ISMCConfiguration::GetSerialNumber - Returns the RTC Serial number.
+	* @return Current Value.
+	*/
+	virtual LibMCDriver_ScanLabSMC_uint32 GetSerialNumber() = 0;
+
+	/**
+	* ISMCConfiguration::SetCorrectionFile - Sets correction file as binary data.
+	* @param[in] nCorrectionFileDataBufferSize - Number of elements in buffer
+	* @param[in] pCorrectionFileDataBuffer - byte array of the firmware program file.
+	*/
+	virtual void SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pCorrectionFileDataBuffer) = 0;
+
+	/**
+	* ISMCConfiguration::SetCorrectionFileResource - Sets correction file as resource data. Fails if resource name does not exist.
+	* @param[in] sResourceName - Resource name to load.
+	*/
+	virtual void SetCorrectionFileResource(const std::string & sResourceName) = 0;
+
 };
 
 typedef IBaseSharedPtr<ISMCConfiguration> PISMCConfiguration;
@@ -490,13 +521,6 @@ public:
 	* @param[in] pAuxiliaryDataBuffer - byte array of the binary auxiliary file.
 	*/
 	virtual void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer) = 0;
-
-	/**
-	* ISMCContext::SetCorrectionFile - Sets correction file as binary data.
-	* @param[in] nCorrectionFileDataBufferSize - Number of elements in buffer
-	* @param[in] pCorrectionFileDataBuffer - byte array of the firmware program file.
-	*/
-	virtual void SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pCorrectionFileDataBuffer) = 0;
 
 	/**
 	* ISMCContext::ReinitializeInstance - Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.

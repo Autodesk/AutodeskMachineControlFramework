@@ -124,6 +124,9 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY 1016 /** Context exists already. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND 1017 /** Context not found. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER 1018 /** Invalid RTC Serial Number. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONRESOURCENAME 1019 /** Empty RTC correction resource. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND 1020 /** RTC correction resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE 1021 /** Empty RTC Correction File. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -160,6 +163,9 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTEXISTSALREADY: return "Context exists already.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_CONTEXTNOTFOUND: return "Context not found.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER: return "Invalid RTC Serial Number.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONRESOURCENAME: return "Empty RTC correction resource.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND: return "RTC correction resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE: return "Empty RTC Correction File.";
     default: return "unknown error";
   }
 }

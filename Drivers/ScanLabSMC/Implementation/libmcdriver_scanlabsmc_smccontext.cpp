@@ -74,10 +74,6 @@ void CSMCContext::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataB
 	m_pContextInstance->SetFirmware(nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer);
 }
 
-void CSMCContext::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer)
-{
-	m_pContextInstance->SetCorrectionFile(nCorrectionFileDataBufferSize, pCorrectionFileDataBuffer);
-}
 
 void CSMCContext::ReinitializeInstance()
 {

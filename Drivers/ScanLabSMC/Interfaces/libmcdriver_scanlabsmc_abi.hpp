@@ -204,6 +204,15 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_drawhatches(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC_uint64 nHatchesBufferSize, const LibMCDriver_ScanLabSMC::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLabSMC_double dMarkSpeed, LibMCDriver_ScanLabSMC_double dJumpSpeed, LibMCDriver_ScanLabSMC_double dPower, LibMCDriver_ScanLabSMC_double dZValue);
 
 /**
+* Adds a layer instance to the current open list.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] pLayer - Instance of the layer to add to the lists.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_addlayertolist(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_ToolpathLayer pLayer);
+
+/**
 * Returns if the scanner is ready for execution.
 *
 * @param[in] pSMCJob - SMCJob instance.
@@ -287,6 +296,43 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getwarnlevel(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC::eWarnLevel * pValue);
 
+/**
+* Sets the RTC Serial number. MUST be larger than 0.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setserialnumber(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_uint32 nValue);
+
+/**
+* Returns the RTC Serial number.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[out] pValue - Current Value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getserialnumber(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_uint32 * pValue);
+
+/**
+* Sets correction file as binary data.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nCorrectionFileDataBufferSize - Number of elements in buffer
+* @param[in] pCorrectionFileDataBuffer - uint8 buffer of byte array of the firmware program file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfile(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pCorrectionFileDataBuffer);
+
+/**
+* Sets correction file as resource data. Fails if resource name does not exist.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pResourceName - Resource name to load.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfileresource(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
 /*************************************************************************************************************************
  Class definition for SMCContext
 **************************************************************************************************************************/
@@ -321,16 +367,6 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_setfirmware(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pFPGADataBuffer, LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pAuxiliaryDataBuffer);
-
-/**
-* Sets correction file as binary data.
-*
-* @param[in] pSMCContext - SMCContext instance.
-* @param[in] nCorrectionFileDataBufferSize - Number of elements in buffer
-* @param[in] pCorrectionFileDataBuffer - uint8 buffer of byte array of the firmware program file.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_setcorrectionfile(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8 * pCorrectionFileDataBuffer);
 
 /**
 * Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.

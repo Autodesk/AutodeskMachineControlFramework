@@ -70,7 +70,10 @@
 		<error name="CONTEXTEXISTSALREADY" code="1016" description="Context exists already." />		
 		<error name="CONTEXTNOTFOUND" code="1017" description="Context not found." />				
 		<error name="INVALIDRTCSERIALNUMBER" code="1018" description="Invalid RTC Serial Number." />						
-								
+		<error name="EMPTYRTCCORRECTIONRESOURCENAME" code="1019" description="Empty RTC correction resource." />				
+		<error name="RTCCORRECTIONRESOURCENOTFOUND" code="1020" description="RTC correction resource not found." />		
+		<error name="EMPTYRTCCORRECTIONFILE" code="1021" description="Empty RTC Correction File." />		
+									
 	</errors>
 
 	<struct name="Point2D">
@@ -200,10 +203,9 @@ Custom implementation
 			<param name="ZValue" type="double" pass="in" description="Focus Z Value" />
 		</method>
 		
-		<!--<method name="AddLayerToList" description="Adds a layer instance to the current open list.">
+		<method name="AddLayerToList" description="Adds a layer instance to the current open list.">
 			<param name="Layer" type="class" class="LibMCEnv:ToolpathLayer" pass="in" description="Instance of the layer to add to the lists." />
-			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, fails if there is a laser index that does not match." />
-		</method> -->
+		</method>
 
 		<method name="IsReady" description="Returns if the scanner is ready for execution.">
 			<param name="IsExecuting" type="bool" pass="return" description="Returns true if the scanner is executing." />
@@ -245,6 +247,22 @@ Custom implementation
 			<param name="Value" type="enum" class="WarnLevel" pass="return" description="Current Value." />
 		</method>		
 	
+		<method name="SetSerialNumber" description="Sets the RTC Serial number. MUST be larger than 0.">
+			<param name="Value" type="uint32" class="WarnLevel" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetSerialNumber" description="Returns the RTC Serial number.">
+			<param name="Value" type="uint32" class="WarnLevel" pass="return" description="Current Value." />
+		</method>		
+
+		<method name="SetCorrectionFile" description="Sets correction file as binary data.">
+			<param name="CorrectionFileData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+		</method>
+
+		<method name="SetCorrectionFileResource" description="Sets correction file as resource data. Fails if resource name does not exist.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+		</method>
+
 	</class>
 
 
@@ -262,11 +280,7 @@ Custom implementation
 			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
 			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
 		</method>
-		
-		<method name="SetCorrectionFile" description="Sets correction file as binary data.">
-			<param name="CorrectionFileData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
-		</method>
-		
+				
 		<method name="ReinitializeInstance" description="Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.">
 		</method>
 

@@ -39,6 +39,9 @@ Abstract: This is a stub class definition of CSMCConfiguration
 
 using namespace LibMCDriver_ScanLabSMC::Impl;
 
+#define SMCCONFIGURATION_MINSERIALNUMBER 1
+#define SMCCONFIGURATION_MAXSERIALNUMBER 100000000
+
 /*************************************************************************************************************************
  Class definition of CSMCConfiguration 
 **************************************************************************************************************************/
@@ -47,7 +50,7 @@ CSMCConfiguration::CSMCConfiguration(LibMCEnv::PDriverEnvironment pDriverEnviron
     : m_pDriverEnvironment (pDriverEnvironment),
       m_DynamicViolationReaction (LibMCDriver_ScanLabSMC::eDynamicViolationReaction::WarningOnly),
      m_WarnLevel (LibMCDriver_ScanLabSMC::eWarnLevel::Error),
-    m_nSerialNumber (123456)
+    m_nSerialNumber (0)
 
 {
     if (pDriverEnvironment.get() == nullptr)
@@ -79,17 +82,69 @@ LibMCDriver_ScanLabSMC::eWarnLevel CSMCConfiguration::GetWarnLevel()
     return m_WarnLevel;
 }
 
-std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::CWorkingFile* pCorrectionFile)
+void CSMCConfiguration::SetSerialNumber(const LibMCDriver_ScanLabSMC_uint32 nValue)
+{
+    if ((nValue < SMCCONFIGURATION_MINSERIALNUMBER) || (nValue > SMCCONFIGURATION_MAXSERIALNUMBER))
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER, "invalid RTC serial number: " + std::to_string (nValue));
+
+    m_nSerialNumber = nValue;
+}
+
+LibMCDriver_ScanLabSMC_uint32 CSMCConfiguration::GetSerialNumber()
+{
+    return m_nSerialNumber;
+}
+
+void CSMCConfiguration::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer)
+{
+    m_CorrectionFileData.resize(0);
+    if (nCorrectionFileDataBufferSize > 0) {
+        if (pCorrectionFileDataBuffer == nullptr)
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+        m_CorrectionFileData.resize(nCorrectionFileDataBufferSize);
+        for (uint64_t nIndex = 0; nIndex < nCorrectionFileDataBufferSize; nIndex++)
+            m_CorrectionFileData.at(nIndex) = pCorrectionFileDataBuffer[nIndex];
+
+    }
+
+}
+
+void CSMCConfiguration::SetCorrectionFileResource(const std::string& sResourceName)
+{
+    m_CorrectionFileData.resize(0);
+
+    if (sResourceName.empty ())
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONRESOURCENAME, "empty RTC correction resource name");
+
+    if (m_pDriverEnvironment->MachineHasResourceData(sResourceName)) {
+        m_pDriverEnvironment->RetrieveMachineResourceData(sResourceName, m_CorrectionFileData);
+    }
+    else if (m_pDriverEnvironment->DriverHasResourceData(sResourceName)) 
+    {
+        m_pDriverEnvironment->RetrieveDriverResourceData(sResourceName, m_CorrectionFileData);
+    }
+    else {
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND, "RTC correction resource not found: " + sResourceName);
+    }
+
+
+}
+
+
+std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::PWorkingFile& newCorrectionFile)
 {
     if (pWorkingDirectory == nullptr)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
-    if (pCorrectionFile == nullptr)
-        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
-    if (m_nSerialNumber == 0)
+    if ((m_nSerialNumber < SMCCONFIGURATION_MINSERIALNUMBER) || (m_nSerialNumber > SMCCONFIGURATION_MAXSERIALNUMBER))
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER);
+    if (m_CorrectionFileData.size () == 0)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE);
+
+    newCorrectionFile = pWorkingDirectory->StoreCustomDataInTempFile("ct5", m_CorrectionFileData);
 
     std::string sBaseDirectoryPath = pWorkingDirectory->GetAbsoluteFilePath();
-    std::string sCorrectionFilePath = pWorkingDirectory->GetAbsoluteFilePath();
+    std::string sCorrectionFilePath = newCorrectionFile->GetAbsoluteFileName();
     std::string sLogFilePath = pWorkingDirectory->GetAbsoluteFilePath() + "/log.txt";
 
     auto pXMLDocument = m_pDriverEnvironment->CreateXMLDocument("Configuration", "SCANmotionControl");
@@ -107,7 +162,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     auto pLogConfigNode = pGeneralConfigNode->AddChild("", "LogConfig");
     pLogConfigNode->AddChildText("", "LogfilePath", sLogFilePath);
     pLogConfigNode->AddChildText("", "Loglevel", "Warn");
-    pLogConfigNode->AddChildText("", "EnableConsoleLogging", "true");
+    pLogConfigNode->AddChildText("", "EnableConsoleLogging", "false");
     pLogConfigNode->AddChildText("", "EnableFilelogging", "true");
     pLogConfigNode->AddChildText("", "MaxLogfileSize", "26214400");
     pLogConfigNode->AddChildText("", "MaxBackupFileCount", "0");
@@ -171,7 +226,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     pYDirectionNode->AddAttribute("", "Min", "-27");
 
     pScanDeviceConfigNode->AddChildText("", "MonitoringLevel", "Position");
-    auto pFocalLengthNode = pScanDeviceConfigNode->AddChildText("", "FocalLength", "100");
+    auto pFocalLengthNode = pScanDeviceConfigNode->AddChildText("", "FocalLength", "500");
     pFocalLengthNode->AddAttribute("", "Unit", "mm");
 
     auto pDelayNode = pScanDeviceConfigNode->AddChildText("", "Delay", "0.00125");

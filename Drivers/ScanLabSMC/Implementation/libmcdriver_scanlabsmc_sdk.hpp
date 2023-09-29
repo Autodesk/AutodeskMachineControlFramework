@@ -75,6 +75,15 @@ namespace LibMCDriver_ScanLabSMC {
 			slsc_PolylineProfile ProfileType;
 		};
 
+		enum slsc_ExecState
+		{
+			slsc_ExecState_Idle = 0, 
+			slsc_ExecState_ReadyForExecution = 1, //!< The RTC6 board is ready to execute jobs.
+			slsc_ExecState_Executing = 2,         //!< The RTC6 board is executing a job.
+			slsc_ExecState_NotInitOrError = 3,    //!< The RTC6 board is not initialized or an error is present.
+		};
+		typedef enum slsc_ExecState slsc_ExecState;
+
 		typedef struct _slsc_PolylineOptions slsc_PolylineOptions;
 
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION *PScanLabSMCPtr_slsc_cfg_initialize_from_file) (slscHandle * Handle, const char* XmlConfigFileName);
@@ -88,7 +97,9 @@ namespace LibMCDriver_ScanLabSMC {
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_start_execution) (size_t Handle);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop) (size_t Handle);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop_controlled) (size_t Handle);
-
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_get_exec_state) (size_t Handle, slsc_ExecState * execState);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_set_jump_speed) (size_t Handle, double dJumpSpeed);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_set_mark_speed) (size_t Handle, double dMarkSpeed);
 
 		class CScanLabSMCSDK_DLLDirectoryCache {
 		private:
@@ -126,6 +137,9 @@ namespace LibMCDriver_ScanLabSMC {
 			PScanLabSMCPtr_slsc_ctrl_start_execution slsc_ctrl_start_execution = nullptr;
 			PScanLabSMCPtr_slsc_ctrl_stop slsc_ctrl_stop = nullptr;
 			PScanLabSMCPtr_slsc_ctrl_stop_controlled slsc_ctrl_stop_controlled = nullptr;
+			PScanLabSMCPtr_slsc_ctrl_get_exec_state slsc_ctrl_get_exec_state = nullptr;
+			PScanLabSMCPtr_slsc_job_set_jump_speed slsc_job_set_jump_speed = nullptr;
+			PScanLabSMCPtr_slsc_job_set_mark_speed slsc_job_set_mark_speed = nullptr;
 
 			CScanLabSMCSDK(const std::string & sDLLNameUTF8, const std::string& sDLLDirectoryUTF8);
 			~CScanLabSMCSDK();

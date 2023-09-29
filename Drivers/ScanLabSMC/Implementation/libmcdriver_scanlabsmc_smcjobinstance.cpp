@@ -127,7 +127,9 @@ void CSMCJobInstance::DrawPolyline(const LibMCDriver_ScanLabSMC_uint64 nPointsBu
 
         auto contextHandle = m_pContextHandle->getHandle();
 
-        // Set speed etc..
+        m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
+        m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
+
         drawPolylineEx(contextHandle, nPointsBufferSize, pPointsBuffer, false);
 
 
@@ -144,7 +146,8 @@ void CSMCJobInstance::DrawLoop(const LibMCDriver_ScanLabSMC_uint64 nPointsBuffer
 
         auto contextHandle = m_pContextHandle->getHandle();
 
-        // Set speed etc..
+        m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
+        m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
         drawPolylineEx(contextHandle, nPointsBufferSize, pPointsBuffer, true);
 
 
@@ -157,6 +160,32 @@ void CSMCJobInstance::DrawHatches(const LibMCDriver_ScanLabSMC_uint64 nHatchesBu
 {
     if (m_bIsFinalized)
         throw std::runtime_error("Job is already finalized!");
+
+    if (nHatchesBufferSize > 0) {
+        if (pHatchesBuffer == nullptr)
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+        auto contextHandle = m_pContextHandle->getHandle();
+
+        m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
+        m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
+
+        for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchesBufferSize; nHatchIndex++) {
+            auto& hatch = pHatchesBuffer[nHatchIndex];
+            std::array<double, 2> point1;
+            point1[0] = hatch.m_X1;
+            point1[1] = hatch.m_Y1;
+
+            std::array<double, 2> point2;
+            point2[0] = hatch.m_X2;
+            point2[1] = hatch.m_Y2;
+
+
+            m_pSDK->checkError(m_pSDK->slsc_job_jump(contextHandle, point1.data()));
+            m_pSDK->checkError(m_pSDK->slsc_job_line(contextHandle, point2.data()));
+
+        }
+    }
 
 }
 
@@ -171,11 +200,11 @@ void CSMCJobInstance::Execute(const bool bBlocking)
 
     std::cout << "Waiting for execution" << std::endl;
 
-    /*slsc_ExecState execState1 = slsc_ExecState_NotInitOrError;
+    slsc_ExecState execState1 = slsc_ExecState_NotInitOrError;
     while (execState1 != slsc_ExecState_ReadyForExecution) {
         m_pSDK->checkError(m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState1));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    } */
+    } 
 
     //std::cout << "Starting execution" << std::endl;
 
@@ -183,11 +212,11 @@ void CSMCJobInstance::Execute(const bool bBlocking)
 
     //std::cout << "Waiting for execution finished" << std::endl;
 
-    /*slsc_ExecState execState2 = slsc_ExecState_Executing;
+    slsc_ExecState execState2 = slsc_ExecState_Executing;
     while (execState2 == slsc_ExecState_Executing) {
-        checkError(slsc_ctrl_get_exec_state(contextHandle, &execState2));
+        m_pSDK->checkError(m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState2));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    } */
+    } 
 }
 
 bool CSMCJobInstance::IsExecuting()

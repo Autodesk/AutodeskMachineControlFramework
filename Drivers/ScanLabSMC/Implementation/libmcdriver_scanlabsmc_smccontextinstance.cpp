@@ -65,7 +65,7 @@ CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCCo
 
 	auto pCorrectionFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ct5", "");
 
-	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get (), pCorrectionFile.get ());
+	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get (), pCorrectionFile);
 
 	std::vector<uint8_t> Buffer (sConfigurationXML.begin (), sConfigurationXML.end ());
 
@@ -101,10 +101,6 @@ bool CSMCContextInstance::IsSimulationMode()
 }
 
 void CSMCContextInstance::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer)
-{
-}
-
-void CSMCContextInstance::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer)
 {
 }
 

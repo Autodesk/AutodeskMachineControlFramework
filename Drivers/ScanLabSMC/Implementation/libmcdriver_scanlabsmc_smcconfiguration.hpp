@@ -62,6 +62,7 @@ private:
     LibMCDriver_ScanLabSMC::eDynamicViolationReaction m_DynamicViolationReaction;
     LibMCDriver_ScanLabSMC::eWarnLevel m_WarnLevel;
     uint32_t m_nSerialNumber;
+    std::vector<uint8_t> m_CorrectionFileData;
 
 public:
 
@@ -77,7 +78,15 @@ public:
 
 	LibMCDriver_ScanLabSMC::eWarnLevel GetWarnLevel() override;
 
-    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::CWorkingFile * pCorrectionFile);
+	void SetSerialNumber(const LibMCDriver_ScanLabSMC_uint32 nValue) override;
+
+	LibMCDriver_ScanLabSMC_uint32 GetSerialNumber() override;
+
+	void SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer) override;
+
+	void SetCorrectionFileResource(const std::string& sResourceName) override;
+
+    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile);
 
 };
 

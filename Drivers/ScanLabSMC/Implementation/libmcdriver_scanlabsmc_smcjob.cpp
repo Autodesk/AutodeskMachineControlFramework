@@ -92,6 +92,21 @@ void CSMCJob::DrawHatches(const LibMCDriver_ScanLabSMC_uint64 nHatchesBufferSize
     m_pJobInstance->DrawHatches(nHatchesBufferSize, pHatchesBuffer, dMarkSpeed, dJumpSpeed, dPower, dZValue);
 }
 
+void CSMCJob::AddLayerToList(LibMCEnv::PToolpathLayer pLayer)
+{
+    if (pLayer.get() == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+    uint32_t nSegmentCount = pLayer->GetSegmentCount();
+    for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
+
+
+
+    }
+
+}
+
+
 bool CSMCJob::IsReady()
 {
     return m_pJobInstance->IsReady();
