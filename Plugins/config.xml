@@ -3,8 +3,8 @@
 	<services threadcount="32"/>
 
   <internationalization default="en">
-	<language identifier="en" name="English" resource="language_english" />
-	<language identifier="de" name="Deutsch" resource="language_german" />
+		<language identifier="en" name="English" resource="language_english" />
+		<language identifier="de" name="Deutsch" resource="language_german" />
   </internationalization>
 
   <accesscontrol>
@@ -13,9 +13,10 @@
       <permission identifier="permission_view_builds" displayname="View Builds" description="Can view build files on machine." />
       <permission identifier="permission_start_build" displayname="Start Build" description="Can start a new build on machine." />
       <permission identifier="permission_user_management" displayname="User Management" description="Can create/edit local users." />
+      <permission identifier="permission_that_nobody_has" displayname="Permission that nobody has" description="." />
     </permissions>
-    
-    
+
+
     <roles default="operator">
 
       <role identifier="observer" displayname="Observer" description="Machine Observer - can not change anything">
@@ -43,15 +44,25 @@
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol"/>
 	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
 	<driver name="raylase" library="driver_raylase" type="raylase"/>
+  <driver name="scanlabsmc" library="driver_scanlabsmc" type="scanlab-smc-0.6">
 
-	<statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
+    <preset name="smc_laser_1">
+			<general DynamicViolationReaction="WarningOnly" />
+    </preset>
+
+
+
+  </driver>
+    
+
+  <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
 		<parametergroup name="jobinfo" description="Job Information">
 			<parameter name="jobname" description="Job Name" default="Job Name" type="string"/>
 			<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string"/>
 			<parameter name="layercount" description="Layer Count" default="0" type="int"/>
 			<parameter name="currentlayer" description="Current Layer" default="0" type="int"/>
-			<parameter name="totalheight" description="Total Height" default="0" type="double"/>
+			<parameter name="totalheight" description="Total Height" default="0" type="double" />
 			<parameter name="currentheight" description="Current Height" default="0" type="double"/>
 			<parameter name="autostart" description="Automatically start job after init" default="0" type="bool"/>
 			<parameter name="printinprogress" description="Print is in progress" default="0" type="bool"/>
@@ -147,9 +158,9 @@
 	<statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
 
 		<parametergroup name="cardconfig" description="Scanner Card Config">
-			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlab" type="string"/>
+			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlabsmc" type="string"/>
 			<parameter name="serial" description="Serial" default="341731" type="int"/>
-			<parameter name="ipaddress" description="Scanner Ethernet Address" default="" type="string"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.0.1" type="string"/>
 			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
 			<parameter name="port" description="Port" default="49374" type="int"/>
 			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
@@ -326,7 +337,11 @@
 
 				<content name="settings" columnstart="1" rowstart="3" columnend="2" rowend="3">
 
-					<form name="simulationparameters">
+          <buttongroup distribution="equal">
+            <button name="testjounral" caption="Test Journal" event="testjournal" />
+          </buttongroup>
+
+          <form name="simulationparameters">
 						<switch name="simulatelaser" caption="Simulate Laser Control" sync:value="main.configuration.simulatelaser" changeevent="changesimulationparameter"/>
 						<switch name="simulateplc" caption="Simulate PLC behaviour" sync:value="main.configuration.simulateplc" changeevent="changesimulationparameter"/>
 					</form>
@@ -548,7 +563,7 @@
 
     </page>
 
-		<page name="settings">
+		<page name="settings" permission="permission_view_builds">
 
 			<content name="settings" title="System Settings">
 			</content>
@@ -556,7 +571,7 @@
 		</page>
 
 		<menu>
-			<item id="buildlist" icon="mdi-library" description="Upload build files and start build jobs." caption="Build Library" targetpage="buildlist"/>
+			<item id="buildlist" icon="mdi-library" permission="permission_view_builds" description="Upload build files and start build jobs." caption="Build Library" targetpage="buildlist"/>
 			<item id="buildprocess" icon="mdi-printer-3d" caption="Build Process" description="Manage and monitor current build process" targetpage="buildstatus"/>
 			<item id="systemstatus" icon="mdi-factory" caption="Current Status" description="Display current machine status." targetpage="systemstatus"/>
 			<item id="systemlog" icon="mdi-book-open-variant" caption="System Logs" description="Browse and display stored system log files." targetpage="systemlog"/>
