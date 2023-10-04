@@ -568,7 +568,11 @@
 		<error name="EMPTYROLEIDENTIFIER" code="542" description="Empty role identifier"/>		
 		<error name="EMPTYPERMISSIONIDENTIFIER" code="543" description="Empty permission identifier"/>		
 		<error name="USERHASUNKNOWNROLE" code="544" description="User has unknown role"/>		
-		<error name="MISSINGDEFAULTACCESSROLE" code="545" description="Missing default access role"/>		
+		<error name="MISSINGDEFAULTACCESSROLE" code="545" description="Missing default access role"/>				
+		<error name="FIXEDFLOATBUFFEROVERRUN" code="546" description="Fixed float buffer overrun"/>		
+		<error name="MESHENTITYNOTLOADED" code="547" description="Mesh entity not loaded"/>		
+		<error name="MESHENTITYALREADYLOADED" code="548" description="Mesh entity already loaded"/>		
+		
 		
 		
 		

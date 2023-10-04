@@ -75,6 +75,7 @@ namespace AMC {
 	class CAccessControl;
 	class CStringResourceHandler;
 	class CLanguageHandler;
+	class CMeshHandler;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -88,6 +89,7 @@ namespace AMC {
 	typedef std::shared_ptr<CAccessControl> PAccessControl;
 	typedef std::shared_ptr<CStringResourceHandler> PStringResourceHandler;
 	typedef std::shared_ptr<CLanguageHandler> PLanguageHandler;
+	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
 
 	class CSystemState {
 	private:
@@ -102,6 +104,7 @@ namespace AMC {
 		AMC::PAccessControl m_pAccessControl;
 		AMC::PStringResourceHandler m_pStringResourceHandler;
 		AMC::PLanguageHandler m_pLanguageHandler;
+		AMC::PMeshHandler m_pMeshHandler;
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
@@ -147,6 +150,7 @@ namespace AMC {
 		PStateJournal getStateJournalInstance();
 		PAccessControl getAccessControlInstance();
 		PLanguageHandler getLanguageHandlerInstance();
+		PMeshHandler getMeshHandlerInstance();
 
 		LibMCData::PStorage getStorageInstance();
 		LibMCData::PLoginHandler getLoginHandlerInstance();

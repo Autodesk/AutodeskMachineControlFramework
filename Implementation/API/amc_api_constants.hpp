@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_PROTOCOL_SETUP "com.autodesk.machinecontrol.setup"
 #define AMC_API_PROTOCOL_UPLOAD "com.autodesk.machinecontrol.upload"
 #define AMC_API_PROTOCOL_BUILD "com.autodesk.machinecontrol.build"
+#define AMC_API_PROTOCOL_MESH "com.autodesk.machinecontrol.mesh"
 #define AMC_API_PROTOCOL_SIGNAL "com.autodesk.machinecontrol.signal"
 #define AMC_API_PROTOCOL_AUTH "com.autodesk.machinecontrol.auth"
 #define AMC_API_PROTOCOL_UI "com.autodesk.machinecontrol.ui"

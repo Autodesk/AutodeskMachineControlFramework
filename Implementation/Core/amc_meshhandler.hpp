@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,86 +29,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_RESPONSE
-#define __AMC_API_RESPONSE
+#ifndef __AMC_MESHHANDLER
+#define __AMC_MESHHANDLER
 
-#include "header_protection.hpp"
+#include <memory>
+#include <map>
+#include <string>
 
-#include "amc_api_types.hpp"
-
-#include <vector>
+#include "amc_meshentity.hpp"
+#include "libmcdata_dynamic.hpp"
 
 namespace AMC {
 
-	class CAPIResponse {
-	protected:
+	
 
-		std::vector<uint8_t> m_StreamData;
+	class CMeshHandler;
+	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
 
-		std::string m_sContentType;
-
-		uint32_t m_nHTTPCode;
-			
-	public:
-
-		CAPIResponse (uint32_t nHTTPCode, const std::string & sContentType);
-		
-		size_t getStreamSize () const;
-		
-		const uint8_t * getStreamData () const;
-		
-		std::string getContentType () const;
-
-		uint32_t getHTTPCode() const;
-
-	};
-
-
-	class CAPIStringResponse : public CAPIResponse {
+	class CMeshHandler {
 	private:
-			
-	public:
-
-		CAPIStringResponse(uint32_t nHTTPCode, const std::string & sContentType, const std::string & sStringValue);
-
-	};
-
-
-	class CAPIFixedFloatBufferResponse : public CAPIResponse {
-	private:
-
-		size_t m_nWriteIndex;
+	
+		std::map<std::string, PMeshEntity> m_Entities;
 
 	public:
 
-		CAPIFixedFloatBufferResponse(const std::string& sContentType);
+		CMeshHandler();
+		virtual ~CMeshHandler();
 
-		void resizeTo (size_t nFloatCount);
+		bool hasMeshEntity(const std::string& sEntityUUID);
+		CMeshEntity * findMeshEntity(const std::string & sEntityUUID, bool bFailIfNotExistent);
+		
+		void unloadMeshEntity (const std::string& sEntityUUID);
+		void unloadAllEntities();
 
-		void resetWriting ();
-
-		void addFloat (float fValue);
-
+		void register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
+		
 	};
-
-
-	class CAPIFixedBufferResponse : public CAPIResponse {
-	private:
-
-	public:
-
-		CAPIFixedBufferResponse(const std::string& sContentType);
-
-		std::vector<uint8_t>& getBuffer();
-
-	};
-
-
-	typedef std::shared_ptr<CAPIResponse> PAPIResponse;
 
 	
 }
 
 
-#endif //__AMC_API_RESPONSE
+#endif //__AMC_MESHHANDLER
 

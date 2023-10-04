@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,86 +29,69 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_RESPONSE
-#define __AMC_API_RESPONSE
+#ifndef __AMC_MESHENTITY
+#define __AMC_MESHENTITY
 
-#include "header_protection.hpp"
-
-#include "amc_api_types.hpp"
-
+#include <memory>
+#include <map>
+#include <string>
+#include <cstdint>
 #include <vector>
+
+#include "lib3mf/lib3mf_dynamic.hpp"
 
 namespace AMC {
 
-	class CAPIResponse {
-	protected:
+	typedef struct _sMeshEntityNode {
+		float m_fCoordinates[3];
+	} sMeshEntityNode;
 
-		std::vector<uint8_t> m_StreamData;
+	typedef struct _sMeshEntityEdge {
+		uint32_t m_nID;
+		uint32_t m_NodeIndices[2];		
+		uint32_t m_nFlags;
+	} sMeshEntityEdge;
 
-		std::string m_sContentType;
+	typedef struct _sMeshEntityFace {
+		uint32_t m_nNodeIndices[3];
+	} sMeshEntityFace;
 
-		uint32_t m_nHTTPCode;
-			
-	public:
+	class CMeshEntity;
+	typedef std::shared_ptr<CMeshEntity> PMeshEntity;
 
-		CAPIResponse (uint32_t nHTTPCode, const std::string & sContentType);
-		
-		size_t getStreamSize () const;
-		
-		const uint8_t * getStreamData () const;
-		
-		std::string getContentType () const;
-
-		uint32_t getHTTPCode() const;
-
-	};
-
-
-	class CAPIStringResponse : public CAPIResponse {
-	private:
-			
-	public:
-
-		CAPIStringResponse(uint32_t nHTTPCode, const std::string & sContentType, const std::string & sStringValue);
-
-	};
-
-
-	class CAPIFixedFloatBufferResponse : public CAPIResponse {
+	class CMeshEntity {
 	private:
 
-		size_t m_nWriteIndex;
+		std::string m_sUUID;
+		std::vector<sMeshEntityNode> m_Vertices;
+		std::map<std::pair<uint32_t, uint32_t>, sMeshEntityEdge> m_Edges;
+		std::vector<sMeshEntityFace> m_Faces;		
 
 	public:
 
-		CAPIFixedFloatBufferResponse(const std::string& sContentType);
+		CMeshEntity(const std::string & sUUID);
 
-		void resizeTo (size_t nFloatCount);
+		virtual ~CMeshEntity();
 
-		void resetWriting ();
+		std::string getUUID();
 
-		void addFloat (float fValue);
+		void IncRef();
 
-	};
+		bool DecRef();
 
+		void loadFrom3MF(Lib3MF::CLib3MFMeshObject * pMeshObject);
 
-	class CAPIFixedBufferResponse : public CAPIResponse {
-	private:
+		size_t getVertexCount();
+		size_t getEdgeCount();
+		size_t getFaceCount();
 
-	public:
-
-		CAPIFixedBufferResponse(const std::string& sContentType);
-
-		std::vector<uint8_t>& getBuffer();
+		void getFaceVertices(uint32_t nFaceIndex, sMeshEntityNode & sNode1, sMeshEntityNode& sNode2, sMeshEntityNode& sNode3);
 
 	};
-
-
-	typedef std::shared_ptr<CAPIResponse> PAPIResponse;
 
 	
 }
 
 
-#endif //__AMC_API_RESPONSE
+#endif //__AMC_MESHENTITY
 

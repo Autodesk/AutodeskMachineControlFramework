@@ -560,6 +560,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER 543 /** Empty permission identifier */
 #define LIBMC_ERROR_USERHASUNKNOWNROLE 544 /** User has unknown role */
 #define LIBMC_ERROR_MISSINGDEFAULTACCESSROLE 545 /** Missing default access role */
+#define LIBMC_ERROR_FIXEDFLOATBUFFEROVERRUN 546 /** Fixed float buffer overrun */
+#define LIBMC_ERROR_MESHENTITYNOTLOADED 547 /** Mesh entity not loaded */
+#define LIBMC_ERROR_MESHENTITYALREADYLOADED 548 /** Mesh entity already loaded */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1032,6 +1035,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
     case LIBMC_ERROR_USERHASUNKNOWNROLE: return "User has unknown role";
     case LIBMC_ERROR_MISSINGDEFAULTACCESSROLE: return "Missing default access role";
+    case LIBMC_ERROR_FIXEDFLOATBUFFEROVERRUN: return "Fixed float buffer overrun";
+    case LIBMC_ERROR_MESHENTITYNOTLOADED: return "Mesh entity not loaded";
+    case LIBMC_ERROR_MESHENTITYALREADYLOADED: return "Mesh entity already loaded";
     default: return "unknown error";
   }
 }

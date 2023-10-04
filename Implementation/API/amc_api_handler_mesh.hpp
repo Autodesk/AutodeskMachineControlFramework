@@ -29,86 +29,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_RESPONSE
-#define __AMC_API_RESPONSE
+#ifndef __AMC_API_HANDLER_MESH
+#define __AMC_API_HANDLER_MESH
 
-#include "header_protection.hpp"
-
-#include "amc_api_types.hpp"
-
-#include <vector>
+#include "amc_api_handler.hpp"
+#include "amc_logger.hpp"
+#include "amc_api_response.hpp"
+#include "amc_meshhandler.hpp"
 
 namespace AMC {
 
-	class CAPIResponse {
-	protected:
-
-		std::vector<uint8_t> m_StreamData;
-
-		std::string m_sContentType;
-
-		uint32_t m_nHTTPCode;
-			
-	public:
-
-		CAPIResponse (uint32_t nHTTPCode, const std::string & sContentType);
-		
-		size_t getStreamSize () const;
-		
-		const uint8_t * getStreamData () const;
-		
-		std::string getContentType () const;
-
-		uint32_t getHTTPCode() const;
-
+	enum class APIHandler_MeshType : uint32_t {
+		mtUnknown = 0,
+		mtInformation = 1,
+		mtRenderGeometry = 2
 	};
 
-
-	class CAPIStringResponse : public CAPIResponse {
-	private:
-			
-	public:
-
-		CAPIStringResponse(uint32_t nHTTPCode, const std::string & sContentType, const std::string & sStringValue);
-
-	};
-
-
-	class CAPIFixedFloatBufferResponse : public CAPIResponse {
+	class CAPIHandler_Mesh : public CAPIHandler {
 	private:
 
-		size_t m_nWriteIndex;
+		PMeshHandler m_pMeshHandler;
+		
+		APIHandler_MeshType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& paramUUID);
+
+		PAPIResponse handleGetRenderGeometryRequest(PAPIAuth pAuth, std::string& buildDataUUID);
 
 	public:
 
-		CAPIFixedFloatBufferResponse(const std::string& sContentType);
+		CAPIHandler_Mesh(const std::string & sClientHash, PMeshHandler pMeshHandler);
 
-		void resizeTo (size_t nFloatCount);
+		virtual ~CAPIHandler_Mesh();
+				
+		virtual std::string getBaseURI () override;
 
-		void resetWriting ();
-
-		void addFloat (float fValue);
-
-	};
-
-
-	class CAPIFixedBufferResponse : public CAPIResponse {
-	private:
-
-	public:
-
-		CAPIFixedBufferResponse(const std::string& sContentType);
-
-		std::vector<uint8_t>& getBuffer();
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
 
 	};
-
-
-	typedef std::shared_ptr<CAPIResponse> PAPIResponse;
 
 	
 }
 
 
-#endif //__AMC_API_RESPONSE
+#endif //__AMC_API_HANDLER_MESH
 
