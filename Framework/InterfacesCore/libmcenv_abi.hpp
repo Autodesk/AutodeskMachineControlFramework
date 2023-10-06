@@ -601,6 +601,50 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_addfield(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
+ Class definition for MeshObject
+**************************************************************************************************************************/
+
+/**
+* Returns the name of the Mesh Object.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns the name of the mesh object., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_getname(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the UUID of the mesh object.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns mesh uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_getuuid(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the number of triangles.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pTriangleCount - Number of triangles.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_gettrianglecount(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pTriangleCount);
+
+/**
+* Returns the number of vertices.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pVertexCount - Number of vertices.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_getvertexcount(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pVertexCount);
+
+/*************************************************************************************************************************
  Class definition for ToolpathPart
 **************************************************************************************************************************/
 
@@ -4548,6 +4592,36 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createusermanagement(
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getcurrentjournal(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
 
+/**
+* Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Resource name to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_registermeshfrom3mfresource(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, LibMCEnv_MeshObject * pMeshObject);
+
+/**
+* Checks if a mesh uuid is registered.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshIsRegistered - Flag is registered.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_meshisregistered(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
+
+/**
+* Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findregisteredmesh(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -5104,6 +5178,37 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createusermanagement(Lib
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentjournal(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
+
+/**
+* Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Resource name to load.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_registermeshfrom3mfresource(LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+
+/**
+* Checks if a mesh uuid is registered.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshIsRegistered - Flag is registered.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_meshisregistered(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
+
+/**
+* Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findregisteredmesh(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
 
 /*************************************************************************************************************************
  Global functions

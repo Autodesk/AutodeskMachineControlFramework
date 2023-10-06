@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include "amc_meshentity.hpp"
+#include "amc_resourcepackage.hpp"
 #include "libmcdata_dynamic.hpp"
 
 namespace AMC {
@@ -57,12 +58,14 @@ namespace AMC {
 		virtual ~CMeshHandler();
 
 		bool hasMeshEntity(const std::string& sEntityUUID);
-		CMeshEntity * findMeshEntity(const std::string & sEntityUUID, bool bFailIfNotExistent);
+		PMeshEntity findMeshEntity(const std::string & sEntityUUID, bool bFailIfNotExistent);
 		
 		void unloadMeshEntity (const std::string& sEntityUUID);
 		void unloadAllEntities();
 
-		void register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
+		PMeshEntity register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
+
+		PMeshEntity register3MFResource(Lib3MF::CLib3MFWrapper * pWrapper, AMC::CResourcePackage * pResourcePackage, const std::string & sResourceName);
 		
 	};
 

@@ -48,8 +48,8 @@ private:
 
 public:
 
-	CAPIRenderGeometryResponse(const std::string& sContentType, CMeshEntity* pMeshEntity)
-		: CAPIFixedFloatBufferResponse (sContentType)
+	CAPIRenderGeometryResponse(CMeshEntity* pMeshEntity)
+		: CAPIFixedFloatBufferResponse ("application/binary")
 	{
 
 		if (pMeshEntity == nullptr)
@@ -58,13 +58,55 @@ public:
 		size_t nFaceCount = pMeshEntity->getFaceCount();
 		resizeTo(nFaceCount * 9);
 
-		for (size_t nFaceIndex = 0; nFaceIndex < nFaceCount; nFaceIndex++) {
-			//pMeshEntity->getFacePositions (nFaceIndex, );
+		for (size_t nFaceID = 1; nFaceID <= nFaceCount; nFaceID++) {
+			std::array<sMeshEntityNode, 3> Nodes;
+			pMeshEntity->getFaceNodes(nFaceID, Nodes.at (0), Nodes.at(1), Nodes.at(2));
+			for (uint32_t nNodeIndex = 0; nNodeIndex < 3; nNodeIndex++) {
+				for (uint32_t nCoordIndex = 0; nCoordIndex < 3; nCoordIndex++) {
+					addFloat(Nodes[nNodeIndex].m_fCoordinates[nCoordIndex]);
+				}
+			}
+			
 		}
 	}
 
 };
 
+
+class CAPIRenderEdgesResponse : public CAPIFixedFloatBufferResponse {
+private:
+
+public:
+
+	CAPIRenderEdgesResponse(CMeshEntity* pMeshEntity)
+		: CAPIFixedFloatBufferResponse("application/binary")
+	{
+
+		if (pMeshEntity == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		size_t nEdgeCount = pMeshEntity->getEdgeCount();
+		resizeTo(nEdgeCount * 6);
+
+		for (size_t nEdgeID = 1; nEdgeID <= nEdgeCount; nEdgeID++) {
+
+			auto& edge = pMeshEntity->getEdge(nEdgeID);
+
+			if (edge.m_nAngleInDegrees > 45) {
+
+				std::array<sMeshEntityNode, 2> Nodes;
+				pMeshEntity->getEdgeNodes(nEdgeID, Nodes.at(0), Nodes.at(1));
+				for (uint32_t nNodeIndex = 0; nNodeIndex < 2; nNodeIndex++) {
+					for (uint32_t nCoordIndex = 0; nCoordIndex < 3; nCoordIndex++) {
+						addFloat(Nodes[nNodeIndex].m_fCoordinates[nCoordIndex]);
+					}
+				}
+			}
+
+		}
+	}
+
+};
 
 CAPIHandler_Mesh::CAPIHandler_Mesh(const std::string& sClientHash, PMeshHandler pMeshHandler)
 	: CAPIHandler (sClientHash), m_pMeshHandler (pMeshHandler)
@@ -97,51 +139,17 @@ APIHandler_MeshType CAPIHandler_Mesh::parseRequest(const std::string& sURI, cons
 			return APIHandler_MeshType::mtRenderGeometry;
 		}
 
+		if (sParameterString.substr(0, 12) == "renderedges/") {
+			paramUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(12));
+			return APIHandler_MeshType::mtRenderEdges;
+		}
+
 	}
 
 
 	return APIHandler_MeshType::mtUnknown;
 }
 
-
-PAPIResponse CAPIHandler_Mesh::handleGetRenderGeometryRequest(PAPIAuth pAuth, std::string& meshUUID)
-{
-	auto pAPIResponse = std::make_shared<CAPIFixedFloatBufferResponse> ("application/binary");
-
-	auto pMeshEntity = m_pMeshHandler->findMeshEntity(meshUUID, true);
-
-
-	float dWidth = 5.0f;
-	float dHeight = 3.0f;
-
-	pAPIResponse->resizeTo (18);
-
-	pAPIResponse->addFloat (dWidth);
-	pAPIResponse->addFloat (dHeight);
-	pAPIResponse->addFloat (0.0f);
-
-	pAPIResponse->addFloat(dWidth);
-	pAPIResponse->addFloat(0.0f);
-	pAPIResponse->addFloat(0.0f);
-
-	pAPIResponse->addFloat(0.0f);
-	pAPIResponse->addFloat(0.0f);
-	pAPIResponse->addFloat(2.0f);
-
-	pAPIResponse->addFloat(0.0f);
-	pAPIResponse->addFloat(0.0f);
-	pAPIResponse->addFloat(2.0f);
-
-	pAPIResponse->addFloat(0.0f);
-	pAPIResponse->addFloat(dHeight);
-	pAPIResponse->addFloat(0.0f);
-
-	pAPIResponse->addFloat(dWidth);
-	pAPIResponse->addFloat(dHeight);
-	pAPIResponse->addFloat(0.0f);
-
-	return pAPIResponse;
-}
 
 
 
@@ -155,9 +163,15 @@ PAPIResponse CAPIHandler_Mesh::handleRequest(const std::string& sURI, const eAPI
 	writeJSONHeader(writer, AMC_API_PROTOCOL_MESH);
 
 	switch (buildType) {
-	case APIHandler_MeshType::mtRenderGeometry:
-		return handleGetRenderGeometryRequest (pAuth, paramUUID);
-		break;
+	case APIHandler_MeshType::mtRenderGeometry: {
+		auto pMeshEntity = m_pMeshHandler->findMeshEntity(paramUUID, true);
+		return std::make_shared<CAPIRenderGeometryResponse>(pMeshEntity.get());
+	}
+
+	case APIHandler_MeshType::mtRenderEdges: {
+		auto pMeshEntity = m_pMeshHandler->findMeshEntity(paramUUID, true);
+		return std::make_shared<CAPIRenderEdgesResponse>(pMeshEntity.get());
+	}
 
 	default:
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -165,8 +179,7 @@ PAPIResponse CAPIHandler_Mesh::handleRequest(const std::string& sURI, const eAPI
 	}
 
 	return std::make_shared<CAPIStringResponse>(AMC_API_HTTP_SUCCESS, AMC_API_CONTENTTYPE, writer.saveToString());
-
-	return nullptr;
+	
 }
 
 

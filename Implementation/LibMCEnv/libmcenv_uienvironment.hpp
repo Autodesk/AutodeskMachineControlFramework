@@ -206,6 +206,12 @@ public:
 
 	IJournalHandler* GetCurrentJournal() override;
 
+	IMeshObject* RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID) override;
+
+	bool MeshIsRegistered(const std::string& sMeshUUID) override;
+
+	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
+
 };
 
 } // namespace Impl

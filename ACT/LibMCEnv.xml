@@ -169,6 +169,7 @@
 		<error name="EMPTYPNGSTREAM" code="10129" description="Empty PNG Stream"/>
 		<error name="COULDNOTLOADPNGIMAGE" code="10130" description="Could not load PNG image"/>
 		<error name="INVALIDPIXELSIZE" code="10131" description="Invalid pixel size"/>
+		<error name="MESHISNOTREGISTERED" code="10132" description="Mesh is not registered"/>
 
 	</errors>
 
@@ -558,6 +559,28 @@
 		</method>		
 
 	</class>
+
+
+	<class name="MeshObject" parent="Base">
+	
+		<method name="GetName" description="Returns the name of the Mesh Object.">
+			<param name="Name" type="string" pass="return" description="Returns the name of the mesh object." />
+		</method>
+	
+		<method name="GetUUID" description="Returns the UUID of the mesh object.">
+			<param name="UUID" type="string" pass="return" description="Returns mesh uuid." />
+		</method>
+
+		<method name="GetTriangleCount" description="Returns the number of triangles.">
+			<param name="TriangleCount" type="uint32" pass="return" description="Number of triangles." />
+		</method>
+	
+		<method name="GetVertexCount" description="Returns the number of vertices.">
+			<param name="VertexCount" type="uint32" pass="return" description="Number of vertices." />
+		</method>
+
+	</class>
+
 
 	<class name="ToolpathPart" parent="Base">
 	
@@ -2549,7 +2572,22 @@
 		<method name="GetCurrentJournal" description="Returns the journal instance of the current session.">
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
-			
+						
+		<method name="RegisterMeshFrom3MFResource" description="Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+
+		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
+		</method>	
+
+		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+
 	</class>
 
 
@@ -2831,6 +2869,22 @@
 		
 		<method name="GetCurrentJournal" description="Returns the journal instance of the current session.">
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
+		</method>	
+
+		<method name="RegisterMeshFrom3MFResource" description="Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+
+		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
+		</method>	
+
+		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
 		</method>	
 
 	</class>

@@ -219,7 +219,12 @@ class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 				remotevalue: entity.value,
 				disabled: entity.disabled,
 				readonly: entity.readonly,
-				changeevent: entity.changeevent
+				changeevent: entity.changeevent,
+				validation: entity.validation,
+				validationmessage: entity.validationmessage,
+				minvalue: entity.minvalue,
+				maxvalue: entity.maxvalue
+				
 			};
 			
 			this.moduleInstance.page.application.AppContent.FormEntityMap.set (entity.uuid, entity);

@@ -572,10 +572,10 @@
 		<error name="FIXEDFLOATBUFFEROVERRUN" code="546" description="Fixed float buffer overrun"/>		
 		<error name="MESHENTITYNOTLOADED" code="547" description="Mesh entity not loaded"/>		
 		<error name="MESHENTITYALREADYLOADED" code="548" description="Mesh entity already loaded"/>		
-		
-		
-		
-		
+		<error name="INVALIDMESHFACEID" code="549" description="Invalid face ID"/>		
+		<error name="MESH3MFRESOURCEISEMPTY" code="550" description="Mesh 3MF resource is empty"/>		
+		<error name="INVALIDMESHEDGEID" code="551" description="Invalid edge ID"/>		
+		<error name="INVALIDMESHNODEID" code="552" description="Invalid node ID"/>			
 
 	</errors>
 	

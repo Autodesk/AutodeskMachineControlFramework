@@ -563,6 +563,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_FIXEDFLOATBUFFEROVERRUN 546 /** Fixed float buffer overrun */
 #define LIBMC_ERROR_MESHENTITYNOTLOADED 547 /** Mesh entity not loaded */
 #define LIBMC_ERROR_MESHENTITYALREADYLOADED 548 /** Mesh entity already loaded */
+#define LIBMC_ERROR_INVALIDMESHFACEID 549 /** Invalid face ID */
+#define LIBMC_ERROR_MESH3MFRESOURCEISEMPTY 550 /** Mesh 3MF resource is empty */
+#define LIBMC_ERROR_INVALIDMESHEDGEID 551 /** Invalid edge ID */
+#define LIBMC_ERROR_INVALIDMESHNODEID 552 /** Invalid node ID */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1038,6 +1042,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_FIXEDFLOATBUFFEROVERRUN: return "Fixed float buffer overrun";
     case LIBMC_ERROR_MESHENTITYNOTLOADED: return "Mesh entity not loaded";
     case LIBMC_ERROR_MESHENTITYALREADYLOADED: return "Mesh entity already loaded";
+    case LIBMC_ERROR_INVALIDMESHFACEID: return "Invalid face ID";
+    case LIBMC_ERROR_MESH3MFRESOURCEISEMPTY: return "Mesh 3MF resource is empty";
+    case LIBMC_ERROR_INVALIDMESHEDGEID: return "Invalid edge ID";
+    case LIBMC_ERROR_INVALIDMESHNODEID: return "Invalid node ID";
     default: return "unknown error";
   }
 }

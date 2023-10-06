@@ -42,7 +42,8 @@ namespace AMC {
 	enum class APIHandler_MeshType : uint32_t {
 		mtUnknown = 0,
 		mtInformation = 1,
-		mtRenderGeometry = 2
+		mtRenderGeometry = 2,
+		mtRenderEdges = 3
 	};
 
 	class CAPIHandler_Mesh : public CAPIHandler {
@@ -51,8 +52,6 @@ namespace AMC {
 		PMeshHandler m_pMeshHandler;
 		
 		APIHandler_MeshType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& paramUUID);
-
-		PAPIResponse handleGetRenderGeometryRequest(PAPIAuth pAuth, std::string& buildDataUUID);
 
 	public:
 

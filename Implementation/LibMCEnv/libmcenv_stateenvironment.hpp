@@ -159,6 +159,11 @@ public:
 
 	IJournalHandler* GetCurrentJournal() override;
 
+	IMeshObject* RegisterMeshFrom3MFResource(const std::string& sResourceName) override;
+
+	bool MeshIsRegistered(const std::string& sMeshUUID) override;
+
+	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
 
 };
 

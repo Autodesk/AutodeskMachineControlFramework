@@ -226,6 +226,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_EMPTYPNGSTREAM 10129 /** Empty PNG Stream */
 #define LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE 10130 /** Could not load PNG image */
 #define LIBMCENV_ERROR_INVALIDPIXELSIZE 10131 /** Invalid pixel size */
+#define LIBMCENV_ERROR_MESHISNOTREGISTERED 10132 /** Mesh is not registered */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -364,6 +365,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_EMPTYPNGSTREAM: return "Empty PNG Stream";
     case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "Could not load PNG image";
     case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
+    case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "Mesh is not registered";
     default: return "unknown error";
   }
 }
@@ -380,6 +382,7 @@ typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
+typedef LibMCEnvHandle LibMCEnv_MeshObject;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;

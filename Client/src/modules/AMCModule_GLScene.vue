@@ -61,8 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						
 					const delta = this.glInstance.clock.getDelta();
 
-					this.box1.glelement.rotation.z += 2.25 * delta;
-
 
 				},
 				
@@ -103,11 +101,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 					
 					this.glInstance.addAmbientLight ("ambientlight", 0x808080, 3);
-					this.box1 = this.glInstance.addBoxElement ("box1", 4, 3, 2);
-					this.box1.setPosition (2, 3, 0.0);
+
 					
-					let grid = this.glInstance.add2DGridGeometry ("grid", 30, 30, 0.08, 1);
-					grid.setPosition (-15, -15, 0);
+					this.mesh1 = this.glInstance.addMeshElement ("mesh1", this.Application, "9c930330-b1ef-4358-a927-e7a64f7f33a7");
+					this.mesh1.setPosition (0,0, 0.0, 0.0);
+
+					this.mesh2 = this.glInstance.addMeshElement ("mesh2", this.Application, "fdc19fd5-93b4-49b2-a873-6356d513b3f0");
+					this.mesh2.setPosition (0,0, 0.0, 0.0);
+					
 					
 					this.glInstance.setupDemoScene ();
 					this.animate();

@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_journalhandler.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
+#include "libmcenv_meshobject.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -50,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statemachinedata.hpp"
 #include "amc_xmldocument.hpp"
 #include "amc_accesscontrol.hpp"
+#include "amc_meshhandler.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -553,3 +555,40 @@ IJournalHandler* CStateEnvironment::GetCurrentJournal()
 	return new CJournalHandler(m_pSystemState->getStateJournalInstance());
 }
 
+IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+	auto nResourceSize = pResourceEntry->getSize();
+
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	auto pLib3MFWrapper = m_pSystemState->getToolpathHandlerInstance()->getLib3MFWrapper();
+	
+	auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName);
+
+	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+bool CStateEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
+{
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	return pMeshHandler->hasMeshEntity(sMeshUUID);
+}
+
+IMeshObject* CStateEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
+{
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
+
+	if (pMeshEntity.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
+
+	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}

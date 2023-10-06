@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<v-container dense>				
 		<template v-for="entity in moduleitem.entities">			
 			<v-row dense no-gutters :key="entity.name" v-if="(entity.type=='edit')">
-				<v-col cols="12"><v-text-field outlined dense v-model="entity.dataObject.value" :label="entity.caption" :disabled="entity.dataObject.disabled" :readonly="entity.dataObject.readonly" :prefix="entity.prefix" :suffix="entity.suffix"/></v-col>
+				<v-col cols="12"><v-text-field outlined dense v-model="entity.dataObject.value" :label="entity.caption" :disabled="entity.dataObject.disabled" :readonly="entity.dataObject.readonly" :prefix="entity.prefix" :suffix="entity.suffix" :rules="checkRules (entity)"/></v-col>
 			</v-row>
 
 			<v-row dense no-gutters :key="entity.name" v-if="(entity.type=='switch')">
@@ -77,6 +77,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					}
 				}
 			}
+		},
+		
+		checkRules (editentity) {
+		
+		
+			const rules = [];		
+			
+			if (editentity) {
+			
+				if (editentity.validation === "double") {
+			
+					rules.push((value) => {
+						return !!value || editentity.validationmessage;
+					});
+													
+					rules.push((value) => {
+						return !isNaN(value) || editentity.validationmessage;
+					});
+								
+					rules.push((value) => {
+						return ((value >= editentity.minvalue) && (value <= editentity.maxvalue)) || editentity.validationmessage;
+					});
+										
+				}
+				
+				if (editentity.validation === "string") {
+			
+					rules.push((value) => {
+						return ((value.length >= editentity.minlength) && (value.length >= editentity.maxlength)) || editentity.validationmessage;
+					});
+																							
+				}
+				
+			}
+			
+			return rules;
 		}
 	  
 	  }

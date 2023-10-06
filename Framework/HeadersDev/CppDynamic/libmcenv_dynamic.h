@@ -588,6 +588,50 @@ typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_AddFieldPtr) (LibMCEnv_Dis
 typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DuplicatePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
+ Class definition for MeshObject
+**************************************************************************************************************************/
+
+/**
+* Returns the name of the Mesh Object.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns the name of the mesh object., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetNamePtr) (LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the UUID of the mesh object.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns mesh uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetUUIDPtr) (LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the number of triangles.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pTriangleCount - Number of triangles.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetTriangleCountPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pTriangleCount);
+
+/**
+* Returns the number of vertices.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pVertexCount - Number of vertices.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetVertexCountPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pVertexCount);
+
+/*************************************************************************************************************************
  Class definition for ToolpathPart
 **************************************************************************************************************************/
 
@@ -4535,6 +4579,36 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateUserManagementPtr) (Lib
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetCurrentJournalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
 
+/**
+* Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Resource name to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, LibMCEnv_MeshObject * pMeshObject);
+
+/**
+* Checks if a mesh uuid is registered.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshIsRegistered - Flag is registered.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
+
+/**
+* Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -5092,6 +5166,37 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateUserManagementPtr) (LibMCE
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetCurrentJournalPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
 
+/**
+* Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Resource name to load.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+
+/**
+* Checks if a mesh uuid is registered.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshIsRegistered - Flag is registered.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
+
+/**
+* Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMeshUUID - Mesh UUID to load.
+* @param[out] pMeshObject - Mesh Object instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -5197,6 +5302,10 @@ typedef struct {
 	PLibMCEnvDiscreteFieldData2D_TransformFieldPtr m_DiscreteFieldData2D_TransformField;
 	PLibMCEnvDiscreteFieldData2D_AddFieldPtr m_DiscreteFieldData2D_AddField;
 	PLibMCEnvDiscreteFieldData2D_DuplicatePtr m_DiscreteFieldData2D_Duplicate;
+	PLibMCEnvMeshObject_GetNamePtr m_MeshObject_GetName;
+	PLibMCEnvMeshObject_GetUUIDPtr m_MeshObject_GetUUID;
+	PLibMCEnvMeshObject_GetTriangleCountPtr m_MeshObject_GetTriangleCount;
+	PLibMCEnvMeshObject_GetVertexCountPtr m_MeshObject_GetVertexCount;
 	PLibMCEnvToolpathPart_GetNamePtr m_ToolpathPart_GetName;
 	PLibMCEnvToolpathPart_GetUUIDPtr m_ToolpathPart_GetUUID;
 	PLibMCEnvToolpathPart_GetMeshUUIDPtr m_ToolpathPart_GetMeshUUID;
@@ -5557,6 +5666,9 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CheckUserPermissionPtr m_StateEnvironment_CheckUserPermission;
 	PLibMCEnvStateEnvironment_CreateUserManagementPtr m_StateEnvironment_CreateUserManagement;
 	PLibMCEnvStateEnvironment_GetCurrentJournalPtr m_StateEnvironment_GetCurrentJournal;
+	PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr m_StateEnvironment_RegisterMeshFrom3MFResource;
+	PLibMCEnvStateEnvironment_MeshIsRegisteredPtr m_StateEnvironment_MeshIsRegistered;
+	PLibMCEnvStateEnvironment_FindRegisteredMeshPtr m_StateEnvironment_FindRegisteredMesh;
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
@@ -5607,6 +5719,9 @@ typedef struct {
 	PLibMCEnvUIEnvironment_GetCurrentUserUUIDPtr m_UIEnvironment_GetCurrentUserUUID;
 	PLibMCEnvUIEnvironment_CreateUserManagementPtr m_UIEnvironment_CreateUserManagement;
 	PLibMCEnvUIEnvironment_GetCurrentJournalPtr m_UIEnvironment_GetCurrentJournal;
+	PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr m_UIEnvironment_RegisterMeshFrom3MFResource;
+	PLibMCEnvUIEnvironment_MeshIsRegisteredPtr m_UIEnvironment_MeshIsRegistered;
+	PLibMCEnvUIEnvironment_FindRegisteredMeshPtr m_UIEnvironment_FindRegisteredMesh;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

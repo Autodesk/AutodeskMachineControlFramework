@@ -62,6 +62,7 @@ class IPNGImageData;
 class IImageData;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
+class IMeshObject;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
@@ -730,6 +731,41 @@ public:
 };
 
 typedef IBaseSharedPtr<IDiscreteFieldData2D> PIDiscreteFieldData2D;
+
+
+/*************************************************************************************************************************
+ Class interface for MeshObject 
+**************************************************************************************************************************/
+
+class IMeshObject : public virtual IBase {
+public:
+	/**
+	* IMeshObject::GetName - Returns the name of the Mesh Object.
+	* @return Returns the name of the mesh object.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IMeshObject::GetUUID - Returns the UUID of the mesh object.
+	* @return Returns mesh uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IMeshObject::GetTriangleCount - Returns the number of triangles.
+	* @return Number of triangles.
+	*/
+	virtual LibMCEnv_uint32 GetTriangleCount() = 0;
+
+	/**
+	* IMeshObject::GetVertexCount - Returns the number of vertices.
+	* @return Number of vertices.
+	*/
+	virtual LibMCEnv_uint32 GetVertexCount() = 0;
+
+};
+
+typedef IBaseSharedPtr<IMeshObject> PIMeshObject;
 
 
 /*************************************************************************************************************************
@@ -3623,6 +3659,27 @@ public:
 	*/
 	virtual IJournalHandler * GetCurrentJournal() = 0;
 
+	/**
+	* IStateEnvironment::RegisterMeshFrom3MFResource - Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+	* @param[in] sResourceName - Resource name to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName) = 0;
+
+	/**
+	* IStateEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IStateEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
@@ -4008,6 +4065,28 @@ public:
 	* @return Journal instance.
 	*/
 	virtual IJournalHandler * GetCurrentJournal() = 0;
+
+	/**
+	* IUIEnvironment::RegisterMeshFrom3MFResource - Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+	* @param[in] sResourceName - Resource name to load.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID) = 0;
+
+	/**
+	* IUIEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IUIEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
 
 };
 

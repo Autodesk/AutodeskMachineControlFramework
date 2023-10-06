@@ -37,24 +37,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <cstdint>
 #include <vector>
+#include "amc_resourcepackage.hpp"
+#include "amc_geometryutils.hpp"
 
 #include "lib3mf/lib3mf_dynamic.hpp"
 
 namespace AMC {
 
 	typedef struct _sMeshEntityNode {
+		uint32_t m_nNodeID;
 		float m_fCoordinates[3];
 	} sMeshEntityNode;
 
 	typedef struct _sMeshEntityEdge {
-		uint32_t m_nID;
-		uint32_t m_NodeIndices[2];		
+		uint32_t m_nEdgeID;
+		uint32_t m_nNodeIDs[2];		
+		uint32_t m_nFaceIDs[2];
+		uint32_t m_nAngleInDegrees;
 		uint32_t m_nFlags;
 	} sMeshEntityEdge;
 
 	typedef struct _sMeshEntityFace {
-		uint32_t m_nNodeIndices[3];
+		uint32_t m_nFaceID;
+		uint32_t m_nNodeIDs[3];
 	} sMeshEntityFace;
+
+	
 
 	class CMeshEntity;
 	typedef std::shared_ptr<CMeshEntity> PMeshEntity;
@@ -63,17 +71,20 @@ namespace AMC {
 	private:
 
 		std::string m_sUUID;
-		std::vector<sMeshEntityNode> m_Vertices;
-		std::map<std::pair<uint32_t, uint32_t>, sMeshEntityEdge> m_Edges;
+		std::string m_sName;
+		std::vector<sMeshEntityNode> m_Nodes;
+		std::vector<sMeshEntityEdge> m_Edges;
 		std::vector<sMeshEntityFace> m_Faces;		
 
 	public:
 
-		CMeshEntity(const std::string & sUUID);
+		CMeshEntity(const std::string & sUUID, const std::string & sName);
 
 		virtual ~CMeshEntity();
 
 		std::string getUUID();
+
+		std::string getName();
 
 		void IncRef();
 
@@ -81,11 +92,22 @@ namespace AMC {
 
 		void loadFrom3MF(Lib3MF::CLib3MFMeshObject * pMeshObject);
 
-		size_t getVertexCount();
+		void loadFrom3MFResource(Lib3MF::CWrapper * p3MFWrapper, AMC::CResourcePackage* pResourcePackage, const std::string sResourceName);
+
+		size_t getNodeCount();
 		size_t getEdgeCount();
 		size_t getFaceCount();
 
-		void getFaceVertices(uint32_t nFaceIndex, sMeshEntityNode & sNode1, sMeshEntityNode& sNode2, sMeshEntityNode& sNode3);
+		sMeshEntityNode& getNode(size_t nNodeID);
+		sMeshEntityEdge& getEdge(size_t nEdgeID);
+		sMeshEntityFace& getFace(size_t nFaceID);
+
+		void getFaceNodes(size_t nFaceID, sMeshEntityNode & sNode1, sMeshEntityNode& sNode2, sMeshEntityNode& sNode3);
+		void getEdgeNodes(size_t nEdgeID, sMeshEntityNode& sNode1, sMeshEntityNode& sNode2);
+
+		double calcFaceAngleInDegree (size_t nFaceID1, size_t nFaceID2);
+		sMeshVector3D calcFaceNormal(size_t nFaceID);
+
 
 	};
 

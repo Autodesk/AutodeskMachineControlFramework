@@ -569,3 +569,17 @@ IJournalHandler* CUIEnvironment::GetCurrentJournal()
     return new CJournalHandler(m_pStateJournal);
 }
 
+IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+bool CUIEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IMeshObject* CUIEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}

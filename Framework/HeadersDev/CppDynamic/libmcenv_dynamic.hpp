@@ -67,6 +67,7 @@ class CPNGImageData;
 class CImageData;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
+class CMeshObject;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
@@ -107,6 +108,7 @@ typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
+typedef CMeshObject CLibMCEnvMeshObject;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
@@ -147,6 +149,7 @@ typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
+typedef std::shared_ptr<CMeshObject> PMeshObject;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
@@ -187,6 +190,7 @@ typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
+typedef PMeshObject PLibMCEnvMeshObject;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
@@ -423,6 +427,7 @@ public:
 			case LIBMCENV_ERROR_EMPTYPNGSTREAM: return "EMPTYPNGSTREAM";
 			case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "COULDNOTLOADPNGIMAGE";
 			case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "INVALIDPIXELSIZE";
+			case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "MESHISNOTREGISTERED";
 		}
 		return "UNKNOWN";
 	}
@@ -561,6 +566,7 @@ public:
 			case LIBMCENV_ERROR_EMPTYPNGSTREAM: return "Empty PNG Stream";
 			case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "Could not load PNG image";
 			case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
+			case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "Mesh is not registered";
 		}
 		return "unknown error";
 	}
@@ -685,6 +691,7 @@ private:
 	friend class CImageData;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
+	friend class CMeshObject;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
@@ -931,6 +938,26 @@ public:
 	inline void TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
 	inline void AddField(classParam<CDiscreteFieldData2D> pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
 	inline PDiscreteFieldData2D Duplicate();
+};
+	
+/*************************************************************************************************************************
+ Class CMeshObject 
+**************************************************************************************************************************/
+class CMeshObject : public CBase {
+public:
+	
+	/**
+	* CMeshObject::CMeshObject - Constructor for MeshObject class.
+	*/
+	CMeshObject(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetUUID();
+	inline LibMCEnv_uint32 GetTriangleCount();
+	inline LibMCEnv_uint32 GetVertexCount();
 };
 	
 /*************************************************************************************************************************
@@ -1707,6 +1734,9 @@ public:
 	inline bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier);
 	inline PUserManagementHandler CreateUserManagement();
 	inline PJournalHandler GetCurrentJournal();
+	inline PMeshObject RegisterMeshFrom3MFResource(const std::string & sResourceName);
+	inline bool MeshIsRegistered(const std::string & sMeshUUID);
+	inline PMeshObject FindRegisteredMesh(const std::string & sMeshUUID);
 };
 	
 /*************************************************************************************************************************
@@ -1773,6 +1803,9 @@ public:
 	inline std::string GetCurrentUserUUID();
 	inline PUserManagementHandler CreateUserManagement();
 	inline PJournalHandler GetCurrentJournal();
+	inline PMeshObject RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID);
+	inline bool MeshIsRegistered(const std::string & sMeshUUID);
+	inline PMeshObject FindRegisteredMesh(const std::string & sMeshUUID);
 };
 	
 	/**
@@ -1905,6 +1938,10 @@ public:
 		pWrapperTable->m_DiscreteFieldData2D_TransformField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_AddField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
+		pWrapperTable->m_MeshObject_GetName = nullptr;
+		pWrapperTable->m_MeshObject_GetUUID = nullptr;
+		pWrapperTable->m_MeshObject_GetTriangleCount = nullptr;
+		pWrapperTable->m_MeshObject_GetVertexCount = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
@@ -2265,6 +2302,9 @@ public:
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateUserManagement = nullptr;
 		pWrapperTable->m_StateEnvironment_GetCurrentJournal = nullptr;
+		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = nullptr;
+		pWrapperTable->m_StateEnvironment_MeshIsRegistered = nullptr;
+		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -2315,6 +2355,9 @@ public:
 		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateUserManagement = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCurrentJournal = nullptr;
+		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = nullptr;
+		pWrapperTable->m_UIEnvironment_MeshIsRegistered = nullptr;
+		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -2809,6 +2852,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetName = (PLibMCEnvMeshObject_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getname");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetName = (PLibMCEnvMeshObject_GetNamePtr) dlsym(hLibrary, "libmcenv_meshobject_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetUUID = (PLibMCEnvMeshObject_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetUUID = (PLibMCEnvMeshObject_GetUUIDPtr) dlsym(hLibrary, "libmcenv_meshobject_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleCount = (PLibMCEnvMeshObject_GetTriangleCountPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_gettrianglecount");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleCount = (PLibMCEnvMeshObject_GetTriangleCountPtr) dlsym(hLibrary, "libmcenv_meshobject_gettrianglecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetTriangleCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetVertexCount = (PLibMCEnvMeshObject_GetVertexCountPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getvertexcount");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetVertexCount = (PLibMCEnvMeshObject_GetVertexCountPtr) dlsym(hLibrary, "libmcenv_meshobject_getvertexcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetVertexCount == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6052,6 +6131,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_registermeshfrom3mfresource");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr) dlsym(hLibrary, "libmcenv_stateenvironment_registermeshfrom3mfresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_MeshIsRegistered = (PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_meshisregistered");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_MeshIsRegistered = (PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) dlsym(hLibrary, "libmcenv_stateenvironment_meshisregistered");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_MeshIsRegistered == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = (PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findregisteredmesh");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = (PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findregisteredmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindRegisteredMesh == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
@@ -6502,6 +6608,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_registermeshfrom3mfresource");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr) dlsym(hLibrary, "libmcenv_uienvironment_registermeshfrom3mfresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_MeshIsRegistered = (PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_meshisregistered");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_MeshIsRegistered = (PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) dlsym(hLibrary, "libmcenv_uienvironment_meshisregistered");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_MeshIsRegistered == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = (PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findregisteredmesh");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = (PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) dlsym(hLibrary, "libmcenv_uienvironment_findregisteredmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_FindRegisteredMesh == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -6756,6 +6889,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_duplicate", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Duplicate));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getname", (void**)&(pWrapperTable->m_MeshObject_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getuuid", (void**)&(pWrapperTable->m_MeshObject_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_gettrianglecount", (void**)&(pWrapperTable->m_MeshObject_GetTriangleCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetTriangleCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getvertexcount", (void**)&(pWrapperTable->m_MeshObject_GetVertexCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertexCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
@@ -8198,6 +8347,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetCurrentJournal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_registermeshfrom3mfresource", (void**)&(pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_meshisregistered", (void**)&(pWrapperTable->m_StateEnvironment_MeshIsRegistered));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_MeshIsRegistered == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_findregisteredmesh", (void**)&(pWrapperTable->m_StateEnvironment_FindRegisteredMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindRegisteredMesh == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8396,6 +8557,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentjournal", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentJournal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentJournal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_registermeshfrom3mfresource", (void**)&(pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_meshisregistered", (void**)&(pWrapperTable->m_UIEnvironment_MeshIsRegistered));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_MeshIsRegistered == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_findregisteredmesh", (void**)&(pWrapperTable->m_UIEnvironment_FindRegisteredMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindRegisteredMesh == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -9027,6 +9200,64 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
+	}
+	
+	/**
+	 * Method definitions for class CMeshObject
+	 */
+	
+	/**
+	* CMeshObject::GetName - Returns the name of the Mesh Object.
+	* @return Returns the name of the mesh object.
+	*/
+	std::string CMeshObject::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CMeshObject::GetUUID - Returns the UUID of the mesh object.
+	* @return Returns mesh uuid.
+	*/
+	std::string CMeshObject::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CMeshObject::GetTriangleCount - Returns the number of triangles.
+	* @return Number of triangles.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetTriangleCount()
+	{
+		LibMCEnv_uint32 resultTriangleCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangleCount(m_pHandle, &resultTriangleCount));
+		
+		return resultTriangleCount;
+	}
+	
+	/**
+	* CMeshObject::GetVertexCount - Returns the number of vertices.
+	* @return Number of vertices.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetVertexCount()
+	{
+		LibMCEnv_uint32 resultVertexCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexCount(m_pHandle, &resultVertexCount));
+		
+		return resultVertexCount;
 	}
 	
 	/**
@@ -14080,6 +14311,51 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::RegisterMeshFrom3MFResource - Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+	* @param[in] sResourceName - Resource name to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CStateEnvironment::RegisterMeshFrom3MFResource(const std::string & sResourceName)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RegisterMeshFrom3MFResource(m_pHandle, sResourceName.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+	}
+	
+	/**
+	* CStateEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	bool CStateEnvironment::MeshIsRegistered(const std::string & sMeshUUID)
+	{
+		bool resultMeshIsRegistered = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_MeshIsRegistered(m_pHandle, sMeshUUID.c_str(), &resultMeshIsRegistered));
+		
+		return resultMeshIsRegistered;
+	}
+	
+	/**
+	* CStateEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CStateEnvironment::FindRegisteredMesh(const std::string & sMeshUUID)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindRegisteredMesh(m_pHandle, sMeshUUID.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+	}
+	
+	/**
 	 * Method definitions for class CUIEnvironment
 	 */
 	
@@ -14788,6 +15064,52 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CJournalHandler>(m_pWrapper, hJournalHandler);
+	}
+	
+	/**
+	* CUIEnvironment::RegisterMeshFrom3MFResource - Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+	* @param[in] sResourceName - Resource name to load.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CUIEnvironment::RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RegisterMeshFrom3MFResource(m_pHandle, sResourceName.c_str(), sMeshUUID.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+	}
+	
+	/**
+	* CUIEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	bool CUIEnvironment::MeshIsRegistered(const std::string & sMeshUUID)
+	{
+		bool resultMeshIsRegistered = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_MeshIsRegistered(m_pHandle, sMeshUUID.c_str(), &resultMeshIsRegistered));
+		
+		return resultMeshIsRegistered;
+	}
+	
+	/**
+	* CUIEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CUIEnvironment::FindRegisteredMesh(const std::string & sMeshUUID)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindRegisteredMesh(m_pHandle, sMeshUUID.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
 	}
 
 } // namespace LibMCEnv

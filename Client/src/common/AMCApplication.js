@@ -142,6 +142,22 @@ export default class AMCApplication extends Common.AMCObject {
         });
     }
 
+    axiosGetArrayBufferRequest(subURL) {
+        let headers = {}
+        let authToken = this.API.authToken;
+
+        if (authToken != Common.nullToken ())
+            headers.Authorization = "Bearer " + authToken;
+
+        return Axios({
+            method: "GET",
+            "headers": headers,
+			"responseType": "arraybuffer",
+            url: this.API.baseURL + subURL
+        });
+    }
+
+
     axiosPostRequest(subURL, data) {
         let headers = {}
         let authToken = this.API.authToken;

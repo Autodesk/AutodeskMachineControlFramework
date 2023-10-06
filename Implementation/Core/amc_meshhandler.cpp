@@ -51,12 +51,12 @@ namespace AMC {
 		return (iIter != m_Entities.end ());
 	}
 
-	CMeshEntity * CMeshHandler::findMeshEntity(const std::string & sEntityUUID, bool bFailIfNotExistent)
+	PMeshEntity CMeshHandler::findMeshEntity(const std::string & sEntityUUID, bool bFailIfNotExistent)
 	{
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sEntityUUID);
 		auto iIter = m_Entities.find(sNormalizedUUID);
 		if (iIter != m_Entities.end()) {
-			return iIter->second.get();
+			return iIter->second;
 		}
 
 		if (bFailIfNotExistent)
@@ -80,7 +80,25 @@ namespace AMC {
 		m_Entities.clear();
 	}
 
-	void CMeshHandler::register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject)
+	PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
+	{
+		if (pWrapper == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pResourcePackage == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::string sMeshUUID = AMCCommon::CUtils::createUUID();
+		auto pMeshEntity = std::make_shared<CMeshEntity>(sMeshUUID, sResourceName);
+		pMeshEntity->loadFrom3MFResource(pWrapper, pResourcePackage, sResourceName);
+
+		pMeshEntity->IncRef();
+		m_Entities.insert(std::make_pair(sMeshUUID, pMeshEntity));
+
+		return pMeshEntity;
+	}
+
+
+	PMeshEntity CMeshHandler::register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject)
 	{
 		if (pMeshObject == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -91,12 +109,13 @@ namespace AMC {
 		if (iIter != m_Entities.end())
 			throw ELibMCCustomException(LIBMC_ERROR_MESHENTITYALREADYLOADED, sNormalizedUUID);
 
-		auto pMeshEntity = std::make_shared<CMeshEntity>(sNormalizedUUID);
+		auto pMeshEntity = std::make_shared<CMeshEntity>(sNormalizedUUID, pMeshObject->GetName ());
 		pMeshEntity->loadFrom3MF(pMeshObject);
 
 		pMeshEntity->IncRef();
 		m_Entities.insert(std::make_pair (sNormalizedUUID, pMeshEntity));
 
+		return pMeshEntity;
 	}
 
 }
