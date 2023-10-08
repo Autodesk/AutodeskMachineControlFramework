@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					if (this.glInstance)
 						this.glInstance.renderScene ();
 						
-					const delta = this.glInstance.clock.getDelta();
+					//const delta = this.glInstance.clock.getDelta();
 
 
 				},
