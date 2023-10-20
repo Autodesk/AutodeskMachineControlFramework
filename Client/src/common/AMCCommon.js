@@ -41,6 +41,11 @@ export function nullUUID ()
 	return "00000000-0000-0000-0000-000000000000";
 }
 
+export function minimumPasswordLength ()
+{
+	return 5;
+}
+
 
 export class AMCObject {
 		

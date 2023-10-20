@@ -94,8 +94,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				var width = glDiv.clientWidth;
 				var height = glDiv.clientHeight;
 				if ((width > 0) && (height > 0)) {
-					this.glInstance.setupPerspectiveView (45, width / height, 1, 1000);
-					this.glInstance.setCameraPosition (15, 15, 15);
+					this.glInstance.setupPerspectiveView (45, width / height, 1, 3000);
+					this.glInstance.setCameraPosition (150, 150, 150);
 					this.glInstance.resizeTo (width, height);
 					this.glInstance.setupDOMElement (glDiv);														
 					
@@ -103,10 +103,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					this.glInstance.addAmbientLight ("ambientlight", 0x808080, 3);
 
 					
-					this.mesh1 = this.glInstance.addMeshElement ("mesh1", this.Application, "9c930330-b1ef-4358-a927-e7a64f7f33a7");
+					this.mesh1 = this.glInstance.addMeshElement ("mesh1", this.Application, "b56d10d3-978c-4299-958d-c33e750c67f9");
 					this.mesh1.setPosition (0,0, 0.0, 0.0);
 
-					this.mesh2 = this.glInstance.addMeshElement ("mesh2", this.Application, "fdc19fd5-93b4-49b2-a873-6356d513b3f0");
+					this.mesh2 = this.glInstance.addMeshElement ("mesh2", this.Application, "da30f227-4d14-49a7-8d20-6e52a03e783b");
 					this.mesh2.setPosition (0,0, 0.0, 0.0);
 					
 					

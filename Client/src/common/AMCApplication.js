@@ -51,6 +51,7 @@ import AMCUpload from "./AMCImplementation_Upload.js"
 import AMCApplicationDialog from "./AMCDialog.js"
 
 export default class AMCApplication extends Common.AMCObject {
+	
 
     constructor(apiBaseURL, uiResizeEvent) {
 		
@@ -88,6 +89,7 @@ export default class AMCApplication extends Common.AMCObject {
             LogoAspectRatio: 1.0,
 			LoginBackgroundImageUUID: "",
 			LoginWelcomeMessage: "",
+			FirstLaunchMode: false,
             Colors: {}
         }
 
@@ -792,6 +794,36 @@ export default class AMCApplication extends Common.AMCObject {
 			return false;
 		
 		return this.API.userPermissions.has (Assert.IdentifierString (permissionIdentifier));
+	}
+	
+	generateUserPassword (clearTextPassword)
+	{
+		if (!clearTextPassword.isString ()) 
+			throw "could not set user password: invalid input string";
+		
+		let trimmedPassword = clearTextPassword.trim ();
+		
+		if (trimmedPassword.length < Common.minimumPasswordLength ())
+			throw "could not set user password: invalid user password length";
+					
+		if (!this.userIsLoggedIn ())
+			throw "could not get user permissions: user is not logged in";
+		
+		const randomArray = new Uint32Array(1024);
+		asmCrypto.random.getValues( randomArray );
+		
+		let randomString = this.API.authToken;
+		for (let value in randomArray)
+			randomString = randomString + value.toString ();
+
+		let passwordSalt = asmCrypto.SHA256.hex(randomString);
+		let passwordHash = asmCrypto.SHA256.hex(passwordSalt + trimmedPassword);
+		
+		return {
+			"salt": passwordSalt,
+			"hash": passwordHash
+		}
+		
 	}
 
 

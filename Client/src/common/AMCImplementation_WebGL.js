@@ -870,10 +870,10 @@ class WebGLImpl {
 				this.scene.add( mesh );
 				
 		
-		this.scene.fog = new THREE.Fog( 0xffffff, 505, 650 );
+		this.scene.fog = new THREE.Fog( 0xffffff, 1505, 1650 );
 		
 		const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 3 );
-		hemiLight.position.set( 0, 20, 0 );
+		hemiLight.position.set( 0, 500, 0 );
 		this.scene.add( hemiLight );
 		
 		this.renderer.shadowMap.enabled = true;
