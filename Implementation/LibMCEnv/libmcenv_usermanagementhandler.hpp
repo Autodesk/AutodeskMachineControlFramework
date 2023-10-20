@@ -109,6 +109,8 @@ public:
 
 	void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword) override;
 
+	IUserDetailList* GetActiveUsers() override;
+
 };
 
 } // namespace Impl

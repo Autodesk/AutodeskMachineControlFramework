@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CUserManagementHandler
 
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_userdetaillist.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -281,5 +282,25 @@ void CUserManagementHandler::SetUserPasswordByUUID(const std::string & sUUID, co
 	std::string sNormalizedHash = AMCCommon::CUtils::normalizeSHA256String(sHashedPassword);
 
 	m_pLoginHandler->SetUserPasswordByUUID(sNormalizedUUID, sNormalizedSalt, sNormalizedHash);
+}
+
+IUserDetailList* CUserManagementHandler::GetActiveUsers()
+{
+	auto pUserList = m_pLoginHandler->GetActiveUsers();
+	auto pResultList = std::make_unique<CUserDetailList> ();
+
+	/*
+	uint32_t nCount = pUserList->Count();
+	for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+		
+		pUserList->GetUserProperties(nIndex, sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
+
+		pResultList->addUser(sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
+	} 
+	
+	*/
+
+	return pResultList.release();
+
 }
 

@@ -87,6 +87,7 @@ class ISignalHandler;
 class IUniformJournalSampling;
 class IJournalVariable;
 class IJournalHandler;
+class IUserDetailList;
 class IUserManagementHandler;
 class IStateEnvironment;
 class IUIEnvironment;
@@ -171,6 +172,29 @@ template <class T1, class T2, class T3, class T4> class ParameterCache_4 : publi
 			param2 = m_param2;
 			param3 = m_param3;
 			param4 = m_param4;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
 		}
 };
 
@@ -3165,6 +3189,69 @@ typedef IBaseSharedPtr<IJournalHandler> PIJournalHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for UserDetailList 
+**************************************************************************************************************************/
+
+class IUserDetailList : public virtual IBase {
+public:
+	/**
+	* IUserDetailList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	virtual LibMCEnv_uint32 Count() = 0;
+
+	/**
+	* IUserDetailList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const LibMCEnv_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserDetailList::GetUsername - Retrieves the user name of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return User name
+	*/
+	virtual std::string GetUsername(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetUUID - Retrieves the UUID of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return UUID of the user.
+	*/
+	virtual std::string GetUUID(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetDescription - Retrieves the description of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Description of the user.
+	*/
+	virtual std::string GetDescription(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetRole - Retrieves the role of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Role of the user.
+	*/
+	virtual std::string GetRole(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetLanguage - Retrieves the language identifier of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Language Identifier of the user.
+	*/
+	virtual std::string GetLanguage(const LibMCEnv_uint32 nUserIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUserDetailList> PIUserDetailList;
+
+
+/*************************************************************************************************************************
  Class interface for UserManagementHandler 
 **************************************************************************************************************************/
 
@@ -3321,6 +3408,12 @@ public:
 	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
 	*/
 	virtual void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* IUserManagementHandler::GetActiveUsers - Returns a list of all users.
+	* @return Instance of active users.
+	*/
+	virtual IUserDetailList * GetActiveUsers() = 0;
 
 };
 

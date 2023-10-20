@@ -70,6 +70,7 @@ class CBuildJobDataIterator;
 class CBuildJob;
 class CBuildJobIterator;
 class CBuildJobHandler;
+class CUserList;
 class CLoginHandler;
 class CPersistencyHandler;
 class CDataModel;
@@ -89,6 +90,7 @@ typedef CBuildJobDataIterator CLibMCDataBuildJobDataIterator;
 typedef CBuildJob CLibMCDataBuildJob;
 typedef CBuildJobIterator CLibMCDataBuildJobIterator;
 typedef CBuildJobHandler CLibMCDataBuildJobHandler;
+typedef CUserList CLibMCDataUserList;
 typedef CLoginHandler CLibMCDataLoginHandler;
 typedef CPersistencyHandler CLibMCDataPersistencyHandler;
 typedef CDataModel CLibMCDataDataModel;
@@ -108,6 +110,7 @@ typedef std::shared_ptr<CBuildJobDataIterator> PBuildJobDataIterator;
 typedef std::shared_ptr<CBuildJob> PBuildJob;
 typedef std::shared_ptr<CBuildJobIterator> PBuildJobIterator;
 typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
+typedef std::shared_ptr<CUserList> PUserList;
 typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
 typedef std::shared_ptr<CDataModel> PDataModel;
@@ -127,6 +130,7 @@ typedef PBuildJobDataIterator PLibMCDataBuildJobDataIterator;
 typedef PBuildJob PLibMCDataBuildJob;
 typedef PBuildJobIterator PLibMCDataBuildJobIterator;
 typedef PBuildJobHandler PLibMCDataBuildJobHandler;
+typedef PUserList PLibMCDataUserList;
 typedef PLoginHandler PLibMCDataLoginHandler;
 typedef PPersistencyHandler PLibMCDataPersistencyHandler;
 typedef PDataModel PLibMCDataDataModel;
@@ -476,6 +480,11 @@ public:
 			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "EMPTYUSERNAME";
 			case LIBMCDATA_ERROR_EMPTYUSERUUID: return "EMPTYUSERUUID";
 			case LIBMCDATA_ERROR_USERNOTUNIQUE: return "USERNOTUNIQUE";
+			case LIBMCDATA_ERROR_EMPTYUSERROLE: return "EMPTYUSERROLE";
+			case LIBMCDATA_ERROR_EMPTYUSERSALT: return "EMPTYUSERSALT";
+			case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "EMPTYUSERPASSWORD";
+			case LIBMCDATA_ERROR_INVALIDUSERROLE: return "INVALIDUSERROLE";
+			case LIBMCDATA_ERROR_USERALREADYEXISTS: return "USERALREADYEXISTS";
 		}
 		return "UNKNOWN";
 	}
@@ -751,6 +760,11 @@ public:
 			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
 			case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
 			case LIBMCDATA_ERROR_USERNOTUNIQUE: return "User not unique";
+			case LIBMCDATA_ERROR_EMPTYUSERROLE: return "Empty user role";
+			case LIBMCDATA_ERROR_EMPTYUSERSALT: return "Empty user salt";
+			case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "Empty user password";
+			case LIBMCDATA_ERROR_INVALIDUSERROLE: return "Invalid user role";
+			case LIBMCDATA_ERROR_USERALREADYEXISTS: return "User already exists";
 		}
 		return "unknown error";
 	}
@@ -879,6 +893,7 @@ private:
 	friend class CBuildJob;
 	friend class CBuildJobIterator;
 	friend class CBuildJobHandler;
+	friend class CUserList;
 	friend class CLoginHandler;
 	friend class CPersistencyHandler;
 	friend class CDataModel;
@@ -1171,6 +1186,24 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CUserList 
+**************************************************************************************************************************/
+class CUserList : public CBase {
+public:
+	
+	/**
+	* CUserList::CUserList - Constructor for UserList class.
+	*/
+	CUserList(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCData_uint32 Count();
+	inline void GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+};
+	
+/*************************************************************************************************************************
  Class CLoginHandler 
 **************************************************************************************************************************/
 class CLoginHandler : public CBase {
@@ -1205,6 +1238,7 @@ public:
 	inline void SetUserRoleByUUID(const std::string & sUUID, const std::string & sRole);
 	inline void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription);
 	inline void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword);
+	inline PUserList GetActiveUsers();
 };
 	
 /*************************************************************************************************************************
@@ -1431,6 +1465,8 @@ public:
 		pWrapperTable->m_BuildJobHandler_ListJobsByStatus = nullptr;
 		pWrapperTable->m_BuildJobHandler_ConvertBuildStatusToString = nullptr;
 		pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus = nullptr;
+		pWrapperTable->m_UserList_Count = nullptr;
+		pWrapperTable->m_UserList_GetUserProperties = nullptr;
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDetails = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserProperties = nullptr;
@@ -1452,6 +1488,7 @@ public:
 		pWrapperTable->m_LoginHandler_SetUserRoleByUUID = nullptr;
 		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = nullptr;
 		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_GetActiveUsers = nullptr;
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = nullptr;
 		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = nullptr;
@@ -2149,6 +2186,24 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UserList_Count = (PLibMCDataUserList_CountPtr) GetProcAddress(hLibrary, "libmcdata_userlist_count");
+		#else // _WIN32
+		pWrapperTable->m_UserList_Count = (PLibMCDataUserList_CountPtr) dlsym(hLibrary, "libmcdata_userlist_count");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserList_Count == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserList_GetUserProperties = (PLibMCDataUserList_GetUserPropertiesPtr) GetProcAddress(hLibrary, "libmcdata_userlist_getuserproperties");
+		#else // _WIN32
+		pWrapperTable->m_UserList_GetUserProperties = (PLibMCDataUserList_GetUserPropertiesPtr) dlsym(hLibrary, "libmcdata_userlist_getuserproperties");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserList_GetUserProperties == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_LoginHandler_UserExists = (PLibMCDataLoginHandler_UserExistsPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_userexists");
 		#else // _WIN32
 		pWrapperTable->m_LoginHandler_UserExists = (PLibMCDataLoginHandler_UserExistsPtr) dlsym(hLibrary, "libmcdata_loginhandler_userexists");
@@ -2335,6 +2390,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LoginHandler_SetUserPasswordByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetActiveUsers = (PLibMCDataLoginHandler_GetActiveUsersPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getactiveusers");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetActiveUsers = (PLibMCDataLoginHandler_GetActiveUsersPtr) dlsym(hLibrary, "libmcdata_loginhandler_getactiveusers");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetActiveUsers == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2931,6 +2995,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_userlist_count", (void**)&(pWrapperTable->m_UserList_Count));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserList_Count == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_userlist_getuserproperties", (void**)&(pWrapperTable->m_UserList_GetUserProperties));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserList_GetUserProperties == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_userexists", (void**)&(pWrapperTable->m_LoginHandler_UserExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UserExists == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3013,6 +3085,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserpasswordbyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserPasswordByUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserPasswordByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getactiveusers", (void**)&(pWrapperTable->m_LoginHandler_GetActiveUsers));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetActiveUsers == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_persistencyhandler_haspersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_HasPersistentParameter));
@@ -4154,6 +4230,57 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CUserList
+	 */
+	
+	/**
+	* CUserList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	LibMCData_uint32 CUserList::Count()
+	{
+		LibMCData_uint32 resultUserCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserList_Count(m_pHandle, &resultUserCount));
+		
+		return resultUserCount;
+	}
+	
+	/**
+	* CUserList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CUserList::GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCData_uint32 bytesNeededUsername = 0;
+		LibMCData_uint32 bytesWrittenUsername = 0;
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserList_GetUserProperties(m_pHandle, nUserIndex, 0, &bytesNeededUsername, nullptr, 0, &bytesNeededUUID, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserList_GetUserProperties(m_pHandle, nUserIndex, bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0], bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUsername = std::string(&bufferUsername[0]);
+		sUUID = std::string(&bufferUUID[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
 	 * Method definitions for class CLoginHandler
 	 */
 	
@@ -4478,6 +4605,21 @@ public:
 	void CLoginHandler::SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserPasswordByUUID(m_pHandle, sUUID.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::GetActiveUsers - Returns a list of active users.
+	* @return New instance of active users.
+	*/
+	PUserList CLoginHandler::GetActiveUsers()
+	{
+		LibMCDataHandle hActiveUsers = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetActiveUsers(m_pHandle, &hActiveUsers));
+		
+		if (!hActiveUsers) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUserList>(m_pWrapper, hActiveUsers);
 	}
 	
 	/**

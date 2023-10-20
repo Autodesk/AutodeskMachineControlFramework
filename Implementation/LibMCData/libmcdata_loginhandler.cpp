@@ -238,7 +238,44 @@ std::string CLoginHandler::GetUserLanguageByUUID(const std::string& sUUID)
 
 std::string CLoginHandler::CreateUser(const std::string& sUsername, const std::string& sRole, const std::string& sSalt, const std::string& sHashedPassword, const std::string& sDescription)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (sUsername.empty ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+    if (sRole.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERROLE);
+    if (sSalt.empty ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERSALT);
+    if (sHashedPassword.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERPASSWORD);
+
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sUsername))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERNAME);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sRole))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERROLE);
+
+    std::string sNormalizedSalt = AMCCommon::CUtils::normalizeSHA256String(sSalt);
+    std::string sNormalizedHashedPassword = AMCCommon::CUtils::normalizeSHA256String(sHashedPassword);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+    auto pUserCheckStatement = pTransaction->prepareStatement("SELECT uuid FROM users WHERE login=? AND active=1");
+    pUserCheckStatement->setString(1, sUsername);
+    if (pUserCheckStatement->nextRow ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERALREADYEXISTS, "user already exists: " + sUsername);
+
+    std::string sNewUserUUID = AMCCommon::CUtils::createUUID();
+    auto pUserCreateStatement = pTransaction->prepareStatement("INSERT INTO users (uuid, login, description, salt, passwordhash, role, active) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    pUserCreateStatement->setString(1, sNewUserUUID);
+    pUserCreateStatement->setString(2, sUsername);
+    pUserCreateStatement->setString(3, sDescription);
+    pUserCreateStatement->setString(4, sNormalizedSalt);
+    pUserCreateStatement->setString(5, sNormalizedHashedPassword);
+    pUserCreateStatement->setString(6, sRole);
+    pUserCreateStatement->setInt(7, 1);
+
+    pUserCreateStatement->execute();
+
+    pTransaction->commit();
+
+    return sNewUserUUID;
 }
 
 void CLoginHandler::SetUserLanguage(const std::string& sUsername, const std::string& sLanguageIdentifier)
@@ -281,6 +318,10 @@ void CLoginHandler::SetUserPasswordByUUID(const std::string& sUUID, const std::s
 
 }
 
+IUserList* CLoginHandler::GetActiveUsers()
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
 
 
 

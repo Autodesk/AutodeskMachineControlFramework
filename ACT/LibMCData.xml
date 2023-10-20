@@ -335,7 +335,12 @@
 		<error name="EMPTYUSERUUID" code="337" description="Empty user UUID" />			
 		<error name="USERNOTUNIQUE" code="338" description="User not unique" />
 		
-								
+		<error name="EMPTYUSERROLE" code="339" description="Empty user role" />
+		<error name="EMPTYUSERSALT" code="340" description="Empty user salt" />
+		<error name="EMPTYUSERPASSWORD" code="341" description="Empty user password" />
+		<error name="INVALIDUSERROLE" code="342" description="Invalid user role" />
+		<error name="USERALREADYEXISTS" code="343" description="User already exists" />
+										
 	</errors>
 	
 		
@@ -768,6 +773,23 @@
 
 
 
+	<class name="UserList" parent="Base" description="List of users">
+	
+		<method name="Count" description="Result Number of Users in the list.">
+			<param name="UserCount" type="uint32" pass="return" description="Number of users in the list" />
+		</method>
+
+		<method name="GetUserProperties" description="Retrieves all the data of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+	
+	</class>
 
 	<class name="LoginHandler" parent="Base" description="Login handler instance">
 	
@@ -887,6 +909,10 @@
 			<param name="UUID" type="string" pass="in" description="UUID of the user." />
 			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
 			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
+		<method name="GetActiveUsers" description="Returns a list of active users.">
+			<param name="ActiveUsers" type="class" class="UserList" pass="return" description="New instance of active users." />
 		</method>
 
 	</class>

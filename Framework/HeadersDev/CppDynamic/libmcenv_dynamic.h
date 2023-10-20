@@ -3861,6 +3861,103 @@ typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer);
 
 /*************************************************************************************************************************
+ Class definition for UserDetailList
+**************************************************************************************************************************/
+
+/**
+* Result Number of Users in the list.
+*
+* @param[in] pUserDetailList - UserDetailList instance.
+* @param[out] pUserCount - Number of users in the list
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserDetailList_CountPtr) (LibMCEnv_UserDetailList pUserDetailList, LibMCEnv_uint32 * pUserCount);
+
+/**
+* Retrieves all the data of a user in the list. 
+*
+* @param[in] pUserDetailList - UserDetailList instance.
+* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+* @param[in] nUsernameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsernameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsernameBuffer -  buffer of User name, may be NULL
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the user., may be NULL
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of LanguageIdentifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserDetailList_GetUserPropertiesPtr) (LibMCEnv_UserDetailList pUserDetailList, LibMCEnv_uint32 nUserIndex, const LibMCEnv_uint32 nUsernameBufferSize, LibMCEnv_uint32* pUsernameNeededChars, char * pUsernameBuffer, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/**
+* Retrieves the user name of a user in the list. 
+*
+* @param[in] pUserDetailList - UserDetailList instance.
+* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+* @param[in] nUsernameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsernameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsernameBuffer -  buffer of User name, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserDetailList_GetUsernamePtr) (LibMCEnv_UserDetailList pUserDetailList, LibMCEnv_uint32 nUserIndex, const LibMCEnv_uint32 nUsernameBufferSize, LibMCEnv_uint32* pUsernameNeededChars, char * pUsernameBuffer);
+
+/**
+* Retrieves the UUID of a user in the list. 
+*
+* @param[in] pUserDetailList - UserDetailList instance.
+* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserDetailList_GetUUIDPtr) (LibMCEnv_UserDetailList pUserDetailList, LibMCEnv_uint32 nUserIndex, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Retrieves the description of a user in the list. 
+*
+* @param[in] pUserDetailList - UserDetailList instance.
+* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserDetailList_GetDescriptionPtr) (LibMCEnv_UserDetailList pUserDetailList, LibMCEnv_uint32 nUserIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Retrieves the role of a user in the list. 
+*
+* @param[in] pUserDetailList - UserDetailList instance.
+* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserDetailList_GetRolePtr) (LibMCEnv_UserDetailList pUserDetailList, LibMCEnv_uint32 nUserIndex, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer);
+
+/**
+* Retrieves the language identifier of a user in the list. 
+*
+* @param[in] pUserDetailList - UserDetailList instance.
+* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of Language Identifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserDetailList_GetLanguagePtr) (LibMCEnv_UserDetailList pUserDetailList, LibMCEnv_uint32 nUserIndex, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/*************************************************************************************************************************
  Class definition for UserManagementHandler
 **************************************************************************************************************************/
 
@@ -4109,6 +4206,15 @@ typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserDescriptionByUUID
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_SetUserPasswordByUUIDPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, const char * pSalt, const char * pHashedPassword);
+
+/**
+* Returns a list of all users.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[out] pListInstance - Instance of active users.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetActiveUsersPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, LibMCEnv_UserDetailList * pListInstance);
 
 /*************************************************************************************************************************
  Class definition for StateEnvironment
@@ -5603,6 +5709,13 @@ typedef struct {
 	PLibMCEnvJournalHandler_HasJournalMarkerPtr m_JournalHandler_HasJournalMarker;
 	PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr m_JournalHandler_RetrieveJournalMarker;
 	PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr m_JournalHandler_RetrieveJournalMarkers;
+	PLibMCEnvUserDetailList_CountPtr m_UserDetailList_Count;
+	PLibMCEnvUserDetailList_GetUserPropertiesPtr m_UserDetailList_GetUserProperties;
+	PLibMCEnvUserDetailList_GetUsernamePtr m_UserDetailList_GetUsername;
+	PLibMCEnvUserDetailList_GetUUIDPtr m_UserDetailList_GetUUID;
+	PLibMCEnvUserDetailList_GetDescriptionPtr m_UserDetailList_GetDescription;
+	PLibMCEnvUserDetailList_GetRolePtr m_UserDetailList_GetRole;
+	PLibMCEnvUserDetailList_GetLanguagePtr m_UserDetailList_GetLanguage;
 	PLibMCEnvUserManagementHandler_UserExistsPtr m_UserManagementHandler_UserExists;
 	PLibMCEnvUserManagementHandler_GetUserPropertiesPtr m_UserManagementHandler_GetUserProperties;
 	PLibMCEnvUserManagementHandler_GetUserPropertiesByUUIDPtr m_UserManagementHandler_GetUserPropertiesByUUID;
@@ -5623,6 +5736,7 @@ typedef struct {
 	PLibMCEnvUserManagementHandler_SetUserRoleByUUIDPtr m_UserManagementHandler_SetUserRoleByUUID;
 	PLibMCEnvUserManagementHandler_SetUserDescriptionByUUIDPtr m_UserManagementHandler_SetUserDescriptionByUUID;
 	PLibMCEnvUserManagementHandler_SetUserPasswordByUUIDPtr m_UserManagementHandler_SetUserPasswordByUUID;
+	PLibMCEnvUserManagementHandler_GetActiveUsersPtr m_UserManagementHandler_GetActiveUsers;
 	PLibMCEnvStateEnvironment_GetMachineStatePtr m_StateEnvironment_GetMachineState;
 	PLibMCEnvStateEnvironment_PrepareSignalPtr m_StateEnvironment_PrepareSignal;
 	PLibMCEnvStateEnvironment_WaitForSignalPtr m_StateEnvironment_WaitForSignal;

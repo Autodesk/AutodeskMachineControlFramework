@@ -92,6 +92,7 @@ class CSignalHandler;
 class CUniformJournalSampling;
 class CJournalVariable;
 class CJournalHandler;
+class CUserDetailList;
 class CUserManagementHandler;
 class CStateEnvironment;
 class CUIEnvironment;
@@ -133,6 +134,7 @@ typedef CSignalHandler CLibMCEnvSignalHandler;
 typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
 typedef CJournalVariable CLibMCEnvJournalVariable;
 typedef CJournalHandler CLibMCEnvJournalHandler;
+typedef CUserDetailList CLibMCEnvUserDetailList;
 typedef CUserManagementHandler CLibMCEnvUserManagementHandler;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
 typedef CUIEnvironment CLibMCEnvUIEnvironment;
@@ -174,6 +176,7 @@ typedef std::shared_ptr<CSignalHandler> PSignalHandler;
 typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
 typedef std::shared_ptr<CJournalVariable> PJournalVariable;
 typedef std::shared_ptr<CJournalHandler> PJournalHandler;
+typedef std::shared_ptr<CUserDetailList> PUserDetailList;
 typedef std::shared_ptr<CUserManagementHandler> PUserManagementHandler;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
 typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
@@ -215,6 +218,7 @@ typedef PSignalHandler PLibMCEnvSignalHandler;
 typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
 typedef PJournalVariable PLibMCEnvJournalVariable;
 typedef PJournalHandler PLibMCEnvJournalHandler;
+typedef PUserDetailList PLibMCEnvUserDetailList;
 typedef PUserManagementHandler PLibMCEnvUserManagementHandler;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
 typedef PUIEnvironment PLibMCEnvUIEnvironment;
@@ -716,6 +720,7 @@ private:
 	friend class CUniformJournalSampling;
 	friend class CJournalVariable;
 	friend class CJournalHandler;
+	friend class CUserDetailList;
 	friend class CUserManagementHandler;
 	friend class CStateEnvironment;
 	friend class CUIEnvironment;
@@ -1642,6 +1647,29 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CUserDetailList 
+**************************************************************************************************************************/
+class CUserDetailList : public CBase {
+public:
+	
+	/**
+	* CUserDetailList::CUserDetailList - Constructor for UserDetailList class.
+	*/
+	CUserDetailList(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint32 Count();
+	inline void GetUserProperties(const LibMCEnv_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+	inline std::string GetUsername(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetUUID(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetDescription(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetRole(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetLanguage(const LibMCEnv_uint32 nUserIndex);
+};
+	
+/*************************************************************************************************************************
  Class CUserManagementHandler 
 **************************************************************************************************************************/
 class CUserManagementHandler : public CBase {
@@ -1675,6 +1703,7 @@ public:
 	inline void SetUserRoleByUUID(const std::string & sUUID, const std::string & sUserRole);
 	inline void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription);
 	inline void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword);
+	inline PUserDetailList GetActiveUsers();
 };
 	
 /*************************************************************************************************************************
@@ -2239,6 +2268,13 @@ public:
 		pWrapperTable->m_JournalHandler_HasJournalMarker = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = nullptr;
+		pWrapperTable->m_UserDetailList_Count = nullptr;
+		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
+		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
+		pWrapperTable->m_UserDetailList_GetUUID = nullptr;
+		pWrapperTable->m_UserDetailList_GetDescription = nullptr;
+		pWrapperTable->m_UserDetailList_GetRole = nullptr;
+		pWrapperTable->m_UserDetailList_GetLanguage = nullptr;
 		pWrapperTable->m_UserManagementHandler_UserExists = nullptr;
 		pWrapperTable->m_UserManagementHandler_GetUserProperties = nullptr;
 		pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID = nullptr;
@@ -2259,6 +2295,7 @@ public:
 		pWrapperTable->m_UserManagementHandler_SetUserRoleByUUID = nullptr;
 		pWrapperTable->m_UserManagementHandler_SetUserDescriptionByUUID = nullptr;
 		pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetActiveUsers = nullptr;
 		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
@@ -5564,6 +5601,69 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_Count = (PLibMCEnvUserDetailList_CountPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_count");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_Count = (PLibMCEnvUserDetailList_CountPtr) dlsym(hLibrary, "libmcenv_userdetaillist_count");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_Count == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetUserProperties = (PLibMCEnvUserDetailList_GetUserPropertiesPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getuserproperties");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetUserProperties = (PLibMCEnvUserDetailList_GetUserPropertiesPtr) dlsym(hLibrary, "libmcenv_userdetaillist_getuserproperties");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetUserProperties == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetUsername = (PLibMCEnvUserDetailList_GetUsernamePtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getusername");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetUsername = (PLibMCEnvUserDetailList_GetUsernamePtr) dlsym(hLibrary, "libmcenv_userdetaillist_getusername");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetUsername == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetUUID = (PLibMCEnvUserDetailList_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetUUID = (PLibMCEnvUserDetailList_GetUUIDPtr) dlsym(hLibrary, "libmcenv_userdetaillist_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetDescription = (PLibMCEnvUserDetailList_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getdescription");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetDescription = (PLibMCEnvUserDetailList_GetDescriptionPtr) dlsym(hLibrary, "libmcenv_userdetaillist_getdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetRole = (PLibMCEnvUserDetailList_GetRolePtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getrole");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetRole = (PLibMCEnvUserDetailList_GetRolePtr) dlsym(hLibrary, "libmcenv_userdetaillist_getrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetRole == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetLanguage = (PLibMCEnvUserDetailList_GetLanguagePtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getlanguage");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetLanguage = (PLibMCEnvUserDetailList_GetLanguagePtr) dlsym(hLibrary, "libmcenv_userdetaillist_getlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetLanguage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UserManagementHandler_UserExists = (PLibMCEnvUserManagementHandler_UserExistsPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_userexists");
 		#else // _WIN32
 		pWrapperTable->m_UserManagementHandler_UserExists = (PLibMCEnvUserManagementHandler_UserExistsPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_userexists");
@@ -5741,6 +5841,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetActiveUsers = (PLibMCEnvUserManagementHandler_GetActiveUsersPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getactiveusers");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetActiveUsers = (PLibMCEnvUserManagementHandler_GetActiveUsersPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getactiveusers");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetActiveUsers == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8095,6 +8204,34 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalMarkers == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_Count == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getuserproperties", (void**)&(pWrapperTable->m_UserDetailList_GetUserProperties));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetUserProperties == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getusername", (void**)&(pWrapperTable->m_UserDetailList_GetUsername));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetUsername == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getuuid", (void**)&(pWrapperTable->m_UserDetailList_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getdescription", (void**)&(pWrapperTable->m_UserDetailList_GetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getrole", (void**)&(pWrapperTable->m_UserDetailList_GetRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetRole == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getlanguage", (void**)&(pWrapperTable->m_UserDetailList_GetLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetLanguage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_userexists", (void**)&(pWrapperTable->m_UserManagementHandler_UserExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_UserExists == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8173,6 +8310,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserpasswordbyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getactiveusers", (void**)&(pWrapperTable->m_UserManagementHandler_GetActiveUsers));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetActiveUsers == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getmachinestate", (void**)&(pWrapperTable->m_StateEnvironment_GetMachineState));
@@ -13392,6 +13533,137 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CUserDetailList
+	 */
+	
+	/**
+	* CUserDetailList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	LibMCEnv_uint32 CUserDetailList::Count()
+	{
+		LibMCEnv_uint32 resultUserCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_Count(m_pHandle, &resultUserCount));
+		
+		return resultUserCount;
+	}
+	
+	/**
+	* CUserDetailList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CUserDetailList::GetUserProperties(const LibMCEnv_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededUsername = 0;
+		LibMCEnv_uint32 bytesWrittenUsername = 0;
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUserProperties(m_pHandle, nUserIndex, 0, &bytesNeededUsername, nullptr, 0, &bytesNeededUUID, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUserProperties(m_pHandle, nUserIndex, bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0], bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUsername = std::string(&bufferUsername[0]);
+		sUUID = std::string(&bufferUUID[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetUsername - Retrieves the user name of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return User name
+	*/
+	std::string CUserDetailList::GetUsername(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededUsername = 0;
+		LibMCEnv_uint32 bytesWrittenUsername = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUsername(m_pHandle, nUserIndex, 0, &bytesNeededUsername, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUsername(m_pHandle, nUserIndex, bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0]));
+		
+		return std::string(&bufferUsername[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetUUID - Retrieves the UUID of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return UUID of the user.
+	*/
+	std::string CUserDetailList::GetUUID(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUUID(m_pHandle, nUserIndex, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUUID(m_pHandle, nUserIndex, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetDescription - Retrieves the description of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Description of the user.
+	*/
+	std::string CUserDetailList::GetDescription(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetDescription(m_pHandle, nUserIndex, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetDescription(m_pHandle, nUserIndex, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetRole - Retrieves the role of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Role of the user.
+	*/
+	std::string CUserDetailList::GetRole(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetRole(m_pHandle, nUserIndex, 0, &bytesNeededRole, nullptr));
+		std::vector<char> bufferRole(bytesNeededRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetRole(m_pHandle, nUserIndex, bytesNeededRole, &bytesWrittenRole, &bufferRole[0]));
+		
+		return std::string(&bufferRole[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetLanguage - Retrieves the language identifier of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Language Identifier of the user.
+	*/
+	std::string CUserDetailList::GetLanguage(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetLanguage(m_pHandle, nUserIndex, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetLanguage(m_pHandle, nUserIndex, bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		
+		return std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
 	 * Method definitions for class CUserManagementHandler
 	 */
 	
@@ -13696,6 +13968,21 @@ public:
 	void CUserManagementHandler::SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserPasswordByUUID(m_pHandle, sUUID.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::GetActiveUsers - Returns a list of all users.
+	* @return Instance of active users.
+	*/
+	PUserDetailList CUserManagementHandler::GetActiveUsers()
+	{
+		LibMCEnvHandle hListInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetActiveUsers(m_pHandle, &hListInstance));
+		
+		if (!hListInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUserDetailList>(m_pWrapper, hListInstance);
 	}
 	
 	/**

@@ -111,6 +111,8 @@ public:
 
 	void SetUserPasswordByUUID(const std::string& sUUID, const std::string& sSalt, const std::string& sHashedPassword) override;
 
+	IUserList* GetActiveUsers() override;
+
 
 };
 

@@ -2211,6 +2211,47 @@
 	
 	</class>
 
+	<class name="UserDetailList" parent="Base" description="List of user details at a certain snapshot time.">
+
+		<method name="Count" description="Result Number of Users in the list.">
+			<param name="UserCount" type="uint32" pass="return" description="Number of users in the list" />
+		</method>
+
+		<method name="GetUserProperties" description="Retrieves all the data of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+		
+		<method name="GetUsername" description="Retrieves the user name of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Username" type="string" pass="return" description="User name" />
+		</method>
+
+		<method name="GetUUID" description="Retrieves the UUID of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="UUID" type="string" pass="return" description="UUID of the user." />
+		</method>
+
+		<method name="GetDescription" description="Retrieves the description of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetRole" description="Retrieves the role of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetLanguage" description="Retrieves the language identifier of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language Identifier of the user." />
+		</method>
+		
+	</class>
 	
 	<class name="UserManagementHandler" parent="Base" description="Login handler instance">
 	
@@ -2325,6 +2366,11 @@
 			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
 			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
 		</method>
+		
+		<method name="GetActiveUsers" description="Returns a list of all users.">
+			<param name="ListInstance" type="class" class="UserDetailList" pass="return" description="Instance of active users." />		
+		</method>
+		
 
 	</class>	
 

@@ -816,6 +816,43 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertbuildstatust
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertstringtobuildstatus(LibMCData_BuildJobHandler pBuildJobHandler, const char * pString, LibMCData::eBuildJobStatus * pStatus);
 
 /*************************************************************************************************************************
+ Class definition for UserList
+**************************************************************************************************************************/
+
+/**
+* Result Number of Users in the list.
+*
+* @param[in] pUserList - UserList instance.
+* @param[out] pUserCount - Number of users in the list
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_userlist_count(LibMCData_UserList pUserList, LibMCData_uint32 * pUserCount);
+
+/**
+* Retrieves all the data of a user in the list. 
+*
+* @param[in] pUserList - UserList instance.
+* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+* @param[in] nUsernameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsernameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsernameBuffer -  buffer of User name, may be NULL
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID of the user., may be NULL
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the user., may be NULL
+* @param[in] nRoleBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRoleNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRoleBuffer -  buffer of Role of the user., may be NULL
+* @param[in] nLanguageIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLanguageIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLanguageIdentifierBuffer -  buffer of LanguageIdentifier of the user., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_userlist_getuserproperties(LibMCData_UserList pUserList, LibMCData_uint32 nUserIndex, const LibMCData_uint32 nUsernameBufferSize, LibMCData_uint32* pUsernameNeededChars, char * pUsernameBuffer, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCData_uint32 nRoleBufferSize, LibMCData_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCData_uint32 nLanguageIdentifierBufferSize, LibMCData_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer);
+
+/*************************************************************************************************************************
  Class definition for LoginHandler
 **************************************************************************************************************************/
 
@@ -1079,6 +1116,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserdescriptionbyuu
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserpasswordbyuuid(LibMCData_LoginHandler pLoginHandler, const char * pUUID, const char * pSalt, const char * pHashedPassword);
+
+/**
+* Returns a list of active users.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[out] pActiveUsers - New instance of active users.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getactiveusers(LibMCData_LoginHandler pLoginHandler, LibMCData_UserList * pActiveUsers);
 
 /*************************************************************************************************************************
  Class definition for PersistencyHandler

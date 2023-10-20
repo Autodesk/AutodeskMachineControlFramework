@@ -65,6 +65,7 @@ class IBuildJobDataIterator;
 class IBuildJob;
 class IBuildJobIterator;
 class IBuildJobHandler;
+class IUserList;
 class ILoginHandler;
 class IPersistencyHandler;
 class IDataModel;
@@ -864,6 +865,34 @@ typedef IBaseSharedPtr<IBuildJobHandler> PIBuildJobHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for UserList 
+**************************************************************************************************************************/
+
+class IUserList : public virtual IBase {
+public:
+	/**
+	* IUserList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	virtual LibMCData_uint32 Count() = 0;
+
+	/**
+	* IUserList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUserList> PIUserList;
+
+
+/*************************************************************************************************************************
  Class interface for LoginHandler 
 **************************************************************************************************************************/
 
@@ -1028,6 +1057,12 @@ public:
 	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
 	*/
 	virtual void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* ILoginHandler::GetActiveUsers - Returns a list of active users.
+	* @return New instance of active users.
+	*/
+	virtual IUserList * GetActiveUsers() = 0;
 
 };
 

@@ -994,7 +994,7 @@ void CScanLabSDK::n_mcbsp_init_spi(uint32_t nCardNo, uint32_t nClockLevel, uint3
 void CScanLabSDK::n_set_mcbsp_out_ptr(uint32_t nCardNo, uint32_t nNumber, void* pSignalPtr)
 {
 	if (m_pLogJournal.get() != nullptr)
-		m_pLogJournal->logCall("n_set_mcbsp_out_ptr", std::to_string(nCardNo) + ", " + std::to_string((intptr_t)pSignalPtr));
+		m_pLogJournal->logCall("n_set_mcbsp_out_ptr", std::to_string(nCardNo) + ", " + std::to_string(nNumber));
 
 	ptr_n_set_mcbsp_out_ptr(nCardNo, nNumber, pSignalPtr);
 }

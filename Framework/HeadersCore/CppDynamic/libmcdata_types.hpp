@@ -363,6 +363,11 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_EMPTYUSERNAME 336 /** Empty user name */
 #define LIBMCDATA_ERROR_EMPTYUSERUUID 337 /** Empty user UUID */
 #define LIBMCDATA_ERROR_USERNOTUNIQUE 338 /** User not unique */
+#define LIBMCDATA_ERROR_EMPTYUSERROLE 339 /** Empty user role */
+#define LIBMCDATA_ERROR_EMPTYUSERSALT 340 /** Empty user salt */
+#define LIBMCDATA_ERROR_EMPTYUSERPASSWORD 341 /** Empty user password */
+#define LIBMCDATA_ERROR_INVALIDUSERROLE 342 /** Invalid user role */
+#define LIBMCDATA_ERROR_USERALREADYEXISTS 343 /** User already exists */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -638,6 +643,11 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
     case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
     case LIBMCDATA_ERROR_USERNOTUNIQUE: return "User not unique";
+    case LIBMCDATA_ERROR_EMPTYUSERROLE: return "Empty user role";
+    case LIBMCDATA_ERROR_EMPTYUSERSALT: return "Empty user salt";
+    case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "Empty user password";
+    case LIBMCDATA_ERROR_INVALIDUSERROLE: return "Invalid user role";
+    case LIBMCDATA_ERROR_USERALREADYEXISTS: return "User already exists";
     default: return "unknown error";
   }
 }
@@ -657,6 +667,7 @@ typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
+typedef LibMCDataHandle LibMCData_UserList;
 typedef LibMCDataHandle LibMCData_LoginHandler;
 typedef LibMCDataHandle LibMCData_PersistencyHandler;
 typedef LibMCDataHandle LibMCData_DataModel;
