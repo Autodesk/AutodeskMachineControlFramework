@@ -289,16 +289,18 @@ IUserDetailList* CUserManagementHandler::GetActiveUsers()
 	auto pUserList = m_pLoginHandler->GetActiveUsers();
 	auto pResultList = std::make_unique<CUserDetailList> ();
 
-	/*
+	
 	uint32_t nCount = pUserList->Count();
 	for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+
+		std::string sUsername, sUUID, sDescription, sRole, sLanguageIdentifier;
 		
 		pUserList->GetUserProperties(nIndex, sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
 
 		pResultList->addUser(sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
 	} 
 	
-	*/
+	
 
 	return pResultList.release();
 

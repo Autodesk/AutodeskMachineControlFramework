@@ -368,6 +368,11 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_EMPTYUSERPASSWORD 341 /** Empty user password */
 #define LIBMCDATA_ERROR_INVALIDUSERROLE 342 /** Invalid user role */
 #define LIBMCDATA_ERROR_USERALREADYEXISTS 343 /** User already exists */
+#define LIBMCDATA_ERROR_INVALIDUSERLANGUAGE 344 /** Invalid user language */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE 345 /** Could not update user language */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE 346 /** Could not update user role */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION 347 /** Could not update user description */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD 348 /** Could not update user password */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -648,6 +653,11 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "Empty user password";
     case LIBMCDATA_ERROR_INVALIDUSERROLE: return "Invalid user role";
     case LIBMCDATA_ERROR_USERALREADYEXISTS: return "User already exists";
+    case LIBMCDATA_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE: return "Could not update user language";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE: return "Could not update user role";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "Could not update user description";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
     default: return "unknown error";
   }
 }

@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CLoginHandler
 
 #include "libmcdata_loginhandler.hpp"
 #include "libmcdata_interfaceexception.hpp"
+#include "libmcdata_userlist.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -280,47 +281,253 @@ std::string CLoginHandler::CreateUser(const std::string& sUsername, const std::s
 
 void CLoginHandler::SetUserLanguage(const std::string& sUsername, const std::string& sLanguageIdentifier)
 {
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERNAME);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sLanguageIdentifier))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERLANGUAGE);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET language=?, updateuuid=? WHERE login=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sLanguageIdentifier);
+    pStatement->setString(2, sUpdateUUID);
+    pStatement->setString(3, sUsername);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE);
+
+    pTransaction->commit();
 
 }
 
-void CLoginHandler::SetUserRole(const std::string& sUsername, const std::string& sLanguageIdentifier)
+void CLoginHandler::SetUserRole(const std::string& sUsername, const std::string& sRole)
 {
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERNAME);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sRole))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERROLE);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET role=?, updateuuid=? WHERE login=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sRole);
+    pStatement->setString(2, sUpdateUUID);
+    pStatement->setString(3, sUsername);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE);
+
+    pTransaction->commit();
 
 }
 
 void CLoginHandler::SetUserDescription(const std::string& sUsername, const std::string& sDescription)
 {
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERNAME);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET description=?, updateuuid=? WHERE login=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sDescription);
+    pStatement->setString(2, sUpdateUUID);
+    pStatement->setString(3, sUsername);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION);
+
+    pTransaction->commit();
 
 }
 
 void CLoginHandler::SetUserPassword(const std::string& sUsername, const std::string& sSalt, const std::string& sHashedPassword)
 {
+    if (sUsername.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERNAME);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERNAME);
+
+    std::string sNormalizedSalt = AMCCommon::CUtils::normalizeSHA256String(sSalt);
+    std::string sNormalizedPassword = AMCCommon::CUtils::normalizeSHA256String(sHashedPassword);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET salt=?, passwordhash=?, updateuuid=? WHERE login=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sNormalizedSalt);
+    pStatement->setString(2, sNormalizedPassword);
+    pStatement->setString(3, sUpdateUUID);
+    pStatement->setString(4, sUsername);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD);
+
+    pTransaction->commit();
 
 }
 
 void CLoginHandler::SetUserLanguageByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier)
 {
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sLanguageIdentifier))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERLANGUAGE);
+    
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET language=?, updateuuid=? WHERE uuid=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sLanguageIdentifier);
+    pStatement->setString(2, sUpdateUUID);
+    pStatement->setString(3, sNormalizedUUID);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE);
+
+    pTransaction->commit();
 
 }
 
-void CLoginHandler::SetUserRoleByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier)
+void CLoginHandler::SetUserRoleByUUID(const std::string& sUUID, const std::string& sRole)
 {
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sRole))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERROLE);
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET role=?, updateuuid=? WHERE uuid=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sRole);
+    pStatement->setString(2, sUpdateUUID);
+    pStatement->setString(3, sNormalizedUUID);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE);
+
+    pTransaction->commit();
 
 }
 
 void CLoginHandler::SetUserDescriptionByUUID(const std::string& sUUID, const std::string& sDescription)
 {
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET description=?, updateuuid=? WHERE uuid=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sDescription);
+    pStatement->setString(2, sUpdateUUID);
+    pStatement->setString(3, sNormalizedUUID);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION);
+
+    pTransaction->commit();
 
 }
 
 void CLoginHandler::SetUserPasswordByUUID(const std::string& sUUID, const std::string& sSalt, const std::string& sHashedPassword)
 {
+    if (sUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYUSERUUID);
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    std::string sNormalizedSalt = AMCCommon::CUtils::normalizeSHA256String(sSalt);
+    std::string sNormalizedPassword = AMCCommon::CUtils::normalizeSHA256String(sHashedPassword);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+    std::string sQuery = "UPDATE users SET salt=?, passwordhash=?, updateuuid=? WHERE uuid=? AND active=1";
+    auto pStatement = pTransaction->prepareStatement(sQuery);
+    pStatement->setString(1, sNormalizedSalt);
+    pStatement->setString(2, sNormalizedPassword);
+    pStatement->setString(3, sUpdateUUID);
+    pStatement->setString(4, sNormalizedUUID);
+    pStatement->execute();
+
+    std::string sCheckQuery = "SELECT uuid FROM users WHERE updateuuid=?";
+    auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+    pCheckStatement->setString(1, sUpdateUUID);
+    if (!pCheckStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD);
+
+    pTransaction->commit();
 
 }
 
 IUserList* CLoginHandler::GetActiveUsers()
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    auto userList = std::make_unique<CUserList>();
+
+    std::string sQuery = "SELECT login, description, role, language, uuid FROM users WHERE active=1 ORDER BY login";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    while (pStatement->nextRow()) {
+
+        std::string sUUID = pStatement->getColumnString(1);
+        std::string sUsername = pStatement->getColumnString(2);
+        std::string sDescription = pStatement->getColumnString(3);
+        std::string sRole = pStatement->getColumnString(4);
+        std::string sLanguageIdentifier = pStatement->getColumnString(5);
+
+        userList->addUser(sUUID, sUsername, sDescription, sRole, sLanguageIdentifier);
+    }
+
+    return userList.release();
 }
 
 

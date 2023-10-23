@@ -227,6 +227,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE 10130 /** Could not load PNG image */
 #define LIBMCENV_ERROR_INVALIDPIXELSIZE 10131 /** Invalid pixel size */
 #define LIBMCENV_ERROR_MESHISNOTREGISTERED 10132 /** Mesh is not registered */
+#define LIBMCENV_ERROR_INVALIDUSERINDEX 10133 /** Invalid user index */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -366,6 +367,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "Could not load PNG image";
     case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
     case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "Mesh is not registered";
+    case LIBMCENV_ERROR_INVALIDUSERINDEX: return "Invalid user index";
     default: return "unknown error";
   }
 }

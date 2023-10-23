@@ -170,6 +170,8 @@
 		<error name="COULDNOTLOADPNGIMAGE" code="10130" description="Could not load PNG image"/>
 		<error name="INVALIDPIXELSIZE" code="10131" description="Invalid pixel size"/>
 		<error name="MESHISNOTREGISTERED" code="10132" description="Mesh is not registered"/>
+		<error name="INVALIDUSERINDEX" code="10133" description="Invalid user index"/>
+		
 
 	</errors>
 

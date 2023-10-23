@@ -340,6 +340,13 @@
 		<error name="EMPTYUSERPASSWORD" code="341" description="Empty user password" />
 		<error name="INVALIDUSERROLE" code="342" description="Invalid user role" />
 		<error name="USERALREADYEXISTS" code="343" description="User already exists" />
+		
+		<error name="INVALIDUSERLANGUAGE" code="344" description="Invalid user language" />
+		<error name="COULDNOTUPDATEUSERLANGUAGE" code="345" description="Could not update user language" />
+		<error name="COULDNOTUPDATEUSERROLE" code="346" description="Could not update user role" />
+		<error name="COULDNOTUPDATEUSERDESCRIPTION" code="347" description="Could not update user description" />
+		<error name="COULDNOTUPDATEUSERPASSWORD" code="348" description="Could not update user password" />
+		
 										
 	</errors>
 	

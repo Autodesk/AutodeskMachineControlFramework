@@ -432,6 +432,7 @@ public:
 			case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "COULDNOTLOADPNGIMAGE";
 			case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "INVALIDPIXELSIZE";
 			case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "MESHISNOTREGISTERED";
+			case LIBMCENV_ERROR_INVALIDUSERINDEX: return "INVALIDUSERINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -571,6 +572,7 @@ public:
 			case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "Could not load PNG image";
 			case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
 			case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "Mesh is not registered";
+			case LIBMCENV_ERROR_INVALIDUSERINDEX: return "Invalid user index";
 		}
 		return "unknown error";
 	}
