@@ -346,6 +346,7 @@
 		<error name="COULDNOTUPDATEUSERROLE" code="346" description="Could not update user role" />
 		<error name="COULDNOTUPDATEUSERDESCRIPTION" code="347" description="Could not update user description" />
 		<error name="COULDNOTUPDATEUSERPASSWORD" code="348" description="Could not update user password" />
+		<error name="INVALIDUSERINDEX" code="349" description="Invalid user index" />
 		
 										
 	</errors>

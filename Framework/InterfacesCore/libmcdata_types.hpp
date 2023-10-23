@@ -373,6 +373,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE 346 /** Could not update user role */
 #define LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION 347 /** Could not update user description */
 #define LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD 348 /** Could not update user password */
+#define LIBMCDATA_ERROR_INVALIDUSERINDEX 349 /** Invalid user index */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -658,6 +659,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE: return "Could not update user role";
     case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "Could not update user description";
     case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
+    case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
     default: return "unknown error";
   }
 }

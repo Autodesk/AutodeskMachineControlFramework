@@ -35,13 +35,63 @@ Abstract: This is a stub class definition of CUserList
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include "common_utils.hpp"
 
 using namespace LibMCData::Impl;
 
 /*************************************************************************************************************************
  Class definition of CUserList 
 **************************************************************************************************************************/
+
+class LibMCData::Impl::CUserListEntryImpl
+{
+private:
+    std::string m_sUsername;
+    std::string m_sUUID;
+    std::string m_sDescription;
+    std::string m_sRole;
+    std::string m_sLanguageIdentifier;
+
+public:
+
+    CUserListEntryImpl(const std::string& sUsername, const std::string& sUUID, const std::string& sDescription, const std::string& sRole, const std::string& sLanguageIdentifier)
+        :  m_sUsername(sUsername), m_sUUID(sUUID), m_sDescription(sDescription), m_sRole(sRole), m_sLanguageIdentifier(sLanguageIdentifier)
+    {
+
+    }
+
+    virtual ~CUserListEntryImpl()
+    {
+
+    }
+
+    std::string getUsername()
+    {
+        return m_sUsername;
+    }
+
+    std::string getUUID()
+    {
+        return m_sUUID;
+    }
+
+    std::string getDescription()
+    {
+        return m_sDescription;
+    }
+
+    std::string getRole()
+    {
+        return m_sRole;
+    }
+
+    std::string getLanguageIdentifier()
+    {
+        return m_sLanguageIdentifier;
+    }
+
+};
+
 
 CUserList::CUserList()
 {
@@ -61,10 +111,20 @@ LibMCData_uint32 CUserList::Count()
 
 void CUserList::GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (nUserIndex >= m_Entries.size ())
+	    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERINDEX);
+
+    auto pEntry = m_Entries.at(nUserIndex);
+    sUsername = pEntry->getUsername();
+    sUUID = pEntry->getUUID ();
+    sDescription = pEntry->getDescription();
+    sRole = pEntry->getRole();
+    sLanguageIdentifier = pEntry->getLanguageIdentifier();
+
 }
 
 void CUserList::addUser(const std::string& sUUID, const std::string& sUsername, const std::string& const sDescription, const std::string& sRole, const std::string& sLanguageIdentifier)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    auto pEntry = std::make_shared<CUserListEntryImpl>(sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
+    m_Entries.push_back(pEntry);
 }
