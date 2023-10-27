@@ -514,7 +514,7 @@ IUserList* CLoginHandler::GetActiveUsers()
 {
     auto userList = std::make_unique<CUserList>();
 
-    std::string sQuery = "SELECT login, description, role, language, uuid FROM users WHERE active=1 ORDER BY login";
+    std::string sQuery = "SELECT uuid, login, description, role, language FROM users WHERE active=1 ORDER BY login";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     while (pStatement->nextRow()) {
 
