@@ -576,6 +576,20 @@
 		<error name="MESH3MFRESOURCEISEMPTY" code="550" description="Mesh 3MF resource is empty"/>		
 		<error name="INVALIDMESHEDGEID" code="551" description="Invalid edge ID"/>		
 		<error name="INVALIDMESHNODEID" code="552" description="Invalid node ID"/>			
+		<error name="INVALIDGLSCENEMODELNAME" code="553" description="Invalid GL scene model name"/>			
+		<error name="INVALIDGLSCENEINSTANCENAME" code="554" description="Invalid GL scene instance name"/>			
+		<error name="EMPTYGLMODELNAME" code="555" description="Empty GL model name"/>			
+		<error name="INVALIDGLMODELNAME" code="556" description="Invalid GL model name"/>			
+		<error name="DUPLICATEGLMODELNAME" code="557" description="Duplicate GL model name"/>			
+		<error name="MODELGLRESOURCENOTFOUND" code="558" description="Model GL Resource not found"/>			
+		<error name="EMPTYGLINSTANCENAME" code="559" description="Empty GL instance name"/>			
+		<error name="INVALIDGLINSTANCENAME" code="560" description="Invalid GL instance name"/>			
+		<error name="EMPTYGLINSTANCEMODEL" code="561" description="Empty GL instance model"/>			
+		<error name="INVALIDGLINSTANCEMODEL" code="562" description="Invalid GL instance model"/>			
+		<error name="GLINSTANCEMODELNOTFOUND" code="563" description="GL instance model not found"/>
+		<error name="DUPLICATEGLINSTANCENAME" code="564" description="Duplicate GL instance name"/>			
+				
+		
 
 	</errors>
 	

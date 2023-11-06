@@ -567,6 +567,18 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MESH3MFRESOURCEISEMPTY 550 /** Mesh 3MF resource is empty */
 #define LIBMC_ERROR_INVALIDMESHEDGEID 551 /** Invalid edge ID */
 #define LIBMC_ERROR_INVALIDMESHNODEID 552 /** Invalid node ID */
+#define LIBMC_ERROR_INVALIDGLSCENEMODELNAME 553 /** Invalid GL scene model name */
+#define LIBMC_ERROR_INVALIDGLSCENEINSTANCENAME 554 /** Invalid GL scene instance name */
+#define LIBMC_ERROR_EMPTYGLMODELNAME 555 /** Empty GL model name */
+#define LIBMC_ERROR_INVALIDGLMODELNAME 556 /** Invalid GL model name */
+#define LIBMC_ERROR_DUPLICATEGLMODELNAME 557 /** Duplicate GL model name */
+#define LIBMC_ERROR_MODELGLRESOURCENOTFOUND 558 /** Model GL Resource not found */
+#define LIBMC_ERROR_EMPTYGLINSTANCENAME 559 /** Empty GL instance name */
+#define LIBMC_ERROR_INVALIDGLINSTANCENAME 560 /** Invalid GL instance name */
+#define LIBMC_ERROR_EMPTYGLINSTANCEMODEL 561 /** Empty GL instance model */
+#define LIBMC_ERROR_INVALIDGLINSTANCEMODEL 562 /** Invalid GL instance model */
+#define LIBMC_ERROR_GLINSTANCEMODELNOTFOUND 563 /** GL instance model not found */
+#define LIBMC_ERROR_DUPLICATEGLINSTANCENAME 564 /** Duplicate GL instance name */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1046,6 +1058,18 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MESH3MFRESOURCEISEMPTY: return "Mesh 3MF resource is empty";
     case LIBMC_ERROR_INVALIDMESHEDGEID: return "Invalid edge ID";
     case LIBMC_ERROR_INVALIDMESHNODEID: return "Invalid node ID";
+    case LIBMC_ERROR_INVALIDGLSCENEMODELNAME: return "Invalid GL scene model name";
+    case LIBMC_ERROR_INVALIDGLSCENEINSTANCENAME: return "Invalid GL scene instance name";
+    case LIBMC_ERROR_EMPTYGLMODELNAME: return "Empty GL model name";
+    case LIBMC_ERROR_INVALIDGLMODELNAME: return "Invalid GL model name";
+    case LIBMC_ERROR_DUPLICATEGLMODELNAME: return "Duplicate GL model name";
+    case LIBMC_ERROR_MODELGLRESOURCENOTFOUND: return "Model GL Resource not found";
+    case LIBMC_ERROR_EMPTYGLINSTANCENAME: return "Empty GL instance name";
+    case LIBMC_ERROR_INVALIDGLINSTANCENAME: return "Invalid GL instance name";
+    case LIBMC_ERROR_EMPTYGLINSTANCEMODEL: return "Empty GL instance model";
+    case LIBMC_ERROR_INVALIDGLINSTANCEMODEL: return "Invalid GL instance model";
+    case LIBMC_ERROR_GLINSTANCEMODELNOTFOUND: return "GL instance model not found";
+    case LIBMC_ERROR_DUPLICATEGLINSTANCENAME: return "Duplicate GL instance name";
     default: return "unknown error";
   }
 }

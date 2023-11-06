@@ -44,6 +44,79 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
+CUIModule_GLSceneModel::CUIModule_GLSceneModel(const std::string& sUUID, const std::string& sName, const std::string& sResourceName)
+	: m_sUUID(AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sName (sName), m_sResourceName (sResourceName)
+{
+	if (sName.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDGLSCENEMODELNAME);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDGLSCENEMODELNAME, sName);
+
+	if (sResourceName.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDGLSCENEINSTANCENAME);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sResourceName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDGLSCENEINSTANCENAME, sResourceName);
+
+}
+
+CUIModule_GLSceneModel::~CUIModule_GLSceneModel()
+{
+
+}
+
+std::string CUIModule_GLSceneModel::getUUID()
+{
+	return m_sUUID;
+}
+
+std::string CUIModule_GLSceneModel::getName()
+{
+	return m_sName;
+}
+
+std::string CUIModule_GLSceneModel::getResourceName()
+{
+	return m_sResourceName;
+}
+
+
+
+CUIModule_GLSceneInstance::CUIModule_GLSceneInstance(const std::string& sUUID, const std::string& sName, PUIModule_GLSceneModel pModel)
+	: m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)), m_sName(sName), m_pModel(pModel)
+{
+	if (sName.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDGLSCENEMODELNAME);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDGLSCENEMODELNAME, sName);
+
+	if (pModel.get () == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+}
+
+CUIModule_GLSceneInstance::~CUIModule_GLSceneInstance()
+{
+
+}
+
+std::string CUIModule_GLSceneInstance::getUUID()
+{
+	return m_sUUID;
+}
+
+std::string CUIModule_GLSceneInstance::getName()
+{
+	return m_sName;
+}
+
+PUIModule_GLSceneModel CUIModule_GLSceneInstance::getModel()
+{
+	return m_pModel;
+}
+
 
 CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
@@ -51,7 +124,81 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
 	if (getTypeFromXML(xmlNode) != getStaticType())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
+
+	auto pResourcePackage = pUIModuleEnvironment->resourcePackage();
+
+	auto modelsNode = xmlNode.child("models");
+	if (!modelsNode.empty()) {
+		auto modelNodes = modelsNode.children("model");
+		for (auto modelNode : modelNodes) {
+			auto modelNameAttrib = modelNode.attribute("name");
+			auto modelResourceAttrib = modelNode.attribute("resource");
+			std::string sModelName = modelNameAttrib.as_string();
+			std::string sModelResourceName = modelResourceAttrib.as_string();
+
+			if (sModelName.empty ())
+				throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYGLMODELNAME);
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sModelName))
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDGLMODELNAME, sModelName);
+
+			auto iIter = m_ModelNameMap.find(sModelName);
+			if (iIter != m_ModelNameMap.end())
+				throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEGLMODELNAME, sModelName);
+
+			if (sModelResourceName.empty())
+				throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYGLMODELNAME);
+
+			auto pModelResource = pResourcePackage->findEntryByName (sModelResourceName, false);
+			if (pModelResource.get () == nullptr)
+				throw ELibMCCustomException(LIBMC_ERROR_MODELGLRESOURCENOTFOUND, sModelResourceName);
+
+			std::string sModelUUID = AMCCommon::CUtils::createUUID();
+
+			auto pModel = std::make_shared<CUIModule_GLSceneModel>(sModelUUID, sModelName, sModelResourceName);
+			m_ModelNameMap.insert(std::make_pair (sModelName, pModel));
+			m_ModelUUIDMap.insert(std::make_pair (sModelUUID, pModel));
+		}
+
+	}
+
+	auto sceneNode = xmlNode.child("scene");
+	if (!sceneNode.empty()) {
+		auto instancesNodes = sceneNode.children("instance");
+		for (auto instanceNode : instancesNodes) {
+			auto instanceNameAttrib = instanceNode.attribute("name");
+			auto instanceModelAttrib = instanceNode.attribute("model");
+
+			std::string sName = instanceNameAttrib.as_string();
+			std::string sModelName = instanceModelAttrib.as_string();
+
+			if (sName.empty ())
+				throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYGLINSTANCENAME);
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDGLINSTANCENAME, sName);
+			auto iNameIter = m_InstanceNameMap.find(sName);
+			if (iNameIter != m_InstanceNameMap.end())
+				throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEGLINSTANCENAME, sName);
+
+			if (sModelName.empty())
+				throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYGLINSTANCEMODEL);
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sModelName))
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDGLINSTANCEMODEL, sModelName);
+
+			auto iIter = m_ModelNameMap.find(sModelName);
+			if (iIter == m_ModelNameMap.end())
+				throw ELibMCCustomException(LIBMC_ERROR_GLINSTANCEMODELNOTFOUND, sModelName);
+
+			std::string sInstanceUUID = AMCCommon::CUtils::createUUID();
+
+			auto pInstance = std::make_shared<CUIModule_GLSceneInstance>(sInstanceUUID, sName, iIter->second);
+			m_InstanceNameMap.insert(std::make_pair (sName, pInstance));
+			m_InstanceUUIDMap.insert(std::make_pair(sInstanceUUID, pInstance));
+		}
+	}
+
+
+
 
 }
 

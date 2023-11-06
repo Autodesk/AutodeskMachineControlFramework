@@ -9,6 +9,10 @@
 
   <accesscontrol>
 
+    <defaultusers>
+      <defaultuser name="test" salt="f735faa2ac49ac0a68dbf41d9cd57cfb426ef91eb19726afd8f075ac625cccb2" passwordhash="556080937385d8eb21ea0e8707d7cf3e94b79ed234596ba8a2ac98da1ff4fee3" description="This is a test user." />
+    </defaultusers>
+
     <permissions>
       <permission identifier="permission_view_builds" displayname="View Builds" description="Can view build files on machine." />
       <permission identifier="permission_start_build" displayname="Start Build" description="Can start a new build on machine." />
@@ -321,7 +325,8 @@
 						<edit name="mainstatename" caption="Main System" readonly="1" sync:value="main.$state"/>
 						<edit name="scannerstatename" caption="Scanner System" readonly="1" sync:value="laser.$state"/>
 						<edit name="plcstatename" caption="PLC System" readonly="1" sync:value="plc.$state"/>
-					</form>
+            <edit name="test" caption="Test"  value="1234" validation="double" minvalue="10" maxvalue="20" validationmessage="Invalid value!"/>
+          </form>
 
 
 				</content>
@@ -524,6 +529,9 @@
 		<page name="buildreport">
 
 			<glscene name="manualcontrol3">
+						
+        
+        
 
 			</glscene>
 
@@ -559,6 +567,45 @@
     <page name="modelview">
 
       <glscene name="glscene1">
+
+        <models>
+          <model name="platform" resource="bptest" />
+          <model name="testpart" resource="test3mf5" />
+          <model name="recoater" resource="recoater" />
+        </models>
+
+        <lights>
+          <spotlight name="spotlight">
+
+          </spotlight>
+        </lights>
+
+
+        <fog>
+          
+        </fog>
+
+
+        <scene>
+          
+          <instance name="platform_view" model="platform" visible="1">
+            <color red="0.8" green="0.9" blue="0.5" shininess="50" specular_red="0.1" specular_green="0.1" specular_blue="0.1" />
+            
+            <position x="100" y="20" z="30" />
+            <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
+            
+          </instance>
+
+          <instance name="recoater_view" model="recoater" visible="1">
+            <color red="0.8" green="0.9" blue="0.5" shininess="50" specular_red="0.1" specular_green="0.1" specular_blue="0.1" />
+
+            <position x="100" sync:y="plc.recoater_position.x" z="30" />
+            <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
+
+          </instance>
+
+        </scene>
+
       </glscene>
 
     </page>

@@ -49,13 +49,59 @@ namespace AMC {
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CUIModule_GLSceneModel, PUIModule_GLSceneModel);
+	amcDeclareDependingClass(CUIModule_GLSceneInstance, PUIModule_GLSceneInstance);
 
-	
+	class CUIModule_GLSceneModel {
+	private:
+		std::string m_sUUID;
+		std::string m_sName;
+		std::string m_sResourceName;
+
+	public:
+		CUIModule_GLSceneModel(const std::string & sUUID, const std::string & sName, const std::string & sResourceName);
+
+		virtual ~CUIModule_GLSceneModel();
+
+		std::string getUUID ();
+
+		std::string getName ();
+
+		std::string getResourceName ();
+
+	};
+
+
+	class CUIModule_GLSceneInstance {
+	private:
+		std::string m_sUUID;
+		std::string m_sName;
+		PUIModule_GLSceneModel m_pModel;
+
+	public:
+		CUIModule_GLSceneInstance(const std::string& sUUID, const std::string& sName, PUIModule_GLSceneModel pModel);
+
+		virtual ~CUIModule_GLSceneInstance();
+
+		std::string getUUID();
+
+		std::string getName();
+
+		PUIModule_GLSceneModel getModel();
+
+	};
+
 
 	class CUIModule_GLScene : public CUIModule {
 	protected:		
 
 		std::string m_sCaption;
+
+		std::map<std::string, PUIModule_GLSceneModel> m_ModelNameMap;
+		std::map<std::string, PUIModule_GLSceneModel> m_ModelUUIDMap;
+
+		std::map<std::string, PUIModule_GLSceneInstance> m_InstanceNameMap;
+		std::map<std::string, PUIModule_GLSceneInstance> m_InstanceUUIDMap;
 
 	public:
 
