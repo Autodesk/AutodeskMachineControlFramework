@@ -72,7 +72,7 @@ public:
 
 	void GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) override;
 
-    void addUser(const std::string& sUUID, const std::string& sUsername, const std::string& const sDescription, const std::string& sRole, const std::string& sLanguageIdentifier);
+    void addUser(const std::string& sUUID, const std::string& sUsername, const std::string& sDescription, const std::string& sRole, const std::string& sLanguageIdentifier);
 
 };
 
