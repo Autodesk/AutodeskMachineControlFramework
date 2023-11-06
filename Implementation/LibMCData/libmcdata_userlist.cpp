@@ -123,7 +123,7 @@ void CUserList::GetUserProperties(const LibMCData_uint32 nUserIndex, std::string
 
 }
 
-void CUserList::addUser(const std::string& sUUID, const std::string& sUsername, const std::string& const sDescription, const std::string& sRole, const std::string& sLanguageIdentifier)
+void CUserList::addUser(const std::string& sUUID, const std::string& sUsername, const std::string& sDescription, const std::string& sRole, const std::string& sLanguageIdentifier)
 {
     auto pEntry = std::make_shared<CUserListEntryImpl>(sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
     m_Entries.push_back(pEntry);
