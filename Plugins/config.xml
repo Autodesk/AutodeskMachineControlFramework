@@ -162,7 +162,7 @@
 	<statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
 
 		<parametergroup name="cardconfig" description="Scanner Card Config">
-			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlabsmc" type="string"/>
+			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlab" type="string"/>
 			<parameter name="serial" description="Serial" default="341731" type="int"/>
 			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.0.1" type="string"/>
 			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
@@ -571,7 +571,6 @@
         <models>
           <model name="platform" resource="bptest" />
           <model name="testpart" resource="test3mf5" />
-          <model name="recoater" resource="recoater" />
         </models>
 
         <lights>
@@ -594,14 +593,6 @@
             <position x="100" y="20" z="30" />
             <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
             
-          </instance>
-
-          <instance name="recoater_view" model="recoater" visible="1">
-            <color red="0.8" green="0.9" blue="0.5" shininess="50" specular_red="0.1" specular_green="0.1" specular_blue="0.1" />
-
-            <position x="100" sync:y="plc.recoater_position.x" z="30" />
-            <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
-
           </instance>
 
         </scene>
