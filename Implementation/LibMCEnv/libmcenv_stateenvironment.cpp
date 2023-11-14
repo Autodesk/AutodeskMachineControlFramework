@@ -566,7 +566,6 @@ IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& s
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
 	auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
-	auto nResourceSize = pResourceEntry->getSize();
 
 	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
 	auto pLib3MFWrapper = m_pSystemState->getToolpathHandlerInstance()->getLib3MFWrapper();

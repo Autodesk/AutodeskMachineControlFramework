@@ -77,6 +77,7 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sName;
 		PUIModule_GLSceneModel m_pModel;
+		double dColor;
 
 	public:
 		CUIModule_GLSceneInstance(const std::string& sUUID, const std::string& sName, PUIModule_GLSceneModel pModel);
@@ -88,6 +89,8 @@ namespace AMC {
 		std::string getName();
 
 		PUIModule_GLSceneModel getModel();
+
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object);
 
 	};
 

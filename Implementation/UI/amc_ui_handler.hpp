@@ -81,6 +81,7 @@ namespace AMC {
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
 	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
+	amcDeclareDependingClass(CMeshHandler, PMeshHandler);
 	amcDeclareDependingClass(CUserInformation, PUserInformation);
 	amcDeclareDependingClass(CAccessControl, PAccessControl);
 	amcDeclareDependingClass(CLanguageHandler, PLanguageHandler);
@@ -145,6 +146,7 @@ namespace AMC {
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
 		PToolpathHandler m_pToolpathHandler;
+		PMeshHandler m_pMeshHandler;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		LibMCData::PStorage m_pStorage;
 

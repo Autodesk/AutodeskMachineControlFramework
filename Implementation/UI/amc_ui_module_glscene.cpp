@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_toolpathhandler.hpp"
+#include "amc_meshhandler.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 
@@ -117,6 +119,12 @@ PUIModule_GLSceneModel CUIModule_GLSceneInstance::getModel()
 	return m_pModel;
 }
 
+void CUIModule_GLSceneInstance::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+
+}
+
+
 
 CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
@@ -127,6 +135,9 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
 
 	auto pResourcePackage = pUIModuleEnvironment->resourcePackage();
+	auto pMeshHandler = pUIModuleEnvironment->meshHandler();
+	auto pLib3MFWrapper = pUIModuleEnvironment->toolpathHandler()->getLib3MFWrapper();
+
 
 	auto modelsNode = xmlNode.child("models");
 	if (!modelsNode.empty()) {
@@ -158,6 +169,9 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 			auto pModel = std::make_shared<CUIModule_GLSceneModel>(sModelUUID, sModelName, sModelResourceName);
 			m_ModelNameMap.insert(std::make_pair (sModelName, pModel));
 			m_ModelUUIDMap.insert(std::make_pair (sModelUUID, pModel));
+
+			pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sModelResourceName);
+
 		}
 
 	}
@@ -231,6 +245,19 @@ void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
+
+	CJSONWriterArray instancesNode(writer);
+	for (auto instance : m_InstanceNameMap) {
+		CJSONWriterObject instanceObject(writer);
+
+		instance.second->addContentToJSON (writer, instanceObject);
+
+		instanceObject.addString(AMC_API_KEY_UI_INSTANCENAME, instance.second->getName ());
+		instanceObject.addString(AMC_API_KEY_UI_UUID, instance.second->getUUID());
+
+		instancesNode.addObject(instanceObject);
+	}
+	moduleObject.addArray(AMC_API_KEY_UI_INSTANCES, instancesNode);
 
 }
 
