@@ -95,7 +95,7 @@ std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
 
 
 
-CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler)
+CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler)
     : m_dLogoAspectRatio (1.0), 
     m_pStateMachineData(pStateMachineData),
     m_pEnvironmentWrapper (pEnvironmentWrapper),
@@ -109,7 +109,8 @@ CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandle
     m_sSystemUserID (sSystemUserID),
     m_pAccessControl (pAccessControl),
     m_pLanguageHandler (pLanguageHandler),
-    m_pLoginHandler (pLoginHandler)
+    m_pLoginHandler (pLoginHandler),
+    m_pMeshHandler (pMeshHandler)
 {
     if (pStateMachineData.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -132,6 +133,8 @@ CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandle
     if (pLanguageHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pLoginHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pMeshHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 

@@ -46,8 +46,8 @@ CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, 
 	LibMCAssertNotNull(pBuildJobHandler.get());
 	LibMCAssertNotNull(pLogger.get());
 	LibMCAssertNotNull(pContentRegistry);
-	LibMCAssertNotNull(pMeshHandler.get());
 	LibMCAssertNotNull(pToolpathHandler.get());
+	LibMCAssertNotNull(pMeshHandler.get());
 }
 
 PStateMachineData CUIModuleEnvironment::stateMachineData()

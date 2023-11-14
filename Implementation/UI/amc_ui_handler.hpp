@@ -161,7 +161,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string & sTestOutputPath, const std::string & sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler);
+		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string & sTestOutputPath, const std::string & sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler);
 		
 		virtual ~CUIHandler();
 		

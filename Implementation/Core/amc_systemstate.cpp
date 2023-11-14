@@ -86,8 +86,8 @@ namespace AMC {
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
 		m_pLanguageHandler = std::make_shared<CLanguageHandler>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID (), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler);
 		m_pMeshHandler = std::make_shared<CMeshHandler>();
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID (), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler, m_pMeshHandler);
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
 		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
