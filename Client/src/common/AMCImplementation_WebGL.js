@@ -287,12 +287,15 @@ class WebGLBoxElement extends WebGLElement {
 
 class WebGLMeshElement extends WebGLElement {
 
-    constructor(applicationInstance, meshUUID) {
+    constructor(applicationInstance, meshUUID, meshcolor) {
 		
         super();
 
 		let normalizedUUID = Assert.UUIDValue (meshUUID);
 		this.meshUUID = normalizedUUID;
+		
+		if (!meshcolor)
+			meshcolor = 0x808080;
 		
 		this.material = new THREE.MeshPhongMaterial( {
 			color: 0x808080,
@@ -764,12 +767,12 @@ class WebGLImpl {
 		return boxElement;
 	}
 
-	addMeshElement (identifier, applicationInstance, meshUUID)
+	addMeshElement (identifier, applicationInstance, meshUUID, meshColor)
 	{
         if (!identifier)
             return;
 		
-		let meshElement = new WebGLMeshElement (applicationInstance, meshUUID);
+		let meshElement = new WebGLMeshElement (applicationInstance, meshUUID, meshColor);
 				
 		this.addElement(identifier, meshElement);
 		

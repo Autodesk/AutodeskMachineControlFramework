@@ -103,12 +103,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					this.glInstance.addAmbientLight ("ambientlight", 0x808080, 3);
 
 					
-					this.mesh1 = this.glInstance.addMeshElement ("mesh1", this.Application, "b56d10d3-978c-4299-958d-c33e750c67f9");
+					/*this.mesh1 = this.glInstance.addMeshElement ("mesh1", this.Application, "fff71800-4b1d-489e-8679-1f90b9b26646");
 					this.mesh1.setPosition (0,0, 0.0, 0.0);
 
-					this.mesh2 = this.glInstance.addMeshElement ("mesh2", this.Application, "da30f227-4d14-49a7-8d20-6e52a03e783b");
-					this.mesh2.setPosition (0,0, 0.0, 0.0);
+					this.mesh2 = this.glInstance.addMeshElement ("mesh2", this.Application, "e7cf4193-c77d-49b3-b8e3-edf266454a50", 0xc0c0c0);
+					this.mesh2.setPosition (0,0, 0.0, 0.0); */
 					
+					let scene = this.module.scene;
+					for (let instance of scene.instances) {
+						let mesh = this.glInstance.addMeshElement (instance.instancename, this.Application, instance.meshuuid);
+						mesh.setPosition (0,0, 0.0, 0.0);
+					
+					}
+					 
 					
 					this.glInstance.setupDemoScene ();
 					this.animate();
