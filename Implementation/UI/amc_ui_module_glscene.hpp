@@ -57,9 +57,11 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sName;
 		std::string m_sResourceName;
+		std::string m_sMeshUUID;
 
 	public:
-		CUIModule_GLSceneModel(const std::string & sUUID, const std::string & sName, const std::string & sResourceName);
+
+		CUIModule_GLSceneModel(const std::string & sUUID, const std::string & sName, const std::string & sResourceName, const std::string & sMeshUUID);
 
 		virtual ~CUIModule_GLSceneModel();
 
@@ -69,6 +71,8 @@ namespace AMC {
 
 		std::string getResourceName ();
 
+		std::string getMeshUUID();
+
 	};
 
 
@@ -77,7 +81,7 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sName;
 		PUIModule_GLSceneModel m_pModel;
-		double dColor;
+		
 
 	public:
 		CUIModule_GLSceneInstance(const std::string& sUUID, const std::string& sName, PUIModule_GLSceneModel pModel);

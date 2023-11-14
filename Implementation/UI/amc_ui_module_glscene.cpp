@@ -46,8 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_GLSceneModel::CUIModule_GLSceneModel(const std::string& sUUID, const std::string& sName, const std::string& sResourceName)
-	: m_sUUID(AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sName (sName), m_sResourceName (sResourceName)
+CUIModule_GLSceneModel::CUIModule_GLSceneModel(const std::string& sUUID, const std::string& sName, const std::string& sResourceName, const std::string& sMeshUUID)
+	: m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)), m_sName(sName), m_sResourceName(sResourceName),
+	  m_sMeshUUID(AMCCommon::CUtils::normalizeUUIDString (sMeshUUID))
 {
 	if (sName.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDGLSCENEMODELNAME);
@@ -83,6 +84,10 @@ std::string CUIModule_GLSceneModel::getResourceName()
 	return m_sResourceName;
 }
 
+std::string CUIModule_GLSceneModel::getMeshUUID()
+{
+	return m_sMeshUUID;
+}
 
 
 CUIModule_GLSceneInstance::CUIModule_GLSceneInstance(const std::string& sUUID, const std::string& sName, PUIModule_GLSceneModel pModel)
@@ -137,6 +142,8 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 	auto pResourcePackage = pUIModuleEnvironment->resourcePackage();
 	auto pMeshHandler = pUIModuleEnvironment->meshHandler();
 	auto pLib3MFWrapper = pUIModuleEnvironment->toolpathHandler()->getLib3MFWrapper();
+	auto pLogger = pUIModuleEnvironment->getLogger();
+
 
 
 	auto modelsNode = xmlNode.child("models");
@@ -166,11 +173,13 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 
 			std::string sModelUUID = AMCCommon::CUtils::createUUID();
 
-			auto pModel = std::make_shared<CUIModule_GLSceneModel>(sModelUUID, sModelName, sModelResourceName);
+			auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sModelResourceName);
+
+			auto pModel = std::make_shared<CUIModule_GLSceneModel>(sModelUUID, sModelName, sModelResourceName, pMeshEntity->getUUID ());
 			m_ModelNameMap.insert(std::make_pair (sModelName, pModel));
 			m_ModelUUIDMap.insert(std::make_pair (sModelUUID, pModel));
 
-			pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sModelResourceName);
+			pLogger->logMessage ("registering 3D resource " + sModelResourceName + " as " + sModelName, LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
 		}
 
@@ -179,7 +188,7 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 	auto sceneNode = xmlNode.child("scene");
 	if (!sceneNode.empty()) {
 		auto instancesNodes = sceneNode.children("instance");
-		for (auto instanceNode : instancesNodes) {
+		for (auto instanceNode : instancesNodes) { 
 			auto instanceNameAttrib = instanceNode.attribute("name");
 			auto instanceModelAttrib = instanceNode.attribute("model");
 
@@ -246,18 +255,28 @@ void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
 
+	CJSONWriterObject sceneNode(writer);
+
+	sceneNode.addString(AMC_API_KEY_UI_ITEMTYPE, "scene");
+	sceneNode.addString(AMC_API_KEY_UI_ITEMUUID, getUUID());
+
 	CJSONWriterArray instancesNode(writer);
 	for (auto instance : m_InstanceNameMap) {
 		CJSONWriterObject instanceObject(writer);
 
-		instance.second->addContentToJSON (writer, instanceObject);
+		auto pInstance = instance.second;
+		auto pModel = pInstance->getModel();
 
-		instanceObject.addString(AMC_API_KEY_UI_INSTANCENAME, instance.second->getName ());
-		instanceObject.addString(AMC_API_KEY_UI_UUID, instance.second->getUUID());
+		pInstance->addContentToJSON (writer, instanceObject);
+
+		instanceObject.addString(AMC_API_KEY_UI_INSTANCENAME, pInstance->getName ());
+		instanceObject.addString(AMC_API_KEY_UI_UUID, pInstance->getUUID());
+		instanceObject.addString(AMC_API_KEY_UI_MESHUUID, pModel->getMeshUUID());
 
 		instancesNode.addObject(instanceObject);
 	}
-	moduleObject.addArray(AMC_API_KEY_UI_INSTANCES, instancesNode);
+	sceneNode.addArray(AMC_API_KEY_UI_INSTANCES, instancesNode);
+	moduleObject.addObject(AMC_API_KEY_UI_SCENE, sceneNode);
 
 }
 
