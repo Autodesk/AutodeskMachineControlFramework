@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_resourcepackage.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_parameterhandler.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 
@@ -101,6 +102,15 @@ CUIModule_GLSceneInstance::CUIModule_GLSceneInstance(const std::string& sUUID, c
 
 	if (pModel.get () == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	
+	for (uint32_t nIndex = 0; nIndex < 3; nIndex++)
+		m_Position.at(nIndex).setFixedValue ("0.0");
+
+	for (uint32_t i = 0; i < 3; i++) {
+		for (uint32_t j = 0; j < 3; j++) {
+			m_Transform[i][j].setFixedValue ((i == j) ? "1.0" : "0.0");
+		}
+	}
 
 }
 
@@ -129,6 +139,78 @@ void CUIModule_GLSceneInstance::addContentToJSON(CJSONWriter& writer, CJSONWrite
 
 }
 
+void CUIModule_GLSceneInstance::setPosition(CUIExpression positionX, CUIExpression positionY, CUIExpression positionZ)
+{
+	m_Position.at(0) = positionX;
+	m_Position.at(1) = positionY;
+	m_Position.at(2) = positionZ;
+}
+
+void CUIModule_GLSceneInstance::getPosition(CUIExpression& positionX, CUIExpression& positionY, CUIExpression& positionZ)
+{
+	positionX = m_Position.at(0);
+	positionY = m_Position.at(1);
+	positionZ = m_Position.at(2);
+}
+
+
+void CUIModule_GLSceneInstance::setMatrix(uint32_t nRow, uint32_t nColumn, CUIExpression value)
+{
+	if ((nRow >= 3) || (nColumn >= 3))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	m_Transform.at(nRow).at(nColumn) = value;
+}
+
+CUIExpression CUIModule_GLSceneInstance::getMatrix(uint32_t nRow, uint32_t nColumn)
+{
+	if ((nRow >= 3) || (nColumn >= 3))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	return m_Transform.at(nRow).at(nColumn);
+}
+
+
+CUIModule_GLSceneItem::CUIModule_GLSceneItem(const std::string& sItemPath, const std::string& sUUID, PUIModuleEnvironment pUIModuleEnvironment, CUIModule_GLScene* pScene)
+	: CUIModuleItem(sItemPath), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)),
+	   m_pUIModuleEnvironment (pUIModuleEnvironment), m_pScene (pScene)
+{
+
+}
+
+std::string CUIModule_GLSceneItem::getUUID()
+{
+	return m_sUUID;
+}
+
+std::string CUIModule_GLSceneItem::findElementPathByUUID(const std::string& sUUID)
+{
+	if (sUUID == getUUID())
+		return getItemPath();
+
+	return "";
+}
+
+void CUIModule_GLSceneItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
+{
+	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+
+	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
+
+	m_pScene->writeSceneToJSON(writer, object, pClientVariableHandler);
+
+}
+
+void CUIModule_GLSceneItem::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
+{
+
+}
+
+void CUIModule_GLSceneItem::populateClientVariables(CParameterHandler* pClientVariableHandler)
+{
+	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "gl scene");
+
+}
 
 
 CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
@@ -137,13 +219,17 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
 	if (getTypeFromXML(xmlNode) != getStaticType())
-		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType());
+
+	if (sPath.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULEPATH, m_sName);
+
+	m_sModulePath = sPath + "." + m_sName;
 
 	auto pResourcePackage = pUIModuleEnvironment->resourcePackage();
 	auto pMeshHandler = pUIModuleEnvironment->meshHandler();
 	auto pLib3MFWrapper = pUIModuleEnvironment->toolpathHandler()->getLib3MFWrapper();
 	auto pLogger = pUIModuleEnvironment->getLogger();
-
 
 
 	auto modelsNode = xmlNode.child("models");
@@ -173,13 +259,13 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 
 			std::string sModelUUID = AMCCommon::CUtils::createUUID();
 
+			pLogger->logMessage("registering 3D resource " + sModelResourceName + " as " + sModelName, LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+
 			auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sModelResourceName);
 
 			auto pModel = std::make_shared<CUIModule_GLSceneModel>(sModelUUID, sModelName, sModelResourceName, pMeshEntity->getUUID ());
 			m_ModelNameMap.insert(std::make_pair (sModelName, pModel));
 			m_ModelUUIDMap.insert(std::make_pair (sModelUUID, pModel));
-
-			pLogger->logMessage ("registering 3D resource " + sModelResourceName + " as " + sModelName, LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
 		}
 
@@ -221,7 +307,7 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 	}
 
 
-
+	m_pSceneItem = std::make_shared<CUIModule_GLSceneItem>(m_sModulePath, m_sUUID, pUIModuleEnvironment, this);
 
 }
 
@@ -247,14 +333,8 @@ std::string CUIModule_GLScene::getCaption()
 	return m_sCaption;
 }
 
-
-void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
+void CUIModule_GLScene::writeSceneToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
 {
-	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
-	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
-	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
-	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
-
 	CJSONWriterObject sceneNode(writer);
 
 	sceneNode.addString(AMC_API_KEY_UI_ITEMTYPE, "scene");
@@ -267,9 +347,9 @@ void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 		auto pInstance = instance.second;
 		auto pModel = pInstance->getModel();
 
-		pInstance->addContentToJSON (writer, instanceObject);
+		pInstance->addContentToJSON(writer, instanceObject);
 
-		instanceObject.addString(AMC_API_KEY_UI_INSTANCENAME, pInstance->getName ());
+		instanceObject.addString(AMC_API_KEY_UI_INSTANCENAME, pInstance->getName());
 		instanceObject.addString(AMC_API_KEY_UI_UUID, pInstance->getUUID());
 		instanceObject.addString(AMC_API_KEY_UI_MESHUUID, pModel->getMeshUUID());
 
@@ -280,13 +360,29 @@ void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 
 }
 
+
+void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
+{
+	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
+	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
+	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
+	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
+
+	m_pSceneItem->addContentToJSON(writer, moduleObject, pClientVariableHandler, 0);
+}
+
 PUIModuleItem CUIModule_GLScene::findItem(const std::string& sUUID)
 {
+	if (m_pSceneItem->getUUID() == sUUID)
+		return m_pSceneItem;
+
 	return nullptr;
 }
 
+
 void CUIModule_GLScene::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
 {
+	itemMap.insert(std::make_pair(m_pSceneItem->getUUID(), m_pSceneItem));
 }
 
 void CUIModule_GLScene::configurePostLoading()
@@ -296,5 +392,8 @@ void CUIModule_GLScene::configurePostLoading()
 
 void CUIModule_GLScene::populateClientVariables(CParameterHandler* pParameterHandler)
 {
+	LibMCAssertNotNull(pParameterHandler);
+
+	m_pSceneItem->populateClientVariables(pParameterHandler);
 
 }
