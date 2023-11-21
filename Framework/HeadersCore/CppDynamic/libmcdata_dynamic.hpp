@@ -63,6 +63,7 @@ class CBase;
 class CIterator;
 class CLogEntryList;
 class CLogSession;
+class CJournalSession;
 class CStorageStream;
 class CStorage;
 class CBuildJobData;
@@ -83,6 +84,7 @@ typedef CBase CLibMCDataBase;
 typedef CIterator CLibMCDataIterator;
 typedef CLogEntryList CLibMCDataLogEntryList;
 typedef CLogSession CLibMCDataLogSession;
+typedef CJournalSession CLibMCDataJournalSession;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorage CLibMCDataStorage;
 typedef CBuildJobData CLibMCDataBuildJobData;
@@ -103,6 +105,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CLogSession> PLogSession;
+typedef std::shared_ptr<CJournalSession> PJournalSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorage> PStorage;
 typedef std::shared_ptr<CBuildJobData> PBuildJobData;
@@ -123,6 +126,7 @@ typedef PBase PLibMCDataBase;
 typedef PIterator PLibMCDataIterator;
 typedef PLogEntryList PLibMCDataLogEntryList;
 typedef PLogSession PLibMCDataLogSession;
+typedef PJournalSession PLibMCDataJournalSession;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorage PLibMCDataStorage;
 typedef PBuildJobData PLibMCDataBuildJobData;
@@ -491,6 +495,7 @@ public:
 			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "COULDNOTUPDATEUSERDESCRIPTION";
 			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "COULDNOTUPDATEUSERPASSWORD";
 			case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "INVALIDUSERINDEX";
+			case LIBMCDATA_ERROR_INVALIDJOURNAL: return "INVALIDJOURNAL";
 		}
 		return "UNKNOWN";
 	}
@@ -777,6 +782,7 @@ public:
 			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "Could not update user description";
 			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
 			case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
+			case LIBMCDATA_ERROR_INVALIDJOURNAL: return "Invalid journal";
 		}
 		return "unknown error";
 	}
@@ -898,6 +904,7 @@ private:
 	friend class CIterator;
 	friend class CLogEntryList;
 	friend class CLogSession;
+	friend class CJournalSession;
 	friend class CStorageStream;
 	friend class CStorage;
 	friend class CBuildJobData;
@@ -1024,9 +1031,28 @@ public:
 	{
 	}
 	
-	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp);
+	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestampUTC);
 	inline LibMCData_uint32 GetMaxLogEntryID();
 	inline PLogEntryList RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const eLogLevel eMinLogLevel);
+};
+	
+/*************************************************************************************************************************
+ Class CJournalSession 
+**************************************************************************************************************************/
+class CJournalSession : public CBase {
+public:
+	
+	/**
+	* CJournalSession::CJournalSession - Constructor for JournalSession class.
+	*/
+	CJournalSession(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<LibMCData_uint8> & DataBuffer);
+	inline LibMCData_uint32 GetChunkCapacity();
+	inline LibMCData_uint32 GetFlushInterval();
 };
 	
 /*************************************************************************************************************************
@@ -1145,7 +1171,6 @@ public:
 	inline std::string GetTimeStamp();
 	inline PStorageStream GetStorageStream();
 	inline std::string GetStorageStreamUUID();
-	inline PLogSession GetBuildJobLogger();
 	inline void StartValidating();
 	inline void FinishValidating(const LibMCData_uint32 nLayerCount);
 	inline void ArchiveJob();
@@ -1303,6 +1328,7 @@ public:
 	inline PStorage CreateStorage();
 	inline PBuildJobHandler CreateBuildJobHandler();
 	inline PLogSession CreateNewLogSession();
+	inline PJournalSession CreateJournalSession();
 	inline PLoginHandler CreateLoginHandler();
 	inline PPersistencyHandler CreatePersistencyHandler();
 	inline void SetBaseTempDirectory(const std::string & sTempDirectory);
@@ -1421,6 +1447,9 @@ public:
 		pWrapperTable->m_LogSession_AddEntry = nullptr;
 		pWrapperTable->m_LogSession_GetMaxLogEntryID = nullptr;
 		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = nullptr;
+		pWrapperTable->m_JournalSession_WriteJournalChunkData = nullptr;
+		pWrapperTable->m_JournalSession_GetChunkCapacity = nullptr;
+		pWrapperTable->m_JournalSession_GetFlushInterval = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
 		pWrapperTable->m_StorageStream_GetContextIdentifier = nullptr;
@@ -1459,7 +1488,6 @@ public:
 		pWrapperTable->m_BuildJob_GetTimeStamp = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStream = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStreamUUID = nullptr;
-		pWrapperTable->m_BuildJob_GetBuildJobLogger = nullptr;
 		pWrapperTable->m_BuildJob_StartValidating = nullptr;
 		pWrapperTable->m_BuildJob_FinishValidating = nullptr;
 		pWrapperTable->m_BuildJob_ArchiveJob = nullptr;
@@ -1521,6 +1549,7 @@ public:
 		pWrapperTable->m_DataModel_CreateStorage = nullptr;
 		pWrapperTable->m_DataModel_CreateBuildJobHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
+		pWrapperTable->m_DataModel_CreateJournalSession = nullptr;
 		pWrapperTable->m_DataModel_CreateLoginHandler = nullptr;
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
 		pWrapperTable->m_DataModel_SetBaseTempDirectory = nullptr;
@@ -1691,6 +1720,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_WriteJournalChunkData = (PLibMCDataJournalSession_WriteJournalChunkDataPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_writejournalchunkdata");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_WriteJournalChunkData = (PLibMCDataJournalSession_WriteJournalChunkDataPtr) dlsym(hLibrary, "libmcdata_journalsession_writejournalchunkdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_WriteJournalChunkData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_GetChunkCapacity = (PLibMCDataJournalSession_GetChunkCapacityPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getchunkcapacity");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_GetChunkCapacity = (PLibMCDataJournalSession_GetChunkCapacityPtr) dlsym(hLibrary, "libmcdata_journalsession_getchunkcapacity");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_GetChunkCapacity == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_GetFlushInterval = (PLibMCDataJournalSession_GetFlushIntervalPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getflushinterval");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_GetFlushInterval = (PLibMCDataJournalSession_GetFlushIntervalPtr) dlsym(hLibrary, "libmcdata_journalsession_getflushinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_GetFlushInterval == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2033,15 +2089,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJob_GetStorageStreamUUID == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
-		#else // _WIN32
-		pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) dlsym(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJob_GetBuildJobLogger == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2594,6 +2641,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataModel_CreateJournalSession = (PLibMCDataDataModel_CreateJournalSessionPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createjournalsession");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_CreateJournalSession = (PLibMCDataDataModel_CreateJournalSessionPtr) dlsym(hLibrary, "libmcdata_datamodel_createjournalsession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_CreateJournalSession == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataModel_CreateLoginHandler = (PLibMCDataDataModel_CreateLoginHandlerPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createloginhandler");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_CreateLoginHandler = (PLibMCDataDataModel_CreateLoginHandlerPtr) dlsym(hLibrary, "libmcdata_datamodel_createloginhandler");
@@ -2783,6 +2839,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_WriteJournalChunkData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalsession_getchunkcapacity", (void**)&(pWrapperTable->m_JournalSession_GetChunkCapacity));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetChunkCapacity == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalsession_getflushinterval", (void**)&(pWrapperTable->m_JournalSession_GetFlushInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetFlushInterval == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storagestream_getuuid", (void**)&(pWrapperTable->m_StorageStream_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2933,10 +3001,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getstoragestreamuuid", (void**)&(pWrapperTable->m_BuildJob_GetStorageStreamUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetStorageStreamUUID == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjob_getbuildjoblogger", (void**)&(pWrapperTable->m_BuildJob_GetBuildJobLogger));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetBuildJobLogger == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_startvalidating", (void**)&(pWrapperTable->m_BuildJob_StartValidating));
@@ -3183,6 +3247,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateNewLogSession == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_datamodel_createjournalsession", (void**)&(pWrapperTable->m_DataModel_CreateJournalSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateJournalSession == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createloginhandler", (void**)&(pWrapperTable->m_DataModel_CreateLoginHandler));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateLoginHandler == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3409,11 +3477,11 @@ public:
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
 	* @param[in] eLogLevel - Log Level
-	* @param[in] sTimestamp - Timestamp in ISO8601 UTC format
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	void CLogSession::AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp)
+	void CLogSession::AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestampUTC)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_AddEntry(m_pHandle, sMessage.c_str(), sSubSystem.c_str(), eLogLevel, sTimestamp.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_AddEntry(m_pHandle, sMessage.c_str(), sSubSystem.c_str(), eLogLevel, sTimestampUTC.c_str()));
 	}
 	
 	/**
@@ -3444,6 +3512,46 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CLogEntryList>(m_pWrapper, hLogEntryList);
+	}
+	
+	/**
+	 * Method definitions for class CJournalSession
+	 */
+	
+	/**
+	* CJournalSession::WriteJournalChunkData - writes detailed journal states to disk.
+	* @param[in] nChunkIndex - Index of the Chunk to write
+	* @param[in] nStartTimeStamp - Start Timestamp of the chunk
+	* @param[in] nEndTimeStamp - End Timestamp of the chunk
+	* @param[in] DataBuffer - Data to write into chunk.
+	*/
+	void CJournalSession::WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<LibMCData_uint8> & DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_WriteJournalChunkData(m_pHandle, nChunkIndex, nStartTimeStamp, nEndTimeStamp, (LibMCData_uint64)DataBuffer.size(), DataBuffer.data()));
+	}
+	
+	/**
+	* CJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.
+	* @return Maximum Chunk Capacity in Journal in Bytes
+	*/
+	LibMCData_uint32 CJournalSession::GetChunkCapacity()
+	{
+		LibMCData_uint32 resultChunkCapacity = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetChunkCapacity(m_pHandle, &resultChunkCapacity));
+		
+		return resultChunkCapacity;
+	}
+	
+	/**
+	* CJournalSession::GetFlushInterval - Returns the flush interval of the session journal.
+	* @return The interval determines how often a session journal chunk is written to disk. In Seconds.
+	*/
+	LibMCData_uint32 CJournalSession::GetFlushInterval()
+	{
+		LibMCData_uint32 resultFlushInterval = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetFlushInterval(m_pHandle, &resultFlushInterval));
+		
+		return resultFlushInterval;
 	}
 	
 	/**
@@ -3991,21 +4099,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetStorageStreamUUID(m_pHandle, bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0]));
 		
 		return std::string(&bufferStreamUUID[0]);
-	}
-	
-	/**
-	* CBuildJob::GetBuildJobLogger - creates a build job log session access class.
-	* @return LogSession class instance.
-	*/
-	PLogSession CBuildJob::GetBuildJobLogger()
-	{
-		LibMCDataHandle hLogSession = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetBuildJobLogger(m_pHandle, &hLogSession));
-		
-		if (!hLogSession) {
-			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CLogSession>(m_pWrapper, hLogSession);
 	}
 	
 	/**
@@ -4907,6 +5000,21 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CLogSession>(m_pWrapper, hLogSession);
+	}
+	
+	/**
+	* CDataModel::CreateJournalSession - creates a global journal session access class.
+	* @return JournalSession class instance.
+	*/
+	PJournalSession CDataModel::CreateJournalSession()
+	{
+		LibMCDataHandle hJournalSession = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_CreateJournalSession(m_pHandle, &hJournalSession));
+		
+		if (!hJournalSession) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalSession>(m_pWrapper, hJournalSession);
 	}
 	
 	/**

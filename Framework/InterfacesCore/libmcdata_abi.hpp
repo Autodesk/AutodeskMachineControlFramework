@@ -182,10 +182,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logentrylist_hasentry(LibMCData_Log
 * @param[in] pMessage - Log Message
 * @param[in] pSubSystem - Sub System identifier
 * @param[in] eLogLevel - Log Level
-* @param[in] pTimestamp - Timestamp in ISO8601 UTC format
+* @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_addentry(LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestamp);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_addentry(LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestampUTC);
 
 /**
 * retrieves the maximum log entry ID in the log.
@@ -207,6 +207,41 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_getmaxlogentryid(LibMCDa
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
+
+/*************************************************************************************************************************
+ Class definition for JournalSession
+**************************************************************************************************************************/
+
+/**
+* writes detailed journal states to disk.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] nChunkIndex - Index of the Chunk to write
+* @param[in] nStartTimeStamp - Start Timestamp of the chunk
+* @param[in] nEndTimeStamp - End Timestamp of the chunk
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[in] pDataBuffer - uint8 buffer of Data to write into chunk.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_writejournalchunkdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer);
+
+/**
+* Returns the chunk capacity of the session journal.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[out] pChunkCapacity - Maximum Chunk Capacity in Journal in Bytes
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkcapacity(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkCapacity);
+
+/**
+* Returns the flush interval of the session journal.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[out] pFlushInterval - The interval determines how often a session journal chunk is written to disk. In Seconds.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getflushinterval(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pFlushInterval);
 
 /*************************************************************************************************************************
  Class definition for StorageStream
@@ -631,15 +666,6 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getstoragestream(LibMCData
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getstoragestreamuuid(LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer);
-
-/**
-* creates a build job log session access class.
-*
-* @param[in] pBuildJob - BuildJob instance.
-* @param[out] pLogSession - LogSession class instance.
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getbuildjoblogger(LibMCData_BuildJob pBuildJob, LibMCData_LogSession * pLogSession);
 
 /**
 * Starts validation of a build job.
@@ -1348,6 +1374,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createbuildjobhandler(Lib
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createnewlogsession(LibMCData_DataModel pDataModel, LibMCData_LogSession * pLogSession);
+
+/**
+* creates a global journal session access class.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pJournalSession - JournalSession class instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createjournalsession(LibMCData_DataModel pDataModel, LibMCData_JournalSession * pJournalSession);
 
 /**
 * creates a login handler instance.

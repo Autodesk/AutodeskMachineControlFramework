@@ -96,7 +96,7 @@ void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sConte
     pInsertStatement->setInt64(6, nSize);
     pInsertStatement->setString(7, sUserID);
     pInsertStatement->setString(8, sTimestamp);
-    pInsertStatement->setString(9, AMCData::CStoragePath::storageStreamStatusToString (AMCData::sssNew));
+    pInsertStatement->setString(9, AMCData::CStoragePath::storageStreamStatusToString (AMCData::eStorageStreamStatus::sssNew));
     pInsertStatement->execute();
     pInsertStatement = nullptr;
 
@@ -118,7 +118,7 @@ bool CStorage::StreamIsReady(const std::string& sUUID)
     std::string sQuery = "SELECT uuid FROM storage_streams WHERE uuid=? AND status=?";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sParsedUUID);
-    pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
+    pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
     return (pStatement->nextRow());
 }
 
@@ -248,11 +248,11 @@ void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string
 
     std::string sUpdateQuery = "UPDATE storage_streams SET status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
     auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
-    pUpdateStatement->setString(1, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
+    pUpdateStatement->setString(1, AMCData::CStoragePath::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
     pUpdateStatement->setString(2, sCalculatedSHA256);
     pUpdateStatement->setString(3, sCalculatedBlockSHA256);
     pUpdateStatement->setString(4, sUUID);
-    pUpdateStatement->setString(5, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssNew));
+    pUpdateStatement->setString(5, AMCData::CStoragePath::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
     pUpdateStatement->execute();
 
 }

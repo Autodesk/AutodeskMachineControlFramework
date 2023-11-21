@@ -108,8 +108,6 @@ public:
 
     std::string GetStorageStreamUUID() override;
 
-    ILogSession * GetBuildJobLogger() override;
-
     void StartValidating() override;
 
     void FinishValidating(const LibMCData_uint32 nLayerCount) override;

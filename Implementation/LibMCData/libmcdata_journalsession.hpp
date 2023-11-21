@@ -26,50 +26,58 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+Abstract: This is the class declaration of CJournalSession
+
 */
 
 
-#ifndef __AMCDATA_STORAGEPATH
-#define __AMCDATA_STORAGEPATH
+#ifndef __LIBMCDATA_JOURNALSESSION
+#define __LIBMCDATA_JOURNALSESSION
 
-#include <string>
-#include <memory>
+#include "libmcdata_interfaces.hpp"
 
-namespace AMCData {
+// Parent classes
+#include "libmcdata_base.hpp"
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4250)
+#endif
+
+// Include custom headers here.
+#include "amcdata_journal.hpp"
+
+namespace LibMCData {
+namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CStoragePath
+ Class declaration of CJournalSession 
 **************************************************************************************************************************/
 
-enum class eStorageStreamStatus : int32_t {
-    sssNew = 0,
-    sssValidated = 1,
-    sssArchived = 2
-};
-
-class CStoragePath {
+class CJournalSession : public virtual IJournalSession, public virtual CBase {
 private:
-    std::string m_sDataPath;
-    
+
+    AMCData::PJournal m_pJournal;
 
 public:
 
-    CStoragePath(const std::string & sDataPath);
+    CJournalSession(AMCData::PJournal pJournalSession);
 
-    std::string getStreamPath(const std::string& sStreamUUID);
-    std::string getJournalPath(const std::string& sTimeFileName);
-    std::string getJournalDataPath(const std::string& sTimeFileName);
-    std::string getJournalFileName(const std::string& sTimeFileName);
-    std::string getJournalDataFileName(const std::string& sTimeFileName);
+    virtual ~CJournalSession();
 
-    static std::string storageStreamStatusToString(eStorageStreamStatus eStatus);
-    static eStorageStreamStatus stringToStorageStreamStatus(const std::string & sStatus);
+	void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer) override;
+
+    LibMCData_uint32 GetChunkCapacity() override;
+
+    LibMCData_uint32 GetFlushInterval() override;
 
 };
 
-typedef std::shared_ptr <CStoragePath> PStoragePath;
+} // namespace Impl
+} // namespace LibMCData
 
-} // namespace AMCDATA
-
-#endif // __AMCDATA_STORAGEPATH
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#endif // __LIBMCDATA_JOURNALSESSION

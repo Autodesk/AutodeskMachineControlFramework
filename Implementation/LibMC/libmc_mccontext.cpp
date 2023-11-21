@@ -71,8 +71,6 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 {
     LibMCAssertNotNull(pDataModel.get());
 
-    m_pStateJournal = std::make_shared<CStateJournal> (std::make_shared<CStateJournalStream> ());
-
     m_pEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
 
     // Create Log Multiplexer to StdOut and Database
@@ -80,6 +78,9 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel->CreateNewLogSession ()));
     if (pDataModel->HasLogCallback())
         pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel));
+
+    // Create State Journal
+    m_pStateJournal = std::make_shared<CStateJournal>(std::make_shared<CStateJournalStream>(pDataModel->CreateJournalSession()));
 
     // Create system state
     m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput");

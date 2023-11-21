@@ -169,10 +169,10 @@ typedef LibMCDataResult (*PLibMCDataLogEntryList_HasEntryPtr) (LibMCData_LogEntr
 * @param[in] pMessage - Log Message
 * @param[in] pSubSystem - Sub System identifier
 * @param[in] eLogLevel - Log Level
-* @param[in] pTimestamp - Timestamp in ISO8601 UTC format
+* @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataLogSession_AddEntryPtr) (LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestamp);
+typedef LibMCDataResult (*PLibMCDataLogSession_AddEntryPtr) (LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestampUTC);
 
 /**
 * retrieves the maximum log entry ID in the log.
@@ -194,6 +194,41 @@ typedef LibMCDataResult (*PLibMCDataLogSession_GetMaxLogEntryIDPtr) (LibMCData_L
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataLogSession_RetrieveLogEntriesByIDPtr) (LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
+
+/*************************************************************************************************************************
+ Class definition for JournalSession
+**************************************************************************************************************************/
+
+/**
+* writes detailed journal states to disk.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] nChunkIndex - Index of the Chunk to write
+* @param[in] nStartTimeStamp - Start Timestamp of the chunk
+* @param[in] nEndTimeStamp - End Timestamp of the chunk
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[in] pDataBuffer - uint8 buffer of Data to write into chunk.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalSession_WriteJournalChunkDataPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer);
+
+/**
+* Returns the chunk capacity of the session journal.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[out] pChunkCapacity - Maximum Chunk Capacity in Journal in Bytes
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalSession_GetChunkCapacityPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkCapacity);
+
+/**
+* Returns the flush interval of the session journal.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[out] pFlushInterval - The interval determines how often a session journal chunk is written to disk. In Seconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalSession_GetFlushIntervalPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pFlushInterval);
 
 /*************************************************************************************************************************
  Class definition for StorageStream
@@ -618,15 +653,6 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_GetStorageStreamPtr) (LibMCData_Bui
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataBuildJob_GetStorageStreamUUIDPtr) (LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer);
-
-/**
-* creates a build job log session access class.
-*
-* @param[in] pBuildJob - BuildJob instance.
-* @param[out] pLogSession - LogSession class instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDataResult (*PLibMCDataBuildJob_GetBuildJobLoggerPtr) (LibMCData_BuildJob pBuildJob, LibMCData_LogSession * pLogSession);
 
 /**
 * Starts validation of a build job.
@@ -1337,6 +1363,15 @@ typedef LibMCDataResult (*PLibMCDataDataModel_CreateBuildJobHandlerPtr) (LibMCDa
 typedef LibMCDataResult (*PLibMCDataDataModel_CreateNewLogSessionPtr) (LibMCData_DataModel pDataModel, LibMCData_LogSession * pLogSession);
 
 /**
+* creates a global journal session access class.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pJournalSession - JournalSession class instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_CreateJournalSessionPtr) (LibMCData_DataModel pDataModel, LibMCData_JournalSession * pJournalSession);
+
+/**
 * creates a login handler instance.
 *
 * @param[in] pDataModel - DataModel instance.
@@ -1489,6 +1524,9 @@ typedef struct {
 	PLibMCDataLogSession_AddEntryPtr m_LogSession_AddEntry;
 	PLibMCDataLogSession_GetMaxLogEntryIDPtr m_LogSession_GetMaxLogEntryID;
 	PLibMCDataLogSession_RetrieveLogEntriesByIDPtr m_LogSession_RetrieveLogEntriesByID;
+	PLibMCDataJournalSession_WriteJournalChunkDataPtr m_JournalSession_WriteJournalChunkData;
+	PLibMCDataJournalSession_GetChunkCapacityPtr m_JournalSession_GetChunkCapacity;
+	PLibMCDataJournalSession_GetFlushIntervalPtr m_JournalSession_GetFlushInterval;
 	PLibMCDataStorageStream_GetUUIDPtr m_StorageStream_GetUUID;
 	PLibMCDataStorageStream_GetTimeStampPtr m_StorageStream_GetTimeStamp;
 	PLibMCDataStorageStream_GetContextIdentifierPtr m_StorageStream_GetContextIdentifier;
@@ -1527,7 +1565,6 @@ typedef struct {
 	PLibMCDataBuildJob_GetTimeStampPtr m_BuildJob_GetTimeStamp;
 	PLibMCDataBuildJob_GetStorageStreamPtr m_BuildJob_GetStorageStream;
 	PLibMCDataBuildJob_GetStorageStreamUUIDPtr m_BuildJob_GetStorageStreamUUID;
-	PLibMCDataBuildJob_GetBuildJobLoggerPtr m_BuildJob_GetBuildJobLogger;
 	PLibMCDataBuildJob_StartValidatingPtr m_BuildJob_StartValidating;
 	PLibMCDataBuildJob_FinishValidatingPtr m_BuildJob_FinishValidating;
 	PLibMCDataBuildJob_ArchiveJobPtr m_BuildJob_ArchiveJob;
@@ -1589,6 +1626,7 @@ typedef struct {
 	PLibMCDataDataModel_CreateStoragePtr m_DataModel_CreateStorage;
 	PLibMCDataDataModel_CreateBuildJobHandlerPtr m_DataModel_CreateBuildJobHandler;
 	PLibMCDataDataModel_CreateNewLogSessionPtr m_DataModel_CreateNewLogSession;
+	PLibMCDataDataModel_CreateJournalSessionPtr m_DataModel_CreateJournalSession;
 	PLibMCDataDataModel_CreateLoginHandlerPtr m_DataModel_CreateLoginHandler;
 	PLibMCDataDataModel_CreatePersistencyHandlerPtr m_DataModel_CreatePersistencyHandler;
 	PLibMCDataDataModel_SetBaseTempDirectoryPtr m_DataModel_SetBaseTempDirectory;

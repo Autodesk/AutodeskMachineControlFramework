@@ -58,6 +58,7 @@ class IBase;
 class IIterator;
 class ILogEntryList;
 class ILogSession;
+class IJournalSession;
 class IStorageStream;
 class IStorage;
 class IBuildJobData;
@@ -390,9 +391,9 @@ public:
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
 	* @param[in] eLogLevel - Log Level
-	* @param[in] sTimestamp - Timestamp in ISO8601 UTC format
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	virtual void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string & sTimestamp) = 0;
+	virtual void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string & sTimestampUTC) = 0;
 
 	/**
 	* ILogSession::GetMaxLogEntryID - retrieves the maximum log entry ID in the log.
@@ -412,6 +413,39 @@ public:
 };
 
 typedef IBaseSharedPtr<ILogSession> PILogSession;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalSession 
+**************************************************************************************************************************/
+
+class IJournalSession : public virtual IBase {
+public:
+	/**
+	* IJournalSession::WriteJournalChunkData - writes detailed journal states to disk.
+	* @param[in] nChunkIndex - Index of the Chunk to write
+	* @param[in] nStartTimeStamp - Start Timestamp of the chunk
+	* @param[in] nEndTimeStamp - End Timestamp of the chunk
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[in] pDataBuffer - Data to write into chunk.
+	*/
+	virtual void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer) = 0;
+
+	/**
+	* IJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.
+	* @return Maximum Chunk Capacity in Journal in Bytes
+	*/
+	virtual LibMCData_uint32 GetChunkCapacity() = 0;
+
+	/**
+	* IJournalSession::GetFlushInterval - Returns the flush interval of the session journal.
+	* @return The interval determines how often a session journal chunk is written to disk. In Seconds.
+	*/
+	virtual LibMCData_uint32 GetFlushInterval() = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalSession> PIJournalSession;
 
 
 /*************************************************************************************************************************
@@ -717,12 +751,6 @@ public:
 	* @return Stream UUID.
 	*/
 	virtual std::string GetStorageStreamUUID() = 0;
-
-	/**
-	* IBuildJob::GetBuildJobLogger - creates a build job log session access class.
-	* @return LogSession class instance.
-	*/
-	virtual ILogSession * GetBuildJobLogger() = 0;
 
 	/**
 	* IBuildJob::StartValidating - Starts validation of a build job.
@@ -1230,6 +1258,12 @@ public:
 	* @return LogSession class instance.
 	*/
 	virtual ILogSession * CreateNewLogSession() = 0;
+
+	/**
+	* IDataModel::CreateJournalSession - creates a global journal session access class.
+	* @return JournalSession class instance.
+	*/
+	virtual IJournalSession * CreateJournalSession() = 0;
 
 	/**
 	* IDataModel::CreateLoginHandler - creates a login handler instance.

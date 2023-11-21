@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,59 +29,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __LIBMCDATA_LOGSESSION
-#define __LIBMCDATA_LOGSESSION
+#ifndef __AMCDATA_DATABASEMIGRATOR_JOURNALS
+#define __AMCDATA_DATABASEMIGRATOR_JOURNALS
 
-#include "libmcdata_interfaces.hpp"
+#include "amcdata_databasemigrator.hpp"
 
-// Parent classes
-#include "libmcdata_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+namespace AMCData {
 
-// Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_journal.hpp"
+	class CDatabaseMigrationClass_Journals : public CDatabaseMigrationClass {
+	public:
+		void increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex) override;
+	};
 
-#include "common_exportstream.hpp"
-
-#include <thread>
-#include <mutex>
+}
 
 
-namespace LibMCData {
-namespace Impl {
-
-
-/*************************************************************************************************************************
- Class declaration of CLogSession 
-**************************************************************************************************************************/
-
-class CLogSession : public virtual ILogSession, public virtual CBase {
-private:
-
-	AMCData::PJournal m_pJournal;
-
-public:
-
-	CLogSession(AMCData::PJournal pJournal);
-
-	virtual ~CLogSession();
-
-	void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp) override;
-
-	LibMCData_uint32 GetMaxLogEntryID() override;
-
-	ILogEntryList* RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCData
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDATA_LOGSESSION
+#endif //__AMCDATA_DATABASEMIGRATOR_JOURNALS

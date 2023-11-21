@@ -48,19 +48,32 @@ namespace AMCData {
 		return m_sDataPath + "/" + AMCCommon::CUtils::normalizeUUIDString(sStreamUUID) + ".stream";
 	}
 
-	std::string CStoragePath::getLogPath()
+	std::string CStoragePath::getJournalPath(const std::string& sTimeFileName)
+	{		
+		return m_sDataPath + "/" + getJournalFileName (sTimeFileName);
+	}
+
+	std::string CStoragePath::getJournalDataPath(const std::string& sTimeFileName)
 	{
-		AMCCommon::CChrono chrono;
-		auto sTimeFileName = chrono.getStartTimeFileName();
-		return m_sDataPath + "/log_" + sTimeFileName + ".db";
+		return m_sDataPath + "/" + getJournalDataFileName (sTimeFileName);
+	}
+
+	std::string CStoragePath::getJournalFileName(const std::string& sTimeFileName)
+	{
+		return "journal_" + sTimeFileName + ".db";
+	}
+
+	std::string CStoragePath::getJournalDataFileName(const std::string& sTimeFileName)
+	{
+		return "journal_" + sTimeFileName + ".data";
 	}
 
 	std::string CStoragePath::storageStreamStatusToString(eStorageStreamStatus eStatus)
 	{
 		switch (eStatus) {
-		case sssNew: return "new";
-		case sssValidated: return "validated";
-		case sssArchived: return "archived";
+		case eStorageStreamStatus::sssNew: return "new";
+		case eStorageStreamStatus::sssValidated: return "validated";
+		case eStorageStreamStatus::sssArchived: return "archived";
 		default: 
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS);
 		}
@@ -69,11 +82,11 @@ namespace AMCData {
 	eStorageStreamStatus CStoragePath::stringToStorageStreamStatus(const std::string& sStatus)
 	{
 		if (sStatus == "new")
-			return sssNew;
+			return eStorageStreamStatus::sssNew;
 		if (sStatus == "validated")
-			return sssValidated;
+			return eStorageStreamStatus::sssValidated;
 		if (sStatus == "archived")
-			return sssArchived;
+			return eStorageStreamStatus::sssArchived;
 
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS);
 	}

@@ -339,14 +339,16 @@
 		<error name="EMPTYUSERSALT" code="340" description="Empty user salt" />
 		<error name="EMPTYUSERPASSWORD" code="341" description="Empty user password" />
 		<error name="INVALIDUSERROLE" code="342" description="Invalid user role" />
-		<error name="USERALREADYEXISTS" code="343" description="User already exists" />
-		
+		<error name="USERALREADYEXISTS" code="343" description="User already exists" />		
 		<error name="INVALIDUSERLANGUAGE" code="344" description="Invalid user language" />
 		<error name="COULDNOTUPDATEUSERLANGUAGE" code="345" description="Could not update user language" />
 		<error name="COULDNOTUPDATEUSERROLE" code="346" description="Could not update user role" />
 		<error name="COULDNOTUPDATEUSERDESCRIPTION" code="347" description="Could not update user description" />
 		<error name="COULDNOTUPDATEUSERPASSWORD" code="348" description="Could not update user password" />
-		<error name="INVALIDUSERINDEX" code="349" description="Invalid user index" />
+		<error name="INVALIDUSERINDEX" code="349" description="Invalid user index" />		
+		<error name="INVALIDJOURNAL" code="350" description="Invalid journal" />
+		
+		
 		
 										
 	</errors>
@@ -477,7 +479,7 @@
 			<param name="Message" type="string" pass="in" description="Log Message" />	
 			<param name="SubSystem" type="string" pass="in" description="Sub System identifier" />	
 			<param name="LogLevel" type="enum" class="LogLevel" pass="in" description="Log Level" />	
-			<param name="Timestamp" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
+			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
 		</method>	
 
 		<method name="GetMaxLogEntryID" description="retrieves the maximum log entry ID in the log.">
@@ -491,6 +493,27 @@
 			<param name="LogEntryList" type="class" class="LogEntryList" pass="return" description="Log Entry List." />
 		</method>	
 				
+	</class>
+
+	<class name="JournalSession" parent="Base" description="Journaling Instance">
+
+		<method name="WriteJournalChunkData" description="writes detailed journal states to disk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start Timestamp of the chunk" />	
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End Timestamp of the chunk" />	
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to write into chunk." />	
+		</method>
+		
+		<method name="GetChunkCapacity" description="Returns the chunk capacity of the session journal.">
+			<param name="ChunkCapacity" type="uint32" pass="return" description="Maximum Chunk Capacity in Journal in Bytes" />	
+		</method>
+		
+		<method name="GetFlushInterval" description="Returns the flush interval of the session journal.">
+			<param name="FlushInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk. In Seconds." />	
+		</method>
+		
+		
+
 	</class>
 
 	<class name="StorageStream" parent="Base" description="Storage Stream Instance">
@@ -683,11 +706,7 @@
 
 		<method name="GetStorageStreamUUID" description="returns the storage stream uuid of the build.">
 			<param name="StreamUUID" type="string" pass="return" description="Stream UUID." />
-		</method>
-		
-		<method name="GetBuildJobLogger" description="creates a build job log session access class.">
-			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
-		</method>
+		</method>	
 		
 		<method name="StartValidating" description="Starts validation of a build job.">
 		</method>
@@ -1040,6 +1059,10 @@
 			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
 		</method>
 		
+		<method name="CreateJournalSession" description="creates a global journal session access class.">
+			<param name="JournalSession" type="class" class="JournalSession" pass="return" description="JournalSession class instance." />	
+		</method>
+
 		<method name="CreateLoginHandler" description="creates a login handler instance.">
 			<param name="LoginHandler" type="class" class="LoginHandler" pass="return" description="LoginHandler instance." />	
 		</method>

@@ -26,50 +26,48 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+Abstract: This is a stub class definition of CJournalSession
+
 */
 
+#include "libmcdata_journalsession.hpp"
+#include "libmcdata_interfaceexception.hpp"
 
-#ifndef __AMCDATA_STORAGEPATH
-#define __AMCDATA_STORAGEPATH
+// Include custom headers here.
 
-#include <string>
-#include <memory>
 
-namespace AMCData {
-
+using namespace LibMCData::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CStoragePath
+ Class definition of CJournalSession 
 **************************************************************************************************************************/
 
-enum class eStorageStreamStatus : int32_t {
-    sssNew = 0,
-    sssValidated = 1,
-    sssArchived = 2
-};
+CJournalSession::CJournalSession(AMCData::PJournal pJournal)
+    : m_pJournal (pJournal)
+{
+    if (pJournal.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-class CStoragePath {
-private:
-    std::string m_sDataPath;
-    
+}
 
-public:
+CJournalSession::~CJournalSession()
+{
 
-    CStoragePath(const std::string & sDataPath);
+}
 
-    std::string getStreamPath(const std::string& sStreamUUID);
-    std::string getJournalPath(const std::string& sTimeFileName);
-    std::string getJournalDataPath(const std::string& sTimeFileName);
-    std::string getJournalFileName(const std::string& sTimeFileName);
-    std::string getJournalDataFileName(const std::string& sTimeFileName);
 
-    static std::string storageStreamStatusToString(eStorageStreamStatus eStatus);
-    static eStorageStreamStatus stringToStorageStreamStatus(const std::string & sStatus);
+void CJournalSession::WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer)
+{
+    m_pJournal->WriteJournalChunkData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nDataBufferSize, pDataBuffer);
+}
 
-};
+LibMCData_uint32 CJournalSession::GetChunkCapacity()
+{
+    return 1024 * 1024;
+}
 
-typedef std::shared_ptr <CStoragePath> PStoragePath;
-
-} // namespace AMCDATA
-
-#endif // __AMCDATA_STORAGEPATH
+LibMCData_uint32 CJournalSession::GetFlushInterval()
+{
+    return 10;
+}

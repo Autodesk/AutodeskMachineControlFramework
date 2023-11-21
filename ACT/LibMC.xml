@@ -588,9 +588,11 @@
 		<error name="INVALIDGLINSTANCEMODEL" code="562" description="Invalid GL instance model"/>			
 		<error name="GLINSTANCEMODELNOTFOUND" code="563" description="GL instance model not found"/>
 		<error name="DUPLICATEGLINSTANCENAME" code="564" description="Duplicate GL instance name"/>			
-				
+		<error name="INVALIDJOURNALSTREAMCAPACITY" code="565" description="Invalid journal stream capacity"/>			
+		<error name="INVALIDUIFORMAT" code="566" description="Invalid UI format" />
+		<error name="INVALIDJOURNALTIMESTAMP" code="567" description="Invalid Journal Timestamp" />
 		
-
+		
 	</errors>
 	
 	

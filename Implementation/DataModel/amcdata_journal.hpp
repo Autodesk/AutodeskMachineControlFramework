@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,59 +29,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __LIBMCDATA_LOGSESSION
-#define __LIBMCDATA_LOGSESSION
+#ifndef __AMCDATA_JOURNAL
+#define __AMCDATA_JOURNAL
 
-#include "libmcdata_interfaces.hpp"
-
-// Parent classes
-#include "libmcdata_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
-// Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_journal.hpp"
-
-#include "common_exportstream.hpp"
-
-#include <thread>
+#include <memory>
+#include <list>
+#include <vector>
 #include <mutex>
 
+#include "amcdata_sqlhandler.hpp"
+#include "common_exportstream.hpp"
+#include "libmcdata_types.hpp"
 
-namespace LibMCData {
-namespace Impl {
+namespace AMCData {
+	
+
+	class CJournal {
+	private:
+
+		AMCData::PSQLHandler m_pSQLHandler;
+		std::mutex m_LogMutex;
+		std::mutex m_JournalMutex;
+		std::atomic<uint32_t> m_LogID;
+
+		AMCCommon::PExportStream m_pJournalStream;
+		
+	public:
+
+		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath);
+
+		virtual ~CJournal();
+
+		void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp);
+
+		LibMCData_uint32 GetMaxLogEntryID();
+
+		void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8* pDataBuffer);
+
+		AMCData::PSQLHandler getSQLHandler();
+
+	};
+
+	typedef std::shared_ptr<CJournal> PJournal;
+	
+}
 
 
-/*************************************************************************************************************************
- Class declaration of CLogSession 
-**************************************************************************************************************************/
+#endif //__AMCDATA_JOURNAL
 
-class CLogSession : public virtual ILogSession, public virtual CBase {
-private:
-
-	AMCData::PJournal m_pJournal;
-
-public:
-
-	CLogSession(AMCData::PJournal pJournal);
-
-	virtual ~CLogSession();
-
-	void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp) override;
-
-	LibMCData_uint32 GetMaxLogEntryID() override;
-
-	ILogEntryList* RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCData
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDATA_LOGSESSION

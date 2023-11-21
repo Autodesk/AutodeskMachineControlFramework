@@ -166,11 +166,6 @@ std::string CBuildJob::GetStorageStreamUUID()
     return m_sStorageStreamUUID;
 }
 
-ILogSession * CBuildJob::GetBuildJobLogger()
-{
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
-}
-
 void CBuildJob::ensureUpdate(const std::string sUpdateUUID, uint32_t nErrorCode)
 {
     std::string sSelectQuery = "SELECT uuid FROM buildjobs WHERE updateuuid=?";

@@ -374,6 +374,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION 347 /** Could not update user description */
 #define LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD 348 /** Could not update user password */
 #define LIBMCDATA_ERROR_INVALIDUSERINDEX 349 /** Invalid user index */
+#define LIBMCDATA_ERROR_INVALIDJOURNAL 350 /** Invalid journal */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -660,6 +661,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "Could not update user description";
     case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
     case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
+    case LIBMCDATA_ERROR_INVALIDJOURNAL: return "Invalid journal";
     default: return "unknown error";
   }
 }
@@ -672,6 +674,7 @@ typedef LibMCDataHandle LibMCData_Base;
 typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogEntryList;
 typedef LibMCDataHandle LibMCData_LogSession;
+typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
 typedef LibMCDataHandle LibMCData_BuildJobData;

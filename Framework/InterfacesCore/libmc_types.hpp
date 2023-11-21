@@ -579,6 +579,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDGLINSTANCEMODEL 562 /** Invalid GL instance model */
 #define LIBMC_ERROR_GLINSTANCEMODELNOTFOUND 563 /** GL instance model not found */
 #define LIBMC_ERROR_DUPLICATEGLINSTANCENAME 564 /** Duplicate GL instance name */
+#define LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY 565 /** Invalid journal stream capacity */
+#define LIBMC_ERROR_INVALIDUIFORMAT 566 /** Invalid UI format */
+#define LIBMC_ERROR_INVALIDJOURNALTIMESTAMP 567 /** Invalid Journal Timestamp */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1070,6 +1073,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDGLINSTANCEMODEL: return "Invalid GL instance model";
     case LIBMC_ERROR_GLINSTANCEMODELNOTFOUND: return "GL instance model not found";
     case LIBMC_ERROR_DUPLICATEGLINSTANCENAME: return "Duplicate GL instance name";
+    case LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY: return "Invalid journal stream capacity";
+    case LIBMC_ERROR_INVALIDUIFORMAT: return "Invalid UI format";
+    case LIBMC_ERROR_INVALIDJOURNALTIMESTAMP: return "Invalid Journal Timestamp";
     default: return "unknown error";
   }
 }

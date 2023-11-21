@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -28,60 +28,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include "amcdata_databasemigrator_journals.hpp"
+#include "libmcdata_interfaceexception.hpp"
+#include "common_utils.hpp"
 
-#ifndef __LIBMCDATA_LOGSESSION
-#define __LIBMCDATA_LOGSESSION
+namespace AMCData {
+		
+	void CDatabaseMigrationClass_Journals::increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex)
+	{
 
-#include "libmcdata_interfaces.hpp"
+		if (pTransaction.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-// Parent classes
-#include "libmcdata_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+		switch (nCurrentVersionIndex) {
+		case 6: {
+				std::string sCreateQuery = "CREATE TABLE `journals` (";
+				sCreateQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+				sCreateQuery += "`starttime`  varchar ( 256 ) NOT NULL,";
+				sCreateQuery += "`logfilename`  varchar ( 256 ) NOT NULL,";
+				sCreateQuery += "`journalfilename`  varchar ( 256 ) NOT NULL,";
+				sCreateQuery += "`logfilepath`  varchar ( 256 ) NOT NULL,";
+				sCreateQuery += "`journalfilepath`  varchar ( 256 ) NOT NULL,";
+				sCreateQuery += "`updateuuid`  varchar ( 64 ))";
+				pTransaction->executeStatement(sCreateQuery);
 
-// Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_journal.hpp"
+				break;
+			}
 
-#include "common_exportstream.hpp"
-
-#include <thread>
-#include <mutex>
-
-
-namespace LibMCData {
-namespace Impl {
+		}
+	}
 
 
-/*************************************************************************************************************************
- Class declaration of CLogSession 
-**************************************************************************************************************************/
+}
 
-class CLogSession : public virtual ILogSession, public virtual CBase {
-private:
 
-	AMCData::PJournal m_pJournal;
-
-public:
-
-	CLogSession(AMCData::PJournal pJournal);
-
-	virtual ~CLogSession();
-
-	void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp) override;
-
-	LibMCData_uint32 GetMaxLogEntryID() override;
-
-	ILogEntryList* RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCData
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDATA_LOGSESSION

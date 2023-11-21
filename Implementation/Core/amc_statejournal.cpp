@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_exceptiontypes.hpp"
 #include <map>
 #include <thread>
+#include <future>
 #include <iostream>
 #include <mutex>
 
@@ -102,8 +103,9 @@ namespace AMC {
 
 		void defineVariableInStream() override
 		{
-			m_pStream->writeNameDefinition(m_nID, m_sName);
-			m_pStream->writeBool(m_nID, m_bCurrentValue);
+			// Only write to stream if value is not false
+			if (m_bCurrentValue)
+				m_pStream->writeBool(m_nID, m_bCurrentValue);
 		}
 
 
@@ -143,8 +145,9 @@ namespace AMC {
 
 		void defineVariableInStream() override
 		{
-			m_pStream->writeNameDefinition(m_nID, m_sName);
-			m_pStream->writeInt64Delta(m_nID, m_nCurrentValue);
+			// Only write to stream if value is not 0
+			if (m_nCurrentValue != 0)
+				m_pStream->writeInt64Delta(m_nID, m_nCurrentValue);
 		}
 
 		void readTimeStream(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, int64_t& dStartValue, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
@@ -228,9 +231,9 @@ namespace AMC {
 			if (!m_bHasUnits)
 				throw ELibMCCustomException(LIBMC_ERROR_UNITSHAVENOTBEENSET, m_sName);
 
-			m_pStream->writeNameDefinition(m_nID, m_sName);
-			m_pStream->writeUnits(m_nID, m_dUnits);
-			m_pStream->writeInt64Delta(m_nID, m_nCurrentValueInUnits);
+			// Only write to stream if value is not 0
+			if (m_nCurrentValueInUnits != 0)
+				m_pStream->writeInt64Delta(m_nID, m_nCurrentValueInUnits);
 		}
 
 		void readTimeStream(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, double & dStartValue, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
@@ -281,8 +284,9 @@ namespace AMC {
 
 		void defineVariableInStream() override
 		{
-			m_pStream->writeNameDefinition(m_nID, m_sName);
-			m_pStream->writeString(m_nID, m_sCurrentValue);
+			// Only write to stream if value is not empty
+			if (!m_sCurrentValue.empty ())
+				m_pStream->writeString(m_nID, m_sCurrentValue);
 		}
 
 
@@ -295,11 +299,12 @@ namespace AMC {
 	typedef std::shared_ptr<CStateJournalImplStringVariable> PStateJournalImplStringVariable;
 
 	class CStateJournalImpl {
-	private:		
+	private:
 		std::map<std::string, PStateJournalImplVariable> m_VariableStringMap;
 		std::map<uint32_t, PStateJournalImplVariable> m_VariableIDMap;
 
 		uint32_t m_nVariableCount;
+		uint32_t m_nChunkIntervalInSeconds;
 
 		eStateJournalMode m_JournalMode;
 		AMCCommon::CChrono m_Chrono;
@@ -307,6 +312,9 @@ namespace AMC {
 		PStateJournalStream m_pStream;
 
 		std::mutex m_Mutex;
+
+		std::atomic<bool> m_ThreadStopFlag;
+		std::future<void> m_ThreadFuture;
 
 	public:
 
@@ -326,6 +334,9 @@ namespace AMC {
 
 		void readDoubleTimeStream(const std::string& sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, double & dStartValue, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
+		void startNewChunk();
+
+		void recordingThread();
 	};
 
 
@@ -333,14 +344,25 @@ namespace AMC {
 		: m_JournalMode(eStateJournalMode::sjmInitialising),
 	     m_Chrono (false),
 		m_nVariableCount (1),
-		m_pStream (pStream)
+		m_pStream (pStream),
+		m_nChunkIntervalInSeconds (0),
+		m_ThreadStopFlag (false)
 
 	{
 		LibMCAssertNotNull(pStream.get());
+		m_nChunkIntervalInSeconds = pStream->getJournalFlushInterval();
+
+		startNewChunk();
+	}
+
+
+	void CStateJournalImpl::startNewChunk()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 		// Create a new stream chunk
 		m_pStream->startNewChunk();
-		for (auto pVariable : m_VariableIDMap) 
+		for (auto pVariable : m_VariableIDMap)
 			pVariable.second->defineVariableInStream();
 
 	}
@@ -390,16 +412,32 @@ namespace AMC {
 
 	void CStateJournalImpl::startRecording()
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		startNewChunk();
 
-		if (m_JournalMode != eStateJournalMode::sjmInitialising)
-			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTINITIALISING);
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		m_JournalMode = eStateJournalMode::sjmRecording;
+			if (m_JournalMode != eStateJournalMode::sjmInitialising)
+				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTINITIALISING);
+
+			m_JournalMode = eStateJournalMode::sjmRecording;
+		}
+
+		m_ThreadStopFlag = false;
+		m_ThreadFuture = std::async(std::launch::async, [this] { this->recordingThread(); });
+
+
 	}
 
 	void CStateJournalImpl::finishRecording()
 	{
+		
+		// Close thread
+		m_ThreadStopFlag = true;
+		if (m_ThreadFuture.valid())
+			m_ThreadFuture.wait();
+		m_ThreadStopFlag = false;
+
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 		if (m_JournalMode != eStateJournalMode::sjmRecording)
@@ -407,7 +445,24 @@ namespace AMC {
 
 		m_JournalMode = eStateJournalMode::sjmFinished;
 
+
 	}
+
+	void CStateJournalImpl::recordingThread()
+	{
+		while (!m_ThreadStopFlag) {
+			try {
+				startNewChunk();
+				m_pStream->writeChunksToDiskThreaded();
+			}
+			catch (std::exception & E) {
+
+			}
+
+			std::this_thread::sleep_for(std::chrono::seconds (m_nChunkIntervalInSeconds));
+		}
+	}
+
 
 	void CStateJournalImpl::updateBoolValue(const uint32_t nVariableID, const bool bValue)
 	{
