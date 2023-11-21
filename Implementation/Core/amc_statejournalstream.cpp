@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
+#define STATEJOURNALSTREAMMINCAPACITY 65536
+
 namespace AMC {
 
 	class CStateJournalStreamChunk
