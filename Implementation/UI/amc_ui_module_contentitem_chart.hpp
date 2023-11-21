@@ -1,4 +1,4 @@
-<!--
+/*++
 
 Copyright (C) 2020 Autodesk Inc.
 
@@ -26,33 +26,46 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-!-->
+*/
 
-<template>
 
-<div v-if="(moduleitem.type=='parameterlist')">  	
-	
-	<v-data-table
-		:headers="moduleitem.headers"
-		:items="moduleitem.entries"
-		:items-per-page="moduleitem.entriesperpage"
-		class="elevation-1"
-		search 
-		disable-pagination
-		hide-default-footer
-		width="100%"
-		loadingText="moduleitem.loadingtext">
-	</v-data-table>											
+#ifndef __AMC_UI_MODULE_CONTENTITEM_CHART
+#define __AMC_UI_MODULE_CONTENTITEM_CHART
 
-</div>
+#include "header_protection.hpp"
 
-</template>
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
-<script>
+#include "amc_ui_module_contentitem.hpp"
+#include "pugixml.hpp"
 
-	export default {
-	  props: ["Application", "moduleitem"]
-	 
+
+namespace AMC {
+
+	amcDeclareDependingClass(CUIModule_ContentChart, PUIModule_ContentChart);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+
+	class CUIModule_ContentChart : public CUIModule_ContentItem {
+	protected:		
+
+	public:
+
+		static PUIModule_ContentChart makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+
+		CUIModule_ContentChart(const std::string & sUUID, const std::string& sItemName, const std::string& sModulePath);
+		
+		virtual ~CUIModule_ContentChart();
+
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+
+
 	};
-	
-</script>
+
+
+}
+
+
+#endif //__AMC_UI_MODULE_CONTENTITEM_CHART
+

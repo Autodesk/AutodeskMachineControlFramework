@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statemachinedata.hpp"
 #include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
+#include <sstream>
+#include <iomanip>
 
 using namespace AMC;
 
@@ -66,9 +68,11 @@ void CUIExpression::readFromXML(const pugi::xml_node& xmlNode, const std::string
 {
 	auto valueAttrib = xmlNode.attribute(attributeName.c_str());
 	auto syncvalueAttrib = xmlNode.attribute(("sync:" + attributeName).c_str());
+	auto formatvalueAttrib = xmlNode.attribute(("format:" + attributeName).c_str());
 
 	std::string sValue = valueAttrib.as_string();
 	std::string sSyncValue = syncvalueAttrib.as_string();
+	m_sFormatString = formatvalueAttrib.as_string();
 
 	if ((!sValue.empty()) && (!sSyncValue.empty()))
 		throw ELibMCCustomException(LIBMC_ERROR_EXPRESSIONVALUEGIVENTWICE, attributeName);
@@ -90,7 +94,7 @@ void CUIExpression::readFromXML(const pugi::xml_node& xmlNode, const std::string
 	}
 }
 
-std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineData)
+std::string CUIExpression::evaluateValueEx(CStateMachineData* pStateMachineData)
 {
 	if (!m_sExpressionValue.empty()) {
 		LibMCAssertNotNull(pStateMachineData);
@@ -118,6 +122,88 @@ std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineD
 	else {
 		return m_sFixedValue;
 	}
+}
+
+const char* parseDotString(const char* pChar, uint32_t& nPrecision)
+{
+	LibMCAssertNotNull(pChar);
+
+	nPrecision = 0;
+
+	while (true) {
+		char ch = *pChar;
+		if ((ch >= '0') && (ch <= '9')) {
+			nPrecision = nPrecision * 10 + (uint32_t) (ch - '0');
+		}
+		else {
+			if (ch == 'f') {
+				return pChar;
+			}
+			else {
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDUIFORMAT);
+			}
+		} 
+
+
+		pChar++;
+	}
+
+	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDUIFORMAT);
+
+}
+
+std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineData)
+{
+	if (m_sFormatString.empty ())
+		return evaluateValueEx(pStateMachineData);
+
+	std::stringstream sStream;
+	const char* pChar = m_sFormatString.c_str();
+
+	uint32_t nPrecision = 0;
+
+	while (*pChar) {
+		char ch = *pChar;
+		pChar++;
+
+		if (ch != '%') {
+			sStream << ch;
+		}
+		else {
+			switch (*pChar) {
+			case '%':
+				sStream << '%';
+				break;
+
+			case 'd':
+				sStream << evaluateIntegerValue (pStateMachineData);
+				break;
+
+			case 'f':
+				sStream << evaluateNumberValue(pStateMachineData);
+				break;
+
+			case 's':
+				sStream << evaluateValueEx(pStateMachineData);
+				break;
+
+			case '.': 
+				pChar = parseDotString(pChar + 1, nPrecision);
+
+				sStream << std::fixed << std::setprecision(nPrecision) << evaluateNumberValue(pStateMachineData);
+				break;
+
+			default:
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDUIFORMAT, m_sFormatString);
+			}
+
+			pChar++;
+		}
+	}
+
+	return sStream.str();
+	
+	
 }
 
 std::string CUIExpression::evaluateStringValue(PStateMachineData pStateMachineData)
@@ -273,7 +359,7 @@ bool CUIExpression::evaluateBoolValue(PStateMachineData pStateMachineData)
 
 void CUIExpression::checkExpressionSyntax(CStateMachineData* pStateMachineData)
 {
-	evaluateStringValue(pStateMachineData);
+	evaluateValueEx(pStateMachineData);
 }
 
 void CUIExpression::checkExpressionSyntax(PStateMachineData pStateMachineData)
@@ -288,7 +374,7 @@ bool CUIExpression::needsSync()
 
 bool CUIExpression::isEmpty(CStateMachineData* pStateMachineData)
 {
-	std::string sValue = evaluateStringValue(pStateMachineData);
+	std::string sValue = evaluateValueEx(pStateMachineData);
 	return sValue.empty();
 }
 

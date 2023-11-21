@@ -1,4 +1,4 @@
-<!--
+/*++
 
 Copyright (C) 2020 Autodesk Inc.
 
@@ -26,33 +26,51 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-!-->
+*/
 
-<template>
+#define __AMCIMPL_UI_MODULE
+#define __AMCIMPL_API_CONSTANTS
 
-<div v-if="(moduleitem.type=='parameterlist')">  	
-	
-	<v-data-table
-		:headers="moduleitem.headers"
-		:items="moduleitem.entries"
-		:items-per-page="moduleitem.entriesperpage"
-		class="elevation-1"
-		search 
-		disable-pagination
-		hide-default-footer
-		width="100%"
-		loadingText="moduleitem.loadingtext">
-	</v-data-table>											
+#include "amc_ui_module_contentitem_chart.hpp"
+#include "libmc_interfaceexception.hpp"
 
-</div>
+#include "amc_api_constants.hpp"
+#include "Common/common_utils.hpp"
+#include "amc_parameterhandler.hpp"
+#include "libmc_exceptiontypes.hpp"
+#include "amc_ui_module.hpp"
+#include "amc_resourcepackage.hpp"
 
-</template>
+#include "libmcdata_dynamic.hpp"
 
-<script>
+using namespace AMC;
 
-	export default {
-	  props: ["Application", "moduleitem"]
-	 
-	};
-	
-</script>
+PUIModule_ContentChart CUIModule_ContentChart::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+{
+	LibMCAssertNotNull(pUIModuleEnvironment);
+
+	auto pItem = std::make_shared <CUIModule_ContentChart>(AMCCommon::CUtils::createUUID (), sItemName, sModulePath);
+
+	return pItem;
+}
+
+
+CUIModule_ContentChart::CUIModule_ContentChart(const std::string& sUUID, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(sUUID, sItemName, sModulePath)
+{
+
+}
+
+CUIModule_ContentChart::~CUIModule_ContentChart()
+{
+
+}
+
+
+void CUIModule_ContentChart::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+{
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "chart");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	//object.addDouble(AMC_API_KEY_UI_ITEMASPECTRATIO, m_dAspectRatio);
+
+}

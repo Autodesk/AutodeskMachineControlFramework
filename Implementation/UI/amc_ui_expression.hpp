@@ -43,12 +43,23 @@ namespace AMC {
 
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 
+	enum class eUIExpressionFormatType 
+	{
+		eftString = 1,
+		eftDouble = 2,
+		eftInteger = 3
+	};
+
 	class CUIExpression {
 	private:
 		std::string m_sFixedValue;
 		std::string m_sExpressionValue;
 
+		std::string m_sFormatString;
+
 		void readFromXML(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue, bool bValueMustExist);
+
+		std::string evaluateValueEx(CStateMachineData* pStateMachineData);
 	public:
 
 		CUIExpression();

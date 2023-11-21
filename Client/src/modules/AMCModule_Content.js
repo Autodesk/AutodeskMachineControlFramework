@@ -198,6 +198,19 @@ class AMCApplicationItem_Content_Image extends Common.AMCApplicationItem {
 }
 
 
+class AMCApplicationItem_Content_Chart extends Common.AMCApplicationItem {
+	
+	constructor (moduleInstance, itemJSON) 
+	{
+		Assert.ObjectValue (itemJSON);		
+		
+		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
+		this.registerClass ("amcItem_Chart");
+				
+	}
+		
+}
+
 
 class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 	
@@ -368,6 +381,9 @@ export default class AMCApplicationModule_Content extends Common.AMCApplicationM
 			
 			if (itemJSON.type === "image") 
 				item = new AMCApplicationItem_Content_Image (this, itemJSON);
+
+			if (itemJSON.type === "chart") 
+				item = new AMCApplicationItem_Content_Chart (this, itemJSON);
 
 			if (itemJSON.type === "form") 
 				item = new AMCApplicationItem_Content_Form (this, itemJSON);

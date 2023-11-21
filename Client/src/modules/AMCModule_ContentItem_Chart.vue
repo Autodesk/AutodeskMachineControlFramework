@@ -30,29 +30,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <template>
 
-<div v-if="(moduleitem.type=='parameterlist')">  	
-	
-	<v-data-table
-		:headers="moduleitem.headers"
-		:items="moduleitem.entries"
-		:items-per-page="moduleitem.entriesperpage"
-		class="elevation-1"
-		search 
-		disable-pagination
-		hide-default-footer
-		width="100%"
-		loadingText="moduleitem.loadingtext">
-	</v-data-table>											
-
+<div v-if="(moduleitem.type=='chart')">  	
+	 <VueApexCharts width="500" type="line" :options="options" :series="series"></VueApexCharts>
 </div>
 
 </template>
 
 <script>
-
+	import VueApexCharts from 'vue-apexcharts';
+	
 	export default {
-	  props: ["Application", "moduleitem"]
-	 
+	  props: ["Application", "moduleitem"],
+	  components: {
+		VueApexCharts
+	  },
+	   data: () => ({
+		options: {
+        chart: {
+          id: 'vuechart-example'
+        },
+        xaxis: {
+          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+        }
+      },
+      series: [{
+        name: 'series-1',
+        data: [30, 40, 45, 50, 49, 60, 70, 91]
+      },
+	  {
+        name: 'series-1',
+        data: [41, 23, 98, 50, 49, 60, 70, 91]
+      }],
+
+
+	  })
 	};
 	
 </script>
