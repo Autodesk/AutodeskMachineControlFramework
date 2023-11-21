@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <vector>
 #include <mutex>
+#include <atomic>
 
 #include "amcdata_sqlhandler.hpp"
 #include "common_exportstream.hpp"
