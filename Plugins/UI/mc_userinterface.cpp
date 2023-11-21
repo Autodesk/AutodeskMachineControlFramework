@@ -124,7 +124,7 @@ public:
 			auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID("importbuildjob.preview", "builduuid");
 
 			pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
-			pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);
+			pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 200);
 
 			auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_initjob");
 			pSignal->SetString("jobuuid", sBuildUUID);
@@ -159,6 +159,22 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 		pUIEnvironment->LogMessage("Clicked on Test Journal Button");
+
+		auto pUserManagement = pUIEnvironment->CreateUserManagement();
+		auto activeUsers = pUserManagement->GetActiveUsers();
+		uint32_t nCount = activeUsers->Count();
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+			auto sUserName = activeUsers->GetUsername(nIndex);
+			pUIEnvironment->LogMessage("UserName: " + sUserName);
+		}
+
+		std::string sUserDescription = pUserManagement->GetUserDescription("test");
+		pUIEnvironment->LogMessage("user description: " + sUserDescription);
+
+		pUIEnvironment->LogMessage("creating user dummy");
+
+		pUserManagement->CreateUser("dummy", "administrator", "3fbde1f66fb512223edb195d247fe770130f59fdd914e3ffa7327af53fe4cb46", "dd9a86491eb7572c1a9cda800e6eb81bb9dad55576b01416d06cdf6ae181fb33", "This is the new dummy user.");
+
 
 		/*auto pJournalVariable = pUIEnvironment->RetrieveJournalVariable ("main.ui.debug", 10000);
 		pUIEnvironment->LogMessage("Variable Name: " +  pJournalVariable->GetVariableName());
@@ -267,7 +283,7 @@ public:
 		}
 		
 		pUIEnvironment->SetUIProperty("importbuildjob.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 3);
+		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 200);
 
 		pUIEnvironment->ActivatePage("importbuildjob");
 	}
@@ -302,7 +318,7 @@ public:
 		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);*/
 
 		pUIEnvironment->SetUIProperty("importbuildjob.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 3);
+		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 200);
 
 		pUIEnvironment->ActivatePage("importbuildjob");
 

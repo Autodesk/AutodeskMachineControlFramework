@@ -72,7 +72,8 @@
 			<parameter name="printinprogress" description="Print is in progress" default="0" type="bool"/>
 			<parameter name="recoatingtimeout" description="Recoating Timeout" default="60000" type="int"/>
 			<parameter name="exposuretimeout" description="Exposure Timeout" default="300000" type="int"/>
-		</parametergroup>
+      <parameter name="countertest" description="Countertest" default="0" type="double"/>
+    </parametergroup>
 
 		<parametergroup name="ui" description="User interface">
 			<parameter name="currentlayerdisplay" description="Current Layer Display" default="" type="string"/>
@@ -80,7 +81,7 @@
 			<parameter name="build_canbepaused" description="Build can be paused" default="0" type="bool"/>
 			<parameter name="build_canbecanceled" description="Build can be paused" default="0" type="bool"/>
 			<parameter name="build_canbestarted" description="Build can be started" default="1" type="bool"/>
-		</parametergroup>
+    </parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
 			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
@@ -109,7 +110,7 @@
 			<outstate target="idle"/>
 		</state>
 
-		<state name="idle" repeatdelay="1000">
+		<state name="idle" repeatdelay="10">
 			<outstate target="idle"/>
 			<outstate target="initbuild"/>
 		</state>
@@ -320,12 +321,13 @@
 					<paragraph text="."/>
 					<paragraph text="Autodesk example machine"/>
 					<paragraph text="."/>
+					
 
-					<form name="machinestateinforform">
+          <form name="machinestateinforform">
 						<edit name="mainstatename" caption="Main System" readonly="1" sync:value="main.$state"/>
 						<edit name="scannerstatename" caption="Scanner System" readonly="1" sync:value="laser.$state"/>
 						<edit name="plcstatename" caption="PLC System" readonly="1" sync:value="plc.$state"/>
-            <edit name="test" caption="Test"  value="1234" validation="double" minvalue="10" maxvalue="20" validationmessage="Invalid value!"/>
+            <edit name="test" caption="Test" sync:value="main.jobinfo.countertest" format:value="test %.2f" validation="double" minvalue="10" maxvalue="20" validationmessage="Invalid value!"/>
           </form>
 
 
@@ -528,13 +530,6 @@
 
 		<page name="buildreport">
 
-			<glscene name="manualcontrol3">
-						
-        
-        
-
-			</glscene>
-
 
 		</page>
 
@@ -593,6 +588,10 @@
             <position x="100" y="20" z="30" />
             <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
             
+          </instance>
+
+          <instance name="testpart_instance" model="testpart" visible="1">
+
           </instance>
 
         </scene>
