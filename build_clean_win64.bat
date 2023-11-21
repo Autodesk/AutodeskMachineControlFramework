@@ -143,4 +143,10 @@ if "%1" neq "NOPAUSE" (
 	pause
 )
 
+IF "%UPLOADTOPACKAGEREPOSITORY%"=="true" (
+    echo "Uploading to package repository: %AMCF_PACKAGE_REPOSITORY%"
+    echo "Using key file: %AMCF_PACKAGE_REPOSITORY_KEYFILE%"
+    "%basepath%\DevTools\pscp.exe" -batch -i "%AMCF_PACKAGE_REPOSITORY_KEYFILE%" -v "%builddir%\DevPackage\amcf_win64_%LONGGITHASH%.zip" %AMCF_PACKAGE_REPOSITORY%
+)
+
 exit 0
