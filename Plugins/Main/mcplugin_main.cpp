@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcplugin_impl.hpp"
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 /*************************************************************************************************************************
   Driver import definition
