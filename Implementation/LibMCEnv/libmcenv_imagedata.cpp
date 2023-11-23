@@ -40,6 +40,7 @@ Abstract: This is a stub class definition of CImageData
 using namespace LibMCEnv::Impl;
 
 #define IMAGEDATA_MAXPIXELCOUNT (1024ULL * 1024ULL * 32ULL)
+#define IMAGEDATA_MAXPIXELSIZE (1024ULL * 1024ULL)
 
 /*************************************************************************************************************************
  Class definition of CImageData 
@@ -47,7 +48,65 @@ using namespace LibMCEnv::Impl;
 
 CImageData* CImageData::createFromPNG(const uint8_t* pBuffer, uint64_t nBufferSize, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pBuffer == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (nBufferSize == 0)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGSTREAM);
+
+	std::unique_ptr <std::vector<uint8_t>> pixelBuffer(new std::vector<uint8_t>());
+	
+	unsigned int width = 0;
+	unsigned int height = 0;
+	lodepng::State state;
+	unsigned int errorCode = lodepng::decode (*pixelBuffer, width, height, pBuffer, nBufferSize);
+	if (errorCode)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE, "could not load png image (error #" + std::to_string (errorCode));
+
+	if ((width == 0) || (width > IMAGEDATA_MAXPIXELSIZE) || (height == 0) || (height > IMAGEDATA_MAXPIXELSIZE))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELSIZE);
+
+	size_t pixelCount = (size_t)width * (size_t)height;
+
+	switch (pixelFormat) {
+	case eImagePixelFormat::RGBA32bit:
+		return new CImageData(pixelBuffer.release(), width, height, dDPIValueX, dDPIValueY, eImagePixelFormat::RGBA32bit, false);
+
+	case eImagePixelFormat::RGB24bit:
+	{
+		std::unique_ptr <std::vector<uint8_t>> convertedPixelBuffer(new std::vector<uint8_t>());
+		convertedPixelBuffer->resize(pixelCount * 3);
+		uint8_t* pSource = &pixelBuffer->at (0);
+		uint8_t* pTarget = &convertedPixelBuffer->at(0);
+		for (size_t nIndex = 0; nIndex < pixelCount; nIndex++) {
+			pTarget[0] = pSource[0];
+			pTarget[1] = pSource[1];
+			pTarget[2] = pSource[2];
+			pTarget += 3;
+			pSource += 4; // Skip Alpha
+		}
+
+		return new CImageData(convertedPixelBuffer.release(), width, height, dDPIValueX, dDPIValueY, eImagePixelFormat::RGB24bit, false);
+	}
+
+	case eImagePixelFormat::GreyScale8bit:
+	{
+		std::unique_ptr <std::vector<uint8_t>> convertedPixelBuffer(new std::vector<uint8_t>());
+		convertedPixelBuffer->resize(pixelCount);
+		uint8_t* pSource = &pixelBuffer->at(0);
+		uint8_t* pTarget = &convertedPixelBuffer->at(0);
+		for (size_t nIndex = 0; nIndex < pixelCount; nIndex++) {
+			*pTarget = ((uint32_t)pSource[0] + (uint32_t)pSource[1] + (uint32_t)pSource[2]) / 3;
+			pTarget ++;
+			pSource += 4; // Skip Alpha
+		}
+
+		return new CImageData(convertedPixelBuffer.release(), width, height, dDPIValueX, dDPIValueY, eImagePixelFormat::RGB24bit, false);
+	}
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
 
 }
 
@@ -492,3 +551,7 @@ void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 	}
 }
 
+std::vector <uint8_t>& CImageData::getPixelData()
+{
+	return *m_PixelData.get ();
+}

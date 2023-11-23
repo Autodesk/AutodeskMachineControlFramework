@@ -67,6 +67,7 @@ class CPNGImageData;
 class CImageData;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
+class CMeshObject;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
@@ -90,6 +91,9 @@ class CSignalTrigger;
 class CSignalHandler;
 class CUniformJournalSampling;
 class CJournalVariable;
+class CJournalHandler;
+class CUserDetailList;
+class CUserManagementHandler;
 class CStateEnvironment;
 class CUIEnvironment;
 
@@ -105,6 +109,7 @@ typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
+typedef CMeshObject CLibMCEnvMeshObject;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
@@ -128,6 +133,9 @@ typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
 typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
 typedef CJournalVariable CLibMCEnvJournalVariable;
+typedef CJournalHandler CLibMCEnvJournalHandler;
+typedef CUserDetailList CLibMCEnvUserDetailList;
+typedef CUserManagementHandler CLibMCEnvUserManagementHandler;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
 typedef CUIEnvironment CLibMCEnvUIEnvironment;
 
@@ -143,6 +151,7 @@ typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
+typedef std::shared_ptr<CMeshObject> PMeshObject;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
@@ -166,6 +175,9 @@ typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
 typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
 typedef std::shared_ptr<CJournalVariable> PJournalVariable;
+typedef std::shared_ptr<CJournalHandler> PJournalHandler;
+typedef std::shared_ptr<CUserDetailList> PUserDetailList;
+typedef std::shared_ptr<CUserManagementHandler> PUserManagementHandler;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
 typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 
@@ -181,6 +193,7 @@ typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
+typedef PMeshObject PLibMCEnvMeshObject;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
@@ -204,6 +217,9 @@ typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
 typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
 typedef PJournalVariable PLibMCEnvJournalVariable;
+typedef PJournalHandler PLibMCEnvJournalHandler;
+typedef PUserDetailList PLibMCEnvUserDetailList;
+typedef PUserManagementHandler PLibMCEnvUserManagementHandler;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
 typedef PUIEnvironment PLibMCEnvUIEnvironment;
 
@@ -400,6 +416,23 @@ public:
 			case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "SAMPLEPOINTCOUNTEXCEEDSMAXIMUM";
 			case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "INVALIDCLAMPINTERVAL";
 			case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "COULDNOTRETRIEVEPNGSTREAM";
+			case LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA: return "COULDNOTSTOREFIELDDATA";
+			case LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND: return "DISCRETEFIELDDATANOTFOUND";
+			case LIBMCENV_ERROR_EMPTYUSERLOGIN: return "EMPTYUSERLOGIN";
+			case LIBMCENV_ERROR_INVALIDUSERLOGIN: return "INVALIDUSERLOGIN";
+			case LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER: return "EMPTYPERMISSIONIDENTIFIER";
+			case LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER: return "INVALIDPERMISSIONIDENTIFIER";
+			case LIBMCENV_ERROR_EMPTYUSERROLE: return "EMPTYUSERROLE";
+			case LIBMCENV_ERROR_INVALIDUSERROLE: return "INVALIDUSERROLE";
+			case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "EMPTYUSERLANGUAGE";
+			case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "INVALIDUSERLANGUAGE";
+			case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "ORIGINOUTOFRANGE";
+			case LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH: return "RAWPIXELDATASIZEMISMATCH";
+			case LIBMCENV_ERROR_EMPTYPNGSTREAM: return "EMPTYPNGSTREAM";
+			case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "COULDNOTLOADPNGIMAGE";
+			case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "INVALIDPIXELSIZE";
+			case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "MESHISNOTREGISTERED";
+			case LIBMCENV_ERROR_INVALIDUSERINDEX: return "INVALIDUSERINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -523,6 +556,23 @@ public:
 			case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
 			case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "Invalid clamp interval";
 			case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
+			case LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA: return "Could not store field data";
+			case LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND: return "Discrete field data not found";
+			case LIBMCENV_ERROR_EMPTYUSERLOGIN: return "Empty user login";
+			case LIBMCENV_ERROR_INVALIDUSERLOGIN: return "Invalid user login";
+			case LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
+			case LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER: return "Invalid permission identifier";
+			case LIBMCENV_ERROR_EMPTYUSERROLE: return "Empty user role";
+			case LIBMCENV_ERROR_INVALIDUSERROLE: return "Invalid user role";
+			case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "Empty user language";
+			case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
+			case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "Origin out of range";
+			case LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH: return "Raw pixel data size mismatch";
+			case LIBMCENV_ERROR_EMPTYPNGSTREAM: return "Empty PNG Stream";
+			case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "Could not load PNG image";
+			case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
+			case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "Mesh is not registered";
+			case LIBMCENV_ERROR_INVALIDUSERINDEX: return "Invalid user index";
 		}
 		return "unknown error";
 	}
@@ -647,6 +697,7 @@ private:
 	friend class CImageData;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
+	friend class CMeshObject;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
@@ -670,6 +721,9 @@ private:
 	friend class CSignalHandler;
 	friend class CUniformJournalSampling;
 	friend class CJournalVariable;
+	friend class CJournalHandler;
+	friend class CUserDetailList;
+	friend class CUserManagementHandler;
 	friend class CStateEnvironment;
 	friend class CUIEnvironment;
 
@@ -894,6 +948,26 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CMeshObject 
+**************************************************************************************************************************/
+class CMeshObject : public CBase {
+public:
+	
+	/**
+	* CMeshObject::CMeshObject - Constructor for MeshObject class.
+	*/
+	CMeshObject(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetUUID();
+	inline LibMCEnv_uint32 GetTriangleCount();
+	inline LibMCEnv_uint32 GetVertexCount();
+};
+	
+/*************************************************************************************************************************
  Class CToolpathPart 
 **************************************************************************************************************************/
 class CToolpathPart : public CBase {
@@ -1025,13 +1099,13 @@ public:
 	inline void UnloadToolpath();
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
-	inline std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
-	inline PDiscreteFieldData2D LoadDiscreteField2DByName(const std::string & sName);
+	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
-	inline std::string StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
-	inline PImageData LoadPNGImageByName(const std::string & sName);
+	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
-	inline std::string StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 };
 	
 /*************************************************************************************************************************
@@ -1172,6 +1246,8 @@ public:
 	
 	inline std::string GetName();
 	inline std::string GetNameSpace();
+	inline std::string GetTextContent();
+	inline void SetTextContent(const std::string & sTextContent);
 	inline LibMCEnv_uint64 GetAttributeCount();
 	inline PXMLDocumentAttribute GetAttribute(const LibMCEnv_uint64 nIndex);
 	inline bool HasAttribute(const std::string & sNameSpace, const std::string & sName);
@@ -1199,6 +1275,7 @@ public:
 	inline bool HasUniqueChild(const std::string & sNameSpace, const std::string & sName);
 	inline PXMLDocumentNode FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist);
 	inline PXMLDocumentNode AddChild(const std::string & sNameSpace, const std::string & sName);
+	inline PXMLDocumentNode AddChildText(const std::string & sNameSpace, const std::string & sName, const std::string & sTextContent);
 	inline void RemoveChild(classParam<CXMLDocumentNode> pChildInstance);
 	inline void RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName);
 	inline void Remove();
@@ -1247,6 +1324,7 @@ public:
 	inline bool HasNamespace(const std::string & sNamespace);
 	inline std::string GetNamespacePrefix(const std::string & sNamespace);
 	inline void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix);
+	inline void ChangeNamespacePrefix(const std::string & sOldNamespacePrefix, const std::string & sNewNamespacePrefix);
 	inline PXMLDocumentNode GetRootNode();
 	inline std::string SaveToString(const bool bAddLineBreaks);
 };
@@ -1436,6 +1514,7 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 };
@@ -1521,7 +1600,7 @@ public:
 	inline LibMCEnv_uint64 GetStartTimeStamp();
 	inline LibMCEnv_uint64 GetEndTimeStamp();
 	inline void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue);
-	inline void GetAllSamples(std::vector<LibMCEnv_uint64> & TimeStampsBuffer, std::vector<LibMCEnv_double> & ValuesBuffer);
+	inline void GetAllSamples(std::vector<sTimeStreamEntry> & SamplesBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -1541,8 +1620,92 @@ public:
 	inline std::string GetVariableName();
 	inline LibMCEnv_uint64 GetStartTimeStamp();
 	inline LibMCEnv_uint64 GetEndTimeStamp();
+	inline LibMCEnv_double ComputeFullAverage();
 	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval);
 	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+	inline void ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CJournalHandler 
+**************************************************************************************************************************/
+class CJournalHandler : public CBase {
+public:
+	
+	/**
+	* CJournalHandler::CJournalHandler - Constructor for JournalHandler class.
+	*/
+	CJournalHandler(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
+	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds);
+	inline LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
+	inline bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName);
+	inline LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
+	inline void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, std::vector<LibMCEnv_uint64> & TimeStampsBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CUserDetailList 
+**************************************************************************************************************************/
+class CUserDetailList : public CBase {
+public:
+	
+	/**
+	* CUserDetailList::CUserDetailList - Constructor for UserDetailList class.
+	*/
+	CUserDetailList(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint32 Count();
+	inline void GetUserProperties(const LibMCEnv_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+	inline std::string GetUsername(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetUUID(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetDescription(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetRole(const LibMCEnv_uint32 nUserIndex);
+	inline std::string GetLanguage(const LibMCEnv_uint32 nUserIndex);
+};
+	
+/*************************************************************************************************************************
+ Class CUserManagementHandler 
+**************************************************************************************************************************/
+class CUserManagementHandler : public CBase {
+public:
+	
+	/**
+	* CUserManagementHandler::CUserManagementHandler - Constructor for UserManagementHandler class.
+	*/
+	CUserManagementHandler(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool UserExists(const std::string & sUsername);
+	inline void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+	inline void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+	inline std::string GetUsernameByUUID(const std::string & sUUID);
+	inline std::string GetUserUUID(const std::string & sUsername);
+	inline std::string GetUserDescription(const std::string & sUsername);
+	inline std::string GetUserDescriptionByUUID(const std::string & sUUID);
+	inline std::string GetUserRole(const std::string & sUsername);
+	inline std::string GetUserRoleByUUID(const std::string & sUUID);
+	inline std::string GetUserLanguage(const std::string & sUsername);
+	inline std::string GetUserLanguageByUUID(const std::string & sUUID);
+	inline std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription);
+	inline void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier);
+	inline void SetUserRole(const std::string & sUsername, const std::string & sUserRole);
+	inline void SetUserDescription(const std::string & sUsername, const std::string & sDescription);
+	inline void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword);
+	inline void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier);
+	inline void SetUserRoleByUUID(const std::string & sUUID, const std::string & sUserRole);
+	inline void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription);
+	inline void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword);
+	inline PUserDetailList GetActiveUsers();
 };
 	
 /*************************************************************************************************************************
@@ -1593,12 +1756,18 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
+	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
-	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
+	inline bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier);
+	inline PUserManagementHandler CreateUserManagement();
+	inline PJournalHandler GetCurrentJournal();
+	inline PMeshObject RegisterMeshFrom3MFResource(const std::string & sResourceName);
+	inline bool MeshIsRegistered(const std::string & sMeshUUID);
+	inline PMeshObject FindRegisteredMesh(const std::string & sMeshUUID);
 };
 	
 /*************************************************************************************************************************
@@ -1656,7 +1825,18 @@ public:
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
-	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
+	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
+	inline bool CheckPermission(const std::string & sPermissionIdentifier);
+	inline std::string GetCurrentUserLogin();
+	inline std::string GetCurrentUserDescription();
+	inline std::string GetCurrentUserRole();
+	inline std::string GetCurrentUserLanguage();
+	inline std::string GetCurrentUserUUID();
+	inline PUserManagementHandler CreateUserManagement();
+	inline PJournalHandler GetCurrentJournal();
+	inline PMeshObject RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID);
+	inline bool MeshIsRegistered(const std::string & sMeshUUID);
+	inline PMeshObject FindRegisteredMesh(const std::string & sMeshUUID);
 };
 	
 	/**
@@ -1789,6 +1969,10 @@ public:
 		pWrapperTable->m_DiscreteFieldData2D_TransformField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_AddField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
+		pWrapperTable->m_MeshObject_GetName = nullptr;
+		pWrapperTable->m_MeshObject_GetUUID = nullptr;
+		pWrapperTable->m_MeshObject_GetTriangleCount = nullptr;
+		pWrapperTable->m_MeshObject_GetVertexCount = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
@@ -1860,10 +2044,10 @@ public:
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
-		pWrapperTable->m_Build_LoadDiscreteField2DByName = nullptr;
+		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = nullptr;
 		pWrapperTable->m_Build_StoreDiscreteField2D = nullptr;
-		pWrapperTable->m_Build_LoadPNGImageByName = nullptr;
+		pWrapperTable->m_Build_LoadPNGImageByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadPNGImageByUUID = nullptr;
 		pWrapperTable->m_Build_StorePNGImage = nullptr;
 		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
@@ -1910,6 +2094,8 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_Remove = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetNameSpace = nullptr;
+		pWrapperTable->m_XMLDocumentNode_GetTextContent = nullptr;
+		pWrapperTable->m_XMLDocumentNode_SetTextContent = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetAttribute = nullptr;
 		pWrapperTable->m_XMLDocumentNode_HasAttribute = nullptr;
@@ -1937,6 +2123,7 @@ public:
 		pWrapperTable->m_XMLDocumentNode_HasUniqueChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_FindChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_AddChild = nullptr;
+		pWrapperTable->m_XMLDocumentNode_AddChildText = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_Remove = nullptr;
@@ -1953,6 +2140,7 @@ public:
 		pWrapperTable->m_XMLDocument_HasNamespace = nullptr;
 		pWrapperTable->m_XMLDocument_GetNamespacePrefix = nullptr;
 		pWrapperTable->m_XMLDocument_RegisterNamespace = nullptr;
+		pWrapperTable->m_XMLDocument_ChangeNamespacePrefix = nullptr;
 		pWrapperTable->m_XMLDocument_GetRootNode = nullptr;
 		pWrapperTable->m_XMLDocument_SaveToString = nullptr;
 		pWrapperTable->m_TCPIPPacket_IsEmpty = nullptr;
@@ -2030,6 +2218,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
@@ -2071,8 +2260,44 @@ public:
 		pWrapperTable->m_JournalVariable_GetVariableName = nullptr;
 		pWrapperTable->m_JournalVariable_GetStartTimeStamp = nullptr;
 		pWrapperTable->m_JournalVariable_GetEndTimeStamp = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeFullAverage = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeAverage = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = nullptr;
+		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
+		pWrapperTable->m_JournalHandler_StoreJournalMarker = nullptr;
+		pWrapperTable->m_JournalHandler_HasJournalMarker = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = nullptr;
+		pWrapperTable->m_UserDetailList_Count = nullptr;
+		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
+		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
+		pWrapperTable->m_UserDetailList_GetUUID = nullptr;
+		pWrapperTable->m_UserDetailList_GetDescription = nullptr;
+		pWrapperTable->m_UserDetailList_GetRole = nullptr;
+		pWrapperTable->m_UserDetailList_GetLanguage = nullptr;
+		pWrapperTable->m_UserManagementHandler_UserExists = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserProperties = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUsernameByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserDescription = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserDescriptionByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserRole = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserRoleByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserLanguage = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetUserLanguageByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_CreateUser = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserLanguage = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserRole = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserDescription = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserPassword = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserLanguageByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserRoleByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserDescriptionByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID = nullptr;
+		pWrapperTable->m_UserManagementHandler_GetActiveUsers = nullptr;
 		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
@@ -2107,12 +2332,18 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLData = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = nullptr;
+		pWrapperTable->m_StateEnvironment_CheckUserPermission = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateUserManagement = nullptr;
+		pWrapperTable->m_StateEnvironment_GetCurrentJournal = nullptr;
+		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = nullptr;
+		pWrapperTable->m_StateEnvironment_MeshIsRegistered = nullptr;
+		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -2154,7 +2385,18 @@ public:
 		pWrapperTable->m_UIEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
-		pWrapperTable->m_UIEnvironment_RetrieveJournalVariable = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = nullptr;
+		pWrapperTable->m_UIEnvironment_CheckPermission = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLogin = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserDescription = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserRole = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateUserManagement = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentJournal = nullptr;
+		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = nullptr;
+		pWrapperTable->m_UIEnvironment_MeshIsRegistered = nullptr;
+		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -2649,6 +2891,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetName = (PLibMCEnvMeshObject_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getname");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetName = (PLibMCEnvMeshObject_GetNamePtr) dlsym(hLibrary, "libmcenv_meshobject_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetUUID = (PLibMCEnvMeshObject_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetUUID = (PLibMCEnvMeshObject_GetUUIDPtr) dlsym(hLibrary, "libmcenv_meshobject_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleCount = (PLibMCEnvMeshObject_GetTriangleCountPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_gettrianglecount");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleCount = (PLibMCEnvMeshObject_GetTriangleCountPtr) dlsym(hLibrary, "libmcenv_meshobject_gettrianglecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetTriangleCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetVertexCount = (PLibMCEnvMeshObject_GetVertexCountPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getvertexcount");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetVertexCount = (PLibMCEnvMeshObject_GetVertexCountPtr) dlsym(hLibrary, "libmcenv_meshobject_getvertexcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetVertexCount == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3291,12 +3569,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuild_LoadDiscreteField2DByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyidentifier");
 		#else // _WIN32
-		pWrapperTable->m_Build_LoadDiscreteField2DByName = (PLibMCEnvBuild_LoadDiscreteField2DByNamePtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyname");
+		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuild_LoadDiscreteField2DByIdentifierPtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyidentifier");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr)
+		if (pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3318,12 +3596,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyname");
+		pWrapperTable->m_Build_LoadPNGImageByIdentifier = (PLibMCEnvBuild_LoadPNGImageByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_loadpngimagebyidentifier");
 		#else // _WIN32
-		pWrapperTable->m_Build_LoadPNGImageByName = (PLibMCEnvBuild_LoadPNGImageByNamePtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyname");
+		pWrapperTable->m_Build_LoadPNGImageByIdentifier = (PLibMCEnvBuild_LoadPNGImageByIdentifierPtr) dlsym(hLibrary, "libmcenv_build_loadpngimagebyidentifier");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Build_LoadPNGImageByName == nullptr)
+		if (pWrapperTable->m_Build_LoadPNGImageByIdentifier == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3741,6 +4019,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetTextContent = (PLibMCEnvXMLDocumentNode_GetTextContentPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_gettextcontent");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_GetTextContent = (PLibMCEnvXMLDocumentNode_GetTextContentPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_gettextcontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_GetTextContent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_SetTextContent = (PLibMCEnvXMLDocumentNode_SetTextContentPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_settextcontent");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_SetTextContent = (PLibMCEnvXMLDocumentNode_SetTextContentPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_settextcontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_SetTextContent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = (PLibMCEnvXMLDocumentNode_GetAttributeCountPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getattributecount");
 		#else // _WIN32
 		pWrapperTable->m_XMLDocumentNode_GetAttributeCount = (PLibMCEnvXMLDocumentNode_GetAttributeCountPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getattributecount");
@@ -3984,6 +4280,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddChildText = (PLibMCEnvXMLDocumentNode_AddChildTextPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_addchildtext");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_AddChildText = (PLibMCEnvXMLDocumentNode_AddChildTextPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_addchildtext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_AddChildText == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_XMLDocumentNode_RemoveChild = (PLibMCEnvXMLDocumentNode_RemoveChildPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_removechild");
 		#else // _WIN32
 		pWrapperTable->m_XMLDocumentNode_RemoveChild = (PLibMCEnvXMLDocumentNode_RemoveChildPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_removechild");
@@ -4125,6 +4430,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocument_RegisterNamespace == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocument_ChangeNamespacePrefix = (PLibMCEnvXMLDocument_ChangeNamespacePrefixPtr) GetProcAddress(hLibrary, "libmcenv_xmldocument_changenamespaceprefix");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocument_ChangeNamespacePrefix = (PLibMCEnvXMLDocument_ChangeNamespacePrefixPtr) dlsym(hLibrary, "libmcenv_xmldocument_changenamespaceprefix");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocument_ChangeNamespacePrefix == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4821,6 +5135,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_creatediscretefield2dfromimage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_creatediscretefield2dfromimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = (PLibMCEnvDriverEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_driverenvironment_hasbuildjob");
@@ -5190,6 +5513,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeFullAverage = (PLibMCEnvJournalVariable_ComputeFullAveragePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computefullaverage");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeFullAverage = (PLibMCEnvJournalVariable_ComputeFullAveragePtr) dlsym(hLibrary, "libmcenv_journalvariable_computefullaverage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeFullAverage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeaverage");
 		#else // _WIN32
 		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) dlsym(hLibrary, "libmcenv_journalvariable_computeaverage");
@@ -5205,6 +5537,321 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = (PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_receiverawtimestream");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = (PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) dlsym(hLibrary, "libmcenv_journalvariable_receiverawtimestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ReceiveRawTimeStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_StoreJournalMarker = (PLibMCEnvJournalHandler_StoreJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_storejournalmarker");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_StoreJournalMarker = (PLibMCEnvJournalHandler_StoreJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_storejournalmarker");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_StoreJournalMarker == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_HasJournalMarker = (PLibMCEnvJournalHandler_HasJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_hasjournalmarker");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_HasJournalMarker = (PLibMCEnvJournalHandler_HasJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_hasjournalmarker");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_HasJournalMarker == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = (PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalmarker");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = (PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalmarker");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveJournalMarker == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = (PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalmarkers");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = (PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalmarkers");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveJournalMarkers == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_Count = (PLibMCEnvUserDetailList_CountPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_count");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_Count = (PLibMCEnvUserDetailList_CountPtr) dlsym(hLibrary, "libmcenv_userdetaillist_count");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_Count == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetUserProperties = (PLibMCEnvUserDetailList_GetUserPropertiesPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getuserproperties");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetUserProperties = (PLibMCEnvUserDetailList_GetUserPropertiesPtr) dlsym(hLibrary, "libmcenv_userdetaillist_getuserproperties");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetUserProperties == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetUsername = (PLibMCEnvUserDetailList_GetUsernamePtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getusername");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetUsername = (PLibMCEnvUserDetailList_GetUsernamePtr) dlsym(hLibrary, "libmcenv_userdetaillist_getusername");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetUsername == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetUUID = (PLibMCEnvUserDetailList_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetUUID = (PLibMCEnvUserDetailList_GetUUIDPtr) dlsym(hLibrary, "libmcenv_userdetaillist_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetDescription = (PLibMCEnvUserDetailList_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getdescription");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetDescription = (PLibMCEnvUserDetailList_GetDescriptionPtr) dlsym(hLibrary, "libmcenv_userdetaillist_getdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetRole = (PLibMCEnvUserDetailList_GetRolePtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getrole");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetRole = (PLibMCEnvUserDetailList_GetRolePtr) dlsym(hLibrary, "libmcenv_userdetaillist_getrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetRole == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserDetailList_GetLanguage = (PLibMCEnvUserDetailList_GetLanguagePtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_getlanguage");
+		#else // _WIN32
+		pWrapperTable->m_UserDetailList_GetLanguage = (PLibMCEnvUserDetailList_GetLanguagePtr) dlsym(hLibrary, "libmcenv_userdetaillist_getlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserDetailList_GetLanguage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_UserExists = (PLibMCEnvUserManagementHandler_UserExistsPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_userexists");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_UserExists = (PLibMCEnvUserManagementHandler_UserExistsPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_userexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_UserExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserProperties = (PLibMCEnvUserManagementHandler_GetUserPropertiesPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserproperties");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserProperties = (PLibMCEnvUserManagementHandler_GetUserPropertiesPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserproperties");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserProperties == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID = (PLibMCEnvUserManagementHandler_GetUserPropertiesByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserpropertiesbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID = (PLibMCEnvUserManagementHandler_GetUserPropertiesByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserpropertiesbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUsernameByUUID = (PLibMCEnvUserManagementHandler_GetUsernameByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getusernamebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUsernameByUUID = (PLibMCEnvUserManagementHandler_GetUsernameByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getusernamebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUsernameByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserUUID = (PLibMCEnvUserManagementHandler_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserUUID = (PLibMCEnvUserManagementHandler_GetUserUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserDescription = (PLibMCEnvUserManagementHandler_GetUserDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserDescription = (PLibMCEnvUserManagementHandler_GetUserDescriptionPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserDescriptionByUUID = (PLibMCEnvUserManagementHandler_GetUserDescriptionByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserdescriptionbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserDescriptionByUUID = (PLibMCEnvUserManagementHandler_GetUserDescriptionByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserdescriptionbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserDescriptionByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserRole = (PLibMCEnvUserManagementHandler_GetUserRolePtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserrole");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserRole = (PLibMCEnvUserManagementHandler_GetUserRolePtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserRole == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserRoleByUUID = (PLibMCEnvUserManagementHandler_GetUserRoleByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserrolebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserRoleByUUID = (PLibMCEnvUserManagementHandler_GetUserRoleByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserrolebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserRoleByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserLanguage = (PLibMCEnvUserManagementHandler_GetUserLanguagePtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserLanguage = (PLibMCEnvUserManagementHandler_GetUserLanguagePtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserLanguage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserLanguageByUUID = (PLibMCEnvUserManagementHandler_GetUserLanguageByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserlanguagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetUserLanguageByUUID = (PLibMCEnvUserManagementHandler_GetUserLanguageByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserlanguagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetUserLanguageByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_CreateUser = (PLibMCEnvUserManagementHandler_CreateUserPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_createuser");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_CreateUser = (PLibMCEnvUserManagementHandler_CreateUserPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_createuser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_CreateUser == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserLanguage = (PLibMCEnvUserManagementHandler_SetUserLanguagePtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserLanguage = (PLibMCEnvUserManagementHandler_SetUserLanguagePtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserLanguage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserRole = (PLibMCEnvUserManagementHandler_SetUserRolePtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserrole");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserRole = (PLibMCEnvUserManagementHandler_SetUserRolePtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserRole == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserDescription = (PLibMCEnvUserManagementHandler_SetUserDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserDescription = (PLibMCEnvUserManagementHandler_SetUserDescriptionPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserPassword = (PLibMCEnvUserManagementHandler_SetUserPasswordPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserpassword");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserPassword = (PLibMCEnvUserManagementHandler_SetUserPasswordPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserpassword");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserPassword == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserLanguageByUUID = (PLibMCEnvUserManagementHandler_SetUserLanguageByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserlanguagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserLanguageByUUID = (PLibMCEnvUserManagementHandler_SetUserLanguageByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserlanguagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserLanguageByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserRoleByUUID = (PLibMCEnvUserManagementHandler_SetUserRoleByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserrolebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserRoleByUUID = (PLibMCEnvUserManagementHandler_SetUserRoleByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserrolebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserRoleByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserDescriptionByUUID = (PLibMCEnvUserManagementHandler_SetUserDescriptionByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserdescriptionbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserDescriptionByUUID = (PLibMCEnvUserManagementHandler_SetUserDescriptionByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserdescriptionbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserDescriptionByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID = (PLibMCEnvUserManagementHandler_SetUserPasswordByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_setuserpasswordbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID = (PLibMCEnvUserManagementHandler_SetUserPasswordByUUIDPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_setuserpasswordbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_GetActiveUsers = (PLibMCEnvUserManagementHandler_GetActiveUsersPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getactiveusers");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_GetActiveUsers = (PLibMCEnvUserManagementHandler_GetActiveUsersPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getactiveusers");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_GetActiveUsers == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5514,6 +6161,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_creatediscretefield2dfromimage");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_creatediscretefield2dfromimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
@@ -5559,12 +6215,57 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = (PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievejournalvariable");
+		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveJournalVariable = (PLibMCEnvStateEnvironment_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievejournalvariable");
+		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveJournalVariable == nullptr)
+		if (pWrapperTable->m_StateEnvironment_CheckUserPermission == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateUserManagement = (PLibMCEnvStateEnvironment_CreateUserManagementPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createusermanagement");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateUserManagement = (PLibMCEnvStateEnvironment_CreateUserManagementPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createusermanagement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateUserManagement == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetCurrentJournal = (PLibMCEnvStateEnvironment_GetCurrentJournalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getcurrentjournal");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetCurrentJournal = (PLibMCEnvStateEnvironment_GetCurrentJournalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getcurrentjournal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetCurrentJournal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_registermeshfrom3mfresource");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr) dlsym(hLibrary, "libmcenv_stateenvironment_registermeshfrom3mfresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_MeshIsRegistered = (PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_meshisregistered");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_MeshIsRegistered = (PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) dlsym(hLibrary, "libmcenv_stateenvironment_meshisregistered");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_MeshIsRegistered == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = (PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findregisteredmesh");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = (PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findregisteredmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindRegisteredMesh == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5937,12 +6638,111 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_RetrieveJournalVariable = (PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrievejournalvariable");
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_creatediscretefield2dfromimage");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_RetrieveJournalVariable = (PLibMCEnvUIEnvironment_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_uienvironment_retrievejournalvariable");
+		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = (PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_creatediscretefield2dfromimage");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_RetrieveJournalVariable == nullptr)
+		if (pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CheckPermission = (PLibMCEnvUIEnvironment_CheckPermissionPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_checkpermission");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CheckPermission = (PLibMCEnvUIEnvironment_CheckPermissionPtr) dlsym(hLibrary, "libmcenv_uienvironment_checkpermission");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CheckPermission == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLogin = (PLibMCEnvUIEnvironment_GetCurrentUserLoginPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserlogin");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLogin = (PLibMCEnvUIEnvironment_GetCurrentUserLoginPtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserlogin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserLogin == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserDescription = (PLibMCEnvUIEnvironment_GetCurrentUserDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserDescription = (PLibMCEnvUIEnvironment_GetCurrentUserDescriptionPtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserRole = (PLibMCEnvUIEnvironment_GetCurrentUserRolePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserrole");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserRole = (PLibMCEnvUIEnvironment_GetCurrentUserRolePtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserRole == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage = (PLibMCEnvUIEnvironment_GetCurrentUserLanguagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage = (PLibMCEnvUIEnvironment_GetCurrentUserLanguagePtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = (PLibMCEnvUIEnvironment_GetCurrentUserUUIDPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = (PLibMCEnvUIEnvironment_GetCurrentUserUUIDPtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentUserUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateUserManagement = (PLibMCEnvUIEnvironment_CreateUserManagementPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createusermanagement");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateUserManagement = (PLibMCEnvUIEnvironment_CreateUserManagementPtr) dlsym(hLibrary, "libmcenv_uienvironment_createusermanagement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateUserManagement == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentJournal = (PLibMCEnvUIEnvironment_GetCurrentJournalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentjournal");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentJournal = (PLibMCEnvUIEnvironment_GetCurrentJournalPtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentjournal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentJournal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_registermeshfrom3mfresource");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr) dlsym(hLibrary, "libmcenv_uienvironment_registermeshfrom3mfresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_MeshIsRegistered = (PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_meshisregistered");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_MeshIsRegistered = (PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) dlsym(hLibrary, "libmcenv_uienvironment_meshisregistered");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_MeshIsRegistered == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = (PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findregisteredmesh");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = (PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) dlsym(hLibrary, "libmcenv_uienvironment_findregisteredmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_FindRegisteredMesh == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6200,6 +7000,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_duplicate", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Duplicate));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getname", (void**)&(pWrapperTable->m_MeshObject_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getuuid", (void**)&(pWrapperTable->m_MeshObject_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_gettrianglecount", (void**)&(pWrapperTable->m_MeshObject_GetTriangleCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetTriangleCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getvertexcount", (void**)&(pWrapperTable->m_MeshObject_GetVertexCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertexCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
@@ -6486,8 +7302,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddBinaryData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyname", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByName == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyidentifier", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyuuid", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByUUID));
@@ -6498,8 +7314,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyname", (void**)&(pWrapperTable->m_Build_LoadPNGImageByName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByName == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyidentifier", (void**)&(pWrapperTable->m_Build_LoadPNGImageByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadPNGImageByIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyuuid", (void**)&(pWrapperTable->m_Build_LoadPNGImageByUUID));
@@ -6686,6 +7502,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetNameSpace == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_gettextcontent", (void**)&(pWrapperTable->m_XMLDocumentNode_GetTextContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetTextContent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_settextcontent", (void**)&(pWrapperTable->m_XMLDocumentNode_SetTextContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_SetTextContent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getattributecount", (void**)&(pWrapperTable->m_XMLDocumentNode_GetAttributeCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetAttributeCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6794,6 +7618,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddChild == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_addchildtext", (void**)&(pWrapperTable->m_XMLDocumentNode_AddChildText));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_AddChildText == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_removechild", (void**)&(pWrapperTable->m_XMLDocumentNode_RemoveChild));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_RemoveChild == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6856,6 +7684,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocument_registernamespace", (void**)&(pWrapperTable->m_XMLDocument_RegisterNamespace));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_RegisterNamespace == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocument_changenamespaceprefix", (void**)&(pWrapperTable->m_XMLDocument_ChangeNamespacePrefix));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocument_ChangeNamespacePrefix == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocument_getrootnode", (void**)&(pWrapperTable->m_XMLDocument_GetRootNode));
@@ -7166,6 +7998,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2dfromimage", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_hasbuildjob", (void**)&(pWrapperTable->m_DriverEnvironment_HasBuildJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_HasBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -7330,12 +8166,156 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computefullaverage", (void**)&(pWrapperTable->m_JournalVariable_ComputeFullAverage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeFullAverage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_computeaverage", (void**)&(pWrapperTable->m_JournalVariable_ComputeAverage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_computeuniformaveragesamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_receiverawtimestream", (void**)&(pWrapperTable->m_JournalVariable_ReceiveRawTimeStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ReceiveRawTimeStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariable", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariablefromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_storejournalmarker", (void**)&(pWrapperTable->m_JournalHandler_StoreJournalMarker));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_StoreJournalMarker == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_hasjournalmarker", (void**)&(pWrapperTable->m_JournalHandler_HasJournalMarker));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_HasJournalMarker == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalmarker", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalMarker));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalMarker == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalmarkers", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalMarkers));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalMarkers == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_Count == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getuserproperties", (void**)&(pWrapperTable->m_UserDetailList_GetUserProperties));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetUserProperties == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getusername", (void**)&(pWrapperTable->m_UserDetailList_GetUsername));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetUsername == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getuuid", (void**)&(pWrapperTable->m_UserDetailList_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getdescription", (void**)&(pWrapperTable->m_UserDetailList_GetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getrole", (void**)&(pWrapperTable->m_UserDetailList_GetRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetRole == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_userdetaillist_getlanguage", (void**)&(pWrapperTable->m_UserDetailList_GetLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserDetailList_GetLanguage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_userexists", (void**)&(pWrapperTable->m_UserManagementHandler_UserExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_UserExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserproperties", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserProperties));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserProperties == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserpropertiesbyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getusernamebyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_GetUsernameByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUsernameByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuseruuid", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserdescription", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserdescriptionbyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserDescriptionByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserDescriptionByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserrole", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserRole == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserrolebyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserRoleByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserRoleByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserlanguage", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserLanguage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserlanguagebyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserLanguageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetUserLanguageByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_createuser", (void**)&(pWrapperTable->m_UserManagementHandler_CreateUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_CreateUser == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserlanguage", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserLanguage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserrole", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserRole == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserdescription", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserpassword", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserPassword));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserPassword == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserlanguagebyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserLanguageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserLanguageByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserrolebyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserRoleByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserRoleByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserdescriptionbyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserDescriptionByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserDescriptionByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_setuserpasswordbyuuid", (void**)&(pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getactiveusers", (void**)&(pWrapperTable->m_UserManagementHandler_GetActiveUsers));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_GetActiveUsers == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getmachinestate", (void**)&(pWrapperTable->m_StateEnvironment_GetMachineState));
@@ -7474,6 +8454,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_creatediscretefield2dfromimage", (void**)&(pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -7494,8 +8478,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievejournalvariable", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveJournalVariable));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveJournalVariable == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_checkuserpermission", (void**)&(pWrapperTable->m_StateEnvironment_CheckUserPermission));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckUserPermission == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createusermanagement", (void**)&(pWrapperTable->m_StateEnvironment_CreateUserManagement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateUserManagement == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getcurrentjournal", (void**)&(pWrapperTable->m_StateEnvironment_GetCurrentJournal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetCurrentJournal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_registermeshfrom3mfresource", (void**)&(pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_meshisregistered", (void**)&(pWrapperTable->m_StateEnvironment_MeshIsRegistered));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_MeshIsRegistered == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_findregisteredmesh", (void**)&(pWrapperTable->m_StateEnvironment_FindRegisteredMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindRegisteredMesh == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
@@ -7662,8 +8666,52 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_retrievejournalvariable", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveJournalVariable));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveJournalVariable == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2dfromimage", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_checkpermission", (void**)&(pWrapperTable->m_UIEnvironment_CheckPermission));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CheckPermission == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserlogin", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserLogin));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserLogin == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserdescription", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserrole", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserRole == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuserlanguage", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserLanguage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentuseruuid", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentUserUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createusermanagement", (void**)&(pWrapperTable->m_UIEnvironment_CreateUserManagement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateUserManagement == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentjournal", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentJournal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentJournal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_registermeshfrom3mfresource", (void**)&(pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_meshisregistered", (void**)&(pWrapperTable->m_UIEnvironment_MeshIsRegistered));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_MeshIsRegistered == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_findregisteredmesh", (void**)&(pWrapperTable->m_UIEnvironment_FindRegisteredMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindRegisteredMesh == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -8295,6 +9343,64 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
+	}
+	
+	/**
+	 * Method definitions for class CMeshObject
+	 */
+	
+	/**
+	* CMeshObject::GetName - Returns the name of the Mesh Object.
+	* @return Returns the name of the mesh object.
+	*/
+	std::string CMeshObject::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CMeshObject::GetUUID - Returns the UUID of the mesh object.
+	* @return Returns mesh uuid.
+	*/
+	std::string CMeshObject::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CMeshObject::GetTriangleCount - Returns the number of triangles.
+	* @return Number of triangles.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetTriangleCount()
+	{
+		LibMCEnv_uint32 resultTriangleCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangleCount(m_pHandle, &resultTriangleCount));
+		
+		return resultTriangleCount;
+	}
+	
+	/**
+	* CMeshObject::GetVertexCount - Returns the number of vertices.
+	* @return Number of vertices.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetVertexCount()
+	{
+		LibMCEnv_uint32 resultVertexCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexCount(m_pHandle, &resultVertexCount));
+		
+		return resultVertexCount;
 	}
 	
 	/**
@@ -9303,31 +10409,32 @@ public:
 	
 	/**
 	* CBuild::AddBinaryData - Adds binary data to store with the build.
-	* @param[in] sName - Unique name of the attache data block. Fails if ther already exists a binary data with the equal name.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
 	* @param[in] ContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
+	std::string CBuild::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
 	{
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
-	* CBuild::LoadDiscreteField2DByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
-	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByName(const std::string & sName)
+	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByName(m_pHandle, sName.c_str(), &hFieldDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -9353,33 +10460,34 @@ public:
 	
 	/**
 	* CBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StoreDiscreteField2D(const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	std::string CBuild::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
-	* CBuild::LoadPNGImageByName - Loads a discrete field by name which was previously stored in the build job. MIME Type MUST be image/png.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Image data instance.
 	*/
-	PImageData CBuild::LoadPNGImageByName(const std::string & sName)
+	PImageData CBuild::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByName(m_pHandle, sName.c_str(), &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -9405,20 +10513,21 @@ public:
 	
 	/**
 	* CBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StorePNGImage(const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	std::string CBuild::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -10036,6 +11145,30 @@ public:
 	}
 	
 	/**
+	* CXMLDocumentNode::GetTextContent - Retrieves the text content of the node. A node with text content MUST NOT have children.
+	* @return returns the text content of the node.
+	*/
+	std::string CXMLDocumentNode::GetTextContent()
+	{
+		LibMCEnv_uint32 bytesNeededTextContent = 0;
+		LibMCEnv_uint32 bytesWrittenTextContent = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetTextContent(m_pHandle, 0, &bytesNeededTextContent, nullptr));
+		std::vector<char> bufferTextContent(bytesNeededTextContent);
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_GetTextContent(m_pHandle, bytesNeededTextContent, &bytesWrittenTextContent, &bufferTextContent[0]));
+		
+		return std::string(&bufferTextContent[0]);
+	}
+	
+	/**
+	* CXMLDocumentNode::SetTextContent - Sets the text content of the node. Call will fail if node has children.
+	* @param[in] sTextContent - the new text content of the node.
+	*/
+	void CXMLDocumentNode::SetTextContent(const std::string & sTextContent)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_SetTextContent(m_pHandle, sTextContent.c_str()));
+	}
+	
+	/**
 	* CXMLDocumentNode::GetAttributeCount - Returns number of attributes.
 	* @return returns the number of attributes.
 	*/
@@ -10418,7 +11551,7 @@ public:
 	}
 	
 	/**
-	* CXMLDocumentNode::AddChild - Adds a new child with a specific name.
+	* CXMLDocumentNode::AddChild - Adds a new child with a specific name. Fails if node has a non-empty text content.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns child instance.
@@ -10427,6 +11560,24 @@ public:
 	{
 		LibMCEnvHandle hChildInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddChild(m_pHandle, sNameSpace.c_str(), sName.c_str(), &hChildInstance));
+		
+		if (!hChildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hChildInstance);
+	}
+	
+	/**
+	* CXMLDocumentNode::AddChildText - Adds a new child with text content and a specific name. Fails if node has a non-empty text content.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @param[in] sTextContent - Text content of the child.
+	* @return returns child instance.
+	*/
+	PXMLDocumentNode CXMLDocumentNode::AddChildText(const std::string & sNameSpace, const std::string & sName, const std::string & sTextContent)
+	{
+		LibMCEnvHandle hChildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_AddChildText(m_pHandle, sNameSpace.c_str(), sName.c_str(), sTextContent.c_str(), &hChildInstance));
 		
 		if (!hChildInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -10660,6 +11811,16 @@ public:
 	void CXMLDocument::RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_RegisterNamespace(m_pHandle, sNamespace.c_str(), sNamespacePrefix.c_str()));
+	}
+	
+	/**
+	* CXMLDocument::ChangeNamespacePrefix - Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.
+	* @param[in] sOldNamespacePrefix - name space prefix that is currently in use.
+	* @param[in] sNewNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+	*/
+	void CXMLDocument::ChangeNamespacePrefix(const std::string & sOldNamespacePrefix, const std::string & sNewNamespacePrefix)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocument_ChangeNamespacePrefix(m_pHandle, sOldNamespacePrefix.c_str(), sNewNamespacePrefix.c_str()));
 	}
 	
 	/**
@@ -11663,6 +12824,27 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CDriverEnvironment::CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDiscreteField2DFromImage(m_pHandle, hImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
 	* CDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Returns true if build exists
@@ -12140,19 +13322,15 @@ public:
 	
 	/**
 	* CUniformJournalSampling::GetAllSamples - Returns all timestamps and values of the sampling.
-	* @param[out] TimeStampsBuffer - Array of TimeStamps in ms, in increasing order.
-	* @param[out] ValuesBuffer - Array of the associated values of the samples at those timestamps. Cardinality will be equal to the TimeStamps array.
+	* @param[out] SamplesBuffer - Array of Timestream entries, in increasing order.
 	*/
-	void CUniformJournalSampling::GetAllSamples(std::vector<LibMCEnv_uint64> & TimeStampsBuffer, std::vector<LibMCEnv_double> & ValuesBuffer)
+	void CUniformJournalSampling::GetAllSamples(std::vector<sTimeStreamEntry> & SamplesBuffer)
 	{
-		LibMCEnv_uint64 elementsNeededTimeStamps = 0;
-		LibMCEnv_uint64 elementsWrittenTimeStamps = 0;
-		LibMCEnv_uint64 elementsNeededValues = 0;
-		LibMCEnv_uint64 elementsWrittenValues = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, 0, &elementsNeededTimeStamps, nullptr, 0, &elementsNeededValues, nullptr));
-		TimeStampsBuffer.resize((size_t) elementsNeededTimeStamps);
-		ValuesBuffer.resize((size_t) elementsNeededValues);
-		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, elementsNeededTimeStamps, &elementsWrittenTimeStamps, TimeStampsBuffer.data(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+		LibMCEnv_uint64 elementsNeededSamples = 0;
+		LibMCEnv_uint64 elementsWrittenSamples = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, 0, &elementsNeededSamples, nullptr));
+		SamplesBuffer.resize((size_t) elementsNeededSamples);
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamples(m_pHandle, elementsNeededSamples, &elementsWrittenSamples, SamplesBuffer.data()));
 	}
 	
 	/**
@@ -12199,6 +13377,18 @@ public:
 	}
 	
 	/**
+	* CJournalVariable::ComputeFullAverage - Calculates the average value over the full available time interval.
+	* @return Average value of the variable.
+	*/
+	LibMCEnv_double CJournalVariable::ComputeFullAverage()
+	{
+		LibMCEnv_double resultAverageValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeFullAverage(m_pHandle, &resultAverageValue));
+		
+		return resultAverageValue;
+	}
+	
+	/**
 	* CJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
 	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
 	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
@@ -12231,6 +13421,570 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hJournalSampling);
+	}
+	
+	/**
+	* CJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
+	* @param[out] TimeStreamEntriesBuffer - All change events of the variable in the accessed interval.
+	*/
+	void CJournalVariable::ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTimeStreamEntries = 0;
+		LibMCEnv_uint64 elementsWrittenTimeStreamEntries = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ReceiveRawTimeStream(m_pHandle, 0, &elementsNeededTimeStreamEntries, nullptr));
+		TimeStreamEntriesBuffer.resize((size_t) elementsNeededTimeStreamEntries);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ReceiveRawTimeStream(m_pHandle, elementsNeededTimeStreamEntries, &elementsWrittenTimeStreamEntries, TimeStreamEntriesBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CJournalHandler
+	 */
+	
+	/**
+	* CJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @return Journal Instance.
+	*/
+	PJournalVariable CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+	{
+		LibMCEnvHandle hJournalVariable = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMilliseconds, &hJournalVariable));
+		
+		if (!hJournalVariable) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nStartTimeInMilliseconds - Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMilliseconds - End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval.
+	* @return Journal Instance.
+	*/
+	PJournalVariable CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds)
+	{
+		LibMCEnvHandle hJournalVariable = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariableFromTimeInterval(m_pHandle, sVariableName.c_str(), nStartTimeInMilliseconds, nEndTimeInMilliseconds, &hJournalVariable));
+		
+		if (!hJournalVariable) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
+	}
+	
+	/**
+	* CJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
+	* @return Returns the stored time stamp in milliseconds.
+	*/
+	LibMCEnv_uint64 CJournalHandler::StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
+	{
+		LibMCEnv_uint64 resultTimeStamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_StoreJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStamp));
+		
+		return resultTimeStamp;
+	}
+	
+	/**
+	* CJournalHandler::HasJournalMarker - Checks if a journal marker tag exists.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @return Returns true if the marker exists.
+	*/
+	bool CJournalHandler::HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName)
+	{
+		bool resultMarkerExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_HasJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), &resultMarkerExists));
+		
+		return resultMarkerExists;
+	}
+	
+	/**
+	* CJournalHandler::RetrieveJournalMarker - Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
+	* @return Returns the time stamp in milliseconds.
+	*/
+	LibMCEnv_uint64 CJournalHandler::RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
+	{
+		LibMCEnv_uint64 resultTimeStamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStamp));
+		
+		return resultTimeStamp;
+	}
+	
+	/**
+	* CJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[out] TimeStampsBuffer - Returns an array of time stamps in milliseconds.
+	*/
+	void CJournalHandler::RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, std::vector<LibMCEnv_uint64> & TimeStampsBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTimeStamps = 0;
+		LibMCEnv_uint64 elementsWrittenTimeStamps = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarkers(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), 0, &elementsNeededTimeStamps, nullptr));
+		TimeStampsBuffer.resize((size_t) elementsNeededTimeStamps);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarkers(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), elementsNeededTimeStamps, &elementsWrittenTimeStamps, TimeStampsBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CUserDetailList
+	 */
+	
+	/**
+	* CUserDetailList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	LibMCEnv_uint32 CUserDetailList::Count()
+	{
+		LibMCEnv_uint32 resultUserCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_Count(m_pHandle, &resultUserCount));
+		
+		return resultUserCount;
+	}
+	
+	/**
+	* CUserDetailList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CUserDetailList::GetUserProperties(const LibMCEnv_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededUsername = 0;
+		LibMCEnv_uint32 bytesWrittenUsername = 0;
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUserProperties(m_pHandle, nUserIndex, 0, &bytesNeededUsername, nullptr, 0, &bytesNeededUUID, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUserProperties(m_pHandle, nUserIndex, bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0], bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUsername = std::string(&bufferUsername[0]);
+		sUUID = std::string(&bufferUUID[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetUsername - Retrieves the user name of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return User name
+	*/
+	std::string CUserDetailList::GetUsername(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededUsername = 0;
+		LibMCEnv_uint32 bytesWrittenUsername = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUsername(m_pHandle, nUserIndex, 0, &bytesNeededUsername, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUsername(m_pHandle, nUserIndex, bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0]));
+		
+		return std::string(&bufferUsername[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetUUID - Retrieves the UUID of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return UUID of the user.
+	*/
+	std::string CUserDetailList::GetUUID(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUUID(m_pHandle, nUserIndex, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetUUID(m_pHandle, nUserIndex, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetDescription - Retrieves the description of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Description of the user.
+	*/
+	std::string CUserDetailList::GetDescription(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetDescription(m_pHandle, nUserIndex, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetDescription(m_pHandle, nUserIndex, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetRole - Retrieves the role of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Role of the user.
+	*/
+	std::string CUserDetailList::GetRole(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetRole(m_pHandle, nUserIndex, 0, &bytesNeededRole, nullptr));
+		std::vector<char> bufferRole(bytesNeededRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetRole(m_pHandle, nUserIndex, bytesNeededRole, &bytesWrittenRole, &bufferRole[0]));
+		
+		return std::string(&bufferRole[0]);
+	}
+	
+	/**
+	* CUserDetailList::GetLanguage - Retrieves the language identifier of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Language Identifier of the user.
+	*/
+	std::string CUserDetailList::GetLanguage(const LibMCEnv_uint32 nUserIndex)
+	{
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetLanguage(m_pHandle, nUserIndex, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserDetailList_GetLanguage(m_pHandle, nUserIndex, bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		
+		return std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	 * Method definitions for class CUserManagementHandler
+	 */
+	
+	/**
+	* CUserManagementHandler::UserExists - Checks if a user exist.
+	* @param[in] sUsername - User name
+	* @return Flag if users exists
+	*/
+	bool CUserManagementHandler::UserExists(const std::string & sUsername)
+	{
+		bool resultUserExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_UserExists(m_pHandle, sUsername.c_str(), &resultUserExists));
+		
+		return resultUserExists;
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserProperties - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CUserManagementHandler::GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserProperties(m_pHandle, sUsername.c_str(), 0, &bytesNeededUUID, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserProperties(m_pHandle, sUsername.c_str(), bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUUID = std::string(&bufferUUID[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserPropertiesByUUID - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[out] sUsername - User name
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CUserManagementHandler::GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededUsername = 0;
+		LibMCEnv_uint32 bytesWrittenUsername = 0;
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserPropertiesByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededUsername, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserPropertiesByUUID(m_pHandle, sUUID.c_str(), bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUsername = std::string(&bufferUsername[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return User name
+	*/
+	std::string CUserManagementHandler::GetUsernameByUUID(const std::string & sUUID)
+	{
+		LibMCEnv_uint32 bytesNeededUsername = 0;
+		LibMCEnv_uint32 bytesWrittenUsername = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUsernameByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededUsername, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUsernameByUUID(m_pHandle, sUUID.c_str(), bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0]));
+		
+		return std::string(&bufferUsername[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserUUID - Retrieves a users UUID. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return UUID of the user.
+	*/
+	std::string CUserManagementHandler::GetUserUUID(const std::string & sUsername)
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserUUID(m_pHandle, sUsername.c_str(), 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserUUID(m_pHandle, sUsername.c_str(), bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserDescription - Retrieves a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Description of the user.
+	*/
+	std::string CUserManagementHandler::GetUserDescription(const std::string & sUsername)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserDescription(m_pHandle, sUsername.c_str(), 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserDescription(m_pHandle, sUsername.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserDescriptionByUUID - Retrieves a users description by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Description of the user.
+	*/
+	std::string CUserManagementHandler::GetUserDescriptionByUUID(const std::string & sUUID)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserDescriptionByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserDescriptionByUUID(m_pHandle, sUUID.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Role of the user.
+	*/
+	std::string CUserManagementHandler::GetUserRole(const std::string & sUsername)
+	{
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserRole(m_pHandle, sUsername.c_str(), 0, &bytesNeededRole, nullptr));
+		std::vector<char> bufferRole(bytesNeededRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserRole(m_pHandle, sUsername.c_str(), bytesNeededRole, &bytesWrittenRole, &bufferRole[0]));
+		
+		return std::string(&bufferRole[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserRoleByUUID - Retrieves a users role by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Role of the user.
+	*/
+	std::string CUserManagementHandler::GetUserRoleByUUID(const std::string & sUUID)
+	{
+		LibMCEnv_uint32 bytesNeededRole = 0;
+		LibMCEnv_uint32 bytesWrittenRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserRoleByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededRole, nullptr));
+		std::vector<char> bufferRole(bytesNeededRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserRoleByUUID(m_pHandle, sUUID.c_str(), bytesNeededRole, &bytesWrittenRole, &bufferRole[0]));
+		
+		return std::string(&bufferRole[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Language identifier of the user.
+	*/
+	std::string CUserManagementHandler::GetUserLanguage(const std::string & sUsername)
+	{
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserLanguage(m_pHandle, sUsername.c_str(), 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserLanguage(m_pHandle, sUsername.c_str(), bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		
+		return std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::GetUserLanguageByUUID - Retrieves a users language preference by user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Language identifier of the user.
+	*/
+	std::string CUserManagementHandler::GetUserLanguageByUUID(const std::string & sUUID)
+	{
+		LibMCEnv_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserLanguageByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetUserLanguageByUUID(m_pHandle, sUUID.c_str(), bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		
+		return std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::CreateUser - Creates a new user. Fails if the user already exists.
+	* @param[in] sUsername - User name to create. MUST be alphanumeric and not empty.
+	* @param[in] sRole - Role of the new user. MUST NOT be empty.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	* @param[in] sDescription - Description of the new user.
+	* @return UUID of the new user.
+	*/
+	std::string CUserManagementHandler::CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription)
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_CreateUser(m_pHandle, sUsername.c_str(), sRole.c_str(), sSalt.c_str(), sHashedPassword.c_str(), sDescription.c_str(), 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_CreateUser(m_pHandle, sUsername.c_str(), sRole.c_str(), sSalt.c_str(), sHashedPassword.c_str(), sDescription.c_str(), bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserLanguage - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CUserManagementHandler::SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserLanguage(m_pHandle, sUsername.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserRole - Updates a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sUserRole - New Role identifier of the user.
+	*/
+	void CUserManagementHandler::SetUserRole(const std::string & sUsername, const std::string & sUserRole)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserRole(m_pHandle, sUsername.c_str(), sUserRole.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sDescription - New Description of the user.
+	*/
+	void CUserManagementHandler::SetUserDescription(const std::string & sUsername, const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserDescription(m_pHandle, sUsername.c_str(), sDescription.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserPassword - Updates a users password. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	void CUserManagementHandler::SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserPassword(m_pHandle, sUsername.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserLanguageByUUID - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CUserManagementHandler::SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserLanguageByUUID(m_pHandle, sUUID.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sUserRole - New Role identifier of the user.
+	*/
+	void CUserManagementHandler::SetUserRoleByUUID(const std::string & sUUID, const std::string & sUserRole)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserRoleByUUID(m_pHandle, sUUID.c_str(), sUserRole.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sDescription - New Description identifier of the user.
+	*/
+	void CUserManagementHandler::SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserDescriptionByUUID(m_pHandle, sUUID.c_str(), sDescription.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::SetUserPasswordByUUID - Updates a users password. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	void CUserManagementHandler::SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_SetUserPasswordByUUID(m_pHandle, sUUID.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
+	}
+	
+	/**
+	* CUserManagementHandler::GetActiveUsers - Returns a list of all users.
+	* @return Instance of active users.
+	*/
+	PUserDetailList CUserManagementHandler::GetActiveUsers()
+	{
+		LibMCEnvHandle hListInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_GetActiveUsers(m_pHandle, &hListInstance));
+		
+		if (!hListInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUserDetailList>(m_pWrapper, hListInstance);
 	}
 	
 	/**
@@ -12705,6 +14459,27 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	PDiscreteFieldData2D CStateEnvironment::CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDiscreteField2DFromImage(m_pHandle, hImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY, &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
 	* CStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
@@ -12781,20 +14556,92 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
-	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
-	* @return Journal Instance.
+	* CStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+	* @param[in] sUserLogin - Login of user to check
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
 	*/
-	PJournalVariable CStateEnvironment::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+	bool CStateEnvironment::CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier)
 	{
-		LibMCEnvHandle hJournalVariable = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMilliseconds, &hJournalVariable));
+		bool resultUserHasPermission = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CheckUserPermission(m_pHandle, sUserLogin.c_str(), sPermissionIdentifier.c_str(), &resultUserHasPermission));
 		
-		if (!hJournalVariable) {
+		return resultUserHasPermission;
+	}
+	
+	/**
+	* CStateEnvironment::CreateUserManagement - Returns a user management handler instance.
+	* @return Returns a user management handler.
+	*/
+	PUserManagementHandler CStateEnvironment::CreateUserManagement()
+	{
+		LibMCEnvHandle hUserManagementInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateUserManagement(m_pHandle, &hUserManagementInstance));
+		
+		if (!hUserManagementInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
+		return std::make_shared<CUserManagementHandler>(m_pWrapper, hUserManagementInstance);
+	}
+	
+	/**
+	* CStateEnvironment::GetCurrentJournal - Returns the journal instance of the current session.
+	* @return Journal instance.
+	*/
+	PJournalHandler CStateEnvironment::GetCurrentJournal()
+	{
+		LibMCEnvHandle hJournalHandler = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetCurrentJournal(m_pHandle, &hJournalHandler));
+		
+		if (!hJournalHandler) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalHandler>(m_pWrapper, hJournalHandler);
+	}
+	
+	/**
+	* CStateEnvironment::RegisterMeshFrom3MFResource - Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+	* @param[in] sResourceName - Resource name to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CStateEnvironment::RegisterMeshFrom3MFResource(const std::string & sResourceName)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RegisterMeshFrom3MFResource(m_pHandle, sResourceName.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+	}
+	
+	/**
+	* CStateEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	bool CStateEnvironment::MeshIsRegistered(const std::string & sMeshUUID)
+	{
+		bool resultMeshIsRegistered = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_MeshIsRegistered(m_pHandle, sMeshUUID.c_str(), &resultMeshIsRegistered));
+		
+		return resultMeshIsRegistered;
+	}
+	
+	/**
+	* CStateEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CStateEnvironment::FindRegisteredMesh(const std::string & sMeshUUID)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindRegisteredMesh(m_pHandle, sMeshUUID.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
 	}
 	
 	/**
@@ -13370,20 +15217,188 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
-	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
-	* @return Journal Instance.
+	* CUIEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
 	*/
-	PJournalVariable CUIEnvironment::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+	PDiscreteFieldData2D CUIEnvironment::CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
 	{
-		LibMCEnvHandle hJournalVariable = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMilliseconds, &hJournalVariable));
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDiscreteField2DFromImage(m_pHandle, hImageDataInstance, dBlackValue, dWhiteValue, dOriginX, dOriginY, &hFieldDataInstance));
 		
-		if (!hJournalVariable) {
+		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CheckPermission - Returns if the current user has a certain permission. Fails if permission is not known to the system.
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	bool CUIEnvironment::CheckPermission(const std::string & sPermissionIdentifier)
+	{
+		bool resultUserHasPermission = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CheckPermission(m_pHandle, sPermissionIdentifier.c_str(), &resultUserHasPermission));
+		
+		return resultUserHasPermission;
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserLogin - Returns the current user login name.
+	* @return Returns the current users login name.
+	*/
+	std::string CUIEnvironment::GetCurrentUserLogin()
+	{
+		LibMCEnv_uint32 bytesNeededUserLogin = 0;
+		LibMCEnv_uint32 bytesWrittenUserLogin = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLogin(m_pHandle, 0, &bytesNeededUserLogin, nullptr));
+		std::vector<char> bufferUserLogin(bytesNeededUserLogin);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLogin(m_pHandle, bytesNeededUserLogin, &bytesWrittenUserLogin, &bufferUserLogin[0]));
+		
+		return std::string(&bufferUserLogin[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserDescription - Returns the current user description.
+	* @return Returns the current users description.
+	*/
+	std::string CUIEnvironment::GetCurrentUserDescription()
+	{
+		LibMCEnv_uint32 bytesNeededUserDescription = 0;
+		LibMCEnv_uint32 bytesWrittenUserDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserDescription(m_pHandle, 0, &bytesNeededUserDescription, nullptr));
+		std::vector<char> bufferUserDescription(bytesNeededUserDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserDescription(m_pHandle, bytesNeededUserDescription, &bytesWrittenUserDescription, &bufferUserDescription[0]));
+		
+		return std::string(&bufferUserDescription[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserRole - Returns the current user role identifier.
+	* @return Returns the current users role identifier.
+	*/
+	std::string CUIEnvironment::GetCurrentUserRole()
+	{
+		LibMCEnv_uint32 bytesNeededUserRole = 0;
+		LibMCEnv_uint32 bytesWrittenUserRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserRole(m_pHandle, 0, &bytesNeededUserRole, nullptr));
+		std::vector<char> bufferUserRole(bytesNeededUserRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserRole(m_pHandle, bytesNeededUserRole, &bytesWrittenUserRole, &bufferUserRole[0]));
+		
+		return std::string(&bufferUserRole[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserLanguage - Returns the current users language identifier.
+	* @return Returns the current users language identifier.
+	*/
+	std::string CUIEnvironment::GetCurrentUserLanguage()
+	{
+		LibMCEnv_uint32 bytesNeededUserLanguage = 0;
+		LibMCEnv_uint32 bytesWrittenUserLanguage = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLanguage(m_pHandle, 0, &bytesNeededUserLanguage, nullptr));
+		std::vector<char> bufferUserLanguage(bytesNeededUserLanguage);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserLanguage(m_pHandle, bytesNeededUserLanguage, &bytesWrittenUserLanguage, &bufferUserLanguage[0]));
+		
+		return std::string(&bufferUserLanguage[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentUserUUID - Returns the current user UUID.
+	* @return Returns the current user UUID.
+	*/
+	std::string CUIEnvironment::GetCurrentUserUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUserUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserUUID(m_pHandle, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentUserUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CUIEnvironment::CreateUserManagement - Returns a user management handler instance.
+	* @return Returns a user management handler.
+	*/
+	PUserManagementHandler CUIEnvironment::CreateUserManagement()
+	{
+		LibMCEnvHandle hUserManagementInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateUserManagement(m_pHandle, &hUserManagementInstance));
+		
+		if (!hUserManagementInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUserManagementHandler>(m_pWrapper, hUserManagementInstance);
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentJournal - Returns the journal instance of the current session.
+	* @return Journal instance.
+	*/
+	PJournalHandler CUIEnvironment::GetCurrentJournal()
+	{
+		LibMCEnvHandle hJournalHandler = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentJournal(m_pHandle, &hJournalHandler));
+		
+		if (!hJournalHandler) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalHandler>(m_pWrapper, hJournalHandler);
+	}
+	
+	/**
+	* CUIEnvironment::RegisterMeshFrom3MFResource - Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+	* @param[in] sResourceName - Resource name to load.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CUIEnvironment::RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RegisterMeshFrom3MFResource(m_pHandle, sResourceName.c_str(), sMeshUUID.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+	}
+	
+	/**
+	* CUIEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	bool CUIEnvironment::MeshIsRegistered(const std::string & sMeshUUID)
+	{
+		bool resultMeshIsRegistered = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_MeshIsRegistered(m_pHandle, sMeshUUID.c_str(), &resultMeshIsRegistered));
+		
+		return resultMeshIsRegistered;
+	}
+	
+	/**
+	* CUIEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	PMeshObject CUIEnvironment::FindRegisteredMesh(const std::string & sMeshUUID)
+	{
+		LibMCEnvHandle hMeshObject = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindRegisteredMesh(m_pHandle, sMeshUUID.c_str(), &hMeshObject));
+		
+		if (!hMeshObject) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
 	}
 
 } // namespace LibMCEnv

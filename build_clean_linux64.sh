@@ -177,4 +177,20 @@ go run "$basepath/BuildScripts/createDevPackage.go" ./DevPackage/Framework ./Dev
 
 cp "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "$builddir/Artifacts/devpackage_${PLATFORMNAME}.zip"
 
+if [[ -z "${AMCF_PACKAGE_REPOSITORY}" ]]; then
+  echo "No AMCF package repository given!"
+
+else
+  echo "AMCF package repository: ${AMCF_PACKAGE_REPOSITORY}"
+  if [[ -z "${AMCF_PACKAGE_REPOSITORY_KEYFILE}" ]]; then
+    echo "No AMCF package repository key file given!"
+
+  else
+    echo "AMCF package key file: ${AMCF_PACKAGE_REPOSITORY_KEYFILE}"
+    echo "Uploading package to server..."
+    scp -i "${AMCF_PACKAGE_REPOSITORY_KEYFILE}" "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "${AMCF_PACKAGE_REPOSITORY}"
+    echo "Upload finished."
+  fi
+fi
+
 echo "Build done!"

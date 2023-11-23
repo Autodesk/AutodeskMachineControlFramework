@@ -96,6 +96,8 @@ void CDriver_ScanLab::LoadSDK(const std::string& sResourceName)
     m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
     m_pOwnerData->setScanLabSDK(m_pScanLabSDK);
 
+    //m_pScanLabSDK->setJournal(std::make_shared<CScanLabSDKJournal>("C:/Temp/journal.txt"));
+
     m_nDLLVersion = m_pScanLabSDK->get_dll_version();
 
     updateDLLVersionParameter(m_nDLLVersion);

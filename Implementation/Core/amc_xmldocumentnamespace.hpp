@@ -54,9 +54,14 @@ namespace AMC {
 
 		std::string getPrefix ();
 
+		bool hasPrefix();
+
 		static bool checkXMLNameSpaceName(const std::string& sNodeName);
 
 		static bool checkXMLNameSpacePrefixName(const std::string& sPrefix);
+
+		void changePrefix(const std::string & sNewNamespacePrefix);
+
 
 	};
 

@@ -149,9 +149,21 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
-	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
+	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;	
 
-	IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
+	IDiscreteFieldData2D* CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) override;
+
+	bool CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier) override;
+
+	IUserManagementHandler * CreateUserManagement() override;
+
+	IJournalHandler* GetCurrentJournal() override;
+
+	IMeshObject* RegisterMeshFrom3MFResource(const std::string& sResourceName) override;
+
+	bool MeshIsRegistered(const std::string& sMeshUUID) override;
+
+	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
 
 };
 

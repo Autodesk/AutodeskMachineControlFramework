@@ -35,12 +35,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 
 using namespace AMC;
 
 #define DISCRETEFIELD_MAXPIXELCOUNT (1024ULL * 1024ULL * 32ULL)
 #define DISCRETEFIELD_MINVALUEDISTANCE 1E-6
 #define DISCRETEFIELD_MAXPOINTVALUESCOUNT (1024ULL * 1024ULL * 1024ULL)
+
+#define DISCRETEFIELD_MAXORIGINCOORDINATE 1.0e9
+
+#define DISCRETEFIELD2D_STREAMFILESIGN 0x17AE971A
+#define DISCRETEFIELD2D_STREAMFILEMAJORVERSION 1
+#define DISCRETEFIELD2D_STREAMFILEMINORVERSION 0
+#define DISCRETEFIELD2D_STREAMFILEPATCHVERSION 0
+
+#define DISCRETEFIELD2D_STREAMSTORAGETYPE_RAWDATA 1
+
+#pragma pack(push)
+#pragma pack(1)
+typedef struct _sDiscreteField2DStreamHeader {
+	uint32_t m_nFileSign;
+	uint8_t m_nMajorVersion;
+	uint8_t m_nMinorVersion;
+	uint8_t m_nPatchVersion;
+	uint8_t m_nStreamStorageType;
+	uint32_t m_nPixelCountX;
+	uint32_t m_nPixelCountY;
+	double m_dDPIX;
+	double m_dDPIY;
+	double m_dOriginX;
+	double m_dOriginY;
+	uint64_t m_nDataOffset;
+	uint32_t m_nReserved[32];
+} sDiscreteField2DStreamHeader;
+#pragma pack(pop)
+
+
+PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::createFromBuffer(const std::vector<uint8_t>& Buffer)
+{
+	if (Buffer.size () < sizeof (sDiscreteField2DStreamHeader))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDBUFFER);
+
+	sDiscreteField2DStreamHeader* header = (sDiscreteField2DStreamHeader*)Buffer.data();
+
+	if (header->m_nFileSign != DISCRETEFIELD2D_STREAMFILESIGN)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDFILESIGN);
+
+	if (header->m_nMajorVersion != DISCRETEFIELD2D_STREAMFILEMAJORVERSION)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INCOMPATIBLEDISCRETEFIELDFILEVERSION);
+
+	if (header->m_nMinorVersion > DISCRETEFIELD2D_STREAMFILEMINORVERSION)
+		throw ELibMCInterfaceException(LIBMC_ERROR_TOONEWDISCRETEFIELDFILEVERSION);
+
+	if (header->m_nStreamStorageType != DISCRETEFIELD2D_STREAMSTORAGETYPE_RAWDATA)
+		throw ELibMCInterfaceException(LIBMC_ERROR_TOONEWDISCRETEFIELDSTREAMTYPE);
+
+	if (header->m_nDataOffset < sizeof(sDiscreteField2DStreamHeader))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET);
+
+	auto pInstance = std::make_shared<CDiscreteFieldData2DInstance>(header->m_nPixelCountX, header->m_nPixelCountY, header->m_dDPIX, header->m_dDPIY, header->m_dOriginX, header->m_dOriginY, 0.0, false);
+
+	uint64_t nPixelCount = (uint64_t)header->m_nPixelCountX * (uint64_t)header->m_nPixelCountY;
+	if (header->m_nDataOffset + nPixelCount * sizeof (double) > Buffer.size ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE);
+
+	auto * pDataVector = pInstance->m_Data.get ();
+	if (pDataVector == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA);
+	if (pDataVector->size () != nPixelCount)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA);
+
+	double * pTargetPtr = pDataVector->data();
+	double * pSourcePtr = (double*)&Buffer.at(header->m_nDataOffset);
+	for (uint64_t nIndex = 0; nIndex < nPixelCount; nIndex++) {
+		*pTargetPtr = *pSourcePtr;
+		pTargetPtr++;
+		pSourcePtr++;
+	}
+
+
+	return pInstance;
+}
 
 CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, size_t nPixelCountY, double dDPIX, double dDPIY, double dOriginX, double dOriginY, double dDefaultValue, bool bDoClear)
 	: m_nPixelCountX (nPixelCountX), m_nPixelCountY (nPixelCountY), m_dDPIX (dDPIX), m_dDPIY (dDPIY), m_dOriginX (dOriginX), m_dOriginY (dOriginY)
@@ -57,6 +133,10 @@ CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, 
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDPIVALUE);
 	if (dDPIY <= 0.0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDPIVALUE);
+	if (abs (dOriginX) > DISCRETEFIELD_MAXORIGINCOORDINATE)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ORIGINOUTOFRANGE);
+	if (abs(dOriginY) > DISCRETEFIELD_MAXORIGINCOORDINATE)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ORIGINOUTOFRANGE);
 
 	m_Data = std::make_unique<std::vector<double>> ();
 
@@ -91,8 +171,8 @@ void CDiscreteFieldData2DInstance::SetDPI(const double dDPIValueX, const double 
 
 void CDiscreteFieldData2DInstance::GetOriginInMM(double& dOriginX, double& dOriginY)
 {
-	m_dOriginX = dOriginX;
-	m_dOriginY = dOriginY;
+	dOriginX = m_dOriginX;
+	dOriginY = m_dOriginY;
 }
 
 void CDiscreteFieldData2DInstance::SetOriginInMM(const double dOriginX, const double dOriginY)
@@ -262,7 +342,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::ScaleFieldDown(const 
 			uint32_t nCount = 0;
 
 			for (uint32_t dY = 0; dY < nFactorY; dY++) {
-				size_t nTargetY = (nY + dY);
+				size_t nTargetY = ((uint64_t)nY + dY);
 
 				if (nTargetY < m_nPixelCountY) {
 
@@ -317,7 +397,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::ScaleFieldUp(const ui
 		double* pSource = &m_Data->at(nY * m_nPixelCountX);
 		for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
 			double dValue = *pSource;
-			dValue++;
+			pSource++;
 
 			for (uint32_t dY = 0; dY < nFactorY; dY++) {
 				double* pTarget = &pNewField->m_Data->at(((size_t)nY * nFactorY + dY) * nNewPixelCountX);
@@ -470,6 +550,7 @@ void CDiscreteFieldData2DInstance::renderRGBImage(std::vector<uint8_t>* pPixelDa
 	
 }
 
+
 void CDiscreteFieldData2DInstance::renderAveragePointValues_FloorSampling(const LibMCEnv_double dDefaultValue, const uint64_t nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint* pPointValuesBuffer)
 {
 	if (nPointValuesBufferSize == 0) {
@@ -537,6 +618,133 @@ void CDiscreteFieldData2DInstance::renderAveragePointValues_FloorSampling(const 
 			}
 		}
 
+	}
+
+}
+
+void CDiscreteFieldData2DInstance::saveToBuffer(std::vector<uint8_t>& Buffer)
+{
+	uint64_t nPixelCount = m_nPixelCountX * m_nPixelCountY;
+	Buffer.resize (sizeof (sDiscreteField2DStreamHeader) + nPixelCount * sizeof (double));
+	sDiscreteField2DStreamHeader* header = (sDiscreteField2DStreamHeader*)Buffer.data();
+
+	memset((void*)header, 0, sizeof(sDiscreteField2DStreamHeader));
+	header->m_nFileSign = DISCRETEFIELD2D_STREAMFILESIGN;
+	header->m_nMajorVersion = DISCRETEFIELD2D_STREAMFILEMAJORVERSION;
+	header->m_nMinorVersion = DISCRETEFIELD2D_STREAMFILEMINORVERSION;
+	header->m_nPatchVersion = DISCRETEFIELD2D_STREAMFILEPATCHVERSION;
+	header->m_nStreamStorageType = DISCRETEFIELD2D_STREAMSTORAGETYPE_RAWDATA;
+	header->m_nPixelCountX = (uint32_t) m_nPixelCountX;
+	header->m_nPixelCountY = (uint32_t) m_nPixelCountY;
+	header->m_dDPIX = m_dDPIX;
+	header->m_dDPIY = m_dDPIY;
+	header->m_dOriginX = m_dOriginX;
+	header->m_dOriginY = m_dOriginY;
+	header->m_nDataOffset = sizeof(sDiscreteField2DStreamHeader);
+
+	double* pSourcePtr = m_Data.get()->data();
+	double* pTargetPtr = (double*)&Buffer.at(header->m_nDataOffset);
+	for (uint64_t nIndex = 0; nIndex < nPixelCount; nIndex++) {
+		*pTargetPtr = *pSourcePtr;
+		pTargetPtr++;
+		pSourcePtr++;
+	}
+}
+
+void CDiscreteFieldData2DInstance::loadFromRawPixelData(const std::vector<uint8_t>& pixelData, LibMCEnv::eImagePixelFormat pixelFormat, double dBlackValue, double dWhiteValue)
+{
+
+	switch (pixelFormat) {
+	case LibMCEnv::eImagePixelFormat::GreyScale8bit:
+		if (pixelData.size() != (m_nPixelCountX * m_nPixelCountY))
+			throw eLibMCEnvImagePixelFormat(LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH);
+
+		for (uint32_t nY = 0; nY < m_nPixelCountY; nY++) {
+
+			double* pTarget = &m_Data->at(nY * m_nPixelCountX);
+			const uint8_t* pSource = &pixelData.at (nY * m_nPixelCountX);
+			for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
+				double dGreyScale = (*pSource) / 255.0;
+				pSource++;
+
+				double dValue = (1.0 - dGreyScale) * dBlackValue + dGreyScale * dWhiteValue;
+				*pTarget = dValue;
+				pTarget++;
+
+			}
+		}
+
+
+
+		break;
+
+	case LibMCEnv::eImagePixelFormat::RGB24bit:
+		if (pixelData.size() != (m_nPixelCountX * m_nPixelCountY * 3))
+			throw eLibMCEnvImagePixelFormat(LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH);
+
+		for (uint32_t nY = 0; nY < m_nPixelCountY; nY++) {
+
+			double* pTarget = &m_Data->at(nY * m_nPixelCountX);
+			const uint8_t* pSource = &pixelData.at(nY * m_nPixelCountX * 3);
+			for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
+				int64_t nRed = *pSource; 
+				pSource++;
+
+				int64_t nGreen = *pSource;
+				pSource++;
+
+				int64_t nBlue = *pSource;
+				pSource++;
+
+				double dGreyScale = (nRed + nGreen + nBlue) / (255.0 * 3);
+
+				double dValue = (1.0 - dGreyScale) * dBlackValue + dGreyScale * dWhiteValue;
+				*pTarget = dValue;
+				pTarget++;
+
+			}
+		}
+
+
+
+		break;
+
+	case LibMCEnv::eImagePixelFormat::RGBA32bit:
+		if (pixelData.size() != (m_nPixelCountX * m_nPixelCountY * 4))
+			throw eLibMCEnvImagePixelFormat(LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH);
+
+		for (uint32_t nY = 0; nY < m_nPixelCountY; nY++) {
+
+			double* pTarget = &m_Data->at(nY * m_nPixelCountX);
+			const uint8_t* pSource = &pixelData.at(nY * m_nPixelCountX * 4);
+			for (uint32_t nX = 0; nX < m_nPixelCountX; nX++) {
+				int64_t nRed = *pSource;
+				pSource++;
+
+				int64_t nGreen = *pSource;
+				pSource++;
+
+				int64_t nBlue = *pSource;
+				pSource++;
+
+				// Skip Alpha
+				pSource++;
+
+				double dGreyScale = (nRed + nGreen + nBlue) / (255.0 * 3);
+
+				double dValue = (1.0 - dGreyScale) * dBlackValue + dGreyScale * dWhiteValue;
+				*pTarget = dValue;
+				pTarget++;
+
+			}
+		}
+
+
+
+		break;
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
 	}
 
 }

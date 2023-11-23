@@ -360,6 +360,21 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DATATYPEMISMATCH 333 /** Datatype mismatch */
 #define LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY 334 /** Could not find log entry */
 #define LIBMCDATA_ERROR_NOLOGCALLBACK 335 /** No log callback */
+#define LIBMCDATA_ERROR_EMPTYUSERNAME 336 /** Empty user name */
+#define LIBMCDATA_ERROR_EMPTYUSERUUID 337 /** Empty user UUID */
+#define LIBMCDATA_ERROR_USERNOTUNIQUE 338 /** User not unique */
+#define LIBMCDATA_ERROR_EMPTYUSERROLE 339 /** Empty user role */
+#define LIBMCDATA_ERROR_EMPTYUSERSALT 340 /** Empty user salt */
+#define LIBMCDATA_ERROR_EMPTYUSERPASSWORD 341 /** Empty user password */
+#define LIBMCDATA_ERROR_INVALIDUSERROLE 342 /** Invalid user role */
+#define LIBMCDATA_ERROR_USERALREADYEXISTS 343 /** User already exists */
+#define LIBMCDATA_ERROR_INVALIDUSERLANGUAGE 344 /** Invalid user language */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE 345 /** Could not update user language */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE 346 /** Could not update user role */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION 347 /** Could not update user description */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD 348 /** Could not update user password */
+#define LIBMCDATA_ERROR_INVALIDUSERINDEX 349 /** Invalid user index */
+#define LIBMCDATA_ERROR_INVALIDJOURNAL 350 /** Invalid journal */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -632,6 +647,21 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
     case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
     case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
+    case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
+    case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
+    case LIBMCDATA_ERROR_USERNOTUNIQUE: return "User not unique";
+    case LIBMCDATA_ERROR_EMPTYUSERROLE: return "Empty user role";
+    case LIBMCDATA_ERROR_EMPTYUSERSALT: return "Empty user salt";
+    case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "Empty user password";
+    case LIBMCDATA_ERROR_INVALIDUSERROLE: return "Invalid user role";
+    case LIBMCDATA_ERROR_USERALREADYEXISTS: return "User already exists";
+    case LIBMCDATA_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE: return "Could not update user language";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE: return "Could not update user role";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "Could not update user description";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
+    case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
+    case LIBMCDATA_ERROR_INVALIDJOURNAL: return "Invalid journal";
     default: return "unknown error";
   }
 }
@@ -644,6 +674,7 @@ typedef LibMCDataHandle LibMCData_Base;
 typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogEntryList;
 typedef LibMCDataHandle LibMCData_LogSession;
+typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
 typedef LibMCDataHandle LibMCData_BuildJobData;
@@ -651,6 +682,7 @@ typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
+typedef LibMCDataHandle LibMCData_UserList;
 typedef LibMCDataHandle LibMCData_LoginHandler;
 typedef LibMCDataHandle LibMCData_PersistencyHandler;
 typedef LibMCDataHandle LibMCData_DataModel;

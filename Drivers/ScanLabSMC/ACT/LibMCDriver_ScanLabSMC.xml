@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="MC Driver ScanLab SCANmotionControl" namespace="LibMCDriver_ScanLabSMC" copyright="Autodesk Inc." year="2023" basename="libmcdriver_scanlabsmc"
+	version="2.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		<error name="EMPTYCONFIGURATIONXML" code="9" description="empty configuration XML" />
+		
+
+		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+		<error name="UNSUPPORTEDPLATFORM" code="1001" description="Unsupported platform. SMC only works on Windows only for now." />
+		<error name="SDKALREADYLOADED" code="1002" description="SDK has already been loaded." />
+		<error name="EMPTYSMCDLLRESOURCENAME" code="1003" description="Empty SMC DLL Resource Name." />
+		<error name="EMPTYRTCDLLRESOURCENAME" code="1004" description="Empty RTC DLL Resource Name." />
+		<error name="SMCSDKRESOURCENOTFOUND" code="1005" description="SMC SDK Resource not found." />
+		<error name="COULDNOTSTORESMCSDK" code="1006" description="Could not store SMC SDK." />
+		<error name="RTCSDKRESOURCENOTFOUND" code="1007" description="RTC SDK Resource not found." />
+		<error name="COULDNOTSTORERTCSDK" code="1008" description="Could not store RTC SDK." />
+		<error name="EMPTYSMCDLLRESOURCEDATA" code="1009" description="Empty SMC DLL Resource Data." />		
+		<error name="EMPTYRTCDLLRESOURCEDATA" code="1010" description="Empty RTC DLL Resource Data." />		
+		<error name="EMPTYXERCESDLLRESOURCENAME" code="1011" description="Empty Xerces Resource Name." />		
+		<error name="XERCESRESOURCENOTFOUND" code="1012" description="Xerces Resource not found." />		
+		<error name="COULDNOTSTOREXERCESDLL" code="1013" description="Could not store Xerces DLL." />		
+		<error name="EMPTYXERCESRESOURCEDATA" code="1014" description="Empty Xerces Resource Data." />		
+		<error name="INVALIDCONTEXTNAME" code="1015" description="Invalid context name." />		
+		<error name="CONTEXTEXISTSALREADY" code="1016" description="Context exists already." />		
+		<error name="CONTEXTNOTFOUND" code="1017" description="Context not found." />				
+		<error name="INVALIDRTCSERIALNUMBER" code="1018" description="Invalid RTC Serial Number." />						
+		<error name="EMPTYRTCCORRECTIONRESOURCENAME" code="1019" description="Empty RTC correction resource." />				
+		<error name="RTCCORRECTIONRESOURCENOTFOUND" code="1020" description="RTC correction resource not found." />		
+		<error name="EMPTYRTCCORRECTIONFILE" code="1021" description="Empty RTC Correction File." />				
+		<error name="EMPTYIPADDRESS" code="1022" description="Empty IP Address." />		
+		<error name="INVALIDIPADDRESS" code="1023" description="Invalid IP Address." />		
+		<error name="EMPTYRTCFIRMWARERESOURCENAME" code="1024" description="Empty RTC firmware resource name." />		
+		<error name="RTCFIRMWARERESOURCENOTFOUND" code="1025" description="RTC firmware resource not found." />
+		<error name="EMPTYRTCFPGARESOURCENAME" code="1026" description="Empty RTC FPGA resource name." />
+		<error name="RTCFPGARESOURCENOTFOUND" code="1027" description="RTC FPGA resource not found." />		
+		<error name="EMPTYRTCAUXILIARYRESOURCENAME" code="1028" description="Empty RTC auxiliary resource name" />		
+		<error name="RTCAUXILIARYRESOURCENOTFOUND" code="1029" description="RTC auxiliary resource not found." />				
+		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count." />		
+									
+	</errors>
+
+	<struct name="Point2D">
+		<member name="X" type="single" />
+		<member name="Y" type="single" />
+	</struct>
+
+	<struct name="Hatch2D">
+		<member name="X1" type="single" />
+		<member name="Y1" type="single" />
+		<member name="X2" type="single" />
+		<member name="Y2" type="single" />
+	</struct>
+
+	<enum name="BlendMode">
+	   <option name="Deactivated" value="0" />
+	   <option name="MaxAccuracy" value="1" />
+	   <option name="Fast" value="2" />
+	</enum>
+	
+	<enum name="DynamicViolationReaction">
+	   <option name="Unknown" value="0" />
+	   <option name="WarningOnly" value="1" />
+	   <option name="AbortImmediately" value="2" />
+	   <option name="StopAndReport" value="3" />
+	</enum>
+
+	<enum name="WarnLevel">
+	   <option name="Unknown" value="0" />
+	   <option name="Error" value="1" />
+	   <option name="Warn" value="2" />
+	   <option name="Info" value="3" />
+	</enum>
+
+	
+<!--
+
+This base Driver interface MUST be in Sync with LibMCDriver.xml
+
+-->
+	
+	<class name="Base">
+	</class>
+	
+	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
+	
+		<method name="GetName" description = "returns the name identifier of the driver">
+			<param name="Name" type="string" pass="return" description="Name of the driver." />
+		</method>
+
+		<method name="GetType" description = "returns the type identifier of the driver">
+			<param name="Type" type="string" pass="return" description="Type of the driver." />
+		</method>
+
+		<method name="GetVersion" description = "returns the version identifiers of the driver">
+			<param name="Major" type="uint32" pass="out" description="Major version." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version." />
+			<param name="Micro" type="uint32" pass="out" description="Micro version." />
+			<param name="Build" type="string" pass="out" description="Build identifier." />
+		</method>
+
+		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should only be called in the driver thread.">
+		</method>
+
+		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
+			<param name="DriverUpdateInstance" type="class" class="LibMCEnv:DriverStatusUpdateSession" pass="in" description="Status update instance." />
+		</method>
+
+	</class>
+
+<!--
+
+End Interface
+
+-->
+
+
+<!--
+
+Custom implementation
+
+-->
+
+
+<class name="SMCJob" parent="Base" description="SMC Job Definition">
+
+		<method name="GetJobID" description="Returns the Job ID">
+			<param name="JobID" type="uint64" pass="return" description="Job ID." />
+		</method>
+
+		<method name="Finalize" description="Finalizes the job definition.">
+		</method>
+
+		<method name="IsFinalized" description="Returns if job is finalized.">
+			<param name="Finalized" type="bool" pass="return" description="If flag returns false, new data can be written to the job." />
+		</method>
+		
+		<method name="DrawPolyline" description="Writes a polyline into the open list">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="double" pass="in" description="Mark speed in mm/s" />
+			<param name="MinimalMarkSpeed" type="double" pass="in" description="Minimal allowed mark speed in mm/s" />
+			<param name="JumpSpeed" type="double" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="double" pass="in" description="Laser power in percent" />
+			<param name="CornerTolerance" type="double" pass="in" description="Allowed position deviation on corners (in mm.)" />
+			<param name="ZValue" type="double" pass="in" description="Focus Z Value" />
+		</method>
+
+		<method name="DrawLoop" description="Writes a loop into the open list">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="double" pass="in" description="Mark speed in mm/s" />
+			<param name="MinimalMarkSpeed" type="double" pass="in" description="Minimal allowed mark speed in mm/s" />
+			<param name="JumpSpeed" type="double" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="double" pass="in" description="Laser power in percent" />
+			<param name="CornerTolerance" type="double" pass="in" description="Allowed position deviation on corners (in mm.)" />
+			<param name="ZValue" type="double" pass="in" description="Focus Z Value" />
+		</method>
+	
+		<method name="DrawHatches" description="Writes a list of hatches into the open list">
+			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
+			<param name="MarkSpeed" type="double" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="double" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="double" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="double" pass="in" description="Focus Z Value" />
+		</method>
+		
+		<method name="AddLayerToList" description="Adds a layer instance to the current open list.">
+			<param name="Layer" type="class" class="LibMCEnv:ToolpathLayer" pass="in" description="Instance of the layer to add to the lists." />
+		</method>
+
+		<method name="IsReady" description="Returns if the scanner is ready for execution.">
+			<param name="IsExecuting" type="bool" pass="return" description="Returns true if the scanner is executing." />
+		</method>	
+
+		<method name="Execute" description="Starts the list execution. Will fail if the scanner is not ready or the job is not finalized.">
+			<param name="Blocking" type="bool" pass="in" description="If true, the method waits until the execution is finished." />
+		</method>	
+
+		<method name="IsExecuting" description="Returns if the scanner is executing.">
+			<param name="IsExecuting" type="bool" pass="return" description="Returns true if the scanner is executing." />
+		</method>	
+
+		<method name="WaitForExecution" description="Waits until the execution is finished. Will fail if an error occured or the timeout is reached.">
+			<param name="TimeOutInMilliseconds" type="uint32" pass="in" description="Timeout for the execution." />
+		</method>	
+
+		<method name="StopExecution" description="Stops the execution of the current list immediately.">
+		</method>	
+
+	</class>
+
+
+	<class name="SMCConfiguration" parent="Base" description="SMC Configuration">
+	
+		<method name="SetDynamicViolationReaction" description="Sets the response to a dynamic violation. Default is WarningOnly.">
+			<param name="Value" type="enum" class="DynamicViolationReaction" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetDynamicViolationReaction" description="Returns the response to a dynamic violation.">
+			<param name="Value" type="enum" class="DynamicViolationReaction" pass="return" description="Current Value." />
+		</method>	
+	
+		<method name="SetWarnLevel" description="Sets the log warning level.">
+			<param name="Value" type="enum" class="WarnLevel" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetWarnLevel" description="Returns the log warning level.">
+			<param name="Value" type="enum" class="WarnLevel" pass="return" description="Current Value." />
+		</method>		
+	
+		<method name="SetSerialNumber" description="Sets the RTC Serial number. MUST be larger than 0.">
+			<param name="Value" type="uint32" class="WarnLevel" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetSerialNumber" description="Returns the RTC Serial number.">
+			<param name="Value" type="uint32" class="WarnLevel" pass="return" description="Current Value." />
+		</method>		
+
+		<method name="SetIPAddress" description="Sets the RTC IP Address.">
+			<param name="Value" type="string" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="GetIPAddress" description="Returns the RTC IP Address.">
+			<param name="Value" type="string" class="WarnLevel" pass="return" description="Current Value." />
+		</method>		
+
+		<method name="SetCorrectionFile" description="Sets correction file as binary data.">
+			<param name="CorrectionFileData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+		</method>
+
+		<method name="SetCorrectionFileResource" description="Sets correction file as resource data. Fails if resource name does not exist.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+		</method>
+
+		<method name="SetFirmware" description="Sets card firmware from binary data.">
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
+		</method>
+
+		<method name="SetFirmwareResources" description="Sets card firmware as resource data. Fails if resource name does not exist.">
+			<param name="FirmwareDataResource" type="string" pass="in" description="Resource name of the firmware program file." />
+			<param name="FPGADataResource" type="string" pass="in" description="Resource name of the firmware FPGA file." />
+			<param name="AuxiliaryDataResource" type="string" pass="in" description="Resource name of the binary auxiliary file." />
+		</method>
+
+	</class>
+
+
+	<class name="SMCContext" parent="Base" description="SMC Control Context">
+
+		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
+		</method>
+		
+		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
+			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
+		</method>		
+				
+		<method name="ReinitializeInstance" description="Reinitializes an instance of SCANmotionControl. All created jobs will become invalid.">
+		</method>
+
+		<method name="GetIPAddress" description="Returns the IP Address of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="IPAddress" type="string" pass="return" description="IP Address Value." />
+		</method>		
+
+		<method name="GetNetmask" description="Returns the Netmask of the RTC Card. Fails if driver has not been initialized.">		
+			<param name="Netmask" type="string" pass="return" description="Netmask Value." />
+		</method>		
+
+		<method name="GetSerialNumber" description="Returns serial number of card">
+			<param name="SerialNumber" type="uint32" pass="return" description="Returns serial number of board." />
+		</method>
+		
+		<method name="GetLaserIndex" description="Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.">
+			<param name="LaserIndex" type="uint32" pass="return" description="Returns laser index of board." />
+		</method>
+		
+		<method name="SetLaserOrigin" description="Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.">
+			<param name="OriginX" type="double" pass="in" description="Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+			<param name="OriginY" type="double" pass="in" description="Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+		</method>
+
+		<method name="GetLaserOrigin" description="Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.">
+			<param name="OriginX" type="double" pass="out" description="Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+			<param name="OriginY" type="double" pass="out" description="Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+		</method>
+
+		<method name="SetLaserField" description="Sets the laser field limits in absolute coordinates.">
+			<param name="MinX" type="double" pass="in" description="Sets minimum laser X coordinate in mm." />
+			<param name="MinY" type="double" pass="in" description="Sets minimum laser Y coordinate in mm." />
+			<param name="MaxX" type="double" pass="in" description="Sets maximum laser X coordinate in mm." />
+			<param name="MaxY" type="double" pass="in" description="Sets maximum laser Y coordinate in mm." />
+		</method>
+
+		<method name="ResetLaserField" description="Resets the laser field to default values.">
+		</method>
+		
+		<method name="GetLaserField" description="Returns the laser field limits in absolute coordinates.">
+			<param name="MinX" type="double" pass="out" description="Sets minimum laser X coordinate in mm." />
+			<param name="MinY" type="double" pass="out" description="Sets minimum laser Y coordinate in mm." />
+			<param name="MaxX" type="double" pass="out" description="Sets maximum laser X coordinate in mm." />
+			<param name="MaxY" type="double" pass="out" description="Sets maximum laser Y coordinate in mm." />
+			<param name="HasLaserField" type="bool" pass="return" description="Returns true if a laser field has been set." />
+		</method>		
+		
+		<method name="BeginJob" description="Starts a new job definition. Fails if another job is not finalized yet.">
+			<param name="StartPositionX" type="double" pass="in" description="Start position in X." />
+			<param name="StartPositionY" type="double" pass="in" description="Start position in Y." />
+			<param name="BlendMode" type="enum" class="BlendMode" pass="in" description="Blend Mode that the job shall be drawn in." />			
+			<param name="JobInstance" type="class" class="SMCJob" pass="return" description="SMC Job Instance." />
+		</method>
+		
+		<method name="GetUnfinishedJob" description="Returns the job that is not finalized yet. Returns null if no job is active.">
+			<param name="JobInstance" type="optionalclass" class="SMCJob" pass="return" description="SMC Job Instance." />
+		</method>
+		
+		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+				
+	</class>
+
+
+
+	<class name="Driver_ScanLabSMC" parent="Driver" description="A LaserScanner Driver for a SCANLAB SCANmotionControl.">
+
+		<method name="SetDLLResources" description="Sets the default resource name of the SCANLAB DLLs. Overrides custom resource data if set before.">
+			<param name="SMCDLLResourceName" type="string" pass="in" description="Resource name of SCANmotionControl DLL" />
+			<param name="RTCDLLResourceName" type="string" pass="in" description="Resource name of RTC DLL" />
+		</method>
+
+		<method name="SetXercesDLLResource" description="Sets the default resource name of auxiliary resource DLLs. Overrides custom resource data if set before.">
+			<param name="XercesDLLResourceName" type="string" pass="in" description="Resource name of the Xerces dependency DLL" />
+		</method>
+
+		<method name="SetCustomDLLData" description="Sets custom binaries for the needed SCANLAB DLLs. Overrides custom resource data if set before.">
+			<param name="SMCDLLResourceData" type="basicarray" class="uint8" pass="in" description="Resource data of SCANmotionControl DLL" />
+			<param name="RTCDLLResourceData" type="basicarray" class="uint8" pass="in" description="Resource data of RTC DLL" />
+		</method>
+
+		<method name="SetCustomXercesDLLData" description="Sets the custom binary for auxiliary resource DLLs. Overrides custom resource data if set before.">
+			<param name="XercesDLLResourceData" type="basicarray" class="uint8" pass="in" description="Resource data of the Xerces dependency DLL" />
+		</method>
+
+		<method name="LoadSDK" description="Initializes the SCANmotionControl SDK.">
+		</method>
+		
+		<method name="CreateContext" description="Creates and initializes a new SMC context. Fails if Configuration Data is invalid or context already exists.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
+			<param name="SMCConfiguration" type="class" class="SMCConfiguration" pass="in" description="SMC Configuration Data." />
+			<param name="Instance" type="class" class="SMCContext" pass="return" description="New Context instance" />
+		</method>
+
+		<method name="ContextExists" description="Checks if a context identifier exists already.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
+			<param name="Exists" type="bool" pass="return" description="Returns true if a context exists." />
+		</method>
+
+		<method name="FindContext" description="Retrieves an existing context by identifier. Fails if context does not exist.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
+			<param name="Instance" type="class" class="SMCContext" pass="return" description="New Context instance" />
+		</method>
+
+		<method name="ReleaseContext" description="Releases an existing context by identifier. Fails if context does not exist.">
+			<param name="ContextName" type="string" pass="in" description="Unique context identifier. MUST NOT be empty." />
+		</method>
+		
+		<method name="CreateEmptyConfiguration" description="Creates and initializes a SMC configuration with default values.">
+			<param name="Instance" type="class" class="SMCConfiguration" pass="return" description="New Configuration instance" />
+		</method>
+
+		<method name="CreateTemplateConfiguration" description="Creates and initializes a SMC configuration with templated values.">
+			<param name="TemplateName" type="string" pass="in" description="Name of SMC Template." />
+			<param name="Instance" type="class" class="SMCConfiguration" pass="return" description="New Configuration instance" />
+		</method>
+
+	</class>
+
+
+<!--
+
+End of Custom implementation
+
+-->
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
+			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
+			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="Instance" type="optionalclass" class="Driver" pass="return" description="New Driver instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

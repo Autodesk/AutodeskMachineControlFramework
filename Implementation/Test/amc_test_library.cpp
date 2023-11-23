@@ -37,6 +37,7 @@ using namespace AMCTest;
 CTestLibrary::CTestLibrary(const std::string& sName, const std::string& sDLLFileName, const std::string& sResourceFileName)
 	: m_sName (sName), m_sDLLFileName (sDLLFileName), m_sResourceFileName (sResourceFileName)
 {
+	m_sResourceExtension = ".data";
 #ifdef _WIN32
 	m_sDLLExtension = ".dll";
 #else
@@ -64,5 +65,5 @@ std::string CTestLibrary::getResourceFileName(const std::string& sGitHash)
 	if (m_sResourceFileName.empty())
 		return "";
 
-	return std::regex_replace(m_sResourceFileName, std::regex("\\%githash%"), sGitHash) + m_sDLLExtension;
+	return std::regex_replace(m_sResourceFileName, std::regex("\\%githash%"), sGitHash) + m_sResourceExtension;
 }

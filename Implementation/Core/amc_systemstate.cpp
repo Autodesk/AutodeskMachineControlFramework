@@ -40,6 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
 #include "amc_statemachinedata.hpp"
+#include "amc_accesscontrol.hpp"
+#include "amc_stringresourcehandler.hpp"
+#include "amc_languagehandler.hpp"
+#include "amc_meshhandler.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -67,6 +71,9 @@ namespace AMC {
 		// Retrieve Installation UUID and Secret
 		m_pDataModel->GetInstallationInformation(m_sInstallationUUID, m_sInstallationSecret);
 
+		m_pAccessControl = std::make_shared<CAccessControl> ();
+		m_pStringResourceHandler = std::make_shared<CStringResourceHandler> ();
+
 		// Create Data Model Instances
 		m_pStorage = m_pDataModel->CreateStorage();
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
@@ -78,7 +85,9 @@ namespace AMC {
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID ());
+		m_pLanguageHandler = std::make_shared<CLanguageHandler>();
+		m_pMeshHandler = std::make_shared<CMeshHandler>();
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler,  pEnvWrapper, m_pLogger, m_pStateJournal, getTestEnvironmentPath (), getSystemUserID (), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler, m_pMeshHandler);
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
 		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
@@ -144,9 +153,17 @@ namespace AMC {
 	CStateMachineData* CSystemState::stateMachineData()
 	{
 		return m_pStateMachineData.get();
-
 	}
 
+	AMC::CAccessControl* CSystemState::accessControl()
+	{
+		return m_pAccessControl.get();
+	}
+
+	AMC::CStringResourceHandler* CSystemState::stringResourceHandler()
+	{
+		return m_pStringResourceHandler.get();
+	}
 
 
 	PLogger CSystemState::getLoggerInstance()
@@ -172,6 +189,21 @@ namespace AMC {
 	PStateJournal CSystemState::getStateJournalInstance()
 	{
 		return m_pStateJournal;
+	}
+
+	PAccessControl CSystemState::getAccessControlInstance()
+	{
+		return m_pAccessControl;
+	}
+
+	PLanguageHandler CSystemState::getLanguageHandlerInstance()
+	{
+		return m_pLanguageHandler;
+	}
+
+	PMeshHandler CSystemState::getMeshHandlerInstance()
+	{
+		return m_pMeshHandler;
 	}
 
 

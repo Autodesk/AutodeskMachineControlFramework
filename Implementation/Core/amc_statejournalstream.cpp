@@ -37,15 +37,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
+#define STATEJOURNALSTREAMMINCAPACITY 65536
+
 namespace AMC {
 
 	class CStateJournalStreamChunk
 	{
 	private:
 
-		std::vector<uint64_t> m_TimeStamps;
+		uint32_t m_nChunkIndex;
+		uint64_t m_nCapacityInBytes;
+		uint64_t m_nMaxDataSize;
+		uint64_t m_nStartTimeStamp;
+		uint64_t m_nEndTimeStamp;
+
 		std::vector<uint8_t> m_Data;
-		std::map<uint32_t, std::string> m_NameDefinitions;
 
 		void writeData(const uint8_t* pData, uint32_t nLength)
 		{
@@ -60,9 +66,18 @@ namespace AMC {
 
 	public:
 
-		CStateJournalStreamChunk(uint64_t nStartTimeStamp)
+		CStateJournalStreamChunk(uint32_t nChunkIndex, uint64_t nStartTimeStamp, uint64_t nCapacityInBytes)
+			: m_nCapacityInBytes (nCapacityInBytes), m_nChunkIndex (nChunkIndex), m_nStartTimeStamp (nStartTimeStamp), m_nEndTimeStamp (nStartTimeStamp)
 		{
-			m_TimeStamps.push_back(nStartTimeStamp);
+			if (nCapacityInBytes < STATEJOURNALSTREAMMINCAPACITY)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY);
+			if ((nCapacityInBytes % 32) != 0)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY);
+
+			// Make sure that the data blocks never exceed capacity
+			m_nMaxDataSize = nCapacityInBytes;
+			m_Data.reserve(m_nMaxDataSize);
+
 
 		}
 
@@ -88,25 +103,8 @@ namespace AMC {
 			writeData((const uint8_t*)&dValue, 8);
 		}
 
-		void storeTimeStamp (const uint64_t nTimeStamp)
-		{
-			auto iLast = m_TimeStamps.rbegin();
-			if (iLast == m_TimeStamps.rend())
-				throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
 
-			auto nLastTimeStamp = *iLast;
-
-			if (nTimeStamp < nLastTimeStamp)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
-
-			if (nTimeStamp > nLastTimeStamp) {
-				m_TimeStamps.push_back(nTimeStamp);
-			}
-
-		}
-
-
-		void writeNameDefinition (const uint32_t nID, const std::string& sName)
+		/*void writeNameDefinition (const uint32_t nID, const std::string& sName)
 		{
 			auto iIter = m_NameDefinitions.find(nID);
 			if (iIter != m_NameDefinitions.end())
@@ -117,14 +115,45 @@ namespace AMC {
 			writeCommand(nID | STATEJOURNAL_COMMANDFLAG_DEFINITION);
 			writeString(sName);
 
+		} */
+
+		void setEndTimeStamp(uint64_t nEndTimeStamp)
+		{
+			if (nEndTimeStamp < m_nEndTimeStamp)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJOURNALTIMESTAMP);
+
 		}
 
+		uint32_t getChunkIndex()
+		{
+			return m_nChunkIndex;
+		}
+
+		std::vector<uint8_t>& getDataBuffer()
+		{
+			return m_Data;
+		}
+
+		uint64_t getStartTimeStamp()
+		{
+			return m_nStartTimeStamp;
+		}
+
+		uint64_t getEndTimeStamp()
+		{
+			return m_nEndTimeStamp;
+		}
 
 	};
 
-	CStateJournalStream::CStateJournalStream()
-		: m_nCurrentTimeStamp (0), m_nStartTimeStamp (0)
+	CStateJournalStream::CStateJournalStream(LibMCData::PJournalSession pJournalSession)
+		: m_nCurrentTimeStamp (0), m_nStartTimeStamp (0), m_pJournalSession(pJournalSession), m_nChunkIndex (0), m_nJournalFlushInterval (0)
 	{
+		if (pJournalSession.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		m_nChunkCapacityInBytes = pJournalSession->GetChunkCapacity();
+		m_nJournalFlushInterval = pJournalSession->GetFlushInterval();
 
 	}
 
@@ -146,12 +175,28 @@ namespace AMC {
 
 	void CStateJournalStream::startNewChunk()
 	{
-		m_pCurrentChunk = std::make_shared <CStateJournalStreamChunk>(m_nCurrentTimeStamp);
-		m_Chunks.push_back(m_pCurrentChunk);
+		std::lock_guard<std::mutex> lockGuard(m_ChunkChangeMutex);
+
+		if (m_pCurrentChunk.get() != nullptr)
+			m_ChunksToWrite.push_back(m_pCurrentChunk);
+
+		m_pCurrentChunk = nullptr;
+		m_pCurrentChunk = std::make_shared <CStateJournalStreamChunk>(m_nChunkIndex, m_nCurrentTimeStamp, m_nChunkCapacityInBytes);
+		m_nChunkIndex++;
+		
 	}
+
+	uint32_t CStateJournalStream::getJournalFlushInterval()
+	{
+		return m_nJournalFlushInterval;
+	}
+
 
 	void CStateJournalStream::writeTimeStamp(const uint64_t nAbsoluteTimeStamp)
 	{
+		if (m_pCurrentChunk == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_NOCURRENTJOURNALCHUNK);
+
 		if (nAbsoluteTimeStamp < m_nCurrentTimeStamp)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
 
@@ -160,7 +205,6 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
 
 		m_pCurrentChunk->writeCommand(((uint32_t) nDeltaTime) | STATEJOURNAL_COMMANDFLAG_TIMESTAMP);
-		m_pCurrentChunk->storeTimeStamp(nAbsoluteTimeStamp);
 
 		m_nCurrentTimeStamp = nAbsoluteTimeStamp;
 	}
@@ -219,7 +263,7 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_NOCURRENTJOURNALCHUNK);
 
 
-		m_pCurrentChunk->writeNameDefinition(nID, sName);
+		//m_pCurrentChunk->writeNameDefinition(nID, sName);
 	}
 
 	void CStateJournalStream::writeUnits(const uint32_t nID, double dUnits)
@@ -229,6 +273,29 @@ namespace AMC {
 
 		m_pCurrentChunk->writeCommand(nID | STATEJOURNAL_COMMANDFLAG_UNITS);
 		m_pCurrentChunk->writeDouble(dUnits);
+
+	}
+
+	void CStateJournalStream::writeChunksToDiskThreaded()
+	{
+		std::vector<PStateJournalStreamChunk> chunksToWrite;
+		{
+			// Copy over chunk pointers thread safe!
+			std::lock_guard<std::mutex> lockGuard(m_ChunkChangeMutex);
+			chunksToWrite = m_ChunksToWrite;
+
+			// Clear write pipeline
+			m_ChunksToWrite.clear();
+		}
+
+		for (auto pChunk : chunksToWrite) {
+			//std::cout << "writing chunk " << pChunk->getChunkIndex() << std::endl;
+			std::lock_guard<std::mutex> lockGuard(m_JournalSessionMutex);
+			std::vector<uint8_t> & dataBuffer = pChunk->getDataBuffer();
+			m_pJournalSession->WriteJournalChunkData(pChunk->getChunkIndex(), pChunk->getStartTimeStamp(), pChunk->getEndTimeStamp(), dataBuffer);
+			
+		}
+
 
 	}
 

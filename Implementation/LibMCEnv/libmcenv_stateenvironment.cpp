@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_usermanagementhandler.hpp"
+#include "libmcenv_meshobject.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -47,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_handler.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_xmldocument.hpp"
+#include "amc_accesscontrol.hpp"
+#include "amc_meshhandler.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -489,11 +494,100 @@ IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_ui
 	return new CDiscreteFieldData2D(pInstance);
 }
 
-IJournalVariable* CStateEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
 {
-	uint64_t nStartTimeStamp = 0;
-	uint64_t nEndTimeStamp = 0;
-	auto pStateJournal = m_pSystemState->getStateJournalInstance();
-	pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
-	return new CJournalVariable(pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
+	if (pImageDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto pImageDataImpl = dynamic_cast<CImageData*> (pImageDataInstance);
+	if (pImageDataImpl == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+	uint32_t nPixelSizeX, nPixelSizeY;
+	pImageDataImpl->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
+
+	double dDPIValueX, dDPIValueY;
+	pImageDataImpl->GetDPI(dDPIValueX, dDPIValueY);
+
+	AMC::PDiscreteFieldData2DInstance pFieldInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, 0.0, false);
+
+	auto pixelFormat = pImageDataImpl->GetPixelFormat();
+	auto& rawPixelData = pImageDataImpl->getPixelData();
+	
+	pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
+
+	return new CDiscreteFieldData2D(pFieldInstance);
+
+}
+
+bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier)
+{
+	if (sUserLogin.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sUserLogin))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
+
+	if (sPermissionIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPermissionIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER, sPermissionIdentifier);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pAccessControl = m_pSystemState->accessControl();
+
+	std::string sUserRole = pLoginHandler->GetUserRole (sUserLogin);
+	AMC::PAccessRole pRole;
+	if (sUserRole.empty())
+		pRole = pAccessControl->findRole(sUserRole, true);
+	else
+		pRole = pAccessControl->getDefaultRole();
+
+	return pRole->hasPermission(sPermissionIdentifier);
+}
+
+IUserManagementHandler* CStateEnvironment::CreateUserManagement()
+{
+	return new CUserManagementHandler (m_pSystemState->getLoginHandlerInstance (), m_pSystemState->getAccessControlInstance (), m_pSystemState->getLanguageHandlerInstance ());
+}
+
+IJournalHandler* CStateEnvironment::GetCurrentJournal()
+{
+	return new CJournalHandler(m_pSystemState->getStateJournalInstance());
+}
+
+IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	auto pLib3MFWrapper = m_pSystemState->getToolpathHandlerInstance()->getLib3MFWrapper();
+	
+	auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName);
+
+	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+bool CStateEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
+{
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	return pMeshHandler->hasMeshEntity(sMeshUUID);
+}
+
+IMeshObject* CStateEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
+{
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
+
+	if (pMeshEntity.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
+
+	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
 }

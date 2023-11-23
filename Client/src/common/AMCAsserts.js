@@ -70,6 +70,15 @@ export function UUIDValue (value)
 	return value.toString ();
 }
 
+export function SHA256Value (value)
+{
+	if (!value)
+		throw "invalid sha256 string";
+	
+	return value.toString ();
+}
+
+
 export function OptionalUUIDValue (value)
 {
 	if (!value)

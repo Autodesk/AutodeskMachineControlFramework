@@ -105,16 +105,24 @@ private:
     CPagedVector<sDataRecordingEntry, SCANLABOIE_DATARECORDPAGESIZE> m_Entries;
 
     uint32_t m_nValuesPerRecord;
-    uint32_t m_nRTCValuesPerRecord;
+
+    uint32_t m_nFirstRTCValueIndex;
+    uint32_t m_nRTCValueCount;
+    uint32_t m_nFirstSensorValueIndex;
+    uint32_t m_nSensorValueCount;
+    uint32_t m_nFirstAdditionalValueIndex;
+    uint32_t m_nAdditionalValueCount;
+
     uint32_t m_nBufferSizeInRecords;
     size_t m_nValueCountPerBuffer;
     
     int32_t* getRTCData (size_t nRecordIndex);
     int32_t* getSensorData(size_t nRecordIndex);
+    int32_t* getAdditionalData(size_t nRecordIndex);
 
 public:
 
-    CDataRecordingInstance(uint32_t nValuesPerRecord, uint32_t nRTCValuesPerRecord, uint32_t nBufferSizeInRecords);
+    CDataRecordingInstance(uint32_t nSensorValuesPerRecord, uint32_t nRTCValuesPerRecord, uint32_t nAdditionalValuesPerRecord, uint32_t nBufferSizeInRecords);
 
     virtual ~CDataRecordingInstance();
 
@@ -126,7 +134,7 @@ public:
 
     size_t getRecordCount();
 
-    uint32_t getValuesPerRecord ();
+    uint32_t getAdditionalValuesPerRecord ();
 
     uint32_t getRTCValuesPerRecord();
 
@@ -137,6 +145,8 @@ public:
     void copyRTCSignals (size_t nRecordIndex, int32_t * pRTCSignalBuffer, size_t nRTCSignalBufferSize);
 
     void copySensorSignals(size_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
+    
+    void copyAdditionalSignals(size_t nRecordIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize);
 
     void copyXCoordinates(double * pCoordinateBuffer, size_t nCoordinateBufferSize);
 
@@ -147,6 +157,8 @@ public:
     void copyAllRTCSignalsByIndex(uint32_t nRTCIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize);
 
     void copyAllSensorSignalsByIndex(uint32_t nSensorIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
+
+    void copyAllAdditionalSignalsByIndex(uint32_t nSensnAdditionalIndexorIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize);
 
     void writeToFile(const std::string & sFileName);
 

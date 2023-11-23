@@ -82,6 +82,11 @@ LibMCEnv_uint64 CJournalVariable::GetEndTimeStamp()
     return m_nEndTimeStamp;
 }
 
+LibMCEnv_double CJournalVariable::ComputeFullAverage()
+{
+    return ComputeAverage(m_nStartTimeStamp, m_nEndTimeStamp, true);
+}
+
 LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval)
 {
     uint64_t nClampedStartTimeInMS = nStartTimeInMS;
@@ -153,3 +158,36 @@ IUniformJournalSampling * CJournalVariable::ComputeUniformAverageSamples(const L
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
+
+void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry* pTimeStreamEntriesBuffer)
+{
+    std::vector<AMC::sJournalTimeStreamDoubleEntry> timeStream;
+
+    double dStartValue = 0.0;
+
+    m_pStateJournal->readDoubleTimeStream(m_sVariableName, m_nStartTimeStamp, m_nEndTimeStamp, dStartValue, timeStream);
+
+    // Add start value as first entry!
+    size_t nRawEntryCount = timeStream.size() + 1;
+
+    if (pTimeStreamEntriesNeededCount != nullptr)
+        *pTimeStreamEntriesNeededCount = nRawEntryCount;
+
+    if (pTimeStreamEntriesBuffer != nullptr) 
+    {
+        if (nTimeStreamEntriesBufferSize < nRawEntryCount)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+        auto pTargetEntry = pTimeStreamEntriesBuffer;
+        pTargetEntry->m_TimestampInMS = m_nStartTimeStamp;
+        pTargetEntry->m_Value = dStartValue;
+        pTargetEntry++;
+
+        for (auto& timeStreamIter : timeStream) {
+            pTargetEntry->m_TimestampInMS = timeStreamIter.m_nTimeStamp;
+            pTargetEntry->m_Value = timeStreamIter.m_dValue;
+            pTargetEntry++;
+        }
+    }
+
+}

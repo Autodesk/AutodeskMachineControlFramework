@@ -55,7 +55,15 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
-		pUIEnvironment->LogMessage("Clicked on Logout");
+		pUIEnvironment->LogMessage("Clicked on Logout: " + pUIEnvironment->GetCurrentUserLogin ());
+		pUIEnvironment->LogMessage("User Role: " + pUIEnvironment->GetCurrentUserRole());
+		pUIEnvironment->LogMessage("User Language: " + pUIEnvironment->GetCurrentUserLanguage());
+		pUIEnvironment->LogMessage("User UUID: " + pUIEnvironment->GetCurrentUserUUID());
+		pUIEnvironment->LogMessage("User Description: " + pUIEnvironment->GetCurrentUserDescription());
+		pUIEnvironment->LogMessage("User Permission for permission_user_management: " + std::to_string ( pUIEnvironment->CheckPermission("permission_user_management")) );
+		pUIEnvironment->LogMessage("User Permission for permission_that_nobody_has: " + std::to_string(pUIEnvironment->CheckPermission("permission_that_nobody_has")));
+		pUIEnvironment->LogMessage("User Permission for permission_view_builds: " + std::to_string(pUIEnvironment->CheckPermission("permission_view_builds")));
+		pUIEnvironment->LogMessage("User Permission for permission_invalid: " + std::to_string(pUIEnvironment->CheckPermission("permission_invalid")));
 		pUIEnvironment->LogOut();
 
 	}
@@ -116,10 +124,11 @@ public:
 			auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID("importbuildjob.preview", "builduuid");
 
 			pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
-			pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);
+			pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 200);
 
 			auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_initjob");
 			pSignal->SetString("jobuuid", sBuildUUID);
+			//pSignal->SetString("user_who_started_build", pUIEnvironment->GetUserLogin ());
 			pSignal->Trigger();
 
 			pUIEnvironment->ActivatePage("buildstatus");
@@ -133,6 +142,54 @@ public:
 
 };
 
+
+/*************************************************************************************************************************
+ Class declaration of CEvent_TestJournal
+**************************************************************************************************************************/
+
+class CEvent_TestJournal : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "testjournal";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		pUIEnvironment->LogMessage("Clicked on Test Journal Button");
+
+		auto pUserManagement = pUIEnvironment->CreateUserManagement();
+		auto activeUsers = pUserManagement->GetActiveUsers();
+		uint32_t nCount = activeUsers->Count();
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+			auto sUserName = activeUsers->GetUsername(nIndex);
+			pUIEnvironment->LogMessage("UserName: " + sUserName);
+		}
+
+		std::string sUserDescription = pUserManagement->GetUserDescription("test");
+		pUIEnvironment->LogMessage("user description: " + sUserDescription);
+
+		pUIEnvironment->LogMessage("creating user dummy");
+
+		pUserManagement->CreateUser("dummy", "administrator", "3fbde1f66fb512223edb195d247fe770130f59fdd914e3ffa7327af53fe4cb46", "dd9a86491eb7572c1a9cda800e6eb81bb9dad55576b01416d06cdf6ae181fb33", "This is the new dummy user.");
+
+
+		/*auto pJournalVariable = pUIEnvironment->RetrieveJournalVariable ("main.ui.debug", 10000);
+		pUIEnvironment->LogMessage("Variable Name: " +  pJournalVariable->GetVariableName());
+		auto nStartTime = pJournalVariable->GetStartTimeStamp();
+		auto nEndTime = pJournalVariable->GetEndTimeStamp();
+
+		pUIEnvironment->LogMessage("Start Time: " + std::to_string (nStartTime));
+		pUIEnvironment->LogMessage("End Time: " + std::to_string(nEndTime));
+		double dAverage = pJournalVariable->ComputeAverage(nStartTime, nEndTime, true); */
+
+		//pUIEnvironment->LogMessage("Average: " + std::to_string(dAverage));
+
+	}
+
+};
 
 /*************************************************************************************************************************
  Class declaration of CEvent_StartBuild
@@ -204,9 +261,29 @@ public:
 		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "uploaduuid");
 		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
 
+		auto pBuild = pUIEnvironment->GetBuildJob(sBuildUUID);
+		pBuild->LoadToolpath();
 
+		pUIEnvironment->LogMessage("Registering PIDIndex");
+		auto pAccessor = pBuild->CreateToolpathAccessor();
+		pAccessor->RegisterCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "pidindex", LibMCEnv::eToolpathAttributeType::Double);
+
+		pUIEnvironment->LogMessage("Loading Layer 3");
+		auto pLayer = pAccessor->LoadLayer(3);
+
+		uint32_t nAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "pidindex");
+		pUIEnvironment->LogMessage("Attribute ID: " + std::to_string (nAttributeID));
+
+		uint32_t nSegmentCount = pLayer->GetSegmentCount ();
+		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) 
+		{
+			//double nPIDIndex = pLayer->GetSegmentDoubleAttribute(nSegmentIndex, nAttributeID);
+			int64_t nOIEPIDControlIndex = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "pidindex", 0);
+			pUIEnvironment->LogMessage("Segment #" + std::to_string(nSegmentIndex) + ": PID Index " + std::to_string (nOIEPIDControlIndex));
+		}
+		
 		pUIEnvironment->SetUIProperty("importbuildjob.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 3);
+		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 200);
 
 		pUIEnvironment->ActivatePage("importbuildjob");
 	}
@@ -241,7 +318,7 @@ public:
 		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);*/
 
 		pUIEnvironment->SetUIProperty("importbuildjob.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 3);
+		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 200);
 
 		pUIEnvironment->ActivatePage("importbuildjob");
 
@@ -447,9 +524,8 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_Logout>(sEventName, pEventInstance))
 		return pEventInstance;
-
-	
-	
+	if (createEventInstanceByName<CEvent_TestJournal>(sEventName, pEventInstance))
+		return pEventInstance;
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
 }

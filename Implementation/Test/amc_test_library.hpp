@@ -44,6 +44,7 @@ namespace AMCTest {
 		std::string m_sDLLFileName;
 		std::string m_sResourceFileName;
 		std::string m_sDLLExtension;
+		std::string m_sResourceExtension;
 	public:
 		CTestLibrary(const std::string & sName, const std::string & sDLLFileName, const std::string & sResourceFileName);
 		virtual ~CTestLibrary();

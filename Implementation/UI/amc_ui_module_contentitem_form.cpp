@@ -251,6 +251,13 @@ void CUIModule_ContentFormEdit::writeVariablesToJSON(CJSONWriter& writer, CJSONW
 	object.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, pGroup->getParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE));
 	object.addString(AMC_API_KEY_UI_FORMPREFIX, pGroup->getParameterValueByName(AMC_API_KEY_UI_FORMPREFIX));
 	object.addString(AMC_API_KEY_UI_FORMSUFFIX, pGroup->getParameterValueByName(AMC_API_KEY_UI_FORMSUFFIX));
+	std::string sValidation = pGroup->getParameterValueByName(AMC_API_KEY_UI_FORMVALIDATION);
+	if (sValidation == "double") {
+		object.addString(AMC_API_KEY_UI_FORMVALIDATION, sValidation);
+		object.addString(AMC_API_KEY_UI_FORMVALIDATIONMESSAGE, pGroup->getParameterValueByName(AMC_API_KEY_UI_FORMVALIDATIONMESSAGE));
+		object.addDouble(AMC_API_KEY_UI_FORMMINVALUE, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_FORMMINVALUE));
+		object.addDouble(AMC_API_KEY_UI_FORMMAXVALUE, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_FORMMAXVALUE));
+	}
 }
 
 

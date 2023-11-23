@@ -32,13 +32,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import * as Assert from "../common/AMCAsserts.js";
 import * as Common from "../common/AMCCommon.js"
 
+class AMCApplicationItem_GLScene extends Common.AMCApplicationItem {
+	
+	constructor (moduleInstance, itemJSON) 
+	{
+		Assert.ObjectValue (itemJSON);		
+		
+		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
+		this.registerClass ("amcItem_GLScene");
+				
+		this.instances = [];
+		this.updateFromJSON (itemJSON);
+				
+		this.setRefreshFlag ();
+											
+	}
+
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);		
+		Assert.ArrayValue (updateJSON.instances);
+		
+		this.instances = updateJSON.instances;
+		
+		//for (let instance of updateJSON.instances) {
+		//}
+		
+		//this.moduleInstance.callDataHasChanged ();
+	}
+
+		
+}
+
+
+
 export default class AMCApplicationModule_GLScene extends Common.AMCApplicationModule {
 	
 	constructor (page, moduleJSON) 
 	{		
 		Assert.ObjectValue (moduleJSON);				
 		super (page, moduleJSON.uuid, moduleJSON.type, moduleJSON.name, moduleJSON.caption);		
-		this.registerClass ("amcModule_GLScene");
+		this.registerClass ("amcModule_GLScene");		
+		
+		this.scene = null;
+		
+		if (moduleJSON.scene) {
+			this.scene = new AMCApplicationItem_GLScene (this, moduleJSON.scene);
+		}
 				
 	}
 		

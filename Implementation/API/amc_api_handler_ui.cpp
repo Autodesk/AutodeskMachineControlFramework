@@ -238,10 +238,10 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
 		sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
 	}
-
+	
 	auto pUIHandler = m_pSystemState->uiHandler();
 
-	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth->getClientVariableHandler ());
+	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth->getClientVariableHandler (), pAuth->getUserInformation ());
 
 	CJSONWriterArray contentUpdateNode(writer);
 

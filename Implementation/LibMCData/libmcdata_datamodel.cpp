@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Include custom headers here.
 #include "libmcdata_storage.hpp"
 #include "libmcdata_logsession.hpp"
+#include "libmcdata_journalsession.hpp"
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
 #include "libmcdata_persistencyhandler.hpp"
@@ -45,9 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amcdata_databasemigrator_buildjobs.hpp"
 #include "amcdata_databasemigrator_users.hpp"
 #include "amcdata_databasemigrator_persistentparameters.hpp"
+#include "amcdata_databasemigrator_journals.hpp"
 
 #include "common_utils.hpp"
-
+#include "common_chrono.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -58,6 +60,12 @@ using namespace LibMCData::Impl;
 CDataModel::CDataModel()
     : m_eDataBaseType(eDataBaseType::Unknown), m_pLogCallback (nullptr), m_pLogUserData (nullptr)
 {
+    m_sSessionUUID = AMCCommon::CUtils::createUUID();
+
+    AMCCommon::CChrono chrono;
+    m_sTimeFileName = chrono.getStartTimeFileName();
+    m_sStartTime = chrono.getStartTimeISO8601TimeUTC();
+
 
 }
 
@@ -83,10 +91,28 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_BuildJobs>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Users>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_PersistentParameters>());
+    migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Journals>());
     migrator.migrateDatabaseSchemas(m_pSQLHandler, m_sInstallationUUID, m_sInstallationSecret);
 
     // Store Database type after successful initialisation
     m_eDataBaseType = dataBaseType;
+
+    auto sJournalPath = m_pStoragePath->getJournalPath(m_sTimeFileName);
+    auto sJournalDataPath = m_pStoragePath->getJournalDataPath(m_sTimeFileName);
+    auto sJournalName = m_pStoragePath->getJournalFileName(m_sTimeFileName);
+    auto sJournalDataName = m_pStoragePath->getJournalDataFileName(m_sTimeFileName);
+
+    m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath);
+
+    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath) VALUES (?, ?, ?, ?, ?, ?)");
+    pStatement->setString(1, m_sSessionUUID);
+    pStatement->setString(2, m_sStartTime);
+    pStatement->setString(3, sJournalName);
+    pStatement->setString(4, sJournalDataName);
+    pStatement->setString(5, sJournalPath);
+    pStatement->setString(6, sJournalDataPath);
+    pStatement->execute();
+
 }
 
 LibMCData_uint32 CDataModel::GetDataModelVersion()
@@ -118,12 +144,24 @@ ILogSession* CDataModel::CreateNewLogSession()
 {
     if (m_pStoragePath.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGEPATH);
-    
-    auto sLogName = m_pStoragePath->getLogPath();
 
-	return new CLogSession(sLogName);
+    if (m_pJournal.get () == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
+
+	return new CLogSession(m_pJournal);
 }
 
+IJournalSession* CDataModel::CreateJournalSession()
+{
+    if (m_pStoragePath.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGEPATH);
+
+    if (m_pJournal.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
+
+    return new CJournalSession(m_pJournal);
+
+}
 
 IBuildJobHandler* CDataModel::CreateBuildJobHandler()
 {

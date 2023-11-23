@@ -105,6 +105,13 @@
 		<error name="INVALIDDEVICECONFIGURATION" code="1047" description="Invalid device configuration." />
 		<error name="OIESDKLIBRARYRETURNSINVALIDVERSION" code="1048" description="OIE SDK Library returns invalid version." />
 		
+		<error name="INVALIDADDITIONALSIGNALCOUNT" code="1049" description="Invalid Additional signal count." />	
+		<error name="NORTCVALUESAVAILABLE" code="1050" description="No RTC values available." />	
+		<error name="NOSENSORVALUESAVAILABLE" code="1051" description="No Sensor values available." />	
+		<error name="NOADDITIONALVALUESAVAILABLE" code="1052" description="No Additional values available." />	
+		<error name="INVALIDADDITIONALINDEX" code="1053" description="Invalid additional index." />	
+		
+		
 		
 		
 	</errors>
@@ -187,6 +194,10 @@ Custom implementation
 		<method name="GetSensorSignalCount" description="Returns the configured Sensor signal count of the configuration.">
 			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
 		</method>	
+
+		<method name="GetAdditionalSignalCount" description="Returns the configured Additional signal count of the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="Additional Signal Count" />
+		</method>	
 		
 		<method name="GetRTCSignalIDs" description="Returns the configured RTC signal IDs of the configuration.">
 			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="RTC Signal IDs" />
@@ -196,6 +207,16 @@ Custom implementation
 			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="Sensor Signal IDs" />
 		</method>	
 
+		<method name="GetAdditionalSignalIDs" description="Returns the configured Additional signal IDs of the configuration.">
+			<param name="AdditionalIDs" type="basicarray" class="uint32" pass="out" description="Additional Signal IDs" />
+		</method>	
+
+		<method name="GetAdditionalSignalInfo" description="Returns the configured Additional signal information.">
+			<param name="Index" type="uint32" pass="in" description="Index of additional signal. 0-based." />
+			<param name="SignalID" type="uint32" pass="out" description="ID of additional signal." />
+			<param name="SignalName" type="string" pass="out" description="Name of additional signal." />
+		</method>	
+		
 		<method name="GetDeviceConfigurationString" description="Returns the device configuration string.">
 			<param name="DeviceConfigurationString" type="string" pass="return" description="Device configuration string." />
 		</method>	
@@ -213,6 +234,10 @@ Custom implementation
 			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
 		</method>	
 		
+		<method name="GetAdditionalSignalCount" description="Returns the configured Additional data signal count of the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
+		</method>	
+
 		<method name="GetRecordCount" description="Returns the number of records in the recording.">
 			<param name="Record" type="uint64" pass="return" description="Number of records in the recording" />
 		</method>	
@@ -232,6 +257,11 @@ Custom implementation
 		<method name="GetSensorSignalsOfRecord" description="Returns the sensor signals of a specific record.">
 			<param name="Index" type="uint32" pass="in" description="Index of the record. 0-based. MUST be smaller than RecordCount." />
 			<param name="SensorSignals" type="basicarray" class="int32" pass="out" description="Recorded Sensor Signals" />
+		</method>	
+
+		<method name="GetAdditionalSignalsOfRecord" description="Returns the additional signals of a specific record.">
+			<param name="Index" type="uint32" pass="in" description="Index of the record. 0-based. MUST be smaller than RecordCount." />
+			<param name="AdditionalSignals" type="basicarray" class="int32" pass="out" description="Recorded Additional Signals" />
 		</method>	
 		
 		<method name="GetAllCoordinates" description="Returns an array of all coordinates.">
@@ -253,6 +283,11 @@ Custom implementation
 			<param name="Signals" type="basicarray" class="int32" pass="out" description="Array of the Indexed RTC Signal of all records." />
 		</method>	
 		
+		<method name="GetAllAdditionalSignals" description="Returns an array of all additional signals of a specific index.">
+			<param name="AdditionalIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount." />
+			<param name="Signals" type="basicarray" class="int32" pass="out" description="Array of the Indexed RTC Signal of all records." />
+		</method>	
+
 		<method name="StoreAsBuildData" description="Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.">
 			<param name="Name" type="string" pass="in" description="Name of the recording to be stored." />
 			<param name="Build" type="class" class="LibMCEnv:Build" pass="in" description="Build that should store the data." />

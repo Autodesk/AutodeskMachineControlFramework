@@ -211,6 +211,23 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM 10114 /** Sample point count exceeds maximum */
 #define LIBMCENV_ERROR_INVALIDCLAMPINTERVAL 10115 /** Invalid clamp interval */
 #define LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM 10116 /** Could not retrieve PNG stream */
+#define LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA 10117 /** Could not store field data */
+#define LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND 10118 /** Discrete field data not found */
+#define LIBMCENV_ERROR_EMPTYUSERLOGIN 10119 /** Empty user login */
+#define LIBMCENV_ERROR_INVALIDUSERLOGIN 10120 /** Invalid user login */
+#define LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER 10121 /** Empty permission identifier */
+#define LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER 10122 /** Invalid permission identifier */
+#define LIBMCENV_ERROR_EMPTYUSERROLE 10123 /** Empty user role */
+#define LIBMCENV_ERROR_INVALIDUSERROLE 10124 /** Invalid user role */
+#define LIBMCENV_ERROR_EMPTYUSERLANGUAGE 10125 /** Empty user language */
+#define LIBMCENV_ERROR_INVALIDUSERLANGUAGE 10126 /** Invalid user language */
+#define LIBMCENV_ERROR_ORIGINOUTOFRANGE 10127 /** Origin out of range */
+#define LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH 10128 /** Raw pixel data size mismatch */
+#define LIBMCENV_ERROR_EMPTYPNGSTREAM 10129 /** Empty PNG Stream */
+#define LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE 10130 /** Could not load PNG image */
+#define LIBMCENV_ERROR_INVALIDPIXELSIZE 10131 /** Invalid pixel size */
+#define LIBMCENV_ERROR_MESHISNOTREGISTERED 10132 /** Mesh is not registered */
+#define LIBMCENV_ERROR_INVALIDUSERINDEX 10133 /** Invalid user index */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -334,6 +351,23 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_SAMPLEPOINTCOUNTEXCEEDSMAXIMUM: return "Sample point count exceeds maximum";
     case LIBMCENV_ERROR_INVALIDCLAMPINTERVAL: return "Invalid clamp interval";
     case LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM: return "Could not retrieve PNG stream";
+    case LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA: return "Could not store field data";
+    case LIBMCENV_ERROR_DISCRETEFIELDDATANOTFOUND: return "Discrete field data not found";
+    case LIBMCENV_ERROR_EMPTYUSERLOGIN: return "Empty user login";
+    case LIBMCENV_ERROR_INVALIDUSERLOGIN: return "Invalid user login";
+    case LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
+    case LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER: return "Invalid permission identifier";
+    case LIBMCENV_ERROR_EMPTYUSERROLE: return "Empty user role";
+    case LIBMCENV_ERROR_INVALIDUSERROLE: return "Invalid user role";
+    case LIBMCENV_ERROR_EMPTYUSERLANGUAGE: return "Empty user language";
+    case LIBMCENV_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
+    case LIBMCENV_ERROR_ORIGINOUTOFRANGE: return "Origin out of range";
+    case LIBMCENV_ERROR_RAWPIXELDATASIZEMISMATCH: return "Raw pixel data size mismatch";
+    case LIBMCENV_ERROR_EMPTYPNGSTREAM: return "Empty PNG Stream";
+    case LIBMCENV_ERROR_COULDNOTLOADPNGIMAGE: return "Could not load PNG image";
+    case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
+    case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "Mesh is not registered";
+    case LIBMCENV_ERROR_INVALIDUSERINDEX: return "Invalid user index";
     default: return "unknown error";
   }
 }
@@ -350,6 +384,7 @@ typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
+typedef LibMCEnvHandle LibMCEnv_MeshObject;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
@@ -373,6 +408,9 @@ typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;
+typedef LibMCEnvHandle LibMCEnv_JournalHandler;
+typedef LibMCEnvHandle LibMCEnv_UserDetailList;
+typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
 typedef LibMCEnvHandle LibMCEnv_UIEnvironment;
 
@@ -484,6 +522,11 @@ namespace LibMCEnv {
       LibMCEnv_double m_Blue;
   } sColorRGB;
   
+  typedef struct sTimeStreamEntry {
+      LibMCEnv_uint64 m_TimestampInMS;
+      LibMCEnv_double m_Value;
+  } sTimeStreamEntry;
+  
   #pragma pack ()
   
 } // namespace LibMCEnv;
@@ -503,5 +546,6 @@ typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;
 typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
 typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
+typedef LibMCEnv::sTimeStreamEntry sLibMCEnvTimeStreamEntry;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP

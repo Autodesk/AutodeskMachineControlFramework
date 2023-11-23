@@ -63,6 +63,7 @@ class CBase;
 class CIterator;
 class CLogEntryList;
 class CLogSession;
+class CJournalSession;
 class CStorageStream;
 class CStorage;
 class CBuildJobData;
@@ -70,6 +71,7 @@ class CBuildJobDataIterator;
 class CBuildJob;
 class CBuildJobIterator;
 class CBuildJobHandler;
+class CUserList;
 class CLoginHandler;
 class CPersistencyHandler;
 class CDataModel;
@@ -82,6 +84,7 @@ typedef CBase CLibMCDataBase;
 typedef CIterator CLibMCDataIterator;
 typedef CLogEntryList CLibMCDataLogEntryList;
 typedef CLogSession CLibMCDataLogSession;
+typedef CJournalSession CLibMCDataJournalSession;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorage CLibMCDataStorage;
 typedef CBuildJobData CLibMCDataBuildJobData;
@@ -89,6 +92,7 @@ typedef CBuildJobDataIterator CLibMCDataBuildJobDataIterator;
 typedef CBuildJob CLibMCDataBuildJob;
 typedef CBuildJobIterator CLibMCDataBuildJobIterator;
 typedef CBuildJobHandler CLibMCDataBuildJobHandler;
+typedef CUserList CLibMCDataUserList;
 typedef CLoginHandler CLibMCDataLoginHandler;
 typedef CPersistencyHandler CLibMCDataPersistencyHandler;
 typedef CDataModel CLibMCDataDataModel;
@@ -101,6 +105,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CLogSession> PLogSession;
+typedef std::shared_ptr<CJournalSession> PJournalSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorage> PStorage;
 typedef std::shared_ptr<CBuildJobData> PBuildJobData;
@@ -108,6 +113,7 @@ typedef std::shared_ptr<CBuildJobDataIterator> PBuildJobDataIterator;
 typedef std::shared_ptr<CBuildJob> PBuildJob;
 typedef std::shared_ptr<CBuildJobIterator> PBuildJobIterator;
 typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
+typedef std::shared_ptr<CUserList> PUserList;
 typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
 typedef std::shared_ptr<CDataModel> PDataModel;
@@ -120,6 +126,7 @@ typedef PBase PLibMCDataBase;
 typedef PIterator PLibMCDataIterator;
 typedef PLogEntryList PLibMCDataLogEntryList;
 typedef PLogSession PLibMCDataLogSession;
+typedef PJournalSession PLibMCDataJournalSession;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorage PLibMCDataStorage;
 typedef PBuildJobData PLibMCDataBuildJobData;
@@ -127,6 +134,7 @@ typedef PBuildJobDataIterator PLibMCDataBuildJobDataIterator;
 typedef PBuildJob PLibMCDataBuildJob;
 typedef PBuildJobIterator PLibMCDataBuildJobIterator;
 typedef PBuildJobHandler PLibMCDataBuildJobHandler;
+typedef PUserList PLibMCDataUserList;
 typedef PLoginHandler PLibMCDataLoginHandler;
 typedef PPersistencyHandler PLibMCDataPersistencyHandler;
 typedef PDataModel PLibMCDataDataModel;
@@ -473,6 +481,21 @@ public:
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "DATATYPEMISMATCH";
 			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "COULDNOTFINDLOGENTRY";
 			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "NOLOGCALLBACK";
+			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "EMPTYUSERNAME";
+			case LIBMCDATA_ERROR_EMPTYUSERUUID: return "EMPTYUSERUUID";
+			case LIBMCDATA_ERROR_USERNOTUNIQUE: return "USERNOTUNIQUE";
+			case LIBMCDATA_ERROR_EMPTYUSERROLE: return "EMPTYUSERROLE";
+			case LIBMCDATA_ERROR_EMPTYUSERSALT: return "EMPTYUSERSALT";
+			case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "EMPTYUSERPASSWORD";
+			case LIBMCDATA_ERROR_INVALIDUSERROLE: return "INVALIDUSERROLE";
+			case LIBMCDATA_ERROR_USERALREADYEXISTS: return "USERALREADYEXISTS";
+			case LIBMCDATA_ERROR_INVALIDUSERLANGUAGE: return "INVALIDUSERLANGUAGE";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE: return "COULDNOTUPDATEUSERLANGUAGE";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE: return "COULDNOTUPDATEUSERROLE";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "COULDNOTUPDATEUSERDESCRIPTION";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "COULDNOTUPDATEUSERPASSWORD";
+			case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "INVALIDUSERINDEX";
+			case LIBMCDATA_ERROR_INVALIDJOURNAL: return "INVALIDJOURNAL";
 		}
 		return "UNKNOWN";
 	}
@@ -745,6 +768,21 @@ public:
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
 			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
 			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
+			case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
+			case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
+			case LIBMCDATA_ERROR_USERNOTUNIQUE: return "User not unique";
+			case LIBMCDATA_ERROR_EMPTYUSERROLE: return "Empty user role";
+			case LIBMCDATA_ERROR_EMPTYUSERSALT: return "Empty user salt";
+			case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "Empty user password";
+			case LIBMCDATA_ERROR_INVALIDUSERROLE: return "Invalid user role";
+			case LIBMCDATA_ERROR_USERALREADYEXISTS: return "User already exists";
+			case LIBMCDATA_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE: return "Could not update user language";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE: return "Could not update user role";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "Could not update user description";
+			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
+			case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
+			case LIBMCDATA_ERROR_INVALIDJOURNAL: return "Invalid journal";
 		}
 		return "unknown error";
 	}
@@ -866,6 +904,7 @@ private:
 	friend class CIterator;
 	friend class CLogEntryList;
 	friend class CLogSession;
+	friend class CJournalSession;
 	friend class CStorageStream;
 	friend class CStorage;
 	friend class CBuildJobData;
@@ -873,6 +912,7 @@ private:
 	friend class CBuildJob;
 	friend class CBuildJobIterator;
 	friend class CBuildJobHandler;
+	friend class CUserList;
 	friend class CLoginHandler;
 	friend class CPersistencyHandler;
 	friend class CDataModel;
@@ -991,9 +1031,28 @@ public:
 	{
 	}
 	
-	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp);
+	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestampUTC);
 	inline LibMCData_uint32 GetMaxLogEntryID();
 	inline PLogEntryList RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const eLogLevel eMinLogLevel);
+};
+	
+/*************************************************************************************************************************
+ Class CJournalSession 
+**************************************************************************************************************************/
+class CJournalSession : public CBase {
+public:
+	
+	/**
+	* CJournalSession::CJournalSession - Constructor for JournalSession class.
+	*/
+	CJournalSession(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<LibMCData_uint8> & DataBuffer);
+	inline LibMCData_uint32 GetChunkCapacity();
+	inline LibMCData_uint32 GetFlushInterval();
 };
 	
 /*************************************************************************************************************************
@@ -1012,6 +1071,7 @@ public:
 	
 	inline std::string GetUUID();
 	inline std::string GetTimeStamp();
+	inline std::string GetContextIdentifier();
 	inline std::string GetName();
 	inline std::string GetMIMEType();
 	inline std::string GetSHA2();
@@ -1036,8 +1096,8 @@ public:
 	
 	inline bool StreamIsReady(const std::string & sUUID);
 	inline PStorageStream RetrieveStream(const std::string & sUUID);
-	inline void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID);
-	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID);
+	inline void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID);
+	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
 	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
@@ -1063,6 +1123,7 @@ public:
 	inline std::string GetDataUUID();
 	inline std::string GetJobUUID();
 	inline std::string GetName();
+	inline std::string GetContextIdentifier();
 	inline std::string GetTimeStamp();
 	inline PStorageStream GetStorageStream();
 	inline std::string GetStorageStreamSHA2();
@@ -1110,14 +1171,13 @@ public:
 	inline std::string GetTimeStamp();
 	inline PStorageStream GetStorageStream();
 	inline std::string GetStorageStreamUUID();
-	inline PLogSession GetBuildJobLogger();
 	inline void StartValidating();
 	inline void FinishValidating(const LibMCData_uint32 nLayerCount);
 	inline void ArchiveJob();
 	inline void UnArchiveJob();
 	inline void DeleteJob();
 	inline bool JobCanBeArchived();
-	inline void AddJobData(const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID);
+	inline void AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID);
 	inline PBuildJobDataIterator ListJobDataByType(const eBuildJobDataType eDataType);
 	inline PBuildJobDataIterator ListJobData();
 	inline PBuildJobData RetrieveJobData(const std::string & sDataUUID);
@@ -1163,6 +1223,24 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CUserList 
+**************************************************************************************************************************/
+class CUserList : public CBase {
+public:
+	
+	/**
+	* CUserList::CUserList - Constructor for UserList class.
+	*/
+	CUserList(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCData_uint32 Count();
+	inline void GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+};
+	
+/*************************************************************************************************************************
  Class CLoginHandler 
 **************************************************************************************************************************/
 class CLoginHandler : public CBase {
@@ -1178,6 +1256,26 @@ public:
 	
 	inline bool UserExists(const std::string & sUsername);
 	inline void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword);
+	inline void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+	inline void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
+	inline std::string GetUsernameByUUID(const std::string & sUUID);
+	inline std::string GetUserUUID(const std::string & sUsername);
+	inline std::string GetUserDescription(const std::string & sUsername);
+	inline std::string GetUserDescriptionByUUID(const std::string & sUUID);
+	inline std::string GetUserRole(const std::string & sUsername);
+	inline std::string GetUserRoleByUUID(const std::string & sUUID);
+	inline std::string GetUserLanguage(const std::string & sUsername);
+	inline std::string GetUserLanguageByUUID(const std::string & sUUID);
+	inline std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription);
+	inline void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier);
+	inline void SetUserRole(const std::string & sUsername, const std::string & sRole);
+	inline void SetUserDescription(const std::string & sUsername, const std::string & sDescription);
+	inline void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword);
+	inline void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier);
+	inline void SetUserRoleByUUID(const std::string & sUUID, const std::string & sRole);
+	inline void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription);
+	inline void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword);
+	inline PUserList GetActiveUsers();
 };
 	
 /*************************************************************************************************************************
@@ -1230,6 +1328,7 @@ public:
 	inline PStorage CreateStorage();
 	inline PBuildJobHandler CreateBuildJobHandler();
 	inline PLogSession CreateNewLogSession();
+	inline PJournalSession CreateJournalSession();
 	inline PLoginHandler CreateLoginHandler();
 	inline PPersistencyHandler CreatePersistencyHandler();
 	inline void SetBaseTempDirectory(const std::string & sTempDirectory);
@@ -1348,8 +1447,12 @@ public:
 		pWrapperTable->m_LogSession_AddEntry = nullptr;
 		pWrapperTable->m_LogSession_GetMaxLogEntryID = nullptr;
 		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = nullptr;
+		pWrapperTable->m_JournalSession_WriteJournalChunkData = nullptr;
+		pWrapperTable->m_JournalSession_GetChunkCapacity = nullptr;
+		pWrapperTable->m_JournalSession_GetFlushInterval = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
+		pWrapperTable->m_StorageStream_GetContextIdentifier = nullptr;
 		pWrapperTable->m_StorageStream_GetName = nullptr;
 		pWrapperTable->m_StorageStream_GetMIMEType = nullptr;
 		pWrapperTable->m_StorageStream_GetSHA2 = nullptr;
@@ -1369,6 +1472,7 @@ public:
 		pWrapperTable->m_BuildJobData_GetDataUUID = nullptr;
 		pWrapperTable->m_BuildJobData_GetJobUUID = nullptr;
 		pWrapperTable->m_BuildJobData_GetName = nullptr;
+		pWrapperTable->m_BuildJobData_GetContextIdentifier = nullptr;
 		pWrapperTable->m_BuildJobData_GetTimeStamp = nullptr;
 		pWrapperTable->m_BuildJobData_GetStorageStream = nullptr;
 		pWrapperTable->m_BuildJobData_GetStorageStreamSHA2 = nullptr;
@@ -1384,7 +1488,6 @@ public:
 		pWrapperTable->m_BuildJob_GetTimeStamp = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStream = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStreamUUID = nullptr;
-		pWrapperTable->m_BuildJob_GetBuildJobLogger = nullptr;
 		pWrapperTable->m_BuildJob_StartValidating = nullptr;
 		pWrapperTable->m_BuildJob_FinishValidating = nullptr;
 		pWrapperTable->m_BuildJob_ArchiveJob = nullptr;
@@ -1402,8 +1505,30 @@ public:
 		pWrapperTable->m_BuildJobHandler_ListJobsByStatus = nullptr;
 		pWrapperTable->m_BuildJobHandler_ConvertBuildStatusToString = nullptr;
 		pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus = nullptr;
+		pWrapperTable->m_UserList_Count = nullptr;
+		pWrapperTable->m_UserList_GetUserProperties = nullptr;
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDetails = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserProperties = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_GetUsernameByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserUUID = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserDescription = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserDescriptionByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserRole = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserRoleByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserLanguage = nullptr;
+		pWrapperTable->m_LoginHandler_GetUserLanguageByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_CreateUser = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserLanguage = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserRole = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserDescription = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserPassword = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserLanguageByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserRoleByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = nullptr;
+		pWrapperTable->m_LoginHandler_GetActiveUsers = nullptr;
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = nullptr;
 		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = nullptr;
@@ -1424,6 +1549,7 @@ public:
 		pWrapperTable->m_DataModel_CreateStorage = nullptr;
 		pWrapperTable->m_DataModel_CreateBuildJobHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
+		pWrapperTable->m_DataModel_CreateJournalSession = nullptr;
 		pWrapperTable->m_DataModel_CreateLoginHandler = nullptr;
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
 		pWrapperTable->m_DataModel_SetBaseTempDirectory = nullptr;
@@ -1597,6 +1723,33 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_WriteJournalChunkData = (PLibMCDataJournalSession_WriteJournalChunkDataPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_writejournalchunkdata");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_WriteJournalChunkData = (PLibMCDataJournalSession_WriteJournalChunkDataPtr) dlsym(hLibrary, "libmcdata_journalsession_writejournalchunkdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_WriteJournalChunkData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_GetChunkCapacity = (PLibMCDataJournalSession_GetChunkCapacityPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getchunkcapacity");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_GetChunkCapacity = (PLibMCDataJournalSession_GetChunkCapacityPtr) dlsym(hLibrary, "libmcdata_journalsession_getchunkcapacity");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_GetChunkCapacity == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_GetFlushInterval = (PLibMCDataJournalSession_GetFlushIntervalPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getflushinterval");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_GetFlushInterval = (PLibMCDataJournalSession_GetFlushIntervalPtr) dlsym(hLibrary, "libmcdata_journalsession_getflushinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_GetFlushInterval == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StorageStream_GetUUID = (PLibMCDataStorageStream_GetUUIDPtr) GetProcAddress(hLibrary, "libmcdata_storagestream_getuuid");
 		#else // _WIN32
 		pWrapperTable->m_StorageStream_GetUUID = (PLibMCDataStorageStream_GetUUIDPtr) dlsym(hLibrary, "libmcdata_storagestream_getuuid");
@@ -1612,6 +1765,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StorageStream_GetTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageStream_GetContextIdentifier = (PLibMCDataStorageStream_GetContextIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_storagestream_getcontextidentifier");
+		#else // _WIN32
+		pWrapperTable->m_StorageStream_GetContextIdentifier = (PLibMCDataStorageStream_GetContextIdentifierPtr) dlsym(hLibrary, "libmcdata_storagestream_getcontextidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageStream_GetContextIdentifier == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1786,6 +1948,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJobData_GetContextIdentifier = (PLibMCDataBuildJobData_GetContextIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getcontextidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobData_GetContextIdentifier = (PLibMCDataBuildJobData_GetContextIdentifierPtr) dlsym(hLibrary, "libmcdata_buildjobdata_getcontextidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobData_GetContextIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_gettimestamp");
 		#else // _WIN32
 		pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_buildjobdata_gettimestamp");
@@ -1918,15 +2089,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJob_GetStorageStreamUUID == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
-		#else // _WIN32
-		pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) dlsym(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJob_GetBuildJobLogger == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2083,6 +2245,24 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UserList_Count = (PLibMCDataUserList_CountPtr) GetProcAddress(hLibrary, "libmcdata_userlist_count");
+		#else // _WIN32
+		pWrapperTable->m_UserList_Count = (PLibMCDataUserList_CountPtr) dlsym(hLibrary, "libmcdata_userlist_count");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserList_Count == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UserList_GetUserProperties = (PLibMCDataUserList_GetUserPropertiesPtr) GetProcAddress(hLibrary, "libmcdata_userlist_getuserproperties");
+		#else // _WIN32
+		pWrapperTable->m_UserList_GetUserProperties = (PLibMCDataUserList_GetUserPropertiesPtr) dlsym(hLibrary, "libmcdata_userlist_getuserproperties");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserList_GetUserProperties == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_LoginHandler_UserExists = (PLibMCDataLoginHandler_UserExistsPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_userexists");
 		#else // _WIN32
 		pWrapperTable->m_LoginHandler_UserExists = (PLibMCDataLoginHandler_UserExistsPtr) dlsym(hLibrary, "libmcdata_loginhandler_userexists");
@@ -2098,6 +2278,186 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LoginHandler_GetUserDetails == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserProperties = (PLibMCDataLoginHandler_GetUserPropertiesPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserproperties");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserProperties = (PLibMCDataLoginHandler_GetUserPropertiesPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserproperties");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserProperties == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = (PLibMCDataLoginHandler_GetUserPropertiesByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserpropertiesbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = (PLibMCDataLoginHandler_GetUserPropertiesByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserpropertiesbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUsernameByUUID = (PLibMCDataLoginHandler_GetUsernameByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getusernamebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUsernameByUUID = (PLibMCDataLoginHandler_GetUsernameByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_getusernamebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUsernameByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserUUID = (PLibMCDataLoginHandler_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserUUID = (PLibMCDataLoginHandler_GetUserUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserDescription = (PLibMCDataLoginHandler_GetUserDescriptionPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserDescription = (PLibMCDataLoginHandler_GetUserDescriptionPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserDescription == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserDescriptionByUUID = (PLibMCDataLoginHandler_GetUserDescriptionByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserdescriptionbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserDescriptionByUUID = (PLibMCDataLoginHandler_GetUserDescriptionByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserdescriptionbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserDescriptionByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserRole = (PLibMCDataLoginHandler_GetUserRolePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserrole");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserRole = (PLibMCDataLoginHandler_GetUserRolePtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserRole == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserRoleByUUID = (PLibMCDataLoginHandler_GetUserRoleByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserrolebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserRoleByUUID = (PLibMCDataLoginHandler_GetUserRoleByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserrolebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserRoleByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserLanguage = (PLibMCDataLoginHandler_GetUserLanguagePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserLanguage = (PLibMCDataLoginHandler_GetUserLanguagePtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserLanguage == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetUserLanguageByUUID = (PLibMCDataLoginHandler_GetUserLanguageByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getuserlanguagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetUserLanguageByUUID = (PLibMCDataLoginHandler_GetUserLanguageByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_getuserlanguagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetUserLanguageByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_CreateUser = (PLibMCDataLoginHandler_CreateUserPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_createuser");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_CreateUser = (PLibMCDataLoginHandler_CreateUserPtr) dlsym(hLibrary, "libmcdata_loginhandler_createuser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_CreateUser == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguage = (PLibMCDataLoginHandler_SetUserLanguagePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserlanguage");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguage = (PLibMCDataLoginHandler_SetUserLanguagePtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserlanguage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserLanguage == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRole = (PLibMCDataLoginHandler_SetUserRolePtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserrole");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRole = (PLibMCDataLoginHandler_SetUserRolePtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserrole");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserRole == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescription = (PLibMCDataLoginHandler_SetUserDescriptionPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserdescription");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescription = (PLibMCDataLoginHandler_SetUserDescriptionPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserDescription == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPassword = (PLibMCDataLoginHandler_SetUserPasswordPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserpassword");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPassword = (PLibMCDataLoginHandler_SetUserPasswordPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserpassword");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserPassword == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguageByUUID = (PLibMCDataLoginHandler_SetUserLanguageByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserlanguagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserLanguageByUUID = (PLibMCDataLoginHandler_SetUserLanguageByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserlanguagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserLanguageByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRoleByUUID = (PLibMCDataLoginHandler_SetUserRoleByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserrolebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserRoleByUUID = (PLibMCDataLoginHandler_SetUserRoleByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserrolebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserRoleByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = (PLibMCDataLoginHandler_SetUserDescriptionByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserdescriptionbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = (PLibMCDataLoginHandler_SetUserDescriptionByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserdescriptionbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = (PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_setuserpasswordbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = (PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr) dlsym(hLibrary, "libmcdata_loginhandler_setuserpasswordbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_SetUserPasswordByUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_GetActiveUsers = (PLibMCDataLoginHandler_GetActiveUsersPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_getactiveusers");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_GetActiveUsers = (PLibMCDataLoginHandler_GetActiveUsersPtr) dlsym(hLibrary, "libmcdata_loginhandler_getactiveusers");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_GetActiveUsers == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2278,6 +2638,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataModel_CreateNewLogSession == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_CreateJournalSession = (PLibMCDataDataModel_CreateJournalSessionPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createjournalsession");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_CreateJournalSession = (PLibMCDataDataModel_CreateJournalSessionPtr) dlsym(hLibrary, "libmcdata_datamodel_createjournalsession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_CreateJournalSession == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2470,12 +2839,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_WriteJournalChunkData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalsession_getchunkcapacity", (void**)&(pWrapperTable->m_JournalSession_GetChunkCapacity));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetChunkCapacity == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalsession_getflushinterval", (void**)&(pWrapperTable->m_JournalSession_GetFlushInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetFlushInterval == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storagestream_getuuid", (void**)&(pWrapperTable->m_StorageStream_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storagestream_gettimestamp", (void**)&(pWrapperTable->m_StorageStream_GetTimeStamp));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetTimeStamp == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storagestream_getcontextidentifier", (void**)&(pWrapperTable->m_StorageStream_GetContextIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetContextIdentifier == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storagestream_getname", (void**)&(pWrapperTable->m_StorageStream_GetName));
@@ -2554,6 +2939,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetName == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjobdata_getcontextidentifier", (void**)&(pWrapperTable->m_BuildJobData_GetContextIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetContextIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjobdata_gettimestamp", (void**)&(pWrapperTable->m_BuildJobData_GetTimeStamp));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetTimeStamp == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2612,10 +3001,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getstoragestreamuuid", (void**)&(pWrapperTable->m_BuildJob_GetStorageStreamUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetStorageStreamUUID == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjob_getbuildjoblogger", (void**)&(pWrapperTable->m_BuildJob_GetBuildJobLogger));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetBuildJobLogger == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_startvalidating", (void**)&(pWrapperTable->m_BuildJob_StartValidating));
@@ -2686,12 +3071,100 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_userlist_count", (void**)&(pWrapperTable->m_UserList_Count));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserList_Count == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_userlist_getuserproperties", (void**)&(pWrapperTable->m_UserList_GetUserProperties));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserList_GetUserProperties == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_userexists", (void**)&(pWrapperTable->m_LoginHandler_UserExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UserExists == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserdetails", (void**)&(pWrapperTable->m_LoginHandler_GetUserDetails));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserDetails == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserproperties", (void**)&(pWrapperTable->m_LoginHandler_GetUserProperties));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserProperties == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserpropertiesbyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getusernamebyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUsernameByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUsernameByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuseruuid", (void**)&(pWrapperTable->m_LoginHandler_GetUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserdescription", (void**)&(pWrapperTable->m_LoginHandler_GetUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserDescription == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserdescriptionbyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUserDescriptionByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserDescriptionByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserrole", (void**)&(pWrapperTable->m_LoginHandler_GetUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserRole == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserrolebyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUserRoleByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserRoleByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserlanguage", (void**)&(pWrapperTable->m_LoginHandler_GetUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserLanguage == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserlanguagebyuuid", (void**)&(pWrapperTable->m_LoginHandler_GetUserLanguageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserLanguageByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_createuser", (void**)&(pWrapperTable->m_LoginHandler_CreateUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_CreateUser == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserlanguage", (void**)&(pWrapperTable->m_LoginHandler_SetUserLanguage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserLanguage == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserrole", (void**)&(pWrapperTable->m_LoginHandler_SetUserRole));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserRole == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserdescription", (void**)&(pWrapperTable->m_LoginHandler_SetUserDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserDescription == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserpassword", (void**)&(pWrapperTable->m_LoginHandler_SetUserPassword));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserPassword == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserlanguagebyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserLanguageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserLanguageByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserrolebyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserRoleByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserRoleByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserdescriptionbyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_setuserpasswordbyuuid", (void**)&(pWrapperTable->m_LoginHandler_SetUserPasswordByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_SetUserPasswordByUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_getactiveusers", (void**)&(pWrapperTable->m_LoginHandler_GetActiveUsers));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetActiveUsers == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_persistencyhandler_haspersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_HasPersistentParameter));
@@ -2772,6 +3245,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createnewlogsession", (void**)&(pWrapperTable->m_DataModel_CreateNewLogSession));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateNewLogSession == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_createjournalsession", (void**)&(pWrapperTable->m_DataModel_CreateJournalSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateJournalSession == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createloginhandler", (void**)&(pWrapperTable->m_DataModel_CreateLoginHandler));
@@ -3000,11 +3477,11 @@ public:
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
 	* @param[in] eLogLevel - Log Level
-	* @param[in] sTimestamp - Timestamp in ISO8601 UTC format
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	void CLogSession::AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp)
+	void CLogSession::AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestampUTC)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_AddEntry(m_pHandle, sMessage.c_str(), sSubSystem.c_str(), eLogLevel, sTimestamp.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_AddEntry(m_pHandle, sMessage.c_str(), sSubSystem.c_str(), eLogLevel, sTimestampUTC.c_str()));
 	}
 	
 	/**
@@ -3035,6 +3512,46 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CLogEntryList>(m_pWrapper, hLogEntryList);
+	}
+	
+	/**
+	 * Method definitions for class CJournalSession
+	 */
+	
+	/**
+	* CJournalSession::WriteJournalChunkData - writes detailed journal states to disk.
+	* @param[in] nChunkIndex - Index of the Chunk to write
+	* @param[in] nStartTimeStamp - Start Timestamp of the chunk
+	* @param[in] nEndTimeStamp - End Timestamp of the chunk
+	* @param[in] DataBuffer - Data to write into chunk.
+	*/
+	void CJournalSession::WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<LibMCData_uint8> & DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_WriteJournalChunkData(m_pHandle, nChunkIndex, nStartTimeStamp, nEndTimeStamp, (LibMCData_uint64)DataBuffer.size(), DataBuffer.data()));
+	}
+	
+	/**
+	* CJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.
+	* @return Maximum Chunk Capacity in Journal in Bytes
+	*/
+	LibMCData_uint32 CJournalSession::GetChunkCapacity()
+	{
+		LibMCData_uint32 resultChunkCapacity = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetChunkCapacity(m_pHandle, &resultChunkCapacity));
+		
+		return resultChunkCapacity;
+	}
+	
+	/**
+	* CJournalSession::GetFlushInterval - Returns the flush interval of the session journal.
+	* @return The interval determines how often a session journal chunk is written to disk. In Seconds.
+	*/
+	LibMCData_uint32 CJournalSession::GetFlushInterval()
+	{
+		LibMCData_uint32 resultFlushInterval = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetFlushInterval(m_pHandle, &resultFlushInterval));
+		
+		return resultFlushInterval;
 	}
 	
 	/**
@@ -3072,7 +3589,22 @@ public:
 	}
 	
 	/**
-	* CStorageStream::GetName - returns the name of a storage stream.
+	* CStorageStream::GetContextIdentifier - returns the context identifier of a storage stream.
+	* @return Context Identifier String
+	*/
+	std::string CStorageStream::GetContextIdentifier()
+	{
+		LibMCData_uint32 bytesNeededContextIdentifier = 0;
+		LibMCData_uint32 bytesWrittenContextIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageStream_GetContextIdentifier(m_pHandle, 0, &bytesNeededContextIdentifier, nullptr));
+		std::vector<char> bufferContextIdentifier(bytesNeededContextIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageStream_GetContextIdentifier(m_pHandle, bytesNeededContextIdentifier, &bytesWrittenContextIdentifier, &bufferContextIdentifier[0]));
+		
+		return std::string(&bufferContextIdentifier[0]);
+	}
+	
+	/**
+	* CStorageStream::GetName - returns the name description of a storage stream.
 	* @return Name String
 	*/
 	std::string CStorageStream::GetName()
@@ -3189,28 +3721,30 @@ public:
 	* CStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
 	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
-	* @param[in] sName - Name of the stream.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] ContentBuffer - Data of stream
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID)
+	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserID.c_str()));
 	}
 	
 	/**
 	* CStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
 	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID)
+	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str()));
 	}
 	
 	/**
@@ -3317,7 +3851,7 @@ public:
 	}
 	
 	/**
-	* CBuildJobData::GetName - returns the name of a build job uuid.
+	* CBuildJobData::GetName - returns the name of the job data.
 	* @return Name String
 	*/
 	std::string CBuildJobData::GetName()
@@ -3332,7 +3866,22 @@ public:
 	}
 	
 	/**
-	* CBuildJobData::GetTimeStamp - returns the timestamp when the job was created.
+	* CBuildJobData::GetContextIdentifier - returns the unique context identifier of the job data.
+	* @return Context Identifier String
+	*/
+	std::string CBuildJobData::GetContextIdentifier()
+	{
+		LibMCData_uint32 bytesNeededContextIdentifier = 0;
+		LibMCData_uint32 bytesWrittenContextIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetContextIdentifier(m_pHandle, 0, &bytesNeededContextIdentifier, nullptr));
+		std::vector<char> bufferContextIdentifier(bytesNeededContextIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetContextIdentifier(m_pHandle, bytesNeededContextIdentifier, &bytesWrittenContextIdentifier, &bufferContextIdentifier[0]));
+		
+		return std::string(&bufferContextIdentifier[0]);
+	}
+	
+	/**
+	* CBuildJobData::GetTimeStamp - returns the timestamp when the job data was created.
 	* @return Timestamp in ISO8601 UTC format
 	*/
 	std::string CBuildJobData::GetTimeStamp()
@@ -3553,21 +4102,6 @@ public:
 	}
 	
 	/**
-	* CBuildJob::GetBuildJobLogger - creates a build job log session access class.
-	* @return LogSession class instance.
-	*/
-	PLogSession CBuildJob::GetBuildJobLogger()
-	{
-		LibMCDataHandle hLogSession = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetBuildJobLogger(m_pHandle, &hLogSession));
-		
-		if (!hLogSession) {
-			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CLogSession>(m_pWrapper, hLogSession);
-	}
-	
-	/**
 	* CBuildJob::StartValidating - Starts validation of a build job.
 	*/
 	void CBuildJob::StartValidating()
@@ -3622,15 +4156,16 @@ public:
 	
 	/**
 	* CBuildJob::AddJobData - Adds additional data to the Job. Job MUST be of state validated in order to add job data.
-	* @param[in] sName - Name of the job
+	* @param[in] sIdentifier - Unique identifier for the job data.
+	* @param[in] sName - Name of the job data
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	void CBuildJob::AddJobData(const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID)
+	void CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sName.c_str(), hStream, eDataType, sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str()));
 	}
 	
 	/**
@@ -3800,6 +4335,57 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CUserList
+	 */
+	
+	/**
+	* CUserList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	LibMCData_uint32 CUserList::Count()
+	{
+		LibMCData_uint32 resultUserCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserList_Count(m_pHandle, &resultUserCount));
+		
+		return resultUserCount;
+	}
+	
+	/**
+	* CUserList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CUserList::GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCData_uint32 bytesNeededUsername = 0;
+		LibMCData_uint32 bytesWrittenUsername = 0;
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserList_GetUserProperties(m_pHandle, nUserIndex, 0, &bytesNeededUsername, nullptr, 0, &bytesNeededUUID, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_UserList_GetUserProperties(m_pHandle, nUserIndex, bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0], bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUsername = std::string(&bufferUsername[0]);
+		sUUID = std::string(&bufferUUID[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
 	 * Method definitions for class CLoginHandler
 	 */
 	
@@ -3817,7 +4403,7 @@ public:
 	}
 	
 	/**
-	* CLoginHandler::GetUserDetails - Retrieves a users data.
+	* CLoginHandler::GetUserDetails - Retrieves login relevant users data. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @param[out] sSalt - Salt of the user.
 	* @param[out] sHashedPassword - Hashed Password.
@@ -3834,6 +4420,311 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserDetails(m_pHandle, sUsername.c_str(), bytesNeededSalt, &bytesWrittenSalt, &bufferSalt[0], bytesNeededHashedPassword, &bytesWrittenHashedPassword, &bufferHashedPassword[0]));
 		sSalt = std::string(&bufferSalt[0]);
 		sHashedPassword = std::string(&bufferHashedPassword[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserProperties - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CLoginHandler::GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserProperties(m_pHandle, sUsername.c_str(), 0, &bytesNeededUUID, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserProperties(m_pHandle, sUsername.c_str(), bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUUID = std::string(&bufferUUID[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserPropertiesByUUID - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[out] sUsername - User name
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	void CLoginHandler::GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
+	{
+		LibMCData_uint32 bytesNeededUsername = 0;
+		LibMCData_uint32 bytesWrittenUsername = 0;
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserPropertiesByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededUsername, nullptr, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededRole, nullptr, 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferRole(bytesNeededRole);
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserPropertiesByUUID(m_pHandle, sUUID.c_str(), bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededRole, &bytesWrittenRole, &bufferRole[0], bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		sUsername = std::string(&bufferUsername[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sRole = std::string(&bufferRole[0]);
+		sLanguageIdentifier = std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return User name
+	*/
+	std::string CLoginHandler::GetUsernameByUUID(const std::string & sUUID)
+	{
+		LibMCData_uint32 bytesNeededUsername = 0;
+		LibMCData_uint32 bytesWrittenUsername = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUsernameByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededUsername, nullptr));
+		std::vector<char> bufferUsername(bytesNeededUsername);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUsernameByUUID(m_pHandle, sUUID.c_str(), bytesNeededUsername, &bytesWrittenUsername, &bufferUsername[0]));
+		
+		return std::string(&bufferUsername[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserUUID - Retrieves a users UUID. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return UUID of the user.
+	*/
+	std::string CLoginHandler::GetUserUUID(const std::string & sUsername)
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserUUID(m_pHandle, sUsername.c_str(), 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserUUID(m_pHandle, sUsername.c_str(), bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserDescription - Retrieves a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Description of the user.
+	*/
+	std::string CLoginHandler::GetUserDescription(const std::string & sUsername)
+	{
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserDescription(m_pHandle, sUsername.c_str(), 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserDescription(m_pHandle, sUsername.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserDescriptionByUUID - Retrieves a users description by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Description of the user.
+	*/
+	std::string CLoginHandler::GetUserDescriptionByUUID(const std::string & sUUID)
+	{
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserDescriptionByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserDescriptionByUUID(m_pHandle, sUUID.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Role of the user.
+	*/
+	std::string CLoginHandler::GetUserRole(const std::string & sUsername)
+	{
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserRole(m_pHandle, sUsername.c_str(), 0, &bytesNeededRole, nullptr));
+		std::vector<char> bufferRole(bytesNeededRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserRole(m_pHandle, sUsername.c_str(), bytesNeededRole, &bytesWrittenRole, &bufferRole[0]));
+		
+		return std::string(&bufferRole[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserRoleByUUID - Retrieves a users role by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Role of the user.
+	*/
+	std::string CLoginHandler::GetUserRoleByUUID(const std::string & sUUID)
+	{
+		LibMCData_uint32 bytesNeededRole = 0;
+		LibMCData_uint32 bytesWrittenRole = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserRoleByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededRole, nullptr));
+		std::vector<char> bufferRole(bytesNeededRole);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserRoleByUUID(m_pHandle, sUUID.c_str(), bytesNeededRole, &bytesWrittenRole, &bufferRole[0]));
+		
+		return std::string(&bufferRole[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Language identifier of the user.
+	*/
+	std::string CLoginHandler::GetUserLanguage(const std::string & sUsername)
+	{
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserLanguage(m_pHandle, sUsername.c_str(), 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserLanguage(m_pHandle, sUsername.c_str(), bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		
+		return std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CLoginHandler::GetUserLanguageByUUID - Retrieves a users language preference by user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Language identifier of the user.
+	*/
+	std::string CLoginHandler::GetUserLanguageByUUID(const std::string & sUUID)
+	{
+		LibMCData_uint32 bytesNeededLanguageIdentifier = 0;
+		LibMCData_uint32 bytesWrittenLanguageIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserLanguageByUUID(m_pHandle, sUUID.c_str(), 0, &bytesNeededLanguageIdentifier, nullptr));
+		std::vector<char> bufferLanguageIdentifier(bytesNeededLanguageIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetUserLanguageByUUID(m_pHandle, sUUID.c_str(), bytesNeededLanguageIdentifier, &bytesWrittenLanguageIdentifier, &bufferLanguageIdentifier[0]));
+		
+		return std::string(&bufferLanguageIdentifier[0]);
+	}
+	
+	/**
+	* CLoginHandler::CreateUser - Creates a new user. Fails if the user already exists.
+	* @param[in] sUsername - User name to create. MUST be alphanumeric and not empty.
+	* @param[in] sRole - Role of the new user. MUST NOT be empty.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	* @param[in] sDescription - Description of the new user.
+	* @return UUID of the new user.
+	*/
+	std::string CLoginHandler::CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription)
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_CreateUser(m_pHandle, sUsername.c_str(), sRole.c_str(), sSalt.c_str(), sHashedPassword.c_str(), sDescription.c_str(), 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_CreateUser(m_pHandle, sUsername.c_str(), sRole.c_str(), sSalt.c_str(), sHashedPassword.c_str(), sDescription.c_str(), bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CLoginHandler::SetUserLanguage - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserLanguage(m_pHandle, sUsername.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserRole - Updates a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sRole - New Role identifier of the user.
+	*/
+	void CLoginHandler::SetUserRole(const std::string & sUsername, const std::string & sRole)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRole(m_pHandle, sUsername.c_str(), sRole.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sDescription - New Description of the user.
+	*/
+	void CLoginHandler::SetUserDescription(const std::string & sUsername, const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserDescription(m_pHandle, sUsername.c_str(), sDescription.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserPassword - Updates a users password. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	void CLoginHandler::SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserPassword(m_pHandle, sUsername.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserLanguageByUUID - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserLanguageByUUID(m_pHandle, sUUID.c_str(), sLanguageIdentifier.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sRole - New Role identifier of the user.
+	*/
+	void CLoginHandler::SetUserRoleByUUID(const std::string & sUUID, const std::string & sRole)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserRoleByUUID(m_pHandle, sUUID.c_str(), sRole.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sDescription - New Language identifier of the user.
+	*/
+	void CLoginHandler::SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserDescriptionByUUID(m_pHandle, sUUID.c_str(), sDescription.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::SetUserPasswordByUUID - Updates a users password. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	void CLoginHandler::SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_SetUserPasswordByUUID(m_pHandle, sUUID.c_str(), sSalt.c_str(), sHashedPassword.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::GetActiveUsers - Returns a list of active users.
+	* @return New instance of active users.
+	*/
+	PUserList CLoginHandler::GetActiveUsers()
+	{
+		LibMCDataHandle hActiveUsers = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_GetActiveUsers(m_pHandle, &hActiveUsers));
+		
+		if (!hActiveUsers) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUserList>(m_pWrapper, hActiveUsers);
 	}
 	
 	/**
@@ -4109,6 +5000,21 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CLogSession>(m_pWrapper, hLogSession);
+	}
+	
+	/**
+	* CDataModel::CreateJournalSession - creates a global journal session access class.
+	* @return JournalSession class instance.
+	*/
+	PJournalSession CDataModel::CreateJournalSession()
+	{
+		LibMCDataHandle hJournalSession = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_CreateJournalSession(m_pHandle, &hJournalSession));
+		
+		if (!hJournalSession) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalSession>(m_pWrapper, hJournalSession);
 	}
 	
 	/**

@@ -52,6 +52,7 @@ namespace LibMCUI {
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
 	amcDeclareDependingClass(CStorage, PStorage);
+	amcDeclareDependingClass(CLoginHandler, PLoginHandler);
 }
 
 namespace LibMCEnv {
@@ -80,7 +81,10 @@ namespace AMC {
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
 	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
-
+	amcDeclareDependingClass(CMeshHandler, PMeshHandler);
+	amcDeclareDependingClass(CUserInformation, PUserInformation);
+	amcDeclareDependingClass(CAccessControl, PAccessControl);
+	amcDeclareDependingClass(CLanguageHandler, PLanguageHandler);
 
 	class CUIHandleEventResponse {
 	private:
@@ -120,6 +124,10 @@ namespace AMC {
 		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
 		PStateJournal m_pStateJournal;
+		PAccessControl m_pAccessControl;
+		PLanguageHandler m_pLanguageHandler;
+		LibMCData::PLoginHandler m_pLoginHandler;
+
 		PLogger m_pLogger;
 
 		std::vector <PUIMenuItem> m_MenuItems;
@@ -138,6 +146,7 @@ namespace AMC {
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
 		PToolpathHandler m_pToolpathHandler;
+		PMeshHandler m_pMeshHandler;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		LibMCData::PStorage m_pStorage;
 
@@ -152,7 +161,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string & sTestOutputPath, const std::string & sSystemUserID);
+		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string & sTestOutputPath, const std::string & sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler);
 		
 		virtual ~CUIHandler();
 		
@@ -172,7 +181,7 @@ namespace AMC {
 
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler);
+		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler, PUserInformation pUserInformation);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 

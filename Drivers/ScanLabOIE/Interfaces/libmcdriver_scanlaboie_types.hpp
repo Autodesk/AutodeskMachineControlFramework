@@ -153,6 +153,11 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION 1046 /** Unsupported OIE SDK Version. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION 1047 /** Invalid device configuration. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION 1048 /** OIE SDK Library returns invalid version. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALSIGNALCOUNT 1049 /** Invalid Additional signal count. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_NORTCVALUESAVAILABLE 1050 /** No RTC values available. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE 1051 /** No Sensor values available. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE 1052 /** No Additional values available. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX 1053 /** Invalid additional index. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -218,6 +223,11 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION: return "Unsupported OIE SDK Version.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION: return "Invalid device configuration.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION: return "OIE SDK Library returns invalid version.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALSIGNALCOUNT: return "Invalid Additional signal count.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_NORTCVALUESAVAILABLE: return "No RTC values available.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "No Sensor values available.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "No Additional values available.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "Invalid additional index.";
     default: return "unknown error";
   }
 }

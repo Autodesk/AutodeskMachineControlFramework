@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcplugin_impl.hpp"
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 /*************************************************************************************************************************
   Driver import definition
@@ -64,6 +65,11 @@ __DECLARESTATE(idle)
 {
 	PSignalHandler pSignalHandler;
 	pStateEnvironment->SetBoolParameter("ui", "build_canbestarted", true);
+
+	auto dCounterTest = pStateEnvironment->GetDoubleParameter("jobinfo", "countertest");
+	auto nTimer = pStateEnvironment->GetGlobalTimerInMilliseconds();
+
+	pStateEnvironment->SetDoubleParameter ("jobinfo", "countertest", dCounterTest + abs (sin (nTimer * 0.001)));
 
 	//pStateEnvironment->LogMessage ("Waiting for user input...");
 	if (pStateEnvironment->WaitForSignal("signal_initjob", 100, pSignalHandler)) {

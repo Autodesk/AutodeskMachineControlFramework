@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <map>
 
+#include "Common/common_exportstream_native.hpp"
+#include "libmcdata_dynamic.hpp"
+
 #define STATEJOURNAL_MAXTIMESTAMPDELTA  (256 * 1024 * 1024)
 
 #define STATEJOURNAL_COMMANDFLAG_TIMESTAMP 0x00000000UL 
@@ -70,16 +73,21 @@ namespace AMC {
 	class CStateJournalStream
 	{
 	private:
+		std::mutex m_ChunkChangeMutex;
 		PStateJournalStreamChunk m_pCurrentChunk;
-		std::vector<PStateJournalStreamChunk> m_Chunks;
+		std::vector<PStateJournalStreamChunk> m_ChunksToWrite;
 
-		std::mutex m_Mutex;
-
+		uint32_t m_nChunkIndex;
 		uint64_t m_nStartTimeStamp;
 		uint64_t m_nCurrentTimeStamp;
+		uint64_t m_nChunkCapacityInBytes;
+		uint32_t m_nJournalFlushInterval;
+
+		std::mutex m_JournalSessionMutex;
+		LibMCData::PJournalSession m_pJournalSession;
 
 	public:
-		CStateJournalStream();
+		CStateJournalStream(LibMCData::PJournalSession pJournalSession);
 		virtual ~CStateJournalStream();
 
 		virtual void writeTimeStamp(const uint64_t nAbsoluteTimeStamp);
@@ -92,6 +100,11 @@ namespace AMC {
 		virtual void writeNameDefinition(const uint32_t nID, const std::string& sName);
 
 		void startNewChunk();
+
+		uint32_t getJournalFlushInterval ();
+
+		// Threaded function to write chunk buffers to disk!
+		void writeChunksToDiskThreaded();
 
 	};
 	typedef std::shared_ptr<CStateJournalStream> PStateJournalStream;

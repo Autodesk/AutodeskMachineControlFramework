@@ -166,9 +166,11 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	auto nSize = jsonRequest.getUint64(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize(), LIBMC_ERROR_INVALIDSTREAMSIZE);
 
 	std::string sContextUUID;
+	std::string sContextIdentifier;
 
 	if (sContext == "build") {
 		sContextUUID = createNewBuild (sName, sUUID, pAuth);
+		sContextIdentifier = "builddata";
 	}
 	else {
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCONTEXTUUID);
@@ -180,7 +182,7 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
 		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED);
 
-	pStorage->BeginPartialStream (sUUID, sContextUUID, sName, sMimeType, nSize, pAuth->getUserName ());
+	pStorage->BeginPartialStream (sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, pAuth->getUserName ());
 
 	writer.addString(AMC_API_KEY_UPLOAD_STREAMUUID, sUUID);
 	writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);

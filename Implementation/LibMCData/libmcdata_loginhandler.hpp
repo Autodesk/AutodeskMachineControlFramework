@@ -73,6 +73,47 @@ public:
 
 	void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) override;
 
+	void GetUserProperties(const std::string& sUsername, std::string& sUUID, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier) override;
+
+	void GetUserPropertiesByUUID(const std::string& sUUID, std::string& sUsername, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier) override;
+
+	std::string GetUsernameByUUID(const std::string& sUUID) override;
+
+	std::string GetUserUUID(const std::string& sUsername) override;
+
+	std::string GetUserDescription(const std::string& sUsername) override;
+
+	std::string GetUserDescriptionByUUID(const std::string& sUUID) override;
+
+	std::string GetUserRole(const std::string& sUsername) override;
+
+	std::string GetUserRoleByUUID(const std::string& sUUID) override;
+
+	std::string GetUserLanguage(const std::string& sUsername) override;
+
+	std::string GetUserLanguageByUUID(const std::string& sUUID) override;
+
+	std::string CreateUser(const std::string& sUsername, const std::string& sRole, const std::string& sSalt, const std::string& sHashedPassword, const std::string& sDescription) override;
+
+	void SetUserLanguage(const std::string& sUsername, const std::string& sLanguageIdentifier) override;
+
+	void SetUserRole(const std::string& sUsername, const std::string& sLanguageIdentifier) override;
+
+	void SetUserDescription(const std::string& sUsername, const std::string& sDescription) override;
+
+	void SetUserPassword(const std::string& sUsername, const std::string& sSalt, const std::string& sHashedPassword) override;
+
+	void SetUserLanguageByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier) override;
+
+	void SetUserRoleByUUID(const std::string& sUUID, const std::string& sLanguageIdentifier) override;
+
+	void SetUserDescriptionByUUID(const std::string& sUUID, const std::string& sDescription) override;
+
+	void SetUserPasswordByUUID(const std::string& sUUID, const std::string& sSalt, const std::string& sHashedPassword) override;
+
+	IUserList* GetActiveUsers() override;
+
+
 };
 
 } // namespace Impl

@@ -35,8 +35,11 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_usermanagementhandler.hpp"
+#include "libmcenv_journalhandler.hpp"
 
 #include "amc_systemstate.hpp"
+#include "amc_accesscontrol.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
@@ -47,7 +50,6 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
 #include "libmcdata_dynamic.hpp"
-#include "amc_systemstate.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -84,7 +86,7 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl, LibMCData::PLoginHandler pLoginHandler, AMC::PLanguageHandler pLanguageHandler)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
@@ -97,7 +99,11 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
       m_sLogSubSystem ("ui"),
       m_sSenderName (sSenderName),
       m_pClientVariableHandler (pClientVariableHandler),
-      m_pBuildJobHandler (pBuildJobHandler)
+      m_pBuildJobHandler (pBuildJobHandler), 
+      m_pUserInformation (pUserInformation),
+      m_pAccessControl (pAccessControl),
+      m_pLoginHandler (pLoginHandler),
+      m_pLanguageHandler (pLanguageHandler)
 {
 
     if (pLogger.get() == nullptr)
@@ -114,7 +120,15 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pTool
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pStateJournal.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
-    
+    if (pUserInformation.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pAccessControl.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pLoginHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pLanguageHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
     if (pUIHandler == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
@@ -486,12 +500,86 @@ IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint3
     return new CDiscreteFieldData2D(pInstance);
 }
 
-IJournalVariable* CUIEnvironment::RetrieveJournalVariable(const std::string& sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
 {
-    uint64_t nStartTimeStamp = 0;
-    uint64_t nEndTimeStamp = 0;
-    m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
-    return new CJournalVariable (m_pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
+    if (pImageDataInstance == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    auto pImageDataImpl = dynamic_cast<CImageData*> (pImageDataInstance);
+    if (pImageDataImpl == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+    uint32_t nPixelSizeX, nPixelSizeY;
+    pImageDataImpl->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
+
+    double dDPIValueX, dDPIValueY;
+    pImageDataImpl->GetDPI(dDPIValueX, dDPIValueY);
+
+    AMC::PDiscreteFieldData2DInstance pFieldInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, 0.0, false);
+
+    auto pixelFormat = pImageDataImpl->GetPixelFormat();
+    auto& rawPixelData = pImageDataImpl->getPixelData();
+    pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
+    
+    return new CDiscreteFieldData2D(pFieldInstance);
+
 }
 
 
+bool CUIEnvironment::CheckPermission(const std::string& sPermissionIdentifier)
+{
+    return m_pAccessControl->checkPermissionInRole(m_pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
+}
+
+std::string CUIEnvironment::GetCurrentUserLogin()
+{
+    return m_pUserInformation->getLogin();
+}
+
+std::string CUIEnvironment::GetCurrentUserDescription()
+{
+    return m_pUserInformation->getDescription();
+}
+
+std::string CUIEnvironment::GetCurrentUserRole()
+{
+    return m_pUserInformation->getRoleIdentifier();
+
+}
+
+std::string CUIEnvironment::GetCurrentUserLanguage()
+{
+    return m_pUserInformation->getLanguageIdentifier();
+
+}
+
+std::string CUIEnvironment::GetCurrentUserUUID()
+{
+    return m_pUserInformation->getUUID();
+
+}
+
+IUserManagementHandler* CUIEnvironment::CreateUserManagement()
+{
+    return new CUserManagementHandler(m_pLoginHandler, m_pAccessControl, m_pLanguageHandler);
+}
+
+IJournalHandler* CUIEnvironment::GetCurrentJournal()
+{
+    return new CJournalHandler(m_pStateJournal);
+}
+
+IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+bool CUIEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IMeshObject* CUIEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}

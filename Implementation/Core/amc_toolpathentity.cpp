@@ -294,11 +294,10 @@ namespace AMC {
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE, "invalid segment attribute type of " + sNameSpace + "/" + sAttributeName);
 		}
 		
-		CToolpathCustomSegmentAttribute segmentAttribute(sNameSpace, sAttributeName, eAttributeType);
-		m_CustomSegmentAttributes.push_back(segmentAttribute);
-		auto pAttribute = &(*m_CustomSegmentAttributes.rbegin());
+		auto pSegmentAttribute = std::make_shared<CToolpathCustomSegmentAttribute> (sNameSpace, sAttributeName, eAttributeType);
+		m_CustomSegmentAttributes.push_back(pSegmentAttribute);
 
-		m_CustomSegmentAttributeMap.insert(std::make_pair (key, pAttribute));
+		m_CustomSegmentAttributeMap.insert(std::make_pair (key, pSegmentAttribute));
 		
 	}
 

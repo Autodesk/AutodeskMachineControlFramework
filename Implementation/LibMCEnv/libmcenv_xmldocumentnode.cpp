@@ -73,6 +73,16 @@ std::string CXMLDocumentNode::GetNameSpace()
 	return m_pXMLDocumentNode->GetNameSpace()->getNameSpaceName ();
 }
 
+std::string CXMLDocumentNode::GetTextContent()
+{
+    return m_pXMLDocumentNode->GetTextContent();
+}
+
+void CXMLDocumentNode::SetTextContent(const std::string& sTextContent)
+{
+    m_pXMLDocumentNode->SetTextContent(sTextContent);
+}
+
 LibMCEnv_uint64 CXMLDocumentNode::GetAttributeCount()
 {
 	return m_pXMLDocumentNode->GetAttributeCount();
@@ -307,6 +317,16 @@ IXMLDocumentNode* CXMLDocumentNode::AddChild(const std::string& sNameSpace, cons
     auto pChild = m_pXMLDocumentNode->AddChild(pNameSpace, sName);
     return new CXMLDocumentNode(m_pXMLDocument, pChild);
 }
+
+IXMLDocumentNode* CXMLDocumentNode::AddChildText(const std::string& sNameSpace, const std::string& sName, const std::string& sTextContent)
+{
+    auto pNameSpace = m_pXMLDocument->FindNamespace(sNameSpace, true);
+    auto pChild = m_pXMLDocumentNode->AddChild(pNameSpace, sName);
+    pChild->SetTextContent(sTextContent);
+    return new CXMLDocumentNode(m_pXMLDocument, pChild);
+
+}
+
 
 void CXMLDocumentNode::RemoveChild(IXMLDocumentNode* pChildInstance)
 {

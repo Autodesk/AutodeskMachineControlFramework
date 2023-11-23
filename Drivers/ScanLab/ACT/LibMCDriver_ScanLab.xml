@@ -110,7 +110,15 @@
 		<error name="INVALIDLASERFIELDCOORDINATES" code="1058" description="Invalid laser field coordinates" />		
 		<error name="NOLASERFIELDSET" code="1059" description="No laser field has been set." />
 		<error name="INVALIDFREEVARIABLEINDEX" code="1060" description="Invalid free variable index." />		
+		<error name="DUPLICATELASERPOWERCALIBRATIONSETPOINT" code="1061" description="Duplicate laser power calibration set point." />		
+		<error name="INVALIDPOWERCALIBRATIONSETPOINT" code="1062" description="Invalid power calibration set point." />		
+		<error name="INVALIDPOWERCALIBRATIONOUTPUTSCALING" code="1063" description="Invalid power calibration output scaling." />		
+		<error name="POWERCALIBRATIONLOOKUPFAILED" code="1064" description="Power calibration lookup failed." />		
+		<error name="INVALIDMODULATIONCALLBACK" code="1065" description="Invalid modulation callback." />		
+		<error name="INVALIDSUBDIVISIONTHRESHOLD" code="1066" description="Invalid subdivision threshold." />		
 		
+		
+					
 						
 	</errors>
 
@@ -161,6 +169,23 @@
 		<member name="X2" type="single" />
 		<member name="Y2" type="single" />
 	</struct>
+
+	<struct name="LaserCalibrationPoint" description="The laser output calibration at a point will be calculated by ((PowerSetPointInPercent + PowerOffsetInPercent) * PowerOutputScaling). The result is clamped to [0, 100]">
+		<member name="PowerSetPointInPercent" type="double" description="Set point of the power in Percent." />
+		<member name="PowerOffsetInPercent" type="double" description="Additional offset of the Power value. ." />
+		<member name="PowerOutputScaling" type="double" description="Scaling factor of the laser output. MUST be positive." />
+	</struct>
+
+	<functiontype name="SpatialPowerModulationCallback" description="A callback function to modulate laser power depending on the position of the laser.">
+		<param name="StartX" type="double" pass="in" description="The X start position of the marking in mm"/>
+		<param name="StartY" type="double" pass="in" description="The Y start position of the marking in mm"/>
+		<param name="TargetX" type="double" pass="in" description="The X target position of the marking in mm"/>
+		<param name="TargetY" type="double" pass="in" description="The Y target position of the marking in mm"/>	
+		<param name="LaserPowerInPercent" type="double" pass="in" description="The nominal laser power to be used in percent."/>
+		<param name="ModulationType" type="int32" pass="in" description="A type ID from the build file that specifies the modulation type to use."/>	
+		<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+		<param name="AdjustedLaserPowerInPercent" type="double" pass="return" description="Returns the adjusted laser power in percent."/>
+	</functiontype>
 
 	
 <!--
@@ -389,6 +414,18 @@ Custom implementation
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 		
+		<method name="AddSetPower" description="adds a power change to the open list">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+		
+		<method name="AddSetJumpSpeed" description="adds a jump speed change to the open list">
+			<param name="JumpSpeedInMMPerSecond" type="single" pass="in" description="Jump speed in mm/s" />
+		</method>
+
+		<method name="AddSetMarkSpeed" description="adds a mark speed change to the open list">
+			<param name="MarkSpeedInMMPerSecond" type="single" pass="in" description="Mark speed in mm/s" />
+		</method>
+
 		<method name="AddJumpMovement" description="Adds a Jump movement to the open list">
 			<param name="TargetX" type="double" pass="in" description="X Position." />
 			<param name="TargetY" type="double" pass="in" description="Y Position." />
@@ -397,6 +434,12 @@ Custom implementation
 		<method name="AddMarkMovement" description="Adds a Mark movement to the open list">
 			<param name="TargetX" type="double" pass="in" description="X Position." />
 			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddTimedMarkMovement" description="Adds a timed Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+			<param name="DurationInMicroseconds" type="double" pass="in" description="Duration of mark movement in Microseconds." />
 		</method>		
 
 		<method name="AddFreeVariable" description="Adds a free variable set to the open list">
@@ -626,7 +669,45 @@ Custom implementation
 			<param name="FailIfError" type="bool" pass="in" description="If true, the call will fail in case of an error." />
 			<param name="ErrorCode" type="uint32" pass="return" description="Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation." />
 		</method>
+
+		<method name="LaserPowerCalibrationIsEnabled" description="Returns if the laser power calibration table is non-empty.">
+			<param name="CalibrationEnabled" type="bool" pass="return" description="Laser Calibration Is Enabled" />			
+		</method>
 		
+		<method name="LaserPowerCalibrationIsLinear" description="Returns if the laser power calibration table has one entry.">
+			<param name="CalibrationIsLinear" type="bool" pass="return" description="Laser Calibration Is Affine Linear" />			
+		</method>
+
+		<method name="ClearLaserPowerCalibration" description="Clears the laser power calibration table.">
+		</method>
+
+		<method name="GetLaserPowerCalibration" description="Returns the laser power calibration table. Fails if laser calibration is not enabled.">
+			<param name="CalibrationPoints" type="structarray" class="LaserCalibrationPoint" pass="out" description="Laser Calibration Points" />			
+		</method>
+				
+		<method name="SetLinearLaserPowerCalibration" description="Enables the laser power calibration with an affine linear tranformation.">
+			<param name="PowerOffsetInPercent" type="double" pass="in" description="Additional offset of the Power value." />
+			<param name="PowerOutputScaling" type="double" pass="in" description="Scaling factor of the laser output." />			
+		</method>
+		
+		<method name="SetPiecewiseLinearLaserPowerCalibration" description="Enables the laser power calibration with multiple calibration point values. Table MUST NOT have negative power entries. Laser Power Output will be linear scaled with the given values within their respective intervals. Any laser power outside of the minimum or maximum Power values will be scaled according to the respective minimum or maximum scaling value.">
+			<param name="CalibrationPoints" type="structarray" class="LaserCalibrationPoint" pass="in" description="Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Percent)." />
+		</method>
+				
+		<method name="EnableSpatialLaserPowerModulation" description="Enables a spatial laser power modulation via callback.">
+			<param name="ModulationCallback" type="functiontype" class="SpatialPowerModulationCallback" pass="in" description="Callback to call for modulating the laser power."/>			
+			<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+		</method>
+
+		<method name="DisablePowerModulation" description="Disables all power modulation functions.">
+		</method>
+		
+		<method name="EnableLineSubdivision" description="If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.">
+			<param name="LengthThreshold" type="double" pass="in" description="Length threshold in mm." />			
+		</method>
+		
+		<method name="DisableLineSubdivision" description="Disables the subdivision of mark lines.">
+		</method>
 		
 	</class>
 

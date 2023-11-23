@@ -79,19 +79,28 @@ int32_t* CDataRecordingBuffer::allocData(size_t nValueCount)
 }
 
 
-CDataRecordingInstance::CDataRecordingInstance(uint32_t nValuesPerRecord, uint32_t nRTCValuesPerRecord, uint32_t nBufferSizeInRecords)
-    : m_nValuesPerRecord(nValuesPerRecord), m_nBufferSizeInRecords (nBufferSizeInRecords), m_nRTCValuesPerRecord (nRTCValuesPerRecord)
+CDataRecordingInstance::CDataRecordingInstance(uint32_t nSensorValuesPerRecord, uint32_t nRTCValuesPerRecord, uint32_t nAdditionalValuesPerRecord, uint32_t nBufferSizeInRecords)
+    : m_nBufferSizeInRecords (nBufferSizeInRecords)
 {
-    if (nValuesPerRecord <= 0)
+    if (nSensorValuesPerRecord <= 0)
         throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERRECORD);
+    if (nRTCValuesPerRecord <= 0)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERRECORD);
+
+    m_nValuesPerRecord = nSensorValuesPerRecord + nRTCValuesPerRecord + nAdditionalValuesPerRecord;
+    m_nFirstSensorValueIndex = 0;
+    m_nSensorValueCount = nSensorValuesPerRecord;
+    m_nFirstRTCValueIndex = m_nFirstSensorValueIndex + m_nSensorValueCount;
+    m_nRTCValueCount = nRTCValuesPerRecord;
+    m_nFirstAdditionalValueIndex = m_nFirstRTCValueIndex + m_nRTCValueCount;
+    m_nAdditionalValueCount = nAdditionalValuesPerRecord;
+
     if (nBufferSizeInRecords < DATARECORDING_MINBUFFERSIZEINRECORDS)
         throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE);
     if (nBufferSizeInRecords > DATARECORDING_MAXBUFFERSIZEINRECORDS)
         throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE);
-    if (nRTCValuesPerRecord >= nValuesPerRecord)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD);
 
-    m_nValueCountPerBuffer = (size_t)nValuesPerRecord * (size_t)nBufferSizeInRecords;
+    m_nValueCountPerBuffer = (size_t)m_nValuesPerRecord * (size_t)nBufferSizeInRecords;
     memset((void*)&m_CurrentEntry, 0, sizeof(m_CurrentEntry));
 }
 
@@ -180,22 +189,19 @@ void CDataRecordingInstance::writeToFile(const std::string& sFileName)
 }
 
 
-uint32_t CDataRecordingInstance::getValuesPerRecord()
-{
-    return m_nValuesPerRecord;
-}
-
 uint32_t CDataRecordingInstance::getRTCValuesPerRecord()
 {
-    return m_nRTCValuesPerRecord;
+    return m_nRTCValueCount;
 }
 
 uint32_t CDataRecordingInstance::getSensorValuesPerRecord()
 {
-    if (m_nValuesPerRecord < m_nRTCValuesPerRecord)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD);
+    return m_nSensorValueCount;
+}
 
-    return m_nValuesPerRecord - m_nRTCValuesPerRecord;
+uint32_t CDataRecordingInstance::getAdditionalValuesPerRecord()
+{
+    return m_nAdditionalValueCount;
 }
 
 
@@ -214,20 +220,36 @@ sDataRecordingEntry* CDataRecordingInstance::getRecord(uint32_t nIndex)
 
 PDataRecordingInstance CDataRecordingInstance::createEmptyDuplicate()
 {
-    return std::make_shared<CDataRecordingInstance>(m_nValuesPerRecord, m_nRTCValuesPerRecord, m_nBufferSizeInRecords);
+    return std::make_shared<CDataRecordingInstance>(m_nSensorValueCount, m_nRTCValueCount, m_nAdditionalValueCount, m_nBufferSizeInRecords);
 }
 
 int32_t* CDataRecordingInstance::getRTCData(size_t nRecordIndex)
 {
+    if (m_nRTCValueCount == 0)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NORTCVALUESAVAILABLE);
+
     auto pRecord = m_Entries.getData(nRecordIndex);
-    return &pRecord->m_pData[0];
+    return &pRecord->m_pData[m_nFirstRTCValueIndex];
 }
 
 int32_t* CDataRecordingInstance::getSensorData(size_t nRecordIndex)
 {
+    if (m_nSensorValueCount == 0)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE);
+
     auto pRecord = m_Entries.getData(nRecordIndex);
-    return &pRecord->m_pData[m_nRTCValuesPerRecord];
+    return &pRecord->m_pData[m_nFirstSensorValueIndex];
 }
+
+int32_t* CDataRecordingInstance::getAdditionalData(size_t nRecordIndex)
+{
+    if (m_nAdditionalValueCount == 0)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE);
+
+    auto pRecord = m_Entries.getData(nRecordIndex);
+    return &pRecord->m_pData[m_nFirstAdditionalValueIndex];
+}
+
 
 
 void CDataRecordingInstance::copyRTCSignals(size_t nRecordIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize)
@@ -254,6 +276,19 @@ void CDataRecordingInstance::copySensorSignals(size_t nRecordIndex, int32_t* pSe
 
     for (uint32_t nIndex = 0; nIndex < nSensorValuesPerRecord; nIndex++)
         pSensorSignalBuffer[nIndex] = pSensorData[nIndex];
+
+}
+
+void CDataRecordingInstance::copyAdditionalSignals(size_t nRecordIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize)
+{
+    uint32_t nAdditionalValuesPerRecord = getAdditionalValuesPerRecord();
+    int32_t* pAdditionalData = getAdditionalData(nRecordIndex);
+
+    if (nAdditionalSignalBufferSize < (size_t)nAdditionalValuesPerRecord)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    for (uint32_t nIndex = 0; nIndex < nAdditionalValuesPerRecord; nIndex++)
+        pAdditionalSignalBuffer[nIndex] = pAdditionalData[nIndex];
 
 }
 
@@ -367,4 +402,29 @@ void CDataRecordingInstance::copyAllSensorSignalsByIndex(uint32_t nSensorIndex, 
     }
 
 }
+
+void CDataRecordingInstance::copyAllAdditionalSignalsByIndex(uint32_t nAdditionalIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (nAdditionalIndex >= getAdditionalValuesPerRecord())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX);
+
+    if (pAdditionalSignalBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nAdditionalSignalBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    int32_t* pTarget = pAdditionalSignalBuffer;
+    for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+        int32_t* pAdditionalData = getAdditionalData(nRecordIndex);
+        *pTarget = pAdditionalData[nAdditionalIndex];
+        pTarget++;
+    }
+
+}
+
 

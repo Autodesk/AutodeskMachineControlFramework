@@ -69,6 +69,7 @@ private:
 
     std::vector<uint32_t> m_SensorSignalIDs;
 
+    std::vector<std::pair<uint32_t, std::string>> m_AdditionalSignalIDs;
 
 public:
 
@@ -82,9 +83,15 @@ public:
 
 	LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() override;
 
+    LibMCDriver_ScanLabOIE_uint32 GetAdditionalSignalCount() override;
+
 	void GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) override;
 
 	void GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) override;
+
+    void GetAdditionalSignalIDs(LibMCDriver_ScanLabOIE_uint64 nAdditionalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32* pAdditionalIDsBuffer) override;
+
+    void GetAdditionalSignalInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32& nSignalID, std::string& sSignalName) override;
 
     std::string GetDeviceConfigurationString() override;
 

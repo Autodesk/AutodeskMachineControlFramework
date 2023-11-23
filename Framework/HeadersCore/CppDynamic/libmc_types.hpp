@@ -524,6 +524,64 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDSEGMENTINDEX 507 /** Invalid segment index. */
 #define LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID 508 /** Invalid toolpath attribute ID. */
 #define LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE 509 /** Ambiguous segment attribute type. */
+#define LIBMC_ERROR_XMLNODEHASCHILDREN 510 /** XML Node has children */
+#define LIBMC_ERROR_XMLNODEHASTEXTCONTENT 511 /** XML Node has text content */
+#define LIBMC_ERROR_STRINGHANDLERNOTAVAILABLE 512 /** String handler not available */
+#define LIBMC_ERROR_DUPLICATEROLEPERMISSION 513 /** Duplicate role permission */
+#define LIBMC_ERROR_EMPTYACCESSROLEIDENTIFIER 514 /** Empty access role identifier */
+#define LIBMC_ERROR_INVALIDACCESSROLEIDENTIFIER 515 /** Invalid access role identifier */
+#define LIBMC_ERROR_EMPTYACCESSROLEDISPLAYNAME 516 /** Empty access role display name */
+#define LIBMC_ERROR_EMPTYACCESSPERMISSIONIDENTIFIER 517 /** Empty access permission identifier */
+#define LIBMC_ERROR_INVALIDACCESSPERMISSIONIDENTIFIER 518 /** Invalid access permission identifier */
+#define LIBMC_ERROR_EMPTYACCESSPERMISSIONDISPLAYNAME 519 /** Empty access permission display name */
+#define LIBMC_ERROR_EMPTYSTRINGRESOURCENAME 520 /** Empty string resource name */
+#define LIBMC_ERROR_DUPLICATESTRINGRESOURCENAME 521 /** Duplicate string resource name */
+#define LIBMC_ERROR_INVALIDSTRINGRESOURCENAMEIDENTIFIER 522 /** Invalid string resource name identifier */
+#define LIBMC_ERROR_STRINGRESOURCENOTFOUND 523 /** String resource not found */
+#define LIBMC_ERROR_LANGUAGEIDNOTFOUND 524 /** Language ID not found */
+#define LIBMC_ERROR_DUPLICATEPERMISSIONIDENTIFIER 525 /** Duplicate Permission Identifier */
+#define LIBMC_ERROR_DUPLICATEROLEIDENTIFIER 526 /** Duplicate Role Identifier */
+#define LIBMC_ERROR_PERMISSIONNOTFOUND 527 /** Permission not found */
+#define LIBMC_ERROR_ROLENOTFOUND 528 /** Role not found */
+#define LIBMC_ERROR_MISSINGACCESSCONTROLPERMISSIONS 529 /** Missing access control permissions */
+#define LIBMC_ERROR_MISSINGACCESSCONTROLROLES 530 /** Missing access control roles */
+#define LIBMC_ERROR_MISSINGACCESSCONTROLROLEPERMISSIONS 531 /** Missing access control role permissions */
+#define LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER 532 /** Missing role permission identifier */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDBUFFER 533 /** Invalid discrete field buffer */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDFILESIGN 534 /** Invalid discrete field file sign */
+#define LIBMC_ERROR_INCOMPATIBLEDISCRETEFIELDFILEVERSION 535 /** Incompatible discrete field file version */
+#define LIBMC_ERROR_TOONEWDISCRETEFIELDFILEVERSION 536 /** Too new discrete field file version */
+#define LIBMC_ERROR_TOONEWDISCRETEFIELDSTREAMTYPE 537 /** Too new discrete field stream type */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET 538 /** Invalid discrete field data offset */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE 539 /** Invalid discrete field stream size */
+#define LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA 540 /** Invalid discrete field internal data */
+#define LIBMC_ERROR_DEFAULTROLEHASNOTBEENSET 541 /** Default role has not been set */
+#define LIBMC_ERROR_EMPTYROLEIDENTIFIER 542 /** Empty role identifier */
+#define LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER 543 /** Empty permission identifier */
+#define LIBMC_ERROR_USERHASUNKNOWNROLE 544 /** User has unknown role */
+#define LIBMC_ERROR_MISSINGDEFAULTACCESSROLE 545 /** Missing default access role */
+#define LIBMC_ERROR_FIXEDFLOATBUFFEROVERRUN 546 /** Fixed float buffer overrun */
+#define LIBMC_ERROR_MESHENTITYNOTLOADED 547 /** Mesh entity not loaded */
+#define LIBMC_ERROR_MESHENTITYALREADYLOADED 548 /** Mesh entity already loaded */
+#define LIBMC_ERROR_INVALIDMESHFACEID 549 /** Invalid face ID */
+#define LIBMC_ERROR_MESH3MFRESOURCEISEMPTY 550 /** Mesh 3MF resource is empty */
+#define LIBMC_ERROR_INVALIDMESHEDGEID 551 /** Invalid edge ID */
+#define LIBMC_ERROR_INVALIDMESHNODEID 552 /** Invalid node ID */
+#define LIBMC_ERROR_INVALIDGLSCENEMODELNAME 553 /** Invalid GL scene model name */
+#define LIBMC_ERROR_INVALIDGLSCENEINSTANCENAME 554 /** Invalid GL scene instance name */
+#define LIBMC_ERROR_EMPTYGLMODELNAME 555 /** Empty GL model name */
+#define LIBMC_ERROR_INVALIDGLMODELNAME 556 /** Invalid GL model name */
+#define LIBMC_ERROR_DUPLICATEGLMODELNAME 557 /** Duplicate GL model name */
+#define LIBMC_ERROR_MODELGLRESOURCENOTFOUND 558 /** Model GL Resource not found */
+#define LIBMC_ERROR_EMPTYGLINSTANCENAME 559 /** Empty GL instance name */
+#define LIBMC_ERROR_INVALIDGLINSTANCENAME 560 /** Invalid GL instance name */
+#define LIBMC_ERROR_EMPTYGLINSTANCEMODEL 561 /** Empty GL instance model */
+#define LIBMC_ERROR_INVALIDGLINSTANCEMODEL 562 /** Invalid GL instance model */
+#define LIBMC_ERROR_GLINSTANCEMODELNOTFOUND 563 /** GL instance model not found */
+#define LIBMC_ERROR_DUPLICATEGLINSTANCENAME 564 /** Duplicate GL instance name */
+#define LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY 565 /** Invalid journal stream capacity */
+#define LIBMC_ERROR_INVALIDUIFORMAT 566 /** Invalid UI format */
+#define LIBMC_ERROR_INVALIDJOURNALTIMESTAMP 567 /** Invalid Journal Timestamp */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -960,6 +1018,64 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDSEGMENTINDEX: return "Invalid segment index.";
     case LIBMC_ERROR_INVALIDTOOLPATHATTRIBUTEID: return "Invalid toolpath attribute ID.";
     case LIBMC_ERROR_AMBIGUOUSSEGMENTATTRIBUTETYPE: return "Ambiguous segment attribute type.";
+    case LIBMC_ERROR_XMLNODEHASCHILDREN: return "XML Node has children";
+    case LIBMC_ERROR_XMLNODEHASTEXTCONTENT: return "XML Node has text content";
+    case LIBMC_ERROR_STRINGHANDLERNOTAVAILABLE: return "String handler not available";
+    case LIBMC_ERROR_DUPLICATEROLEPERMISSION: return "Duplicate role permission";
+    case LIBMC_ERROR_EMPTYACCESSROLEIDENTIFIER: return "Empty access role identifier";
+    case LIBMC_ERROR_INVALIDACCESSROLEIDENTIFIER: return "Invalid access role identifier";
+    case LIBMC_ERROR_EMPTYACCESSROLEDISPLAYNAME: return "Empty access role display name";
+    case LIBMC_ERROR_EMPTYACCESSPERMISSIONIDENTIFIER: return "Empty access permission identifier";
+    case LIBMC_ERROR_INVALIDACCESSPERMISSIONIDENTIFIER: return "Invalid access permission identifier";
+    case LIBMC_ERROR_EMPTYACCESSPERMISSIONDISPLAYNAME: return "Empty access permission display name";
+    case LIBMC_ERROR_EMPTYSTRINGRESOURCENAME: return "Empty string resource name";
+    case LIBMC_ERROR_DUPLICATESTRINGRESOURCENAME: return "Duplicate string resource name";
+    case LIBMC_ERROR_INVALIDSTRINGRESOURCENAMEIDENTIFIER: return "Invalid string resource name identifier";
+    case LIBMC_ERROR_STRINGRESOURCENOTFOUND: return "String resource not found";
+    case LIBMC_ERROR_LANGUAGEIDNOTFOUND: return "Language ID not found";
+    case LIBMC_ERROR_DUPLICATEPERMISSIONIDENTIFIER: return "Duplicate Permission Identifier";
+    case LIBMC_ERROR_DUPLICATEROLEIDENTIFIER: return "Duplicate Role Identifier";
+    case LIBMC_ERROR_PERMISSIONNOTFOUND: return "Permission not found";
+    case LIBMC_ERROR_ROLENOTFOUND: return "Role not found";
+    case LIBMC_ERROR_MISSINGACCESSCONTROLPERMISSIONS: return "Missing access control permissions";
+    case LIBMC_ERROR_MISSINGACCESSCONTROLROLES: return "Missing access control roles";
+    case LIBMC_ERROR_MISSINGACCESSCONTROLROLEPERMISSIONS: return "Missing access control role permissions";
+    case LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER: return "Missing role permission identifier";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDBUFFER: return "Invalid discrete field buffer";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDFILESIGN: return "Invalid discrete field file sign";
+    case LIBMC_ERROR_INCOMPATIBLEDISCRETEFIELDFILEVERSION: return "Incompatible discrete field file version";
+    case LIBMC_ERROR_TOONEWDISCRETEFIELDFILEVERSION: return "Too new discrete field file version";
+    case LIBMC_ERROR_TOONEWDISCRETEFIELDSTREAMTYPE: return "Too new discrete field stream type";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDDATAOFFSET: return "Invalid discrete field data offset";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDSTREAMSIZE: return "Invalid discrete field stream size";
+    case LIBMC_ERROR_INVALIDDISCRETEFIELDINTERNALDATA: return "Invalid discrete field internal data";
+    case LIBMC_ERROR_DEFAULTROLEHASNOTBEENSET: return "Default role has not been set";
+    case LIBMC_ERROR_EMPTYROLEIDENTIFIER: return "Empty role identifier";
+    case LIBMC_ERROR_EMPTYPERMISSIONIDENTIFIER: return "Empty permission identifier";
+    case LIBMC_ERROR_USERHASUNKNOWNROLE: return "User has unknown role";
+    case LIBMC_ERROR_MISSINGDEFAULTACCESSROLE: return "Missing default access role";
+    case LIBMC_ERROR_FIXEDFLOATBUFFEROVERRUN: return "Fixed float buffer overrun";
+    case LIBMC_ERROR_MESHENTITYNOTLOADED: return "Mesh entity not loaded";
+    case LIBMC_ERROR_MESHENTITYALREADYLOADED: return "Mesh entity already loaded";
+    case LIBMC_ERROR_INVALIDMESHFACEID: return "Invalid face ID";
+    case LIBMC_ERROR_MESH3MFRESOURCEISEMPTY: return "Mesh 3MF resource is empty";
+    case LIBMC_ERROR_INVALIDMESHEDGEID: return "Invalid edge ID";
+    case LIBMC_ERROR_INVALIDMESHNODEID: return "Invalid node ID";
+    case LIBMC_ERROR_INVALIDGLSCENEMODELNAME: return "Invalid GL scene model name";
+    case LIBMC_ERROR_INVALIDGLSCENEINSTANCENAME: return "Invalid GL scene instance name";
+    case LIBMC_ERROR_EMPTYGLMODELNAME: return "Empty GL model name";
+    case LIBMC_ERROR_INVALIDGLMODELNAME: return "Invalid GL model name";
+    case LIBMC_ERROR_DUPLICATEGLMODELNAME: return "Duplicate GL model name";
+    case LIBMC_ERROR_MODELGLRESOURCENOTFOUND: return "Model GL Resource not found";
+    case LIBMC_ERROR_EMPTYGLINSTANCENAME: return "Empty GL instance name";
+    case LIBMC_ERROR_INVALIDGLINSTANCENAME: return "Invalid GL instance name";
+    case LIBMC_ERROR_EMPTYGLINSTANCEMODEL: return "Empty GL instance model";
+    case LIBMC_ERROR_INVALIDGLINSTANCEMODEL: return "Invalid GL instance model";
+    case LIBMC_ERROR_GLINSTANCEMODELNOTFOUND: return "GL instance model not found";
+    case LIBMC_ERROR_DUPLICATEGLINSTANCENAME: return "Duplicate GL instance name";
+    case LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY: return "Invalid journal stream capacity";
+    case LIBMC_ERROR_INVALIDUIFORMAT: return "Invalid UI format";
+    case LIBMC_ERROR_INVALIDJOURNALTIMESTAMP: return "Invalid Journal Timestamp";
     default: return "unknown error";
   }
 }

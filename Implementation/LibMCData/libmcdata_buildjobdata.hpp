@@ -64,6 +64,7 @@ class CBuildJobData : public virtual IBuildJobData, public virtual CBase {
 private:
 
     std::string m_sDataUUID;
+    std::string m_sIdentifier;
     std::string m_sName;
     LibMCData::eBuildJobDataType m_eDataType;
     std::string m_sTimeStamp;
@@ -77,24 +78,26 @@ private:
 
 protected:
 
-    CBuildJobData(const std::string& sDataUUID, const std::string & sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string & sTimeStamp, std::string & sStorageStreamUUID, std::string & sUserID, std::string & sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    CBuildJobData(const std::string& sDataUUID, const std::string& sIdentifier, const std::string & sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string & sTimeStamp, std::string & sStorageStreamUUID, std::string & sUserID, std::string & sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
 
 public:
 
     ~CBuildJobData();
 
-    static CBuildJobData* make(const std::string& sDataUUID, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static CBuildJobData* make(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
     static CBuildJobData* makeFrom(CBuildJobData* pBuildJob);
 
-    static PBuildJobData makeShared(const std::string& sDataUUID, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static PBuildJobData makeShared(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
     static PBuildJobData makeSharedFrom(CBuildJobData* pBuildJobData);    
 
-    static CBuildJobData* createInDatabase(const std::string sName, const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
-    static PBuildJobData createSharedInDatabase(const std::string sName, const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static CBuildJobData* createInDatabase(const std::string& sIdentifier, const std::string sName, const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static PBuildJobData createSharedInDatabase(const std::string& sIdentifier, const std::string sName,  const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
 
     std::string GetDataUUID() override;
 
     std::string GetJobUUID() override;
+
+    std::string GetContextIdentifier() override;
 
 	std::string GetName() override;
 

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <thread>
 #include <fstream>
+#include <algorithm>
 
 #include <chrono>
 #include <ctime>
@@ -44,6 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 using namespace LibMCDriver_ScanLab::Impl;
+
+#define RTCCONTEXT_LASERPOWERCALIBRATIONUNITS 0.005
+
+
+#define RTCCONTEXT_MIN_LINESUBDIVISIONTHRESHOLD 0.001
+#define RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD 1000000.0
 
 CRTCContextOwnerData::CRTCContextOwnerData()
 	: m_nAttributeFilterValue (0), m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled), m_dMaxLaserPowerInWatts (100.0)
@@ -68,12 +75,6 @@ void CRTCContextOwnerData::setAttributeFilters(const std::string& sAttributeFilt
 	m_sAttributeFilterNameSpace = sAttributeFilterNameSpace;
 	m_sAttributeFilterName = sAttributeFilterName;
 	m_nAttributeFilterValue = nAttributeFilterValue;
-}
-
-void CRTCContextOwnerData::getExposureParameters(double& dMaxLaserPowerInWatts, LibMCDriver_ScanLab::eOIERecordingMode& oieRecordingMode)
-{
-	dMaxLaserPowerInWatts = dMaxLaserPowerInWatts;
-	oieRecordingMode = m_OIERecordingMode;
 }
 
 void CRTCContextOwnerData::setMaxLaserPower(double dMaxLaserPowerInWatts)
@@ -135,7 +136,12 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_b2DMarkOnTheFlyEnabled (false),
 	m_dScaleXInBitsPerEncoderStep (1.0),
 	m_dScaleYInBitsPerEncoderStep (1.0),
-	m_bEnableOIEPIDControl (false)
+	m_bEnableOIEPIDControl (false),
+	m_dLaserPowerCalibrationUnits (RTCCONTEXT_LASERPOWERCALIBRATIONUNITS),
+	m_pModulationCallback (nullptr),
+	m_pModulationCallbackUserData (nullptr),
+	m_bEnableLineSubdivision (false),
+	m_dLineSubdivisionThreshold (RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD)
 
 {
 	if (pOwnerData.get() == nullptr)
@@ -440,60 +446,129 @@ void CRTCContext::SetLaserDelaysInBits(const LibMCDriver_ScanLab_int32 nLaserOnD
 }
 
 
-void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, bool bOIEPIDControlFlag)
+void CRTCContext::writeJumpSpeed(float jumpSpeedinMMPerSecond)
 {
-
 	double dBitsPerMM = m_dCorrectionFactor;
 
-	double dMarkSpeedInMMPerMilliSecond = (double)fMarkSpeed / 1000.0;
-	double dMarkSpeedInBits = dMarkSpeedInMMPerMilliSecond * dBitsPerMM;
-	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInBits);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
-	double dJumpSpeedInMMPerMilliSecond = (double)fJumpSpeed / 1000.0;
+	double dJumpSpeedInMMPerMilliSecond = (double)jumpSpeedinMMPerSecond / 1000.0;
 	double dJumpSpeedInBits = dJumpSpeedInMMPerMilliSecond * dBitsPerMM;
 	m_pScanLabSDK->n_set_jump_speed(m_CardNo, dJumpSpeedInBits);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+}
 
-	double fClippedPowerFactor = fPower / 100.0f;
-	if (fClippedPowerFactor > 1.0f)
-		fClippedPowerFactor = 1.0f;
-	if (fClippedPowerFactor < 0.0f)
-		fClippedPowerFactor = 0.0f;
+void CRTCContext::writeMarkSpeed(float markSpeedinMMPerSecond)
+{
+	double dBitsPerMM = m_dCorrectionFactor;
 
-	int digitalPowerValue = 0;
-	
+	double dMarkSpeedInMMPerMilliSecond = (double)markSpeedinMMPerSecond / 1000.0;
+	double dMarkSpeedInBits = dMarkSpeedInMMPerMilliSecond * dBitsPerMM;
+	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInBits);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+}
+
+void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
+{
+
+	double dAdjustedPowerInPercent = dPowerInPercent;
+	if (m_LaserPowerCalibrationList.size() == 1) {
+		auto& calibration = m_LaserPowerCalibrationList.at (0);
+		dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, calibration.m_PowerOffsetInPercent, calibration.m_PowerOutputScaling);
+	}
+
+	if (m_LaserPowerCalibrationList.size() >= 2) {
+		size_t nMinIndex = 0;
+		size_t nMaxIndex = m_LaserPowerCalibrationList.size() - 1;
+		auto& minCalibration = m_LaserPowerCalibrationList.at(nMinIndex);
+		auto& maxCalibration = m_LaserPowerCalibrationList.at(nMaxIndex);
+
+		if (dPowerInPercent < minCalibration.m_PowerOffsetInPercent) {
+			dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, minCalibration.m_PowerOffsetInPercent, minCalibration.m_PowerOutputScaling);
+		} 
+		else if (dPowerInPercent > maxCalibration.m_PowerOffsetInPercent) {
+			dAdjustedPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, maxCalibration.m_PowerOffsetInPercent, maxCalibration.m_PowerOutputScaling);
+		}
+		else {
+			// Binary search of calibration values
+			while ((nMinIndex + 1) < nMaxIndex) {
+				size_t nMidIndex = (nMinIndex + nMaxIndex) / 2;
+				auto& calibration = m_LaserPowerCalibrationList.at(nMidIndex);
+
+				if (dPowerInPercent < calibration.m_PowerOffsetInPercent) {
+					nMaxIndex = nMidIndex;
+					maxCalibration = calibration;
+				}
+				else {
+					nMinIndex = nMidIndex;
+					minCalibration = calibration;
+				}
+			}
+
+			if ((nMinIndex + 1) != nMaxIndex)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+			
+			double dAdjustedMinPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, minCalibration.m_PowerOffsetInPercent, minCalibration.m_PowerOutputScaling);
+			double dAdjustedMaxPowerInPercent = adjustLaserPowerCalibration(dPowerInPercent, maxCalibration.m_PowerOffsetInPercent, maxCalibration.m_PowerOutputScaling);
+			double dDelta = (maxCalibration.m_PowerSetPointInPercent - minCalibration.m_PowerSetPointInPercent);
+			// dDelta should be larger than any arbitrary fraction of units.
+			if (dDelta < m_dLaserPowerCalibrationUnits * 0.1)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+
+			double dFactor = (dPowerInPercent - minCalibration.m_PowerSetPointInPercent) / dDelta;
+			if (dFactor < 0.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+			if (dFactor > 1.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED);
+
+			// Linear interpolation between factors
+			dAdjustedPowerInPercent = (1.0 - dFactor) * dAdjustedMinPowerInPercent + dFactor * dAdjustedMaxPowerInPercent;
+
+		}
+
+
+
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED, "multiple power calibration values not implemented");
+	}
+
+
+	double dClippedPowerFactor = dPowerInPercent / 100.0f;
+	if (dClippedPowerFactor > 1.0f)
+		dClippedPowerFactor = 1.0f;
+	if (dClippedPowerFactor < 0.0f)
+		dClippedPowerFactor = 0.0f;
+
+	int32_t digitalPowerValue = 0;
+
 
 	if (bOIEPIDControlFlag) {
 
 		switch (m_LaserPort) {
 		case eLaserPort::Port16bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 65535.0);
 			//nPortIndex = 6;  See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 6, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port8bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 255.0);
 			//nPortIndex = 3;  See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 3, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog1:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 1; // See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 1, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 2; // See set_auto_laser_control in SDK documentation
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog1andAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 1, digitalPowerValue, 1);
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
 			break;
 		}
-	
+
 		// See documentation what 1 means.
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
@@ -503,28 +578,28 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 
 		switch (m_LaserPort) {
 		case eLaserPort::Port16bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 65535.0);
 			//nPortIndex = 3;  See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 3, digitalPowerValue);
 
 			break;
 		case eLaserPort::Port8bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 255.0);
 			//nPortIndex = 2; See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 2, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog1:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 0;  See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			//nPortIndex = 1; // See set_laser_power in SDK documentation
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
 			break;
 		case eLaserPort::Port12BitAnalog1andAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
 			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
 			break;
@@ -533,33 +608,97 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 		/*
-		
-		RTC5 Compatibility mode:
-		
-		switch (m_LaserPort) {
-		case eLaserPort::Port16bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
-			// m_pScanLabSDK->n_write_io_port_list(m_CardNo, digitalPowerValue);
-			break;
-		case eLaserPort::Port8bitDigital:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
-			m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, digitalPowerValue);
-			break;
-		case eLaserPort::Port12BitAnalog1:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			m_pScanLabSDK->n_write_da_1_list(m_CardNo, digitalPowerValue);
-			break;
-		case eLaserPort::Port12BitAnalog2:
-			digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
-			m_pScanLabSDK->n_write_da_2_list(m_CardNo, digitalPowerValue);
-			break;
 
-		} */
+RTC5 Compatibility mode:
+
+switch (m_LaserPort) {
+case eLaserPort::Port16bitDigital:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+	// m_pScanLabSDK->n_write_io_port_list(m_CardNo, digitalPowerValue);
+	break;
+case eLaserPort::Port8bitDigital:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+	m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, digitalPowerValue);
+	break;
+case eLaserPort::Port12BitAnalog1:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+	m_pScanLabSDK->n_write_da_1_list(m_CardNo, digitalPowerValue);
+	break;
+case eLaserPort::Port12BitAnalog2:
+	digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+	m_pScanLabSDK->n_write_da_2_list(m_CardNo, digitalPowerValue);
+	break;
+
+} */
 
 	}
+}
+
+
+void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, bool bOIEPIDControlFlag)
+{
+
+	writeMarkSpeed(fMarkSpeed);
+	writeJumpSpeed(fJumpSpeed);
+	writePower(fPower, bOIEPIDControlFlag);
+
+
 
 }
 
+void CRTCContext::jumpAbsoluteEx(double dTargetXInMM, double dTargetYInMM)
+{
+	double dTargetXInUnits = round((dTargetXInMM - m_dLaserOriginX) * m_dCorrectionFactor);
+	double dTargetYInUnits = round((dTargetYInMM - m_dLaserOriginY) * m_dCorrectionFactor);
+
+	m_pScanLabSDK->n_jump_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
+void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double dTargetXInMM, double dTargetYInMM, double dLaserPowerInPercent, bool bOIEControlFlag)
+{
+	int32_t nSubdivisionCount = 1;
+	double dDeltaX = dTargetXInMM - dStartXInMM;
+	double dDeltaY = dTargetYInMM - dStartYInMM;
+
+	int32_t nModulationType = 0; // TODO
+
+	if (m_bEnableLineSubdivision) {
+		double dLen = sqrt(dDeltaX * dDeltaX + dDeltaY * dDeltaY);
+		if (dLen > RTCCONTEXT_MIN_LINESUBDIVISIONTHRESHOLD) {
+			nSubdivisionCount = (int32_t) ceil(dLen / m_dLineSubdivisionThreshold);
+			dDeltaX /= nSubdivisionCount;
+			dDeltaY /= nSubdivisionCount;
+		}
+	}
+
+	double dOldX = dStartXInMM;
+	double dOldY = dStartYInMM;
+
+	for (int32_t nSubdivisionIndex = 1; nSubdivisionIndex <= nSubdivisionCount; nSubdivisionIndex++) {
+
+		double dMarkToX = dStartXInMM + nSubdivisionIndex * dDeltaX;
+		double dMarkToY = dStartYInMM + nSubdivisionIndex * dDeltaY;
+
+		double dTargetXInUnits = round((dMarkToX - m_dLaserOriginX) * m_dCorrectionFactor);
+		double dTargetYInUnits = round((dMarkToY - m_dLaserOriginY) * m_dCorrectionFactor);
+
+		if (m_pModulationCallback != nullptr) {
+			double dNewPowerInPercent = dLaserPowerInPercent;
+			m_pModulationCallback(dOldX, dOldY, dMarkToX, dMarkToY, dLaserPowerInPercent, nModulationType, m_pModulationCallbackUserData, &dNewPowerInPercent);
+			writePower(dNewPowerInPercent, bOIEControlFlag);
+		}
+
+		m_pScanLabSDK->n_mark_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
+		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		
+		dOldX = dMarkToX;
+		dOldY = dMarkToY;
+	}
+
+
+}
 
 void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D* pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
@@ -575,7 +714,8 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	if (nPointsBufferSize == 0)
 		return;
 
-	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, nOIEPIDControlIndex != 0);
+	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
+	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
 	// Z Plane
 	double defocusZ = round(fZValue * m_dZCorrectionFactor);
@@ -583,29 +723,17 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
 
 	const sPoint2D* pPoint = pPointsBuffer;
-	double dX = round((pPoint->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
-	double dY = round((pPoint->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
-	pPoint++;
+	jumpAbsoluteEx(pPoint->m_X, pPoint->m_Y);
+	auto pPrevPoint = pPoint;
 
-	int intX = (int)dX;
-	int intY = (int)dY;
-
-	if (nOIEPIDControlIndex != 0)
+	if (bOIEControlFlag)
 		SetOIEPIDMode(nOIEPIDControlIndex);
 
-	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
-		dX = round((pPoint->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
-		dY = round((pPoint->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
-		pPoint++;
 
-		intX = (int)dX;
-		intY = (int)dY;
-
-		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		markAbsoluteEx(pPrevPoint->m_X, pPrevPoint->m_Y, pPoint->m_X, pPoint->m_Y, fPower, bOIEControlFlag);
+		pPrevPoint = pPoint;
+		pPoint++;		
 
 	}
 
@@ -619,34 +747,22 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 	if (nHatchesBufferSize == 0)
 		return;
 
-	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, (nOIEPIDControlIndex != 0));
+	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
+	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
 	// Z Plane
 	double defocusZ = round(fZValue * m_dZCorrectionFactor);
 	int intDefocusZ = (int)defocusZ;
 	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
 
-	if (nOIEPIDControlIndex != 0)
+	if (bOIEControlFlag)
 		SetOIEPIDMode(nOIEPIDControlIndex);
 
 	const sHatch2D* pHatch = pHatchesBuffer;
 
 	for (uint64_t index = 0; index < nHatchesBufferSize; index++) {
-		double dX = round((pHatch->m_X1 - m_dLaserOriginX) * m_dCorrectionFactor);
-		double dY = round((pHatch->m_Y1 - m_dLaserOriginY) * m_dCorrectionFactor);
-	
-		int intX = (int)dX;
-		int intY = (int)dY;
-		m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
-		dX = round((pHatch->m_X2 - m_dLaserOriginX) * m_dCorrectionFactor);
-		dY = round((pHatch->m_Y2 - m_dLaserOriginY) * m_dCorrectionFactor);
-		
-		intX = (int)dX;
-		intY = (int)dY;
-		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		jumpAbsoluteEx(pHatch->m_X1, pHatch->m_Y1);
+		markAbsoluteEx(pHatch->m_X1, pHatch->m_Y1, pHatch->m_X2, pHatch->m_Y2, fPower, bOIEControlFlag);
 
 		pHatch++;
 	}
@@ -661,15 +777,7 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 void CRTCContext::AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	double dX = round((dTargetX - m_dLaserOriginX) * m_dCorrectionFactor);
-	double dY = round((dTargetY - m_dLaserOriginY) * m_dCorrectionFactor);
-
-	int32_t intX = (int32_t)dX;
-	int32_t intY = (int32_t)dY;
-
-	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
+	jumpAbsoluteEx(dTargetX, dTargetY);
 }
 
 void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
@@ -703,6 +811,158 @@ void CRTCContext::StopExecution()
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 }
+
+bool CRTCContext::LaserPowerCalibrationIsEnabled()
+{
+	return m_LaserPowerCalibrationList.size() > 0;
+}
+
+bool CRTCContext::LaserPowerCalibrationIsLinear()
+{
+	return m_LaserPowerCalibrationList.size() == 1;
+}
+
+void CRTCContext::ClearLaserPowerCalibration()
+{
+	m_LaserPowerCalibrationList.clear();
+}
+
+void CRTCContext::GetLaserPowerCalibration(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer)
+{
+	if (pCalibrationPointsNeededCount != nullptr)
+		*pCalibrationPointsNeededCount = m_LaserPowerCalibrationList.size();
+
+	if (pCalibrationPointsBuffer != nullptr) {
+		if (nCalibrationPointsBufferSize < m_LaserPowerCalibrationList.size())
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_BUFFERTOOSMALL);
+
+		auto pTarget = pCalibrationPointsBuffer;
+		for (auto iIter = m_LaserPowerCalibrationList.begin(); iIter != m_LaserPowerCalibrationList.end(); iIter++) {
+			*pTarget = *iIter;
+			pTarget++;
+		}
+	}
+}
+
+void CRTCContext::SetLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dPowerOffsetInPercent, const LibMCDriver_ScanLab_double dPowerOutputScaling) 
+{
+	if (dPowerOutputScaling < 0.0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING);
+
+	m_LaserPowerCalibrationList.clear();
+	sLaserCalibrationPoint calibration;
+	calibration.m_PowerSetPointInPercent = 0.0;
+	calibration.m_PowerOffsetInPercent = dPowerOffsetInPercent;
+	calibration.m_PowerOutputScaling = dPowerOutputScaling;
+	m_LaserPowerCalibrationList.push_back(calibration);
+
+}
+
+bool calibrationPointCompare (LibMCDriver_ScanLab::sLaserCalibrationPoint point1, LibMCDriver_ScanLab::sLaserCalibrationPoint point2) {
+	return (point1.m_PowerSetPointInPercent < point2.m_PowerSetPointInPercent); 
+}
+
+void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint* pCalibrationPointsBuffer)
+{
+	m_LaserPowerCalibrationList.clear();
+	if (nCalibrationPointsBufferSize > 0) {
+		if (pCalibrationPointsBuffer == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+		for (size_t nIndex = 0; nIndex < nCalibrationPointsBufferSize; nIndex++) {
+			auto point = pCalibrationPointsBuffer[nIndex];
+			if (point.m_PowerSetPointInPercent < 0.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT);
+			if (point.m_PowerOutputScaling < 0.0)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING);
+
+			m_LaserPowerCalibrationList.push_back(point);
+		}
+
+		std::sort(m_LaserPowerCalibrationList.begin(), m_LaserPowerCalibrationList.end(), calibrationPointCompare);
+
+		// Make sure List is strictly ascending in Power!
+		int64_t nOldDiscretePower = -1;
+		for (auto point : m_LaserPowerCalibrationList) {
+			int64_t nDiscreteLaserPower = (int64_t) round (point.m_PowerSetPointInPercent / m_dLaserPowerCalibrationUnits);
+			if (nDiscreteLaserPower <= nOldDiscretePower)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT);
+			nOldDiscretePower = nDiscreteLaserPower;
+		}
+
+	}
+
+}
+
+void CRTCContext::EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData)
+{
+	if (pModulationCallback == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK);
+
+	m_pModulationCallback = pModulationCallback;
+	m_pModulationCallbackUserData = pUserData;
+}
+
+void CRTCContext::DisablePowerModulation()
+{
+	m_pModulationCallback = nullptr;
+	m_pModulationCallbackUserData = nullptr;
+}
+
+void CRTCContext::EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold)
+{
+	if (dLengthThreshold < RTCCONTEXT_MIN_LINESUBDIVISIONTHRESHOLD)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD);
+	if (dLengthThreshold > RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD);
+
+	m_dLineSubdivisionThreshold = dLengthThreshold;
+	m_bEnableLineSubdivision = true;
+}
+
+void CRTCContext::DisableLineSubdivision()
+{
+	m_dLineSubdivisionThreshold = RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD;
+	m_bEnableLineSubdivision = false;
+
+}
+
+
+double CRTCContext::adjustLaserPowerCalibration(double dLaserPowerInPercent, double dPowerOffsetInPercent, double dPowerOutputScaling)
+{
+	return ((dLaserPowerInPercent + dPowerOffsetInPercent) * dPowerOutputScaling);
+}
+
+
+void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
+{
+	writePower(fPowerInPercent, false);
+}
+
+void CRTCContext::AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond)
+{
+	writeJumpSpeed(fJumpSpeedInMMPerSecond);
+}
+
+void CRTCContext::AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond)
+{
+	writeMarkSpeed(fMarkSpeedInMMPerSecond);
+}
+
+void CRTCContext::AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	double dX = round((dTargetX - m_dLaserOriginX) * m_dCorrectionFactor);
+	double dY = round((dTargetY - m_dLaserOriginY) * m_dCorrectionFactor);
+
+	int32_t intX = (int32_t)dX;
+	int32_t intY = (int32_t)dY;
+
+	m_pScanLabSDK->n_timed_mark_abs(m_CardNo, intX, intY, dDurationInMicroseconds);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
 
 LibMCDriver_ScanLab_uint32 CRTCContext::GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo)
 {
@@ -1463,9 +1723,6 @@ void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNo
 	if (pLayer.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-	LibMCDriver_ScanLab::eOIERecordingMode oieRecordingMode = LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled;
-	double dMaxLaserPowerInWatts = 100.0;
-
 	int64_t nAttributeFilterValue = 0;
 	std::string sAttributeFilterNameSpace;
 	std::string sAttributeFilterName;
@@ -1475,7 +1732,8 @@ void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNo
 		nAttributeFilterID = pLayer->FindCustomSegmentAttributeID(sAttributeFilterNameSpace, sAttributeFilterName);
 	}
 
-	m_pOwnerData->getExposureParameters(dMaxLaserPowerInWatts, oieRecordingMode);
+	LibMCDriver_ScanLab::eOIERecordingMode oieRecordingMode = m_pOwnerData->getOIERecordingMode ();
+	double dMaxLaserPowerInWatts = m_pOwnerData->getMaxLaserPower();
 
 	addLayerToListEx(pLayer, oieRecordingMode, nAttributeFilterID, nAttributeFilterValue, (float)dMaxLaserPowerInWatts, bFailIfNonAssignedDataExists);
 }
@@ -1485,15 +1743,6 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 {
 	if (pLayer.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-
-	uint32_t nPIDControlIndexAttributeID = 0; 
-	uint32_t nMeasurementTagAttributeID = 0;
-
-	if (pLayer->HasCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "pidindex")) 
-		nPIDControlIndexAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "pidindex");
-	if (pLayer->HasCustomSegmentAttribute("http://schemas.scanlab.com/oie/2023/08", "measurementtag"))
-		nMeasurementTagAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/oie/2023/08", "measurementtag");
-
 
 	double dUnits = pLayer->GetUnits();
 
@@ -1507,7 +1756,11 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	switch (oieRecordingMode) {
 	case eOIERecordingMode::OIEContinuousMeasurement:
 	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
-		StartOIEMeasurement();
+		StartOIEMeasurementEx (false);
+		break;
+	case eOIERecordingMode::OIELaserActiveMeasurement:
+	case eOIERecordingMode::OIEEnableAndLaserActiveMeasurement:
+		StartOIEMeasurementEx(true);
 		break;
 	}
 
@@ -1537,9 +1790,8 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 			float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
 
 			uint32_t nOIEPIDControlIndex = 0;
-			uint32_t nOIEPIDMeasurementTag = 0;
 			if (m_bEnableOIEPIDControl) {
-				nOIEPIDControlIndex = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nPIDControlIndexAttributeID);
+				nOIEPIDControlIndex = (uint32_t) pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "pidindex", 0);
 			}
 
 			int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);

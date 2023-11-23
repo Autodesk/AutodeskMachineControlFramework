@@ -126,6 +126,9 @@ CDriver_BuR::CDriver_BuR(const std::string& sName, LibMCEnv::PDriverEnvironment 
        m_nWorkerThreadCount (1), 
        m_ProtocolVersion (eDriver_BurProtocolVersion::Unknown),
        m_nPacketSignature (0),
+       m_nMajorVersion (0),
+       m_nMinorVersion (0),
+       m_nBuildVersion (0),
        m_nMaxReceiveBufferSize (1024*1024),
        m_bIsQueryingParameters (false),
        m_SimulationMode (false),
@@ -404,7 +407,7 @@ void CDriver_BuR::ReinitializeMachine()
         bool resetSuccessful = false;
         
         m_pConnector->sendCommandToPLC(m_InitMachineCommandID, [&resetSuccessful](CDriver_BuRPacket* pPacket) {
-            resetSuccessful = pPacket->readBool(0);
+            resetSuccessful = true;
         });
 
         if (!resetSuccessful)
