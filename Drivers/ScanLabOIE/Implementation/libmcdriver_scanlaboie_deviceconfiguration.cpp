@@ -45,7 +45,7 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
 **************************************************************************************************************************/
 
 CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::string& sDeviceConfigString, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_pSDK (pSDK), m_RTCDeviceType (LibMCDriver_ScanLabOIE::eRTCDeviceType::Unknown), m_sDeviceConfigString (sDeviceConfigString)
+    : m_pSDK (pSDK), m_RTCDeviceType (LibMCDriver_ScanLabOIE::eRTCDeviceType::RTC5), m_sDeviceConfigString (sDeviceConfigString)
 {
     if (pSDK.get () == nullptr)
         throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
@@ -66,6 +66,8 @@ CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::strin
             m_RTCDeviceType = eRTCDeviceType::RTC5;
         if (rtcType == 1)
             m_RTCDeviceType = eRTCDeviceType::RTC6;
+        if (rtcType == 2)
+            m_RTCDeviceType = eRTCDeviceType::RTC6Ethernet;
 
         std::vector<uint32_t> buffer;
         buffer.resize(OIE_MAX_SIGNALCOUNT);

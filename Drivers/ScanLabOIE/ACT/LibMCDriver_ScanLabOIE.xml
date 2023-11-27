@@ -117,9 +117,9 @@
 	</errors>
 	
 	<enum name="RTCDeviceType">
-		<option name="Unknown" value="0" />
-		<option name="RTC5" value="1" />
-		<option name="RTC6" value="2" />
+		<option name="RTC5" value="0" />
+		<option name="RTC6" value="1" />
+		<option name="RTC6Ethernet" value="2" />
 	</enum>
 
 	<enum name="OIEDeviceDriverType">
