@@ -72,7 +72,7 @@ __DECLARESTATE(idle)
 	pStateEnvironment->SetDoubleParameter ("jobinfo", "countertest", dCounterTest + abs (sin (nTimer * 0.001)));
 
 	//pStateEnvironment->LogMessage ("Waiting for user input...");
-	if (pStateEnvironment->WaitForSignal("signal_initjob", 100, pSignalHandler)) {
+	if (pStateEnvironment->WaitForSignal("signal_initjob", 0, pSignalHandler)) {
 		auto sJobUUID = pSignalHandler->GetUUID("jobuuid");
 		pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", sJobUUID);
 		pSignalHandler->SignalHandled();
@@ -82,7 +82,7 @@ __DECLARESTATE(idle)
 		pStateEnvironment->SetNextState("initbuild");
 
 	}
-	else if (pStateEnvironment->WaitForSignal("signal_changesimulationparameters", 100, pSignalHandler)) {
+	else if (pStateEnvironment->WaitForSignal("signal_changesimulationparameters", 0, pSignalHandler)) {
 		bool bSimulateLaser = pSignalHandler->GetBool("simulatelaser");
 		bool bSimulatePLC = pSignalHandler->GetBool("simulateplc");
 		pSignalHandler->SignalHandled();
