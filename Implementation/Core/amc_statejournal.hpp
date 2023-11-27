@@ -54,6 +54,18 @@ namespace AMC {
 		sjmFinished = 3
 	};
 
+	typedef struct _sStateJournalStatistics {
+		uint64_t m_nStartTime;
+		uint64_t m_nEndTime;
+
+		double m_dMinValue;
+		double m_dMaxValue;
+		double m_dAverageValue;
+		double m_dAverageSquaredValue;
+		double m_dVariance;
+
+	} sStateJournalStatistics;
+
 
 	class CStateJournal;
 	typedef std::shared_ptr<CStateJournal> PStateJournal;
@@ -61,16 +73,6 @@ namespace AMC {
 	class CStateJournalImpl;
 	typedef std::shared_ptr<CStateJournalImpl> PStateJournalImpl;
 
-
-	typedef struct _sJournalTimeStreamDoubleEntry {
-		uint64_t m_nTimeStamp;
-		double m_dValue;
-	} sJournalTimeStreamDoubleEntry;
-
-	typedef struct _sJournalTimeStreamInt64Entry {
-		uint64_t m_nTimeStamp;
-		int64_t m_nValue;
-	} sJournalTimeStreamInt64Entry;
 
 	class CStateJournal {		
 	protected:
@@ -94,7 +96,9 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		void readDoubleTimeStream (const std::string & sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, double & dStartValue, std::vector<sJournalTimeStreamDoubleEntry> & timeStream);
+		void readDoubleTimeStream (const std::string & sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, std::vector<sJournalTimeStreamDoubleEntry> & timeStream);
+
+		sStateJournalStatistics computeStatistics (const std::string& sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp);
 
 		void retrieveRecentInterval(uint64_t nLastMilliseconds, uint64_t& nStartTimeStamp, uint64_t& nEndTimeStamp);
 

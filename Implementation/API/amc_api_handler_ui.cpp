@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_utils.hpp"
 
+#include <cmath>
 #include <vector>
 #include <memory>
 #include <string>
@@ -96,6 +97,14 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 				return APIHandler_UIType::utImage;
 			}
 		}
+
+		if (sParameterString.length() == 43) {
+			if (sParameterString.substr(0, 7) == "/chart/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(7, 36));
+				return APIHandler_UIType::utChart;
+			}
+		}
+
 
 		if (sParameterString.length() >= 49) {
 			if (sParameterString.substr(0, 13) == "/contentitem/") {
@@ -201,8 +210,29 @@ PAPIResponse CAPIHandler_UI::handleImageRequest(const std::string& sParameterUUI
 		return apiResponse;		
 	}
 
+
 	// if not found, return 404
 	return nullptr;
+
+}
+
+
+PAPIResponse CAPIHandler_UI::handleChartRequest(const std::string& sParameterUUID, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto apiResponse = std::make_shared<CAPIFixedFloatBufferResponse>("application/binary");
+	apiResponse->resizeTo(200);
+
+	for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
+		double dValue = sin((double) nIndex * 0.1) * 10 * exp(- (double) nIndex * 0.002);
+		apiResponse->addFloat((float)nIndex);
+		apiResponse->addFloat((float)dValue);
+	}
+
+	// if not found, return 404
+	return apiResponse;
 
 }
 
@@ -296,6 +326,9 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 
 	case APIHandler_UIType::utImage:
 		return handleImageRequest(sParameterUUID, pAuth);
+
+	case APIHandler_UIType::utChart:
+		return handleChartRequest(sParameterUUID, pAuth);
 
 	case APIHandler_UIType::utEvent:
 		handleEventRequest (writer, pBodyData, nBodyDataSize, pAuth);

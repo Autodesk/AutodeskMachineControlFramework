@@ -34,9 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
+#include <list>
 #include <mutex>
 #include <vector>
 #include <map>
+#include <queue>
 
 #include "Common/common_exportstream_native.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -64,48 +66,102 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define STATEJOURNAL_COMMANDFLAG_UNITS 0x70000000UL
 
 
+
 namespace AMC {
 
-	class CStateJournalStreamChunk;
-	typedef std::shared_ptr< CStateJournalStreamChunk> PStateJournalStreamChunk;
+
+	typedef struct _sJournalTimeStreamDoubleEntry {
+		uint64_t m_nTimeStamp;
+		double m_dValue;
+	} sJournalTimeStreamDoubleEntry;
+
+	typedef struct _sJournalTimeStreamInt64Entry {
+		uint64_t m_nTimeStamp;
+		int64_t m_nValue;
+	} sJournalTimeStreamInt64Entry;
+
+
+	class CStateJournalStreamChunk
+	{
+	private:
+	public:
+
+		CStateJournalStreamChunk();
+
+		virtual ~CStateJournalStreamChunk();
+
+		virtual uint64_t getStartTimeStamp() = 0;
+
+		virtual uint64_t getEndTimeStamp() = 0;
+
+		virtual void readRawIntegerData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, std::vector<sJournalTimeStreamInt64Entry> & rawTimeStream) = 0;
+
+		virtual void readRawDoubleData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, double dUnits, std::vector<sJournalTimeStreamDoubleEntry> & rawTimeStream) = 0;
+
+	};
+
+	class CStateJournalStreamChunk_Dynamic;
+	class CStateJournalStreamChunk_InMemory;
+	class CStateJournalStreamChunk_OnDisk;
+
+	typedef std::shared_ptr<CStateJournalStreamChunk> PStateJournalStreamChunk;
+	typedef std::shared_ptr<CStateJournalStreamChunk_Dynamic> PStateJournalStreamChunk_Dynamic;
+	typedef std::shared_ptr<CStateJournalStreamChunk_InMemory> PStateJournalStreamChunk_InMemory;
+	typedef std::shared_ptr<CStateJournalStreamChunk_OnDisk> PStateJournalStreamChunk_OnDisk;
+
+	typedef struct _sJournalTimeStreamEntry {
+		uint32_t m_nCommand;
+		uint64_t m_nValue;
+	} sJournalTimeStreamEntry;
 
 
 	class CStateJournalStream
 	{
 	private:
 		std::mutex m_ChunkChangeMutex;
-		PStateJournalStreamChunk m_pCurrentChunk;
-		std::vector<PStateJournalStreamChunk> m_ChunksToWrite;
+		PStateJournalStreamChunk_Dynamic m_pCurrentChunk;
 
-		uint32_t m_nChunkIndex;
-		uint64_t m_nStartTimeStamp;
-		uint64_t m_nCurrentTimeStamp;
-		uint64_t m_nChunkCapacityInBytes;
-		uint32_t m_nJournalFlushInterval;
+		// Total list of chunks of the stream
+		std::vector<PStateJournalStreamChunk> m_ChunkTimeline;
+
+		// Queue that holds all chunks that should be serialized in memory
+		std::queue<PStateJournalStreamChunk_Dynamic> m_ChunksToSerialize;
+
+		// Queue that holds all chunks that are serialized in memory but have not been written to disk.
+		std::queue<PStateJournalStreamChunk_InMemory> m_ChunksToWrite;
+
+		// Queue that holds all chunks that have been written to disk and could be freed from memory.
+		std::queue<PStateJournalStreamChunk_OnDisk> m_ChunksToArchive;
 
 		std::mutex m_JournalSessionMutex;
 		LibMCData::PJournalSession m_pJournalSession;
+
+		uint64_t m_nChunkSizeInMilliseconds;
+		uint64_t m_nCurrentTimeStamp;
+
+		std::vector<uint64_t> m_CurrentVariableValues;
+
+		void startNewChunk(const uint64_t nAbsoluteTimeStamp);
+		void ensureChunk(const uint64_t nAbsoluteTimeStamp);
 
 	public:
 		CStateJournalStream(LibMCData::PJournalSession pJournalSession);
 		virtual ~CStateJournalStream();
 
-		virtual void writeTimeStamp(const uint64_t nAbsoluteTimeStamp);
-		virtual void writeBool(const uint32_t nID, bool bValue);
-		virtual void writeInt64Delta(const uint32_t nID, int64_t nDelta);
-		virtual void writeDoubleDelta(const uint32_t nID, int64_t nDelta);
-		virtual void writeString(const uint32_t nID, const std::string & sValue);
-		virtual void writeUnits(const uint32_t nID, double dUnits);
+		virtual void writeBool(const uint64_t nAbsoluteTimeStamp, const uint32_t nStorageIndex, bool bValue);
+		virtual void writeInt64(const uint64_t nAbsoluteTimeStamp, const uint32_t nStorageIndex, int64_t nValue);
+		virtual void writeDouble(const uint64_t nAbsoluteTimeStamp, const uint32_t nStorageIndex, int64_t nValue);
 
-		virtual void writeNameDefinition(const uint32_t nID, const std::string& sName);
+		void readRawIntegerData(const uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, std::vector<sJournalTimeStreamInt64Entry>& rawTimeStream);
 
-		void startNewChunk();
-
-		uint32_t getJournalFlushInterval ();
+		void readRawDoubleData(const uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, double dUnits, std::vector<sJournalTimeStreamDoubleEntry>& rawTimeStream);
 
 		// Threaded function to write chunk buffers to disk!
 		void writeChunksToDiskThreaded();
 
+		uint64_t getChunkSizeInMilliseconds ();
+
+		void setVariableCount (size_t nVariableCount);
 	};
 	typedef std::shared_ptr<CStateJournalStream> PStateJournalStream;
 

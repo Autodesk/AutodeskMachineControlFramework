@@ -116,11 +116,11 @@ namespace AMCData {
 
 			std::string sQuery = "INSERT INTO journal_chunks (chunkindex, starttimestamp, endtimestamp, dataoffset, datalength) VALUES (?, ?, ?, ?, ?)";
 			auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
-			pStatement->setInt(1, nChunkIndex);
-			pStatement->setInt(2, nStartTimeStamp);
-			pStatement->setInt(3, nEndTimeStamp);
-			pStatement->setInt(4, nPosition);
-			pStatement->setInt(5, nDataBufferSize);
+			pStatement->setInt64(1, nChunkIndex);
+			pStatement->setInt64(2, nStartTimeStamp);
+			pStatement->setInt64(3, nEndTimeStamp);
+			pStatement->setInt64(4, nPosition);
+			pStatement->setInt64(5, nDataBufferSize);
 			pStatement->execute();
 			pStatement = nullptr; 
 		}

@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CJournalVariable
 #include "libmcenv_journalvariable.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "amc_statejournal.hpp"
+#include "amc_statejournalstream.hpp"
 
 
 // Include custom headers here.
@@ -104,52 +105,8 @@ LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTim
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA);
     }
 
-    if (nClampedStartTimeInMS >= nClampedEndTimeInMS)
-	    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL);
-
-    uint64_t nTimeDifference = nClampedEndTimeInMS - nClampedStartTimeInMS;
-
-    std::vector<AMC::sJournalTimeStreamDoubleEntry> timeStream;
-    double dStartValue = 0.0;
-
-    m_pStateJournal->readDoubleTimeStream(m_sVariableName, m_nStartTimeStamp, m_nEndTimeStamp, dStartValue, timeStream);
-
-    uint64_t nTimeStepCount = timeStream.size();   
-
-    if (nTimeStepCount == 0)
-        return dStartValue;
-
-    auto& firstEntry = timeStream.at(0);
-    auto& lastEntry = timeStream.at(nTimeStepCount - 1);
-
-    if (firstEntry.m_nTimeStamp < nClampedStartTimeInMS)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL);
-    if (lastEntry.m_nTimeStamp > nClampedEndTimeInMS)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEINTERVAL);
-
-    // First Interval
-    double dIntegral = dStartValue * (firstEntry.m_nTimeStamp - nClampedStartTimeInMS);
-    double dCurrentValue = firstEntry.m_dValue;
-    uint64_t nCurrentTime = firstEntry.m_nTimeStamp;
-
-    for (uint64_t nIndex = 1; nIndex < nTimeStepCount; nIndex++) {        
-        auto& nextEntry = timeStream.at(nIndex);
-
-        if (nextEntry.m_nTimeStamp < nCurrentTime)
-            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALCOMPUTEDATA);
-
-        uint64_t nDeltaTime = nextEntry.m_nTimeStamp - nCurrentTime;
-
-        dIntegral += dCurrentValue * nDeltaTime;
-
-        nCurrentTime = nextEntry.m_nTimeStamp;
-        dCurrentValue = nextEntry.m_dValue;
-    }
-
-    dIntegral += dCurrentValue * (nClampedEndTimeInMS - nCurrentTime);
-
-    return dIntegral / ((double) nTimeDifference);
-    
+    auto sStatistics = m_pStateJournal->computeStatistics(m_sVariableName, nClampedStartTimeInMS, nClampedEndTimeInMS);
+    return sStatistics.m_dAverageValue;
 
 }
 
@@ -163,12 +120,10 @@ void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBu
 {
     std::vector<AMC::sJournalTimeStreamDoubleEntry> timeStream;
 
-    double dStartValue = 0.0;
-
-    m_pStateJournal->readDoubleTimeStream(m_sVariableName, m_nStartTimeStamp, m_nEndTimeStamp, dStartValue, timeStream);
+    m_pStateJournal->readDoubleTimeStream(m_sVariableName, m_nStartTimeStamp, m_nEndTimeStamp, timeStream);
 
     // Add start value as first entry!
-    size_t nRawEntryCount = timeStream.size() + 1;
+    size_t nRawEntryCount = timeStream.size();
 
     if (pTimeStreamEntriesNeededCount != nullptr)
         *pTimeStreamEntriesNeededCount = nRawEntryCount;
@@ -179,9 +134,6 @@ void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBu
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
 
         auto pTargetEntry = pTimeStreamEntriesBuffer;
-        pTargetEntry->m_TimestampInMS = m_nStartTimeStamp;
-        pTargetEntry->m_Value = dStartValue;
-        pTargetEntry++;
 
         for (auto& timeStreamIter : timeStream) {
             pTargetEntry->m_TimestampInMS = timeStreamIter.m_nTimeStamp;
