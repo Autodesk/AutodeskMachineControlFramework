@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <template>
 
 <div v-if="(moduleitem.type=='chart')">  	
-	 <VueApexCharts width="500" type="line" :options="options" :series="series"></VueApexCharts>
+	 <VueApexCharts width="500" type="line" ref="apexChart" :options="options" :series="series"></VueApexCharts>
 </div>
 
 </template>
@@ -44,23 +44,75 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	  components: {
 		VueApexCharts
 	  },
+	  
+		mounted() {
+			this.newData = [];
+			for (let index = 0; index < 1000; index++) {
+				let value = Math.sin (index * 0.1) * 10 * Math.exp (- index * 0.002);
+				this.newData.push ([index, value]);
+			}
+			
+			this.$refs.apexChart.updateSeries([{
+				data: this.newData
+			}]);
+		},
+	  
 	   data: () => ({
 		options: {
         chart: {
           id: 'vuechart-example'
         },
-        xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+  yaxis: [
+    {
+      axisTicks: {
+        show: true
+      },
+      axisBorder: {
+        show: true,		
+      },
+      labels: {
+        style: {
+          
+        },
+		formatter: function (val) {
+			return (val).toFixed(2);
+		},
+      },
+      title: {
+        style: {
+          
         }
+      }
+    }
+  ],
+		
+		xaxis: {			
+			type: "numeric",
+			  labels: {
+				formatter: function (value) {
+					return (value / 1000.0).toFixed(3) + "s";
+				}
+			  }
+		}
+		
       },
-      series: [{
-        name: 'series-1',
-        data: [30, 40, 45, 50, 49, 60, 70, 91]
-      },
-	  {
-        name: 'series-1',
-        data: [41, 23, 98, 50, 49, 60, 70, 91]
-      }],
+	  
+  newData: [],
+	  
+  series: [
+    {
+      name: "Series 1",
+      data: []
+    },
+	
+    {
+      name: "Series 2",
+      data: [
+      ]
+    }
+	
+  ],
+	  
 
 
 	  })

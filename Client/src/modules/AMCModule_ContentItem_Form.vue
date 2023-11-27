@@ -67,14 +67,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 			if (switchentity.dataObject) {
 		
-				if (switchentity.dataObject.value != switchentity.dataObject.remotevalue) {
+				console.log ("value has changed!");
+				if (!switchentity.dataObject.isProgrammaticChange) {
 					if (switchentity.changeevent != "") {
 					
 						console.log ("change event!");
 					
 						var formvalues = this.Application.assembleFormValues ([ switchentity.uuid ]);
-						this.Application.triggerUIEvent (switchentity.changeevent, switchentity.uuid, formvalues);
+						this.Application.triggerUIEvent (switchentity.changeevent, switchentity.uuid, formvalues, () => { 
+						
+							switchentity.dataObject.isProgrammaticChange = true;
+							switchentity.dataObject.value = switchentity.dataObject.remotevalue;
+						
+						} );
+												
 					}
+				} else {
+					switchentity.dataObject.isProgrammaticChange = false;
 				}
 			}
 		},
