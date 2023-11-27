@@ -106,7 +106,7 @@
 			<parameter name="simulateplc" type="bool"/>
 		</signaldefinition>
 
-		<state name="init" repeatdelay="100">
+		<state name="init" repeatdelay="10">
 			<outstate target="idle"/>
 		</state>
 
@@ -321,6 +321,10 @@
 					<paragraph text="."/>
 					<paragraph text="Autodesk example machine"/>
 					<paragraph text="."/>
+
+          <chart name="chart1">
+            
+          </chart>
 					
 
           <form name="machinestateinforform">
@@ -565,7 +569,6 @@
 
         <models>
           <model name="platform" resource="bptest" />
-          <model name="testpart" resource="test3mf5" />
         </models>
 
         <lights>
@@ -590,9 +593,6 @@
             
           </instance>
 
-          <instance name="testpart_instance" model="testpart" visible="1">
-
-          </instance>
 
         </scene>
 

@@ -160,7 +160,7 @@ public:
 	{
 		pUIEnvironment->LogMessage("Clicked on Test Journal Button");
 
-		auto pUserManagement = pUIEnvironment->CreateUserManagement();
+		/*auto pUserManagement = pUIEnvironment->CreateUserManagement();
 		auto activeUsers = pUserManagement->GetActiveUsers();
 		uint32_t nCount = activeUsers->Count();
 		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
@@ -173,19 +173,25 @@ public:
 
 		pUIEnvironment->LogMessage("creating user dummy");
 
-		pUserManagement->CreateUser("dummy", "administrator", "3fbde1f66fb512223edb195d247fe770130f59fdd914e3ffa7327af53fe4cb46", "dd9a86491eb7572c1a9cda800e6eb81bb9dad55576b01416d06cdf6ae181fb33", "This is the new dummy user.");
+		//pUserManagement->CreateUser("dummy", "administrator", "3fbde1f66fb512223edb195d247fe770130f59fdd914e3ffa7327af53fe4cb46", "dd9a86491eb7572c1a9cda800e6eb81bb9dad55576b01416d06cdf6ae181fb33", "This is the new dummy user."); */
 
 
-		/*auto pJournalVariable = pUIEnvironment->RetrieveJournalVariable ("main.ui.debug", 10000);
+		auto pJournal = pUIEnvironment->GetCurrentJournal();
+		auto pJournalVariable = pJournal->RetrieveJournalVariable ("main.jobinfo.countertest", 10000);
 		pUIEnvironment->LogMessage("Variable Name: " +  pJournalVariable->GetVariableName());
 		auto nStartTime = pJournalVariable->GetStartTimeStamp();
 		auto nEndTime = pJournalVariable->GetEndTimeStamp();
 
 		pUIEnvironment->LogMessage("Start Time: " + std::to_string (nStartTime));
 		pUIEnvironment->LogMessage("End Time: " + std::to_string(nEndTime));
-		double dAverage = pJournalVariable->ComputeAverage(nStartTime, nEndTime, true); */
+		double dAverage = pJournalVariable->ComputeAverage(nStartTime, nEndTime, true); 
 
-		//pUIEnvironment->LogMessage("Average: " + std::to_string(dAverage));
+		pUIEnvironment->LogMessage("Average: " + std::to_string(dAverage));
+
+		std::vector <LibMCEnv::sTimeStreamEntry> timeStream;
+		pJournalVariable->ReceiveRawTimeStream(timeStream);
+
+
 
 	}
 
