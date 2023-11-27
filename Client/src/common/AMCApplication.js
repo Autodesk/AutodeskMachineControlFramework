@@ -654,7 +654,7 @@ export default class AMCApplication extends Common.AMCObject {
         return this.API.baseURL + '/ui/image/' + uuid;
     }
 
-    triggerUIEvent(eventname, senderuuid, eventValues) {
+    triggerUIEvent(eventname, senderuuid, eventValues, executionCallback) {
 
         this.axiosPostRequest("/ui/event", {
             "eventname": eventname,
@@ -681,6 +681,10 @@ export default class AMCApplication extends Common.AMCObject {
 					}
 				}
 			}
+			
+			if (executionCallback) {
+				executionCallback ();
+			}				
 			
         })
         .catch(err => {

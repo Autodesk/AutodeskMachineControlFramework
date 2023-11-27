@@ -236,7 +236,8 @@ class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 				validation: entity.validation,
 				validationmessage: entity.validationmessage,
 				minvalue: entity.minvalue,
-				maxvalue: entity.maxvalue
+				maxvalue: entity.maxvalue,
+				isProgrammaticChange: false
 				
 			};
 			
@@ -264,6 +265,9 @@ class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 					
 					if (dataObject.remotevalue != entityJSON.value) {
 						dataObject.value = entityJSON.value;
+						dataObject.isProgrammaticChange = true;
+					} else {
+						dataObject.isProgrammaticChange = false;
 					}
 					dataObject.remotevalue = entityJSON.value;
 					dataObject.prefix = entityJSON.prefix;
