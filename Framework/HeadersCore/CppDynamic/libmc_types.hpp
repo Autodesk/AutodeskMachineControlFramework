@@ -582,6 +582,11 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY 565 /** Invalid journal stream capacity */
 #define LIBMC_ERROR_INVALIDUIFORMAT 566 /** Invalid UI format */
 #define LIBMC_ERROR_INVALIDJOURNALTIMESTAMP 567 /** Invalid Journal Timestamp */
+#define LIBMC_ERROR_CHUNKTIMESTREAMNOTCONTINUOUS 568 /** Chunk time stream not continuous */
+#define LIBMC_ERROR_JOURNALVARIABLENOTFOUND 569 /** Journal Variable not found */
+#define LIBMC_ERROR_INVALIDJOURNALSTREAMQUERY 570 /** Invalid journal stream query */
+#define LIBMC_ERROR_INVALIDJOURNALCOMPUTEDATA 571 /** Invalid journal compute data */
+#define LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL 572 /** Invalid journal compute interval */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1076,6 +1081,11 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDJOURNALSTREAMCAPACITY: return "Invalid journal stream capacity";
     case LIBMC_ERROR_INVALIDUIFORMAT: return "Invalid UI format";
     case LIBMC_ERROR_INVALIDJOURNALTIMESTAMP: return "Invalid Journal Timestamp";
+    case LIBMC_ERROR_CHUNKTIMESTREAMNOTCONTINUOUS: return "Chunk time stream not continuous";
+    case LIBMC_ERROR_JOURNALVARIABLENOTFOUND: return "Journal Variable not found";
+    case LIBMC_ERROR_INVALIDJOURNALSTREAMQUERY: return "Invalid journal stream query";
+    case LIBMC_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid journal compute data";
+    case LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid journal compute interval";
     default: return "unknown error";
   }
 }
