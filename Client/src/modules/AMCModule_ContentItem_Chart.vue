@@ -46,15 +46,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	  },
 	  
 		mounted() {
-			this.newData = [];
-			for (let index = 0; index < 1000; index++) {
-				let value = Math.sin (index * 0.1) * 10 * Math.exp (- index * 0.002);
-				this.newData.push ([index, value]);
-			}
 			
-			this.$refs.apexChart.updateSeries([{
-				data: this.newData
-			}]);
+			
+			let normalizedUUID = "d20b8598-1d4d-4cb8-a594-2f16abbae13d";
+			
+			this.Application.axiosGetArrayBufferRequest("/ui/chart/" + normalizedUUID)
+				.then(responseData => {
+					var floatView = new Float32Array(responseData.data);
+					let dataLength = floatView.length;
+					let pointCount = dataLength / 2;
+					
+					alert ("received chart data: " + dataLength);
+					
+					this.newData = [];
+					for (let index = 0; index < pointCount; index++) {
+						let xvalue = floatView[index * 2];
+						let yvalue = floatView[index * 2 + 1];
+						this.newData.push ([xvalue, yvalue]);
+					}
+					
+					this.$refs.apexChart.updateSeries([{
+						data: this.newData
+					}]); 
+					
+				})
+				.catch(err => {
+					if (err.response) {
+						console.log (err.response);
+					} else {
+						console.log ("fatal error while retrieving chart data " + normalizedUUID);
+					}
+				});			
+			
 		},
 	  
 	   data: () => ({
@@ -103,12 +126,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     {
       name: "Series 1",
       data: []
-    },
-	
-    {
-      name: "Series 2",
-      data: [
-      ]
     }
 	
   ],

@@ -653,6 +653,11 @@ export default class AMCApplication extends Common.AMCObject {
     getImageURL(uuid) {
         return this.API.baseURL + '/ui/image/' + uuid;
     }
+	
+    getChartURL(uuid) {
+        return this.API.baseURL + '/ui/chart/' + uuid;
+    }
+	
 
     triggerUIEvent(eventname, senderuuid, eventValues, executionCallback) {
 
