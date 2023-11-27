@@ -250,9 +250,9 @@ namespace LibMCDriver_ScanLabOIE {
   **************************************************************************************************************************/
   
   enum class eRTCDeviceType : LibMCDriver_ScanLabOIE_int32 {
-    Unknown = 0,
-    RTC5 = 1,
-    RTC6 = 2
+    RTC5 = 0,
+    RTC6 = 1,
+    RTC6Ethernet = 2
   };
   
   enum class eOIEDeviceDriverType : LibMCDriver_ScanLabOIE_int32 {
