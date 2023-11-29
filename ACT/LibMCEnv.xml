@@ -563,6 +563,50 @@
 	</class>
 
 
+	<class name="DataSeries" parent="Base" description="A data series of points.">
+	
+		<method name="GetName" description="Returns the name of the data series.">
+			<param name="Name" type="string" pass="return" description="Returns the name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns the UUID of the data series.">
+			<param name="UUID" type="string" pass="return" description="Returns uuid." />
+		</method>
+
+		<method name="Clear" description="Clears all entries of the data series.">
+		</method>
+
+		<method name="IsEmpty" description="Checks if data series is empty.">
+			<param name="EmptyValue" type="bool" pass="return" description="Returns true if data series has no entries." />
+		</method>
+
+		<method name="GetMinimum" description="Returns the minimum time stamp of the data series. Fails if data series is empty.">
+			<param name="Minimum" type="uint64" pass="return" description="Minimum time stamp in milliseconds." />
+		</method>
+		
+		<method name="GetMaximum" description="Returns the maximum time stamp of the data series. Fails if data series is empty.">
+			<param name="Maximum" type="uint64" pass="return" description="Maximum time stamp in milliseconds." />
+		</method>
+		
+		<method name="GetAllEntries" description="Returns all entries of the data series. Fails if data series is empty.">
+			<param name="EntryArray" type="structarray" class="TimeStreamEntry" pass="out" description="Data series entries will be written in this array." />
+		</method>
+		
+		<method name="SetAllEntries" description="Sets all entries of the data series. The time stamp array MUST be sorted in incrementing order, with no two time stamps being equal.">
+			<param name="EntryArray" type="structarray" class="TimeStreamEntry" pass="in" description="Data series entries to use." />
+		</method>
+		
+		<method name="SampleJournalVariable" description="Samples a journal variable.">
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="in" description="Journal variable to sample." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to generate." />
+			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
+		</method>
+		
+		
+	</class>
+
+
+
 	<class name="MeshObject" parent="Base">
 	
 		<method name="GetName" description="Returns the name of the Mesh Object.">
@@ -2098,6 +2142,7 @@
 
 	</class>
 
+
 	<class name="UniformJournalSampling" parent="Base" description="Result class for Journal Sampling">
 
 		<method name="GetVariableName" description="returns the name of the recorded variable.">
@@ -2169,6 +2214,8 @@
 		
 	</class>
 
+
+
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
 
 		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
@@ -2183,7 +2230,8 @@
 			<param name="EndTimeInMilliseconds" type="uint64" pass="in" description="End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
-
+				
+		
 		<method name="StoreJournalMarker" description="Stores a journal marker tag at the current time stamp.">
 			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
 			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
@@ -2638,6 +2686,22 @@
 
 	</class>
 
+	<class name="UIItem" parent="Base" description="Base item that represents a user interface element.">
+	
+		<method name="GetName" description="Returns the name of the user interface item. MUST be unique within its siblings.">
+			<param name="Name" type="string" pass="return" description="Returns the name." />
+		</method>
+	
+		<method name="GetPath" description="Returns the full path of the user interface item. MUST be unique.">
+			<param name="Path" type="string" pass="return" description="Returns the path." />
+		</method>
+
+		<method name="GetUUID" description="Returns the UUID of the time stream chart object.">
+			<param name="UUID" type="string" pass="return" description="Returns uuid." />
+		</method>
+	
+	</class>
+
 
 	<class name="UIEnvironment" parent="Base" description="Environment of the UI">
 	  
@@ -2935,6 +2999,26 @@
 			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
 		</method>	
 
+		<method name="CreateDataSeries" description="Creates a new empty data series object.">
+			<param name="Name" type="string" pass="in" description="Name to use for this data series. MUST NOT be an empty string." />
+			<param name="BoundToLogin" type="bool" pass="in" description="If true, the data series is tied to the current user login session. If false, the data series will persist until explicitely released. This can be dangerous for the overall machine stability." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="HasDataSeries" description="Checks if a data series exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="DataSeriesExists" type="bool" pass="return" description="returns true if series exists." />
+		</method>	
+
+		<method name="FindDataSeries" description="Finds a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="ReleaseDataSeries" description="Releases the memory of a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to release." />
+		</method>	
+		
 	</class>
 
 

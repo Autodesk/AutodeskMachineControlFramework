@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module.hpp"
 #include "amc_ui_clientaction.hpp"
+#include "amc_meshentity.hpp"
+#include "amc_meshhandler.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -56,11 +58,79 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
+
+class CAPIRenderGeometryResponse : public CAPIFixedFloatBufferResponse {
+private:
+
+public:
+
+	CAPIRenderGeometryResponse(CMeshEntity* pMeshEntity)
+		: CAPIFixedFloatBufferResponse("application/binary")
+	{
+
+		if (pMeshEntity == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		size_t nFaceCount = pMeshEntity->getFaceCount();
+		resizeTo(nFaceCount * 9);
+
+		for (size_t nFaceID = 1; nFaceID <= nFaceCount; nFaceID++) {
+			std::array<sMeshEntityNode, 3> Nodes;
+			pMeshEntity->getFaceNodes(nFaceID, Nodes.at(0), Nodes.at(1), Nodes.at(2));
+			for (uint32_t nNodeIndex = 0; nNodeIndex < 3; nNodeIndex++) {
+				for (uint32_t nCoordIndex = 0; nCoordIndex < 3; nCoordIndex++) {
+					addFloat(Nodes[nNodeIndex].m_fCoordinates[nCoordIndex]);
+				}
+			}
+
+		}
+	}
+
+};
+
+
+class CAPIRenderEdgesResponse : public CAPIFixedFloatBufferResponse {
+private:
+
+public:
+
+	CAPIRenderEdgesResponse(CMeshEntity* pMeshEntity)
+		: CAPIFixedFloatBufferResponse("application/binary")
+	{
+
+		if (pMeshEntity == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		size_t nEdgeCount = pMeshEntity->getEdgeCount();
+		resizeTo(nEdgeCount * 6);
+
+		for (size_t nEdgeID = 1; nEdgeID <= nEdgeCount; nEdgeID++) {
+
+			auto& edge = pMeshEntity->getEdge(nEdgeID);
+
+			if (edge.m_nAngleInDegrees > 45) {
+
+				std::array<sMeshEntityNode, 2> Nodes;
+				pMeshEntity->getEdgeNodes(nEdgeID, Nodes.at(0), Nodes.at(1));
+				for (uint32_t nNodeIndex = 0; nNodeIndex < 2; nNodeIndex++) {
+					for (uint32_t nCoordIndex = 0; nCoordIndex < 3; nCoordIndex++) {
+						addFloat(Nodes[nNodeIndex].m_fCoordinates[nCoordIndex]);
+					}
+				}
+			}
+
+		}
+	}
+
+};
+
+
 CAPIHandler_UI::CAPIHandler_UI(PSystemState pSystemState)
 	: CAPIHandler(pSystemState->getClientHash()), m_pSystemState(pSystemState)
 {
 	if (pSystemState.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
 
 }
 
@@ -119,6 +189,19 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			}
 		}
 
+		if (sParameterString.length() == 50) {
+			if (sParameterString.substr(0, 14) == "/meshgeometry/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(14));
+				return APIHandler_UIType::utMeshGeometry;
+			}
+		}
+
+		if (sParameterString.length() == 47) {
+			if (sParameterString.substr(0, 11) == "/meshedges/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(11));
+				return APIHandler_UIType::utMeshEdges;
+			}
+		}
 
 	}
 
@@ -223,7 +306,7 @@ PAPIResponse CAPIHandler_UI::handleChartRequest(const std::string& sParameterUUI
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	auto apiResponse = std::make_shared<CAPIFixedFloatBufferResponse>("application/binary");
-	apiResponse->resizeTo(200);
+	apiResponse->resizeTo(2000);
 
 	for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
 		double dValue = sin((double) nIndex * 0.1) * 10 * exp(- (double) nIndex * 0.002);
@@ -326,6 +409,19 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 
 	case APIHandler_UIType::utImage:
 		return handleImageRequest(sParameterUUID, pAuth);
+
+	case APIHandler_UIType::utMeshGeometry: {
+		auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+		auto pMeshEntity = pMeshHandler->findMeshEntity(sParameterUUID, true);
+		return std::make_shared<CAPIRenderGeometryResponse>(pMeshEntity.get());
+	}
+
+	case APIHandler_UIType::utMeshEdges: {
+		auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+		auto pMeshEntity = pMeshHandler->findMeshEntity(sParameterUUID, true);
+		return std::make_shared<CAPIRenderEdgesResponse>(pMeshEntity.get());
+	}
+
 
 	case APIHandler_UIType::utChart:
 		return handleChartRequest(sParameterUUID, pAuth);

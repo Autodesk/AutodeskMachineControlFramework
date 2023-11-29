@@ -384,6 +384,7 @@ typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
+typedef LibMCEnvHandle LibMCEnv_DataSeries;
 typedef LibMCEnvHandle LibMCEnv_MeshObject;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
@@ -412,6 +413,7 @@ typedef LibMCEnvHandle LibMCEnv_JournalHandler;
 typedef LibMCEnvHandle LibMCEnv_UserDetailList;
 typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
+typedef LibMCEnvHandle LibMCEnv_UIItem;
 typedef LibMCEnvHandle LibMCEnv_UIEnvironment;
 
 namespace LibMCEnv {

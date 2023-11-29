@@ -212,6 +212,14 @@ public:
 
 	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
 
+	IDataSeries* CreateDataSeries(const std::string& sName, const bool bBoundToLogin) override;
+
+	bool HasDataSeries(const std::string& sDataSeriesUUID) override;
+
+	IDataSeries* FindDataSeries(const std::string& sDataSeriesUUID) override;
+
+	void ReleaseDataSeries(const std::string& sDataSeriesUUID) override;
+
 };
 
 } // namespace Impl
