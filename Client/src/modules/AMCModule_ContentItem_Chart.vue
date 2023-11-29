@@ -55,9 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					var floatView = new Float32Array(responseData.data);
 					let dataLength = floatView.length;
 					let pointCount = dataLength / 2;
-					
-					alert ("received chart data: " + dataLength);
-					
+										
 					this.newData = [];
 					for (let index = 0; index < pointCount; index++) {
 						let xvalue = floatView[index * 2];
