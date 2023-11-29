@@ -583,3 +583,25 @@ IMeshObject* CUIEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
 {
     throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
+
+IDataSeries* CUIEnvironment::CreateDataSeries(const std::string& sName, const bool bBoundToLogin)
+{
+    return nullptr;
+
+}
+
+bool CUIEnvironment::HasDataSeries(const std::string& sDataSeriesUUID)
+{
+    return true;
+}
+
+IDataSeries* CUIEnvironment::FindDataSeries(const std::string& sDataSeriesUUID)
+{
+    return nullptr;
+
+}
+
+void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
+{
+
+}

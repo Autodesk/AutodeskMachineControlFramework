@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,39 +29,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_HANDLER_MESH
-#define __AMC_API_HANDLER_MESH
+#ifndef __AMC_DATASERIES
+#define __AMC_DATASERIES
 
-#include "amc_api_handler.hpp"
-#include "amc_logger.hpp"
-#include "amc_api_response.hpp"
-#include "amc_meshhandler.hpp"
+#include <memory>
+#include <map>
+#include <string>
+#include <cstdint>
+#include <vector>
 
 namespace AMC {
 
-	enum class APIHandler_MeshType : uint32_t {
-		mtUnknown = 0,
-		mtInformation = 1,
-		mtRenderGeometry = 2,
-		mtRenderEdges = 3
-	};
 
-	class CAPIHandler_Mesh : public CAPIHandler {
+	class CDataSeries;
+	typedef std::shared_ptr<CDataSeries> PDataSeries;
+
+	class CDataSeries {
 	private:
 
-		PMeshHandler m_pMeshHandler;
-		
-		APIHandler_MeshType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& paramUUID);
+		std::string m_sUUID;
+		std::string m_sName;
 
 	public:
 
-		CAPIHandler_Mesh(const std::string & sClientHash, PMeshHandler pMeshHandler);
+		CDataSeries(const std::string & sUUID, const std::string & sName);
 
-		virtual ~CAPIHandler_Mesh();
-				
-		virtual std::string getBaseURI () override;
+		virtual ~CDataSeries();
 
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
+		std::string getUUID();
+
+		std::string getName();
+
 
 	};
 
@@ -69,5 +67,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_API_HANDLER_MESH
+#endif //__AMC_DATASERIES
 

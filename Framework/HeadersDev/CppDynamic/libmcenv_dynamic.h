@@ -588,6 +588,99 @@ typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_AddFieldPtr) (LibMCEnv_Dis
 typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DuplicatePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
+ Class definition for DataSeries
+**************************************************************************************************************************/
+
+/**
+* Returns the name of the data series.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns the name., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_GetNamePtr) (LibMCEnv_DataSeries pDataSeries, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the UUID of the data series.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_GetUUIDPtr) (LibMCEnv_DataSeries pDataSeries, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Clears all entries of the data series.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_ClearPtr) (LibMCEnv_DataSeries pDataSeries);
+
+/**
+* Checks if data series is empty.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[out] pEmptyValue - Returns true if data series has no entries.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_IsEmptyPtr) (LibMCEnv_DataSeries pDataSeries, bool * pEmptyValue);
+
+/**
+* Returns the minimum time stamp of the data series. Fails if data series is empty.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[out] pMinimum - Minimum time stamp in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_GetMinimumPtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMinimum);
+
+/**
+* Returns the maximum time stamp of the data series. Fails if data series is empty.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[out] pMaximum - Maximum time stamp in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_GetMaximumPtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMaximum);
+
+/**
+* Returns all entries of the data series. Fails if data series is empty.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[in] nEntryArrayBufferSize - Number of elements in buffer
+* @param[out] pEntryArrayNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pEntryArrayBuffer - TimeStreamEntry  buffer of Data series entries will be written in this array.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_GetAllEntriesPtr) (LibMCEnv_DataSeries pDataSeries, const LibMCEnv_uint64 nEntryArrayBufferSize, LibMCEnv_uint64* pEntryArrayNeededCount, LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer);
+
+/**
+* Sets all entries of the data series. The time stamp array MUST be sorted in incrementing order, with no two time stamps being equal.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[in] nEntryArrayBufferSize - Number of elements in buffer
+* @param[in] pEntryArrayBuffer - TimeStreamEntry buffer of Data series entries to use.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_SetAllEntriesPtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 nEntryArrayBufferSize, const LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer);
+
+/**
+* Samples a journal variable.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[in] pJournalVariable - Journal variable to sample.
+* @param[in] nNumberOfSamples - Number of samples to generate.
+* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_SampleJournalVariablePtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta);
+
+/*************************************************************************************************************************
  Class definition for MeshObject
 **************************************************************************************************************************/
 
@@ -4716,6 +4809,43 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
 
 /*************************************************************************************************************************
+ Class definition for UIItem
+**************************************************************************************************************************/
+
+/**
+* Returns the name of the user interface item. MUST be unique within its siblings.
+*
+* @param[in] pUIItem - UIItem instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns the name., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIItem_GetNamePtr) (LibMCEnv_UIItem pUIItem, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the full path of the user interface item. MUST be unique.
+*
+* @param[in] pUIItem - UIItem instance.
+* @param[in] nPathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pPathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pPathBuffer -  buffer of Returns the path., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIItem_GetPathPtr) (LibMCEnv_UIItem pUIItem, const LibMCEnv_uint32 nPathBufferSize, LibMCEnv_uint32* pPathNeededChars, char * pPathBuffer);
+
+/**
+* Returns the UUID of the time stream chart object.
+*
+* @param[in] pUIItem - UIItem instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIItem_GetUUIDPtr) (LibMCEnv_UIItem pUIItem, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
 
@@ -5303,6 +5433,46 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) (LibMCEnv_U
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
 
+/**
+* Creates a new empty data series object.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pName - Name to use for this data series. MUST NOT be an empty string.
+* @param[in] bBoundToLogin - If true, the data series is tied to the current user login session. If false, the data series will persist until explicitely released. This can be dangerous for the overall machine stability.
+* @param[out] pInstance - Data series instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateDataSeriesPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pName, bool bBoundToLogin, LibMCEnv_DataSeries * pInstance);
+
+/**
+* Checks if a data series exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to find.
+* @param[out] pDataSeriesExists - returns true if series exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasDataSeriesPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDataSeriesUUID, bool * pDataSeriesExists);
+
+/**
+* Finds a data series. Fails if data series does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to find.
+* @param[out] pInstance - Data series instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindDataSeriesPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDataSeriesUUID, LibMCEnv_DataSeries * pInstance);
+
+/**
+* Releases the memory of a data series. Fails if data series does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to release.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ReleaseDataSeriesPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDataSeriesUUID);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -5408,6 +5578,15 @@ typedef struct {
 	PLibMCEnvDiscreteFieldData2D_TransformFieldPtr m_DiscreteFieldData2D_TransformField;
 	PLibMCEnvDiscreteFieldData2D_AddFieldPtr m_DiscreteFieldData2D_AddField;
 	PLibMCEnvDiscreteFieldData2D_DuplicatePtr m_DiscreteFieldData2D_Duplicate;
+	PLibMCEnvDataSeries_GetNamePtr m_DataSeries_GetName;
+	PLibMCEnvDataSeries_GetUUIDPtr m_DataSeries_GetUUID;
+	PLibMCEnvDataSeries_ClearPtr m_DataSeries_Clear;
+	PLibMCEnvDataSeries_IsEmptyPtr m_DataSeries_IsEmpty;
+	PLibMCEnvDataSeries_GetMinimumPtr m_DataSeries_GetMinimum;
+	PLibMCEnvDataSeries_GetMaximumPtr m_DataSeries_GetMaximum;
+	PLibMCEnvDataSeries_GetAllEntriesPtr m_DataSeries_GetAllEntries;
+	PLibMCEnvDataSeries_SetAllEntriesPtr m_DataSeries_SetAllEntries;
+	PLibMCEnvDataSeries_SampleJournalVariablePtr m_DataSeries_SampleJournalVariable;
 	PLibMCEnvMeshObject_GetNamePtr m_MeshObject_GetName;
 	PLibMCEnvMeshObject_GetUUIDPtr m_MeshObject_GetUUID;
 	PLibMCEnvMeshObject_GetTriangleCountPtr m_MeshObject_GetTriangleCount;
@@ -5783,6 +5962,9 @@ typedef struct {
 	PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr m_StateEnvironment_RegisterMeshFrom3MFResource;
 	PLibMCEnvStateEnvironment_MeshIsRegisteredPtr m_StateEnvironment_MeshIsRegistered;
 	PLibMCEnvStateEnvironment_FindRegisteredMeshPtr m_StateEnvironment_FindRegisteredMesh;
+	PLibMCEnvUIItem_GetNamePtr m_UIItem_GetName;
+	PLibMCEnvUIItem_GetPathPtr m_UIItem_GetPath;
+	PLibMCEnvUIItem_GetUUIDPtr m_UIItem_GetUUID;
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
@@ -5836,6 +6018,10 @@ typedef struct {
 	PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr m_UIEnvironment_RegisterMeshFrom3MFResource;
 	PLibMCEnvUIEnvironment_MeshIsRegisteredPtr m_UIEnvironment_MeshIsRegistered;
 	PLibMCEnvUIEnvironment_FindRegisteredMeshPtr m_UIEnvironment_FindRegisteredMesh;
+	PLibMCEnvUIEnvironment_CreateDataSeriesPtr m_UIEnvironment_CreateDataSeries;
+	PLibMCEnvUIEnvironment_HasDataSeriesPtr m_UIEnvironment_HasDataSeries;
+	PLibMCEnvUIEnvironment_FindDataSeriesPtr m_UIEnvironment_FindDataSeries;
+	PLibMCEnvUIEnvironment_ReleaseDataSeriesPtr m_UIEnvironment_ReleaseDataSeries;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

@@ -62,6 +62,7 @@ class IPNGImageData;
 class IImageData;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
+class IDataSeries;
 class IMeshObject;
 class IToolpathPart;
 class IToolpathLayer;
@@ -90,6 +91,7 @@ class IJournalHandler;
 class IUserDetailList;
 class IUserManagementHandler;
 class IStateEnvironment;
+class IUIItem;
 class IUIEnvironment;
 
 
@@ -755,6 +757,75 @@ public:
 };
 
 typedef IBaseSharedPtr<IDiscreteFieldData2D> PIDiscreteFieldData2D;
+
+
+/*************************************************************************************************************************
+ Class interface for DataSeries 
+**************************************************************************************************************************/
+
+class IDataSeries : public virtual IBase {
+public:
+	/**
+	* IDataSeries::GetName - Returns the name of the data series.
+	* @return Returns the name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IDataSeries::GetUUID - Returns the UUID of the data series.
+	* @return Returns uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IDataSeries::Clear - Clears all entries of the data series.
+	*/
+	virtual void Clear() = 0;
+
+	/**
+	* IDataSeries::IsEmpty - Checks if data series is empty.
+	* @return Returns true if data series has no entries.
+	*/
+	virtual bool IsEmpty() = 0;
+
+	/**
+	* IDataSeries::GetMinimum - Returns the minimum time stamp of the data series. Fails if data series is empty.
+	* @return Minimum time stamp in milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetMinimum() = 0;
+
+	/**
+	* IDataSeries::GetMaximum - Returns the maximum time stamp of the data series. Fails if data series is empty.
+	* @return Maximum time stamp in milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetMaximum() = 0;
+
+	/**
+	* IDataSeries::GetAllEntries - Returns all entries of the data series. Fails if data series is empty.
+	* @param[in] nEntryArrayBufferSize - Number of elements in buffer
+	* @param[out] pEntryArrayNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pEntryArrayBuffer - TimeStreamEntry buffer of Data series entries will be written in this array.
+	*/
+	virtual void GetAllEntries(LibMCEnv_uint64 nEntryArrayBufferSize, LibMCEnv_uint64* pEntryArrayNeededCount, LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer) = 0;
+
+	/**
+	* IDataSeries::SetAllEntries - Sets all entries of the data series. The time stamp array MUST be sorted in incrementing order, with no two time stamps being equal.
+	* @param[in] nEntryArrayBufferSize - Number of elements in buffer
+	* @param[in] pEntryArrayBuffer - Data series entries to use.
+	*/
+	virtual void SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, const LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer) = 0;
+
+	/**
+	* IDataSeries::SampleJournalVariable - Samples a journal variable.
+	* @param[in] pJournalVariable - Journal variable to sample.
+	* @param[in] nNumberOfSamples - Number of samples to generate.
+	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	*/
+	virtual void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataSeries> PIDataSeries;
 
 
 /*************************************************************************************************************************
@@ -3779,6 +3850,35 @@ typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
 
 
 /*************************************************************************************************************************
+ Class interface for UIItem 
+**************************************************************************************************************************/
+
+class IUIItem : public virtual IBase {
+public:
+	/**
+	* IUIItem::GetName - Returns the name of the user interface item. MUST be unique within its siblings.
+	* @return Returns the name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IUIItem::GetPath - Returns the full path of the user interface item. MUST be unique.
+	* @return Returns the path.
+	*/
+	virtual std::string GetPath() = 0;
+
+	/**
+	* IUIItem::GetUUID - Returns the UUID of the time stream chart object.
+	* @return Returns uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+};
+
+typedef IBaseSharedPtr<IUIItem> PIUIItem;
+
+
+/*************************************************************************************************************************
  Class interface for UIEnvironment 
 **************************************************************************************************************************/
 
@@ -4180,6 +4280,34 @@ public:
 	* @return Mesh Object instance.
 	*/
 	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IUIEnvironment::CreateDataSeries - Creates a new empty data series object.
+	* @param[in] sName - Name to use for this data series. MUST NOT be an empty string.
+	* @param[in] bBoundToLogin - If true, the data series is tied to the current user login session. If false, the data series will persist until explicitely released. This can be dangerous for the overall machine stability.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * CreateDataSeries(const std::string & sName, const bool bBoundToLogin) = 0;
+
+	/**
+	* IUIEnvironment::HasDataSeries - Checks if a data series exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return returns true if series exists.
+	*/
+	virtual bool HasDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IUIEnvironment::FindDataSeries - Finds a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * FindDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IUIEnvironment::ReleaseDataSeries - Releases the memory of a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to release.
+	*/
+	virtual void ReleaseDataSeries(const std::string & sDataSeriesUUID) = 0;
 
 };
 
