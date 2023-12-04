@@ -86,54 +86,24 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, const std::string& sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl, LibMCData::PLoginHandler pLoginHandler, AMC::PLanguageHandler pLanguageHandler)
+CUIEnvironment::CUIEnvironment(AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string& sTestEnvironmentPath, AMC::PUserInformation pUserInformation)
     : 
-      m_pLogger(pLogger),
-      m_pStateMachineData(pStateMachineData),
-      m_pSignalHandler (pSignalHandler),
       m_pUIHandler (pUIHandler),
-      m_pToolpathHandler (pToolpathHandler),
-      m_pStorage (pStorage),
-      m_pStateJournal (pStateJournal),
-      m_sSystemUserID (sSystemUserID),
       m_sLogSubSystem ("ui"),
       m_sSenderName (sSenderName),
       m_pClientVariableHandler (pClientVariableHandler),
-      m_pBuildJobHandler (pBuildJobHandler), 
-      m_pUserInformation (pUserInformation),
-      m_pAccessControl (pAccessControl),
-      m_pLoginHandler (pLoginHandler),
-      m_pLanguageHandler (pLanguageHandler)
+      m_pUserInformation (pUserInformation)
 {
 
-    if (pLogger.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pStateMachineData.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pSignalHandler.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pToolpathHandler.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pStorage.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pBuildJobHandler.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pStateJournal.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
     if (pUserInformation.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pAccessControl.get () == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pLoginHandler.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pLanguageHandler.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-
     if (pUIHandler == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+    m_pUISystemState = pUIHandler->getUISystemState();
+    m_pLogger = m_pUISystemState->getLogger();
 
     if (!sSenderUUID.empty()) {
         m_sSenderUUID = (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID));
@@ -189,15 +159,15 @@ std::string CUIEnvironment::RetrieveEventSenderUUID()
 
 ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
 {
-    if (!m_pSignalHandler->hasSignalDefinition(sMachineInstance, sSignalName))
+    if (!m_pUISystemState->getSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
 
-    return new CSignalTrigger(m_pSignalHandler, sMachineInstance, sSignalName);
+    return new CSignalTrigger(m_pUISystemState->getSignalHandler(), sMachineInstance, sSignalName);
 }
 
 std::string CUIEnvironment::GetMachineState(const std::string & sMachineInstance)
 {
-    return m_pStateMachineData->getInstanceStateName (sMachineInstance);
+    return m_pUISystemState->getStateMachineData()->getInstanceStateName (sMachineInstance);
 }
 
 void CUIEnvironment::LogMessage(const std::string & sLogString)
@@ -219,35 +189,35 @@ void CUIEnvironment::LogInfo(const std::string & sLogString)
 
 std::string CUIEnvironment::GetMachineParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData ()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
 std::string CUIEnvironment::GetMachineParameterAsUUID(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
 LibMCEnv_double CUIEnvironment::GetMachineParameterAsDouble(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getDoubleParameterValueByName(sParameterName);
 }
 
 LibMCEnv_int64 CUIEnvironment::GetMachineParameterAsInteger(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getIntParameterValueByName(sParameterName);
 }
 
 bool CUIEnvironment::GetMachineParameterAsBool(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getBoolParameterValueByName(sParameterName);
 }
@@ -428,7 +398,7 @@ std::vector<AMC::PUIClientAction>& CUIEnvironment::getClientActions()
 
 ITestEnvironment* CUIEnvironment::GetTestEnvironment()
 {
-    return new CTestEnvironment(m_sTestEnvironmentPath);
+    return new CTestEnvironment(m_pUISystemState->getTestOutputPath ());
 }
 
 LibMCEnv::Impl::IXMLDocument* CUIEnvironment::CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace)
@@ -477,7 +447,7 @@ bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
     try {
-        m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+        m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
         return true;
     }
     catch (std::exception) {
@@ -489,8 +459,8 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-    auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pBuildJob, m_pToolpathHandler, m_pStorage, m_sSystemUserID);
+    auto pBuildJob = m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(pBuildJob, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getStorage(), m_pUISystemState->getSystemUserID());
 }
 
 
@@ -528,7 +498,7 @@ IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2DFromImage(IImageData*
 
 bool CUIEnvironment::CheckPermission(const std::string& sPermissionIdentifier)
 {
-    return m_pAccessControl->checkPermissionInRole(m_pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
+    return m_pUISystemState->getAccessControl()->checkPermissionInRole(m_pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
 }
 
 std::string CUIEnvironment::GetCurrentUserLogin()
@@ -561,12 +531,12 @@ std::string CUIEnvironment::GetCurrentUserUUID()
 
 IUserManagementHandler* CUIEnvironment::CreateUserManagement()
 {
-    return new CUserManagementHandler(m_pLoginHandler, m_pAccessControl, m_pLanguageHandler);
+    return new CUserManagementHandler(m_pUISystemState->getLoginHandler(), m_pUISystemState->getAccessControl(), m_pUISystemState->getLanguageHandler());
 }
 
 IJournalHandler* CUIEnvironment::GetCurrentJournal()
 {
-    return new CJournalHandler(m_pStateJournal);
+    return new CJournalHandler(m_pUISystemState->getStateJournal());
 }
 
 IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
