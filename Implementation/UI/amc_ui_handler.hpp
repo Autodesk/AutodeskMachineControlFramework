@@ -72,6 +72,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUICustomPage, PUICustomPage);
 	amcDeclareDependingClass(CUIDialog, PUIDialog);
 	amcDeclareDependingClass(CLogger, PLogger);
+	amcDeclareDependingClass(CSystemState, PSystemState);
 	amcDeclareDependingClass(CStateJournal, PStateJournal);
 	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
 	amcDeclareDependingClass(CUIModule, PUIModule);
@@ -85,6 +86,51 @@ namespace AMC {
 	amcDeclareDependingClass(CUserInformation, PUserInformation);
 	amcDeclareDependingClass(CAccessControl, PAccessControl);
 	amcDeclareDependingClass(CLanguageHandler, PLanguageHandler);
+	amcDeclareDependingClass(CUISystemState, PUISystemState);
+
+
+	class CUISystemState {
+	private:
+
+		PStateMachineData m_pStateMachineData;
+		PStateSignalHandler m_pSignalHandler; 
+		PLogger m_pLogger;
+		PStateJournal m_pStateJournal;
+	
+		PAccessControl m_pAccessControl;
+		PLanguageHandler m_pLanguageHandler;
+		LibMCData::PLoginHandler m_pLoginHandler;
+
+		PToolpathHandler m_pToolpathHandler;
+		PMeshHandler m_pMeshHandler;
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		LibMCData::PStorage m_pStorage;
+
+		std::string m_sTestOutputPath;
+		std::string m_sSystemUserID;
+
+	public:
+		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler);
+
+		virtual ~CUISystemState();
+
+		PStateMachineData getStateMachineData ();
+		PStateSignalHandler getSignalHandler ();
+		PLogger getLogger ();
+		PStateJournal getStateJournal ();
+
+		PAccessControl getAccessControl ();
+		PLanguageHandler getLanguageHandler ();
+		LibMCData::PLoginHandler getLoginHandler ();
+
+		PToolpathHandler getToolpathHandler ();
+		PMeshHandler getMeshHandler ();
+		LibMCData::PBuildJobHandler getBuildJobHandler ();
+		LibMCData::PStorage getStorage ();
+
+		std::string getTestOutputPath();
+		std::string getSystemUserID();
+	};
 
 	class CUIHandleEventResponse {
 	private:
@@ -118,17 +164,8 @@ namespace AMC {
 		CUIExpression m_LoginWelcomeMessage;
 
 		std::string m_sMainPageName;
-		std::string m_sTestOutputPath;
-		std::string m_sSystemUserID;
 
-		PStateMachineData m_pStateMachineData;
-		PStateSignalHandler m_pSignalHandler;
-		PStateJournal m_pStateJournal;
-		PAccessControl m_pAccessControl;
-		PLanguageHandler m_pLanguageHandler;
-		LibMCData::PLoginHandler m_pLoginHandler;
-
-		PLogger m_pLogger;
+		PUISystemState m_pUISystemState;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
@@ -145,10 +182,6 @@ namespace AMC {
 		LibMCUI::PEventHandler m_pUIEventHandler;
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
-		PToolpathHandler m_pToolpathHandler;
-		PMeshHandler m_pMeshHandler;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-		LibMCData::PStorage m_pStorage;
 
 		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string & sDescription, const std::string& sTargetPage, const std::string & sEventName);
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName);
@@ -161,7 +194,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string & sTestOutputPath, const std::string & sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler);
+		CUIHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PUISystemState pUISystemState);
 		
 		virtual ~CUIHandler();
 		

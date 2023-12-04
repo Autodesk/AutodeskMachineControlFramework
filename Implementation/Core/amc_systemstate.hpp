@@ -76,6 +76,7 @@ namespace AMC {
 	class CStringResourceHandler;
 	class CLanguageHandler;
 	class CMeshHandler;
+	class CDataSeriesHandler;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -90,6 +91,7 @@ namespace AMC {
 	typedef std::shared_ptr<CStringResourceHandler> PStringResourceHandler;
 	typedef std::shared_ptr<CLanguageHandler> PLanguageHandler;
 	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
+	typedef std::shared_ptr<CDataSeriesHandler> PDataSeriesHandler;
 
 	class CSystemState {
 	private:
@@ -105,6 +107,7 @@ namespace AMC {
 		AMC::PStringResourceHandler m_pStringResourceHandler;
 		AMC::PLanguageHandler m_pLanguageHandler;
 		AMC::PMeshHandler m_pMeshHandler;
+		AMC::PDataSeriesHandler m_pDataSeriesHandler;
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
