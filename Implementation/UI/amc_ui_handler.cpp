@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
+#include "amc_ui_systemstate.hpp"
 #include "amc_ui_custompage.hpp"
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module.hpp"
@@ -91,117 +92,6 @@ std::string CUIHandleEventResponse::getErrorMessage()
 std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
 {
     return m_clientActions;
-}
-
-CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler)
-    : m_pStateMachineData(pStateMachineData),
-    m_pSignalHandler(pSignalHandler),
-    m_pBuildJobHandler(pBuildJobHandler),
-    m_pToolpathHandler(pToolpathHandler),
-    m_pStorage(pStorage),
-    m_pStateJournal(pStateJournal),
-    m_sTestOutputPath(sTestOutputPath),
-    m_pLogger(pLogger),
-    m_sSystemUserID(sSystemUserID),
-    m_pAccessControl(pAccessControl),
-    m_pLanguageHandler(pLanguageHandler),
-    m_pLoginHandler(pLoginHandler),
-    m_pMeshHandler(pMeshHandler)
-{
-    if (pStateMachineData.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pSignalHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pBuildJobHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pToolpathHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pStorage.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pLogger.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pStateJournal.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pAccessControl.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pLanguageHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pLoginHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pMeshHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-}
-
-CUISystemState::~CUISystemState()
-{
-
-}
-
-PStateMachineData CUISystemState::getStateMachineData()
-{
-    return m_pStateMachineData;
-}
-
-PStateSignalHandler CUISystemState::getSignalHandler()
-{
-    return m_pSignalHandler;
-}
-
-PLogger CUISystemState::getLogger()
-{
-    return m_pLogger;
-}
-
-PStateJournal CUISystemState::getStateJournal()
-{
-    return m_pStateJournal;
-}
-
-
-std::string CUISystemState::getTestOutputPath()
-{
-    return m_sTestOutputPath;
-}
-
-std::string CUISystemState::getSystemUserID()
-{
-    return m_sSystemUserID;
-}
-
-PAccessControl CUISystemState::getAccessControl()
-{
-    return m_pAccessControl;
-}
-
-PLanguageHandler CUISystemState::getLanguageHandler()
-{
-    return m_pLanguageHandler;
-}
-
-LibMCData::PLoginHandler CUISystemState::getLoginHandler()
-{
-    return m_pLoginHandler;
-}
-
-PToolpathHandler CUISystemState::getToolpathHandler()
-{
-    return m_pToolpathHandler;
-}
-
-PMeshHandler CUISystemState::getMeshHandler()
-{
-    return m_pMeshHandler;
-}
-
-LibMCData::PBuildJobHandler CUISystemState::getBuildJobHandler()
-{
-    return m_pBuildJobHandler;
-}
-
-LibMCData::PStorage CUISystemState::getStorage()
-{
-    return m_pStorage;
 }
 
 

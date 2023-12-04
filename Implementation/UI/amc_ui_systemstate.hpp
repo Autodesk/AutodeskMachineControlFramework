@@ -29,11 +29,92 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_HANDLER
-#define __AMC_UI_HANDLER
+#ifndef __AMC_UI_SYSTEMSTATE
+#define __AMC_UI_SYSTEMSTATE
 
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
 
-#endif //__AMC_UI_HANDLER
+namespace LibMCData {
+	class CDataModel;
+	class CStorage;
+	class CBuildJobHandler;
+	class CLoginHandler;
+	class CPersistencyHandler;
+
+	typedef std::shared_ptr<CDataModel> PDataModel;
+	typedef std::shared_ptr<CStorage> PStorage;
+	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
+	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
+	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
+}
+
+
+
+namespace AMC {
+
+	class CStateMachineData;
+	class CParameterHandler;
+	class CToolpathHandler;
+	class CMeshHandler;
+	class CAccessControl;
+	class CLanguageHandler;
+
+	amcDeclareDependingClass(CLogger, PLogger);
+	amcDeclareDependingClass(CStateJournal, PStateJournal);
+	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
+	amcDeclareDependingClass(CMeshHandler, PMeshHandler);
+	amcDeclareDependingClass(CAccessControl, PAccessControl);
+	amcDeclareDependingClass(CLanguageHandler, PLanguageHandler);
+	amcDeclareDependingClass(CUISystemState, PUISystemState);
+
+	class CUISystemState {
+	private:
+
+		PStateMachineData m_pStateMachineData;
+		PStateSignalHandler m_pSignalHandler;
+		PLogger m_pLogger;
+		PStateJournal m_pStateJournal;
+
+		PAccessControl m_pAccessControl;
+		PLanguageHandler m_pLanguageHandler;
+		LibMCData::PLoginHandler m_pLoginHandler;
+
+		PToolpathHandler m_pToolpathHandler;
+		PMeshHandler m_pMeshHandler;
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		LibMCData::PStorage m_pStorage;
+
+		std::string m_sTestOutputPath;
+		std::string m_sSystemUserID;
+
+	public:
+		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler);
+
+		virtual ~CUISystemState();
+
+		PStateMachineData getStateMachineData();
+		PStateSignalHandler getSignalHandler();
+		PLogger getLogger();
+		PStateJournal getStateJournal();
+
+		PAccessControl getAccessControl();
+		PLanguageHandler getLanguageHandler();
+		LibMCData::PLoginHandler getLoginHandler();
+
+		PToolpathHandler getToolpathHandler();
+		PMeshHandler getMeshHandler();
+		LibMCData::PBuildJobHandler getBuildJobHandler();
+		LibMCData::PStorage getStorage();
+
+		std::string getTestOutputPath();
+		std::string getSystemUserID();
+	};
+
+}
+
+#endif //__AMC_UI_SYSTEMSTATE
 
