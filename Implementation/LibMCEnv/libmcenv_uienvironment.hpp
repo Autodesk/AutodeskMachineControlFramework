@@ -37,11 +37,12 @@ Abstract: This is the class declaration of CUIEnvironment
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_logger.hpp"
-#include "amc_statemachinedata.hpp"
+#include "amc_ui_systemstate.hpp"
 #include "amc_statesignalhandler.hpp"
 #include "amc_ui_clientaction.hpp"
 #include "amc_systemstate.hpp"
 #include "amc_userinformation.hpp"
+#include "amc_ui_systemstate.hpp"
 
 #include <vector>
 
@@ -70,26 +71,16 @@ namespace Impl {
 class CUIEnvironment : public virtual IUIEnvironment, public virtual CBase {
 private:
 
-	AMC::PLogger m_pLogger;
-	AMC::PStateMachineData m_pStateMachineData;
-	AMC::PParameterHandler m_pClientVariableHandler;
-	AMC::PStateSignalHandler m_pSignalHandler;
-	AMC::PToolpathHandler m_pToolpathHandler;
-	AMC::PStateJournal m_pStateJournal;
-	AMC::PAccessControl m_pAccessControl;
-	AMC::PLanguageHandler m_pLanguageHandler;
 	AMC::CUIHandler * m_pUIHandler;
-
-	LibMCData::PStorage m_pStorage;
-	LibMCData::PBuildJobHandler m_pBuildJobHandler;
-	LibMCData::PLoginHandler m_pLoginHandler;
+	AMC::PUISystemState m_pUISystemState;
+	AMC::PLogger m_pLogger;
 
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
-	std::string m_sTestEnvironmentPath;
-	std::string m_sSystemUserID;
+
 	AMC::PUserInformation m_pUserInformation;
+	AMC::PParameterHandler m_pClientVariableHandler;
 
 	AMCCommon::CChrono m_Chrono;
 
@@ -99,7 +90,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, AMC::PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, const std::string & sSystemUserID, AMC::PUserInformation pUserInformation, AMC::PAccessControl pAccessControl, LibMCData::PLoginHandler pLoginHandler, AMC::PLanguageHandler pLanguageHandler);
+	CUIEnvironment(AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandle, const std::string & sTestEnvironmentPath, AMC::PUserInformation pUserInformation);
 
 	virtual ~CUIEnvironment();
 

@@ -711,7 +711,7 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 
     auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pUISystemState->getLogger(), m_pUISystemState->getToolpathHandler (), m_pUISystemState->getBuildJobHandler(), m_pUISystemState->getStorage (), m_pUISystemState->getStateMachineData(), m_pUISystemState->getSignalHandler(), this, sSenderUUID, "", pDummyClientVariableHandler, m_pUISystemState->getStateJournal(), m_pUISystemState->getTestOutputPath (), m_pUISystemState->getSystemUserID (), CUserInformation::makeEmpty (), m_pUISystemState->getAccessControl (), m_pUISystemState->getLoginHandler (), m_pUISystemState->getLanguageHandler ());
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, "", pDummyClientVariableHandler, m_pUISystemState->getTestOutputPath (), CUserInformation::makeEmpty ());
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -780,7 +780,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         }
 
-        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pUISystemState->getLogger(), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getBuildJobHandler (), m_pUISystemState->getStorage (), m_pUISystemState->getStateMachineData (), m_pUISystemState->getSignalHandler (), this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pUISystemState->getStateJournal (), m_pUISystemState->getTestOutputPath (), m_pUISystemState->getSystemUserID (), pUserInformation, m_pUISystemState->getAccessControl(), m_pUISystemState->getLoginHandler (), m_pUISystemState->getLanguageHandler ());
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pUISystemState->getTestOutputPath (), pUserInformation);
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
@@ -856,6 +856,11 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
     return CUIHandleEventResponse (nErrorCode, sErrorMessage, clientActions);
        
 
+}
+
+AMC::PUISystemState CUIHandler::getUISystemState()
+{
+    return m_pUISystemState;
 }
 
 

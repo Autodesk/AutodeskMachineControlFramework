@@ -181,6 +181,8 @@ namespace AMC {
 
 		PUIPage findPage(const std::string& sName);
 		PUIDialog findDialog(const std::string& sName);
+
+		AMC::PUISystemState getUISystemState();
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
