@@ -414,7 +414,11 @@ Custom implementation
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 		
-		<method name="AddSetPower" description="adds a power change to the open list">
+		<method name="AddSetPower" description="adds a power change to the open list. MUST NOT be used for PID control.">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+
+		<method name="AddSetPowerForPIDControl" description="adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.">
 			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
 		</method>
 		
