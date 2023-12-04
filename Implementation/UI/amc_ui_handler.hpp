@@ -89,48 +89,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUISystemState, PUISystemState);
 
 
-	class CUISystemState {
-	private:
-
-		PStateMachineData m_pStateMachineData;
-		PStateSignalHandler m_pSignalHandler; 
-		PLogger m_pLogger;
-		PStateJournal m_pStateJournal;
 	
-		PAccessControl m_pAccessControl;
-		PLanguageHandler m_pLanguageHandler;
-		LibMCData::PLoginHandler m_pLoginHandler;
-
-		PToolpathHandler m_pToolpathHandler;
-		PMeshHandler m_pMeshHandler;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-		LibMCData::PStorage m_pStorage;
-
-		std::string m_sTestOutputPath;
-		std::string m_sSystemUserID;
-
-	public:
-		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler);
-
-		virtual ~CUISystemState();
-
-		PStateMachineData getStateMachineData ();
-		PStateSignalHandler getSignalHandler ();
-		PLogger getLogger ();
-		PStateJournal getStateJournal ();
-
-		PAccessControl getAccessControl ();
-		PLanguageHandler getLanguageHandler ();
-		LibMCData::PLoginHandler getLoginHandler ();
-
-		PToolpathHandler getToolpathHandler ();
-		PMeshHandler getMeshHandler ();
-		LibMCData::PBuildJobHandler getBuildJobHandler ();
-		LibMCData::PStorage getStorage ();
-
-		std::string getTestOutputPath();
-		std::string getSystemUserID();
-	};
 
 	class CUIHandleEventResponse {
 	private:

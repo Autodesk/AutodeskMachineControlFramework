@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_toolpathhandler.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_ui_systemstate.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_accesscontrol.hpp"
 #include "amc_stringresourcehandler.hpp"
