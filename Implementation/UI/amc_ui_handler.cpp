@@ -93,28 +93,22 @@ std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
     return m_clientActions;
 }
 
-
-
-CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler)
-    : m_dLogoAspectRatio (1.0), 
-    m_pStateMachineData(pStateMachineData),
-    m_pEnvironmentWrapper (pEnvironmentWrapper),
-    m_pSignalHandler (pSignalHandler),
-    m_pBuildJobHandler (pBuildJobHandler),
-    m_pToolpathHandler (pToolpathHandler),
-    m_pStorage (pStorage),
-    m_pStateJournal (pStateJournal),
-    m_sTestOutputPath (sTestOutputPath),
+CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler)
+    : m_pStateMachineData(pStateMachineData),
+    m_pSignalHandler(pSignalHandler),
+    m_pBuildJobHandler(pBuildJobHandler),
+    m_pToolpathHandler(pToolpathHandler),
+    m_pStorage(pStorage),
+    m_pStateJournal(pStateJournal),
+    m_sTestOutputPath(sTestOutputPath),
     m_pLogger(pLogger),
-    m_sSystemUserID (sSystemUserID),
-    m_pAccessControl (pAccessControl),
-    m_pLanguageHandler (pLanguageHandler),
-    m_pLoginHandler (pLoginHandler),
-    m_pMeshHandler (pMeshHandler)
+    m_sSystemUserID(sSystemUserID),
+    m_pAccessControl(pAccessControl),
+    m_pLanguageHandler(pLanguageHandler),
+    m_pLoginHandler(pLoginHandler),
+    m_pMeshHandler(pMeshHandler)
 {
     if (pStateMachineData.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pEnvironmentWrapper.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -128,13 +122,100 @@ CUIHandler::CUIHandler(PStateMachineData pStateMachineData, AMC::PToolpathHandle
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pStateJournal.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pAccessControl.get () == nullptr)
+    if (pAccessControl.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pLanguageHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pLoginHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pMeshHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+}
+
+CUISystemState::~CUISystemState()
+{
+
+}
+
+PStateMachineData CUISystemState::getStateMachineData()
+{
+    return m_pStateMachineData;
+}
+
+PStateSignalHandler CUISystemState::getSignalHandler()
+{
+    return m_pSignalHandler;
+}
+
+PLogger CUISystemState::getLogger()
+{
+    return m_pLogger;
+}
+
+PStateJournal CUISystemState::getStateJournal()
+{
+    return m_pStateJournal;
+}
+
+
+std::string CUISystemState::getTestOutputPath()
+{
+    return m_sTestOutputPath;
+}
+
+std::string CUISystemState::getSystemUserID()
+{
+    return m_sSystemUserID;
+}
+
+PAccessControl CUISystemState::getAccessControl()
+{
+    return m_pAccessControl;
+}
+
+PLanguageHandler CUISystemState::getLanguageHandler()
+{
+    return m_pLanguageHandler;
+}
+
+LibMCData::PLoginHandler CUISystemState::getLoginHandler()
+{
+    return m_pLoginHandler;
+}
+
+PToolpathHandler CUISystemState::getToolpathHandler()
+{
+    return m_pToolpathHandler;
+}
+
+PMeshHandler CUISystemState::getMeshHandler()
+{
+    return m_pMeshHandler;
+}
+
+LibMCData::PBuildJobHandler CUISystemState::getBuildJobHandler()
+{
+    return m_pBuildJobHandler;
+}
+
+LibMCData::PStorage CUISystemState::getStorage()
+{
+    return m_pStorage;
+}
+
+
+
+
+
+CUIHandler::CUIHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PUISystemState pUISystemState)
+    : m_dLogoAspectRatio (1.0), 
+    m_pUISystemState (pUISystemState),
+    m_pEnvironmentWrapper (pEnvironmentWrapper)
+{
+    if (pEnvironmentWrapper.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pUISystemState.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 
@@ -206,6 +287,8 @@ PUIPage CUIHandler::findPage(const std::string& sName)
 
 void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler)
 {
+    auto pStateMachineData = m_pUISystemState->getStateMachineData();
+
     writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
     writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
     writer.addString(AMC_API_KEY_UI_MAINPAGE, m_sMainPageName);
@@ -218,11 +301,11 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler
         writer.addString(AMC_API_KEY_UI_TOOLBARLOGOUUID, pToolbarLogoResource->getUUID());
     }
 
-    if (!m_LoginBackgroundUUID.isEmpty(m_pStateMachineData)) {
-        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(m_LoginBackgroundUUID.evaluateStringValue (m_pStateMachineData), true);
+    if (!m_LoginBackgroundUUID.isEmpty(pStateMachineData)) {
+        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(m_LoginBackgroundUUID.evaluateStringValue (pStateMachineData), true);
         writer.addString(AMC_API_KEY_UI_LOGINBACKGROUNDUUID, pResourceEntry->getUUID ());
     }
-    writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(m_pStateMachineData));
+    writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(pStateMachineData));
 
     CJSONWriterObject colorsObject(writer);
     for (auto color : m_Colors) {
@@ -396,6 +479,11 @@ void CUIHandler::setCoreResourcePackage(PResourcePackage pCoreResourcePackage)
 
 void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
 {
+    auto pStateMachineData = m_pUISystemState->getStateMachineData();
+    auto pLogger = m_pUISystemState->getLogger();
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    auto pToolpathHandler = m_pUISystemState->getToolpathHandler();
+
     if (m_pCoreResourcePackage.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
 
@@ -523,7 +611,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger, m_pMeshHandler, m_pToolpathHandler);
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), pLogger, pMeshHandler, pToolpathHandler);
             auto pModule = CUIModuleFactory::createModule(pageChild, sPageName, pModuleEnvironment);
             pPage->addModule(pModule);
 
@@ -548,7 +636,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
 
         auto pPage = addCustomPage_Unsafe(sPageName, sComponentName);
 
-        auto pCustomModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger, m_pMeshHandler, m_pToolpathHandler);
+        auto pCustomModuleEnvironment = std::make_shared<CUIModuleEnvironment>(pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), pLogger, pMeshHandler, pToolpathHandler);
         auto pCustomModule = std::make_shared<CUIModule_Custom>(custompageNode, sPageName, pCustomModuleEnvironment);
         pPage->addModule(pCustomModule);
 
@@ -558,7 +646,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
             auto modulesChildren = modulesNode.children();
             for (pugi::xml_node moduleChild : modulesChildren) {
 
-                auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger, m_pMeshHandler, m_pToolpathHandler);
+                auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), pLogger, pMeshHandler, pToolpathHandler);
                 auto pModule = CUIModuleFactory::createModule(moduleChild, sPageName, pModuleEnvironment);
                 pPage->addModule(pModule);
 
@@ -585,7 +673,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         auto dialogChildren = dialogNode.children();
         for (pugi::xml_node dialogChild : dialogChildren) {
 
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get(), m_pLogger, m_pMeshHandler, m_pToolpathHandler);
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get(), pLogger, pMeshHandler, pToolpathHandler);
             auto pModule = CUIModuleFactory::createModule(dialogChild, sDialogName, pModuleEnvironment);
             pDialog->addModule(pModule);
 
@@ -733,7 +821,7 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 
     auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, "", pDummyClientVariableHandler, m_pStateJournal, m_sTestOutputPath, m_sSystemUserID, CUserInformation::makeEmpty (), m_pAccessControl, m_pLoginHandler, m_pLanguageHandler);
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pUISystemState->getLogger(), m_pUISystemState->getToolpathHandler (), m_pUISystemState->getBuildJobHandler(), m_pUISystemState->getStorage (), m_pUISystemState->getStateMachineData(), m_pUISystemState->getSignalHandler(), this, sSenderUUID, "", pDummyClientVariableHandler, m_pUISystemState->getStateJournal(), m_pUISystemState->getTestOutputPath (), m_pUISystemState->getSystemUserID (), CUserInformation::makeEmpty (), m_pUISystemState->getAccessControl (), m_pUISystemState->getLoginHandler (), m_pUISystemState->getLanguageHandler ());
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -769,6 +857,7 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
 
 CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler, PUserInformation pUserInformation)
 {
+    auto pLogger = m_pUISystemState->getLogger();
 
     uint32_t nErrorCode = 0;
     std::string sErrorMessage;
@@ -801,7 +890,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         }
 
-        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pStateJournal, m_sTestOutputPath, m_sSystemUserID, pUserInformation, m_pAccessControl, m_pLoginHandler, m_pLanguageHandler);
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pUISystemState->getLogger(), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getBuildJobHandler (), m_pUISystemState->getStorage (), m_pUISystemState->getStateMachineData (), m_pUISystemState->getSignalHandler (), this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pUISystemState->getStateJournal (), m_pUISystemState->getTestOutputPath (), m_pUISystemState->getSystemUserID (), pUserInformation, m_pUISystemState->getAccessControl(), m_pUISystemState->getLoginHandler (), m_pUISystemState->getLanguageHandler ());
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
@@ -870,7 +959,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
  
 
     if (nErrorCode) {
-        m_pLogger->logMessage(sErrorMessage, "ui", AMC::eLogLevel::Message);
+        pLogger->logMessage(sErrorMessage, "ui", AMC::eLogLevel::Message);
 
     }
 
