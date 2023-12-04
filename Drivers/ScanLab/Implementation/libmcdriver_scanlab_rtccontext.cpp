@@ -320,7 +320,7 @@ void CRTCContext::SetLaserControlParameters(const bool DisableLaser, const bool 
 
 void CRTCContext::SetLaserPulsesInBits(const LibMCDriver_ScanLab_uint32 nHalfPeriod, const LibMCDriver_ScanLab_uint32 nPulseLength)
 {
-	m_pScanLabSDK->n_set_laser_pulses(m_CardNo, nHalfPeriod, nPulseLength);
+	m_pScanLabSDK->n_set_laser_pulses_ctrl(m_CardNo, nHalfPeriod, nPulseLength);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
 
