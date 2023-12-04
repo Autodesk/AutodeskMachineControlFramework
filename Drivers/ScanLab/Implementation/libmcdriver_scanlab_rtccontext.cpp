@@ -939,6 +939,12 @@ void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
 	writePower(fPowerInPercent, false);
 }
 
+void CRTCContext::AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent)
+{
+	writePower(fPowerInPercent, true);
+}
+
+
 void CRTCContext::AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond)
 {
 	writeJumpSpeed(fJumpSpeedInMMPerSecond);

@@ -693,10 +693,16 @@ public:
 	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
-	* IRTCContext::AddSetPower - adds a power change to the open list
+	* IRTCContext::AddSetPower - adds a power change to the open list. MUST NOT be used for PID control.
 	* @param[in] fPowerInPercent - Laser power in percent
 	*/
 	virtual void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent) = 0;
+
+	/**
+	* IRTCContext::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	virtual void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent) = 0;
 
 	/**
 	* IRTCContext::AddSetJumpSpeed - adds a jump speed change to the open list

@@ -458,13 +458,22 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineO
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
 
 /**
-* adds a power change to the open list
+* adds a power change to the open list. MUST NOT be used for PID control.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] fPowerInPercent - Laser power in percent
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent);
+
+/**
+* adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fPowerInPercent - Laser power in percent
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent);
 
 /**
 * adds a jump speed change to the open list
@@ -1863,6 +1872,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DrawPolylineOIEPtr m_RTCContext_DrawPolylineOIE;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr m_RTCContext_DrawHatches;
 	PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr m_RTCContext_AddSetPower;
+	PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr m_RTCContext_AddSetPowerForPIDControl;
 	PLibMCDriver_ScanLabRTCContext_AddSetJumpSpeedPtr m_RTCContext_AddSetJumpSpeed;
 	PLibMCDriver_ScanLabRTCContext_AddSetMarkSpeedPtr m_RTCContext_AddSetMarkSpeed;
 	PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr m_RTCContext_AddJumpMovement;

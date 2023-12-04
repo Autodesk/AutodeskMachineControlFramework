@@ -303,6 +303,9 @@ public:
 
 	void AddSetPower(const LibMCDriver_ScanLab_single fPower) override;
 
+	void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent) override;
+
+
 	void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeed) override;
 
 	void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeed) override;

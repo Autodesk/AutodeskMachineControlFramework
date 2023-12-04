@@ -597,6 +597,7 @@ public:
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent);
+	inline void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent);
 	inline void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
 	inline void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
 	inline void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
@@ -948,6 +949,7 @@ public:
 		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
 		pWrapperTable->m_RTCContext_AddSetPower = nullptr;
+		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = nullptr;
 		pWrapperTable->m_RTCContext_AddSetJumpSpeed = nullptr;
 		pWrapperTable->m_RTCContext_AddSetMarkSpeed = nullptr;
 		pWrapperTable->m_RTCContext_AddJumpMovement = nullptr;
@@ -1478,6 +1480,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_AddSetPower == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetPowerForPIDControl == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2831,6 +2842,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPower == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol", (void**)&(pWrapperTable->m_RTCContext_AddSetPowerForPIDControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPowerForPIDControl == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetjumpspeed", (void**)&(pWrapperTable->m_RTCContext_AddSetJumpSpeed));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetJumpSpeed == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3796,12 +3811,21 @@ public:
 	}
 	
 	/**
-	* CRTCContext::AddSetPower - adds a power change to the open list
+	* CRTCContext::AddSetPower - adds a power change to the open list. MUST NOT be used for PID control.
 	* @param[in] fPowerInPercent - Laser power in percent
 	*/
 	void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetPower(m_pHandle, fPowerInPercent));
+	}
+	
+	/**
+	* CRTCContext::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	void CRTCContext::AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetPowerForPIDControl(m_pHandle, fPowerInPercent));
 	}
 	
 	/**
