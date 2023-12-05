@@ -221,6 +221,8 @@ void COIEDeviceInstance::buildDeviceConfig(IDeviceConfiguration* pDeviceConfigur
 		if (checkIniKey(sLine, "BackwardTransformation\\enabled")) {
 			if (sCorrectionFileName.empty())
 				sLine = "BackwardTransformation\\enabled=false";
+			else
+				sLine = "BackwardTransformation\\enabled=true";
 		}
 
 		sFilteredDeviceConfigStream << sLine << std::endl;
