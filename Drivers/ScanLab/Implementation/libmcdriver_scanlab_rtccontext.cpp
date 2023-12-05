@@ -1153,6 +1153,8 @@ void CRTCContext::sendFreeVariable0(uint32_t nValue)
 	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, nValue);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
+	m_pScanLabSDK->n_list_nop(m_CardNo);
+
 	m_nCurrentFreeVariable0 = nValue;
 }
 
