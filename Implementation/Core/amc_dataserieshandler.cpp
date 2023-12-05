@@ -44,6 +44,54 @@ namespace AMC {
 	{
 	}
 
+	bool CDataSeriesHandler::hasDataSeries(const std::string& sDataSeriesUUID)
+	{
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataSeriesUUID);
+		auto iIter = m_Entities.find(sNormalizedUUID);
+
+		if (iIter == m_Entities.end()) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+	PDataSeries CDataSeriesHandler::findDataSeries(const std::string& sDataSeriesUUID, bool bFailIfNotExistent)
+	{
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataSeriesUUID);
+		auto iIter = m_Entities.find(sNormalizedUUID);
+
+		if (iIter == m_Entities.end()) {
+			if (bFailIfNotExistent)
+				throw ELibMCCustomException(LIBMC_ERROR_DATASERIESNOTFOUND, sNormalizedUUID);
+
+			return nullptr;
+		}
+
+		return iIter->second;
+
+	}
+
+	PDataSeries CDataSeriesHandler::createDataSeries(const std::string& sName)
+	{
+		std::string sUUID = AMCCommon::CUtils::createUUID();
+		auto pDataSeries = std::make_shared<AMC::CDataSeries> (sUUID, sName);
+
+		m_Entities.insert(std::make_pair (sUUID, pDataSeries));
+
+		return pDataSeries;
+	}
+
+	void CDataSeriesHandler::unloadDataSeries(const std::string& sDataSeriesUUID)
+	{
+
+	}
+
+	void CDataSeriesHandler::unloadAllEntities()
+	{
+
+	}
 
 }
 

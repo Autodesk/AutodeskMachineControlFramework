@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler)
+CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler)
     : m_pStateMachineData(pStateMachineData),
     m_pSignalHandler(pSignalHandler),
     m_pBuildJobHandler(pBuildJobHandler),
@@ -48,7 +48,8 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
     m_pAccessControl(pAccessControl),
     m_pLanguageHandler(pLanguageHandler),
     m_pLoginHandler(pLoginHandler),
-    m_pMeshHandler(pMeshHandler)
+    m_pMeshHandler(pMeshHandler),
+    m_pDataSeriesHandler (pDataSeriesHandler)
 {
     if (pStateMachineData.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -72,6 +73,9 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pMeshHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pDataSeriesHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    
 
 }
 
@@ -144,6 +148,11 @@ LibMCData::PBuildJobHandler CUISystemState::getBuildJobHandler()
 LibMCData::PStorage CUISystemState::getStorage()
 {
     return m_pStorage;
+}
+
+PDataSeriesHandler CUISystemState::getDataSeriesHandler()
+{
+    return m_pDataSeriesHandler;
 }
 
 

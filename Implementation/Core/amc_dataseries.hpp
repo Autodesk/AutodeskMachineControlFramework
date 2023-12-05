@@ -60,6 +60,14 @@ namespace AMC {
 
 		std::string getName();
 
+		void clearData();
+
+		bool isEmpty();
+
+		uint64_t getMinimum();
+
+		uint64_t getMaximum();
+
 
 	};
 

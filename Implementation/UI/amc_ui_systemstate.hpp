@@ -67,6 +67,7 @@ namespace AMC {
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
 	amcDeclareDependingClass(CMeshHandler, PMeshHandler);
+	amcDeclareDependingClass(CDataSeriesHandler, PDataSeriesHandler);
 	amcDeclareDependingClass(CAccessControl, PAccessControl);
 	amcDeclareDependingClass(CLanguageHandler, PLanguageHandler);
 	amcDeclareDependingClass(CUISystemState, PUISystemState);
@@ -82,6 +83,7 @@ namespace AMC {
 		PAccessControl m_pAccessControl;
 		PLanguageHandler m_pLanguageHandler;
 		LibMCData::PLoginHandler m_pLoginHandler;
+		PDataSeriesHandler m_pDataSeriesHandler;
 
 		PToolpathHandler m_pToolpathHandler;
 		PMeshHandler m_pMeshHandler;
@@ -92,7 +94,7 @@ namespace AMC {
 		std::string m_sSystemUserID;
 
 	public:
-		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler);
+		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler);
 
 		virtual ~CUISystemState();
 
@@ -109,6 +111,7 @@ namespace AMC {
 		PMeshHandler getMeshHandler();
 		LibMCData::PBuildJobHandler getBuildJobHandler();
 		LibMCData::PStorage getStorage();
+		PDataSeriesHandler getDataSeriesHandler();
 
 		std::string getTestOutputPath();
 		std::string getSystemUserID();

@@ -596,6 +596,7 @@
 		<error name="INVALIDJOURNALSTREAMQUERY" code="570" description="Invalid journal stream query" />		
 		<error name="INVALIDJOURNALCOMPUTEDATA" code="571" description="Invalid journal compute data" />		
 		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="572" description="Invalid journal compute interval" />		
+		<error name="DATASERIESNOTFOUND" code="573" description="Data series not found" />		
 		
 	</errors>
 	

@@ -42,35 +42,47 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CDataSeries 
 **************************************************************************************************************************/
+CDataSeries::CDataSeries(AMC::PDataSeries pDataSeries)
+	: m_pDataSeries (pDataSeries)
+{
+	if (pDataSeries.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+}
+
+CDataSeries::~CDataSeries()
+{
+
+}
+
 
 std::string CDataSeries::GetName()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pDataSeries->getName();
 }
 
 std::string CDataSeries::GetUUID()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pDataSeries->getUUID();
 }
 
 void CDataSeries::Clear()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pDataSeries->clearData ();
 }
 
 bool CDataSeries::IsEmpty()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pDataSeries->isEmpty();
 }
 
 LibMCEnv_uint64 CDataSeries::GetMinimum()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pDataSeries->getMinimum();
 }
 
 LibMCEnv_uint64 CDataSeries::GetMaximum()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pDataSeries->getMaximum();
 }
 
 void CDataSeries::GetAllEntries(LibMCEnv_uint64 nEntryArrayBufferSize, LibMCEnv_uint64* pEntryArrayNeededCount, LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer)
