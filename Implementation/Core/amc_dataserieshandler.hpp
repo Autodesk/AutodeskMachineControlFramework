@@ -59,6 +59,8 @@ namespace AMC {
 
 		bool hasDataSeries(const std::string& sDataSeriesUUID);
 		PDataSeries findDataSeries(const std::string & sDataSeriesUUID, bool bFailIfNotExistent);
+
+		PDataSeries createDataSeries(const std::string & sName);
 		
 		void unloadDataSeries (const std::string& sDataSeriesUUID);
 		void unloadAllEntities();

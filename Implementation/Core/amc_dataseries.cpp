@@ -57,6 +57,25 @@ namespace AMC {
 		return m_sName;
 	}
 
+	void CDataSeries::clearData()
+	{
+
+	}
+
+	bool CDataSeries::isEmpty()
+	{
+		return true;
+	}
+
+	uint64_t CDataSeries::getMinimum()
+	{
+		return 0;
+	}
+
+	uint64_t CDataSeries::getMaximum()
+	{
+		return 0;
+	}
 
 }
 

@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CDataSeries
 #endif
 
 // Include custom headers here.
-
+#include "amc_dataseries.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -57,27 +57,13 @@ namespace Impl {
 
 class CDataSeries : public virtual IDataSeries, public virtual CBase {
 private:
-
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	AMC::PDataSeries m_pDataSeries;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CDataSeries(AMC::PDataSeries pDataSeries);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+	virtual ~CDataSeries();
 
 	std::string GetName() override;
 

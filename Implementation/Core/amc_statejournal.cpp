@@ -698,6 +698,8 @@ namespace AMC {
 		resultStatistics.m_dAverageSquaredValue = dSquaredIntegral / ((double)nTimeDifference);
 		resultStatistics.m_dVariance = resultStatistics.m_dAverageSquaredValue - resultStatistics.m_dAverageValue * resultStatistics.m_dAverageValue;
 
+		return resultStatistics;
+
 	}
 
 

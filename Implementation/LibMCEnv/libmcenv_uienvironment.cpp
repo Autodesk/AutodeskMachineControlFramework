@@ -37,15 +37,20 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_journalhandler.hpp"
+#include "libmcenv_dataseries.hpp"
+#include "libmcenv_meshobject.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
+#include "amc_meshhandler.hpp"
+#include "amc_dataserieshandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_journalvariable.hpp"
 
+#include "amc_toolpathhandler.hpp"
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
@@ -541,37 +546,65 @@ IJournalHandler* CUIEnvironment::GetCurrentJournal()
 
 IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    auto pLib3MFWrapper = m_pUISystemState->getToolpathHandler()->getLib3MFWrapper();
+
+    auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName);
+
+    return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
 }
 
 bool CUIEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    return pMeshHandler->hasMeshEntity(sMeshUUID);
 }
 
 IMeshObject* CUIEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
+
+    if (pMeshEntity.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
+
+    return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
 }
 
 IDataSeries* CUIEnvironment::CreateDataSeries(const std::string& sName, const bool bBoundToLogin)
-{
-    return nullptr;
+{    
+    auto pDataSeriesHandler = m_pUISystemState->getDataSeriesHandler();
+    auto pDataSeries = pDataSeriesHandler->createDataSeries(sName);
+
+    return new CDataSeries(pDataSeries);
 
 }
 
 bool CUIEnvironment::HasDataSeries(const std::string& sDataSeriesUUID)
 {
-    return true;
+    auto pDataSeriesHandler = m_pUISystemState->getDataSeriesHandler();
+    return pDataSeriesHandler->hasDataSeries(sDataSeriesUUID);
 }
 
 IDataSeries* CUIEnvironment::FindDataSeries(const std::string& sDataSeriesUUID)
 {
-    return nullptr;
+    auto pDataSeries = m_pUISystemState->getDataSeriesHandler()->findDataSeries(sDataSeriesUUID, true);
+
+    return new CDataSeries(pDataSeries);
+
 
 }
 
 void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 {
+    auto pDataSeriesHandler = m_pUISystemState->getDataSeriesHandler();
+    pDataSeriesHandler->unloadDataSeries(sDataSeriesUUID);
 
 }
