@@ -40,6 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+	typedef struct _sDataSeriesEntry {
+		uint32_t m_nTimeStamp;
+		double m_dValue;
+	} sDataSeriesEntry;
+
 
 	class CDataSeries;
 	typedef std::shared_ptr<CDataSeries> PDataSeries;
@@ -49,6 +54,8 @@ namespace AMC {
 
 		std::string m_sUUID;
 		std::string m_sName;
+
+		std::vector<sDataSeriesEntry> m_Entries;
 
 	public:
 
@@ -67,6 +74,10 @@ namespace AMC {
 		uint64_t getMinimum();
 
 		uint64_t getMaximum();
+
+		uint64_t getEntryCount();
+
+		std::vector<sDataSeriesEntry> & getEntries ();
 
 
 	};

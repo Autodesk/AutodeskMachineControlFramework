@@ -49,16 +49,16 @@ PUIModule_ContentChart CUIModule_ContentChart::makeFromXML(const pugi::xml_node&
 {
 	LibMCAssertNotNull(pUIModuleEnvironment);
 
-	auto pItem = std::make_shared <CUIModule_ContentChart>(AMCCommon::CUtils::createUUID (), sItemName, sModulePath);
+	auto pItem = std::make_shared <CUIModule_ContentChart>(AMCCommon::CUtils::createUUID (), sItemName, sModulePath, pUIModuleEnvironment->stateMachineData ());
 
 	return pItem;
 }
 
 
-CUIModule_ContentChart::CUIModule_ContentChart(const std::string& sUUID, const std::string& sItemName, const std::string& sModulePath)
-	: CUIModule_ContentItem(sUUID, sItemName, sModulePath)
+CUIModule_ContentChart::CUIModule_ContentChart(const std::string& sUUID, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData)
+	: CUIModule_ContentItem(sUUID, sItemName, sModulePath), m_pStateMachineData (pStateMachineData)
 {
-
+	LibMCAssertNotNull(m_pStateMachineData.get ());
 }
 
 CUIModule_ContentChart::~CUIModule_ContentChart()
@@ -66,11 +66,29 @@ CUIModule_ContentChart::~CUIModule_ContentChart()
 
 }
 
+void CUIModule_ContentChart::populateClientVariables(CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "chart UI element");
+	pGroup->addNewStringParameter("dataseries", "data series UUID", AMCCommon::CUtils::createEmptyUUID());
+}
 
 void CUIModule_ContentChart::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
+	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "chart");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	//object.addDouble(AMC_API_KEY_UI_ITEMASPECTRATIO, m_dAspectRatio);
+	object.addString(AMC_API_KEY_UI_DATASERIES, pGroup->getParameterValueByName ("dataseries"));
 
 }
+
+void CUIModule_ContentChart::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
+{
+	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "chart");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_DATASERIES, pGroup->getParameterValueByName("dataseries"));
+}
+

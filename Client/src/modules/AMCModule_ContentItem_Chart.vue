@@ -46,36 +46,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	  },
 	  
 		mounted() {
+									
+			this.moduleitem.onChartDataUpdated = this.updateChartData;
 			
-			
-			let normalizedUUID = "d20b8598-1d4d-4cb8-a594-2f16abbae13d";
-			
-			this.Application.axiosGetArrayBufferRequest("/ui/chart/" + normalizedUUID)
-				.then(responseData => {
-					var floatView = new Float32Array(responseData.data);
-					let dataLength = floatView.length;
-					let pointCount = dataLength / 2;
-										
-					this.newData = [];
-					for (let index = 0; index < pointCount; index++) {
-						let xvalue = floatView[index * 2];
-						let yvalue = floatView[index * 2 + 1];
-						this.newData.push ([xvalue, yvalue]);
-					}
-					
+		},
+		
+		methods: {
+		
+			updateChartData ()
+			{
+				if (this.moduleitem) {
+				
 					this.$refs.apexChart.updateSeries([{
-						data: this.newData
-					}]); 
+						data: this.moduleitem.chartData
+					}]); 				
 					
-				})
-				.catch(err => {
-					if (err.response) {
-						console.log (err.response);
-					} else {
-						console.log ("fatal error while retrieving chart data " + normalizedUUID);
-					}
-				});			
-			
+				}
+				
+			}
+		
 		},
 	  
 	   data: () => ({
@@ -119,7 +108,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       },
 	  
   newData: [],
-	  
+  	  
   series: [
     {
       name: "Series 1",

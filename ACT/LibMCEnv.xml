@@ -171,6 +171,9 @@
 		<error name="INVALIDPIXELSIZE" code="10131" description="Invalid pixel size"/>
 		<error name="MESHISNOTREGISTERED" code="10132" description="Mesh is not registered"/>
 		<error name="INVALIDUSERINDEX" code="10133" description="Invalid user index"/>
+		<error name="DATASERIESTIMESTAMPSNOTINCREMENTING" code="10134" description="Data series time stamps not incrementing" />		
+		<error name="INVALIDNUMBEROFSAMPLES" code="10135" description="Invalid number of samples"/>
+		
 		
 
 	</errors>

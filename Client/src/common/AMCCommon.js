@@ -96,6 +96,11 @@ export class AMCApplicationItem extends AMCObject {
 		Assert.ObjectValue (updateJSON);
 	}
 
+	getApplication ()
+	{
+		return this.moduleInstance.page.application;
+	}
+	
 }
 
 

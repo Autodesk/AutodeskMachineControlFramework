@@ -658,6 +658,7 @@ public:
 			case LIBMC_ERROR_INVALIDJOURNALCOMPUTEDATA: return "INVALIDJOURNALCOMPUTEDATA";
 			case LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "INVALIDJOURNALCOMPUTEINTERVAL";
 			case LIBMC_ERROR_DATASERIESNOTFOUND: return "DATASERIESNOTFOUND";
+			case LIBMC_ERROR_DATASERIESISEMPTY: return "DATASERIESISEMPTY";
 		}
 		return "UNKNOWN";
 	}
@@ -1158,6 +1159,7 @@ public:
 			case LIBMC_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid journal compute data";
 			case LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid journal compute interval";
 			case LIBMC_ERROR_DATASERIESNOTFOUND: return "Data series not found";
+			case LIBMC_ERROR_DATASERIESISEMPTY: return "Data series is empty";
 		}
 		return "unknown error";
 	}

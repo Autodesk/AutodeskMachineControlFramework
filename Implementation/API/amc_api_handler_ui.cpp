@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_clientaction.hpp"
 #include "amc_meshentity.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_dataserieshandler.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -305,17 +306,30 @@ PAPIResponse CAPIHandler_UI::handleChartRequest(const std::string& sParameterUUI
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto apiResponse = std::make_shared<CAPIFixedFloatBufferResponse>("application/binary");
-	apiResponse->resizeTo(2000);
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	auto pDataSeries = pDataSeriesHandler->findDataSeries(sParameterUUID, false);
 
-	for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
-		double dValue = sin((double) nIndex * 0.1) * 10 * exp(- (double) nIndex * 0.002);
-		apiResponse->addFloat((float)nIndex);
-		apiResponse->addFloat((float)dValue);
+	if (pDataSeries.get() != nullptr) {
+
+		auto apiResponse = std::make_shared<CAPIFixedFloatBufferResponse>("application/binary");
+		auto & entries = pDataSeries->getEntries();
+
+		size_t nEntryCount = entries.size();
+		apiResponse->resizeTo(nEntryCount * 2);
+
+		for (size_t nIndex = 0; nIndex < nEntryCount; nIndex++) {
+			auto & entry = entries.at(nIndex);
+			
+			apiResponse->addFloat((float) (entry.m_nTimeStamp * 0.001));
+			apiResponse->addFloat((float) entry.m_dValue);
+		}
+
+		return apiResponse;
+
 	}
 
 	// if not found, return 404
-	return apiResponse;
+	return nullptr;
 
 }
 

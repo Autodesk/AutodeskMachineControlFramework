@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_contentitem.hpp"
 #include "pugixml.hpp"
+#include "amc_ui_expression.hpp"
 
 
 namespace AMC {
@@ -48,18 +49,22 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 	class CUIModule_ContentChart : public CUIModule_ContentItem {
-	protected:		
+	private:		
+		PStateMachineData m_pStateMachineData;
 
 	public:
 
 		static PUIModule_ContentChart makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentChart(const std::string & sUUID, const std::string& sItemName, const std::string& sModulePath);
+		CUIModule_ContentChart(const std::string & sUUID, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData);
 		
 		virtual ~CUIModule_ContentChart();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
+
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
 	};
 

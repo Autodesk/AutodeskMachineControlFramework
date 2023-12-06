@@ -211,6 +211,11 @@ namespace AMC {
 		return m_pMeshHandler;
 	}
 
+	PDataSeriesHandler CSystemState::getDataSeriesHandlerInstance()
+	{
+		return m_pDataSeriesHandler;
+	}
+
 
 	PStateMachineData CSystemState::getStateMachineData()
 	{

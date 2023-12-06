@@ -59,22 +59,38 @@ namespace AMC {
 
 	void CDataSeries::clearData()
 	{
+		m_Entries.clear();
+	}
 
+	uint64_t CDataSeries::getEntryCount()
+	{
+		return m_Entries.size();
 	}
 
 	bool CDataSeries::isEmpty()
 	{
-		return true;
+		return (m_Entries.size() == 0);
 	}
 
 	uint64_t CDataSeries::getMinimum()
 	{
-		return 0;
+		if (m_Entries.size() == 0)
+			throw ELibMCCustomException(LIBMC_ERROR_DATASERIESISEMPTY, m_sName);
+
+		return m_Entries.begin ()->m_nTimeStamp;
 	}
 
 	uint64_t CDataSeries::getMaximum()
 	{
-		return 0;
+		if (m_Entries.size() == 0)
+			throw ELibMCCustomException(LIBMC_ERROR_DATASERIESISEMPTY, m_sName);
+
+		return m_Entries.rbegin()->m_nTimeStamp;
+	}
+
+	std::vector<sDataSeriesEntry>& CDataSeries::getEntries()
+	{
+		return m_Entries;
 	}
 
 }
