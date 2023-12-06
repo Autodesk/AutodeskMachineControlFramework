@@ -206,9 +206,65 @@ class AMCApplicationItem_Content_Chart extends Common.AMCApplicationItem {
 		
 		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
 		this.registerClass ("amcItem_Chart");
+		
+		this.dataseries = Common.nullUUID ();
+		this.loadeddataseries = Common.nullUUID ();
+		
+		this.onChartDataUpdated = null;
+		this.chartData = [];
+		
+		this.updateFromJSON (itemJSON);
+		
+		this.setRefreshFlag ();
+	}
+
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);
+		
+		this.dataseries = Assert.UUIDValue (updateJSON.dataseries);
+		if (this.loadeddataseries != this.dataseries) {
+			this.loadeddataseries = this.dataseries;
+			this.refreshChartData ();
+		}
 				
 	}
-		
+	
+	
+	refreshChartData ()
+	{
+		let application = this.getApplication ();
+		let normalizedUUID = this.dataseries;
+	
+		application.axiosGetArrayBufferRequest("/ui/chart/" + normalizedUUID)
+				.then(responseData => {
+					var floatView = new Float32Array(responseData.data);
+					let dataLength = floatView.length;
+					let pointCount = dataLength / 2;
+										
+					this.chartData = [];
+					for (let index = 0; index < pointCount; index++) {
+						let xvalue = floatView[index * 2];
+						let yvalue = floatView[index * 2 + 1];
+						this.chartData.push ([xvalue, yvalue]);
+					}
+					
+					if (this.onChartDataUpdated)
+						this.onChartDataUpdated ();
+										
+				})
+				.catch(err => {
+					this.loadeddataseries = Common.nullUUID ();
+					
+					if (err.response) {
+						console.log (err.response);
+					} else {
+						console.log ("fatal error while retrieving chart data " + normalizedUUID);
+					}
+				});			
+	
+	}
+
 }
 
 

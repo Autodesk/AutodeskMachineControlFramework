@@ -154,6 +154,7 @@ namespace AMC {
 		PAccessControl getAccessControlInstance();
 		PLanguageHandler getLanguageHandlerInstance();
 		PMeshHandler getMeshHandlerInstance();
+		PDataSeriesHandler getDataSeriesHandlerInstance();
 
 		LibMCData::PStorage getStorageInstance();
 		LibMCData::PLoginHandler getLoginHandlerInstance();

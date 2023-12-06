@@ -228,6 +228,8 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDPIXELSIZE 10131 /** Invalid pixel size */
 #define LIBMCENV_ERROR_MESHISNOTREGISTERED 10132 /** Mesh is not registered */
 #define LIBMCENV_ERROR_INVALIDUSERINDEX 10133 /** Invalid user index */
+#define LIBMCENV_ERROR_DATASERIESTIMESTAMPSNOTINCREMENTING 10134 /** Data series time stamps not incrementing */
+#define LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES 10135 /** Invalid number of samples */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -368,6 +370,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDPIXELSIZE: return "Invalid pixel size";
     case LIBMCENV_ERROR_MESHISNOTREGISTERED: return "Mesh is not registered";
     case LIBMCENV_ERROR_INVALIDUSERINDEX: return "Invalid user index";
+    case LIBMCENV_ERROR_DATASERIESTIMESTAMPSNOTINCREMENTING: return "Data series time stamps not incrementing";
+    case LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES: return "Invalid number of samples";
     default: return "unknown error";
   }
 }

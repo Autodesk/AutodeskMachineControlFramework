@@ -588,6 +588,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDJOURNALCOMPUTEDATA 571 /** Invalid journal compute data */
 #define LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL 572 /** Invalid journal compute interval */
 #define LIBMC_ERROR_DATASERIESNOTFOUND 573 /** Data series not found */
+#define LIBMC_ERROR_DATASERIESISEMPTY 574 /** Data series is empty */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1088,6 +1089,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDJOURNALCOMPUTEDATA: return "Invalid journal compute data";
     case LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid journal compute interval";
     case LIBMC_ERROR_DATASERIESNOTFOUND: return "Data series not found";
+    case LIBMC_ERROR_DATASERIESISEMPTY: return "Data series is empty";
     default: return "unknown error";
   }
 }
