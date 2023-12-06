@@ -124,7 +124,7 @@ public:
 			auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID("importbuildjob.preview", "builduuid");
 
 			pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
-			pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 200);
+			pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 3);
 
 			auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_initjob");
 			pSignal->SetString("jobuuid", sBuildUUID);
@@ -190,6 +190,19 @@ public:
 
 		std::vector <LibMCEnv::sTimeStreamEntry> timeStream;
 		pJournalVariable->ReceiveRawTimeStream(timeStream);
+
+		std::vector<LibMCEnv::sTimeStreamEntry> entryBuffer;
+
+		for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
+			entryBuffer.push_back({ nIndex, sin (nIndex * 0.01) * 100 });
+		}
+		
+		auto pDataSeries = pUIEnvironment->CreateDataSeries("testseries", true);
+		pDataSeries->SetAllEntries(entryBuffer);
+		auto sUUID = pDataSeries->GetUUID();
+		pUIEnvironment->LogMessage("Series UUID: " + sUUID);
+
+		pUIEnvironment->SetUIPropertyAsUUID("main.infobox.chart1", "dataseries", sUUID);
 
 
 
