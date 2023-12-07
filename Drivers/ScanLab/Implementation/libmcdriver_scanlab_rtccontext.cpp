@@ -563,10 +563,7 @@ void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
 			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
 			break;
 		case eLaserPort::Port12BitAnalog1andAnalog2:
-			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
-			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 1, digitalPowerValue, 1);
-			m_pScanLabSDK->n_set_multi_mcbsp_in_list(m_CardNo, 2, digitalPowerValue, 1);
-			break;
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID);
 		}
 
 		// See documentation what 1 means.

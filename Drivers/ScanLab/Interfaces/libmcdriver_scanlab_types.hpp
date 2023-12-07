@@ -171,6 +171,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED 1064 /** Power calibration lookup failed. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK 1065 /** Invalid modulation callback. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD 1066 /** Invalid subdivision threshold. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID 1067 /** Multiple laser ports are not compatible with PID control. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -254,6 +255,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "Power calibration lookup failed.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK: return "Invalid modulation callback.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "Invalid subdivision threshold.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID: return "Multiple laser ports are not compatible with PID control.";
     default: return "unknown error";
   }
 }
