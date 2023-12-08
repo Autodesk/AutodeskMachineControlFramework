@@ -226,9 +226,9 @@ namespace AMC {
 			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler);
 
 			if (sNextState.empty())
-				throw ELibMCCustomException(LIBMC_ERROR_NOOUTSTATEGIVEN, m_sName + "/" + sCurrentState);
+				throw ELibMCCustomException(LIBMC_ERROR_NOOUTSTATEGIVEN, m_sName + ": " + sCurrentState);
 			if (!m_pCurrentState->hasOutState(sNextState) && (sNextState != m_pFailedState->getName()))
-				throw ELibMCCustomException(LIBMC_ERROR_INVALIDOUTSTATEGIVEN, m_sName + "/" + sCurrentState);
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDOUTSTATEGIVEN, m_sName + ": " + sCurrentState + "->" + sNextState);
 
 			// Set new current state		
 			if (sCurrentState != sNextState)
