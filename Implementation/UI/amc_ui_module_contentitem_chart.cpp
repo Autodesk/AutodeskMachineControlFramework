@@ -49,16 +49,17 @@ PUIModule_ContentChart CUIModule_ContentChart::makeFromXML(const pugi::xml_node&
 {
 	LibMCAssertNotNull(pUIModuleEnvironment);
 
-	auto pItem = std::make_shared <CUIModule_ContentChart>(AMCCommon::CUtils::createUUID (), sItemName, sModulePath, pUIModuleEnvironment->stateMachineData ());
+	auto pItem = std::make_shared <CUIModule_ContentChart>(AMCCommon::CUtils::createUUID (), sItemName, sModulePath, pUIModuleEnvironment->stateMachineData (), pUIModuleEnvironment->dataSeriesHandler ());
 
 	return pItem;
 }
 
 
-CUIModule_ContentChart::CUIModule_ContentChart(const std::string& sUUID, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData)
-	: CUIModule_ContentItem(sUUID, sItemName, sModulePath), m_pStateMachineData (pStateMachineData)
+CUIModule_ContentChart::CUIModule_ContentChart(const std::string& sUUID, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData, PDataSeriesHandler pDataSeriesHandler)
+	: CUIModule_ContentItem(sUUID, sItemName, sModulePath), m_pStateMachineData (pStateMachineData), m_pDataSeriesHandler (pDataSeriesHandler)
 {
 	LibMCAssertNotNull(m_pStateMachineData.get ());
+	LibMCAssertNotNull(pDataSeriesHandler.get());
 }
 
 CUIModule_ContentChart::~CUIModule_ContentChart()
@@ -75,11 +76,18 @@ void CUIModule_ContentChart::populateClientVariables(CParameterHandler* pClientV
 
 void CUIModule_ContentChart::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
+
 	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+	std::string sDataSeriesUUID = pGroup->getParameterValueByName("dataseries");
 
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "chart");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_DATASERIES, pGroup->getParameterValueByName ("dataseries"));
+	if (!sDataSeriesUUID.empty()) {
+		object.addString(AMC_API_KEY_UI_DATASERIES, sDataSeriesUUID);
+		auto pDataSeries = m_pDataSeriesHandler->findDataSeries(sDataSeriesUUID, false);
+		if (pDataSeries.get () != nullptr)
+			object.addInteger(AMC_API_KEY_UI_VERSION, pDataSeries->getVersion ());
+	}
 
 }
 

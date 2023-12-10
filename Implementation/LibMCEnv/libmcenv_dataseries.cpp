@@ -68,6 +68,7 @@ std::string CDataSeries::GetUUID()
 
 void CDataSeries::Clear()
 {
+	m_pDataSeries->increaseVersion();
 	m_pDataSeries->clearData ();
 }
 
@@ -117,6 +118,8 @@ void CDataSeries::GetAllEntries(LibMCEnv_uint64 nEntryArrayBufferSize, LibMCEnv_
 
 void CDataSeries::SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, const LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer)
 {
+	m_pDataSeries->increaseVersion();
+
 	auto& entries = m_pDataSeries->getEntries();
 	entries.clear();
 
@@ -150,6 +153,7 @@ void CDataSeries::SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, con
 
 void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta)
 {
+	m_pDataSeries->increaseVersion();
 	auto& entries = m_pDataSeries->getEntries();
 	entries.clear();
 
@@ -183,3 +187,14 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 
 }
 
+
+LibMCEnv_uint32 CDataSeries::GetVersion()
+{
+	return m_pDataSeries->getVersion();
+}
+
+void CDataSeries::IncreaseVersion()
+{
+	m_pDataSeries->increaseVersion();
+
+}

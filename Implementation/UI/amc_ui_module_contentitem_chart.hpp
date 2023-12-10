@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem.hpp"
 #include "pugixml.hpp"
 #include "amc_ui_expression.hpp"
+#include "amc_dataserieshandler.hpp"
 
 
 namespace AMC {
@@ -51,12 +52,13 @@ namespace AMC {
 	class CUIModule_ContentChart : public CUIModule_ContentItem {
 	private:		
 		PStateMachineData m_pStateMachineData;
+		PDataSeriesHandler m_pDataSeriesHandler;
 
 	public:
 
 		static PUIModule_ContentChart makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentChart(const std::string & sUUID, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData);
+		CUIModule_ContentChart(const std::string & sUUID, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData, PDataSeriesHandler pDataSeriesHandler);
 		
 		virtual ~CUIModule_ContentChart();
 

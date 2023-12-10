@@ -605,6 +605,13 @@
 			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
 		</method>
 		
+		<method name="GetVersion" description="Returns the incrementing change version of the data series.">
+			<param name="Version" type="uint32" pass="return" description="Version number. Increases with every change to the data." />
+		</method>
+
+		<method name="IncreaseVersion" description="Increases the version number of the data series.">
+		</method>
+
 		
 	</class>
 
@@ -2686,6 +2693,26 @@
 			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
 			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
 		</method>	
+				
+		<method name="CreateDataSeries" description="Creates a new empty data series object.">
+			<param name="Name" type="string" pass="in" description="Name to use for this data series. MUST NOT be an empty string." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="HasDataSeries" description="Checks if a data series exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="DataSeriesExists" type="bool" pass="return" description="returns true if series exists." />
+		</method>	
+
+		<method name="FindDataSeries" description="Finds a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="ReleaseDataSeries" description="Releases the memory of a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to release." />
+		</method>	
+		
 
 	</class>
 

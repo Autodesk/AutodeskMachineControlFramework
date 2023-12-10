@@ -54,6 +54,7 @@ namespace AMC {
 
 		std::string m_sUUID;
 		std::string m_sName;
+		uint32_t m_nVersion;
 
 		std::vector<sDataSeriesEntry> m_Entries;
 
@@ -79,6 +80,9 @@ namespace AMC {
 
 		std::vector<sDataSeriesEntry> & getEntries ();
 
+		void increaseVersion();
+
+		uint32_t getVersion();
 
 	};
 

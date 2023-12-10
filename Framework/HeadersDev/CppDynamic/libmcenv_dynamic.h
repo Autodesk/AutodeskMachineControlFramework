@@ -680,6 +680,23 @@ typedef LibMCEnvResult (*PLibMCEnvDataSeries_SetAllEntriesPtr) (LibMCEnv_DataSer
 */
 typedef LibMCEnvResult (*PLibMCEnvDataSeries_SampleJournalVariablePtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta);
 
+/**
+* Returns the incrementing change version of the data series.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[out] pVersion - Version number. Increases with every change to the data.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_GetVersionPtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint32 * pVersion);
+
+/**
+* Increases the version number of the data series.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_IncreaseVersionPtr) (LibMCEnv_DataSeries pDataSeries);
+
 /*************************************************************************************************************************
  Class definition for MeshObject
 **************************************************************************************************************************/
@@ -4808,6 +4825,45 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) (LibMCEn
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
 
+/**
+* Creates a new empty data series object.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name to use for this data series. MUST NOT be an empty string.
+* @param[out] pInstance - Data series instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateDataSeriesPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_DataSeries * pInstance);
+
+/**
+* Checks if a data series exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to find.
+* @param[out] pDataSeriesExists - returns true if series exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasDataSeriesPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID, bool * pDataSeriesExists);
+
+/**
+* Finds a data series. Fails if data series does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to find.
+* @param[out] pInstance - Data series instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindDataSeriesPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID, LibMCEnv_DataSeries * pInstance);
+
+/**
+* Releases the memory of a data series. Fails if data series does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to release.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID);
+
 /*************************************************************************************************************************
  Class definition for UIItem
 **************************************************************************************************************************/
@@ -5587,6 +5643,8 @@ typedef struct {
 	PLibMCEnvDataSeries_GetAllEntriesPtr m_DataSeries_GetAllEntries;
 	PLibMCEnvDataSeries_SetAllEntriesPtr m_DataSeries_SetAllEntries;
 	PLibMCEnvDataSeries_SampleJournalVariablePtr m_DataSeries_SampleJournalVariable;
+	PLibMCEnvDataSeries_GetVersionPtr m_DataSeries_GetVersion;
+	PLibMCEnvDataSeries_IncreaseVersionPtr m_DataSeries_IncreaseVersion;
 	PLibMCEnvMeshObject_GetNamePtr m_MeshObject_GetName;
 	PLibMCEnvMeshObject_GetUUIDPtr m_MeshObject_GetUUID;
 	PLibMCEnvMeshObject_GetTriangleCountPtr m_MeshObject_GetTriangleCount;
@@ -5962,6 +6020,10 @@ typedef struct {
 	PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr m_StateEnvironment_RegisterMeshFrom3MFResource;
 	PLibMCEnvStateEnvironment_MeshIsRegisteredPtr m_StateEnvironment_MeshIsRegistered;
 	PLibMCEnvStateEnvironment_FindRegisteredMeshPtr m_StateEnvironment_FindRegisteredMesh;
+	PLibMCEnvStateEnvironment_CreateDataSeriesPtr m_StateEnvironment_CreateDataSeries;
+	PLibMCEnvStateEnvironment_HasDataSeriesPtr m_StateEnvironment_HasDataSeries;
+	PLibMCEnvStateEnvironment_FindDataSeriesPtr m_StateEnvironment_FindDataSeries;
+	PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr m_StateEnvironment_ReleaseDataSeries;
 	PLibMCEnvUIItem_GetNamePtr m_UIItem_GetName;
 	PLibMCEnvUIItem_GetPathPtr m_UIItem_GetPath;
 	PLibMCEnvUIItem_GetUUIDPtr m_UIItem_GetUUID;

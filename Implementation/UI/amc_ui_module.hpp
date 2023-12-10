@@ -59,25 +59,24 @@ namespace AMC {
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CMeshHandler, PMeshHandler);
 	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
+	amcDeclareDependingClass(CDataSeriesHandler, PDataSeriesHandler);
+	amcDeclareDependingClass(CUISystemState, PUISystemState);
 
 	class CUIModuleEnvironment {
 	private:
-		PStateMachineData m_pStateMachineData;
+		PUISystemState m_pUISystemState;
 		PResourcePackage m_pResourcePackage;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		CUIModule_ContentRegistry* m_pContentRegistry;
-		PMeshHandler m_pMeshHandler;
-		PToolpathHandler m_pToolpathHandler;
-
-		PLogger m_pLogger;
 
 	public:
-		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry, PLogger pLogger, PMeshHandler pMeshHandler, PToolpathHandler pToolpathHandler);
+		CUIModuleEnvironment(PUISystemState pUISystemState, CUIModule_ContentRegistry* pContentRegistry, PResourcePackage pResourcePackage);
+		virtual ~CUIModuleEnvironment();
 
 		PStateMachineData stateMachineData();
 		PResourcePackage resourcePackage();
 		PMeshHandler meshHandler();
 		PToolpathHandler toolpathHandler();
+		PDataSeriesHandler dataSeriesHandler();
 		LibMCData::PBuildJobHandler buildJobHandler ();
 		CUIModule_ContentRegistry* contentRegistry ();
 		CLogger* getLogger();

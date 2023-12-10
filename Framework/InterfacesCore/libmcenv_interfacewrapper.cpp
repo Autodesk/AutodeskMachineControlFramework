@@ -1676,6 +1676,56 @@ LibMCEnvResult libmcenv_dataseries_samplejournalvariable(LibMCEnv_DataSeries pDa
 	}
 }
 
+LibMCEnvResult libmcenv_dataseries_getversion(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint32 * pVersion)
+{
+	IBase* pIBaseClass = (IBase *)pDataSeries;
+
+	try {
+		if (pVersion == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDataSeries* pIDataSeries = dynamic_cast<IDataSeries*>(pIBaseClass);
+		if (!pIDataSeries)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pVersion = pIDataSeries->GetVersion();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_dataseries_increaseversion(LibMCEnv_DataSeries pDataSeries)
+{
+	IBase* pIBaseClass = (IBase *)pDataSeries;
+
+	try {
+		IDataSeries* pIDataSeries = dynamic_cast<IDataSeries*>(pIBaseClass);
+		if (!pIDataSeries)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataSeries->IncreaseVersion();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for MeshObject
@@ -14298,6 +14348,124 @@ LibMCEnvResult libmcenv_stateenvironment_findregisteredmesh(LibMCEnv_StateEnviro
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_createdataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_DataSeries * pInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IBase* pBaseInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseInstance = pIStateEnvironment->CreateDataSeries(sName);
+
+		*pInstance = (IBase*)(pBaseInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_hasdataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID, bool * pDataSeriesExists)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pDataSeriesUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataSeriesExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sDataSeriesUUID(pDataSeriesUUID);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDataSeriesExists = pIStateEnvironment->HasDataSeries(sDataSeriesUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_finddataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID, LibMCEnv_DataSeries * pInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pDataSeriesUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sDataSeriesUUID(pDataSeriesUUID);
+		IBase* pBaseInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseInstance = pIStateEnvironment->FindDataSeries(sDataSeriesUUID);
+
+		*pInstance = (IBase*)(pBaseInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_releasedataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pDataSeriesUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sDataSeriesUUID(pDataSeriesUUID);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIStateEnvironment->ReleaseDataSeries(sDataSeriesUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UIItem
@@ -16578,6 +16746,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_dataseries_setallentries;
 	if (sProcName == "libmcenv_dataseries_samplejournalvariable") 
 		*ppProcAddress = (void*) &libmcenv_dataseries_samplejournalvariable;
+	if (sProcName == "libmcenv_dataseries_getversion") 
+		*ppProcAddress = (void*) &libmcenv_dataseries_getversion;
+	if (sProcName == "libmcenv_dataseries_increaseversion") 
+		*ppProcAddress = (void*) &libmcenv_dataseries_increaseversion;
 	if (sProcName == "libmcenv_meshobject_getname") 
 		*ppProcAddress = (void*) &libmcenv_meshobject_getname;
 	if (sProcName == "libmcenv_meshobject_getuuid") 
@@ -17328,6 +17500,14 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_meshisregistered;
 	if (sProcName == "libmcenv_stateenvironment_findregisteredmesh") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_findregisteredmesh;
+	if (sProcName == "libmcenv_stateenvironment_createdataseries") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_createdataseries;
+	if (sProcName == "libmcenv_stateenvironment_hasdataseries") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_hasdataseries;
+	if (sProcName == "libmcenv_stateenvironment_finddataseries") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_finddataseries;
+	if (sProcName == "libmcenv_stateenvironment_releasedataseries") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_releasedataseries;
 	if (sProcName == "libmcenv_uiitem_getname") 
 		*ppProcAddress = (void*) &libmcenv_uiitem_getname;
 	if (sProcName == "libmcenv_uiitem_getpath") 
