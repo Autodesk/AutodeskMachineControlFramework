@@ -693,6 +693,23 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_setallentries(LibMCEnv_Data
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_samplejournalvariable(LibMCEnv_DataSeries pDataSeries, LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta);
 
+/**
+* Returns the incrementing change version of the data series.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @param[out] pVersion - Version number. Increases with every change to the data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_getversion(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint32 * pVersion);
+
+/**
+* Increases the version number of the data series.
+*
+* @param[in] pDataSeries - DataSeries instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_increaseversion(LibMCEnv_DataSeries pDataSeries);
+
 /*************************************************************************************************************************
  Class definition for MeshObject
 **************************************************************************************************************************/
@@ -4820,6 +4837,45 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_meshisregistered(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findregisteredmesh(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+
+/**
+* Creates a new empty data series object.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name to use for this data series. MUST NOT be an empty string.
+* @param[out] pInstance - Data series instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createdataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_DataSeries * pInstance);
+
+/**
+* Checks if a data series exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to find.
+* @param[out] pDataSeriesExists - returns true if series exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasdataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID, bool * pDataSeriesExists);
+
+/**
+* Finds a data series. Fails if data series does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to find.
+* @param[out] pInstance - Data series instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_finddataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID, LibMCEnv_DataSeries * pInstance);
+
+/**
+* Releases the memory of a data series. Fails if data series does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pDataSeriesUUID - UUID to release.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_releasedataseries(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID);
 
 /*************************************************************************************************************************
  Class definition for UIItem

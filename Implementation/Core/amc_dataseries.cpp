@@ -37,7 +37,7 @@ namespace AMC {
 
 
 	CDataSeries::CDataSeries(const std::string& sUUID, const std::string& sName)
-		: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sName (sName)
+		: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sName (sName), m_nVersion (1)
 	{
 
 	}
@@ -91,6 +91,16 @@ namespace AMC {
 	std::vector<sDataSeriesEntry>& CDataSeries::getEntries()
 	{
 		return m_Entries;
+	}
+
+	void CDataSeries::increaseVersion()
+	{
+		m_nVersion++;
+	}
+
+	uint32_t CDataSeries::getVersion()
+	{
+		return m_nVersion;
 	}
 
 }

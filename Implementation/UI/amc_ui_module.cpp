@@ -33,26 +33,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "Common/common_utils.hpp"
+#include "amc_ui_systemstate.hpp"
 
 
 using namespace AMC;
 
-
-CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry, PLogger pLogger, PMeshHandler pMeshHandler, PToolpathHandler pToolpathHandler)
-	: m_pStateMachineData(pStateMachineData), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pContentRegistry(pContentRegistry), m_pLogger (pLogger), m_pMeshHandler (pMeshHandler), m_pToolpathHandler (pToolpathHandler)
+CUIModuleEnvironment::CUIModuleEnvironment(PUISystemState pUISystemState, CUIModule_ContentRegistry* pContentRegistry, PResourcePackage pResourcePackage)
+	: m_pUISystemState (pUISystemState), m_pContentRegistry (pContentRegistry), m_pResourcePackage (pResourcePackage)
 {
-	LibMCAssertNotNull(pStateMachineData.get());
-	LibMCAssertNotNull(pResourcePackage.get());
-	LibMCAssertNotNull(pBuildJobHandler.get());
-	LibMCAssertNotNull(pLogger.get());
+	LibMCAssertNotNull(pUISystemState);
 	LibMCAssertNotNull(pContentRegistry);
-	LibMCAssertNotNull(pToolpathHandler.get());
-	LibMCAssertNotNull(pMeshHandler.get());
+	LibMCAssertNotNull(pResourcePackage);
+}
+
+CUIModuleEnvironment::~CUIModuleEnvironment()
+{
+
 }
 
 PStateMachineData CUIModuleEnvironment::stateMachineData()
 {
-	return m_pStateMachineData;
+	return m_pUISystemState->getStateMachineData ();
 }
 
 PResourcePackage CUIModuleEnvironment::resourcePackage()
@@ -62,7 +63,7 @@ PResourcePackage CUIModuleEnvironment::resourcePackage()
 
 LibMCData::PBuildJobHandler CUIModuleEnvironment::buildJobHandler()
 {
-	return m_pBuildJobHandler;
+	return m_pUISystemState->getBuildJobHandler();
 }
 
 CUIModule_ContentRegistry* CUIModuleEnvironment::contentRegistry()
@@ -72,17 +73,22 @@ CUIModule_ContentRegistry* CUIModuleEnvironment::contentRegistry()
 
 CLogger* CUIModuleEnvironment::getLogger()
 {
-	return m_pLogger.get();
+	return m_pUISystemState->getLogger().get();
 }
 
 PMeshHandler CUIModuleEnvironment::meshHandler()
 {
-	return m_pMeshHandler;
+	return m_pUISystemState->getMeshHandler ();
 }
 
 PToolpathHandler CUIModuleEnvironment::toolpathHandler()
 {
-	return m_pToolpathHandler;
+	return m_pUISystemState->getToolpathHandler ();
+}
+
+PDataSeriesHandler CUIModuleEnvironment::dataSeriesHandler()
+{
+	return m_pUISystemState->getDataSeriesHandler ();
 }
 
 

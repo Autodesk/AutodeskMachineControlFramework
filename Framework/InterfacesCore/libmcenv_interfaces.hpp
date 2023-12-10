@@ -823,6 +823,17 @@ public:
 	*/
 	virtual void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta) = 0;
 
+	/**
+	* IDataSeries::GetVersion - Returns the incrementing change version of the data series.
+	* @return Version number. Increases with every change to the data.
+	*/
+	virtual LibMCEnv_uint32 GetVersion() = 0;
+
+	/**
+	* IDataSeries::IncreaseVersion - Increases the version number of the data series.
+	*/
+	virtual void IncreaseVersion() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDataSeries> PIDataSeries;
@@ -3843,6 +3854,33 @@ public:
 	* @return Mesh Object instance.
 	*/
 	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IStateEnvironment::CreateDataSeries - Creates a new empty data series object.
+	* @param[in] sName - Name to use for this data series. MUST NOT be an empty string.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * CreateDataSeries(const std::string & sName) = 0;
+
+	/**
+	* IStateEnvironment::HasDataSeries - Checks if a data series exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return returns true if series exists.
+	*/
+	virtual bool HasDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IStateEnvironment::FindDataSeries - Finds a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * FindDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IStateEnvironment::ReleaseDataSeries - Releases the memory of a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to release.
+	*/
+	virtual void ReleaseDataSeries(const std::string & sDataSeriesUUID) = 0;
 
 };
 

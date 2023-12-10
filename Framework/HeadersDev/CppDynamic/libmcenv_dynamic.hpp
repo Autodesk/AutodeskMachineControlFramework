@@ -984,6 +984,8 @@ public:
 	inline void GetAllEntries(std::vector<sTimeStreamEntry> & EntryArrayBuffer);
 	inline void SetAllEntries(const CInputVector<sTimeStreamEntry> & EntryArrayBuffer);
 	inline void SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta);
+	inline LibMCEnv_uint32 GetVersion();
+	inline void IncreaseVersion();
 };
 	
 /*************************************************************************************************************************
@@ -1807,6 +1809,10 @@ public:
 	inline PMeshObject RegisterMeshFrom3MFResource(const std::string & sResourceName);
 	inline bool MeshIsRegistered(const std::string & sMeshUUID);
 	inline PMeshObject FindRegisteredMesh(const std::string & sMeshUUID);
+	inline PDataSeries CreateDataSeries(const std::string & sName);
+	inline bool HasDataSeries(const std::string & sDataSeriesUUID);
+	inline PDataSeries FindDataSeries(const std::string & sDataSeriesUUID);
+	inline void ReleaseDataSeries(const std::string & sDataSeriesUUID);
 };
 	
 /*************************************************************************************************************************
@@ -2040,6 +2046,8 @@ public:
 		pWrapperTable->m_DataSeries_GetAllEntries = nullptr;
 		pWrapperTable->m_DataSeries_SetAllEntries = nullptr;
 		pWrapperTable->m_DataSeries_SampleJournalVariable = nullptr;
+		pWrapperTable->m_DataSeries_GetVersion = nullptr;
+		pWrapperTable->m_DataSeries_IncreaseVersion = nullptr;
 		pWrapperTable->m_MeshObject_GetName = nullptr;
 		pWrapperTable->m_MeshObject_GetUUID = nullptr;
 		pWrapperTable->m_MeshObject_GetTriangleCount = nullptr;
@@ -2415,6 +2423,10 @@ public:
 		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = nullptr;
 		pWrapperTable->m_StateEnvironment_MeshIsRegistered = nullptr;
 		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateDataSeries = nullptr;
+		pWrapperTable->m_StateEnvironment_HasDataSeries = nullptr;
+		pWrapperTable->m_StateEnvironment_FindDataSeries = nullptr;
+		pWrapperTable->m_StateEnvironment_ReleaseDataSeries = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
 		pWrapperTable->m_UIItem_GetUUID = nullptr;
@@ -3050,6 +3062,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataSeries_SampleJournalVariable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataSeries_GetVersion = (PLibMCEnvDataSeries_GetVersionPtr) GetProcAddress(hLibrary, "libmcenv_dataseries_getversion");
+		#else // _WIN32
+		pWrapperTable->m_DataSeries_GetVersion = (PLibMCEnvDataSeries_GetVersionPtr) dlsym(hLibrary, "libmcenv_dataseries_getversion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataSeries_GetVersion == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataSeries_IncreaseVersion = (PLibMCEnvDataSeries_IncreaseVersionPtr) GetProcAddress(hLibrary, "libmcenv_dataseries_increaseversion");
+		#else // _WIN32
+		pWrapperTable->m_DataSeries_IncreaseVersion = (PLibMCEnvDataSeries_IncreaseVersionPtr) dlsym(hLibrary, "libmcenv_dataseries_increaseversion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataSeries_IncreaseVersion == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6428,6 +6458,42 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDataSeries = (PLibMCEnvStateEnvironment_CreateDataSeriesPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createdataseries");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDataSeries = (PLibMCEnvStateEnvironment_CreateDataSeriesPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createdataseries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateDataSeries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasDataSeries = (PLibMCEnvStateEnvironment_HasDataSeriesPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasdataseries");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasDataSeries = (PLibMCEnvStateEnvironment_HasDataSeriesPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasdataseries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasDataSeries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindDataSeries = (PLibMCEnvStateEnvironment_FindDataSeriesPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_finddataseries");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindDataSeries = (PLibMCEnvStateEnvironment_FindDataSeriesPtr) dlsym(hLibrary, "libmcenv_stateenvironment_finddataseries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindDataSeries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_ReleaseDataSeries = (PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_releasedataseries");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_ReleaseDataSeries = (PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr) dlsym(hLibrary, "libmcenv_stateenvironment_releasedataseries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_ReleaseDataSeries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_uiitem_getname");
 		#else // _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) dlsym(hLibrary, "libmcenv_uiitem_getname");
@@ -7258,6 +7324,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_dataseries_samplejournalvariable", (void**)&(pWrapperTable->m_DataSeries_SampleJournalVariable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataSeries_SampleJournalVariable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_dataseries_getversion", (void**)&(pWrapperTable->m_DataSeries_GetVersion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataSeries_GetVersion == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_dataseries_increaseversion", (void**)&(pWrapperTable->m_DataSeries_IncreaseVersion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataSeries_IncreaseVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_meshobject_getname", (void**)&(pWrapperTable->m_MeshObject_GetName));
@@ -8760,6 +8834,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindRegisteredMesh == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createdataseries", (void**)&(pWrapperTable->m_StateEnvironment_CreateDataSeries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDataSeries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasdataseries", (void**)&(pWrapperTable->m_StateEnvironment_HasDataSeries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasDataSeries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_finddataseries", (void**)&(pWrapperTable->m_StateEnvironment_FindDataSeries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindDataSeries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_releasedataseries", (void**)&(pWrapperTable->m_StateEnvironment_ReleaseDataSeries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ReleaseDataSeries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uiitem_getname", (void**)&(pWrapperTable->m_UIItem_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIItem_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9741,6 +9831,26 @@ public:
 	{
 		LibMCEnvHandle hJournalVariable = pJournalVariable.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_SampleJournalVariable(m_pHandle, hJournalVariable, nNumberOfSamples, dMovingAverageDelta));
+	}
+	
+	/**
+	* CDataSeries::GetVersion - Returns the incrementing change version of the data series.
+	* @return Version number. Increases with every change to the data.
+	*/
+	LibMCEnv_uint32 CDataSeries::GetVersion()
+	{
+		LibMCEnv_uint32 resultVersion = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_GetVersion(m_pHandle, &resultVersion));
+		
+		return resultVersion;
+	}
+	
+	/**
+	* CDataSeries::IncreaseVersion - Increases the version number of the data series.
+	*/
+	void CDataSeries::IncreaseVersion()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_IncreaseVersion(m_pHandle));
 	}
 	
 	/**
@@ -15040,6 +15150,60 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+	}
+	
+	/**
+	* CStateEnvironment::CreateDataSeries - Creates a new empty data series object.
+	* @param[in] sName - Name to use for this data series. MUST NOT be an empty string.
+	* @return Data series instance.
+	*/
+	PDataSeries CStateEnvironment::CreateDataSeries(const std::string & sName)
+	{
+		LibMCEnvHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDataSeries(m_pHandle, sName.c_str(), &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataSeries>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CStateEnvironment::HasDataSeries - Checks if a data series exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return returns true if series exists.
+	*/
+	bool CStateEnvironment::HasDataSeries(const std::string & sDataSeriesUUID)
+	{
+		bool resultDataSeriesExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasDataSeries(m_pHandle, sDataSeriesUUID.c_str(), &resultDataSeriesExists));
+		
+		return resultDataSeriesExists;
+	}
+	
+	/**
+	* CStateEnvironment::FindDataSeries - Finds a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return Data series instance.
+	*/
+	PDataSeries CStateEnvironment::FindDataSeries(const std::string & sDataSeriesUUID)
+	{
+		LibMCEnvHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindDataSeries(m_pHandle, sDataSeriesUUID.c_str(), &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataSeries>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CStateEnvironment::ReleaseDataSeries - Releases the memory of a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to release.
+	*/
+	void CStateEnvironment::ReleaseDataSeries(const std::string & sDataSeriesUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ReleaseDataSeries(m_pHandle, sDataSeriesUUID.c_str()));
 	}
 	
 	/**

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_dataseries.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_journalvariable.hpp"
 #include "libmcenv_testenvironment.hpp"
@@ -52,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_xmldocument.hpp"
 #include "amc_accesscontrol.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_dataserieshandler.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -590,4 +592,36 @@ IMeshObject* CStateEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
 
 	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+IDataSeries* CStateEnvironment::CreateDataSeries(const std::string& sName)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	auto pDataSeries = pDataSeriesHandler->createDataSeries(sName);
+
+	return new CDataSeries(pDataSeries);
+
+}
+
+bool CStateEnvironment::HasDataSeries(const std::string& sDataSeriesUUID)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	return pDataSeriesHandler->hasDataSeries(sDataSeriesUUID);
+}
+
+IDataSeries* CStateEnvironment::FindDataSeries(const std::string& sDataSeriesUUID)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	auto pDataSeries = pDataSeriesHandler->findDataSeries(sDataSeriesUUID, true);
+
+	return new CDataSeries(pDataSeries);
+
+
+}
+
+void CStateEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	pDataSeriesHandler->unloadDataSeries(sDataSeriesUUID);
+
 }

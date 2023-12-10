@@ -83,6 +83,10 @@ public:
 
 	void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta) override;
 
+	LibMCEnv_uint32 GetVersion() override;
+
+	void IncreaseVersion() override;
+
 };
 
 } // namespace Impl
