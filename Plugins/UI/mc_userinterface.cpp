@@ -193,16 +193,26 @@ public:
 
 		std::vector<LibMCEnv::sTimeStreamEntry> entryBuffer;
 
-		for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
+		uint64_t nTimer = pUIEnvironment->GetGlobalTimerInMilliseconds();
+		pUIEnvironment->LogMessage("timer: " + std::to_string (nTimer));
+		uint32_t nCount = nTimer / 10;
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 			entryBuffer.push_back({ nIndex, sin (nIndex * 0.01) * 100 });
 		}
-		
-		auto pDataSeries = pUIEnvironment->CreateDataSeries("testseries", true);
-		pDataSeries->SetAllEntries(entryBuffer);
-		auto sUUID = pDataSeries->GetUUID();
-		pUIEnvironment->LogMessage("Series UUID: " + sUUID);
 
-		pUIEnvironment->SetUIPropertyAsUUID("main.infobox.chart1", "dataseries", sUUID);
+		std::string sDataSeriesUUID = pUIEnvironment->GetUIPropertyAsUUID("main.infobox.chart1", "dataseries");
+		if (pUIEnvironment->HasDataSeries(sDataSeriesUUID)) {
+			auto pDataSeries = pUIEnvironment->FindDataSeries(sDataSeriesUUID);
+			pDataSeries->SetAllEntries(entryBuffer);
+		}
+		else {
+			auto pDataSeries = pUIEnvironment->CreateDataSeries("testseries", true);
+			pDataSeries->SetAllEntries(entryBuffer);
+			auto sUUID = pDataSeries->GetUUID();
+			pUIEnvironment->LogMessage("Series UUID: " + sUUID);
+
+			pUIEnvironment->SetUIPropertyAsUUID("main.infobox.chart1", "dataseries", sUUID);
+		}
 
 
 
