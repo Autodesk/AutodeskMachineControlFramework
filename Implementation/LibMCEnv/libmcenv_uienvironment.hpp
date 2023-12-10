@@ -82,8 +82,6 @@ private:
 	AMC::PUserInformation m_pUserInformation;
 	AMC::PParameterHandler m_pClientVariableHandler;
 
-	AMCCommon::CChrono m_Chrono;
-
 	std::vector<AMC::PUIClientAction> m_ClientActions;
 
 protected:

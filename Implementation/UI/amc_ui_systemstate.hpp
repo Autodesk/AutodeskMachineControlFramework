@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
+#include "common_chrono.hpp"
 
 namespace LibMCData {
 	class CDataModel;
@@ -89,12 +90,13 @@ namespace AMC {
 		PMeshHandler m_pMeshHandler;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		LibMCData::PStorage m_pStorage;
+		AMCCommon::PChrono m_pGlobalChronoInstance;
 
 		std::string m_sTestOutputPath;
 		std::string m_sSystemUserID;
 
 	public:
-		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler);
+		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance);
 
 		virtual ~CUISystemState();
 
@@ -112,6 +114,7 @@ namespace AMC {
 		LibMCData::PBuildJobHandler getBuildJobHandler();
 		LibMCData::PStorage getStorage();
 		PDataSeriesHandler getDataSeriesHandler();
+		AMCCommon::PChrono getGlobalChronoInstance();
 
 		std::string getTestOutputPath();
 		std::string getSystemUserID();
