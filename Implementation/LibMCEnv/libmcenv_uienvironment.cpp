@@ -338,7 +338,7 @@ IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSiz
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_Chrono.getExistenceTimeInMilliseconds();
+    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
 }
 
 void CUIEnvironment::LogOut()

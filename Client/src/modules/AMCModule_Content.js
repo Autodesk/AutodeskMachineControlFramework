@@ -208,7 +208,9 @@ class AMCApplicationItem_Content_Chart extends Common.AMCApplicationItem {
 		this.registerClass ("amcItem_Chart");
 		
 		this.dataseries = Common.nullUUID ();
+		this.version = 0;
 		this.loadeddataseries = Common.nullUUID ();
+		this.loadedversion = 0;
 		
 		this.onChartDataUpdated = null;
 		this.chartData = [];
@@ -223,8 +225,15 @@ class AMCApplicationItem_Content_Chart extends Common.AMCApplicationItem {
 		Assert.ObjectValue (updateJSON);
 		
 		this.dataseries = Assert.UUIDValue (updateJSON.dataseries);
-		if (this.loadeddataseries != this.dataseries) {
+		if (updateJSON.version) {
+			this.version = Assert.IntegerValue (updateJSON.version);
+		} else {
+			this.version = 0;
+		}
+		
+		if ((this.loadeddataseries != this.dataseries) || (this.loadedversion != this.version)) {
 			this.loadeddataseries = this.dataseries;
+			this.loadedversion = this.version;
 			this.refreshChartData ();
 		}
 				

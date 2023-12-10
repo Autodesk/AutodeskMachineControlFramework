@@ -76,7 +76,11 @@ void CUIModule_ContentChart::populateClientVariables(CParameterHandler* pClientV
 
 void CUIModule_ContentChart::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
+	addContentToJSON(writer, object, pClientVariableHandler, 0);
+}
 
+void CUIModule_ContentChart::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
+{
 	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
 	std::string sDataSeriesUUID = pGroup->getParameterValueByName("dataseries");
 
@@ -85,18 +89,8 @@ void CUIModule_ContentChart::addDefinitionToJSON(CJSONWriter& writer, CJSONWrite
 	if (!sDataSeriesUUID.empty()) {
 		object.addString(AMC_API_KEY_UI_DATASERIES, sDataSeriesUUID);
 		auto pDataSeries = m_pDataSeriesHandler->findDataSeries(sDataSeriesUUID, false);
-		if (pDataSeries.get () != nullptr)
-			object.addInteger(AMC_API_KEY_UI_VERSION, pDataSeries->getVersion ());
+		if (pDataSeries.get() != nullptr)
+			object.addInteger(AMC_API_KEY_UI_VERSION, pDataSeries->getVersion());
 	}
-
-}
-
-void CUIModule_ContentChart::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
-
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "chart");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_DATASERIES, pGroup->getParameterValueByName("dataseries"));
 }
 
