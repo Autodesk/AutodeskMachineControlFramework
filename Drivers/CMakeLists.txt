@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project("AMCDrivers")
 
+add_subdirectory(A3200)
 add_subdirectory(ADS)
 add_subdirectory(BK9xxx)
 add_subdirectory(BuR)
