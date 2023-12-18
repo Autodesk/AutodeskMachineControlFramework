@@ -200,17 +200,19 @@ typedef LibMCDataResult (*PLibMCDataLogSession_RetrieveLogEntriesByIDPtr) (LibMC
 **************************************************************************************************************************/
 
 /**
-* writes detailed journal states to disk.
+* writes detailed journal state data to disk.
 *
 * @param[in] pJournalSession - JournalSession instance.
 * @param[in] nChunkIndex - Index of the Chunk to write
-* @param[in] nStartTimeStamp - Start Timestamp of the chunk
-* @param[in] nEndTimeStamp - End Timestamp of the chunk
-* @param[in] nDataBufferSize - Number of elements in buffer
-* @param[in] pDataBuffer - uint8 buffer of Data to write into chunk.
+* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
+* @param[in] nEndTimeStamp - End Timestamp of the chunk (in microseconds)
+* @param[in] nVariableInfoBufferSize - Number of elements in buffer
+* @param[in] pVariableInfoBuffer - JournalChunkVariableInfo buffer of Variable information.
+* @param[in] nEntryDataBufferSize - Number of elements in buffer
+* @param[in] pEntryDataBuffer - JournalChunkIntegerEntry buffer of Entry bulk data.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataJournalSession_WriteJournalChunkDataPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer);
+typedef LibMCDataResult (*PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry * pEntryDataBuffer);
 
 /**
 * Returns the chunk capacity of the session journal.
@@ -1524,7 +1526,7 @@ typedef struct {
 	PLibMCDataLogSession_AddEntryPtr m_LogSession_AddEntry;
 	PLibMCDataLogSession_GetMaxLogEntryIDPtr m_LogSession_GetMaxLogEntryID;
 	PLibMCDataLogSession_RetrieveLogEntriesByIDPtr m_LogSession_RetrieveLogEntriesByID;
-	PLibMCDataJournalSession_WriteJournalChunkDataPtr m_JournalSession_WriteJournalChunkData;
+	PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr m_JournalSession_WriteJournalChunkIntegerData;
 	PLibMCDataJournalSession_GetChunkCapacityPtr m_JournalSession_GetChunkCapacity;
 	PLibMCDataJournalSession_GetFlushIntervalPtr m_JournalSession_GetFlushInterval;
 	PLibMCDataStorageStream_GetUUIDPtr m_StorageStream_GetUUID;

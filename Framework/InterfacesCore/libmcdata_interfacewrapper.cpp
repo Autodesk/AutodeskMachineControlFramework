@@ -518,18 +518,20 @@ LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession
 /*************************************************************************************************************************
  Class implementation for JournalSession
 **************************************************************************************************************************/
-LibMCDataResult libmcdata_journalsession_writejournalchunkdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer)
+LibMCDataResult libmcdata_journalsession_writejournalchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const sLibMCDataJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nEntryDataBufferSize, const sLibMCDataJournalChunkIntegerEntry * pEntryDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pJournalSession;
 
 	try {
-		if ( (!pDataBuffer) && (nDataBufferSize>0))
+		if ( (!pVariableInfoBuffer) && (nVariableInfoBufferSize>0))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pEntryDataBuffer) && (nEntryDataBufferSize>0))
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		IJournalSession* pIJournalSession = dynamic_cast<IJournalSession*>(pIBaseClass);
 		if (!pIJournalSession)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIJournalSession->WriteJournalChunkData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nDataBufferSize, pDataBuffer);
+		pIJournalSession->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nEntryDataBufferSize, pEntryDataBuffer);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -4726,8 +4728,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_logsession_getmaxlogentryid;
 	if (sProcName == "libmcdata_logsession_retrievelogentriesbyid") 
 		*ppProcAddress = (void*) &libmcdata_logsession_retrievelogentriesbyid;
-	if (sProcName == "libmcdata_journalsession_writejournalchunkdata") 
-		*ppProcAddress = (void*) &libmcdata_journalsession_writejournalchunkdata;
+	if (sProcName == "libmcdata_journalsession_writejournalchunkintegerdata") 
+		*ppProcAddress = (void*) &libmcdata_journalsession_writejournalchunkintegerdata;
 	if (sProcName == "libmcdata_journalsession_getchunkcapacity") 
 		*ppProcAddress = (void*) &libmcdata_journalsession_getchunkcapacity;
 	if (sProcName == "libmcdata_journalsession_getflushinterval") 

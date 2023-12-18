@@ -354,6 +354,18 @@
 	</errors>
 	
 		
+	<struct name="JournalChunkVariableInfo">
+		<member name="VariableIndex" type="uint32" />
+		<member name="VariableType" type="uint32" />
+		<member name="EntryStartIndex" type="uint32" />
+		<member name="EntryCount" type="uint32" />
+	</struct>
+
+	<struct name="JournalChunkIntegerEntry">
+		<member name="TimeStampInMicroseconds" type="uint32" />
+		<member name="IntegerValue" type="uint64" />
+	</struct>
+
 	<enum name="LogLevel">
 		<option name="FatalError" value="1"/>
 		<option name="CriticalError" value="2"/>
@@ -497,11 +509,12 @@
 
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
 
-		<method name="WriteJournalChunkData" description="writes detailed journal states to disk.">
+		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
-			<param name="StartTimeStamp" type="uint64" pass="in" description="Start Timestamp of the chunk" />	
-			<param name="EndTimeStamp" type="uint64" pass="in" description="End Timestamp of the chunk" />	
-			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to write into chunk." />	
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start Timestamp of the chunk (in microseconds)" />	
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End Timestamp of the chunk (in microseconds)" />	
+			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="in" description="Variable information." />	
+			<param name="EntryData" type="structarray" class="JournalChunkIntegerEntry" pass="in" description="Entry bulk data." />	
 		</method>
 		
 		<method name="GetChunkCapacity" description="Returns the chunk capacity of the session journal.">

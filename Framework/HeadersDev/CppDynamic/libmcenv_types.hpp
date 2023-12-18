@@ -529,7 +529,7 @@ namespace LibMCEnv {
   } sColorRGB;
   
   typedef struct sTimeStreamEntry {
-      LibMCEnv_uint64 m_TimestampInMS;
+      LibMCEnv_uint64 m_TimestampInMicroSeconds;
       LibMCEnv_double m_Value;
   } sTimeStreamEntry;
   

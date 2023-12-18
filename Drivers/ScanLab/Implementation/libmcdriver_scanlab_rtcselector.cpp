@@ -70,6 +70,7 @@ LibMCDriver_ScanLab_uint32 CRTCSelector::SearchCards(const std::string & sIP, co
 	if (nNetMask == 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNETMASK);
 
+	// eth search cards timeout ethernet
 	m_pScanLabSDK->eth_set_search_cards_timeout(nTimeout);
 
 	uint32_t nCount = m_pScanLabSDK->eth_search_cards(nIP, nNetMask);

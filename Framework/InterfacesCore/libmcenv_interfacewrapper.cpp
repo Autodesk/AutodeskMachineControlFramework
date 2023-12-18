@@ -1543,18 +1543,18 @@ LibMCEnvResult libmcenv_dataseries_isempty(LibMCEnv_DataSeries pDataSeries, bool
 	}
 }
 
-LibMCEnvResult libmcenv_dataseries_getminimum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMinimum)
+LibMCEnvResult libmcenv_dataseries_getminimum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMinimumInMicroSeconds)
 {
 	IBase* pIBaseClass = (IBase *)pDataSeries;
 
 	try {
-		if (pMinimum == nullptr)
+		if (pMinimumInMicroSeconds == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IDataSeries* pIDataSeries = dynamic_cast<IDataSeries*>(pIBaseClass);
 		if (!pIDataSeries)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pMinimum = pIDataSeries->GetMinimum();
+		*pMinimumInMicroSeconds = pIDataSeries->GetMinimum();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -1569,18 +1569,18 @@ LibMCEnvResult libmcenv_dataseries_getminimum(LibMCEnv_DataSeries pDataSeries, L
 	}
 }
 
-LibMCEnvResult libmcenv_dataseries_getmaximum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMaximum)
+LibMCEnvResult libmcenv_dataseries_getmaximum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMaximumInMicroSeconds)
 {
 	IBase* pIBaseClass = (IBase *)pDataSeries;
 
 	try {
-		if (pMaximum == nullptr)
+		if (pMaximumInMicroSeconds == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IDataSeries* pIDataSeries = dynamic_cast<IDataSeries*>(pIBaseClass);
 		if (!pIDataSeries)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pMaximum = pIDataSeries->GetMaximum();
+		*pMaximumInMicroSeconds = pIDataSeries->GetMaximum();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -9641,6 +9641,32 @@ LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmicroseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIDriverEnvironment->GetGlobalTimerInMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_logmessage(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -11035,18 +11061,18 @@ LibMCEnvResult libmcenv_uniformjournalsampling_getnumberofsamples(LibMCEnv_Unifo
 	}
 }
 
-LibMCEnvResult libmcenv_uniformjournalsampling_getstarttimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pStartTimeStampInMS)
+LibMCEnvResult libmcenv_uniformjournalsampling_getstarttimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pStartTimeStampInMicroSeconds)
 {
 	IBase* pIBaseClass = (IBase *)pUniformJournalSampling;
 
 	try {
-		if (pStartTimeStampInMS == nullptr)
+		if (pStartTimeStampInMicroSeconds == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IUniformJournalSampling* pIUniformJournalSampling = dynamic_cast<IUniformJournalSampling*>(pIBaseClass);
 		if (!pIUniformJournalSampling)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pStartTimeStampInMS = pIUniformJournalSampling->GetStartTimeStamp();
+		*pStartTimeStampInMicroSeconds = pIUniformJournalSampling->GetStartTimeStamp();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -11061,18 +11087,18 @@ LibMCEnvResult libmcenv_uniformjournalsampling_getstarttimestamp(LibMCEnv_Unifor
 	}
 }
 
-LibMCEnvResult libmcenv_uniformjournalsampling_getendtimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pEndTimeStampInMS)
+LibMCEnvResult libmcenv_uniformjournalsampling_getendtimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pEndTimeStampInMicroSeconds)
 {
 	IBase* pIBaseClass = (IBase *)pUniformJournalSampling;
 
 	try {
-		if (pEndTimeStampInMS == nullptr)
+		if (pEndTimeStampInMicroSeconds == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IUniformJournalSampling* pIUniformJournalSampling = dynamic_cast<IUniformJournalSampling*>(pIBaseClass);
 		if (!pIUniformJournalSampling)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pEndTimeStampInMS = pIUniformJournalSampling->GetEndTimeStamp();
+		*pEndTimeStampInMicroSeconds = pIUniformJournalSampling->GetEndTimeStamp();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -11193,18 +11219,18 @@ LibMCEnvResult libmcenv_journalvariable_getvariablename(LibMCEnv_JournalVariable
 	}
 }
 
-LibMCEnvResult libmcenv_journalvariable_getstarttimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMS)
+LibMCEnvResult libmcenv_journalvariable_getstarttimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMicroSeconds)
 {
 	IBase* pIBaseClass = (IBase *)pJournalVariable;
 
 	try {
-		if (pRecordingStartInMS == nullptr)
+		if (pRecordingStartInMicroSeconds == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
 		if (!pIJournalVariable)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pRecordingStartInMS = pIJournalVariable->GetStartTimeStamp();
+		*pRecordingStartInMicroSeconds = pIJournalVariable->GetStartTimeStamp();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -11219,18 +11245,18 @@ LibMCEnvResult libmcenv_journalvariable_getstarttimestamp(LibMCEnv_JournalVariab
 	}
 }
 
-LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMS)
+LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMicroSeconds)
 {
 	IBase* pIBaseClass = (IBase *)pJournalVariable;
 
 	try {
-		if (pRecordingEndInMS == nullptr)
+		if (pRecordingEndInMicroSeconds == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
 		if (!pIJournalVariable)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pRecordingEndInMS = pIJournalVariable->GetEndTimeStamp();
+		*pRecordingEndInMicroSeconds = pIJournalVariable->GetEndTimeStamp();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -11271,7 +11297,7 @@ LibMCEnvResult libmcenv_journalvariable_computefullaverage(LibMCEnv_JournalVaria
 	}
 }
 
-LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, bool bClampInterval, LibMCEnv_double * pAverageValue)
+LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, bool bClampInterval, LibMCEnv_double * pAverageValue)
 {
 	IBase* pIBaseClass = (IBase *)pJournalVariable;
 
@@ -11282,7 +11308,7 @@ LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable 
 		if (!pIJournalVariable)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pAverageValue = pIJournalVariable->ComputeAverage(nStartTimeInMS, nEndTimeInMS, bClampInterval);
+		*pAverageValue = pIJournalVariable->ComputeAverage(nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, bClampInterval);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -11297,7 +11323,7 @@ LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable 
 	}
 }
 
-LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling)
+LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling)
 {
 	IBase* pIBaseClass = (IBase *)pJournalVariable;
 
@@ -11309,7 +11335,7 @@ LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_Jo
 		if (!pIJournalVariable)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseJournalSampling = pIJournalVariable->ComputeUniformAverageSamples(nStartTimeInMS, nEndTimeInMS, nNumberOfSamples, dMovingAverageDelta, bClampInterval);
+		pBaseJournalSampling = pIJournalVariable->ComputeUniformAverageSamples(nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, nNumberOfSamples, dMovingAverageDelta, bClampInterval);
 
 		*pJournalSampling = (IBase*)(pBaseJournalSampling);
 		return LIBMCENV_SUCCESS;
@@ -11386,7 +11412,7 @@ LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalH
 	}
 }
 
-LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMilliseconds, LibMCEnv_uint64 nEndTimeInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable)
+LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable)
 {
 	IBase* pIBaseClass = (IBase *)pJournalHandler;
 
@@ -11401,7 +11427,7 @@ LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(L
 		if (!pIJournalHandler)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseJournalVariable = pIJournalHandler->RetrieveJournalVariableFromTimeInterval(sVariableName, nStartTimeInMilliseconds, nEndTimeInMilliseconds);
+		pBaseJournalVariable = pIJournalHandler->RetrieveJournalVariableFromTimeInterval(sVariableName, nStartTimeInMicroseconds, nEndTimeInMicroseconds);
 
 		*pJournalVariable = (IBase*)(pBaseJournalVariable);
 		return LIBMCENV_SUCCESS;
@@ -11481,7 +11507,7 @@ LibMCEnvResult libmcenv_journalhandler_hasjournalmarker(LibMCEnv_JournalHandler 
 	}
 }
 
-LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp)
+LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStampInMicroSeconds)
 {
 	IBase* pIBaseClass = (IBase *)pJournalHandler;
 
@@ -11490,7 +11516,7 @@ LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHan
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pMarkerName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pTimeStamp == nullptr)
+		if (pTimeStampInMicroSeconds == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sMarkerType(pMarkerType);
 		std::string sMarkerName(pMarkerName);
@@ -11498,7 +11524,7 @@ LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHan
 		if (!pIJournalHandler)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pTimeStamp = pIJournalHandler->RetrieveJournalMarker(sMarkerType, sMarkerName, bMustBeUnique);
+		*pTimeStampInMicroSeconds = pIJournalHandler->RetrieveJournalMarker(sMarkerType, sMarkerName, bMustBeUnique);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -14046,6 +14072,32 @@ LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilliseconds(LibMCEnv_S
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIStateEnvironment->GetGlobalTimerInMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_gettestenvironment(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -15834,6 +15886,32 @@ LibMCEnvResult libmcenv_uienvironment_getglobaltimerinmilliseconds(LibMCEnv_UIEn
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_getglobaltimerinmicroseconds(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIUIEnvironment->GetGlobalTimerInMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_gettestenvironment(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -17236,6 +17314,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_sleep;
 	if (sProcName == "libmcenv_driverenvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_getglobaltimerinmilliseconds;
+	if (sProcName == "libmcenv_driverenvironment_getglobaltimerinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_getglobaltimerinmicroseconds;
 	if (sProcName == "libmcenv_driverenvironment_logmessage") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_logmessage;
 	if (sProcName == "libmcenv_driverenvironment_logwarning") 
@@ -17480,6 +17560,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_creatediscretefield2dfromimage;
 	if (sProcName == "libmcenv_stateenvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getglobaltimerinmilliseconds;
+	if (sProcName == "libmcenv_stateenvironment_getglobaltimerinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getglobaltimerinmicroseconds;
 	if (sProcName == "libmcenv_stateenvironment_gettestenvironment") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_gettestenvironment;
 	if (sProcName == "libmcenv_stateenvironment_createxmldocument") 
@@ -17582,6 +17664,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_loadpngimage;
 	if (sProcName == "libmcenv_uienvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getglobaltimerinmilliseconds;
+	if (sProcName == "libmcenv_uienvironment_getglobaltimerinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getglobaltimerinmicroseconds;
 	if (sProcName == "libmcenv_uienvironment_gettestenvironment") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_gettestenvironment;
 	if (sProcName == "libmcenv_uienvironment_createxmldocument") 

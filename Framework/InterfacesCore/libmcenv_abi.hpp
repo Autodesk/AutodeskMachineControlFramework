@@ -647,19 +647,19 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_isempty(LibMCEnv_DataSeries
 * Returns the minimum time stamp of the data series. Fails if data series is empty.
 *
 * @param[in] pDataSeries - DataSeries instance.
-* @param[out] pMinimum - Minimum time stamp in milliseconds.
+* @param[out] pMinimumInMicroSeconds - Minimum time stamp in microseconds.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_getminimum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMinimum);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_getminimum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMinimumInMicroSeconds);
 
 /**
 * Returns the maximum time stamp of the data series. Fails if data series is empty.
 *
 * @param[in] pDataSeries - DataSeries instance.
-* @param[out] pMaximum - Maximum time stamp in milliseconds.
+* @param[out] pMaximumInMicroSeconds - Maximum time stamp in microseconds.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_getmaximum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMaximum);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_getmaximum(LibMCEnv_DataSeries pDataSeries, LibMCEnv_uint64 * pMaximumInMicroSeconds);
 
 /**
 * Returns all entries of the data series. Fails if data series is empty.
@@ -3344,6 +3344,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_sleep(LibMCEnv_Drive
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
+* Returns the global timer in microseconds.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pTimerValue - Timer value in Microseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmicroseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
 * logs a string as message
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -3793,26 +3802,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getnumberofsamp
 * Returns the beginning time stamp of the available data point.
 *
 * @param[in] pUniformJournalSampling - UniformJournalSampling instance.
-* @param[out] pStartTimeStampInMS - Start Timestamp of Recording in ms.
+* @param[out] pStartTimeStampInMicroSeconds - Start Timestamp of Recording in microseconds.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getstarttimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pStartTimeStampInMS);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getstarttimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pStartTimeStampInMicroSeconds);
 
 /**
 * Returns the beginning time stamp of the available data point.
 *
 * @param[in] pUniformJournalSampling - UniformJournalSampling instance.
-* @param[out] pEndTimeStampInMS - End Timestamp of Recording in ms.
+* @param[out] pEndTimeStampInMicroSeconds - End Timestamp of Recording in microseconds.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getendtimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pEndTimeStampInMS);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getendtimestamp(LibMCEnv_UniformJournalSampling pUniformJournalSampling, LibMCEnv_uint64 * pEndTimeStampInMicroSeconds);
 
 /**
 * Returns the timestamp and value of the given sample.
 *
 * @param[in] pUniformJournalSampling - UniformJournalSampling instance.
 * @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
-* @param[out] pTimeStamp - TimeStamp of the sample in ms.
+* @param[out] pTimeStamp - TimeStamp of the sample in MicroSeconds.
 * @param[out] pValue - Value of the sample in ms.
 * @return error code or 0 (success)
 */
@@ -3848,19 +3857,19 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getvariablename(LibMCE
 * Returns the beginning time stamp of the available data point.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pRecordingStartInMS - Start Timestamp of Recording in ms.
+* @param[out] pRecordingStartInMicroSeconds - Start Timestamp of Recording in microseconds.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getstarttimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMS);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getstarttimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMicroSeconds);
 
 /**
 * Returns the beginning time stamp of the available data point.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pRecordingEndInMS - End Timestamp of Recording in ms.
+* @param[out] pRecordingEndInMicroSeconds - End Timestamp of Recording in microseconds.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMS);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMicroSeconds);
 
 /**
 * Calculates the average value over the full available time interval.
@@ -3875,27 +3884,27 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computefullaverage(Lib
 * Calculates the average value over a time interval. Fails if no data is available in this time interval.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
-* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
+* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
 * @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 * @param[out] pAverageValue - Average value of the variable.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, bool bClampInterval, LibMCEnv_double * pAverageValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, bool bClampInterval, LibMCEnv_double * pAverageValue);
 
 /**
 * Retrieves sample values for an interval. Interval MUST be inside the available recording time.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
-* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
-* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
+* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
 * @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
 * @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 * @param[out] pJournalSampling - Returns an instance with the sampling results.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMS, LibMCEnv_uint64 nEndTimeInMS, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
 
 /**
 * Retrieves the raw timestream data of the variable.
@@ -3928,12 +3937,12 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable
 *
 * @param[in] pJournalHandler - JournalHandler instance.
 * @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nStartTimeInMilliseconds - Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval.
-* @param[in] nEndTimeInMilliseconds - End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval.
+* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
 * @param[out] pJournalVariable - Journal Instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMilliseconds, LibMCEnv_uint64 nEndTimeInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable);
 
 /**
 * Stores a journal marker tag at the current time stamp.
@@ -3942,7 +3951,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable
 * @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 * @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 * @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-* @param[out] pTimeStamp - Returns the stored time stamp in milliseconds.
+* @param[out] pTimeStamp - Returns the stored time stamp in microseconds.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_storejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp);
@@ -3965,10 +3974,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_hasjournalmarker(LibMCE
 * @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 * @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 * @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-* @param[out] pTimeStamp - Returns the time stamp in milliseconds.
+* @param[out] pTimeStampInMicroSeconds - Returns the time stamp in microseconds.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStampInMicroSeconds);
 
 /**
 * Retrieves all existing journal marker time stamps. Fails if no marker exists.
@@ -3978,7 +3987,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(L
 * @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 * @param[in] nTimeStampsBufferSize - Number of elements in buffer
 * @param[out] pTimeStampsNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pTimeStampsBuffer - uint64  buffer of Returns an array of time stamps in milliseconds.
+* @param[out] pTimeStampsBuffer - uint64  buffer of Returns an array of time stamps in microseconds.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalmarkers(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer);
@@ -4739,6 +4748,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_creatediscretefield2d
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
+* Returns the global timer in microseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Microseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
 * Returns a test environment instance.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -5296,6 +5314,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loadpngimage(LibMCEnv_UI
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getglobaltimerinmilliseconds(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns the global timer in microseconds.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pTimerValue - Timer value in Microseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getglobaltimerinmicroseconds(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
 * Returns a test environment instance.

@@ -279,7 +279,7 @@
 	</struct>
 
 	<struct name="TimeStreamEntry" description="Entry of a time stream.">
-		<member name="TimestampInMS" type="uint64" />
+		<member name="TimestampInMicroSeconds" type="uint64" />
 		<member name="Value" type="double" />
 	</struct>
 
@@ -584,11 +584,11 @@
 		</method>
 
 		<method name="GetMinimum" description="Returns the minimum time stamp of the data series. Fails if data series is empty.">
-			<param name="Minimum" type="uint64" pass="return" description="Minimum time stamp in milliseconds." />
+			<param name="MinimumInMicroSeconds" type="uint64" pass="return" description="Minimum time stamp in microseconds." />
 		</method>
 		
 		<method name="GetMaximum" description="Returns the maximum time stamp of the data series. Fails if data series is empty.">
-			<param name="Maximum" type="uint64" pass="return" description="Maximum time stamp in milliseconds." />
+			<param name="MaximumInMicroSeconds" type="uint64" pass="return" description="Maximum time stamp in microseconds." />
 		</method>
 		
 		<method name="GetAllEntries" description="Returns all entries of the data series. Fails if data series is empty.">
@@ -1939,6 +1939,10 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
+		<method name="GetGlobalTimerInMicroseconds" description="Returns the global timer in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
 		<method name="LogMessage" description="logs a string as message">
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
@@ -2164,16 +2168,16 @@
 		</method>
 
 		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="StartTimeStampInMS" type="uint64" pass="return" description="Start Timestamp of Recording in ms." />
+			<param name="StartTimeStampInMicroSeconds" type="uint64" pass="return" description="Start Timestamp of Recording in microseconds." />
 		</method>
 	
 		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="EndTimeStampInMS" type="uint64" pass="return" description="End Timestamp of Recording in ms." />
+			<param name="EndTimeStampInMicroSeconds" type="uint64" pass="return" description="End Timestamp of Recording in microseconds." />
 		</method>
 
 		<method name="GetSample" description="Returns the timestamp and value of the given sample.">
 			<param name="Index" type="uint32" pass="in" description="Index of the sample. 0-based. MUST be smaller than NumberOfSamples." />
-			<param name="TimeStamp" type="uint64" pass="out" description="TimeStamp of the sample in ms." />
+			<param name="TimeStamp" type="uint64" pass="out" description="TimeStamp of the sample in MicroSeconds." />
 			<param name="Value" type="double" pass="out" description="Value of the sample in ms." />
 		</method>
 
@@ -2191,11 +2195,11 @@
 		</method>
 		
 		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="RecordingStartInMS" type="uint64" pass="return" description="Start Timestamp of Recording in ms." />
+			<param name="RecordingStartInMicroSeconds" type="uint64" pass="return" description="Start Timestamp of Recording in microseconds." />
 		</method>
 	
 		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="RecordingEndInMS" type="uint64" pass="return" description="End Timestamp of Recording in ms." />
+			<param name="RecordingEndInMicroSeconds" type="uint64" pass="return" description="End Timestamp of Recording in microseconds." />
 		</method>
 
 		<method name="ComputeFullAverage" description="Calculates the average value over the full available time interval.">
@@ -2203,16 +2207,16 @@
 		</method>
 		
 		<method name="ComputeAverage" description="Calculates the average value over a time interval. Fails if no data is available in this time interval.">
-			<param name="StartTimeInMS" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
-			<param name="EndTimeInMS" type="uint64" pass="in" description="End Timestamp of the interval in ms. MUST be larger than Timestamp." />
+			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
+			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in ms. MUST be larger than Timestamp." />
 			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />
 			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
 		</method>
 		
 		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
-			<param name="StartTimeInMS" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
-			<param name="EndTimeInMS" type="uint64" pass="in" description="End Timestamp of the interval in ms." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples." />
+			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
+			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in microseconds." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
 			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
 			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
 			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
@@ -2236,8 +2240,8 @@
 				
 		<method name="RetrieveJournalVariableFromTimeInterval" description = "Retrieves the history of a given variable in the system journal for an arbitrary time interval.">
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="StartTimeInMilliseconds" type="uint64" pass="in" description="Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval." />
-			<param name="EndTimeInMilliseconds" type="uint64" pass="in" description="End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval." />
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
 				
@@ -2246,7 +2250,7 @@
 			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
 			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
 			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal." />
-			<param name="TimeStamp" type="uint64" pass="return" description="Returns the stored time stamp in milliseconds." />
+			<param name="TimeStamp" type="uint64" pass="return" description="Returns the stored time stamp in microseconds." />
 		</method>
 
 		<method name="HasJournalMarker" description="Checks if a journal marker tag exists.">
@@ -2259,13 +2263,13 @@
 			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
 			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
 			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple." />
-			<param name="TimeStamp" type="uint64" pass="return" description="Returns the time stamp in milliseconds." />
+			<param name="TimeStampInMicroSeconds" type="uint64" pass="return" description="Returns the time stamp in microseconds." />
 		</method>
 		
 		<method name="RetrieveJournalMarkers" description="Retrieves all existing journal marker time stamps. Fails if no marker exists.">
 			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
 			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Returns an array of time stamps in milliseconds." />
+			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Returns an array of time stamps in microseconds." />
 		</method>
 		
 	
@@ -2644,6 +2648,10 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
+		<method name="GetGlobalTimerInMicroseconds" description="Returns the global timer in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
 		<method name="GetTestEnvironment" description="Returns a test environment instance.">
 			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
 		</method>
@@ -2930,6 +2938,10 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 		
+		<method name="GetGlobalTimerInMicroseconds" description="Returns the global timer in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
 		<method name="GetTestEnvironment" description="Returns a test environment instance.">
 			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
 		</method>
