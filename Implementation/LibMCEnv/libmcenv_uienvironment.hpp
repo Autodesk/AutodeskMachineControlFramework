@@ -151,6 +151,8 @@ public:
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
+	LibMCEnv_uint64 GetGlobalTimerInMicroseconds() override;
+
 	void LogOut() override;
 
 	void ShowHint(const std::string& sHint, const LibMCEnv_uint32 nTimeoutInMS) override;

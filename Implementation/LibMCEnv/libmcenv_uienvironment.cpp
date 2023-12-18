@@ -341,6 +341,11 @@ LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
     return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
 }
 
+LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMicroseconds()
+{
+    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+}
+
 void CUIEnvironment::LogOut()
 {
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_Logout>());

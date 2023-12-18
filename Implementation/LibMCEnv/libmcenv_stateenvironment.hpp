@@ -141,6 +141,8 @@ public:
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
+	LibMCEnv_uint64 GetGlobalTimerInMicroseconds() override;
+
 	ITestEnvironment* GetTestEnvironment() override;
 
 	IXMLDocument* CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace) override;

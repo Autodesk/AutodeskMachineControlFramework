@@ -53,7 +53,11 @@ namespace AMCCommon {
 		uint64_t writeBuffer(const void* pBuffer, uint64_t cbTotalBytesToWrite) override;
 
 		void writeZeros(uint64_t bytes) override;
+
+		void flushStream ();
 	};
+
+	typedef std::shared_ptr<CExportStream_Native> PExportStream_Native;
 
 }
 

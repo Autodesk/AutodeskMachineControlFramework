@@ -77,7 +77,7 @@ namespace AMC {
 		if (m_Entries.size() == 0)
 			throw ELibMCCustomException(LIBMC_ERROR_DATASERIESISEMPTY, m_sName);
 
-		return m_Entries.begin ()->m_nTimeStamp;
+		return m_Entries.begin ()->m_nTimeStampInMicroSeconds;
 	}
 
 	uint64_t CDataSeries::getMaximum()
@@ -85,7 +85,7 @@ namespace AMC {
 		if (m_Entries.size() == 0)
 			throw ELibMCCustomException(LIBMC_ERROR_DATASERIESISEMPTY, m_sName);
 
-		return m_Entries.rbegin()->m_nTimeStamp;
+		return m_Entries.rbegin()->m_nTimeStampInMicroSeconds;
 	}
 
 	std::vector<sDataSeriesEntry>& CDataSeries::getEntries()

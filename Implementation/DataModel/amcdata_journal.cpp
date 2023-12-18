@@ -101,17 +101,24 @@ namespace AMCData {
 
 	
 
-	void CJournal::WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8* pDataBuffer)
+	void CJournal::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
 
 		uint64_t nPosition = m_pJournalStream->getPosition();
-		if (nDataBufferSize > 0) {
-			if (pDataBuffer == nullptr)
+		if ((nEntryDataBufferSize > 0) && (nVariableInfoBufferSize > 0)) {
+			if (pEntryDataBuffer == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+			if (pVariableInfoBuffer == nullptr)
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
+			uint64_t nVariableBufferMemSize = nVariableInfoBufferSize * sizeof(LibMCData::sJournalChunkVariableInfo);
+			uint64_t nEntryBufferMemSize = nEntryDataBufferSize * sizeof(LibMCData::sJournalChunkIntegerEntry);
+
 			uint64_t nPosition = m_pJournalStream->getPosition();
-			m_pJournalStream->writeBuffer(pDataBuffer, nDataBufferSize);
+			m_pJournalStream->writeBuffer((const void*)pVariableInfoBuffer, nVariableBufferMemSize);
+			m_pJournalStream->writeBuffer((const void*)pEntryDataBuffer, nEntryBufferMemSize);
+			m_pJournalStream->flushStream();
 
 
 			std::string sQuery = "INSERT INTO journal_chunks (chunkindex, starttimestamp, endtimestamp, dataoffset, datalength) VALUES (?, ?, ?, ?, ?)";
@@ -120,7 +127,7 @@ namespace AMCData {
 			pStatement->setInt64(2, nStartTimeStamp);
 			pStatement->setInt64(3, nEndTimeStamp);
 			pStatement->setInt64(4, nPosition);
-			pStatement->setInt64(5, nDataBufferSize);
+			pStatement->setInt64(5, nVariableBufferMemSize + nEntryBufferMemSize);
 			pStatement->execute();
 			pStatement = nullptr; 
 		}

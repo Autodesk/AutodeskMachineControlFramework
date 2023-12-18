@@ -81,11 +81,11 @@ protected:
 	std::string m_sSystemUserID;
 	AMC::PLogger m_pLogger;
 
-	AMCCommon::CChrono m_Chrono;
+	AMCCommon::PChrono m_pGlobalChrono;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, std::string sSystemUserID, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName);
 
 	virtual ~CDriverEnvironment();
 
@@ -138,6 +138,8 @@ public:
 	void Sleep(const LibMCEnv_uint32 nDelay) override;
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
+
+	LibMCEnv_uint64 GetGlobalTimerInMicroseconds() override;
 
 	virtual void LogMessage(const std::string& sLogString) override;
 

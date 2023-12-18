@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 #include "libmc_exceptiontypes.hpp"
+#include "amc_logger.hpp"
 
 #include <map>
 #include <thread>
@@ -96,11 +97,11 @@ namespace AMC {
 			return eStateJournalVariableType::vtBoolParameter;
 		}
 
-		void setValue(const bool bValue, const uint64_t nAbsoluteTimeStamp)
+		void setValue_MicroSecond(const bool bValue, const uint64_t nAbsoluteTimeStampInMicroSeconds)
 		{
 			if (bValue != m_bCurrentValue) {
 
-				m_pStream->writeBool (nAbsoluteTimeStamp, m_nStorageIndex, bValue);
+				m_pStream->writeBool_MicroSecond (nAbsoluteTimeStampInMicroSeconds, m_nStorageIndex, bValue);
 				m_bCurrentValue = bValue;
 			}
 		}
@@ -128,11 +129,11 @@ namespace AMC {
 			return eStateJournalVariableType::vtIntegerParameter;
 		}
 
-		void setValue(const int64_t nValue, const uint64_t nAbsoluteTimeStamp)
+		void setValue_MicroSecond(const int64_t nValue, const uint64_t nAbsoluteTimeStampInMicroSeconds)
 		{
 			if (m_nCurrentValue != nValue) {
 
-				m_pStream->writeInt64(nAbsoluteTimeStamp, m_nStorageIndex, nValue);
+				m_pStream->writeInt64_MicroSecond(nAbsoluteTimeStampInMicroSeconds, m_nStorageIndex, nValue);
 				m_nCurrentValue = nValue;
 			}
 		}
@@ -143,11 +144,11 @@ namespace AMC {
 		}
 
 
-		void readTimeStream(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, int64_t& nStartValue, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
+		void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
 		{
-			nStartValue = 0;
 
-			m_pStream->readRawIntegerData (m_nStorageIndex, nStartTimeStamp, nEndTimeStamp, timeStream);				
+
+			m_pStream->readRawIntegerData (m_nStorageIndex, interval, timeStream);
 
 
 			/*for (auto& timeStreamEntry : m_TimeStream) {
@@ -177,7 +178,7 @@ namespace AMC {
 
 	public:
 		CStateJournalImplDoubleVariable(CStateJournalStream* pStream, const uint32_t nID, const uint32_t nStorageIndex, const std::string& sName)
-			: CStateJournalImplVariable(pStream, nID, nStorageIndex, sName), m_nCurrentValueInUnits(0), m_dUnits (1.0), m_bHasUnits (false)
+			: CStateJournalImplVariable(pStream, nID, nStorageIndex, sName), m_nCurrentValueInUnits(0), m_dUnits (0.0001), m_bHasUnits (false)
 		{
 		}
 
@@ -198,7 +199,7 @@ namespace AMC {
 
 		}
 
-		void setValue(const double dValue, const uint64_t nAbsoluteTimeStamp)
+		void setValue_MicroSecond(const double dValue, const uint64_t nAbsoluteTimeStampInMicroSeconds)
 		{
 			if (!m_bHasUnits)
 				throw ELibMCCustomException(LIBMC_ERROR_UNITSHAVENOTBEENSET, m_sName);
@@ -206,7 +207,7 @@ namespace AMC {
 			int64_t nValueInUnits = (int64_t) (dValue / m_dUnits);
 			if (m_nCurrentValueInUnits != nValueInUnits) {
 
-				m_pStream->writeDouble (nAbsoluteTimeStamp, m_nStorageIndex, nValueInUnits);
+				m_pStream->writeDouble_MicroSecond (nAbsoluteTimeStampInMicroSeconds, m_nStorageIndex, nValueInUnits);
 
 				m_nCurrentValueInUnits = nValueInUnits;
 
@@ -224,26 +225,13 @@ namespace AMC {
 
 		}
 
-		void readTimeStream(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
+		void readTimeStream(const sStateJournalInterval & interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 		{
 			if (!m_bHasUnits)
 				throw ELibMCCustomException(LIBMC_ERROR_UNITSHAVENOTBEENSET, m_sName);
 
-			m_pStream->readRawDoubleData(m_nStorageIndex, nStartTimeStamp, nEndTimeStamp, m_dUnits, timeStream);
+			m_pStream->readRawDoubleData (m_nStorageIndex, interval, m_dUnits, timeStream);
 
-/*			for (auto& timeStreamEntry : m_TimeStream) {
-				if (timeStreamEntry.first <= nStartTimeStamp) {
-					dStartValue = timeStreamEntry.second * m_dUnits;
-				}
-				else {
-					if (timeStreamEntry.first <= nEndTimeStamp) {
-						sJournalTimeStreamDoubleEntry entry;
-						entry.m_nTimeStamp = timeStreamEntry.first;
-						entry.m_dValue = timeStreamEntry.second * m_dUnits;
-						timeStream.push_back(entry);
-					}
-				}
-			} */
 		}
 
 
@@ -263,7 +251,7 @@ namespace AMC {
 			return eStateJournalVariableType::vtStringParameter;
 		}
 
-		void setValue(const std::string & sValue, const uint64_t nAbsoluteTimeStamp)
+		void setValue_MicroSecond(const std::string & sValue, const uint64_t nAbsoluteTimeStamp_MicroSecond)
 		{
 			if (m_sCurrentValue != sValue) {
 
@@ -299,6 +287,7 @@ namespace AMC {
 		AMCCommon::CChrono m_Chrono;
 
 		PStateJournalStream m_pStream;
+		PLogger m_pLogger;
 
 		std::mutex m_Mutex;
 
@@ -319,9 +308,9 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		uint64_t retrieveTimeStamp();
+		uint64_t retrieveTimeStamp_MicroSecond();
 
-		void readDoubleTimeStream(const std::string& sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
+		void readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
 		void recordingThread();
 	};
@@ -427,10 +416,20 @@ namespace AMC {
 	{
 		while (!m_ThreadStopFlag) {
 			try {
-				m_pStream->writeChunksToDiskThreaded();
+				m_pStream->serializeChunksThreaded();
 			}
 			catch (std::exception & E) {
+				m_pLogger->logMessage ("could not serialize journal chunk: " + std::string (E.what ()), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);
+				throw;
+			}
 
+
+			try {
+				m_pStream->writeChunksToDiskThreaded();
+			}
+			catch (std::exception& E) {
+				m_pLogger->logMessage("could not write journal chunk to disk: " + std::string(E.what()), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);
+				throw;
 			}
 
 			std::this_thread::sleep_for(std::chrono::seconds (m_nChunkWriteIntervalInSeconds));
@@ -451,7 +450,7 @@ namespace AMC {
 		if (pBoolVariable.get () == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pBoolVariable->setValue (bValue, retrieveTimeStamp());
+		pBoolVariable->setValue_MicroSecond (bValue, retrieveTimeStamp_MicroSecond());
 	}
 
 	void CStateJournalImpl::updateIntegerValue(const uint32_t nVariableID, const int64_t nValue)
@@ -466,7 +465,7 @@ namespace AMC {
 		if (pIntegerVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pIntegerVariable->setValue(nValue, retrieveTimeStamp());
+		pIntegerVariable->setValue_MicroSecond(nValue, retrieveTimeStamp_MicroSecond());
 
 	}
 
@@ -482,7 +481,7 @@ namespace AMC {
 		if (pStringVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pStringVariable->setValue(sValue, retrieveTimeStamp());
+		pStringVariable->setValue_MicroSecond(sValue, retrieveTimeStamp_MicroSecond());
 	}
 
 	void CStateJournalImpl::updateDoubleValue(const uint32_t nVariableID, const double dValue)
@@ -497,11 +496,11 @@ namespace AMC {
 		if (pDoubleVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pDoubleVariable->setValue(dValue, retrieveTimeStamp());
+		pDoubleVariable->setValue_MicroSecond(dValue, retrieveTimeStamp_MicroSecond());
 
 	}
 
-	void CStateJournalImpl::readDoubleTimeStream(const std::string& sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
+	void CStateJournalImpl::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		if (m_JournalMode != eStateJournalMode::sjmRecording)
@@ -512,14 +511,14 @@ namespace AMC {
 		if (pDoubleVariable.get() == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDVARIABLETYPE, sName);
 
-		pDoubleVariable->readTimeStream(nStartTimeStamp, nEndTimeStamp, timeStream);
+		pDoubleVariable->readTimeStream(interval,  timeStream);
 
 	}
 
 
-	uint64_t CStateJournalImpl::retrieveTimeStamp()
+	uint64_t CStateJournalImpl::retrieveTimeStamp_MicroSecond()
 	{
-		return m_Chrono.getExistenceTimeInMilliseconds();
+		return m_Chrono.getExistenceTimeInMicroseconds();
 	}
 
 
@@ -620,19 +619,18 @@ namespace AMC {
 		m_pImpl->updateDoubleValue(nVariableID, dValue);
 	}
 
-	void CStateJournal::readDoubleTimeStream(const std::string& sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
+	void CStateJournal::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
-		m_pImpl->readDoubleTimeStream(sName, nStartTimeStamp, nEndTimeStamp, timeStream);
+		m_pImpl->readDoubleTimeStream(sName, interval, timeStream);
 	}
 
-	// Computes the statistics of a given time interval with one millisecond sampling frequency...
-	sStateJournalStatistics CStateJournal::computeStatistics(const std::string& sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp)
+
+	sStateJournalStatistics CStateJournal::computeStatistics(const std::string& sName, const sStateJournalInterval& interval)
 	{
 		std::vector<sJournalTimeStreamDoubleEntry> timeStream;
 
 		sStateJournalStatistics resultStatistics;
-		resultStatistics.m_nStartTime = nStartTimeStamp;
-		resultStatistics.m_nEndTime = nEndTimeStamp;
+		resultStatistics.m_Interval = interval;
 		resultStatistics.m_dMinValue = 0.0;
 		resultStatistics.m_dMaxValue = 0.0;
 		resultStatistics.m_dAverageValue = 0.0;
@@ -640,12 +638,12 @@ namespace AMC {
 		resultStatistics.m_dVariance = 0.0;
 
 
-		if (nStartTimeStamp >= nEndTimeStamp)
+		if (interval.m_nStartTimeInMicroSeconds >= interval.m_nEndTimeInMicroSeconds)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL);
 
-		uint64_t nTimeDifference = nEndTimeStamp - nStartTimeStamp;
+		uint64_t nTimeDifferenceInMicroSeconds = interval.m_nEndTimeInMicroSeconds - interval.m_nStartTimeInMicroSeconds;
 
-		readDoubleTimeStream(sName, nStartTimeStamp, nEndTimeStamp, timeStream);
+		readDoubleTimeStream(sName, interval, timeStream);
 
 		uint64_t nTimeStepCount = timeStream.size();
 
@@ -655,10 +653,10 @@ namespace AMC {
 		auto& firstEntry = timeStream.at(0);
 		auto& lastEntry = timeStream.at(nTimeStepCount - 1);
 
-		if (firstEntry.m_nTimeStamp < nStartTimeStamp)
+		if (firstEntry.m_nTimeStampInMicroSeconds < interval.m_nStartTimeInMicroSeconds)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL);
 
-		if (lastEntry.m_nTimeStamp > nEndTimeStamp)
+		if (lastEntry.m_nTimeStampInMicroSeconds > interval.m_nEndTimeInMicroSeconds)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL);
 
 		// First Interval
@@ -668,20 +666,20 @@ namespace AMC {
 		double dMinValue = dCurrentValue;
 		double dMaxValue = dCurrentValue;
 
-		uint64_t nCurrentTime = nStartTimeStamp;
+		uint64_t nCurrentTime = interval.m_nStartTimeInMicroSeconds;
 
 		for (uint64_t nIndex = 0; nIndex < nTimeStepCount; nIndex++) {
 			auto& nextEntry = timeStream.at(nIndex);
 
-			if (nextEntry.m_nTimeStamp < nCurrentTime)
+			if (nextEntry.m_nTimeStampInMicroSeconds < nCurrentTime)
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJOURNALCOMPUTEDATA);
 
-			uint64_t nDeltaTime = nextEntry.m_nTimeStamp - nCurrentTime;
+			uint64_t nDeltaTime = nextEntry.m_nTimeStampInMicroSeconds - nCurrentTime;
 
 			dIntegral += dCurrentValue * nDeltaTime;
 			dSquaredIntegral += dCurrentValue * nDeltaTime;
 
-			nCurrentTime = nextEntry.m_nTimeStamp;
+			nCurrentTime = nextEntry.m_nTimeStampInMicroSeconds;
 			dCurrentValue = nextEntry.m_dValue;
 
 			if (dCurrentValue < dMinValue)
@@ -690,12 +688,12 @@ namespace AMC {
 				dMaxValue = dCurrentValue;
 		}
 
-		dIntegral += dCurrentValue * (nEndTimeStamp - nCurrentTime);
+		dIntegral += dCurrentValue * (interval.m_nEndTimeInMicroSeconds - nCurrentTime);
 
 		resultStatistics.m_dMinValue = dMinValue;
 		resultStatistics.m_dMaxValue = dMaxValue;
-		resultStatistics.m_dAverageValue = dIntegral / ((double)nTimeDifference);
-		resultStatistics.m_dAverageSquaredValue = dSquaredIntegral / ((double)nTimeDifference);
+		resultStatistics.m_dAverageValue = dIntegral / ((double)nTimeDifferenceInMicroSeconds);
+		resultStatistics.m_dAverageSquaredValue = dSquaredIntegral / ((double)nTimeDifferenceInMicroSeconds);
 		resultStatistics.m_dVariance = resultStatistics.m_dAverageSquaredValue - resultStatistics.m_dAverageValue * resultStatistics.m_dAverageValue;
 
 		return resultStatistics;
@@ -703,15 +701,17 @@ namespace AMC {
 	}
 
 
-	void CStateJournal::retrieveRecentInterval(uint64_t nLastMilliseconds, uint64_t& nStartTimeStamp, uint64_t& nEndTimeStamp)
+	void CStateJournal::retrieveRecentInterval(uint64_t nLastMilliSeconds, sStateJournalInterval& interval)
 	{
-		nEndTimeStamp = m_pImpl->retrieveTimeStamp();
-		if (nLastMilliseconds < nEndTimeStamp)
-			nStartTimeStamp = nEndTimeStamp - nLastMilliseconds;
+		uint64_t nLastMicroSeconds = nLastMilliSeconds * 1000;
+
+		interval.m_nEndTimeInMicroSeconds = m_pImpl->retrieveTimeStamp_MicroSecond();
+		if (nLastMicroSeconds < interval.m_nEndTimeInMicroSeconds)
+			interval.m_nStartTimeInMicroSeconds = interval.m_nEndTimeInMicroSeconds - nLastMicroSeconds;
 		else
-			nStartTimeStamp = 0;
+			interval.m_nStartTimeInMicroSeconds = 0;
 		
-		if (nStartTimeStamp >= nEndTimeStamp)
+		if (interval.m_nStartTimeInMicroSeconds >= interval.m_nEndTimeInMicroSeconds)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL);
 	}
 

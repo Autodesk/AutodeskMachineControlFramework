@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_dynamic.hpp"
 #include "libmcdriver_dynamic.hpp"
+#include "common_chrono.hpp"
 
 #define AMCPACKAGE_SCHEMANAMESPACE "http://schemas.autodesk.com/amc/resourcepackage/2020/07"
 
@@ -77,6 +78,8 @@ namespace AMC {
 		PLogger m_pLogger;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		LibMCData::PStorage m_pStorage;
+		AMCCommon::PChrono m_pGlobalChrono;
+
 		std::string m_sSystemUserID;
 
 		// List and Map of registered drivers
@@ -93,7 +96,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, std::string sSystemUserID);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID);
 
 		virtual ~CDriverHandler();
 
