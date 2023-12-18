@@ -422,14 +422,16 @@ typedef IBaseSharedPtr<ILogSession> PILogSession;
 class IJournalSession : public virtual IBase {
 public:
 	/**
-	* IJournalSession::WriteJournalChunkData - writes detailed journal states to disk.
+	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
 	* @param[in] nChunkIndex - Index of the Chunk to write
-	* @param[in] nStartTimeStamp - Start Timestamp of the chunk
-	* @param[in] nEndTimeStamp - End Timestamp of the chunk
-	* @param[in] nDataBufferSize - Number of elements in buffer
-	* @param[in] pDataBuffer - Data to write into chunk.
+	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
+	* @param[in] nEndTimeStamp - End Timestamp of the chunk (in microseconds)
+	* @param[in] nVariableInfoBufferSize - Number of elements in buffer
+	* @param[in] pVariableInfoBuffer - Variable information.
+	* @param[in] nEntryDataBufferSize - Number of elements in buffer
+	* @param[in] pEntryDataBuffer - Entry bulk data.
 	*/
-	virtual void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer) = 0;
+	virtual void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry * pEntryDataBuffer) = 0;
 
 	/**
 	* IJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.

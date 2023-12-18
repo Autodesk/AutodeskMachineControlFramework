@@ -737,6 +737,26 @@ namespace LibMCData {
   };
   
   /*************************************************************************************************************************
+   Declaration of structs
+  **************************************************************************************************************************/
+  
+  #pragma pack (1)
+  
+  typedef struct sJournalChunkVariableInfo {
+      LibMCData_uint32 m_VariableIndex;
+      LibMCData_uint32 m_VariableType;
+      LibMCData_uint32 m_EntryStartIndex;
+      LibMCData_uint32 m_EntryCount;
+  } sJournalChunkVariableInfo;
+  
+  typedef struct sJournalChunkIntegerEntry {
+      LibMCData_uint32 m_TimeStampInMicroseconds;
+      LibMCData_uint64 m_IntegerValue;
+  } sJournalChunkIntegerEntry;
+  
+  #pragma pack ()
+  
+  /*************************************************************************************************************************
    Declaration of function pointers 
   **************************************************************************************************************************/
   
@@ -778,6 +798,8 @@ typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
+typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
+typedef LibMCData::sJournalChunkIntegerEntry sLibMCDataJournalChunkIntegerEntry;
 typedef LibMCData::LogCallback LibMCDataLogCallback;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;

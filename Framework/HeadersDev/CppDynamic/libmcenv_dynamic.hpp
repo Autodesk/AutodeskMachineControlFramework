@@ -1549,6 +1549,7 @@ public:
 	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
+	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
 	inline void LogMessage(const std::string & sLogString);
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
@@ -1662,8 +1663,8 @@ public:
 	inline LibMCEnv_uint64 GetStartTimeStamp();
 	inline LibMCEnv_uint64 GetEndTimeStamp();
 	inline LibMCEnv_double ComputeFullAverage();
-	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval);
-	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval);
+	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
 	inline void ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer);
 };
 	
@@ -1682,7 +1683,7 @@ public:
 	}
 	
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
-	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds);
+	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
 	inline LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
 	inline bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName);
 	inline LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
@@ -1799,6 +1800,7 @@ public:
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
+	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
@@ -1882,6 +1884,7 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
+	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
@@ -2291,6 +2294,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_Sleep = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMicroseconds = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogMessage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogWarning = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
@@ -2413,6 +2417,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
@@ -2464,6 +2469,7 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
+		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLString = nullptr;
@@ -5270,6 +5276,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMicroseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMicroseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_LogMessage = (PLibMCEnvDriverEnvironment_LogMessagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_logmessage");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_LogMessage = (PLibMCEnvDriverEnvironment_LogMessagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_logmessage");
@@ -6368,6 +6383,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = (PLibMCEnvStateEnvironment_GetTestEnvironmentPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_gettestenvironment");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = (PLibMCEnvStateEnvironment_GetTestEnvironmentPtr) dlsym(hLibrary, "libmcenv_stateenvironment_gettestenvironment");
@@ -6824,6 +6848,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds = (PLibMCEnvUIEnvironment_GetGlobalTimerInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getglobaltimerinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds = (PLibMCEnvUIEnvironment_GetGlobalTimerInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_uienvironment_getglobaltimerinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8306,6 +8339,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getglobaltimerinmicroseconds", (void**)&(pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_logmessage", (void**)&(pWrapperTable->m_DriverEnvironment_LogMessage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogMessage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8794,6 +8831,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getglobaltimerinmicroseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_gettestenvironment", (void**)&(pWrapperTable->m_StateEnvironment_GetTestEnvironment));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetTestEnvironment == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8996,6 +9037,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getglobaltimerinmicroseconds", (void**)&(pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_gettestenvironment", (void**)&(pWrapperTable->m_UIEnvironment_GetTestEnvironment));
@@ -9777,26 +9822,26 @@ public:
 	
 	/**
 	* CDataSeries::GetMinimum - Returns the minimum time stamp of the data series. Fails if data series is empty.
-	* @return Minimum time stamp in milliseconds.
+	* @return Minimum time stamp in microseconds.
 	*/
 	LibMCEnv_uint64 CDataSeries::GetMinimum()
 	{
-		LibMCEnv_uint64 resultMinimum = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_GetMinimum(m_pHandle, &resultMinimum));
+		LibMCEnv_uint64 resultMinimumInMicroSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_GetMinimum(m_pHandle, &resultMinimumInMicroSeconds));
 		
-		return resultMinimum;
+		return resultMinimumInMicroSeconds;
 	}
 	
 	/**
 	* CDataSeries::GetMaximum - Returns the maximum time stamp of the data series. Fails if data series is empty.
-	* @return Maximum time stamp in milliseconds.
+	* @return Maximum time stamp in microseconds.
 	*/
 	LibMCEnv_uint64 CDataSeries::GetMaximum()
 	{
-		LibMCEnv_uint64 resultMaximum = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_GetMaximum(m_pHandle, &resultMaximum));
+		LibMCEnv_uint64 resultMaximumInMicroSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_GetMaximum(m_pHandle, &resultMaximumInMicroSeconds));
 		
-		return resultMaximum;
+		return resultMaximumInMicroSeconds;
 	}
 	
 	/**
@@ -13244,6 +13289,18 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetGlobalTimerInMicroseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
 	* CDriverEnvironment::LogMessage - logs a string as message
 	* @param[in] sLogString - String to Log
 	*/
@@ -13795,32 +13852,32 @@ public:
 	
 	/**
 	* CUniformJournalSampling::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in ms.
+	* @return Start Timestamp of Recording in microseconds.
 	*/
 	LibMCEnv_uint64 CUniformJournalSampling::GetStartTimeStamp()
 	{
-		LibMCEnv_uint64 resultStartTimeStampInMS = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetStartTimeStamp(m_pHandle, &resultStartTimeStampInMS));
+		LibMCEnv_uint64 resultStartTimeStampInMicroSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetStartTimeStamp(m_pHandle, &resultStartTimeStampInMicroSeconds));
 		
-		return resultStartTimeStampInMS;
+		return resultStartTimeStampInMicroSeconds;
 	}
 	
 	/**
 	* CUniformJournalSampling::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in ms.
+	* @return End Timestamp of Recording in microseconds.
 	*/
 	LibMCEnv_uint64 CUniformJournalSampling::GetEndTimeStamp()
 	{
-		LibMCEnv_uint64 resultEndTimeStampInMS = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetEndTimeStamp(m_pHandle, &resultEndTimeStampInMS));
+		LibMCEnv_uint64 resultEndTimeStampInMicroSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetEndTimeStamp(m_pHandle, &resultEndTimeStampInMicroSeconds));
 		
-		return resultEndTimeStampInMS;
+		return resultEndTimeStampInMicroSeconds;
 	}
 	
 	/**
 	* CUniformJournalSampling::GetSample - Returns the timestamp and value of the given sample.
 	* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
-	* @param[out] nTimeStamp - TimeStamp of the sample in ms.
+	* @param[out] nTimeStamp - TimeStamp of the sample in MicroSeconds.
 	* @param[out] dValue - Value of the sample in ms.
 	*/
 	void CUniformJournalSampling::GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue)
@@ -13862,26 +13919,26 @@ public:
 	
 	/**
 	* CJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in ms.
+	* @return Start Timestamp of Recording in microseconds.
 	*/
 	LibMCEnv_uint64 CJournalVariable::GetStartTimeStamp()
 	{
-		LibMCEnv_uint64 resultRecordingStartInMS = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetStartTimeStamp(m_pHandle, &resultRecordingStartInMS));
+		LibMCEnv_uint64 resultRecordingStartInMicroSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetStartTimeStamp(m_pHandle, &resultRecordingStartInMicroSeconds));
 		
-		return resultRecordingStartInMS;
+		return resultRecordingStartInMicroSeconds;
 	}
 	
 	/**
 	* CJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in ms.
+	* @return End Timestamp of Recording in microseconds.
 	*/
 	LibMCEnv_uint64 CJournalVariable::GetEndTimeStamp()
 	{
-		LibMCEnv_uint64 resultRecordingEndInMS = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetEndTimeStamp(m_pHandle, &resultRecordingEndInMS));
+		LibMCEnv_uint64 resultRecordingEndInMicroSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetEndTimeStamp(m_pHandle, &resultRecordingEndInMicroSeconds));
 		
-		return resultRecordingEndInMS;
+		return resultRecordingEndInMicroSeconds;
 	}
 	
 	/**
@@ -13898,32 +13955,32 @@ public:
 	
 	/**
 	* CJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
-	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
-	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
 	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 	* @return Average value of the variable.
 	*/
-	LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval)
+	LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval)
 	{
 		LibMCEnv_double resultAverageValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeAverage(m_pHandle, nStartTimeInMS, nEndTimeInMS, bClampInterval, &resultAverageValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeAverage(m_pHandle, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, bClampInterval, &resultAverageValue));
 		
 		return resultAverageValue;
 	}
 	
 	/**
 	* CJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
-	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
-	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
+	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
 	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
 	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 	* @return Returns an instance with the sampling results.
 	*/
-	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
 	{
 		LibMCEnvHandle hJournalSampling = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMS, nEndTimeInMS, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
 		
 		if (!hJournalSampling) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -13968,14 +14025,14 @@ public:
 	/**
 	* CJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nStartTimeInMilliseconds - Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval.
-	* @param[in] nEndTimeInMilliseconds - End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
 	* @return Journal Instance.
 	*/
-	PJournalVariable CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds)
+	PJournalVariable CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
 	{
 		LibMCEnvHandle hJournalVariable = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariableFromTimeInterval(m_pHandle, sVariableName.c_str(), nStartTimeInMilliseconds, nEndTimeInMilliseconds, &hJournalVariable));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariableFromTimeInterval(m_pHandle, sVariableName.c_str(), nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hJournalVariable));
 		
 		if (!hJournalVariable) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -13988,7 +14045,7 @@ public:
 	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-	* @return Returns the stored time stamp in milliseconds.
+	* @return Returns the stored time stamp in microseconds.
 	*/
 	LibMCEnv_uint64 CJournalHandler::StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
 	{
@@ -14017,21 +14074,21 @@ public:
 	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-	* @return Returns the time stamp in milliseconds.
+	* @return Returns the time stamp in microseconds.
 	*/
 	LibMCEnv_uint64 CJournalHandler::RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
 	{
-		LibMCEnv_uint64 resultTimeStamp = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStamp));
+		LibMCEnv_uint64 resultTimeStampInMicroSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStampInMicroSeconds));
 		
-		return resultTimeStamp;
+		return resultTimeStampInMicroSeconds;
 	}
 	
 	/**
 	* CJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
 	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[out] TimeStampsBuffer - Returns an array of time stamps in milliseconds.
+	* @param[out] TimeStampsBuffer - Returns an array of time stamps in microseconds.
 	*/
 	void CJournalHandler::RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, std::vector<LibMCEnv_uint64> & TimeStampsBuffer)
 	{
@@ -15000,6 +15057,18 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetGlobalTimerInMicroseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
 	* CStateEnvironment::GetTestEnvironment - Returns a test environment instance.
 	* @return Test Environment Instance
 	*/
@@ -15708,6 +15777,18 @@ public:
 	{
 		LibMCEnv_uint64 resultTimerValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetGlobalTimerInMicroseconds(m_pHandle, &resultTimerValue));
 		
 		return resultTimerValue;
 	}

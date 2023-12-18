@@ -790,13 +790,13 @@ public:
 
 	/**
 	* IDataSeries::GetMinimum - Returns the minimum time stamp of the data series. Fails if data series is empty.
-	* @return Minimum time stamp in milliseconds.
+	* @return Minimum time stamp in microseconds.
 	*/
 	virtual LibMCEnv_uint64 GetMinimum() = 0;
 
 	/**
 	* IDataSeries::GetMaximum - Returns the maximum time stamp of the data series. Fails if data series is empty.
-	* @return Maximum time stamp in milliseconds.
+	* @return Maximum time stamp in microseconds.
 	*/
 	virtual LibMCEnv_uint64 GetMaximum() = 0;
 
@@ -2789,6 +2789,12 @@ public:
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
 	/**
+	* IDriverEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
+
+	/**
 	* IDriverEnvironment::LogMessage - logs a string as message
 	* @param[in] sLogString - String to Log
 	*/
@@ -3112,20 +3118,20 @@ public:
 
 	/**
 	* IUniformJournalSampling::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in ms.
+	* @return Start Timestamp of Recording in microseconds.
 	*/
 	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
 
 	/**
 	* IUniformJournalSampling::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in ms.
+	* @return End Timestamp of Recording in microseconds.
 	*/
 	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
 
 	/**
 	* IUniformJournalSampling::GetSample - Returns the timestamp and value of the given sample.
 	* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
-	* @param[out] nTimeStamp - TimeStamp of the sample in ms.
+	* @param[out] nTimeStamp - TimeStamp of the sample in MicroSeconds.
 	* @param[out] dValue - Value of the sample in ms.
 	*/
 	virtual void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue) = 0;
@@ -3157,13 +3163,13 @@ public:
 
 	/**
 	* IJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in ms.
+	* @return Start Timestamp of Recording in microseconds.
 	*/
 	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
 
 	/**
 	* IJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in ms.
+	* @return End Timestamp of Recording in microseconds.
 	*/
 	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
 
@@ -3175,23 +3181,23 @@ public:
 
 	/**
 	* IJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
-	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
-	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
 	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 	* @return Average value of the variable.
 	*/
-	virtual LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval) = 0;
+	virtual LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval) = 0;
 
 	/**
 	* IJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMS - Start Timestamp of the interval in ms.
-	* @param[in] nEndTimeInMS - End Timestamp of the interval in ms.
-	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMS - EndTimeInMS) MUST be a multiple of the Number of samples.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
+	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
 	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
 	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 	* @return Returns an instance with the sampling results.
 	*/
-	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
+	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
 
 	/**
 	* IJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
@@ -3223,18 +3229,18 @@ public:
 	/**
 	* IJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nStartTimeInMilliseconds - Start time stamp in milliseconds. MUST be smaller than EndTimeInMilliseconds. Fails if larger than recorded time interval.
-	* @param[in] nEndTimeInMilliseconds - End time stamp in milliseconds. MUST be larger than StartTimeInMilliseconds. Fails if larger than recorded time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
 	* @return Journal Instance.
 	*/
-	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds) = 0;
+	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
 	/**
 	* IJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
 	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-	* @return Returns the stored time stamp in milliseconds.
+	* @return Returns the stored time stamp in microseconds.
 	*/
 	virtual LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
 
@@ -3251,7 +3257,7 @@ public:
 	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-	* @return Returns the time stamp in milliseconds.
+	* @return Returns the time stamp in microseconds.
 	*/
 	virtual LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
 
@@ -3261,7 +3267,7 @@ public:
 	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
 	* @param[in] nTimeStampsBufferSize - Number of elements in buffer
 	* @param[out] pTimeStampsNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pTimeStampsBuffer - uint64 buffer of Returns an array of time stamps in milliseconds.
+	* @param[out] pTimeStampsBuffer - uint64 buffer of Returns an array of time stamps in microseconds.
 	*/
 	virtual void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer) = 0;
 
@@ -3786,6 +3792,12 @@ public:
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
 	/**
+	* IStateEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
+
+	/**
 	* IStateEnvironment::GetTestEnvironment - Returns a test environment instance.
 	* @return Test Environment Instance
 	*/
@@ -4180,6 +4192,12 @@ public:
 	* @return Timer value in Milliseconds
 	*/
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
+
+	/**
+	* IUIEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
 
 	/**
 	* IUIEnvironment::GetTestEnvironment - Returns a test environment instance.

@@ -1197,8 +1197,6 @@ void CRTCContext::StartOIEMeasurementEx(bool bTriggerOnFlag)
 
 	
 
-	m_pScanLabSDK->n_list_nop(m_CardNo);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 	uint32_t nFreeVariable = 0;
 
 	switch (m_OIEOperationMode) {
@@ -1222,14 +1220,6 @@ void CRTCContext::StartOIEMeasurementEx(bool bTriggerOnFlag)
 	
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size() + 2);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
-	
-	//m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, 1234);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
-
-	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size() + 2);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
 
