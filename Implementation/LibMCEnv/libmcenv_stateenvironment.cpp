@@ -446,6 +446,11 @@ LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
 	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
 }
 
+LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMicroseconds()
+{
+	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+}
+
 ITestEnvironment* CStateEnvironment::GetTestEnvironment()
 {
 	return new CTestEnvironment(m_pSystemState->getTestEnvironmentPath ());

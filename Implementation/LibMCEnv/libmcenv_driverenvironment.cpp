@@ -57,9 +57,9 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, std::string sSystemUserID, const std::string& sDriverName)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName)
     : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pDriverResourcePackage (pDriverResourcePackage), m_pMachineResourcePackage (pMachineResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName), m_pBuildJobHandler (pBuildJobHandler),
-    m_pStorage (pStorage), m_sSystemUserID (sSystemUserID)
+    m_pStorage (pStorage), m_sSystemUserID (sSystemUserID), m_pGlobalChrono (pGlobalChrono)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -72,6 +72,8 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
     if (pStorage.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pLogger.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pGlobalChrono.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (sBaseTempPath.empty ())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -262,12 +264,17 @@ void CDriverEnvironment::setIsInitializing(bool bIsInitializing)
 
 void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 {
-    m_Chrono.sleepMilliseconds(nDelay);
+    m_pGlobalChrono->sleepMilliseconds(nDelay);
 }
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_Chrono.getExistenceTimeInMilliseconds();
+    return m_pGlobalChrono->getExistenceTimeInMilliseconds();
+}
+
+LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMicroseconds()
+{
+    return m_pGlobalChrono->getExistenceTimeInMicroseconds();
 }
 
 void CDriverEnvironment::LogMessage(const std::string& sLogString)

@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <atomic>
 
 #include "amcdata_sqlhandler.hpp"
-#include "common_exportstream.hpp"
+#include "common_exportstream_native.hpp"
 #include "libmcdata_types.hpp"
 
 namespace AMCData {
@@ -53,7 +53,7 @@ namespace AMCData {
 		std::mutex m_JournalMutex;
 		std::atomic<uint32_t> m_LogID;
 
-		AMCCommon::PExportStream m_pJournalStream;
+		AMCCommon::PExportStream_Native m_pJournalStream;
 		
 	public:
 
@@ -65,7 +65,7 @@ namespace AMCData {
 
 		LibMCData_uint32 GetMaxLogEntryID();
 
-		void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8* pDataBuffer);
+		void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer);
 
 		AMCData::PSQLHandler getSQLHandler();
 

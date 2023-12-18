@@ -57,9 +57,9 @@ CJournalSession::~CJournalSession()
 }
 
 
-void CJournalSession::WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer)
+void CJournalSession::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer)
 {
-    m_pJournal->WriteJournalChunkData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nDataBufferSize, pDataBuffer);
+    m_pJournal->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nEntryDataBufferSize, pEntryDataBuffer);
 }
 
 LibMCData_uint32 CJournalSession::GetChunkCapacity()

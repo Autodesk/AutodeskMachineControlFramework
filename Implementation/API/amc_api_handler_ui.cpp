@@ -320,7 +320,7 @@ PAPIResponse CAPIHandler_UI::handleChartRequest(const std::string& sParameterUUI
 		for (size_t nIndex = 0; nIndex < nEntryCount; nIndex++) {
 			auto & entry = entries.at(nIndex);
 			
-			apiResponse->addFloat((float) (entry.m_nTimeStamp * 0.001));
+			apiResponse->addFloat((float) (entry.m_nTimeStampInMicroSeconds * 0.000001));
 			apiResponse->addFloat((float) entry.m_dValue);
 		}
 

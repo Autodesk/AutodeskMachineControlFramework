@@ -60,11 +60,10 @@ private:
 
     AMC::PStateJournal m_pStateJournal;
     std::string m_sVariableName;
-    uint64_t m_nStartTimeStamp;
-    uint64_t m_nEndTimeStamp;
+    AMC::sStateJournalInterval m_Interval;
 
 public:
-	CJournalVariable(AMC::PStateJournal pStateJournal, const std::string & sVariableName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp);
+	CJournalVariable(AMC::PStateJournal pStateJournal, const std::string & sVariableName, AMC::sStateJournalInterval interval);
 
 	virtual ~CJournalVariable();
 
@@ -76,9 +75,9 @@ public:
 
     LibMCEnv_double ComputeFullAverage() override;
 
-	LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval) override;
+	LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval) override;
 
-	IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) override;
+	IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) override;
 
     void ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry* pTimeStreamEntriesBuffer) override;
 

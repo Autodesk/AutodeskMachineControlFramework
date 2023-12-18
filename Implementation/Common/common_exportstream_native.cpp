@@ -153,6 +153,13 @@ namespace AMCCommon {
 
 	}
 
+	void CExportStream_Native::flushStream()
+	{
+		m_Stream.flush ();
+		if (m_Stream.fail())
+			throw std::runtime_error("could not flush stream");
+	}
+
 		
 }
 

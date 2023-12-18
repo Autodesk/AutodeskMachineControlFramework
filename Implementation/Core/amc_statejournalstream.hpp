@@ -71,15 +71,19 @@ namespace AMC {
 
 
 	typedef struct _sJournalTimeStreamDoubleEntry {
-		uint64_t m_nTimeStamp;
+		uint64_t m_nTimeStampInMicroSeconds;
 		double m_dValue;
 	} sJournalTimeStreamDoubleEntry;
 
 	typedef struct _sJournalTimeStreamInt64Entry {
-		uint64_t m_nTimeStamp;
+		uint64_t m_nTimeStampInMicroSeconds;
 		int64_t m_nValue;
 	} sJournalTimeStreamInt64Entry;
 
+	typedef struct _sStateJournalInterval {
+		uint64_t m_nStartTimeInMicroSeconds;
+		uint64_t m_nEndTimeInMicroSeconds;
+	} sStateJournalInterval;
 
 	class CStateJournalStreamChunk
 	{
@@ -90,13 +94,15 @@ namespace AMC {
 
 		virtual ~CStateJournalStreamChunk();
 
-		virtual uint64_t getStartTimeStamp() = 0;
+		virtual uint64_t getStartTimeStampInMicroSeconds() = 0;
 
-		virtual uint64_t getEndTimeStamp() = 0;
+		virtual uint64_t getEndTimeStampInMicroSeconds() = 0;
 
-		virtual void readRawIntegerData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, std::vector<sJournalTimeStreamInt64Entry> & rawTimeStream) = 0;
+		virtual uint64_t getChunkIndex() = 0;
 
-		virtual void readRawDoubleData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, double dUnits, std::vector<sJournalTimeStreamDoubleEntry> & rawTimeStream) = 0;
+		virtual void readRawIntegerData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStampInMicroSeconds, uint64_t nIntervalEndTimeStampInMicroSeconds, std::vector<sJournalTimeStreamInt64Entry> & rawTimeStream) = 0;
+
+		virtual void readRawDoubleData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStampInMicroSeconds, uint64_t nIntervalEndTimeStampInMicroSeconds, double dUnits, std::vector<sJournalTimeStreamDoubleEntry> & rawTimeStream) = 0;
 
 	};
 
@@ -136,30 +142,29 @@ namespace AMC {
 		std::mutex m_JournalSessionMutex;
 		LibMCData::PJournalSession m_pJournalSession;
 
-		uint64_t m_nChunkSizeInMilliseconds;
-		uint64_t m_nCurrentTimeStamp;
+		uint64_t m_nChunkSizeInMicroseconds;
+		uint64_t m_nCurrentTimeStampInMicroseconds;
 
 		std::vector<uint64_t> m_CurrentVariableValues;
 
-		void startNewChunk(const uint64_t nAbsoluteTimeStamp);
-		void ensureChunk(const uint64_t nAbsoluteTimeStamp);
+		void startNewChunk(const uint64_t nAbsoluteTimeStampInMicroseconds);
+		void ensureChunk(const uint64_t nAbsoluteTimeStampInMicroseconds);
 
 	public:
 		CStateJournalStream(LibMCData::PJournalSession pJournalSession);
 		virtual ~CStateJournalStream();
 
-		virtual void writeBool(const uint64_t nAbsoluteTimeStamp, const uint32_t nStorageIndex, bool bValue);
-		virtual void writeInt64(const uint64_t nAbsoluteTimeStamp, const uint32_t nStorageIndex, int64_t nValue);
-		virtual void writeDouble(const uint64_t nAbsoluteTimeStamp, const uint32_t nStorageIndex, int64_t nValue);
+		virtual void writeBool_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, bool bValue);
+		virtual void writeInt64_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, int64_t nValue);
+		virtual void writeDouble_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, int64_t nValue);
 
-		void readRawIntegerData(const uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, std::vector<sJournalTimeStreamInt64Entry>& rawTimeStream);
+		void readRawIntegerData(const uint32_t nStorageIndex, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& rawTimeStream);
 
-		void readRawDoubleData(const uint32_t nStorageIndex, uint64_t nIntervalStartTimeStamp, uint64_t nIntervalEndTimeStamp, double dUnits, std::vector<sJournalTimeStreamDoubleEntry>& rawTimeStream);
+		void readRawDoubleData(const uint32_t nStorageIndex, const sStateJournalInterval& interval, double dUnits, std::vector<sJournalTimeStreamDoubleEntry>& rawTimeStream);
 
 		// Threaded function to write chunk buffers to disk!
+		void serializeChunksThreaded();
 		void writeChunksToDiskThreaded();
-
-		uint64_t getChunkSizeInMilliseconds ();
 
 		void setVariableCount (size_t nVariableCount);
 	};

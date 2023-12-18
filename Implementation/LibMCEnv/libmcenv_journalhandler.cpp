@@ -61,9 +61,11 @@ IJournalVariable * CJournalHandler::RetrieveJournalVariable(const std::string & 
 {
 	uint64_t nStartTimeStamp = 0;
 	uint64_t nEndTimeStamp = 0;
-	m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, nStartTimeStamp, nEndTimeStamp);
 
-	return new CJournalVariable(m_pStateJournal, sVariableName, nStartTimeStamp, nEndTimeStamp);
+	AMC::sStateJournalInterval interval;
+	m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, interval);
+
+	return new CJournalVariable(m_pStateJournal, sVariableName, interval);
 }
 
 IJournalVariable * CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds)

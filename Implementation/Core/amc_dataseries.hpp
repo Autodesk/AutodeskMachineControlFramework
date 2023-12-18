@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	typedef struct _sDataSeriesEntry {
-		uint32_t m_nTimeStamp;
+		uint64_t m_nTimeStampInMicroSeconds;
 		double m_dValue;
 	} sDataSeriesEntry;
 

@@ -54,9 +54,9 @@ namespace AMC {
 		sjmFinished = 3
 	};
 
+
 	typedef struct _sStateJournalStatistics {
-		uint64_t m_nStartTime;
-		uint64_t m_nEndTime;
+		sStateJournalInterval m_Interval;
 
 		double m_dMinValue;
 		double m_dMaxValue;
@@ -96,11 +96,11 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		void readDoubleTimeStream (const std::string & sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, std::vector<sJournalTimeStreamDoubleEntry> & timeStream);
+		void readDoubleTimeStream (const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
-		sStateJournalStatistics computeStatistics (const std::string& sName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp);
-
-		void retrieveRecentInterval(uint64_t nLastMilliseconds, uint64_t& nStartTimeStamp, uint64_t& nEndTimeStamp);
+		sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
+		
+		void retrieveRecentInterval (uint64_t nLastMilliSeconds, sStateJournalInterval& interval);
 
 	};
 

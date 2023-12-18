@@ -45,8 +45,8 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CJournalVariable 
 **************************************************************************************************************************/
-CJournalVariable::CJournalVariable(AMC::PStateJournal pStateJournal, const std::string& sVariableName, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp)
-    : m_pStateJournal (pStateJournal), m_sVariableName (sVariableName), m_nStartTimeStamp (nStartTimeStamp), m_nEndTimeStamp (nEndTimeStamp)
+CJournalVariable::CJournalVariable(AMC::PStateJournal pStateJournal, const std::string& sVariableName, AMC::sStateJournalInterval interval)
+    : m_pStateJournal (pStateJournal), m_sVariableName (sVariableName), m_Interval (interval)
 {
     if (pStateJournal.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -54,12 +54,8 @@ CJournalVariable::CJournalVariable(AMC::PStateJournal pStateJournal, const std::
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME);
 
 
-    if (nStartTimeStamp >= nEndTimeStamp)
+    if (interval.m_nStartTimeInMicroSeconds >= interval.m_nEndTimeInMicroSeconds)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL);
-
-    //auto pValue = m_pStateJournal->findValue(sVariableName, false);
-    //if (pValue.get () == nullptr)
-        //throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_JOURNALVARIABLENOTFOUND, "journal variable not found: " + sVariableName);
 
 }
 
@@ -75,42 +71,45 @@ std::string CJournalVariable::GetVariableName()
 
 LibMCEnv_uint64 CJournalVariable::GetStartTimeStamp()
 {
-    return m_nStartTimeStamp;
+    return m_Interval.m_nStartTimeInMicroSeconds;
 }
 
 LibMCEnv_uint64 CJournalVariable::GetEndTimeStamp()
 {
-    return m_nEndTimeStamp;
+    return m_Interval.m_nEndTimeInMicroSeconds;
 }
 
 LibMCEnv_double CJournalVariable::ComputeFullAverage()
 {
-    return ComputeAverage(m_nStartTimeStamp, m_nEndTimeStamp, true);
+    return ComputeAverage(m_Interval.m_nStartTimeInMicroSeconds, m_Interval.m_nEndTimeInMicroSeconds, true);
 }
 
-LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const bool bClampInterval)
+LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval)
 {
-    uint64_t nClampedStartTimeInMS = nStartTimeInMS;
-    uint64_t nClampedEndTimeInMS = nEndTimeInMS;
+    uint64_t nClampedStartTimeInMicroSeconds = nStartTimeInMicroSeconds;
+    uint64_t nClampedEndTimeInMicroSeconds = nEndTimeInMicroSeconds;
     if (bClampInterval) {
-        if (nClampedStartTimeInMS < m_nStartTimeStamp)
-            nClampedStartTimeInMS = m_nStartTimeStamp;
-        if (nClampedEndTimeInMS > m_nEndTimeStamp)
-            nClampedEndTimeInMS = m_nEndTimeStamp;
+        if (nClampedStartTimeInMicroSeconds < m_Interval.m_nStartTimeInMicroSeconds)
+            nClampedStartTimeInMicroSeconds = m_Interval.m_nStartTimeInMicroSeconds;
+        if (nClampedEndTimeInMicroSeconds > m_Interval.m_nEndTimeInMicroSeconds)
+            nClampedEndTimeInMicroSeconds = m_Interval.m_nEndTimeInMicroSeconds;
     }
     else {
-        if (nClampedStartTimeInMS < m_nStartTimeStamp)
+        if (nClampedStartTimeInMicroSeconds < m_Interval.m_nStartTimeInMicroSeconds)
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA);
-        if (nClampedEndTimeInMS > m_nEndTimeStamp)
+        if (nClampedEndTimeInMicroSeconds > m_Interval.m_nEndTimeInMicroSeconds)
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COMPUTATIONOUTSIDEOFJOURNALDATA);
     }
 
-    auto sStatistics = m_pStateJournal->computeStatistics(m_sVariableName, nClampedStartTimeInMS, nClampedEndTimeInMS);
+    AMC::sStateJournalInterval interval;
+    interval.m_nStartTimeInMicroSeconds = nClampedStartTimeInMicroSeconds;
+    interval.m_nEndTimeInMicroSeconds = nClampedEndTimeInMicroSeconds;
+    auto sStatistics = m_pStateJournal->computeStatistics(m_sVariableName, interval);
     return sStatistics.m_dAverageValue;
 
 }
 
-IUniformJournalSampling * CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMS, const LibMCEnv_uint64 nEndTimeInMS, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+IUniformJournalSampling * CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
@@ -120,9 +119,8 @@ void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBu
 {
     std::vector<AMC::sJournalTimeStreamDoubleEntry> timeStream;
 
-    m_pStateJournal->readDoubleTimeStream(m_sVariableName, m_nStartTimeStamp, m_nEndTimeStamp, timeStream);
+    m_pStateJournal->readDoubleTimeStream(m_sVariableName, m_Interval, timeStream);
 
-    // Add start value as first entry!
     size_t nRawEntryCount = timeStream.size();
 
     if (pTimeStreamEntriesNeededCount != nullptr)
@@ -136,7 +134,7 @@ void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBu
         auto pTargetEntry = pTimeStreamEntriesBuffer;
 
         for (auto& timeStreamIter : timeStream) {
-            pTargetEntry->m_TimestampInMS = timeStreamIter.m_nTimeStamp;
+            pTargetEntry->m_TimestampInMicroSeconds = timeStreamIter.m_nTimeStampInMicroSeconds;
             pTargetEntry->m_Value = timeStreamIter.m_dValue;
             pTargetEntry++;
         }

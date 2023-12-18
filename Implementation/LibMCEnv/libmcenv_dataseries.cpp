@@ -105,7 +105,7 @@ void CDataSeries::GetAllEntries(LibMCEnv_uint64 nEntryArrayBufferSize, LibMCEnv_
 			AMC::sDataSeriesEntry* pSource = entries.data();
 
 			for (uint64_t nIndex = 0; nIndex < nEntryCount; nIndex++) {
-				pTarget->m_TimestampInMS = pSource->m_nTimeStamp;
+				pTarget->m_TimestampInMicroSeconds = pSource->m_nTimeStampInMicroSeconds;
 				pTarget->m_Value = pSource->m_dValue;
 				pTarget++;
 				pSource++;
@@ -135,14 +135,14 @@ void CDataSeries::SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, con
 			for (uint64_t nIndex = 0; nIndex < nEntryArrayBufferSize; nIndex++) {
 
 				if (pPrev != nullptr) {
-					if (pPrev->m_TimestampInMS >= pSource->m_TimestampInMS)
+					if (pPrev->m_TimestampInMicroSeconds >= pSource->m_TimestampInMicroSeconds)
 						throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATASERIESTIMESTAMPSNOTINCREMENTING, "Data series time stamps not incrementing: " + m_pDataSeries->getName());
 				}
 
 				pPrev = pSource;
 
 				pTarget->m_dValue = pSource->m_Value;
-				pTarget->m_nTimeStamp = pSource->m_TimestampInMS;
+				pTarget->m_nTimeStampInMicroSeconds = pSource->m_TimestampInMicroSeconds;
 				pTarget++;
 				pSource++;
 			}
@@ -169,22 +169,38 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 
 	uint64_t nStartTimeStamp = pJournalVariableImpl->GetStartTimeStamp();
 	uint64_t nEndTimeStamp = pJournalVariableImpl->GetEndTimeStamp();
+	uint64_t nDeltaTime = nEndTimeStamp - nStartTimeStamp;
 
-	auto pSampling = pJournalVariableImpl->ComputeUniformAverageSamples(nStartTimeStamp, nEndTimeStamp, nNumberOfSamples, dMovingAverageDelta, true);
-	entries.resize(nNumberOfSamples);
+	if (nDeltaTime > 0) {
+		//auto pSampling = pJournalVariableImpl->ComputeUniformAverageSamples(nStartTimeStamp, nEndTimeStamp, nNumberOfSamples, dMovingAverageDelta, true);
+		entries.resize(nNumberOfSamples);
 
-	for (uint32_t nIndex = 0; nIndex < nNumberOfSamples; nIndex++) {
+		for (uint32_t nIndex = 0; nIndex < nNumberOfSamples; nIndex++) {
 
-		uint64_t nTimeStamp = 0;
-		double dValue = 0.0;
-		pSampling->GetSample(nIndex, nTimeStamp, dValue);
+			double dValue = 0.0;
 
-		auto& entry = entries.at(nIndex);
+			uint64_t nMovingAverageDeltaInMicroSeconds = 0;
+			if (dMovingAverageDelta > 0.0)
+				nMovingAverageDeltaInMicroSeconds = (uint64_t) round(dMovingAverageDelta * 1000000);			
+			if (nMovingAverageDeltaInMicroSeconds < 1)
+				nMovingAverageDeltaInMicroSeconds = 1;
 
-		entry.m_nTimeStamp = nTimeStamp;
-		entry.m_dValue = dValue;
+			uint64_t nTimeStampInMicroSeconds = nStartTimeStamp + (nIndex * nDeltaTime + (nDeltaTime / 2)) / nNumberOfSamples;
+			uint64_t nIntervalStartTimeStampInMicroSeconds = 0;
+			if (nMovingAverageDeltaInMicroSeconds < nTimeStampInMicroSeconds)
+				nIntervalStartTimeStampInMicroSeconds = nTimeStampInMicroSeconds - nMovingAverageDeltaInMicroSeconds;
+
+			int64_t nIntervalEndTimeStampInMicroSeconds = nTimeStampInMicroSeconds + nMovingAverageDeltaInMicroSeconds;
+
+			dValue = pJournalVariableImpl->ComputeAverage(nIntervalStartTimeStampInMicroSeconds, nIntervalEndTimeStampInMicroSeconds, true);
+
+			auto& entry = entries.at(nIndex);
+
+			entry.m_nTimeStampInMicroSeconds = nTimeStampInMicroSeconds;
+			entry.m_dValue = dValue;
+		}
+
 	}
-
 }
 
 

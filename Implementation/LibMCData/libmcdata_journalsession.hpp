@@ -66,7 +66,7 @@ public:
 
     virtual ~CJournalSession();
 
-	void WriteJournalChunkData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer) override;
+    void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer);
 
     LibMCData_uint32 GetChunkCapacity() override;
 
