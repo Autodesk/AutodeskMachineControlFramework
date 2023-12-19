@@ -49,6 +49,9 @@ Abstract: This is the class declaration of CDriver_A3200
 
 #include <vector>
 
+#define A3200_MINTASKID 1
+#define A3200_MAXTASKID 31
+
 namespace LibMCDriver_A3200 {
 namespace Impl {
 
@@ -119,29 +122,14 @@ public:
 
 	void SetCustomSDK(const LibMCDriver_A3200_uint64 nCoreSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pCoreSDKBufferBuffer, const LibMCDriver_A3200_uint64 nSystemSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pSystemSDKBufferBuffer, const LibMCDriver_A3200_uint64 nCompilerSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pCompilerSDKBufferBuffer, const LibMCDriver_A3200_uint64 nUtilitiesSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pUtilitiesSDKBufferBuffer, const LibMCDriver_A3200_uint64 nLicenseDecoderSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pLicenseDecoderSDKBufferBuffer) override;
 
-	void Connect(const LibMCDriver_A3200_uint32 nTimeout) override;
+	void Connect() override;
 
 	void Disconnect() override;
 
-	bool VariableExists(const std::string & sVariableName) override;
+	void RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sScript) override;
 
-	LibMCDriver_A3200_int64 ReadIntegerValue(const std::string & sVariableName) override;
+	void StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout) override;
 
-	void WriteIntegerValue(const std::string & sVariableName, const LibMCDriver_A3200_int64 nValue) override;
-
-	LibMCDriver_A3200_double ReadFloatValue(const std::string & sVariableName) override;
-
-	void WriteFloatValue(const std::string & sVariableName, const LibMCDriver_A3200_double dValue) override;
-
-	bool ReadBoolValue(const std::string & sVariableName) override;
-
-	void WriteBoolValue(const std::string & sVariableName, const bool bValue) override;
-
-	std::string ReadStringValue(const std::string & sVariableName) override;
-
-	void WriteStringValue(const std::string & sVariableName, const std::string & sValue) override;
-
-	void GetVariableBounds(const std::string & sVariableName, LibMCDriver_A3200_int64 & nMinValue, LibMCDriver_A3200_int64 & nMaxValue) override;
 
 };
 

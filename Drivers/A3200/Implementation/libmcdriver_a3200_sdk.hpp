@@ -65,7 +65,8 @@ namespace LibMCDriver_A3200 {
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200IsInitialized) (A3200Bool pIsInitialized);
 		typedef A3200ErrorData(A3200_CALLINGCONVENTION* PA3200GetLastError) ();
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200GetLastErrorString) (char * pszBuffer, uint32_t nBufferSize);
-
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200ProgramRun) (A3200Handle pHandle, uint32_t nTaskID, const char * pszFilePath);
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200ProgramStopAndWait) (A3200Handle pHandle, uint32_t nTaskID, uint32_t nTimeOutInMS);
 
 		class CA3200SDK_DLLDirectoryCache {
 		private:
@@ -97,6 +98,8 @@ namespace LibMCDriver_A3200 {
 			PA3200IsInitialized A3200IsInitialized = nullptr;
 			PA3200GetLastError A3200GetLastError = nullptr;
 			PA3200GetLastErrorString A3200GetLastErrorString = nullptr;
+			PA3200ProgramRun A3200ProgramRun = nullptr;
+			PA3200ProgramStopAndWait A3200ProgramStopAndWait = nullptr;
 
 			CA3200SDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectory);
 			~CA3200SDK();

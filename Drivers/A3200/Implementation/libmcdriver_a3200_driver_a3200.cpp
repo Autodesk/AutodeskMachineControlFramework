@@ -199,9 +199,6 @@ void CDriver_A3200::loadSDK()
 	m_pLicenseDecoderSDKDLL = createCustomDLL("LicenseDecoder64.dll", m_LicenseDecoderSDKBuffer, m_sLicenseDecoderSDKResourceName, "licensedecoder64");
 
 	m_pSDK = std::make_shared<CA3200SDK>(m_pCoreSystemDLL->GetAbsoluteFileName (), m_pWorkingDirectory->GetAbsoluteFilePath ());
-
-	m_pHandle = nullptr;
-	m_pSDK->checkError(m_pSDK->A3200Connect(&m_pHandle));
 }
 
 void CDriver_A3200::unloadSDK()
@@ -223,11 +220,13 @@ void CDriver_A3200::unloadSDK()
 }
 
 
-void CDriver_A3200::Connect(const LibMCDriver_A3200_uint32 nTimeout)
+void CDriver_A3200::Connect()
 {
 	if (m_pSDK.get () == nullptr) 
 		loadSDK();
 
+	m_pHandle = nullptr;
+	m_pSDK->checkError(m_pSDK->A3200Connect(&m_pHandle));
 
 }
 
@@ -237,50 +236,29 @@ void CDriver_A3200::Disconnect()
 
 }
 
-bool CDriver_A3200::VariableExists(const std::string & sVariableName)
+void CDriver_A3200::RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sScript)
 {
-	return false;
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nTaskID < A3200_MINTASKID) || (nTaskID > A3200_MAXTASKID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
+
+	auto pTempFile = m_pWorkingDirectory->StoreCustomStringInTempFile("pgm", sScript);
+	std::string sTempFileName = pTempFile->GetAbsoluteFileName();
+
+	m_pSDK->checkError (m_pSDK->A3200ProgramRun(m_pHandle, nTaskID, sTempFileName.c_str ()));
+
 }
 
-LibMCDriver_A3200_int64 CDriver_A3200::ReadIntegerValue(const std::string & sVariableName)
+void CDriver_A3200::StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout)
 {
-	return 0;
+	if ((m_pHandle == nullptr) || (m_pSDK.get () == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nTaskID < A3200_MINTASKID) || (nTaskID > A3200_MAXTASKID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
+
+	m_pSDK->checkError (m_pSDK->A3200ProgramStopAndWait(m_pHandle, nTaskID, nTimeout));
 }
 
-void CDriver_A3200::WriteIntegerValue(const std::string & sVariableName, const LibMCDriver_A3200_int64 nValue)
-{
-}
-
-LibMCDriver_A3200_double CDriver_A3200::ReadFloatValue(const std::string & sVariableName)
-{
-	return 0.0;
-}
-
-void CDriver_A3200::WriteFloatValue(const std::string & sVariableName, const LibMCDriver_A3200_double dValue)
-{
-}
-
-bool CDriver_A3200::ReadBoolValue(const std::string & sVariableName)
-{
-	return false;
-}
-
-void CDriver_A3200::WriteBoolValue(const std::string & sVariableName, const bool bValue)
-{
-}
-
-std::string CDriver_A3200::ReadStringValue(const std::string & sVariableName)
-{
-	return "";
-}
-
-void CDriver_A3200::WriteStringValue(const std::string & sVariableName, const std::string & sValue)
-{
-}
-
-void CDriver_A3200::GetVariableBounds(const std::string & sVariableName, LibMCDriver_A3200_int64 & nMinValue, LibMCDriver_A3200_int64 & nMaxValue)
-{
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
-}
 
 

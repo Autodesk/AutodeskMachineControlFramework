@@ -181,6 +181,7 @@ public:
 			case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "COULDNOTPARSEDRIVERPROTOCOL";
 			case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "NOTCONNECTED";
 			case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "NOWORKINGDIRECTORY";
+			case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "INVALIDTASKID";
 		}
 		return "UNKNOWN";
 	}
@@ -204,6 +205,7 @@ public:
 			case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
 			case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "Not connected";
 			case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "No working directory";
+			case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "Invalid task ID";
 		}
 		return "unknown error";
 	}
@@ -428,18 +430,10 @@ public:
 	inline bool IsSimulationMode();
 	inline void SetCustomSDKResource(const std::string & sCoreResourceName, const std::string & sSystemResourceName, const std::string & sCompilerResourceName, const std::string & sUtilitiesResourceName, const std::string & sLicenseDecoderResourceName);
 	inline void SetCustomSDK(const CInputVector<LibMCDriver_A3200_uint8> & CoreSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & SystemSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & CompilerSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & UtilitiesSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & LicenseDecoderSDKBufferBuffer);
-	inline void Connect(const LibMCDriver_A3200_uint32 nTimeout);
+	inline void Connect();
 	inline void Disconnect();
-	inline bool VariableExists(const std::string & sVariableName);
-	inline LibMCDriver_A3200_int64 ReadIntegerValue(const std::string & sVariableName);
-	inline void WriteIntegerValue(const std::string & sVariableName, const LibMCDriver_A3200_int64 nValue);
-	inline LibMCDriver_A3200_double ReadFloatValue(const std::string & sVariableName);
-	inline void WriteFloatValue(const std::string & sVariableName, const LibMCDriver_A3200_double dValue);
-	inline bool ReadBoolValue(const std::string & sVariableName);
-	inline void WriteBoolValue(const std::string & sVariableName, const bool bValue);
-	inline std::string ReadStringValue(const std::string & sVariableName);
-	inline void WriteStringValue(const std::string & sVariableName, const std::string & sValue);
-	inline void GetVariableBounds(const std::string & sVariableName, LibMCDriver_A3200_int64 & nMinValue, LibMCDriver_A3200_int64 & nMaxValue);
+	inline void RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript);
+	inline void StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout);
 };
 	
 	/**
@@ -576,16 +570,8 @@ public:
 		pWrapperTable->m_Driver_A3200_SetCustomSDK = nullptr;
 		pWrapperTable->m_Driver_A3200_Connect = nullptr;
 		pWrapperTable->m_Driver_A3200_Disconnect = nullptr;
-		pWrapperTable->m_Driver_A3200_VariableExists = nullptr;
-		pWrapperTable->m_Driver_A3200_ReadIntegerValue = nullptr;
-		pWrapperTable->m_Driver_A3200_WriteIntegerValue = nullptr;
-		pWrapperTable->m_Driver_A3200_ReadFloatValue = nullptr;
-		pWrapperTable->m_Driver_A3200_WriteFloatValue = nullptr;
-		pWrapperTable->m_Driver_A3200_ReadBoolValue = nullptr;
-		pWrapperTable->m_Driver_A3200_WriteBoolValue = nullptr;
-		pWrapperTable->m_Driver_A3200_ReadStringValue = nullptr;
-		pWrapperTable->m_Driver_A3200_WriteStringValue = nullptr;
-		pWrapperTable->m_Driver_A3200_GetVariableBounds = nullptr;
+		pWrapperTable->m_Driver_A3200_RunAeroBasicScript = nullptr;
+		pWrapperTable->m_Driver_A3200_StopProgram = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -752,93 +738,21 @@ public:
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_VariableExists = (PLibMCDriver_A3200Driver_A3200_VariableExistsPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_variableexists");
+		pWrapperTable->m_Driver_A3200_RunAeroBasicScript = (PLibMCDriver_A3200Driver_A3200_RunAeroBasicScriptPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_runaerobasicscript");
 		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_VariableExists = (PLibMCDriver_A3200Driver_A3200_VariableExistsPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_variableexists");
+		pWrapperTable->m_Driver_A3200_RunAeroBasicScript = (PLibMCDriver_A3200Driver_A3200_RunAeroBasicScriptPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_runaerobasicscript");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_VariableExists == nullptr)
+		if (pWrapperTable->m_Driver_A3200_RunAeroBasicScript == nullptr)
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_ReadIntegerValue = (PLibMCDriver_A3200Driver_A3200_ReadIntegerValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readintegervalue");
+		pWrapperTable->m_Driver_A3200_StopProgram = (PLibMCDriver_A3200Driver_A3200_StopProgramPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_stopprogram");
 		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_ReadIntegerValue = (PLibMCDriver_A3200Driver_A3200_ReadIntegerValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readintegervalue");
+		pWrapperTable->m_Driver_A3200_StopProgram = (PLibMCDriver_A3200Driver_A3200_StopProgramPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_stopprogram");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_ReadIntegerValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_WriteIntegerValue = (PLibMCDriver_A3200Driver_A3200_WriteIntegerValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writeintegervalue");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_WriteIntegerValue = (PLibMCDriver_A3200Driver_A3200_WriteIntegerValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writeintegervalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_WriteIntegerValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_ReadFloatValue = (PLibMCDriver_A3200Driver_A3200_ReadFloatValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readfloatvalue");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_ReadFloatValue = (PLibMCDriver_A3200Driver_A3200_ReadFloatValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readfloatvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_ReadFloatValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_WriteFloatValue = (PLibMCDriver_A3200Driver_A3200_WriteFloatValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writefloatvalue");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_WriteFloatValue = (PLibMCDriver_A3200Driver_A3200_WriteFloatValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writefloatvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_WriteFloatValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_ReadBoolValue = (PLibMCDriver_A3200Driver_A3200_ReadBoolValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readboolvalue");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_ReadBoolValue = (PLibMCDriver_A3200Driver_A3200_ReadBoolValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readboolvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_ReadBoolValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_WriteBoolValue = (PLibMCDriver_A3200Driver_A3200_WriteBoolValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writeboolvalue");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_WriteBoolValue = (PLibMCDriver_A3200Driver_A3200_WriteBoolValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writeboolvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_WriteBoolValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_ReadStringValue = (PLibMCDriver_A3200Driver_A3200_ReadStringValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readstringvalue");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_ReadStringValue = (PLibMCDriver_A3200Driver_A3200_ReadStringValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readstringvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_ReadStringValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_WriteStringValue = (PLibMCDriver_A3200Driver_A3200_WriteStringValuePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writestringvalue");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_WriteStringValue = (PLibMCDriver_A3200Driver_A3200_WriteStringValuePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writestringvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_WriteStringValue == nullptr)
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_GetVariableBounds = (PLibMCDriver_A3200Driver_A3200_GetVariableBoundsPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_getvariablebounds");
-		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_GetVariableBounds = (PLibMCDriver_A3200Driver_A3200_GetVariableBoundsPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_getvariablebounds");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_GetVariableBounds == nullptr)
+		if (pWrapperTable->m_Driver_A3200_StopProgram == nullptr)
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -968,44 +882,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_Disconnect == nullptr) )
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_variableexists", (void**)&(pWrapperTable->m_Driver_A3200_VariableExists));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_VariableExists == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_runaerobasicscript", (void**)&(pWrapperTable->m_Driver_A3200_RunAeroBasicScript));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_RunAeroBasicScript == nullptr) )
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readintegervalue", (void**)&(pWrapperTable->m_Driver_A3200_ReadIntegerValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadIntegerValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writeintegervalue", (void**)&(pWrapperTable->m_Driver_A3200_WriteIntegerValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteIntegerValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readfloatvalue", (void**)&(pWrapperTable->m_Driver_A3200_ReadFloatValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadFloatValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writefloatvalue", (void**)&(pWrapperTable->m_Driver_A3200_WriteFloatValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteFloatValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readboolvalue", (void**)&(pWrapperTable->m_Driver_A3200_ReadBoolValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadBoolValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writeboolvalue", (void**)&(pWrapperTable->m_Driver_A3200_WriteBoolValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteBoolValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readstringvalue", (void**)&(pWrapperTable->m_Driver_A3200_ReadStringValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadStringValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writestringvalue", (void**)&(pWrapperTable->m_Driver_A3200_WriteStringValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteStringValue == nullptr) )
-			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_getvariablebounds", (void**)&(pWrapperTable->m_Driver_A3200_GetVariableBounds));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_GetVariableBounds == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_stopprogram", (void**)&(pWrapperTable->m_Driver_A3200_StopProgram));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_StopProgram == nullptr) )
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_a3200_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1175,11 +1057,10 @@ public:
 	
 	/**
 	* CDriver_A3200::Connect - Connects to the A3200 PLC Controller.
-	* @param[in] nTimeout - Timeout in milliseconds.
 	*/
-	void CDriver_A3200::Connect(const LibMCDriver_A3200_uint32 nTimeout)
+	void CDriver_A3200::Connect()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_Connect(m_pHandle, nTimeout));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_Connect(m_pHandle));
 	}
 	
 	/**
@@ -1191,122 +1072,23 @@ public:
 	}
 	
 	/**
-	* CDriver_A3200::VariableExists - Returns if a variable exists.
-	* @param[in] sVariableName - Name of variable.
-	* @return Flag if value exists.
+	* CDriver_A3200::RunAeroBasicScript - Runs an AeroBasic script on a PLC task.
+	* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
+	* @param[in] sScript - AeroBasic script as string.
 	*/
-	bool CDriver_A3200::VariableExists(const std::string & sVariableName)
+	void CDriver_A3200::RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript)
 	{
-		bool resultVariableExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_VariableExists(m_pHandle, sVariableName.c_str(), &resultVariableExists));
-		
-		return resultVariableExists;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_RunAeroBasicScript(m_pHandle, nTaskID, sScript.c_str()));
 	}
 	
 	/**
-	* CDriver_A3200::ReadIntegerValue - Reads a value from an integer Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
+	* CDriver_A3200::StopProgram - Stops a running program on a task.
+	* @param[in] nTaskID - TaskID to stop. MUST be between 1 and 31.
+	* @param[in] nTimeout - Timeout in milliseconds.
 	*/
-	LibMCDriver_A3200_int64 CDriver_A3200::ReadIntegerValue(const std::string & sVariableName)
+	void CDriver_A3200::StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout)
 	{
-		LibMCDriver_A3200_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadIntegerValue(m_pHandle, sVariableName.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CDriver_A3200::WriteIntegerValue - Reads a value from an integer Variable. Fails if value is not within the bounds of the variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] nValue - Value to set.
-	*/
-	void CDriver_A3200::WriteIntegerValue(const std::string & sVariableName, const LibMCDriver_A3200_int64 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteIntegerValue(m_pHandle, sVariableName.c_str(), nValue));
-	}
-	
-	/**
-	* CDriver_A3200::ReadFloatValue - Reads a value from an float Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
-	*/
-	LibMCDriver_A3200_double CDriver_A3200::ReadFloatValue(const std::string & sVariableName)
-	{
-		LibMCDriver_A3200_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadFloatValue(m_pHandle, sVariableName.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CDriver_A3200::WriteFloatValue - Reads a value from an integer Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] dValue - Value to set.
-	*/
-	void CDriver_A3200::WriteFloatValue(const std::string & sVariableName, const LibMCDriver_A3200_double dValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteFloatValue(m_pHandle, sVariableName.c_str(), dValue));
-	}
-	
-	/**
-	* CDriver_A3200::ReadBoolValue - Reads a value from an boolean Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
-	*/
-	bool CDriver_A3200::ReadBoolValue(const std::string & sVariableName)
-	{
-		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadBoolValue(m_pHandle, sVariableName.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CDriver_A3200::WriteBoolValue - Reads a value from an boolean Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] bValue - Value to set.
-	*/
-	void CDriver_A3200::WriteBoolValue(const std::string & sVariableName, const bool bValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteBoolValue(m_pHandle, sVariableName.c_str(), bValue));
-	}
-	
-	/**
-	* CDriver_A3200::ReadStringValue - Reads a value from an string Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
-	*/
-	std::string CDriver_A3200::ReadStringValue(const std::string & sVariableName)
-	{
-		LibMCDriver_A3200_uint32 bytesNeededValue = 0;
-		LibMCDriver_A3200_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadStringValue(m_pHandle, sVariableName.c_str(), 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadStringValue(m_pHandle, sVariableName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
-	
-	/**
-	* CDriver_A3200::WriteStringValue - Reads a value from an string Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] sValue - Value to set.
-	*/
-	void CDriver_A3200::WriteStringValue(const std::string & sVariableName, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteStringValue(m_pHandle, sVariableName.c_str(), sValue.c_str()));
-	}
-	
-	/**
-	* CDriver_A3200::GetVariableBounds - Returns the min and max value an integer variable can hold.
-	* @param[in] sVariableName - Name of variable. Fails if variable does not exist or is not an integer value.
-	* @param[out] nMinValue - Minimum value.
-	* @param[out] nMaxValue - Minimum value.
-	*/
-	void CDriver_A3200::GetVariableBounds(const std::string & sVariableName, LibMCDriver_A3200_int64 & nMinValue, LibMCDriver_A3200_int64 & nMaxValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_GetVariableBounds(m_pHandle, sVariableName.c_str(), &nMinValue, &nMaxValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_StopProgram(m_pHandle, nTaskID, nTimeout));
 	}
 
 } // namespace LibMCDriver_A3200

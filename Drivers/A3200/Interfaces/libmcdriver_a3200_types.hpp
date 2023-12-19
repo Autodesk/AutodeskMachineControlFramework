@@ -111,6 +111,7 @@ typedef void * LibMCDriver_A3200_pvoid;
 #define LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1013 /** could not parse driver protocol */
 #define LIBMCDRIVER_A3200_ERROR_NOTCONNECTED 1014 /** Not connected */
 #define LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY 1015 /** No working directory */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDTASKID 1016 /** Invalid task ID */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_A3200
@@ -134,6 +135,7 @@ inline const char * LIBMCDRIVER_A3200_GETERRORSTRING (LibMCDriver_A3200Result nE
     case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
     case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "Not connected";
     case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "No working directory";
+    case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "Invalid task ID";
     default: return "unknown error";
   }
 }

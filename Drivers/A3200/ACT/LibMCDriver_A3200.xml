@@ -55,6 +55,8 @@
 		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1013" description="could not parse driver protocol" />		
 		<error name="NOTCONNECTED" code="1014" description="Not connected" />				
 		<error name="NOWORKINGDIRECTORY" code="1015" description="No working directory" />				
+		<error name="INVALIDTASKID" code="1016" description="Invalid task ID" />				
+		
 						
 	</errors>
 
@@ -139,63 +141,21 @@ Custom implementation
 		</method>		
 
 		<method name="Connect" description= "Connects to the A3200 PLC Controller.">
-			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
 		</method>
 
 		<method name="Disconnect" description= "Disconnects from the A3200 PLC Controller.">
 		</method>
 
-		<method name="VariableExists" description="Returns if a variable exists.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="VariableExists" type="bool" pass="return" description="Flag if value exists." />
-		</method>		
+		<method name="RunAeroBasicScript" description="Runs an AeroBasic script on a PLC task.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID to run the script on. MUST be between 1 and 31." />
+			<param name="Script" type="string" pass="in" description="AeroBasic script as string." />				
+		</method>
 		
-		<method name="ReadIntegerValue" description="Reads a value from an integer Variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="int64" pass="return" description="Result value." />
-		</method>		
-		
-		<method name="WriteIntegerValue" description="Reads a value from an integer Variable. Fails if value is not within the bounds of the variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="int64" pass="in" description="Value to set." />
-		</method>		
+		<method name="StopProgram" description="Stops a running program on a task.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID to stop. MUST be between 1 and 31." />
+			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+		</method>
 
-		<method name="ReadFloatValue" description="Reads a value from an float Variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="double" pass="return" description="Result value." />
-		</method>		
-		
-		<method name="WriteFloatValue" description="Reads a value from an integer Variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="double" pass="in" description="Value to set." />
-		</method>		
-
-		<method name="ReadBoolValue" description="Reads a value from an boolean Variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="bool" pass="return" description="Result value." />
-		</method>		
-		
-		<method name="WriteBoolValue" description="Reads a value from an boolean Variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="bool" pass="in" description="Value to set." />
-		</method>	
-		
-		<method name="ReadStringValue" description="Reads a value from an string Variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="string" pass="return" description="Result value." />
-		</method>		
-		
-		<method name="WriteStringValue" description="Reads a value from an string Variable.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable." />
-			<param name="Value" type="string" pass="in" description="Value to set." />
-		</method>			
-
-		<method name="GetVariableBounds" description="Returns the min and max value an integer variable can hold.">
-			<param name="VariableName" type="string" pass="in" description="Name of variable. Fails if variable does not exist or is not an integer value." />
-			<param name="MinValue" type="int64" pass="out" description="Minimum value." />
-			<param name="MaxValue" type="int64" pass="out" description="Minimum value." />
-		</method>		
-		
 	</class>
 
 
