@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+	<driver name="a3200" library="driver_a3200" type="a3200-1.0">
+	
+	
+	</driver>
+
+	<statemachine name="a3200test" description="A3200 Test 1" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_a3200test">
+
+		<state name="init" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="success" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="100">
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+	<libraries>
+		<library name="plugin_a3200test" dll="%githash%_test_a3200test" />
+		<library name="driver_a3200" dll="%githash%_driver_a3200" />
+	</libraries>
+		
+	<test description="A3200 Test">			
+	
+		<instance name="a3200test" />
+		
+	</test>
+		
+
+</testdefinition>
