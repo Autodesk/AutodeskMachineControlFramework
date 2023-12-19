@@ -56,8 +56,21 @@ namespace LibMCDriver_A3200 {
 			int32_t m_nCode;
 			int32_t m_nLocation; 
 		} A3200ErrorData;
+
+
+		typedef struct _A3200Version
+		{
+			uint32_t m_nMajor;
+			uint32_t m_nMinor;
+			uint32_t m_nPatch;
+			uint32_t m_nBuild;
+			uint32_t m_nReserved[4];
+		} A3200Version;
+
 #pragma	pack(pop)
 
+		
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200InformationGetLibraryVersion) (A3200Version * pVersion);
 
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200Connect) (A3200Handle* ppHandle);
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200Disconnect) (A3200Handle pHandle);
@@ -111,6 +124,7 @@ namespace LibMCDriver_A3200 {
 			PA3200VariableSetValueStringByName A3200VariableSetValueStringByName = nullptr;
 			PA3200VariableGetValueByName A3200VariableGetValueByName = nullptr;
 			PA3200VariableSetValueByName A3200VariableSetValueByName = nullptr;
+			PA3200InformationGetLibraryVersion A3200InformationGetLibraryVersion = nullptr;
 
 			CA3200SDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectory);
 			~CA3200SDK();

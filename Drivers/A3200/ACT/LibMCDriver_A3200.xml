@@ -55,7 +55,6 @@
 		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1013" description="could not parse driver protocol" />		
 		<error name="NOWORKINGDIRECTORY" code="1015" description="No working directory" />				
 		<error name="INVALIDTASKID" code="1016" description="Invalid task ID" />				
-		
 		<error name="VERSIONMISMATCH" code="1" description="An incompatible version was detected" />
 		<error name="FEATURELOCKED" code="2" description="A license error occurred" />
 		<error name="UNSUPPORTEDHARDWARE" code="3" description="A connected hardware type is no longer supported" />
@@ -76,8 +75,48 @@
 		<error name="PCICARDERROR" code="21" description="A problem exists with PCI card configuration." />
 		<error name="AXISMISMATCH" code="22" description="An incorrect number of axes are attached." />
 		<error name="TASKMISMATCH" code="23" description="An insufficient number of tasks are enabled." />
+		<error name="INVALIDCOMMANDLINE" code="24" description="An invalid SMC command line argument was specified." />
+		<error name="MACHINECONFIGURATION" code="25" description="An error occurred while accessing the machine configuration." />
+		<error name="FIREWIRECONFIGURATION" code="28" description="An error was detected in the FireWire configuration." />
+		<error name="GANTRYCONFIGURATION" code="29" description="An error gantry configuration was detected." />
+		<error name="CALLBACKTIMEOUT" code="31" description="A timeout occurred while responding to a callback." />
+		<error name="CALLBACKERROR" code="32" description="A timeout occurred while responding to a callback." />
+		<error name="TOOMANYSTATUSITEMS" code="33" description="The maximum number of status items was exceeded." />
+		<error name="PROGRAMERROR" code="34" description="An error occurred in program execution." />
+		<error name="STRINGOVERFLOW" code="35" description="The maximum string length was exceeded." />
+		<error name="DIVIDEBYZERO" code="36" description="A divide-by-zero was detected." />
+		<error name="PROGRAMTIMEOUT" code="37" description="A program timeout occurred." />
+		<error name="PROFILEQUEUEERROR" code="38" description="An error occurred in the execution queue" />
+		<error name="INVALIDARGUMENT" code="39" description="An invalid argument was specified." />
+		<error name="PARAMETERNOTPASSED" code="40" description="A callstack argument was not passed to a subroutine." />
+		<error name="QUEUEBUFFERFULL" code="41" description="The buffered program queue is full." />
+		<error name="NULLPROGRAMLINE" code="42" description="A NULL code line pointer was specified." />
+		<error name="PROGRAMNUMBEROUTOFBOUNDS" code="43" description="The specified program number is outside of the valid range of values." />
+		<error name="CANNEDFUNCTIONERROR" code="44" description="An error occurred with a canned function." />
+		<error name="ZEROSPEED" code="46" description="The move speed is zero." />
+		<error name="STACKERROR" code="47" description="A stack error occurred." />
+		<error name="SLICEERROR" code="48" description="An error occurred while executing the SLICE command." />
+		<error name="LOOKAHEADERROR" code="49" description="A error occurred while performing lookahead." />
+		<error name="RETRACEERROR" code="50" description="An error occurred while doing retrace." />
+		<error name="AXISINFAULT" code="51" description="An axis fault occurred." />
+		<error name="AXISNOTENABLED" code="52" description="The axis is not enabled." />
+		<error name="MOTIONERROR" code="53" description="An error occurred with a motion command." />
+		<error name="GANTRYMOTIONERROR" code="54" description="An error occurred while performing gantry motion." />
+		<error name="CUTTERCOMPENSATIONERROR" code="55" description="An error occurred while peforming cutter compensation." />
+		<error name="CIRCULARMOTIONERROR" code="56" description="An error occurred while performing circular motion." />
+		<error name="CIRCULARRADIUSERROR" code="57" description="A circular radius error occurred." />
+		<error name="NORMALCYERROR" code="58" description="An error occurred while performing normalcy." />
+		<error name="MOTIONTYPEMISMATCH" code="59" description="A LINEAR move is required to execute this command." />
+		<error name="SPINDLENUMBERNOTASSIGNED" code="60" description="The specified spindle is not assigned to an axis." />
+		<error name="ELLIPTICALMOTIONERROR" code="61" description="An error occurred while performing elliptical motion." />
+		<error name="MOTIONACTIVE" code="62" description="Motion is already active." />
+		<error name="AXISNOTDEPENDENT" code="63" description="This feature is only available on dependent axes." />
+		<error name="AXISNOTDOMINANT" code="64" description="This feature is only available on dominant axes." />
+		<error name="NOJOYSTICKGROUPS" code="65" description="No joystick groups have been specified." />
+		<error name="TRANSFORMATIONERROR" code="66" description="An error occurred performing a transformation." />
+		<error name="CALIBRATIONTABLEERROR" code="67" description="An error occurred with a calibration table." />
+		<error name="CAMTABLEERROR" code="68" description="An error occurred with a cam table command." />
 
-		
 	</errors>
 
 	
