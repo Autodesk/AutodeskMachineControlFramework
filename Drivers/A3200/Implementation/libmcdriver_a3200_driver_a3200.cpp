@@ -34,7 +34,8 @@ Abstract: This is a stub class definition of CDriver_A3200
 #include "libmcdriver_a3200_driver_a3200.hpp"
 #include "libmcdriver_a3200_interfaceexception.hpp"
 
-// Include custom headers here.
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 
 using namespace LibMCDriver_A3200::Impl;
@@ -43,83 +44,243 @@ using namespace LibMCDriver_A3200::Impl;
  Class definition of CDriver_A3200 
 **************************************************************************************************************************/
 
+CDriver_A3200::CDriver_A3200(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_bSimulationMode (false), 
+	m_sName (sName), 
+	m_pDriverEnvironment (pDriverEnvironment), 
+	m_pHandle (nullptr)
+{
+
+}
+
+CDriver_A3200::~CDriver_A3200()
+{
+	unloadSDK();
+}
+
+
+void CDriver_A3200::Configure(const std::string& sConfigurationString)
+{
+
+}
+
+std::string CDriver_A3200::GetName()
+{
+	return m_sName;
+}
+
+std::string CDriver_A3200::GetType()
+{
+	return "a3200-1.0";
+}
+
+void CDriver_A3200::GetVersion(LibMCDriver_A3200_uint32& nMajor, LibMCDriver_A3200_uint32& nMinor, LibMCDriver_A3200_uint32& nMicro, std::string& sBuild)
+{
+	nMajor = LIBMCDRIVER_A3200_VERSION_MAJOR;
+	nMinor = LIBMCDRIVER_A3200_VERSION_MINOR;
+	nMicro = LIBMCDRIVER_A3200_VERSION_MICRO;
+	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
+}
+
+void CDriver_A3200::QueryParameters()
+{
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+void CDriver_A3200::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+
+}
+
+
 void CDriver_A3200::SetToSimulationMode()
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	m_bSimulationMode = true;
 }
 
 bool CDriver_A3200::IsSimulationMode()
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	return m_bSimulationMode;
 }
 
 void CDriver_A3200::SetCustomSDKResource(const std::string & sCoreResourceName, const std::string & sSystemResourceName, const std::string & sCompilerResourceName, const std::string & sUtilitiesResourceName, const std::string & sLicenseDecoderResourceName)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	m_sCoreSystemResourceName = sCoreResourceName;
+	m_sSystemSDKResourceName = sSystemResourceName;
+	m_sCompilerSDKResourceName = sCompilerResourceName;
+	m_sUtilitiesSDKResourceName = sUtilitiesResourceName;
+	m_sLicenseDecoderSDKResourceName = sLicenseDecoderResourceName;
+
+	m_CoreSystemBuffer.resize(0);
+	m_SystemSDKBuffer.resize(0);
+	m_CompilerSDKBuffer.resize(0);
+	m_UtilitiesSDKBuffer.resize(0);
+	m_LicenseDecoderSDKBuffer.resize(0);
 }
 
 void CDriver_A3200::SetCustomSDK(const LibMCDriver_A3200_uint64 nCoreSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pCoreSDKBufferBuffer, const LibMCDriver_A3200_uint64 nSystemSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pSystemSDKBufferBuffer, const LibMCDriver_A3200_uint64 nCompilerSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pCompilerSDKBufferBuffer, const LibMCDriver_A3200_uint64 nUtilitiesSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pUtilitiesSDKBufferBuffer, const LibMCDriver_A3200_uint64 nLicenseDecoderSDKBufferBufferSize, const LibMCDriver_A3200_uint8 * pLicenseDecoderSDKBufferBuffer)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	m_sCoreSystemResourceName = "";
+	m_sSystemSDKResourceName = "";
+	m_sCompilerSDKResourceName = "";
+	m_sUtilitiesSDKResourceName = "";
+	m_sLicenseDecoderSDKResourceName = "";
+
+	storeCustomSDK(m_CoreSystemBuffer, nCoreSDKBufferBufferSize, pCoreSDKBufferBuffer);
+	storeCustomSDK(m_SystemSDKBuffer, nSystemSDKBufferBufferSize, pSystemSDKBufferBuffer);
+	storeCustomSDK(m_CompilerSDKBuffer, nCompilerSDKBufferBufferSize, pCompilerSDKBufferBuffer);
+	storeCustomSDK(m_UtilitiesSDKBuffer, nUtilitiesSDKBufferBufferSize, pUtilitiesSDKBufferBuffer);
+	storeCustomSDK(m_LicenseDecoderSDKBuffer, nLicenseDecoderSDKBufferBufferSize, pLicenseDecoderSDKBufferBuffer);
 }
+
+
+void CDriver_A3200::storeCustomSDK(std::vector<uint8_t>& buffer, uint64_t nArraySize, const uint8_t* pData)
+{
+	buffer.resize(nArraySize);
+	if (nArraySize > 0) {
+		if (pData == nullptr)
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+
+		const uint8_t* pSource = pData;
+		uint8_t* pTarget = buffer.data();
+
+		for (uint64_t nIndex = 0; nIndex < nArraySize; nIndex++) {
+			*pTarget = *pSource;
+			pTarget++;
+			pSource++;
+		}
+	}
+}
+
+LibMCEnv::PWorkingFile CDriver_A3200::createCustomDLL(const std::string& sFileNameOnDisk, std::vector<uint8_t>& buffer, const std::string& sResourceName, const std::string& sDefaultResourceName)
+{
+	if (m_pWorkingDirectory.get() == nullptr)
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY);
+
+	if (buffer.size() > 0) {
+		// Custom SDK Data has been given
+		return m_pWorkingDirectory->StoreCustomData(sFileNameOnDisk, buffer);
+	}
+	else {
+		// Load SDK Data from resource
+		std::string sResourceNameToUse = sResourceName;
+		if (sResourceNameToUse.empty())
+			sResourceNameToUse = sDefaultResourceName;			
+
+		std::vector<uint8_t> resourceDataBuffer;
+		if (m_pDriverEnvironment->MachineHasResourceData(sResourceNameToUse)) {
+			// Either machine resources
+			m_pDriverEnvironment->RetrieveMachineResourceData(sResourceNameToUse, resourceDataBuffer);
+		}
+		else {
+			// Or driver resources
+			m_pDriverEnvironment->RetrieveDriverResourceData(sResourceNameToUse, resourceDataBuffer);
+		}
+
+		return m_pWorkingDirectory->StoreCustomData(sFileNameOnDisk, resourceDataBuffer);
+
+	}
+		
+	
+}
+
+
+void CDriver_A3200::loadSDK()
+{
+	unloadSDK();
+
+	m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+
+	// store DLLs in Temp directory as the SDK mandates them
+	m_pCoreSystemDLL = createCustomDLL("A3200C64.dll", m_CoreSystemBuffer, m_sCoreSystemResourceName, "a3200c64");
+	m_pSystemSDKDLL = createCustomDLL("A32Sys64.dll", m_SystemSDKBuffer, m_sSystemSDKResourceName, "a32sys64");
+	m_pCompilerSDKDLL = createCustomDLL("A32Cmplr64.dll", m_CompilerSDKBuffer, m_sCompilerSDKResourceName, "a32cmplr64");
+	m_pUtilitiesSDKDLL = createCustomDLL("AerUtilities64.dll", m_UtilitiesSDKBuffer, m_sUtilitiesSDKResourceName, "aerutilities64");;
+	m_pLicenseDecoderSDKDLL = createCustomDLL("LicenseDecoder64.dll", m_LicenseDecoderSDKBuffer, m_sLicenseDecoderSDKResourceName, "licensedecoder64");
+
+	m_pSDK = std::make_shared<CA3200SDK>(m_pCoreSystemDLL->GetAbsoluteFileName (), m_pWorkingDirectory->GetAbsoluteFilePath ());
+
+	m_pHandle = nullptr;
+	m_pSDK->checkError(m_pSDK->A3200Connect(&m_pHandle));
+}
+
+void CDriver_A3200::unloadSDK()
+{
+	if ((m_pHandle != nullptr) && (m_pSDK.get () != nullptr)) {
+		m_pSDK->A3200Disconnect(m_pHandle);
+	}
+
+	m_pHandle = nullptr;
+	m_pSDK = nullptr;
+
+	m_pCoreSystemDLL = nullptr;
+	m_pSystemSDKDLL = nullptr;
+	m_pCompilerSDKDLL = nullptr;
+	m_pUtilitiesSDKDLL = nullptr;
+	m_pLicenseDecoderSDKDLL = nullptr;
+	m_pWorkingDirectory = nullptr;
+
+}
+
 
 void CDriver_A3200::Connect(const LibMCDriver_A3200_uint32 nTimeout)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	if (m_pSDK.get () == nullptr) 
+		loadSDK();
+
+
 }
 
 void CDriver_A3200::Disconnect()
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	unloadSDK();
+
 }
 
 bool CDriver_A3200::VariableExists(const std::string & sVariableName)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	return false;
 }
 
 LibMCDriver_A3200_int64 CDriver_A3200::ReadIntegerValue(const std::string & sVariableName)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	return 0;
 }
 
 void CDriver_A3200::WriteIntegerValue(const std::string & sVariableName, const LibMCDriver_A3200_int64 nValue)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
 }
 
 LibMCDriver_A3200_double CDriver_A3200::ReadFloatValue(const std::string & sVariableName)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	return 0.0;
 }
 
 void CDriver_A3200::WriteFloatValue(const std::string & sVariableName, const LibMCDriver_A3200_double dValue)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
 }
 
 bool CDriver_A3200::ReadBoolValue(const std::string & sVariableName)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	return false;
 }
 
 void CDriver_A3200::WriteBoolValue(const std::string & sVariableName, const bool bValue)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
 }
 
 std::string CDriver_A3200::ReadStringValue(const std::string & sVariableName)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	return "";
 }
 
 void CDriver_A3200::WriteStringValue(const std::string & sVariableName, const std::string & sValue)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
 }
 
 void CDriver_A3200::GetVariableBounds(const std::string & sVariableName, LibMCDriver_A3200_int64 & nMinValue, LibMCDriver_A3200_int64 & nMaxValue)
 {
 	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
 }
+
 
