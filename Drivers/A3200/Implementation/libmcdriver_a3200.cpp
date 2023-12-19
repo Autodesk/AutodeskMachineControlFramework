@@ -40,6 +40,8 @@ Interface version: 2.0.0
 #include "libmcdriver_a3200_interfaces.hpp"
 #include "libmcdriver_a3200_interfaceexception.hpp"
 
+#include "libmcdriver_a3200_driver_a3200.hpp"
+
 using namespace LibMCDriver_A3200;
 using namespace LibMCDriver_A3200::Impl;
 
@@ -74,7 +76,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED);
+	if (sType == "a3200-1.0")
+		return new CDriver_A3200(sName, pDriverEnvironment);
+
+	return nullptr;
 }
 
 

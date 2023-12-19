@@ -96,20 +96,21 @@ typedef void * LibMCDriver_A3200_pvoid;
 **************************************************************************************************************************/
 
 #define LIBMCDRIVER_A3200_SUCCESS 0
-#define LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED 1 /** functionality not implemented */
-#define LIBMCDRIVER_A3200_ERROR_INVALIDPARAM 2 /** an invalid parameter was passed */
-#define LIBMCDRIVER_A3200_ERROR_INVALIDCAST 3 /** a type cast failed */
-#define LIBMCDRIVER_A3200_ERROR_BUFFERTOOSMALL 4 /** a provided buffer is too small */
-#define LIBMCDRIVER_A3200_ERROR_GENERICEXCEPTION 5 /** a generic exception occurred */
-#define LIBMCDRIVER_A3200_ERROR_COULDNOTLOADLIBRARY 6 /** the library could not be loaded */
-#define LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT 7 /** a required exported symbol could not be found in the library */
-#define LIBMCDRIVER_A3200_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
-#define LIBMCDRIVER_A3200_ERROR_DRIVERERROR 1000 /** a driver error occured */
-#define LIBMCDRIVER_A3200_ERROR_DRIVERNOTINITIALISED 1001 /** the driver is not initialised */
-#define LIBMCDRIVER_A3200_ERROR_DRIVERNOTCONNECTED 1002 /** the driver is not connected */
-#define LIBMCDRIVER_A3200_ERROR_INVALIDDRIVERPROTOCOL 1003 /** invalid driver protocol definition */
-#define LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1004 /** could not parse driver protocol */
-#define LIBMCDRIVER_A3200_ERROR_NOTCONNECTED 1005 /** Not connected */
+#define LIBMCDRIVER_A3200_ERROR_NOTIMPLEMENTED 1001 /** functionality not implemented */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDPARAM 1002 /** an invalid parameter was passed */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDCAST 1003 /** a type cast failed */
+#define LIBMCDRIVER_A3200_ERROR_BUFFERTOOSMALL 1004 /** a provided buffer is too small */
+#define LIBMCDRIVER_A3200_ERROR_GENERICEXCEPTION 1005 /** a generic exception occurred */
+#define LIBMCDRIVER_A3200_ERROR_COULDNOTLOADLIBRARY 1006 /** the library could not be loaded */
+#define LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT 1007 /** a required exported symbol could not be found in the library */
+#define LIBMCDRIVER_A3200_ERROR_INCOMPATIBLEBINARYVERSION 1008 /** the version of the binary interface does not match the bindings interface */
+#define LIBMCDRIVER_A3200_ERROR_DRIVERERROR 1009 /** a driver error occured */
+#define LIBMCDRIVER_A3200_ERROR_DRIVERNOTINITIALISED 1010 /** the driver is not initialised */
+#define LIBMCDRIVER_A3200_ERROR_DRIVERNOTCONNECTED 1011 /** the driver is not connected */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDDRIVERPROTOCOL 1012 /** invalid driver protocol definition */
+#define LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1013 /** could not parse driver protocol */
+#define LIBMCDRIVER_A3200_ERROR_NOTCONNECTED 1014 /** Not connected */
+#define LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY 1015 /** No working directory */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_A3200
@@ -132,6 +133,7 @@ inline const char * LIBMCDRIVER_A3200_GETERRORSTRING (LibMCDriver_A3200Result nE
     case LIBMCDRIVER_A3200_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
     case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
     case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "Not connected";
+    case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "No working directory";
     default: return "unknown error";
   }
 }

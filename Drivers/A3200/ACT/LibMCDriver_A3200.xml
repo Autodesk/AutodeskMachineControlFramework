@@ -40,22 +40,21 @@
 	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
 	
 	<errors>
-		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
-		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
-		<error name="INVALIDCAST" code="3" description="a type cast failed" />
-		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
-		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
-		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
-		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
-		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
-
-		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
-		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
-		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />
-		<error name="INVALIDDRIVERPROTOCOL" code="1003" description="invalid driver protocol definition" />
-		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1004" description="could not parse driver protocol" />
-		
-		<error name="NOTCONNECTED" code="1005" description="Not connected" />				
+		<error name="NOTIMPLEMENTED" code="1001" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="1002" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="1003" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="1004" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="1005" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="1006" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="1007" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="1008" description="the version of the binary interface does not match the bindings interface" />
+		<error name="DRIVERERROR" code="1009" description="a driver error occured" />
+		<error name="DRIVERNOTINITIALISED" code="1010" description="the driver is not initialised" />
+		<error name="DRIVERNOTCONNECTED" code="1011" description="the driver is not connected" />
+		<error name="INVALIDDRIVERPROTOCOL" code="1012" description="invalid driver protocol definition" />
+		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1013" description="could not parse driver protocol" />		
+		<error name="NOTCONNECTED" code="1014" description="Not connected" />				
+		<error name="NOWORKINGDIRECTORY" code="1015" description="No working directory" />				
 						
 	</errors>
 
@@ -142,7 +141,6 @@ Custom implementation
 		<method name="Connect" description= "Connects to the A3200 PLC Controller.">
 			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
 		</method>
-
 
 		<method name="Disconnect" description= "Disconnects from the A3200 PLC Controller.">
 		</method>

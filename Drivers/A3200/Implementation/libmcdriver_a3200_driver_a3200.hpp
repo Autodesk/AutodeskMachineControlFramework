@@ -45,7 +45,9 @@ Abstract: This is the class declaration of CDriver_A3200
 #endif
 
 // Include custom headers here.
+#include "libmcdriver_a3200_sdk.hpp"
 
+#include <vector>
 
 namespace LibMCDriver_A3200 {
 namespace Impl {
@@ -58,26 +60,56 @@ namespace Impl {
 class CDriver_A3200 : public virtual IDriver_A3200, public virtual CDriver {
 private:
 
-	/**
-	* Put private members here.
-	*/
+	bool m_bSimulationMode;
+	std::string m_sName;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
-protected:
+	std::vector <uint8_t> m_CoreSystemBuffer;
+	std::vector <uint8_t> m_SystemSDKBuffer;
+	std::vector <uint8_t> m_CompilerSDKBuffer;
+	std::vector <uint8_t> m_UtilitiesSDKBuffer;
+	std::vector <uint8_t> m_LicenseDecoderSDKBuffer;
 
-	/**
-	* Put protected members here.
-	*/
+	std::string m_sCoreSystemResourceName;
+	std::string m_sSystemSDKResourceName;
+	std::string m_sCompilerSDKResourceName;
+	std::string m_sUtilitiesSDKResourceName;
+	std::string m_sLicenseDecoderSDKResourceName;
+
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	LibMCEnv::PWorkingFile m_pCoreSystemDLL;
+	LibMCEnv::PWorkingFile m_pSystemSDKDLL;
+	LibMCEnv::PWorkingFile m_pCompilerSDKDLL;
+	LibMCEnv::PWorkingFile m_pUtilitiesSDKDLL;
+	LibMCEnv::PWorkingFile m_pLicenseDecoderSDKDLL;
+
+	PA3200SDK m_pSDK;
+	A3200Handle m_pHandle;
+
+	void loadSDK ();
+	void unloadSDK();
+
+	void storeCustomSDK(std::vector<uint8_t> & buffer, uint64_t nArraySize, const uint8_t * pData);
+	LibMCEnv::PWorkingFile createCustomDLL (const std::string & sFileNameOnDisk, std::vector<uint8_t>& buffer, const std::string & sResourceName, const std::string & sDefaultResourceName);
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CDriver_A3200 (const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
+	virtual ~CDriver_A3200();
 
-	/**
-	* Public member functions to implement.
-	*/
+	void Configure(const std::string& sConfigurationString) override;
+
+	std::string GetName() override;
+
+	std::string GetType() override;
+
+	void GetVersion(LibMCDriver_A3200_uint32& nMajor, LibMCDriver_A3200_uint32& nMinor, LibMCDriver_A3200_uint32& nMicro, std::string& sBuild) override;
+
+	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+
 
 	void SetToSimulationMode() override;
 
@@ -112,6 +144,7 @@ public:
 	void GetVariableBounds(const std::string & sVariableName, LibMCDriver_A3200_int64 & nMinValue, LibMCDriver_A3200_int64 & nMaxValue) override;
 
 };
+
 
 } // namespace Impl
 } // namespace LibMCDriver_A3200
