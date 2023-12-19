@@ -53,11 +53,31 @@
 		<error name="DRIVERNOTCONNECTED" code="1011" description="the driver is not connected" />
 		<error name="INVALIDDRIVERPROTOCOL" code="1012" description="invalid driver protocol definition" />
 		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1013" description="could not parse driver protocol" />		
-		<error name="NOTCONNECTED" code="1014" description="Not connected" />				
 		<error name="NOWORKINGDIRECTORY" code="1015" description="No working directory" />				
 		<error name="INVALIDTASKID" code="1016" description="Invalid task ID" />				
 		
-						
+		<error name="VERSIONMISMATCH" code="1" description="An incompatible version was detected" />
+		<error name="FEATURELOCKED" code="2" description="A license error occurred" />
+		<error name="UNSUPPORTEDHARDWARE" code="3" description="A connected hardware type is no longer supported" />
+		<error name="RESETTIMEOUT" code="6" description="A timeout occurred while waiting for the controller reset to finish." />
+		<error name="ALLOCATIONFAILED" code="8" description="An attempt to allocate memory on the SMC failed" />
+		<error name="NOTCONNECTED" code="9" description="The specified controller handle is invalid" />
+		<error name="INVALIDAXISINDEX" code="10" description="The specified axis index is invalid." />
+		<error name="TOOLTABLEERROR" code="11" description="A problem occurred with a tool table" />
+		<error name="DRIVECOMMANDLOST" code="12" description="A drive command was overwritten and lost." />
+		<error name="DRIVECOMMANDRESPONSE" code="13" description="A timeout occurred while waiting for a drive response" />
+		<error name="FIREWIREISONCHRONOUSERROR" code="14" description="An error occurred with isochronous communication" />
+		<error name="FIREWIREASYNCHRONOUSERROR" code="15" description="An error occurred during an asynchronous communication" />
+		<error name="PCMODBUSERROR" code="16" description="An error occurred with PC Modbus communication" />
+		<error name="COMMUNICATIONLOST" code="17" description="FireWire communications were interrupted." />
+		<error name="ETHERNETCOMMUNICATIONLOST" code="18" description="Ethernet communications were interrupted." />
+		<error name="SERVICECOMMUNICATIONLOST" code="19" description="Communication Service communications were interrupted." />
+		<error name="FIREWIRECARDCONFIGURATION" code="20" description="The FireWire card configuration is invalid." />
+		<error name="PCICARDERROR" code="21" description="A problem exists with PCI card configuration." />
+		<error name="AXISMISMATCH" code="22" description="An incorrect number of axes are attached." />
+		<error name="TASKMISMATCH" code="23" description="An insufficient number of tasks are enabled." />
+
+		
 	</errors>
 
 	
@@ -146,14 +166,63 @@ Custom implementation
 		<method name="Disconnect" description= "Disconnects from the A3200 PLC Controller.">
 		</method>
 
-		<method name="RunAeroBasicScript" description="Runs an AeroBasic script on a PLC task.">
+		<method name="RunScript" description="Runs an AeroBasic script on a PLC task.">
 			<param name="TaskID" type="uint32" pass="in" description="TaskID to run the script on. MUST be between 1 and 31." />
 			<param name="Script" type="string" pass="in" description="AeroBasic script as string." />				
 		</method>
 		
+		<method name="RunCommand" description="Runs a single AeroBasic command on a PLC task.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID to run the script on. MUST be between 1 and 31." />
+			<param name="Command" type="string" pass="in" description="AeroBasic command as string." />				
+		</method>
+
 		<method name="StopProgram" description="Stops a running program on a task.">
 			<param name="TaskID" type="uint32" pass="in" description="TaskID to stop. MUST be between 1 and 31." />
 			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+		</method>
+
+		<method name="ReadGlobalNumberVariable" description="Returns a global number variable.">
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="double" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteGlobalNumberVariable" description="Sets a global number variable.">
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="double" pass="in" description="Value of variable to set." />				
+		</method>
+
+		<method name="ReadGlobalStringVariable" description="Returns a global string variable.">
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="string" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteGlobalStringVariable" description="Sets a global string variable.">
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="string" pass="in" description="Value of variable to set." />				
+		</method>
+
+		<method name="ReadTaskNumberVariable" description="Returns a task number variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="double" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteTaskNumberVariable" description="Sets a task number variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="double" pass="in" description="Value of variable to set." />				
+		</method>
+
+		<method name="ReadTaskStringVariable" description="Returns a task string variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="string" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteTaskStringVariable" description="Sets a task string variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="string" pass="in" description="Value of variable to set." />				
 		</method>
 
 	</class>

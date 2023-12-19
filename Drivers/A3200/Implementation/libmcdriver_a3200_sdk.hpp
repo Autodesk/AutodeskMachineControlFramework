@@ -68,6 +68,12 @@ namespace LibMCDriver_A3200 {
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200ProgramRun) (A3200Handle pHandle, uint32_t nTaskID, const char * pszFilePath);
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200ProgramStopAndWait) (A3200Handle pHandle, uint32_t nTaskID, uint32_t nTimeOutInMS);
 
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200CommandExecute) (A3200Handle pHandle, uint32_t nTaskID, const char* pszCommand, double * pdReturnValue);
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200VariableGetValueStringByName) (A3200Handle pHandle, uint32_t nTaskID, const char* pszVariableName, char * pszBuffer, uint32_t nBufferSize);
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200VariableSetValueStringByName) (A3200Handle pHandle, uint32_t nTaskID, const char* pszVariableName, const char* pszValue);
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200VariableGetValueByName) (A3200Handle pHandle, uint32_t nTaskID, const char* pszVariableName, double * pdValue);
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200VariableSetValueByName) (A3200Handle pHandle, uint32_t nTaskID, const char* pszVariableName, double dValue);
+
 		class CA3200SDK_DLLDirectoryCache {
 		private:
 #ifdef _WIN32
@@ -100,6 +106,11 @@ namespace LibMCDriver_A3200 {
 			PA3200GetLastErrorString A3200GetLastErrorString = nullptr;
 			PA3200ProgramRun A3200ProgramRun = nullptr;
 			PA3200ProgramStopAndWait A3200ProgramStopAndWait = nullptr;
+			PA3200CommandExecute A3200CommandExecute = nullptr;
+			PA3200VariableGetValueStringByName A3200VariableGetValueStringByName = nullptr;
+			PA3200VariableSetValueStringByName A3200VariableSetValueStringByName = nullptr;
+			PA3200VariableGetValueByName A3200VariableGetValueByName = nullptr;
+			PA3200VariableSetValueByName A3200VariableSetValueByName = nullptr;
 
 			CA3200SDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectory);
 			~CA3200SDK();

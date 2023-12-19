@@ -361,11 +361,18 @@ public:
 	virtual void Disconnect() = 0;
 
 	/**
-	* IDriver_A3200::RunAeroBasicScript - Runs an AeroBasic script on a PLC task.
+	* IDriver_A3200::RunScript - Runs an AeroBasic script on a PLC task.
 	* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
 	* @param[in] sScript - AeroBasic script as string.
 	*/
-	virtual void RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript) = 0;
+	virtual void RunScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript) = 0;
+
+	/**
+	* IDriver_A3200::RunCommand - Runs a single AeroBasic command on a PLC task.
+	* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
+	* @param[in] sCommand - AeroBasic command as string.
+	*/
+	virtual void RunCommand(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sCommand) = 0;
 
 	/**
 	* IDriver_A3200::StopProgram - Stops a running program on a task.
@@ -373,6 +380,66 @@ public:
 	* @param[in] nTimeout - Timeout in milliseconds.
 	*/
 	virtual void StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout) = 0;
+
+	/**
+	* IDriver_A3200::ReadGlobalNumberVariable - Returns a global number variable.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	virtual LibMCDriver_A3200_double ReadGlobalNumberVariable(const std::string & sName) = 0;
+
+	/**
+	* IDriver_A3200::WriteGlobalNumberVariable - Sets a global number variable.
+	* @param[in] sName - Variable to set
+	* @param[in] dValue - Value of variable to set.
+	*/
+	virtual void WriteGlobalNumberVariable(const std::string & sName, const LibMCDriver_A3200_double dValue) = 0;
+
+	/**
+	* IDriver_A3200::ReadGlobalStringVariable - Returns a global string variable.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	virtual std::string ReadGlobalStringVariable(const std::string & sName) = 0;
+
+	/**
+	* IDriver_A3200::WriteGlobalStringVariable - Sets a global string variable.
+	* @param[in] sName - Variable to set
+	* @param[in] sValue - Value of variable to set.
+	*/
+	virtual void WriteGlobalStringVariable(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* IDriver_A3200::ReadTaskNumberVariable - Returns a task number variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	virtual LibMCDriver_A3200_double ReadTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName) = 0;
+
+	/**
+	* IDriver_A3200::WriteTaskNumberVariable - Sets a task number variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to set
+	* @param[in] dValue - Value of variable to set.
+	*/
+	virtual void WriteTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const LibMCDriver_A3200_double dValue) = 0;
+
+	/**
+	* IDriver_A3200::ReadTaskStringVariable - Returns a task string variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	virtual std::string ReadTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName) = 0;
+
+	/**
+	* IDriver_A3200::WriteTaskStringVariable - Sets a task string variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to set
+	* @param[in] sValue - Value of variable to set.
+	*/
+	virtual void WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const std::string & sValue) = 0;
 
 };
 

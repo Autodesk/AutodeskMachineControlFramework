@@ -190,7 +190,17 @@ typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_DisconnectPtr) 
 * @param[in] pScript - AeroBasic script as string.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_RunAeroBasicScriptPtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pScript);
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_RunScriptPtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pScript);
+
+/**
+* Runs a single AeroBasic command on a PLC task.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
+* @param[in] pCommand - AeroBasic command as string.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_RunCommandPtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pCommand);
 
 /**
 * Stops a running program on a task.
@@ -201,6 +211,94 @@ typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_RunAeroBasicScr
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_StopProgramPtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, LibMCDriver_A3200_uint32 nTimeout);
+
+/**
+* Returns a global number variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] pName - Variable to return
+* @param[out] pValue - Value of variable
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_ReadGlobalNumberVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pName, LibMCDriver_A3200_double * pValue);
+
+/**
+* Sets a global number variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] pName - Variable to set
+* @param[in] dValue - Value of variable to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_WriteGlobalNumberVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pName, LibMCDriver_A3200_double dValue);
+
+/**
+* Returns a global string variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] pName - Variable to return
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of variable, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_ReadGlobalStringVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pName, const LibMCDriver_A3200_uint32 nValueBufferSize, LibMCDriver_A3200_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Sets a global string variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] pName - Variable to set
+* @param[in] pValue - Value of variable to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_WriteGlobalStringVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pName, const char * pValue);
+
+/**
+* Returns a task number variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+* @param[in] pName - Variable to return
+* @param[out] pValue - Value of variable
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_ReadTaskNumberVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pName, LibMCDriver_A3200_double * pValue);
+
+/**
+* Sets a task number variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+* @param[in] pName - Variable to set
+* @param[in] dValue - Value of variable to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_WriteTaskNumberVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pName, LibMCDriver_A3200_double dValue);
+
+/**
+* Returns a task string variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+* @param[in] pName - Variable to return
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of variable, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_ReadTaskStringVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pName, const LibMCDriver_A3200_uint32 nValueBufferSize, LibMCDriver_A3200_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Sets a task string variable.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+* @param[in] pName - Variable to set
+* @param[in] pValue - Value of variable to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_A3200Result (*PLibMCDriver_A3200Driver_A3200_WriteTaskStringVariablePtr) (LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pName, const char * pValue);
 
 /*************************************************************************************************************************
  Global functions
@@ -290,8 +388,17 @@ typedef struct {
 	PLibMCDriver_A3200Driver_A3200_SetCustomSDKPtr m_Driver_A3200_SetCustomSDK;
 	PLibMCDriver_A3200Driver_A3200_ConnectPtr m_Driver_A3200_Connect;
 	PLibMCDriver_A3200Driver_A3200_DisconnectPtr m_Driver_A3200_Disconnect;
-	PLibMCDriver_A3200Driver_A3200_RunAeroBasicScriptPtr m_Driver_A3200_RunAeroBasicScript;
+	PLibMCDriver_A3200Driver_A3200_RunScriptPtr m_Driver_A3200_RunScript;
+	PLibMCDriver_A3200Driver_A3200_RunCommandPtr m_Driver_A3200_RunCommand;
 	PLibMCDriver_A3200Driver_A3200_StopProgramPtr m_Driver_A3200_StopProgram;
+	PLibMCDriver_A3200Driver_A3200_ReadGlobalNumberVariablePtr m_Driver_A3200_ReadGlobalNumberVariable;
+	PLibMCDriver_A3200Driver_A3200_WriteGlobalNumberVariablePtr m_Driver_A3200_WriteGlobalNumberVariable;
+	PLibMCDriver_A3200Driver_A3200_ReadGlobalStringVariablePtr m_Driver_A3200_ReadGlobalStringVariable;
+	PLibMCDriver_A3200Driver_A3200_WriteGlobalStringVariablePtr m_Driver_A3200_WriteGlobalStringVariable;
+	PLibMCDriver_A3200Driver_A3200_ReadTaskNumberVariablePtr m_Driver_A3200_ReadTaskNumberVariable;
+	PLibMCDriver_A3200Driver_A3200_WriteTaskNumberVariablePtr m_Driver_A3200_WriteTaskNumberVariable;
+	PLibMCDriver_A3200Driver_A3200_ReadTaskStringVariablePtr m_Driver_A3200_ReadTaskStringVariable;
+	PLibMCDriver_A3200Driver_A3200_WriteTaskStringVariablePtr m_Driver_A3200_WriteTaskStringVariable;
 	PLibMCDriver_A3200GetVersionPtr m_GetVersion;
 	PLibMCDriver_A3200GetLastErrorPtr m_GetLastError;
 	PLibMCDriver_A3200ReleaseInstancePtr m_ReleaseInstance;

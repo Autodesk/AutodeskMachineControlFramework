@@ -123,6 +123,11 @@ CA3200SDK::CA3200SDK(const std::string& sDLLNameUTF8, const std::string& sDLLDir
 	this->A3200GetLastErrorString = (PA3200GetLastErrorString)_loadA3200Address(hLibrary, "A3200GetLastErrorString", 0);
 	this->A3200ProgramRun = (PA3200ProgramRun)_loadA3200Address(hLibrary, "A3200ProgramRun", 0);
 	this->A3200ProgramStopAndWait = (PA3200ProgramStopAndWait)_loadA3200Address(hLibrary, "A3200ProgramStopAndWait", 0);
+	this->A3200CommandExecute = (PA3200CommandExecute)_loadA3200Address(hLibrary, "A3200CommandExecute", 0);
+	this->A3200VariableGetValueStringByName = (PA3200VariableGetValueStringByName)_loadA3200Address(hLibrary, "A3200VariableGetValueStringByName", 0);
+	this->A3200VariableSetValueStringByName = (PA3200VariableSetValueStringByName)_loadA3200Address(hLibrary, "A3200VariableSetValueStringByName", 0);
+	this->A3200VariableGetValueByName = (PA3200VariableGetValueByName)_loadA3200Address(hLibrary, "A3200VariableGetValueByName", 0);
+	this->A3200VariableSetValueByName = (PA3200VariableSetValueByName)_loadA3200Address(hLibrary, "A3200VariableSetValueByName", 0);
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -161,10 +166,10 @@ void CA3200SDK::checkError(A3200Bool bSuccess)
 				}
 			}
 
-			throw std::runtime_error(sMessage);
+			throw ELibMCDriver_A3200InterfaceException (errorData.m_nCode, sMessage);
 		}
 		else {
-			throw std::runtime_error("Unknown A3200 Error");
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_GENERICEXCEPTION, "Unknown A3200 Error");
 		}
 	}
 }
@@ -179,6 +184,11 @@ void CA3200SDK::resetFunctionPtrs()
 	A3200GetLastErrorString = nullptr;
 	A3200ProgramRun = nullptr;
 	A3200ProgramStopAndWait = nullptr;
+	A3200CommandExecute = nullptr;
+	A3200VariableGetValueStringByName = nullptr;
+	A3200VariableSetValueStringByName = nullptr;
+	A3200VariableGetValueByName = nullptr;
+	A3200VariableSetValueByName = nullptr;
 
 }
 

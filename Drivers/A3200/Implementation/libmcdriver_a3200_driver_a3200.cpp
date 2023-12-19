@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CDriver_A3200
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
+#include <array>
 
 using namespace LibMCDriver_A3200::Impl;
 
@@ -236,7 +237,7 @@ void CDriver_A3200::Disconnect()
 
 }
 
-void CDriver_A3200::RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sScript)
+void CDriver_A3200::RunScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sScript)
 {
 	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
 		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
@@ -250,6 +251,17 @@ void CDriver_A3200::RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, c
 
 }
 
+void CDriver_A3200::RunCommand(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sCommand)
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nTaskID < A3200_MINTASKID) || (nTaskID > A3200_MAXTASKID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
+
+	m_pSDK->checkError(m_pSDK->A3200CommandExecute(m_pHandle, nTaskID, sCommand.c_str(), nullptr));
+}
+
+
 void CDriver_A3200::StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout)
 {
 	if ((m_pHandle == nullptr) || (m_pSDK.get () == nullptr))
@@ -262,3 +274,99 @@ void CDriver_A3200::StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const Li
 
 
 
+
+LibMCDriver_A3200_double CDriver_A3200::ReadGlobalNumberVariable(const std::string& sName)
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+
+	double dValue = 0.0;
+	m_pSDK->checkError(m_pSDK->A3200VariableGetValueByName(m_pHandle, 0, sName.c_str(), &dValue));
+
+	return dValue;
+}
+
+
+void CDriver_A3200::WriteGlobalNumberVariable(const std::string& sName, const LibMCDriver_A3200_double dValue) 
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+
+	m_pSDK->checkError(m_pSDK->A3200VariableSetValueByName(m_pHandle, 0, sName.c_str(), dValue));
+}
+
+std::string CDriver_A3200::ReadGlobalStringVariable(const std::string& sName) 
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+
+	std::vector<char> stringBuffer;
+	stringBuffer.resize(A3200_MAXSTRINGLENGTH + 1);
+	for (auto& ch : stringBuffer)
+		ch = 0;
+
+
+	m_pSDK->checkError(m_pSDK->A3200VariableGetValueStringByName(m_pHandle, 0, sName.c_str(), stringBuffer.data (), A3200_MAXSTRINGLENGTH));
+
+	stringBuffer.at(A3200_MAXSTRINGLENGTH) = 0;
+	return stringBuffer.data ();
+}
+
+void CDriver_A3200::WriteGlobalStringVariable(const std::string& sName, const std::string& sValue) 
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+
+	m_pSDK->checkError(m_pSDK->A3200VariableSetValueStringByName(m_pHandle, 0, sName.c_str(), sValue.c_str ()));
+}
+
+LibMCDriver_A3200_double CDriver_A3200::ReadTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName) 
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nTaskID < A3200_MINTASKID) || (nTaskID > A3200_MAXTASKID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
+
+	double dValue = 0.0;
+	m_pSDK->checkError(m_pSDK->A3200VariableGetValueByName(m_pHandle, nTaskID, sName.c_str(), &dValue));
+
+	return dValue;
+}
+
+void CDriver_A3200::WriteTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName, const LibMCDriver_A3200_double dValue)
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nTaskID < A3200_MINTASKID) || (nTaskID > A3200_MAXTASKID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
+
+	m_pSDK->checkError(m_pSDK->A3200VariableSetValueByName(m_pHandle, nTaskID, sName.c_str(), dValue));
+}
+
+std::string CDriver_A3200::ReadTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName) 
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nTaskID < A3200_MINTASKID) || (nTaskID > A3200_MAXTASKID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
+
+	std::vector<char> stringBuffer;
+	stringBuffer.resize (A3200_MAXSTRINGLENGTH + 1);
+	for (auto& ch : stringBuffer)
+		ch = 0;
+
+	m_pSDK->checkError(m_pSDK->A3200VariableGetValueStringByName(m_pHandle, nTaskID, sName.c_str(), stringBuffer.data(), A3200_MAXSTRINGLENGTH));
+
+	stringBuffer.at(A3200_MAXSTRINGLENGTH) = 0;
+	return stringBuffer.data();
+}
+
+void CDriver_A3200::WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName, const std::string& sValue) 
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nTaskID < A3200_MINTASKID) || (nTaskID > A3200_MAXTASKID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
+
+	m_pSDK->checkError(m_pSDK->A3200VariableSetValueStringByName(m_pHandle, nTaskID, sName.c_str(), sValue.c_str()));
+}

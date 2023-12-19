@@ -51,6 +51,7 @@ Abstract: This is the class declaration of CDriver_A3200
 
 #define A3200_MINTASKID 1
 #define A3200_MAXTASKID 31
+#define A3200_MAXSTRINGLENGTH 32767
 
 namespace LibMCDriver_A3200 {
 namespace Impl {
@@ -126,9 +127,27 @@ public:
 
 	void Disconnect() override;
 
-	void RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sScript) override;
+	void RunScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sScript) override;
+
+	void RunCommand(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sCommand) override;
 
 	void StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout) override;
+
+	LibMCDriver_A3200_double ReadGlobalNumberVariable(const std::string& sName) override;
+
+	void WriteGlobalNumberVariable(const std::string& sName, const LibMCDriver_A3200_double dValue) override;
+
+	std::string ReadGlobalStringVariable(const std::string& sName) override;
+
+	void WriteGlobalStringVariable(const std::string& sName, const std::string& sValue) override;
+
+	LibMCDriver_A3200_double ReadTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName) override;
+
+	void WriteTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName, const LibMCDriver_A3200_double dValue) override;
+
+	std::string ReadTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName) override;
+
+	void WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName, const std::string& sValue) override;
 
 
 };
