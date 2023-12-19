@@ -352,9 +352,8 @@ public:
 
 	/**
 	* IDriver_A3200::Connect - Connects to the A3200 PLC Controller.
-	* @param[in] nTimeout - Timeout in milliseconds.
 	*/
-	virtual void Connect(const LibMCDriver_A3200_uint32 nTimeout) = 0;
+	virtual void Connect() = 0;
 
 	/**
 	* IDriver_A3200::Disconnect - Disconnects from the A3200 PLC Controller.
@@ -362,75 +361,18 @@ public:
 	virtual void Disconnect() = 0;
 
 	/**
-	* IDriver_A3200::VariableExists - Returns if a variable exists.
-	* @param[in] sVariableName - Name of variable.
-	* @return Flag if value exists.
+	* IDriver_A3200::RunAeroBasicScript - Runs an AeroBasic script on a PLC task.
+	* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
+	* @param[in] sScript - AeroBasic script as string.
 	*/
-	virtual bool VariableExists(const std::string & sVariableName) = 0;
+	virtual void RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript) = 0;
 
 	/**
-	* IDriver_A3200::ReadIntegerValue - Reads a value from an integer Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
+	* IDriver_A3200::StopProgram - Stops a running program on a task.
+	* @param[in] nTaskID - TaskID to stop. MUST be between 1 and 31.
+	* @param[in] nTimeout - Timeout in milliseconds.
 	*/
-	virtual LibMCDriver_A3200_int64 ReadIntegerValue(const std::string & sVariableName) = 0;
-
-	/**
-	* IDriver_A3200::WriteIntegerValue - Reads a value from an integer Variable. Fails if value is not within the bounds of the variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] nValue - Value to set.
-	*/
-	virtual void WriteIntegerValue(const std::string & sVariableName, const LibMCDriver_A3200_int64 nValue) = 0;
-
-	/**
-	* IDriver_A3200::ReadFloatValue - Reads a value from an float Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
-	*/
-	virtual LibMCDriver_A3200_double ReadFloatValue(const std::string & sVariableName) = 0;
-
-	/**
-	* IDriver_A3200::WriteFloatValue - Reads a value from an integer Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] dValue - Value to set.
-	*/
-	virtual void WriteFloatValue(const std::string & sVariableName, const LibMCDriver_A3200_double dValue) = 0;
-
-	/**
-	* IDriver_A3200::ReadBoolValue - Reads a value from an boolean Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
-	*/
-	virtual bool ReadBoolValue(const std::string & sVariableName) = 0;
-
-	/**
-	* IDriver_A3200::WriteBoolValue - Reads a value from an boolean Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] bValue - Value to set.
-	*/
-	virtual void WriteBoolValue(const std::string & sVariableName, const bool bValue) = 0;
-
-	/**
-	* IDriver_A3200::ReadStringValue - Reads a value from an string Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @return Result value.
-	*/
-	virtual std::string ReadStringValue(const std::string & sVariableName) = 0;
-
-	/**
-	* IDriver_A3200::WriteStringValue - Reads a value from an string Variable.
-	* @param[in] sVariableName - Name of variable.
-	* @param[in] sValue - Value to set.
-	*/
-	virtual void WriteStringValue(const std::string & sVariableName, const std::string & sValue) = 0;
-
-	/**
-	* IDriver_A3200::GetVariableBounds - Returns the min and max value an integer variable can hold.
-	* @param[in] sVariableName - Name of variable. Fails if variable does not exist or is not an integer value.
-	* @param[out] nMinValue - Minimum value.
-	* @param[out] nMaxValue - Minimum value.
-	*/
-	virtual void GetVariableBounds(const std::string & sVariableName, LibMCDriver_A3200_int64 & nMinValue, LibMCDriver_A3200_int64 & nMaxValue) = 0;
+	virtual void StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout) = 0;
 
 };
 

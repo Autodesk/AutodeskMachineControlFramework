@@ -183,10 +183,9 @@ LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a320
 * Connects to the A3200 PLC Controller.
 *
 * @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] nTimeout - Timeout in milliseconds.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_connect(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTimeout);
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_connect(LibMCDriver_A3200_Driver_A3200 pDriver_A3200);
 
 /**
 * Disconnects from the A3200 PLC Controller.
@@ -197,107 +196,24 @@ LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a320
 LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_disconnect(LibMCDriver_A3200_Driver_A3200 pDriver_A3200);
 
 /**
-* Returns if a variable exists.
+* Runs an AeroBasic script on a PLC task.
 *
 * @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[out] pVariableExists - Flag if value exists.
+* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
+* @param[in] pScript - AeroBasic script as string.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_variableexists(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, bool * pVariableExists);
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_runaerobasicscript(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pScript);
 
 /**
-* Reads a value from an integer Variable.
+* Stops a running program on a task.
 *
 * @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[out] pValue - Result value.
+* @param[in] nTaskID - TaskID to stop. MUST be between 1 and 31.
+* @param[in] nTimeout - Timeout in milliseconds.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readintegervalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_int64 * pValue);
-
-/**
-* Reads a value from an integer Variable. Fails if value is not within the bounds of the variable.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[in] nValue - Value to set.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writeintegervalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_int64 nValue);
-
-/**
-* Reads a value from an float Variable.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[out] pValue - Result value.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readfloatvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_double * pValue);
-
-/**
-* Reads a value from an integer Variable.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[in] dValue - Value to set.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writefloatvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_double dValue);
-
-/**
-* Reads a value from an boolean Variable.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[out] pValue - Result value.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readboolvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, bool * pValue);
-
-/**
-* Reads a value from an boolean Variable.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[in] bValue - Value to set.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writeboolvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, bool bValue);
-
-/**
-* Reads a value from an string Variable.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Result value., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readstringvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, const LibMCDriver_A3200_uint32 nValueBufferSize, LibMCDriver_A3200_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* Reads a value from an string Variable.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable.
-* @param[in] pValue - Value to set.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writestringvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, const char * pValue);
-
-/**
-* Returns the min and max value an integer variable can hold.
-*
-* @param[in] pDriver_A3200 - Driver_A3200 instance.
-* @param[in] pVariableName - Name of variable. Fails if variable does not exist or is not an integer value.
-* @param[out] pMinValue - Minimum value.
-* @param[out] pMaxValue - Minimum value.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_getvariablebounds(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_int64 * pMinValue, LibMCDriver_A3200_int64 * pMaxValue);
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_stopprogram(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, LibMCDriver_A3200_uint32 nTimeout);
 
 /*************************************************************************************************************************
  Global functions

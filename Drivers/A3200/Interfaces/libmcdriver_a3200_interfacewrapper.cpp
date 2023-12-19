@@ -440,7 +440,7 @@ LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_setcustomsdk(LibMCDriver_
 	}
 }
 
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_connect(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTimeout)
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_connect(LibMCDriver_A3200_Driver_A3200 pDriver_A3200)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_A3200;
 
@@ -449,7 +449,7 @@ LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_connect(LibMCDriver_A3200
 		if (!pIDriver_A3200)
 			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
 		
-		pIDriver_A3200->Connect(nTimeout);
+		pIDriver_A3200->Connect();
 
 		return LIBMCDRIVER_A3200_SUCCESS;
 	}
@@ -488,21 +488,19 @@ LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_disconnect(LibMCDriver_A3
 	}
 }
 
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_variableexists(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, bool * pVariableExists)
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_runaerobasicscript(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pScript)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_A3200;
 
 	try {
-		if (pVariableName == nullptr)
+		if (pScript == nullptr)
 			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if (pVariableExists == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
+		std::string sScript(pScript);
 		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
 		if (!pIDriver_A3200)
 			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
 		
-		*pVariableExists = pIDriver_A3200->VariableExists(sVariableName);
+		pIDriver_A3200->RunAeroBasicScript(nTaskID, sScript);
 
 		return LIBMCDRIVER_A3200_SUCCESS;
 	}
@@ -517,272 +515,16 @@ LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_variableexists(LibMCDrive
 	}
 }
 
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readintegervalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_int64 * pValue)
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_stopprogram(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, LibMCDriver_A3200_uint32 nTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_A3200;
 
 	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if (pValue == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
 		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
 		if (!pIDriver_A3200)
 			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
 		
-		*pValue = pIDriver_A3200->ReadIntegerValue(sVariableName);
-
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writeintegervalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_int64 nValue)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		pIDriver_A3200->WriteIntegerValue(sVariableName, nValue);
-
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readfloatvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_double * pValue)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if (pValue == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		*pValue = pIDriver_A3200->ReadFloatValue(sVariableName);
-
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writefloatvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_double dValue)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		pIDriver_A3200->WriteFloatValue(sVariableName, dValue);
-
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readboolvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, bool * pValue)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if (pValue == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		*pValue = pIDriver_A3200->ReadBoolValue(sVariableName);
-
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writeboolvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, bool bValue)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		pIDriver_A3200->WriteBoolValue(sVariableName, bValue);
-
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readstringvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, const LibMCDriver_A3200_uint32 nValueBufferSize, LibMCDriver_A3200_uint32* pValueNeededChars, char * pValueBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if ( (!pValueBuffer) && !(pValueNeededChars) )
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		std::string sValue("");
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pValueBuffer == nullptr);
-		if (isCacheCall) {
-			sValue = pIDriver_A3200->ReadStringValue(sVariableName);
-
-			pIDriver_A3200->_setCache (new ParameterCache_1<std::string> (sValue));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDriver_A3200->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-			cache->retrieveData (sValue);
-			pIDriver_A3200->_setCache (nullptr);
-		}
-		
-		if (pValueNeededChars)
-			*pValueNeededChars = (LibMCDriver_A3200_uint32) (sValue.size()+1);
-		if (pValueBuffer) {
-			if (sValue.size() >= nValueBufferSize)
-				throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_BUFFERTOOSMALL);
-			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
-				pValueBuffer[iValue] = sValue[iValue];
-			pValueBuffer[sValue.size()] = 0;
-		}
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writestringvalue(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, const char * pValue)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if (pValue == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		std::string sValue(pValue);
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		pIDriver_A3200->WriteStringValue(sVariableName, sValue);
-
-		return LIBMCDRIVER_A3200_SUCCESS;
-	}
-	catch (ELibMCDriver_A3200InterfaceException & Exception) {
-		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_getvariablebounds(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, const char * pVariableName, LibMCDriver_A3200_int64 * pMinValue, LibMCDriver_A3200_int64 * pMaxValue)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_A3200;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if (!pMinValue)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		if (!pMaxValue)
-			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
-		if (!pIDriver_A3200)
-			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
-		
-		pIDriver_A3200->GetVariableBounds(sVariableName, *pMinValue, *pMaxValue);
+		pIDriver_A3200->StopProgram(nTaskID, nTimeout);
 
 		return LIBMCDRIVER_A3200_SUCCESS;
 	}
@@ -836,26 +578,10 @@ LibMCDriver_A3200Result LibMCDriver_A3200::Impl::LibMCDriver_A3200_GetProcAddres
 		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_connect;
 	if (sProcName == "libmcdriver_a3200_driver_a3200_disconnect") 
 		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_disconnect;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_variableexists") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_variableexists;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_readintegervalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readintegervalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_writeintegervalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_writeintegervalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_readfloatvalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readfloatvalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_writefloatvalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_writefloatvalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_readboolvalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readboolvalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_writeboolvalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_writeboolvalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_readstringvalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readstringvalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_writestringvalue") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_writestringvalue;
-	if (sProcName == "libmcdriver_a3200_driver_a3200_getvariablebounds") 
-		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_getvariablebounds;
+	if (sProcName == "libmcdriver_a3200_driver_a3200_runaerobasicscript") 
+		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_runaerobasicscript;
+	if (sProcName == "libmcdriver_a3200_driver_a3200_stopprogram") 
+		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_stopprogram;
 	if (sProcName == "libmcdriver_a3200_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_a3200_getversion;
 	if (sProcName == "libmcdriver_a3200_getlasterror") 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -121,6 +121,8 @@ CA3200SDK::CA3200SDK(const std::string& sDLLNameUTF8, const std::string& sDLLDir
 	this->A3200IsInitialized = (PA3200IsInitialized)_loadA3200Address(hLibrary, "A3200IsInitialized", 0);
 	this->A3200GetLastError = (PA3200GetLastError)_loadA3200Address(hLibrary, "A3200GetLastError", 0);
 	this->A3200GetLastErrorString = (PA3200GetLastErrorString)_loadA3200Address(hLibrary, "A3200GetLastErrorString", 0);
+	this->A3200ProgramRun = (PA3200ProgramRun)_loadA3200Address(hLibrary, "A3200ProgramRun", 0);
+	this->A3200ProgramStopAndWait = (PA3200ProgramStopAndWait)_loadA3200Address(hLibrary, "A3200ProgramStopAndWait", 0);
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -175,6 +177,8 @@ void CA3200SDK::resetFunctionPtrs()
 	A3200IsInitialized = nullptr;
 	A3200GetLastError = nullptr;
 	A3200GetLastErrorString = nullptr;
+	A3200ProgramRun = nullptr;
+	A3200ProgramStopAndWait = nullptr;
 
 }
 
