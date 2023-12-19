@@ -109,9 +109,28 @@ typedef void * LibMCDriver_A3200_pvoid;
 #define LIBMCDRIVER_A3200_ERROR_DRIVERNOTCONNECTED 1011 /** the driver is not connected */
 #define LIBMCDRIVER_A3200_ERROR_INVALIDDRIVERPROTOCOL 1012 /** invalid driver protocol definition */
 #define LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1013 /** could not parse driver protocol */
-#define LIBMCDRIVER_A3200_ERROR_NOTCONNECTED 1014 /** Not connected */
 #define LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY 1015 /** No working directory */
 #define LIBMCDRIVER_A3200_ERROR_INVALIDTASKID 1016 /** Invalid task ID */
+#define LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH 1 /** An incompatible version was detected */
+#define LIBMCDRIVER_A3200_ERROR_FEATURELOCKED 2 /** A license error occurred */
+#define LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE 3 /** A connected hardware type is no longer supported */
+#define LIBMCDRIVER_A3200_ERROR_RESETTIMEOUT 6 /** A timeout occurred while waiting for the controller reset to finish. */
+#define LIBMCDRIVER_A3200_ERROR_ALLOCATIONFAILED 8 /** An attempt to allocate memory on the SMC failed */
+#define LIBMCDRIVER_A3200_ERROR_NOTCONNECTED 9 /** The specified controller handle is invalid */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDAXISINDEX 10 /** The specified axis index is invalid. */
+#define LIBMCDRIVER_A3200_ERROR_TOOLTABLEERROR 11 /** A problem occurred with a tool table */
+#define LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDLOST 12 /** A drive command was overwritten and lost. */
+#define LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDRESPONSE 13 /** A timeout occurred while waiting for a drive response */
+#define LIBMCDRIVER_A3200_ERROR_FIREWIREISONCHRONOUSERROR 14 /** An error occurred with isochronous communication */
+#define LIBMCDRIVER_A3200_ERROR_FIREWIREASYNCHRONOUSERROR 15 /** An error occurred during an asynchronous communication */
+#define LIBMCDRIVER_A3200_ERROR_PCMODBUSERROR 16 /** An error occurred with PC Modbus communication */
+#define LIBMCDRIVER_A3200_ERROR_COMMUNICATIONLOST 17 /** FireWire communications were interrupted. */
+#define LIBMCDRIVER_A3200_ERROR_ETHERNETCOMMUNICATIONLOST 18 /** Ethernet communications were interrupted. */
+#define LIBMCDRIVER_A3200_ERROR_SERVICECOMMUNICATIONLOST 19 /** Communication Service communications were interrupted. */
+#define LIBMCDRIVER_A3200_ERROR_FIREWIRECARDCONFIGURATION 20 /** The FireWire card configuration is invalid. */
+#define LIBMCDRIVER_A3200_ERROR_PCICARDERROR 21 /** A problem exists with PCI card configuration. */
+#define LIBMCDRIVER_A3200_ERROR_AXISMISMATCH 22 /** An incorrect number of axes are attached. */
+#define LIBMCDRIVER_A3200_ERROR_TASKMISMATCH 23 /** An insufficient number of tasks are enabled. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_A3200
@@ -133,9 +152,28 @@ inline const char * LIBMCDRIVER_A3200_GETERRORSTRING (LibMCDriver_A3200Result nE
     case LIBMCDRIVER_A3200_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
     case LIBMCDRIVER_A3200_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
     case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
-    case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "Not connected";
     case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "No working directory";
     case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "Invalid task ID";
+    case LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH: return "An incompatible version was detected";
+    case LIBMCDRIVER_A3200_ERROR_FEATURELOCKED: return "A license error occurred";
+    case LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE: return "A connected hardware type is no longer supported";
+    case LIBMCDRIVER_A3200_ERROR_RESETTIMEOUT: return "A timeout occurred while waiting for the controller reset to finish.";
+    case LIBMCDRIVER_A3200_ERROR_ALLOCATIONFAILED: return "An attempt to allocate memory on the SMC failed";
+    case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "The specified controller handle is invalid";
+    case LIBMCDRIVER_A3200_ERROR_INVALIDAXISINDEX: return "The specified axis index is invalid.";
+    case LIBMCDRIVER_A3200_ERROR_TOOLTABLEERROR: return "A problem occurred with a tool table";
+    case LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDLOST: return "A drive command was overwritten and lost.";
+    case LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDRESPONSE: return "A timeout occurred while waiting for a drive response";
+    case LIBMCDRIVER_A3200_ERROR_FIREWIREISONCHRONOUSERROR: return "An error occurred with isochronous communication";
+    case LIBMCDRIVER_A3200_ERROR_FIREWIREASYNCHRONOUSERROR: return "An error occurred during an asynchronous communication";
+    case LIBMCDRIVER_A3200_ERROR_PCMODBUSERROR: return "An error occurred with PC Modbus communication";
+    case LIBMCDRIVER_A3200_ERROR_COMMUNICATIONLOST: return "FireWire communications were interrupted.";
+    case LIBMCDRIVER_A3200_ERROR_ETHERNETCOMMUNICATIONLOST: return "Ethernet communications were interrupted.";
+    case LIBMCDRIVER_A3200_ERROR_SERVICECOMMUNICATIONLOST: return "Communication Service communications were interrupted.";
+    case LIBMCDRIVER_A3200_ERROR_FIREWIRECARDCONFIGURATION: return "The FireWire card configuration is invalid.";
+    case LIBMCDRIVER_A3200_ERROR_PCICARDERROR: return "A problem exists with PCI card configuration.";
+    case LIBMCDRIVER_A3200_ERROR_AXISMISMATCH: return "An incorrect number of axes are attached.";
+    case LIBMCDRIVER_A3200_ERROR_TASKMISMATCH: return "An insufficient number of tasks are enabled.";
     default: return "unknown error";
   }
 }

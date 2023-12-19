@@ -179,9 +179,28 @@ public:
 			case LIBMCDRIVER_A3200_ERROR_DRIVERNOTCONNECTED: return "DRIVERNOTCONNECTED";
 			case LIBMCDRIVER_A3200_ERROR_INVALIDDRIVERPROTOCOL: return "INVALIDDRIVERPROTOCOL";
 			case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "COULDNOTPARSEDRIVERPROTOCOL";
-			case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "NOTCONNECTED";
 			case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "NOWORKINGDIRECTORY";
 			case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "INVALIDTASKID";
+			case LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH: return "VERSIONMISMATCH";
+			case LIBMCDRIVER_A3200_ERROR_FEATURELOCKED: return "FEATURELOCKED";
+			case LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE: return "UNSUPPORTEDHARDWARE";
+			case LIBMCDRIVER_A3200_ERROR_RESETTIMEOUT: return "RESETTIMEOUT";
+			case LIBMCDRIVER_A3200_ERROR_ALLOCATIONFAILED: return "ALLOCATIONFAILED";
+			case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "NOTCONNECTED";
+			case LIBMCDRIVER_A3200_ERROR_INVALIDAXISINDEX: return "INVALIDAXISINDEX";
+			case LIBMCDRIVER_A3200_ERROR_TOOLTABLEERROR: return "TOOLTABLEERROR";
+			case LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDLOST: return "DRIVECOMMANDLOST";
+			case LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDRESPONSE: return "DRIVECOMMANDRESPONSE";
+			case LIBMCDRIVER_A3200_ERROR_FIREWIREISONCHRONOUSERROR: return "FIREWIREISONCHRONOUSERROR";
+			case LIBMCDRIVER_A3200_ERROR_FIREWIREASYNCHRONOUSERROR: return "FIREWIREASYNCHRONOUSERROR";
+			case LIBMCDRIVER_A3200_ERROR_PCMODBUSERROR: return "PCMODBUSERROR";
+			case LIBMCDRIVER_A3200_ERROR_COMMUNICATIONLOST: return "COMMUNICATIONLOST";
+			case LIBMCDRIVER_A3200_ERROR_ETHERNETCOMMUNICATIONLOST: return "ETHERNETCOMMUNICATIONLOST";
+			case LIBMCDRIVER_A3200_ERROR_SERVICECOMMUNICATIONLOST: return "SERVICECOMMUNICATIONLOST";
+			case LIBMCDRIVER_A3200_ERROR_FIREWIRECARDCONFIGURATION: return "FIREWIRECARDCONFIGURATION";
+			case LIBMCDRIVER_A3200_ERROR_PCICARDERROR: return "PCICARDERROR";
+			case LIBMCDRIVER_A3200_ERROR_AXISMISMATCH: return "AXISMISMATCH";
+			case LIBMCDRIVER_A3200_ERROR_TASKMISMATCH: return "TASKMISMATCH";
 		}
 		return "UNKNOWN";
 	}
@@ -203,9 +222,28 @@ public:
 			case LIBMCDRIVER_A3200_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
 			case LIBMCDRIVER_A3200_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
 			case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
-			case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "Not connected";
 			case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "No working directory";
 			case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "Invalid task ID";
+			case LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH: return "An incompatible version was detected";
+			case LIBMCDRIVER_A3200_ERROR_FEATURELOCKED: return "A license error occurred";
+			case LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE: return "A connected hardware type is no longer supported";
+			case LIBMCDRIVER_A3200_ERROR_RESETTIMEOUT: return "A timeout occurred while waiting for the controller reset to finish.";
+			case LIBMCDRIVER_A3200_ERROR_ALLOCATIONFAILED: return "An attempt to allocate memory on the SMC failed";
+			case LIBMCDRIVER_A3200_ERROR_NOTCONNECTED: return "The specified controller handle is invalid";
+			case LIBMCDRIVER_A3200_ERROR_INVALIDAXISINDEX: return "The specified axis index is invalid.";
+			case LIBMCDRIVER_A3200_ERROR_TOOLTABLEERROR: return "A problem occurred with a tool table";
+			case LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDLOST: return "A drive command was overwritten and lost.";
+			case LIBMCDRIVER_A3200_ERROR_DRIVECOMMANDRESPONSE: return "A timeout occurred while waiting for a drive response";
+			case LIBMCDRIVER_A3200_ERROR_FIREWIREISONCHRONOUSERROR: return "An error occurred with isochronous communication";
+			case LIBMCDRIVER_A3200_ERROR_FIREWIREASYNCHRONOUSERROR: return "An error occurred during an asynchronous communication";
+			case LIBMCDRIVER_A3200_ERROR_PCMODBUSERROR: return "An error occurred with PC Modbus communication";
+			case LIBMCDRIVER_A3200_ERROR_COMMUNICATIONLOST: return "FireWire communications were interrupted.";
+			case LIBMCDRIVER_A3200_ERROR_ETHERNETCOMMUNICATIONLOST: return "Ethernet communications were interrupted.";
+			case LIBMCDRIVER_A3200_ERROR_SERVICECOMMUNICATIONLOST: return "Communication Service communications were interrupted.";
+			case LIBMCDRIVER_A3200_ERROR_FIREWIRECARDCONFIGURATION: return "The FireWire card configuration is invalid.";
+			case LIBMCDRIVER_A3200_ERROR_PCICARDERROR: return "A problem exists with PCI card configuration.";
+			case LIBMCDRIVER_A3200_ERROR_AXISMISMATCH: return "An incorrect number of axes are attached.";
+			case LIBMCDRIVER_A3200_ERROR_TASKMISMATCH: return "An insufficient number of tasks are enabled.";
 		}
 		return "unknown error";
 	}
@@ -432,8 +470,17 @@ public:
 	inline void SetCustomSDK(const CInputVector<LibMCDriver_A3200_uint8> & CoreSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & SystemSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & CompilerSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & UtilitiesSDKBufferBuffer, const CInputVector<LibMCDriver_A3200_uint8> & LicenseDecoderSDKBufferBuffer);
 	inline void Connect();
 	inline void Disconnect();
-	inline void RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript);
+	inline void RunScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript);
+	inline void RunCommand(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sCommand);
 	inline void StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout);
+	inline LibMCDriver_A3200_double ReadGlobalNumberVariable(const std::string & sName);
+	inline void WriteGlobalNumberVariable(const std::string & sName, const LibMCDriver_A3200_double dValue);
+	inline std::string ReadGlobalStringVariable(const std::string & sName);
+	inline void WriteGlobalStringVariable(const std::string & sName, const std::string & sValue);
+	inline LibMCDriver_A3200_double ReadTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName);
+	inline void WriteTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const LibMCDriver_A3200_double dValue);
+	inline std::string ReadTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName);
+	inline void WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const std::string & sValue);
 };
 	
 	/**
@@ -570,8 +617,17 @@ public:
 		pWrapperTable->m_Driver_A3200_SetCustomSDK = nullptr;
 		pWrapperTable->m_Driver_A3200_Connect = nullptr;
 		pWrapperTable->m_Driver_A3200_Disconnect = nullptr;
-		pWrapperTable->m_Driver_A3200_RunAeroBasicScript = nullptr;
+		pWrapperTable->m_Driver_A3200_RunScript = nullptr;
+		pWrapperTable->m_Driver_A3200_RunCommand = nullptr;
 		pWrapperTable->m_Driver_A3200_StopProgram = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadGlobalNumberVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_WriteGlobalNumberVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadGlobalStringVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_WriteGlobalStringVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadTaskNumberVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_WriteTaskNumberVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadTaskStringVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_WriteTaskStringVariable = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -738,12 +794,21 @@ public:
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_A3200_RunAeroBasicScript = (PLibMCDriver_A3200Driver_A3200_RunAeroBasicScriptPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_runaerobasicscript");
+		pWrapperTable->m_Driver_A3200_RunScript = (PLibMCDriver_A3200Driver_A3200_RunScriptPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_runscript");
 		#else // _WIN32
-		pWrapperTable->m_Driver_A3200_RunAeroBasicScript = (PLibMCDriver_A3200Driver_A3200_RunAeroBasicScriptPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_runaerobasicscript");
+		pWrapperTable->m_Driver_A3200_RunScript = (PLibMCDriver_A3200Driver_A3200_RunScriptPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_runscript");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_A3200_RunAeroBasicScript == nullptr)
+		if (pWrapperTable->m_Driver_A3200_RunScript == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_RunCommand = (PLibMCDriver_A3200Driver_A3200_RunCommandPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_runcommand");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_RunCommand = (PLibMCDriver_A3200Driver_A3200_RunCommandPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_runcommand");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_RunCommand == nullptr)
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -753,6 +818,78 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_A3200_StopProgram == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadGlobalNumberVariable = (PLibMCDriver_A3200Driver_A3200_ReadGlobalNumberVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readglobalnumbervariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadGlobalNumberVariable = (PLibMCDriver_A3200Driver_A3200_ReadGlobalNumberVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readglobalnumbervariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadGlobalNumberVariable == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_WriteGlobalNumberVariable = (PLibMCDriver_A3200Driver_A3200_WriteGlobalNumberVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writeglobalnumbervariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_WriteGlobalNumberVariable = (PLibMCDriver_A3200Driver_A3200_WriteGlobalNumberVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writeglobalnumbervariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_WriteGlobalNumberVariable == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadGlobalStringVariable = (PLibMCDriver_A3200Driver_A3200_ReadGlobalStringVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readglobalstringvariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadGlobalStringVariable = (PLibMCDriver_A3200Driver_A3200_ReadGlobalStringVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readglobalstringvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadGlobalStringVariable == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_WriteGlobalStringVariable = (PLibMCDriver_A3200Driver_A3200_WriteGlobalStringVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writeglobalstringvariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_WriteGlobalStringVariable = (PLibMCDriver_A3200Driver_A3200_WriteGlobalStringVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writeglobalstringvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_WriteGlobalStringVariable == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadTaskNumberVariable = (PLibMCDriver_A3200Driver_A3200_ReadTaskNumberVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readtasknumbervariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadTaskNumberVariable = (PLibMCDriver_A3200Driver_A3200_ReadTaskNumberVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readtasknumbervariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadTaskNumberVariable == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_WriteTaskNumberVariable = (PLibMCDriver_A3200Driver_A3200_WriteTaskNumberVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writetasknumbervariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_WriteTaskNumberVariable = (PLibMCDriver_A3200Driver_A3200_WriteTaskNumberVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writetasknumbervariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_WriteTaskNumberVariable == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadTaskStringVariable = (PLibMCDriver_A3200Driver_A3200_ReadTaskStringVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readtaskstringvariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadTaskStringVariable = (PLibMCDriver_A3200Driver_A3200_ReadTaskStringVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readtaskstringvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadTaskStringVariable == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_WriteTaskStringVariable = (PLibMCDriver_A3200Driver_A3200_WriteTaskStringVariablePtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_writetaskstringvariable");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_WriteTaskStringVariable = (PLibMCDriver_A3200Driver_A3200_WriteTaskStringVariablePtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_writetaskstringvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_WriteTaskStringVariable == nullptr)
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -882,12 +1019,48 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_Disconnect == nullptr) )
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_runaerobasicscript", (void**)&(pWrapperTable->m_Driver_A3200_RunAeroBasicScript));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_RunAeroBasicScript == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_runscript", (void**)&(pWrapperTable->m_Driver_A3200_RunScript));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_RunScript == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_runcommand", (void**)&(pWrapperTable->m_Driver_A3200_RunCommand));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_RunCommand == nullptr) )
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_stopprogram", (void**)&(pWrapperTable->m_Driver_A3200_StopProgram));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_StopProgram == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readglobalnumbervariable", (void**)&(pWrapperTable->m_Driver_A3200_ReadGlobalNumberVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadGlobalNumberVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writeglobalnumbervariable", (void**)&(pWrapperTable->m_Driver_A3200_WriteGlobalNumberVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteGlobalNumberVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readglobalstringvariable", (void**)&(pWrapperTable->m_Driver_A3200_ReadGlobalStringVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadGlobalStringVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writeglobalstringvariable", (void**)&(pWrapperTable->m_Driver_A3200_WriteGlobalStringVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteGlobalStringVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readtasknumbervariable", (void**)&(pWrapperTable->m_Driver_A3200_ReadTaskNumberVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadTaskNumberVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writetasknumbervariable", (void**)&(pWrapperTable->m_Driver_A3200_WriteTaskNumberVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteTaskNumberVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readtaskstringvariable", (void**)&(pWrapperTable->m_Driver_A3200_ReadTaskStringVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadTaskStringVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writetaskstringvariable", (void**)&(pWrapperTable->m_Driver_A3200_WriteTaskStringVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteTaskStringVariable == nullptr) )
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_a3200_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1072,13 +1245,23 @@ public:
 	}
 	
 	/**
-	* CDriver_A3200::RunAeroBasicScript - Runs an AeroBasic script on a PLC task.
+	* CDriver_A3200::RunScript - Runs an AeroBasic script on a PLC task.
 	* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
 	* @param[in] sScript - AeroBasic script as string.
 	*/
-	void CDriver_A3200::RunAeroBasicScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript)
+	void CDriver_A3200::RunScript(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sScript)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_RunAeroBasicScript(m_pHandle, nTaskID, sScript.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_RunScript(m_pHandle, nTaskID, sScript.c_str()));
+	}
+	
+	/**
+	* CDriver_A3200::RunCommand - Runs a single AeroBasic command on a PLC task.
+	* @param[in] nTaskID - TaskID to run the script on. MUST be between 1 and 31.
+	* @param[in] sCommand - AeroBasic command as string.
+	*/
+	void CDriver_A3200::RunCommand(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sCommand)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_RunCommand(m_pHandle, nTaskID, sCommand.c_str()));
 	}
 	
 	/**
@@ -1089,6 +1272,108 @@ public:
 	void CDriver_A3200::StopProgram(const LibMCDriver_A3200_uint32 nTaskID, const LibMCDriver_A3200_uint32 nTimeout)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_StopProgram(m_pHandle, nTaskID, nTimeout));
+	}
+	
+	/**
+	* CDriver_A3200::ReadGlobalNumberVariable - Returns a global number variable.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	LibMCDriver_A3200_double CDriver_A3200::ReadGlobalNumberVariable(const std::string & sName)
+	{
+		LibMCDriver_A3200_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadGlobalNumberVariable(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriver_A3200::WriteGlobalNumberVariable - Sets a global number variable.
+	* @param[in] sName - Variable to set
+	* @param[in] dValue - Value of variable to set.
+	*/
+	void CDriver_A3200::WriteGlobalNumberVariable(const std::string & sName, const LibMCDriver_A3200_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteGlobalNumberVariable(m_pHandle, sName.c_str(), dValue));
+	}
+	
+	/**
+	* CDriver_A3200::ReadGlobalStringVariable - Returns a global string variable.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	std::string CDriver_A3200::ReadGlobalStringVariable(const std::string & sName)
+	{
+		LibMCDriver_A3200_uint32 bytesNeededValue = 0;
+		LibMCDriver_A3200_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadGlobalStringVariable(m_pHandle, sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadGlobalStringVariable(m_pHandle, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CDriver_A3200::WriteGlobalStringVariable - Sets a global string variable.
+	* @param[in] sName - Variable to set
+	* @param[in] sValue - Value of variable to set.
+	*/
+	void CDriver_A3200::WriteGlobalStringVariable(const std::string & sName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteGlobalStringVariable(m_pHandle, sName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriver_A3200::ReadTaskNumberVariable - Returns a task number variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	LibMCDriver_A3200_double CDriver_A3200::ReadTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName)
+	{
+		LibMCDriver_A3200_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadTaskNumberVariable(m_pHandle, nTaskID, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriver_A3200::WriteTaskNumberVariable - Sets a task number variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to set
+	* @param[in] dValue - Value of variable to set.
+	*/
+	void CDriver_A3200::WriteTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const LibMCDriver_A3200_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteTaskNumberVariable(m_pHandle, nTaskID, sName.c_str(), dValue));
+	}
+	
+	/**
+	* CDriver_A3200::ReadTaskStringVariable - Returns a task string variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to return
+	* @return Value of variable
+	*/
+	std::string CDriver_A3200::ReadTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName)
+	{
+		LibMCDriver_A3200_uint32 bytesNeededValue = 0;
+		LibMCDriver_A3200_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadTaskStringVariable(m_pHandle, nTaskID, sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadTaskStringVariable(m_pHandle, nTaskID, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CDriver_A3200::WriteTaskStringVariable - Sets a task string variable.
+	* @param[in] nTaskID - TaskID. MUST be between 1 and 31.
+	* @param[in] sName - Variable to set
+	* @param[in] sValue - Value of variable to set.
+	*/
+	void CDriver_A3200::WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteTaskStringVariable(m_pHandle, nTaskID, sName.c_str(), sValue.c_str()));
 	}
 
 } // namespace LibMCDriver_A3200
