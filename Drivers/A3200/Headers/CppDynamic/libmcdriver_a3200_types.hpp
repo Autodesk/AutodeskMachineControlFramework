@@ -131,6 +131,47 @@ typedef void * LibMCDriver_A3200_pvoid;
 #define LIBMCDRIVER_A3200_ERROR_PCICARDERROR 21 /** A problem exists with PCI card configuration. */
 #define LIBMCDRIVER_A3200_ERROR_AXISMISMATCH 22 /** An incorrect number of axes are attached. */
 #define LIBMCDRIVER_A3200_ERROR_TASKMISMATCH 23 /** An insufficient number of tasks are enabled. */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDCOMMANDLINE 24 /** An invalid SMC command line argument was specified. */
+#define LIBMCDRIVER_A3200_ERROR_MACHINECONFIGURATION 25 /** An error occurred while accessing the machine configuration. */
+#define LIBMCDRIVER_A3200_ERROR_FIREWIRECONFIGURATION 28 /** An error was detected in the FireWire configuration. */
+#define LIBMCDRIVER_A3200_ERROR_GANTRYCONFIGURATION 29 /** An error gantry configuration was detected. */
+#define LIBMCDRIVER_A3200_ERROR_CALLBACKTIMEOUT 31 /** A timeout occurred while responding to a callback. */
+#define LIBMCDRIVER_A3200_ERROR_CALLBACKERROR 32 /** A timeout occurred while responding to a callback. */
+#define LIBMCDRIVER_A3200_ERROR_TOOMANYSTATUSITEMS 33 /** The maximum number of status items was exceeded. */
+#define LIBMCDRIVER_A3200_ERROR_PROGRAMERROR 34 /** An error occurred in program execution. */
+#define LIBMCDRIVER_A3200_ERROR_STRINGOVERFLOW 35 /** The maximum string length was exceeded. */
+#define LIBMCDRIVER_A3200_ERROR_DIVIDEBYZERO 36 /** A divide-by-zero was detected. */
+#define LIBMCDRIVER_A3200_ERROR_PROGRAMTIMEOUT 37 /** A program timeout occurred. */
+#define LIBMCDRIVER_A3200_ERROR_PROFILEQUEUEERROR 38 /** An error occurred in the execution queue */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDARGUMENT 39 /** An invalid argument was specified. */
+#define LIBMCDRIVER_A3200_ERROR_PARAMETERNOTPASSED 40 /** A callstack argument was not passed to a subroutine. */
+#define LIBMCDRIVER_A3200_ERROR_QUEUEBUFFERFULL 41 /** The buffered program queue is full. */
+#define LIBMCDRIVER_A3200_ERROR_NULLPROGRAMLINE 42 /** A NULL code line pointer was specified. */
+#define LIBMCDRIVER_A3200_ERROR_PROGRAMNUMBEROUTOFBOUNDS 43 /** The specified program number is outside of the valid range of values. */
+#define LIBMCDRIVER_A3200_ERROR_CANNEDFUNCTIONERROR 44 /** An error occurred with a canned function. */
+#define LIBMCDRIVER_A3200_ERROR_ZEROSPEED 46 /** The move speed is zero. */
+#define LIBMCDRIVER_A3200_ERROR_STACKERROR 47 /** A stack error occurred. */
+#define LIBMCDRIVER_A3200_ERROR_SLICEERROR 48 /** An error occurred while executing the SLICE command. */
+#define LIBMCDRIVER_A3200_ERROR_LOOKAHEADERROR 49 /** A error occurred while performing lookahead. */
+#define LIBMCDRIVER_A3200_ERROR_RETRACEERROR 50 /** An error occurred while doing retrace. */
+#define LIBMCDRIVER_A3200_ERROR_AXISINFAULT 51 /** An axis fault occurred. */
+#define LIBMCDRIVER_A3200_ERROR_AXISNOTENABLED 52 /** The axis is not enabled. */
+#define LIBMCDRIVER_A3200_ERROR_MOTIONERROR 53 /** An error occurred with a motion command. */
+#define LIBMCDRIVER_A3200_ERROR_GANTRYMOTIONERROR 54 /** An error occurred while performing gantry motion. */
+#define LIBMCDRIVER_A3200_ERROR_CUTTERCOMPENSATIONERROR 55 /** An error occurred while peforming cutter compensation. */
+#define LIBMCDRIVER_A3200_ERROR_CIRCULARMOTIONERROR 56 /** An error occurred while performing circular motion. */
+#define LIBMCDRIVER_A3200_ERROR_CIRCULARRADIUSERROR 57 /** A circular radius error occurred. */
+#define LIBMCDRIVER_A3200_ERROR_NORMALCYERROR 58 /** An error occurred while performing normalcy. */
+#define LIBMCDRIVER_A3200_ERROR_MOTIONTYPEMISMATCH 59 /** A LINEAR move is required to execute this command. */
+#define LIBMCDRIVER_A3200_ERROR_SPINDLENUMBERNOTASSIGNED 60 /** The specified spindle is not assigned to an axis. */
+#define LIBMCDRIVER_A3200_ERROR_ELLIPTICALMOTIONERROR 61 /** An error occurred while performing elliptical motion. */
+#define LIBMCDRIVER_A3200_ERROR_MOTIONACTIVE 62 /** Motion is already active. */
+#define LIBMCDRIVER_A3200_ERROR_AXISNOTDEPENDENT 63 /** This feature is only available on dependent axes. */
+#define LIBMCDRIVER_A3200_ERROR_AXISNOTDOMINANT 64 /** This feature is only available on dominant axes. */
+#define LIBMCDRIVER_A3200_ERROR_NOJOYSTICKGROUPS 65 /** No joystick groups have been specified. */
+#define LIBMCDRIVER_A3200_ERROR_TRANSFORMATIONERROR 66 /** An error occurred performing a transformation. */
+#define LIBMCDRIVER_A3200_ERROR_CALIBRATIONTABLEERROR 67 /** An error occurred with a calibration table. */
+#define LIBMCDRIVER_A3200_ERROR_CAMTABLEERROR 68 /** An error occurred with a cam table command. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_A3200
@@ -174,6 +215,47 @@ inline const char * LIBMCDRIVER_A3200_GETERRORSTRING (LibMCDriver_A3200Result nE
     case LIBMCDRIVER_A3200_ERROR_PCICARDERROR: return "A problem exists with PCI card configuration.";
     case LIBMCDRIVER_A3200_ERROR_AXISMISMATCH: return "An incorrect number of axes are attached.";
     case LIBMCDRIVER_A3200_ERROR_TASKMISMATCH: return "An insufficient number of tasks are enabled.";
+    case LIBMCDRIVER_A3200_ERROR_INVALIDCOMMANDLINE: return "An invalid SMC command line argument was specified.";
+    case LIBMCDRIVER_A3200_ERROR_MACHINECONFIGURATION: return "An error occurred while accessing the machine configuration.";
+    case LIBMCDRIVER_A3200_ERROR_FIREWIRECONFIGURATION: return "An error was detected in the FireWire configuration.";
+    case LIBMCDRIVER_A3200_ERROR_GANTRYCONFIGURATION: return "An error gantry configuration was detected.";
+    case LIBMCDRIVER_A3200_ERROR_CALLBACKTIMEOUT: return "A timeout occurred while responding to a callback.";
+    case LIBMCDRIVER_A3200_ERROR_CALLBACKERROR: return "A timeout occurred while responding to a callback.";
+    case LIBMCDRIVER_A3200_ERROR_TOOMANYSTATUSITEMS: return "The maximum number of status items was exceeded.";
+    case LIBMCDRIVER_A3200_ERROR_PROGRAMERROR: return "An error occurred in program execution.";
+    case LIBMCDRIVER_A3200_ERROR_STRINGOVERFLOW: return "The maximum string length was exceeded.";
+    case LIBMCDRIVER_A3200_ERROR_DIVIDEBYZERO: return "A divide-by-zero was detected.";
+    case LIBMCDRIVER_A3200_ERROR_PROGRAMTIMEOUT: return "A program timeout occurred.";
+    case LIBMCDRIVER_A3200_ERROR_PROFILEQUEUEERROR: return "An error occurred in the execution queue";
+    case LIBMCDRIVER_A3200_ERROR_INVALIDARGUMENT: return "An invalid argument was specified.";
+    case LIBMCDRIVER_A3200_ERROR_PARAMETERNOTPASSED: return "A callstack argument was not passed to a subroutine.";
+    case LIBMCDRIVER_A3200_ERROR_QUEUEBUFFERFULL: return "The buffered program queue is full.";
+    case LIBMCDRIVER_A3200_ERROR_NULLPROGRAMLINE: return "A NULL code line pointer was specified.";
+    case LIBMCDRIVER_A3200_ERROR_PROGRAMNUMBEROUTOFBOUNDS: return "The specified program number is outside of the valid range of values.";
+    case LIBMCDRIVER_A3200_ERROR_CANNEDFUNCTIONERROR: return "An error occurred with a canned function.";
+    case LIBMCDRIVER_A3200_ERROR_ZEROSPEED: return "The move speed is zero.";
+    case LIBMCDRIVER_A3200_ERROR_STACKERROR: return "A stack error occurred.";
+    case LIBMCDRIVER_A3200_ERROR_SLICEERROR: return "An error occurred while executing the SLICE command.";
+    case LIBMCDRIVER_A3200_ERROR_LOOKAHEADERROR: return "A error occurred while performing lookahead.";
+    case LIBMCDRIVER_A3200_ERROR_RETRACEERROR: return "An error occurred while doing retrace.";
+    case LIBMCDRIVER_A3200_ERROR_AXISINFAULT: return "An axis fault occurred.";
+    case LIBMCDRIVER_A3200_ERROR_AXISNOTENABLED: return "The axis is not enabled.";
+    case LIBMCDRIVER_A3200_ERROR_MOTIONERROR: return "An error occurred with a motion command.";
+    case LIBMCDRIVER_A3200_ERROR_GANTRYMOTIONERROR: return "An error occurred while performing gantry motion.";
+    case LIBMCDRIVER_A3200_ERROR_CUTTERCOMPENSATIONERROR: return "An error occurred while peforming cutter compensation.";
+    case LIBMCDRIVER_A3200_ERROR_CIRCULARMOTIONERROR: return "An error occurred while performing circular motion.";
+    case LIBMCDRIVER_A3200_ERROR_CIRCULARRADIUSERROR: return "A circular radius error occurred.";
+    case LIBMCDRIVER_A3200_ERROR_NORMALCYERROR: return "An error occurred while performing normalcy.";
+    case LIBMCDRIVER_A3200_ERROR_MOTIONTYPEMISMATCH: return "A LINEAR move is required to execute this command.";
+    case LIBMCDRIVER_A3200_ERROR_SPINDLENUMBERNOTASSIGNED: return "The specified spindle is not assigned to an axis.";
+    case LIBMCDRIVER_A3200_ERROR_ELLIPTICALMOTIONERROR: return "An error occurred while performing elliptical motion.";
+    case LIBMCDRIVER_A3200_ERROR_MOTIONACTIVE: return "Motion is already active.";
+    case LIBMCDRIVER_A3200_ERROR_AXISNOTDEPENDENT: return "This feature is only available on dependent axes.";
+    case LIBMCDRIVER_A3200_ERROR_AXISNOTDOMINANT: return "This feature is only available on dominant axes.";
+    case LIBMCDRIVER_A3200_ERROR_NOJOYSTICKGROUPS: return "No joystick groups have been specified.";
+    case LIBMCDRIVER_A3200_ERROR_TRANSFORMATIONERROR: return "An error occurred performing a transformation.";
+    case LIBMCDRIVER_A3200_ERROR_CALIBRATIONTABLEERROR: return "An error occurred with a calibration table.";
+    case LIBMCDRIVER_A3200_ERROR_CAMTABLEERROR: return "An error occurred with a cam table command.";
     default: return "unknown error";
   }
 }
