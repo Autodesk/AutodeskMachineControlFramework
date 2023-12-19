@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_a3200_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
+#include <sstream>
 using namespace LibMCPlugin::Impl;
 
 #include <iostream>
@@ -100,8 +101,31 @@ public:
 		auto pDriver = m_pPluginData->acquireA3200Driver(pStateEnvironment);
 
 		pStateEnvironment->LogMessage("Connecting to A3200 System...");
-		pDriver->Connect(1000);
+		pDriver->Connect();
 
+		std::stringstream sScriptStream;
+		sScriptStream << "DVAR $test1" << std::endl;
+		sScriptStream << "ENABLE Z X Y" << std::endl;
+		sScriptStream << "$test1=1234" << std::endl; 
+
+		pStateEnvironment->LogMessage("Running Aerobasic Script on task 2");
+
+		pDriver->RunScript(2, sScriptStream.str ()); 
+
+		pStateEnvironment->Sleep(10000); 
+
+		auto sTestVariable = pDriver->ReadTaskNumberVariable(2, "test1");
+		pStateEnvironment->LogMessage("Test1 variable value: " + std::to_string (sTestVariable));
+
+		pDriver->WriteTaskNumberVariable(2, "test1", 4567);
+		
+		//pDriver->RunCommand(2, "$test1=$test1+1");
+
+		sTestVariable = pDriver->ReadTaskNumberVariable(2, "test1");
+		pStateEnvironment->LogMessage("New Test1 variable value: " + std::to_string(sTestVariable));
+
+		pStateEnvironment->LogMessage("Stopping Aerobasic program on task 2");
+		pDriver->StopProgram(2, 5000);
 
 		pStateEnvironment->SetNextState("success");
 	}
