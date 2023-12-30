@@ -750,8 +750,8 @@ namespace LibMCData {
   } sJournalChunkVariableInfo;
   
   typedef struct sJournalChunkIntegerEntry {
-      LibMCData_uint32 m_TimeStampInMicroseconds;
-      LibMCData_uint64 m_IntegerValue;
+      LibMCData_uint32 m_RelativeTimeStampInMicroseconds;
+      LibMCData_int64 m_IntegerValue;
   } sJournalChunkIntegerEntry;
   
   #pragma pack ()
