@@ -69,14 +69,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	  
 	   data: () => ({
 		options: {
+		
         chart: {
           id: 'vuechart-example'
         },
+		stroke: {
+			show: true,
+			curve: 'stepline',
+			lineCap: 'butt',
+			colors: ['#546E7A'],
+			width: 1,
+			dashArray: 0, 
+		},
   yaxis: [
     {
       axisTicks: {
         show: true
       },
+	  
       axisBorder: {
         show: true,		
       },
@@ -100,7 +110,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			type: "numeric",
 			  labels: {
 				formatter: function (value) {
-					return (value / 1000.0).toFixed(3) + "s";
+					return value.toFixed(3) + "s";
 				}
 			  }
 		}
