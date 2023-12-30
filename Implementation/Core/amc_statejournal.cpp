@@ -677,7 +677,7 @@ namespace AMC {
 			uint64_t nDeltaTime = nextEntry.m_nTimeStampInMicroSeconds - nCurrentTime;
 
 			dIntegral += dCurrentValue * nDeltaTime;
-			dSquaredIntegral += dCurrentValue * nDeltaTime;
+			dSquaredIntegral += dCurrentValue * dCurrentValue * nDeltaTime;
 
 			nCurrentTime = nextEntry.m_nTimeStampInMicroSeconds;
 			dCurrentValue = nextEntry.m_dValue;

@@ -362,8 +362,8 @@
 	</struct>
 
 	<struct name="JournalChunkIntegerEntry">
-		<member name="TimeStampInMicroseconds" type="uint32" />
-		<member name="IntegerValue" type="uint64" />
+		<member name="RelativeTimeStampInMicroseconds" type="uint32" />
+		<member name="IntegerValue" type="int64" />
 	</struct>
 
 	<enum name="LogLevel">
