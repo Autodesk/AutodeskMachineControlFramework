@@ -408,26 +408,7 @@ export default class AMCApplication extends Common.AMCObject {
         });
     }
 
-    updateContentItemResult(uuid, content) {
-		
-		Assert.UUIDValue (uuid);
-		Assert.ObjectValue (content);
-		Assert.ArrayValue (content.entries);
-		
-        if (uuid) {
-            if (content) {
-                if (content.entries) {
-					
-					if (this.AppContent.ItemMap.has (uuid)) {
-						let item = this.AppContent.ItemMap.get (uuid);
-						item.updateFromJSON (content);
-					}
-
-				}			
-			}
-        }
-    }
-	
+   
 	
     updateContentItem(item) {
 		
