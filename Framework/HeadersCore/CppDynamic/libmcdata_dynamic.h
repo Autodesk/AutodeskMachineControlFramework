@@ -196,6 +196,26 @@ typedef LibMCDataResult (*PLibMCDataLogSession_GetMaxLogEntryIDPtr) (LibMCData_L
 typedef LibMCDataResult (*PLibMCDataLogSession_RetrieveLogEntriesByIDPtr) (LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
 
 /*************************************************************************************************************************
+ Class definition for AlertSession
+**************************************************************************************************************************/
+
+/**
+* adds a new alert entry.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID
+* @param[in] pIdentifier - Alert Identifier
+* @param[in] eLevel - Alert level.
+* @param[in] pDescription - Alert Description in default language
+* @param[in] pDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+* @param[in] pReadableContextInformation - Readable Context Information in default language
+* @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
+* @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlertSession_AddAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, LibMCData::eAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC);
+
+/*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/
 
@@ -1374,6 +1394,15 @@ typedef LibMCDataResult (*PLibMCDataDataModel_CreateNewLogSessionPtr) (LibMCData
 typedef LibMCDataResult (*PLibMCDataDataModel_CreateJournalSessionPtr) (LibMCData_DataModel pDataModel, LibMCData_JournalSession * pJournalSession);
 
 /**
+* creates a global alert session access class.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pAlertSession - AlertSession class instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_CreateAlertSessionPtr) (LibMCData_DataModel pDataModel, LibMCData_AlertSession * pAlertSession);
+
+/**
 * creates a login handler instance.
 *
 * @param[in] pDataModel - DataModel instance.
@@ -1526,6 +1555,7 @@ typedef struct {
 	PLibMCDataLogSession_AddEntryPtr m_LogSession_AddEntry;
 	PLibMCDataLogSession_GetMaxLogEntryIDPtr m_LogSession_GetMaxLogEntryID;
 	PLibMCDataLogSession_RetrieveLogEntriesByIDPtr m_LogSession_RetrieveLogEntriesByID;
+	PLibMCDataAlertSession_AddAlertPtr m_AlertSession_AddAlert;
 	PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr m_JournalSession_WriteJournalChunkIntegerData;
 	PLibMCDataJournalSession_GetChunkCapacityPtr m_JournalSession_GetChunkCapacity;
 	PLibMCDataJournalSession_GetFlushIntervalPtr m_JournalSession_GetFlushInterval;
@@ -1629,6 +1659,7 @@ typedef struct {
 	PLibMCDataDataModel_CreateBuildJobHandlerPtr m_DataModel_CreateBuildJobHandler;
 	PLibMCDataDataModel_CreateNewLogSessionPtr m_DataModel_CreateNewLogSession;
 	PLibMCDataDataModel_CreateJournalSessionPtr m_DataModel_CreateJournalSession;
+	PLibMCDataDataModel_CreateAlertSessionPtr m_DataModel_CreateAlertSession;
 	PLibMCDataDataModel_CreateLoginHandlerPtr m_DataModel_CreateLoginHandler;
 	PLibMCDataDataModel_CreatePersistencyHandlerPtr m_DataModel_CreatePersistencyHandler;
 	PLibMCDataDataModel_SetBaseTempDirectoryPtr m_DataModel_SetBaseTempDirectory;

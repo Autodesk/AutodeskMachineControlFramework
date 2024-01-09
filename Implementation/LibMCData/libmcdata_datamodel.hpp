@@ -94,6 +94,8 @@ public:
 
 	IJournalSession* CreateJournalSession() override;
 
+	IAlertSession* CreateAlertSession() override;
+
 	IBuildJobHandler* CreateBuildJobHandler() override;
 
 	ILoginHandler* CreateLoginHandler() override;

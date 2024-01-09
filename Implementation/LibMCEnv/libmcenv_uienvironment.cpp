@@ -39,6 +39,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_journalhandler.hpp"
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_meshobject.hpp"
+#include "libmcenv_alert.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -613,3 +614,24 @@ void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
     pDataSeriesHandler->unloadDataSeries(sDataSeriesUUID);
 
 }
+
+IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+{
+    return new CAlert();
+}
+
+IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
+{
+    return nullptr;
+}
+
+void CUIEnvironment::AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment)
+{
+
+}
+
+void CUIEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
+{
+
+}
+

@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_journalhandler.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_meshobject.hpp"
+#include "libmcenv_alert.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -630,3 +631,31 @@ void CStateEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 	pDataSeriesHandler->unloadDataSeries(sDataSeriesUUID);
 
 }
+
+
+IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+{
+	/*if (sIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDALERTIDENTIFIER, "invalid alert identifier: " + sIdentifier);
+
+	auto sNewUUID = AMCCommon::CUtils::createUUID();
+	
+
+	auto pAlertSession = m_pSystemState->createAlertSession();
+	//pAlertSession->AddAlert (sNewUUID, sIdentifier, ); */
+
+	return new CAlert();
+}
+
+IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
+{
+	return nullptr;
+}
+
+void CStateEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
+{
+}
+

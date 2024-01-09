@@ -28,44 +28,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amcdata_databasemigrator_journals.hpp"
-#include "libmcdata_interfaceexception.hpp"
-#include "common_utils.hpp"
 
-namespace AMCData {
+#ifndef __AMC_ALERTHANDLER
+#define __AMC_ALERTHANDLER
+
+#include "amc_alertdefinition.hpp"
+#include <mutex>
+#include <map>
+
+namespace AMC {
+
+	class CAlertHandler;
+	typedef std::shared_ptr<CAlertHandler> PAlertHandler;
+
+
+	class CAlertHandler {
+	private:
+	
+		std::mutex m_Mutex;
+		std::map<std::string, PAlertDefinition> m_AlertDefinitions;
 		
-	void CDatabaseMigrationClass_Journals::increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex)
-	{
 
-		if (pTransaction.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+	public:
 
-		switch (nCurrentVersionIndex) {
-		case 6: {
-				std::string sCreateQuery = "CREATE TABLE `journals` (";
-				sCreateQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
-				sCreateQuery += "`starttime`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`updateuuid`  varchar ( 64 ))";
-				pTransaction->executeStatement(sCreateQuery);
+		CAlertHandler ();
+		
+		virtual ~CAlertHandler();
+		
+		PAlertDefinition findDefinition (const std::string & sIdentifier, bool bFailIfNotExisting);
+		
+		bool hasDefinition (const std::string & sIdentifier);
+		
+		void addDefinition (const std::string & sIdentifier, const std::string & sDescription);
 
-				break;
-			}
-			case 7: {
+	};
 
-				std::string sSchemaVersionAddQuery = "ALTER TABLE `journals` ADD `schemaversion` INTEGER DEFAULT 0";
-				pTransaction->executeStatement(sSchemaVersionAddQuery);
-
-				break;
-			}
-		}
-
-	}
-
-
+	
 }
 
+
+#endif //__AMC_ALERTHANDLER
 

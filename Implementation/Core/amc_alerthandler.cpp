@@ -28,42 +28,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amcdata_databasemigrator_journals.hpp"
-#include "libmcdata_interfaceexception.hpp"
+
+#include "amc_alerthandler.hpp"
+
 #include "common_utils.hpp"
+#include "libmc_exceptiontypes.hpp"
 
-namespace AMCData {
-		
-	void CDatabaseMigrationClass_Journals::increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex)
-	{
 
-		if (pTransaction.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-		switch (nCurrentVersionIndex) {
-		case 6: {
-				std::string sCreateQuery = "CREATE TABLE `journals` (";
-				sCreateQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
-				sCreateQuery += "`starttime`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`updateuuid`  varchar ( 64 ))";
-				pTransaction->executeStatement(sCreateQuery);
+namespace AMC {
 
-				break;
-			}
-			case 7: {
-
-				std::string sSchemaVersionAddQuery = "ALTER TABLE `journals` ADD `schemaversion` INTEGER DEFAULT 0";
-				pTransaction->executeStatement(sSchemaVersionAddQuery);
-
-				break;
-			}
-		}
-
-	}
 
 
 }

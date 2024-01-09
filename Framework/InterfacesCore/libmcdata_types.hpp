@@ -375,6 +375,10 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD 348 /** Could not update user password */
 #define LIBMCDATA_ERROR_INVALIDUSERINDEX 349 /** Invalid user index */
 #define LIBMCDATA_ERROR_INVALIDJOURNAL 350 /** Invalid journal */
+#define LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER 351 /** Empty alert identifier */
+#define LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER 352 /** Invalid alert identifier */
+#define LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER 353 /** Invalid alert description identifier */
+#define LIBMCDATA_ERROR_INVALIDALERTLEVEL 354 /** Invalid alert level */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -662,6 +666,10 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
     case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
     case LIBMCDATA_ERROR_INVALIDJOURNAL: return "Invalid journal";
+    case LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
+    case LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
+    case LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER: return "Invalid alert description identifier";
+    case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
     default: return "unknown error";
   }
 }
@@ -674,6 +682,7 @@ typedef LibMCDataHandle LibMCData_Base;
 typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogEntryList;
 typedef LibMCDataHandle LibMCData_LogSession;
+typedef LibMCDataHandle LibMCData_AlertSession;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
@@ -692,6 +701,13 @@ namespace LibMCData {
   /*************************************************************************************************************************
    Declaration of enums
   **************************************************************************************************************************/
+  
+  enum class eAlertLevel : LibMCData_int32 {
+    FatalError = 1,
+    CriticalError = 2,
+    Warning = 3,
+    Message = 4
+  };
   
   enum class eLogLevel : LibMCData_int32 {
     FatalError = 1,
@@ -750,8 +766,8 @@ namespace LibMCData {
   } sJournalChunkVariableInfo;
   
   typedef struct sJournalChunkIntegerEntry {
-      LibMCData_uint32 m_TimeStampInMicroseconds;
-      LibMCData_uint64 m_IntegerValue;
+      LibMCData_uint32 m_RelativeTimeStampInMicroseconds;
+      LibMCData_int64 m_IntegerValue;
   } sJournalChunkIntegerEntry;
   
   #pragma pack ()
@@ -793,6 +809,7 @@ namespace LibMCData {
 } // namespace LibMCData;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCData::eAlertLevel eLibMCDataAlertLevel;
 typedef LibMCData::eLogLevel eLibMCDataLogLevel;
 typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;

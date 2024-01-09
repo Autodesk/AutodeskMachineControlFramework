@@ -63,6 +63,7 @@ class CBase;
 class CIterator;
 class CLogEntryList;
 class CLogSession;
+class CAlertSession;
 class CJournalSession;
 class CStorageStream;
 class CStorage;
@@ -84,6 +85,7 @@ typedef CBase CLibMCDataBase;
 typedef CIterator CLibMCDataIterator;
 typedef CLogEntryList CLibMCDataLogEntryList;
 typedef CLogSession CLibMCDataLogSession;
+typedef CAlertSession CLibMCDataAlertSession;
 typedef CJournalSession CLibMCDataJournalSession;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorage CLibMCDataStorage;
@@ -105,6 +107,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CLogSession> PLogSession;
+typedef std::shared_ptr<CAlertSession> PAlertSession;
 typedef std::shared_ptr<CJournalSession> PJournalSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorage> PStorage;
@@ -126,6 +129,7 @@ typedef PBase PLibMCDataBase;
 typedef PIterator PLibMCDataIterator;
 typedef PLogEntryList PLibMCDataLogEntryList;
 typedef PLogSession PLibMCDataLogSession;
+typedef PAlertSession PLibMCDataAlertSession;
 typedef PJournalSession PLibMCDataJournalSession;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorage PLibMCDataStorage;
@@ -496,6 +500,10 @@ public:
 			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "COULDNOTUPDATEUSERPASSWORD";
 			case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "INVALIDUSERINDEX";
 			case LIBMCDATA_ERROR_INVALIDJOURNAL: return "INVALIDJOURNAL";
+			case LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER: return "EMPTYALERTIDENTIFIER";
+			case LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER: return "INVALIDALERTIDENTIFIER";
+			case LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER: return "INVALIDALERTDESCRIPTIONIDENTIFIER";
+			case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "INVALIDALERTLEVEL";
 		}
 		return "UNKNOWN";
 	}
@@ -783,6 +791,10 @@ public:
 			case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
 			case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
 			case LIBMCDATA_ERROR_INVALIDJOURNAL: return "Invalid journal";
+			case LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
+			case LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
+			case LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER: return "Invalid alert description identifier";
+			case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
 		}
 		return "unknown error";
 	}
@@ -904,6 +916,7 @@ private:
 	friend class CIterator;
 	friend class CLogEntryList;
 	friend class CLogSession;
+	friend class CAlertSession;
 	friend class CJournalSession;
 	friend class CStorageStream;
 	friend class CStorage;
@@ -1034,6 +1047,23 @@ public:
 	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestampUTC);
 	inline LibMCData_uint32 GetMaxLogEntryID();
 	inline PLogEntryList RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const eLogLevel eMinLogLevel);
+};
+	
+/*************************************************************************************************************************
+ Class CAlertSession 
+**************************************************************************************************************************/
+class CAlertSession : public CBase {
+public:
+	
+	/**
+	* CAlertSession::CAlertSession - Constructor for AlertSession class.
+	*/
+	CAlertSession(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC);
 };
 	
 /*************************************************************************************************************************
@@ -1329,6 +1359,7 @@ public:
 	inline PBuildJobHandler CreateBuildJobHandler();
 	inline PLogSession CreateNewLogSession();
 	inline PJournalSession CreateJournalSession();
+	inline PAlertSession CreateAlertSession();
 	inline PLoginHandler CreateLoginHandler();
 	inline PPersistencyHandler CreatePersistencyHandler();
 	inline void SetBaseTempDirectory(const std::string & sTempDirectory);
@@ -1447,6 +1478,7 @@ public:
 		pWrapperTable->m_LogSession_AddEntry = nullptr;
 		pWrapperTable->m_LogSession_GetMaxLogEntryID = nullptr;
 		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = nullptr;
+		pWrapperTable->m_AlertSession_AddAlert = nullptr;
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkCapacity = nullptr;
 		pWrapperTable->m_JournalSession_GetFlushInterval = nullptr;
@@ -1550,6 +1582,7 @@ public:
 		pWrapperTable->m_DataModel_CreateBuildJobHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
 		pWrapperTable->m_DataModel_CreateJournalSession = nullptr;
+		pWrapperTable->m_DataModel_CreateAlertSession = nullptr;
 		pWrapperTable->m_DataModel_CreateLoginHandler = nullptr;
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
 		pWrapperTable->m_DataModel_SetBaseTempDirectory = nullptr;
@@ -1720,6 +1753,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertSession_AddAlert = (PLibMCDataAlertSession_AddAlertPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_addalert");
+		#else // _WIN32
+		pWrapperTable->m_AlertSession_AddAlert = (PLibMCDataAlertSession_AddAlertPtr) dlsym(hLibrary, "libmcdata_alertsession_addalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertSession_AddAlert == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2650,6 +2692,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataModel_CreateAlertSession = (PLibMCDataDataModel_CreateAlertSessionPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createalertsession");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_CreateAlertSession = (PLibMCDataDataModel_CreateAlertSessionPtr) dlsym(hLibrary, "libmcdata_datamodel_createalertsession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_CreateAlertSession == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataModel_CreateLoginHandler = (PLibMCDataDataModel_CreateLoginHandlerPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createloginhandler");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_CreateLoginHandler = (PLibMCDataDataModel_CreateLoginHandlerPtr) dlsym(hLibrary, "libmcdata_datamodel_createloginhandler");
@@ -2837,6 +2888,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_logsession_retrievelogentriesbyid", (void**)&(pWrapperTable->m_LogSession_RetrieveLogEntriesByID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alertsession_addalert", (void**)&(pWrapperTable->m_AlertSession_AddAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_AddAlert == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkintegerdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData));
@@ -3251,6 +3306,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateJournalSession == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_datamodel_createalertsession", (void**)&(pWrapperTable->m_DataModel_CreateAlertSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateAlertSession == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createloginhandler", (void**)&(pWrapperTable->m_DataModel_CreateLoginHandler));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateLoginHandler == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3512,6 +3571,26 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CLogEntryList>(m_pWrapper, hLogEntryList);
+	}
+	
+	/**
+	 * Method definitions for class CAlertSession
+	 */
+	
+	/**
+	* CAlertSession::AddAlert - adds a new alert entry.
+	* @param[in] sUUID - Alert UUID
+	* @param[in] sIdentifier - Alert Identifier
+	* @param[in] eLevel - Alert level.
+	* @param[in] sDescription - Alert Description in default language
+	* @param[in] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+	* @param[in] sReadableContextInformation - Readable Context Information in default language
+	* @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	void CAlertSession::AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AddAlert(m_pHandle, sUUID.c_str(), sIdentifier.c_str(), eLevel, sDescription.c_str(), sDescriptionIdentifier.c_str(), sReadableContextInformation.c_str(), bNeedsAcknowledgement, sTimestampUTC.c_str()));
 	}
 	
 	/**
@@ -5016,6 +5095,21 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CJournalSession>(m_pWrapper, hJournalSession);
+	}
+	
+	/**
+	* CDataModel::CreateAlertSession - creates a global alert session access class.
+	* @return AlertSession class instance.
+	*/
+	PAlertSession CDataModel::CreateAlertSession()
+	{
+		LibMCDataHandle hAlertSession = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_CreateAlertSession(m_pHandle, &hAlertSession));
+		
+		if (!hAlertSession) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlertSession>(m_pWrapper, hAlertSession);
 	}
 	
 	/**

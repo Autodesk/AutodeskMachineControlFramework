@@ -28,44 +28,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amcdata_databasemigrator_journals.hpp"
-#include "libmcdata_interfaceexception.hpp"
-#include "common_utils.hpp"
 
-namespace AMCData {
+#ifndef __AMC_ALERTDEFINITION
+#define __AMC_ALERTDEFINITION
+
+#include <string>
+#include <memory>
+
+#include "libmcdata_dynamic.hpp"
+#include "amc_languagestring.hpp"
+
+namespace AMC {
+
+	class CAlertDefinition;
+	typedef std::shared_ptr<CAlertDefinition> PAlertDefinition;
+
+
+	class CAlertDefinition {
+	private:
+	
+		std::string m_sIdentifier;
+		LibMCData::eAlertLevel m_nAlertLevel;
+		std::string m_sDescription;
 		
-	void CDatabaseMigrationClass_Journals::increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex)
-	{
+		bool m_bNeedAcknowledgement;
+		std::string m_sAckPermission;
+		
+		
+	public:
 
-		if (pTransaction.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+		CAlertDefinition (const std::string & sIdentifier, LibMCData::eAlertLevel alertLevel);
+		
+		virtual ~CAlertDefinition();
 
-		switch (nCurrentVersionIndex) {
-		case 6: {
-				std::string sCreateQuery = "CREATE TABLE `journals` (";
-				sCreateQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
-				sCreateQuery += "`starttime`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`updateuuid`  varchar ( 64 ))";
-				pTransaction->executeStatement(sCreateQuery);
+		std::string getIdentifier ();
 
-				break;
-			}
-			case 7: {
+		uint32_t getAlertLevel ();
 
-				std::string sSchemaVersionAddQuery = "ALTER TABLE `journals` ADD `schemaversion` INTEGER DEFAULT 0";
-				pTransaction->executeStatement(sSchemaVersionAddQuery);
-
-				break;
-			}
-		}
-
-	}
+		std::string getDescription();
+		
+		bool needsAcknowledgement ();
+		std::string getAckPermission ();
 
 
+	};
+
+	
 }
 
+
+#endif //__AMC_ALERTDEFINITION
 

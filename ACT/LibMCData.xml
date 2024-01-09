@@ -348,6 +348,13 @@
 		<error name="INVALIDUSERINDEX" code="349" description="Invalid user index" />		
 		<error name="INVALIDJOURNAL" code="350" description="Invalid journal" />
 		
+		<error name="EMPTYALERTIDENTIFIER" code="351" description="Empty alert identifier" />
+		<error name="INVALIDALERTIDENTIFIER" code="352" description="Invalid alert identifier" />
+		<error name="INVALIDALERTDESCRIPTIONIDENTIFIER" code="353" description="Invalid alert description identifier" />
+		<error name="INVALIDALERTLEVEL" code="354" description="Invalid alert level" />
+		
+		
+		
 		
 		
 										
@@ -365,6 +372,13 @@
 		<member name="RelativeTimeStampInMicroseconds" type="uint32" />
 		<member name="IntegerValue" type="int64" />
 	</struct>
+
+	<enum name="AlertLevel">
+		<option name="FatalError" value="1"/>
+		<option name="CriticalError" value="2"/>
+		<option name="Warning" value="3"/>
+		<option name="Message" value="4"/>
+	</enum>	
 
 	<enum name="LogLevel">
 		<option name="FatalError" value="1"/>
@@ -505,7 +519,24 @@
 			<param name="LogEntryList" type="class" class="LogEntryList" pass="return" description="Log Entry List." />
 		</method>	
 				
+		
 	</class>
+
+	<class name="AlertSession" parent="Base" description="Alert Session Instance">
+	
+		<method name="AddAlert" description="adds a new alert entry.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID" />	
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier" />	
+			<param name="Level" type="enum" class="AlertLevel" pass="in" description="Alert level." />
+			<param name="Description" type="string" pass="in" description="Alert Description in default language" />	
+			<param name="DescriptionIdentifier" type="string" pass="in" description="Alert Description Identifier for internationalization. May be empty." />	
+			<param name="ReadableContextInformation" type="string" pass="in" description="Readable Context Information in default language" />	
+			<param name="NeedsAcknowledgement" type="bool" pass="in" description="Flag if acknowledgement is needed" />	
+			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
+		</method>	
+		
+	</class>
+
 
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
 
@@ -524,9 +555,7 @@
 		<method name="GetFlushInterval" description="Returns the flush interval of the session journal.">
 			<param name="FlushInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk. In Seconds." />	
 		</method>
-		
-		
-
+				
 	</class>
 
 	<class name="StorageStream" parent="Base" description="Storage Stream Instance">
@@ -1074,6 +1103,10 @@
 		
 		<method name="CreateJournalSession" description="creates a global journal session access class.">
 			<param name="JournalSession" type="class" class="JournalSession" pass="return" description="JournalSession class instance." />	
+		</method>
+
+		<method name="CreateAlertSession" description="creates a global alert session access class.">
+			<param name="AlertSession" type="class" class="AlertSession" pass="return" description="AlertSession class instance." />	
 		</method>
 
 		<method name="CreateLoginHandler" description="creates a login handler instance.">

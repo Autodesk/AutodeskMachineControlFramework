@@ -413,6 +413,8 @@ typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;
+typedef LibMCEnvHandle LibMCEnv_Alert;
+typedef LibMCEnvHandle LibMCEnv_AlertIterator;
 typedef LibMCEnvHandle LibMCEnv_JournalHandler;
 typedef LibMCEnvHandle LibMCEnv_UserDetailList;
 typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
@@ -425,6 +427,13 @@ namespace LibMCEnv {
   /*************************************************************************************************************************
    Declaration of enums
   **************************************************************************************************************************/
+  
+  enum class eAlertLevel : LibMCEnv_int32 {
+    FatalError = 1,
+    CriticalError = 2,
+    Warning = 3,
+    Message = 4
+  };
   
   enum class eImagePixelFormat : LibMCEnv_int32 {
     Unknown = 0,
@@ -538,6 +547,7 @@ namespace LibMCEnv {
 } // namespace LibMCEnv;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;

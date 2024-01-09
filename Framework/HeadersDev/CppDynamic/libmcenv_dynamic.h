@@ -3045,10 +3045,10 @@ typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_LogWarningPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_LogInfoPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString);
 
 /**
-* Sleeps for a definite amount of time.
+* Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
 *
 * @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
-* @param[in] nDelay - Milliseconds to sleep.
+* @param[in] nDelay - Milliseconds to sleeps
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_SleepPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay);
@@ -3903,6 +3903,111 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPt
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) (LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer);
+
+/*************************************************************************************************************************
+ Class definition for Alert
+**************************************************************************************************************************/
+
+/**
+* Returns Alert UUID.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns the alert uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_GetUUIDPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns Alert Level.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pLevel - Returns the alert level.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_GetAlertLevelPtr) (LibMCEnv_Alert pAlert, LibMCEnv::eAlertLevel * pLevel);
+
+/**
+* Returns Alert Identifier.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Returns the alert identifier., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_GetIdentifierPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns Alert Description in the current language.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Returns the alert description., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_GetDescriptionPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Returns Alert Custom Information.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nReadableContextInformationBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReadableContextInformationNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReadableContextInformationBuffer -  buffer of Returns context information for the alert., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_GetReadableContextInformationPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nReadableContextInformationBufferSize, LibMCEnv_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer);
+
+/**
+* Returns if the alert needs acknowledgement.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pValue - Flag if alert needs acknowledgement.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_NeedsAcknowledgementPtr) (LibMCEnv_Alert pAlert, bool * pValue);
+
+/**
+* Returns if the alert is acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pValue - Flag if alert is acknowledged.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_IsAcknowledgedPtr) (LibMCEnv_Alert pAlert, bool * pValue);
+
+/**
+* Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of User who acknowledged the alert., may be NULL
+* @param[in] nUserCommentBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserCommentNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserCommentBuffer -  buffer of Comment of the acknowledgement., may be NULL
+* @param[in] nAckTimeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pAckTimeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pAckTimeBuffer -  buffer of Timestamp in ISO8601 UTC format., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementInformationPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCEnv_uint32 nUserCommentBufferSize, LibMCEnv_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCEnv_uint32 nAckTimeBufferSize, LibMCEnv_uint32* pAckTimeNeededChars, char * pAckTimeBuffer);
+
+/*************************************************************************************************************************
+ Class definition for AlertIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the alert the iterator points at.
+*
+* @param[in] pAlertIterator - AlertIterator instance.
+* @param[out] pAlertInstance - returns the Alert instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlertIterator_GetCurrentAlertPtr) (LibMCEnv_AlertIterator pAlertIterator, LibMCEnv_Alert * pAlertInstance);
 
 /*************************************************************************************************************************
  Class definition for JournalHandler
@@ -4882,6 +4987,38 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindDataSeriesPtr) (LibMCEnv_
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pDataSeriesUUID);
 
+/**
+* creates a new alert
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pIdentifier - Alert type identifier. Call fails if identifier is not registered.
+* @param[in] pReadableContextInformation - Context information string that can be displayed to the user.
+* @param[out] pAlert - Alert instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateAlertPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
+
+/**
+* finds an alert by UUID. Returns null if alert does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUUID - UUID of the alert to return.
+* @param[out] pAlert - Alert instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindAlertPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, LibMCEnv_Alert * pAlert);
+
+/**
+* Acknowledges an alert for a specific user. 
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+* @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+* @param[in] pUserComment - User comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pAlertUUID, const char * pUserUUID, const char * pUserComment);
+
 /*************************************************************************************************************************
  Class definition for UIItem
 **************************************************************************************************************************/
@@ -5556,6 +5693,48 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindDataSeriesPtr) (LibMCEnv_UIE
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ReleaseDataSeriesPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDataSeriesUUID);
 
+/**
+* creates a new alert
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pIdentifier - Alert type identifier. Call fails if identifier is not registered.
+* @param[in] pReadableContextInformation - Context information string that can be displayed to the user.
+* @param[out] pAlert - Alert instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
+
+/**
+* finds an alert by UUID. Returns null if alert does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pUUID - UUID of the alert to return.
+* @param[out] pAlert - Alert instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, LibMCEnv_Alert * pAlert);
+
+/**
+* Acknowledges an alert for the current user. 
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+* @param[in] pUserComment - User comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AcknowledgeAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pAlertUUID, const char * pUserComment);
+
+/**
+* Acknowledges an alert for a specific user. 
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+* @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+* @param[in] pUserComment - User comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AcknowledgeAlertForUserPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pAlertUUID, const char * pUserUUID, const char * pUserComment);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -5968,6 +6147,15 @@ typedef struct {
 	PLibMCEnvJournalVariable_ComputeAveragePtr m_JournalVariable_ComputeAverage;
 	PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr m_JournalVariable_ComputeUniformAverageSamples;
 	PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr m_JournalVariable_ReceiveRawTimeStream;
+	PLibMCEnvAlert_GetUUIDPtr m_Alert_GetUUID;
+	PLibMCEnvAlert_GetAlertLevelPtr m_Alert_GetAlertLevel;
+	PLibMCEnvAlert_GetIdentifierPtr m_Alert_GetIdentifier;
+	PLibMCEnvAlert_GetDescriptionPtr m_Alert_GetDescription;
+	PLibMCEnvAlert_GetReadableContextInformationPtr m_Alert_GetReadableContextInformation;
+	PLibMCEnvAlert_NeedsAcknowledgementPtr m_Alert_NeedsAcknowledgement;
+	PLibMCEnvAlert_IsAcknowledgedPtr m_Alert_IsAcknowledged;
+	PLibMCEnvAlert_GetAcknowledgementInformationPtr m_Alert_GetAcknowledgementInformation;
+	PLibMCEnvAlertIterator_GetCurrentAlertPtr m_AlertIterator_GetCurrentAlert;
 	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
 	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
 	PLibMCEnvJournalHandler_StoreJournalMarkerPtr m_JournalHandler_StoreJournalMarker;
@@ -6053,6 +6241,9 @@ typedef struct {
 	PLibMCEnvStateEnvironment_HasDataSeriesPtr m_StateEnvironment_HasDataSeries;
 	PLibMCEnvStateEnvironment_FindDataSeriesPtr m_StateEnvironment_FindDataSeries;
 	PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr m_StateEnvironment_ReleaseDataSeries;
+	PLibMCEnvStateEnvironment_CreateAlertPtr m_StateEnvironment_CreateAlert;
+	PLibMCEnvStateEnvironment_FindAlertPtr m_StateEnvironment_FindAlert;
+	PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr m_StateEnvironment_AcknowledgeAlertForUser;
 	PLibMCEnvUIItem_GetNamePtr m_UIItem_GetName;
 	PLibMCEnvUIItem_GetPathPtr m_UIItem_GetPath;
 	PLibMCEnvUIItem_GetUUIDPtr m_UIItem_GetUUID;
@@ -6114,6 +6305,10 @@ typedef struct {
 	PLibMCEnvUIEnvironment_HasDataSeriesPtr m_UIEnvironment_HasDataSeries;
 	PLibMCEnvUIEnvironment_FindDataSeriesPtr m_UIEnvironment_FindDataSeries;
 	PLibMCEnvUIEnvironment_ReleaseDataSeriesPtr m_UIEnvironment_ReleaseDataSeries;
+	PLibMCEnvUIEnvironment_CreateAlertPtr m_UIEnvironment_CreateAlert;
+	PLibMCEnvUIEnvironment_FindAlertPtr m_UIEnvironment_FindAlert;
+	PLibMCEnvUIEnvironment_AcknowledgeAlertPtr m_UIEnvironment_AcknowledgeAlert;
+	PLibMCEnvUIEnvironment_AcknowledgeAlertForUserPtr m_UIEnvironment_AcknowledgeAlertForUser;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;
