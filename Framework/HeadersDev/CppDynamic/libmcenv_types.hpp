@@ -230,6 +230,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDUSERINDEX 10133 /** Invalid user index */
 #define LIBMCENV_ERROR_DATASERIESTIMESTAMPSNOTINCREMENTING 10134 /** Data series time stamps not incrementing */
 #define LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES 10135 /** Invalid number of samples */
+#define LIBMCENV_ERROR_EMPTYALERTIDENTIFIER 10136 /** Empty alert identifier */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -372,6 +373,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDUSERINDEX: return "Invalid user index";
     case LIBMCENV_ERROR_DATASERIESTIMESTAMPSNOTINCREMENTING: return "Data series time stamps not incrementing";
     case LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES: return "Invalid number of samples";
+    case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
     default: return "unknown error";
   }
 }
