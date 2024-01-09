@@ -246,8 +246,14 @@ namespace AMC {
 	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
 	{
 		return m_pGlobalChrono;
-
 	}
+
+	LibMCData::PAlertSession CSystemState::createAlertSession()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_DataModelMutex);
+		return m_pDataModel->CreateAlertSession();
+	}
+
 
 	LibMCData::CStorage * CSystemState::storage()
 	{

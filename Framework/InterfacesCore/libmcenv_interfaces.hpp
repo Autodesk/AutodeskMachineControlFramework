@@ -87,6 +87,8 @@ class ISignalTrigger;
 class ISignalHandler;
 class IUniformJournalSampling;
 class IJournalVariable;
+class IAlert;
+class IAlertIterator;
 class IJournalHandler;
 class IUserDetailList;
 class IUserManagementHandler;
@@ -2577,8 +2579,8 @@ public:
 	virtual void LogInfo(const std::string & sLogString) = 0;
 
 	/**
-	* IDriverStatusUpdateSession::Sleep - Sleeps for a definite amount of time.
-	* @param[in] nDelay - Milliseconds to sleep.
+	* IDriverStatusUpdateSession::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
 	*/
 	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
 
@@ -3210,6 +3212,84 @@ public:
 };
 
 typedef IBaseSharedPtr<IJournalVariable> PIJournalVariable;
+
+
+/*************************************************************************************************************************
+ Class interface for Alert 
+**************************************************************************************************************************/
+
+class IAlert : public virtual IBase {
+public:
+	/**
+	* IAlert::GetUUID - Returns Alert UUID.
+	* @return Returns the alert uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IAlert::GetAlertLevel - Returns Alert Level.
+	* @return Returns the alert level.
+	*/
+	virtual LibMCEnv::eAlertLevel GetAlertLevel() = 0;
+
+	/**
+	* IAlert::GetIdentifier - Returns Alert Identifier.
+	* @return Returns the alert identifier.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IAlert::GetDescription - Returns Alert Description in the current language.
+	* @return Returns the alert description.
+	*/
+	virtual std::string GetDescription() = 0;
+
+	/**
+	* IAlert::GetReadableContextInformation - Returns Alert Custom Information.
+	* @return Returns context information for the alert.
+	*/
+	virtual std::string GetReadableContextInformation() = 0;
+
+	/**
+	* IAlert::NeedsAcknowledgement - Returns if the alert needs acknowledgement.
+	* @return Flag if alert needs acknowledgement.
+	*/
+	virtual bool NeedsAcknowledgement() = 0;
+
+	/**
+	* IAlert::IsAcknowledged - Returns if the alert is acknowledged.
+	* @return Flag if alert is acknowledged.
+	*/
+	virtual bool IsAcknowledged() = 0;
+
+	/**
+	* IAlert::GetAcknowledgementInformation - Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+	* @param[out] sUserUUID - User who acknowledged the alert.
+	* @param[out] sUserComment - Comment of the acknowledgement.
+	* @param[out] sAckTime - Timestamp in ISO8601 UTC format.
+	*/
+	virtual void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlert> PIAlert;
+
+
+/*************************************************************************************************************************
+ Class interface for AlertIterator 
+**************************************************************************************************************************/
+
+class IAlertIterator : public virtual IIterator {
+public:
+	/**
+	* IAlertIterator::GetCurrentAlert - Returns the alert the iterator points at.
+	* @return returns the Alert instance.
+	*/
+	virtual IAlert * GetCurrentAlert() = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlertIterator> PIAlertIterator;
 
 
 /*************************************************************************************************************************
@@ -3894,6 +3974,29 @@ public:
 	*/
 	virtual void ReleaseDataSeries(const std::string & sDataSeriesUUID) = 0;
 
+	/**
+	* IStateEnvironment::CreateAlert - creates a new alert
+	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
+	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @return Alert instance.
+	*/
+	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
+
+	/**
+	* IStateEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return Alert instance.
+	*/
+	virtual IAlert * FindAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IStateEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
@@ -4364,6 +4467,36 @@ public:
 	* @param[in] sDataSeriesUUID - UUID to release.
 	*/
 	virtual void ReleaseDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IUIEnvironment::CreateAlert - creates a new alert
+	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
+	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @return Alert instance.
+	*/
+	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
+
+	/**
+	* IUIEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return Alert instance.
+	*/
+	virtual IAlert * FindAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IUIEnvironment::AcknowledgeAlert - Acknowledges an alert for the current user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeAlert(const std::string & sAlertUUID, const std::string & sUserComment) = 0;
+
+	/**
+	* IUIEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
 
 };
 

@@ -175,6 +175,12 @@ public:
 
 	void ReleaseDataSeries(const std::string& sDataSeriesUUID) override;
 
+	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation) override;
+
+	IAlert* FindAlert(const std::string& sUUID) override;
+
+	void AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
+
 };
 
 } // namespace Impl

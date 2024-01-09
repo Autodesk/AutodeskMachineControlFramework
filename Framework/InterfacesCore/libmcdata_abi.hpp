@@ -209,6 +209,26 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_getmaxlogentryid(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
 
 /*************************************************************************************************************************
+ Class definition for AlertSession
+**************************************************************************************************************************/
+
+/**
+* adds a new alert entry.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID
+* @param[in] pIdentifier - Alert Identifier
+* @param[in] eLevel - Alert level.
+* @param[in] pDescription - Alert Description in default language
+* @param[in] pDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+* @param[in] pReadableContextInformation - Readable Context Information in default language
+* @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
+* @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_addalert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, LibMCData::eAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC);
+
+/*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/
 
@@ -1385,6 +1405,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createnewlogsession(LibMC
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createjournalsession(LibMCData_DataModel pDataModel, LibMCData_JournalSession * pJournalSession);
+
+/**
+* creates a global alert session access class.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pAlertSession - AlertSession class instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createalertsession(LibMCData_DataModel pDataModel, LibMCData_AlertSession * pAlertSession);
 
 /**
 * creates a login handler instance.

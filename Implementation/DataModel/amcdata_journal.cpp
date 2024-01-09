@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCData {
 		
 	CJournal::CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath)
-		: m_LogID(1)
+		: m_LogID(1), m_AlertID (1)
 	{
 
 		m_pJournalStream = std::make_shared<AMCCommon::CExportStream_Native>(sJournalDataPath);
@@ -62,6 +62,18 @@ namespace AMCData {
 		sJournalQuery += "`dataoffset` int DEFAULT 0, ";
 		sJournalQuery += "`datalength` int DEFAULT 0) ";
 
+
+		std::string sAlertQuery = "CREATE TABLE `alerts` (";
+		sAlertQuery += "`uuid`  varchar ( 64 ) NOT NULL, ";
+		sAlertQuery += "`identifier`  varchar ( 64 ) NOT NULL, ";
+		sAlertQuery += "`alertindex`	int DEFAULT 0, ";
+		sAlertQuery += "`alertlevel`	int DEFAULT 0,";
+		sAlertQuery += "`description`	TEXT DEFAULT ``,";
+		sAlertQuery += "`descriptionidentifier`  varchar ( 64 ) NOT NULL, ";
+		sAlertQuery += "`contextinformation`	TEXT DEFAULT ``,";
+		sAlertQuery += "`needsacknowledgement`	int DEFAULT 0,";
+		sAlertQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+
 		auto pJournalStatement = m_pSQLHandler->prepareStatement(sJournalQuery);
 		pJournalStatement->execute();
 		pJournalStatement = nullptr;
@@ -71,6 +83,12 @@ namespace AMCData {
 	{
 
 	}
+
+	uint32_t CJournal::getSchemaVersion()
+	{
+		return 1;
+	}
+
 
 	void CJournal::AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp)
 	{
@@ -99,7 +117,58 @@ namespace AMCData {
 		return m_pSQLHandler;
 	}
 
-	
+	void CJournal::addAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC)
+	{
+		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+		if (sIdentifier.empty())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER, "invalid alert identifier: " + sIdentifier);
+
+		if (!sDescriptionIdentifier.empty()) {
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sDescriptionIdentifier))
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER, "invalid alert description identifier: " + sDescriptionIdentifier);
+		}
+
+		switch (eLevel) {
+			case LibMCData::eAlertLevel::Warning:
+				break;
+
+			case LibMCData::eAlertLevel::Message:
+				break;
+
+			case LibMCData::eAlertLevel::FatalError:
+				break;
+
+			case LibMCData::eAlertLevel::CriticalError:
+				break;
+
+			default:
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTLEVEL, "invalid alert level: " + std::to_string ((int) eLevel));
+				
+		}
+
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "INSERT INTO alert (uuid, identifier, alertindex, alertlevel, description, descriptionidentifier, contextinformation, needsacknowledgement, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, sNormalizedUUID);
+		pStatement->setString(2, sIdentifier);
+		pStatement->setInt(3, m_AlertID);
+		pStatement->setInt(4, (int)eLevel);
+		pStatement->setString(5, sDescription);
+		pStatement->setString(6, sDescriptionIdentifier);
+		pStatement->setString(7, sReadableContextInformation);
+		pStatement->setInt(8, bNeedsAcknowledgement);
+		pStatement->setString(9, sTimestampUTC);
+		pStatement->execute();
+		pStatement = nullptr;
+
+		m_AlertID++;
+	}
+
 
 	void CJournal::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer)
 	{

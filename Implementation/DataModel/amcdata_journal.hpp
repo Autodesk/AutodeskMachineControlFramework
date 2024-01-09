@@ -52,6 +52,7 @@ namespace AMCData {
 		std::mutex m_LogMutex;
 		std::mutex m_JournalMutex;
 		std::atomic<uint32_t> m_LogID;
+		std::atomic<uint32_t> m_AlertID;		
 
 		AMCCommon::PExportStream_Native m_pJournalStream;
 		
@@ -61,6 +62,8 @@ namespace AMCData {
 
 		virtual ~CJournal();
 
+		uint32_t getSchemaVersion();
+
 		void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp);
 
 		LibMCData_uint32 GetMaxLogEntryID();
@@ -68,6 +71,8 @@ namespace AMCData {
 		void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer);
 
 		AMCData::PSQLHandler getSQLHandler();
+
+		void addAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC);
 
 	};
 

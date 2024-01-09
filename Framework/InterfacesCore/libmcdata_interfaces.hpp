@@ -58,6 +58,7 @@ class IBase;
 class IIterator;
 class ILogEntryList;
 class ILogSession;
+class IAlertSession;
 class IJournalSession;
 class IStorageStream;
 class IStorage;
@@ -413,6 +414,30 @@ public:
 };
 
 typedef IBaseSharedPtr<ILogSession> PILogSession;
+
+
+/*************************************************************************************************************************
+ Class interface for AlertSession 
+**************************************************************************************************************************/
+
+class IAlertSession : public virtual IBase {
+public:
+	/**
+	* IAlertSession::AddAlert - adds a new alert entry.
+	* @param[in] sUUID - Alert UUID
+	* @param[in] sIdentifier - Alert Identifier
+	* @param[in] eLevel - Alert level.
+	* @param[in] sDescription - Alert Description in default language
+	* @param[in] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+	* @param[in] sReadableContextInformation - Readable Context Information in default language
+	* @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	virtual void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC) = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlertSession> PIAlertSession;
 
 
 /*************************************************************************************************************************
@@ -1266,6 +1291,12 @@ public:
 	* @return JournalSession class instance.
 	*/
 	virtual IJournalSession * CreateJournalSession() = 0;
+
+	/**
+	* IDataModel::CreateAlertSession - creates a global alert session access class.
+	* @return AlertSession class instance.
+	*/
+	virtual IAlertSession * CreateAlertSession() = 0;
 
 	/**
 	* IDataModel::CreateLoginHandler - creates a login handler instance.

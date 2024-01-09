@@ -92,6 +92,8 @@ class CSignalTrigger;
 class CSignalHandler;
 class CUniformJournalSampling;
 class CJournalVariable;
+class CAlert;
+class CAlertIterator;
 class CJournalHandler;
 class CUserDetailList;
 class CUserManagementHandler;
@@ -136,6 +138,8 @@ typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
 typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
 typedef CJournalVariable CLibMCEnvJournalVariable;
+typedef CAlert CLibMCEnvAlert;
+typedef CAlertIterator CLibMCEnvAlertIterator;
 typedef CJournalHandler CLibMCEnvJournalHandler;
 typedef CUserDetailList CLibMCEnvUserDetailList;
 typedef CUserManagementHandler CLibMCEnvUserManagementHandler;
@@ -180,6 +184,8 @@ typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
 typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
 typedef std::shared_ptr<CJournalVariable> PJournalVariable;
+typedef std::shared_ptr<CAlert> PAlert;
+typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CJournalHandler> PJournalHandler;
 typedef std::shared_ptr<CUserDetailList> PUserDetailList;
 typedef std::shared_ptr<CUserManagementHandler> PUserManagementHandler;
@@ -224,6 +230,8 @@ typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
 typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
 typedef PJournalVariable PLibMCEnvJournalVariable;
+typedef PAlert PLibMCEnvAlert;
+typedef PAlertIterator PLibMCEnvAlertIterator;
 typedef PJournalHandler PLibMCEnvJournalHandler;
 typedef PUserDetailList PLibMCEnvUserDetailList;
 typedef PUserManagementHandler PLibMCEnvUserManagementHandler;
@@ -734,6 +742,8 @@ private:
 	friend class CSignalHandler;
 	friend class CUniformJournalSampling;
 	friend class CJournalVariable;
+	friend class CAlert;
+	friend class CAlertIterator;
 	friend class CJournalHandler;
 	friend class CUserDetailList;
 	friend class CUserManagementHandler;
@@ -1669,6 +1679,47 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CAlert 
+**************************************************************************************************************************/
+class CAlert : public CBase {
+public:
+	
+	/**
+	* CAlert::CAlert - Constructor for Alert class.
+	*/
+	CAlert(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline eAlertLevel GetAlertLevel();
+	inline std::string GetIdentifier();
+	inline std::string GetDescription();
+	inline std::string GetReadableContextInformation();
+	inline bool NeedsAcknowledgement();
+	inline bool IsAcknowledged();
+	inline void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime);
+};
+	
+/*************************************************************************************************************************
+ Class CAlertIterator 
+**************************************************************************************************************************/
+class CAlertIterator : public CIterator {
+public:
+	
+	/**
+	* CAlertIterator::CAlertIterator - Constructor for AlertIterator class.
+	*/
+	CAlertIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PAlert GetCurrentAlert();
+};
+	
+/*************************************************************************************************************************
  Class CJournalHandler 
 **************************************************************************************************************************/
 class CJournalHandler : public CBase {
@@ -1815,6 +1866,9 @@ public:
 	inline bool HasDataSeries(const std::string & sDataSeriesUUID);
 	inline PDataSeries FindDataSeries(const std::string & sDataSeriesUUID);
 	inline void ReleaseDataSeries(const std::string & sDataSeriesUUID);
+	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation);
+	inline PAlert FindAlert(const std::string & sUUID);
+	inline void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment);
 };
 	
 /*************************************************************************************************************************
@@ -1908,6 +1962,10 @@ public:
 	inline bool HasDataSeries(const std::string & sDataSeriesUUID);
 	inline PDataSeries FindDataSeries(const std::string & sDataSeriesUUID);
 	inline void ReleaseDataSeries(const std::string & sDataSeriesUUID);
+	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation);
+	inline PAlert FindAlert(const std::string & sUUID);
+	inline void AcknowledgeAlert(const std::string & sAlertUUID, const std::string & sUserComment);
+	inline void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment);
 };
 	
 	/**
@@ -2347,6 +2405,15 @@ public:
 		pWrapperTable->m_JournalVariable_ComputeAverage = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = nullptr;
 		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = nullptr;
+		pWrapperTable->m_Alert_GetUUID = nullptr;
+		pWrapperTable->m_Alert_GetAlertLevel = nullptr;
+		pWrapperTable->m_Alert_GetIdentifier = nullptr;
+		pWrapperTable->m_Alert_GetDescription = nullptr;
+		pWrapperTable->m_Alert_GetReadableContextInformation = nullptr;
+		pWrapperTable->m_Alert_NeedsAcknowledgement = nullptr;
+		pWrapperTable->m_Alert_IsAcknowledged = nullptr;
+		pWrapperTable->m_Alert_GetAcknowledgementInformation = nullptr;
+		pWrapperTable->m_AlertIterator_GetCurrentAlert = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
 		pWrapperTable->m_JournalHandler_StoreJournalMarker = nullptr;
@@ -2432,6 +2499,9 @@ public:
 		pWrapperTable->m_StateEnvironment_HasDataSeries = nullptr;
 		pWrapperTable->m_StateEnvironment_FindDataSeries = nullptr;
 		pWrapperTable->m_StateEnvironment_ReleaseDataSeries = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateAlert = nullptr;
+		pWrapperTable->m_StateEnvironment_FindAlert = nullptr;
+		pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
 		pWrapperTable->m_UIItem_GetUUID = nullptr;
@@ -2493,6 +2563,10 @@ public:
 		pWrapperTable->m_UIEnvironment_HasDataSeries = nullptr;
 		pWrapperTable->m_UIEnvironment_FindDataSeries = nullptr;
 		pWrapperTable->m_UIEnvironment_ReleaseDataSeries = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateAlert = nullptr;
+		pWrapperTable->m_UIEnvironment_FindAlert = nullptr;
+		pWrapperTable->m_UIEnvironment_AcknowledgeAlert = nullptr;
+		pWrapperTable->m_UIEnvironment_AcknowledgeAlertForUser = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -5753,6 +5827,87 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetUUID = (PLibMCEnvAlert_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_alert_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetUUID = (PLibMCEnvAlert_GetUUIDPtr) dlsym(hLibrary, "libmcenv_alert_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetAlertLevel = (PLibMCEnvAlert_GetAlertLevelPtr) GetProcAddress(hLibrary, "libmcenv_alert_getalertlevel");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetAlertLevel = (PLibMCEnvAlert_GetAlertLevelPtr) dlsym(hLibrary, "libmcenv_alert_getalertlevel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetAlertLevel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetIdentifier = (PLibMCEnvAlert_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_alert_getidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetIdentifier = (PLibMCEnvAlert_GetIdentifierPtr) dlsym(hLibrary, "libmcenv_alert_getidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetDescription = (PLibMCEnvAlert_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_alert_getdescription");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetDescription = (PLibMCEnvAlert_GetDescriptionPtr) dlsym(hLibrary, "libmcenv_alert_getdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetReadableContextInformation = (PLibMCEnvAlert_GetReadableContextInformationPtr) GetProcAddress(hLibrary, "libmcenv_alert_getreadablecontextinformation");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetReadableContextInformation = (PLibMCEnvAlert_GetReadableContextInformationPtr) dlsym(hLibrary, "libmcenv_alert_getreadablecontextinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetReadableContextInformation == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_NeedsAcknowledgement = (PLibMCEnvAlert_NeedsAcknowledgementPtr) GetProcAddress(hLibrary, "libmcenv_alert_needsacknowledgement");
+		#else // _WIN32
+		pWrapperTable->m_Alert_NeedsAcknowledgement = (PLibMCEnvAlert_NeedsAcknowledgementPtr) dlsym(hLibrary, "libmcenv_alert_needsacknowledgement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_NeedsAcknowledgement == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_IsAcknowledged = (PLibMCEnvAlert_IsAcknowledgedPtr) GetProcAddress(hLibrary, "libmcenv_alert_isacknowledged");
+		#else // _WIN32
+		pWrapperTable->m_Alert_IsAcknowledged = (PLibMCEnvAlert_IsAcknowledgedPtr) dlsym(hLibrary, "libmcenv_alert_isacknowledged");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_IsAcknowledged == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementInformation = (PLibMCEnvAlert_GetAcknowledgementInformationPtr) GetProcAddress(hLibrary, "libmcenv_alert_getacknowledgementinformation");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementInformation = (PLibMCEnvAlert_GetAcknowledgementInformationPtr) dlsym(hLibrary, "libmcenv_alert_getacknowledgementinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetAcknowledgementInformation == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertIterator_GetCurrentAlert = (PLibMCEnvAlertIterator_GetCurrentAlertPtr) GetProcAddress(hLibrary, "libmcenv_alertiterator_getcurrentalert");
+		#else // _WIN32
+		pWrapperTable->m_AlertIterator_GetCurrentAlert = (PLibMCEnvAlertIterator_GetCurrentAlertPtr) dlsym(hLibrary, "libmcenv_alertiterator_getcurrentalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertIterator_GetCurrentAlert == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
 		#else // _WIN32
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
@@ -6518,6 +6673,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateAlert = (PLibMCEnvStateEnvironment_CreateAlertPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createalert");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateAlert = (PLibMCEnvStateEnvironment_CreateAlertPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateAlert == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindAlert = (PLibMCEnvStateEnvironment_FindAlertPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findalert");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindAlert = (PLibMCEnvStateEnvironment_FindAlertPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindAlert == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser = (PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_acknowledgealertforuser");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser = (PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr) dlsym(hLibrary, "libmcenv_stateenvironment_acknowledgealertforuser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_uiitem_getname");
 		#else // _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) dlsym(hLibrary, "libmcenv_uiitem_getname");
@@ -7064,6 +7246,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_ReleaseDataSeries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateAlert = (PLibMCEnvUIEnvironment_CreateAlertPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createalert");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateAlert = (PLibMCEnvUIEnvironment_CreateAlertPtr) dlsym(hLibrary, "libmcenv_uienvironment_createalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateAlert == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_FindAlert = (PLibMCEnvUIEnvironment_FindAlertPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findalert");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_FindAlert = (PLibMCEnvUIEnvironment_FindAlertPtr) dlsym(hLibrary, "libmcenv_uienvironment_findalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_FindAlert == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_AcknowledgeAlert = (PLibMCEnvUIEnvironment_AcknowledgeAlertPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_acknowledgealert");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_AcknowledgeAlert = (PLibMCEnvUIEnvironment_AcknowledgeAlertPtr) dlsym(hLibrary, "libmcenv_uienvironment_acknowledgealert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_AcknowledgeAlert == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_AcknowledgeAlertForUser = (PLibMCEnvUIEnvironment_AcknowledgeAlertForUserPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_acknowledgealertforuser");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_AcknowledgeAlertForUser = (PLibMCEnvUIEnvironment_AcknowledgeAlertForUserPtr) dlsym(hLibrary, "libmcenv_uienvironment_acknowledgealertforuser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_AcknowledgeAlertForUser == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8551,6 +8769,42 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ReceiveRawTimeStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_alert_getuuid", (void**)&(pWrapperTable->m_Alert_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alert_getalertlevel", (void**)&(pWrapperTable->m_Alert_GetAlertLevel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetAlertLevel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alert_getidentifier", (void**)&(pWrapperTable->m_Alert_GetIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alert_getdescription", (void**)&(pWrapperTable->m_Alert_GetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alert_getreadablecontextinformation", (void**)&(pWrapperTable->m_Alert_GetReadableContextInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetReadableContextInformation == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alert_needsacknowledgement", (void**)&(pWrapperTable->m_Alert_NeedsAcknowledgement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_NeedsAcknowledgement == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alert_isacknowledged", (void**)&(pWrapperTable->m_Alert_IsAcknowledged));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_IsAcknowledged == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alert_getacknowledgementinformation", (void**)&(pWrapperTable->m_Alert_GetAcknowledgementInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetAcknowledgementInformation == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_alertiterator_getcurrentalert", (void**)&(pWrapperTable->m_AlertIterator_GetCurrentAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertIterator_GetCurrentAlert == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariable", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8891,6 +9145,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ReleaseDataSeries == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createalert", (void**)&(pWrapperTable->m_StateEnvironment_CreateAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateAlert == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_findalert", (void**)&(pWrapperTable->m_StateEnvironment_FindAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindAlert == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_acknowledgealertforuser", (void**)&(pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uiitem_getname", (void**)&(pWrapperTable->m_UIItem_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIItem_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9133,6 +9399,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_releasedataseries", (void**)&(pWrapperTable->m_UIEnvironment_ReleaseDataSeries));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ReleaseDataSeries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createalert", (void**)&(pWrapperTable->m_UIEnvironment_CreateAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateAlert == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_findalert", (void**)&(pWrapperTable->m_UIEnvironment_FindAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindAlert == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_acknowledgealert", (void**)&(pWrapperTable->m_UIEnvironment_AcknowledgeAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_AcknowledgeAlert == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_acknowledgealertforuser", (void**)&(pWrapperTable->m_UIEnvironment_AcknowledgeAlertForUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_AcknowledgeAlertForUser == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -12938,8 +13220,8 @@ public:
 	}
 	
 	/**
-	* CDriverStatusUpdateSession::Sleep - Sleeps for a definite amount of time.
-	* @param[in] nDelay - Milliseconds to sleep.
+	* CDriverStatusUpdateSession::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
 	*/
 	void CDriverStatusUpdateSession::Sleep(const LibMCEnv_uint32 nDelay)
 	{
@@ -13999,6 +14281,149 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ReceiveRawTimeStream(m_pHandle, 0, &elementsNeededTimeStreamEntries, nullptr));
 		TimeStreamEntriesBuffer.resize((size_t) elementsNeededTimeStreamEntries);
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ReceiveRawTimeStream(m_pHandle, elementsNeededTimeStreamEntries, &elementsWrittenTimeStreamEntries, TimeStreamEntriesBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CAlert
+	 */
+	
+	/**
+	* CAlert::GetUUID - Returns Alert UUID.
+	* @return Returns the alert uuid.
+	*/
+	std::string CAlert::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CAlert::GetAlertLevel - Returns Alert Level.
+	* @return Returns the alert level.
+	*/
+	eAlertLevel CAlert::GetAlertLevel()
+	{
+		eAlertLevel resultLevel = (eAlertLevel) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetAlertLevel(m_pHandle, &resultLevel));
+		
+		return resultLevel;
+	}
+	
+	/**
+	* CAlert::GetIdentifier - Returns Alert Identifier.
+	* @return Returns the alert identifier.
+	*/
+	std::string CAlert::GetIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CAlert::GetDescription - Returns Alert Description in the current language.
+	* @return Returns the alert description.
+	*/
+	std::string CAlert::GetDescription()
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescription(m_pHandle, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescription(m_pHandle, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CAlert::GetReadableContextInformation - Returns Alert Custom Information.
+	* @return Returns context information for the alert.
+	*/
+	std::string CAlert::GetReadableContextInformation()
+	{
+		LibMCEnv_uint32 bytesNeededReadableContextInformation = 0;
+		LibMCEnv_uint32 bytesWrittenReadableContextInformation = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetReadableContextInformation(m_pHandle, 0, &bytesNeededReadableContextInformation, nullptr));
+		std::vector<char> bufferReadableContextInformation(bytesNeededReadableContextInformation);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetReadableContextInformation(m_pHandle, bytesNeededReadableContextInformation, &bytesWrittenReadableContextInformation, &bufferReadableContextInformation[0]));
+		
+		return std::string(&bufferReadableContextInformation[0]);
+	}
+	
+	/**
+	* CAlert::NeedsAcknowledgement - Returns if the alert needs acknowledgement.
+	* @return Flag if alert needs acknowledgement.
+	*/
+	bool CAlert::NeedsAcknowledgement()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_NeedsAcknowledgement(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CAlert::IsAcknowledged - Returns if the alert is acknowledged.
+	* @return Flag if alert is acknowledged.
+	*/
+	bool CAlert::IsAcknowledged()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_IsAcknowledged(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CAlert::GetAcknowledgementInformation - Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+	* @param[out] sUserUUID - User who acknowledged the alert.
+	* @param[out] sUserComment - Comment of the acknowledgement.
+	* @param[out] sAckTime - Timestamp in ISO8601 UTC format.
+	*/
+	void CAlert::GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime)
+	{
+		LibMCEnv_uint32 bytesNeededUserUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUserUUID = 0;
+		LibMCEnv_uint32 bytesNeededUserComment = 0;
+		LibMCEnv_uint32 bytesWrittenUserComment = 0;
+		LibMCEnv_uint32 bytesNeededAckTime = 0;
+		LibMCEnv_uint32 bytesWrittenAckTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetAcknowledgementInformation(m_pHandle, 0, &bytesNeededUserUUID, nullptr, 0, &bytesNeededUserComment, nullptr, 0, &bytesNeededAckTime, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		std::vector<char> bufferUserComment(bytesNeededUserComment);
+		std::vector<char> bufferAckTime(bytesNeededAckTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetAcknowledgementInformation(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0], bytesNeededUserComment, &bytesWrittenUserComment, &bufferUserComment[0], bytesNeededAckTime, &bytesWrittenAckTime, &bufferAckTime[0]));
+		sUserUUID = std::string(&bufferUserUUID[0]);
+		sUserComment = std::string(&bufferUserComment[0]);
+		sAckTime = std::string(&bufferAckTime[0]);
+	}
+	
+	/**
+	 * Method definitions for class CAlertIterator
+	 */
+	
+	/**
+	* CAlertIterator::GetCurrentAlert - Returns the alert the iterator points at.
+	* @return returns the Alert instance.
+	*/
+	PAlert CAlertIterator::GetCurrentAlert()
+	{
+		LibMCEnvHandle hAlertInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertIterator_GetCurrentAlert(m_pHandle, &hAlertInstance));
+		
+		if (!hAlertInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlert>(m_pWrapper, hAlertInstance);
 	}
 	
 	/**
@@ -15276,6 +15701,51 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateAlert - creates a new alert
+	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
+	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @return Alert instance.
+	*/
+	PAlert CStateEnvironment::CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation)
+	{
+		LibMCEnvHandle hAlert = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateAlert(m_pHandle, sIdentifier.c_str(), sReadableContextInformation.c_str(), &hAlert));
+		
+		if (!hAlert) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlert>(m_pWrapper, hAlert);
+	}
+	
+	/**
+	* CStateEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return Alert instance.
+	*/
+	PAlert CStateEnvironment::FindAlert(const std::string & sUUID)
+	{
+		LibMCEnvHandle hAlert = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindAlert(m_pHandle, sUUID.c_str(), &hAlert));
+		
+		if (hAlert) {
+			return std::make_shared<CAlert>(m_pWrapper, hAlert);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CStateEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	void CStateEnvironment::AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_AcknowledgeAlertForUser(m_pHandle, sAlertUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str()));
+	}
+	
+	/**
 	 * Method definitions for class CUIItem
 	 */
 	
@@ -16146,6 +16616,61 @@ public:
 	void CUIEnvironment::ReleaseDataSeries(const std::string & sDataSeriesUUID)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ReleaseDataSeries(m_pHandle, sDataSeriesUUID.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::CreateAlert - creates a new alert
+	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
+	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @return Alert instance.
+	*/
+	PAlert CUIEnvironment::CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation)
+	{
+		LibMCEnvHandle hAlert = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateAlert(m_pHandle, sIdentifier.c_str(), sReadableContextInformation.c_str(), &hAlert));
+		
+		if (!hAlert) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlert>(m_pWrapper, hAlert);
+	}
+	
+	/**
+	* CUIEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return Alert instance.
+	*/
+	PAlert CUIEnvironment::FindAlert(const std::string & sUUID)
+	{
+		LibMCEnvHandle hAlert = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindAlert(m_pHandle, sUUID.c_str(), &hAlert));
+		
+		if (hAlert) {
+			return std::make_shared<CAlert>(m_pWrapper, hAlert);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CUIEnvironment::AcknowledgeAlert - Acknowledges an alert for the current user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	void CUIEnvironment::AcknowledgeAlert(const std::string & sAlertUUID, const std::string & sUserComment)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_AcknowledgeAlert(m_pHandle, sAlertUUID.c_str(), sUserComment.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	void CUIEnvironment::AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_AcknowledgeAlertForUser(m_pHandle, sAlertUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str()));
 	}
 
 } // namespace LibMCEnv

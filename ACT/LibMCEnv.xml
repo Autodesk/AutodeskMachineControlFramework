@@ -173,10 +173,18 @@
 		<error name="INVALIDUSERINDEX" code="10133" description="Invalid user index"/>
 		<error name="DATASERIESTIMESTAMPSNOTINCREMENTING" code="10134" description="Data series time stamps not incrementing" />		
 		<error name="INVALIDNUMBEROFSAMPLES" code="10135" description="Invalid number of samples"/>
-		
+		<error name="EMPTYALERTIDENTIFIER" code="10136" description="Empty alert identifier"/>
+				
 		
 
 	</errors>
+
+	<enum name="AlertLevel">
+		<option name="FatalError" value="1"/>
+		<option name="CriticalError" value="2"/>
+		<option name="Warning" value="3"/>
+		<option name="Message" value="4"/>
+	</enum>	
 
 
 	<enum name="ImagePixelFormat">
@@ -1793,10 +1801,10 @@
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
 
-		<method name="Sleep" description="Sleeps for a definite amount of time.">
-			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleep." />
+		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
 		</method>
-		
+
 	</class>
 
 
@@ -2228,6 +2236,49 @@
 		
 	</class>
 
+	<class name="Alert" parent="Base">
+	
+		<method name="GetUUID" description="Returns Alert UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns the alert uuid." />
+		</method>
+
+		<method name="GetAlertLevel" description="Returns Alert Level.">
+			<param name="Level" type="enum" class="AlertLevel" pass="return" description="Returns the alert level." />
+		</method>
+
+		<method name="GetIdentifier" description="Returns Alert Identifier.">
+			<param name="Identifier" type="string" pass="return" description="Returns the alert identifier." />
+		</method>
+	
+		<method name="GetDescription" description="Returns Alert Description in the current language.">
+			<param name="Description" type="string" pass="return" description="Returns the alert description." />
+		</method>
+
+		<method name="GetReadableContextInformation" description="Returns Alert Custom Information.">
+			<param name="ReadableContextInformation" type="string" pass="return" description="Returns context information for the alert." />
+		</method>
+
+		<method name="NeedsAcknowledgement" description="Returns if the alert needs acknowledgement.">
+			<param name="Value" type="bool" pass="return" description="Flag if alert needs acknowledgement." />
+		</method>
+	
+		<method name="IsAcknowledged" description="Returns if the alert is acknowledged.">
+			<param name="Value" type="bool" pass="return" description="Flag if alert is acknowledged." />
+		</method>
+
+		<method name="GetAcknowledgementInformation" description="Returns details about the acknowledgement. Fails if the alert is not acknowledged.">
+			<param name="UserUUID" type="string" pass="out" description="User who acknowledged the alert." />
+			<param name="UserComment" type="string" pass="out" description="Comment of the acknowledgement." />
+			<param name="AckTime" type="string" pass="out" description="Timestamp in ISO8601 UTC format." />
+		</method>
+
+	</class>
+
+	<class name="AlertIterator" parent="Iterator">
+		<method name="GetCurrentAlert" description="Returns the alert the iterator points at.">
+			<param name="AlertInstance" type="handle" class="Alert" pass="return" description="returns the Alert instance."/>
+		</method>
+	</class>
 
 
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
@@ -2721,7 +2772,23 @@
 			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to release." />
 		</method>	
 		
+		<method name="CreateAlert" description="creates a new alert">
+			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
+			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
+		</method>
 
+		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
+			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+5
 	</class>
 
 	<class name="UIItem" parent="Base" description="Base item that represents a user interface element.">
@@ -3060,6 +3127,28 @@
 		<method name="ReleaseDataSeries" description="Releases the memory of a data series. Fails if data series does not exist.">
 			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to release." />
 		</method>	
+		
+		<method name="CreateAlert" description="creates a new alert">
+			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
+			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="AcknowledgeAlert" description="Acknowledges an alert for the current user. ">
+			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+		
+		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
+			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
 		
 	</class>
 

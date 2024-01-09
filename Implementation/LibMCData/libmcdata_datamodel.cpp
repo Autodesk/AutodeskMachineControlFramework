@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_storage.hpp"
 #include "libmcdata_logsession.hpp"
 #include "libmcdata_journalsession.hpp"
+#include "libmcdata_alertsession.hpp"
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
 #include "libmcdata_persistencyhandler.hpp"
@@ -104,13 +105,14 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
 
     m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath);
 
-    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath) VALUES (?, ?, ?, ?, ?, ?)");
+    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion) VALUES (?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);
     pStatement->setString(2, m_sStartTime);
     pStatement->setString(3, sJournalName);
     pStatement->setString(4, sJournalDataName);
     pStatement->setString(5, sJournalPath);
     pStatement->setString(6, sJournalDataPath);
+    pStatement->setInt(7, m_pJournal->getSchemaVersion ());
     pStatement->execute();
 
 }
@@ -162,6 +164,19 @@ IJournalSession* CDataModel::CreateJournalSession()
     return new CJournalSession(m_pJournal);
 
 }
+
+IAlertSession* CDataModel::CreateAlertSession()
+{
+    if (m_pStoragePath.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGEPATH);
+
+    if (m_pJournal.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
+
+    return new CAlertSession(m_pJournal);
+
+}
+
 
 IBuildJobHandler* CDataModel::CreateBuildJobHandler()
 {

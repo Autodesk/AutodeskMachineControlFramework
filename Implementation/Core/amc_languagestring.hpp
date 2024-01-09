@@ -28,44 +28,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amcdata_databasemigrator_journals.hpp"
-#include "libmcdata_interfaceexception.hpp"
-#include "common_utils.hpp"
 
-namespace AMCData {
+#ifndef __AMC_LANGUAGESTRING
+#define __AMC_LANGUAGESTRING
+
+#include <string>
+#include <set>
+#include <memory>
+
+namespace AMC {
+	
+	class CLanguageHandler;
+	typedef std::shared_ptr<CLanguageHandler> PLanguageHandler;
+	typedef std::weak_ptr<CLanguageHandler> PWLanguageHandler;
+
+	class CLanguageDefinition;
+
+	class CLanguageString {
+	private:
+		std::string m_sLanguageIdentifier;
+		std::string m_sCustomValue;
+
+		PWLanguageHandler m_pLanguageHandler;
+	
+	public:
+
+		CLanguageString (const std::string & sLanguageIdentifier, const std::string & sCustomValue, PWLanguageHandler pLanguageHandler);
 		
-	void CDatabaseMigrationClass_Journals::increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex)
-	{
+		virtual ~CLanguageString();
+		
+		std::string getLanguageIdentifier ();
+		
+		std::string getCustomValue ();
 
-		if (pTransaction.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string getTranslatedString (CLanguageDefinition * pLanguageDefinition);
 
-		switch (nCurrentVersionIndex) {
-		case 6: {
-				std::string sCreateQuery = "CREATE TABLE `journals` (";
-				sCreateQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
-				sCreateQuery += "`starttime`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilename`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`logfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`journalfilepath`  varchar ( 256 ) NOT NULL,";
-				sCreateQuery += "`updateuuid`  varchar ( 64 ))";
-				pTransaction->executeStatement(sCreateQuery);
+	};
 
-				break;
-			}
-			case 7: {
-
-				std::string sSchemaVersionAddQuery = "ALTER TABLE `journals` ADD `schemaversion` INTEGER DEFAULT 0";
-				pTransaction->executeStatement(sSchemaVersionAddQuery);
-
-				break;
-			}
-		}
-
-	}
-
-
+	
 }
 
+
+#endif //__AMC_LANGUAGESTRING
 

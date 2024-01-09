@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <map>
+#include <mutex>
 #include <string>
 
 namespace LibMCData {
@@ -42,12 +43,14 @@ namespace LibMCData {
 	class CBuildJobHandler;
 	class CLoginHandler;
 	class CPersistencyHandler;
+	class CAlertSession;
 
 	typedef std::shared_ptr<CDataModel> PDataModel;
 	typedef std::shared_ptr<CStorage> PStorage;
 	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
 	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
+	typedef std::shared_ptr<CAlertSession> PAlertSession;
 }
 
 
@@ -111,6 +114,7 @@ namespace AMC {
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
+		std::mutex m_DataModelMutex;
 		LibMCData::PDataModel m_pDataModel;
 		LibMCData::PStorage m_pStorage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
@@ -161,6 +165,8 @@ namespace AMC {
 		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
 		LibMCData::PPersistencyHandler getPersistencyHandler();
 		AMCCommon::PChrono getGlobalChronoInstance();
+
+		LibMCData::PAlertSession createAlertSession();
 
 		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);
 		std::string getLibraryPath(const std::string& sLibraryName);
