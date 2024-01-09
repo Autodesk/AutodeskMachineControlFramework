@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "amc_languagehandler.hpp"
+#include "amc_languagestring.hpp"
 
 #include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
@@ -38,19 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CLanguageHandler::CLanguageHandler ()
-	{
-	}
-
-	CLanguageHandler::~CLanguageHandler ()
-	{
-	}
-
-	bool CLanguageHandler::hasLanguage(const std::string& sLanguageIdentifier)
-	{
-		// TODO Implement language handling...
-		return true;
-	}
 
 
 }
