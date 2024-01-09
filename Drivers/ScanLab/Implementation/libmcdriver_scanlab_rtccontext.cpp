@@ -1306,6 +1306,24 @@ void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimela
 	m_pScanLabSDK->n_set_sky_writing_mode_list(m_CardNo, 3);
 }
 
+void CRTCContext::EnableSkyWritingMode4(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
+{
+
+	//std::cout << "Enabling Skywriting mode 4: timelag " << dTimelag << " laseronshift " << nLaserOnShift << " nprev " << nNPrev << " npost " << nNPost << " limit " << dLimit << std::endl;
+	if (dTimelag < 0.0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG);
+	if ((nLaserOnShift < (int64_t)INT32_MIN) || (nLaserOnShift > (int64_t)INT32_MAX))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGLASERONSHIFT);
+	if ((nNPrev < 0) || (nNPrev > (int64_t) UINT32_MAX))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPREV);
+	if ((nNPost < 0) || (nNPost > (int64_t)UINT32_MAX))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGNPOST);
+
+	m_pScanLabSDK->n_set_sky_writing_para_list(m_CardNo, dTimelag, (int32_t)nLaserOnShift, (uint32_t)nNPrev, (uint32_t)nNPost);
+	m_pScanLabSDK->n_set_sky_writing_limit_list(m_CardNo, dLimit);
+	m_pScanLabSDK->n_set_sky_writing_mode_list(m_CardNo, 4);
+}
+
 
 void CRTCContext::SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees)
 {

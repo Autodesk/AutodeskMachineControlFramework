@@ -2164,6 +2164,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableskywritingmode3(L
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableskywritingmode4(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->EnableSkyWritingMode4(dTimelag, nLaserOnShift, nNPrev, nNPost, dLimit);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationangle(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dAngleInDegrees)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -4714,6 +4738,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enableskywritingmode2;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_enableskywritingmode3") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enableskywritingmode3;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_enableskywritingmode4") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enableskywritingmode4;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_settransformationangle") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_settransformationangle;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_settransformationscale") 

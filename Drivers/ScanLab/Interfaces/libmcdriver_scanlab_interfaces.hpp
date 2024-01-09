@@ -969,6 +969,16 @@ public:
 	virtual void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit) = 0;
 
 	/**
+	* IRTCContext::EnableSkyWritingMode4 - Enables skywriting on the list in mode 4. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	* @param[in] dLimit - Skywriting Angle limit
+	*/
+	virtual void EnableSkyWritingMode4(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit) = 0;
+
+	/**
 	* IRTCContext::SetTransformationAngle - Sets the transformation angle of the scan field.
 	* @param[in] dAngleInDegrees - Angle in Degrees
 	*/

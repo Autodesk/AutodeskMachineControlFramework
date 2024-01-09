@@ -864,6 +864,19 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableskywritingmode3(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
 
 /**
+* Enables skywriting on the list in mode 4. See Scanlab RTC Documentation for details.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTimelag - Skywriting Timelag
+* @param[in] nLaserOnShift - Skywriting Laser On Shift
+* @param[in] nNPrev - Duration of pre-motion in ticks
+* @param[in] nNPost - Duration of post-motion in ticks. 
+* @param[in] dLimit - Skywriting Angle limit
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableskywritingmode4(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
+
+/**
 * Sets the transformation angle of the scan field.
 *
 * @param[in] pRTCContext - RTCContext instance.

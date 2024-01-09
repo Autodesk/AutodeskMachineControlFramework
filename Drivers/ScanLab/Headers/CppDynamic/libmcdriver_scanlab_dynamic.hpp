@@ -637,6 +637,7 @@ public:
 	inline void EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
 	inline void EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
 	inline void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit);
+	inline void EnableSkyWritingMode4(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit);
 	inline void SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees);
 	inline void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor);
 	inline void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY);
@@ -989,6 +990,7 @@ public:
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode2 = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode3 = nullptr;
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode4 = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationAngle = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationScale = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationOffset = nullptr;
@@ -1824,6 +1826,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_EnableSkyWritingMode3 == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode4 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode4Ptr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode4");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableSkyWritingMode4 = (PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode4Ptr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableskywritingmode4");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableSkyWritingMode4 == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2994,6 +3005,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableskywritingmode3", (void**)&(pWrapperTable->m_RTCContext_EnableSkyWritingMode3));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableSkyWritingMode3 == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableskywritingmode4", (void**)&(pWrapperTable->m_RTCContext_EnableSkyWritingMode4));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableSkyWritingMode4 == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_settransformationangle", (void**)&(pWrapperTable->m_RTCContext_SetTransformationAngle));
@@ -4214,6 +4229,19 @@ public:
 	void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableSkyWritingMode3(m_pHandle, dTimelag, nLaserOnShift, nNPrev, nNPost, dLimit));
+	}
+	
+	/**
+	* CRTCContext::EnableSkyWritingMode4 - Enables skywriting on the list in mode 4. See Scanlab RTC Documentation for details.
+	* @param[in] dTimelag - Skywriting Timelag
+	* @param[in] nLaserOnShift - Skywriting Laser On Shift
+	* @param[in] nNPrev - Duration of pre-motion in ticks
+	* @param[in] nNPost - Duration of post-motion in ticks. 
+	* @param[in] dLimit - Skywriting Angle limit
+	*/
+	void CRTCContext::EnableSkyWritingMode4(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableSkyWritingMode4(m_pHandle, dTimelag, nLaserOnShift, nNPrev, nNPost, dLimit));
 	}
 	
 	/**

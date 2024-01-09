@@ -251,6 +251,8 @@ public:
 
 	void EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit) override;
 
+	void EnableSkyWritingMode4(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit) override;
+
 	void SetTransformationAngle(const LibMCDriver_ScanLab_double dAngleInDegrees) override;
 
 	void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor) override;

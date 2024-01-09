@@ -851,6 +851,19 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWrit
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
 
 /**
+* Enables skywriting on the list in mode 4. See Scanlab RTC Documentation for details.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTimelag - Skywriting Timelag
+* @param[in] nLaserOnShift - Skywriting Laser On Shift
+* @param[in] nNPrev - Duration of pre-motion in ticks
+* @param[in] nNPost - Duration of post-motion in ticks. 
+* @param[in] dLimit - Skywriting Angle limit
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode4Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
+
+/**
 * Sets the transformation angle of the scan field.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1910,6 +1923,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr m_RTCContext_EnableSkyWritingMode2;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr m_RTCContext_EnableSkyWritingMode3;
+	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode4Ptr m_RTCContext_EnableSkyWritingMode4;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr m_RTCContext_SetTransformationAngle;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr m_RTCContext_SetTransformationScale;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr m_RTCContext_SetTransformationOffset;

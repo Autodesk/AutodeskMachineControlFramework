@@ -610,6 +610,14 @@ Custom implementation
 			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
 			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
 		</method>
+
+		<method name="EnableSkyWritingMode4" description="Enables skywriting on the list in mode 4. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
+		</method>
 		
 		<method name="SetTransformationAngle" description="Sets the transformation angle of the scan field.">
 			<param name="AngleInDegrees" type="double" pass="in" description="Angle in Degrees" />
