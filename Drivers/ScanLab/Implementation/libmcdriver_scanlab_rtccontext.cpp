@@ -1841,6 +1841,9 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 					case 3:
 						EnableSkyWritingMode3(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
 						break;
+					case 4:
+						EnableSkyWritingMode4(dSkywritingTimeLag, nSkywritingLaserOnShift, nSkywritingPrev, nSkywritingPost, dSkywritingLimit);
+						break;
 					default:
 						DisableSkyWriting();
 					}
