@@ -178,6 +178,58 @@ template <class T1, class T2, class T3, class T4, class T5> class ParameterCache
 		}
 };
 
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7> class ParameterCache_7 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+	public:
+		ParameterCache_7 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
+		}
+};
+
 
 /*************************************************************************************************************************
  Class interface for Base 
@@ -434,6 +486,50 @@ public:
 	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
 	virtual void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC) = 0;
+
+	/**
+	* IAlertSession::HasAlert - Checks if an alert with a certain UUID exists.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @return Flag if alert exists
+	*/
+	virtual bool HasAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IAlertSession::GetAlertInformation - Retrieves information of an alert. Fails if alert does not exist.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[out] sIdentifier - Alert Identifier
+	* @param[out] eLevel - Alert level.
+	* @param[out] sDescription - Alert Description in default language
+	* @param[out] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+	* @param[out] sReadableContextInformation - Readable Context Information in default language
+	* @param[out] bNeedsAcknowledgement - Flag if acknowledgement is needed
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	virtual void GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, LibMCData::eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC) = 0;
+
+	/**
+	* IAlertSession::AcknowledgeAlert - Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[in] sUserUUID - User UUID that acknowledged the alert.
+	* @param[in] sUserComment - Comment of the user.
+	*/
+	virtual void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
+
+	/**
+	* IAlertSession::AlertHasBeenAcknowledged - Checks if an alert has been acknowledged. Fails if alert does not exist.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @return Flag if the alert has been acknowledged.
+	*/
+	virtual bool AlertHasBeenAcknowledged(const std::string & sUUID) = 0;
+
+	/**
+	* IAlertSession::GetAcknowledgementInformation - Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[out] sUserUUID - User UUID that acknowledged the alert.
+	* @param[out] sUserComment - Comment of the user.
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	virtual void GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC) = 0;
 
 };
 

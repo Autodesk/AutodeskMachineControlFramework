@@ -74,6 +74,18 @@ namespace AMCData {
 
 		void addAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC);
 
+
+		bool hasAlert(const std::string& sUUID);
+
+		void getAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC);
+
+		void acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment);
+
+		bool alertHasBeenAcknowledged(const std::string& sUUID);
+
+		void getAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC);
+
+
 	};
 
 	typedef std::shared_ptr<CJournal> PJournal;

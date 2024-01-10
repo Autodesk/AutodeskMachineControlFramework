@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "amc_statesignalhandler.hpp"
 #include "amc_driverhandler.hpp"
+#include "amc_alerthandler.hpp"
 #include "amc_dataserieshandler.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "amc_servicehandler.hpp"
@@ -90,6 +91,7 @@ namespace AMC {
 		m_pLanguageHandler = std::make_shared<CLanguageHandler>();
 		m_pMeshHandler = std::make_shared<CMeshHandler>();
 		m_pDataSeriesHandler = std::make_shared<CDataSeriesHandler>();
+		m_pAlertHandler = std::make_shared<CAlertHandler>();
 
 		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono);
 		m_pUIHandler = std::make_shared<CUIHandler>(pEnvWrapper, pUISystemState);
@@ -114,6 +116,7 @@ namespace AMC {
 		m_pToolpathHandler = nullptr;
 		m_pServiceHandler = nullptr;
 		m_pSignalHandler = nullptr;
+		m_pAlertHandler = nullptr;
 
 		m_pPersistencyHandler = nullptr;
 		m_pLoginHandler = nullptr;
@@ -160,9 +163,14 @@ namespace AMC {
 		return m_pStateMachineData.get();
 	}
 
-	AMC::CAccessControl* CSystemState::accessControl()
+	CAccessControl* CSystemState::accessControl()
 	{
 		return m_pAccessControl.get();
+	}
+
+	CAlertHandler* CSystemState::alertHandler()
+	{
+		return m_pAlertHandler.get();
 	}
 
 	AMC::CStringResourceHandler* CSystemState::stringResourceHandler()
@@ -215,6 +223,12 @@ namespace AMC {
 	{
 		return m_pDataSeriesHandler;
 	}
+
+	PAlertHandler CSystemState::getAlertHandlerInstance()
+	{
+		return m_pAlertHandler;
+	}
+
 
 
 	PStateMachineData CSystemState::getStateMachineData()

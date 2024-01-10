@@ -174,8 +174,7 @@
 		<error name="DATASERIESTIMESTAMPSNOTINCREMENTING" code="10134" description="Data series time stamps not incrementing" />		
 		<error name="INVALIDNUMBEROFSAMPLES" code="10135" description="Invalid number of samples"/>
 		<error name="EMPTYALERTIDENTIFIER" code="10136" description="Empty alert identifier"/>
-				
-		
+		<error name="INVALIDALERTIDENTIFIER" code="10137" description="Invalid alert identifier"/>
 
 	</errors>
 
@@ -2250,10 +2249,6 @@
 			<param name="Identifier" type="string" pass="return" description="Returns the alert identifier." />
 		</method>
 	
-		<method name="GetDescription" description="Returns Alert Description in the current language.">
-			<param name="Description" type="string" pass="return" description="Returns the alert description." />
-		</method>
-
 		<method name="GetReadableContextInformation" description="Returns Alert Custom Information.">
 			<param name="ReadableContextInformation" type="string" pass="return" description="Returns context information for the alert." />
 		</method>

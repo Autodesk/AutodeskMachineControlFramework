@@ -589,6 +589,15 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL 572 /** Invalid journal compute interval */
 #define LIBMC_ERROR_DATASERIESNOTFOUND 573 /** Data series not found */
 #define LIBMC_ERROR_DATASERIESISEMPTY 574 /** Data series is empty */
+#define LIBMC_ERROR_EMPTYALERTIDENTIFIER 575 /** Empty alert identifier */
+#define LIBMC_ERROR_INVALIDALERTIDENTIFIER 576 /** Invalid alert identifier */
+#define LIBMC_ERROR_ALERTDEFINITIONNOTFOUND 577 /** Alert definition not found */
+#define LIBMC_ERROR_DUPLICATEALERTIDENTIFIER 578 /** Duplicate alert identifier */
+#define LIBMC_ERROR_EMPTYLANGUAGEIDENTIFIER 579 /** Empty language identifier */
+#define LIBMC_ERROR_EMPTYLANGUAGESTRINGIDENTIFIER 580 /** Empty language string identifier */
+#define LIBMC_ERROR_INVALIDLANGUAGEIDENTIFIER 581 /** Invalid language identifier */
+#define LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER 582 /** Invalid language string identifier */
+#define LIBMC_ERROR_INVALIDLANGUAGEDEFINITION 583 /** Invalid language definition */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1090,6 +1099,15 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDJOURNALCOMPUTEINTERVAL: return "Invalid journal compute interval";
     case LIBMC_ERROR_DATASERIESNOTFOUND: return "Data series not found";
     case LIBMC_ERROR_DATASERIESISEMPTY: return "Data series is empty";
+    case LIBMC_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
+    case LIBMC_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
+    case LIBMC_ERROR_ALERTDEFINITIONNOTFOUND: return "Alert definition not found";
+    case LIBMC_ERROR_DUPLICATEALERTIDENTIFIER: return "Duplicate alert identifier";
+    case LIBMC_ERROR_EMPTYLANGUAGEIDENTIFIER: return "Empty language identifier";
+    case LIBMC_ERROR_EMPTYLANGUAGESTRINGIDENTIFIER: return "Empty language string identifier";
+    case LIBMC_ERROR_INVALIDLANGUAGEIDENTIFIER: return "Invalid language identifier";
+    case LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER: return "Invalid language string identifier";
+    case LIBMC_ERROR_INVALIDLANGUAGEDEFINITION: return "Invalid language definition";
     default: return "unknown error";
   }
 }

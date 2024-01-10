@@ -706,7 +706,8 @@ namespace LibMCData {
     FatalError = 1,
     CriticalError = 2,
     Warning = 3,
-    Message = 4
+    Message = 4,
+    Unknown = 7
   };
   
   enum class eLogLevel : LibMCData_int32 {

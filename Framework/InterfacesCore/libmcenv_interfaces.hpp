@@ -3239,12 +3239,6 @@ public:
 	virtual std::string GetIdentifier() = 0;
 
 	/**
-	* IAlert::GetDescription - Returns Alert Description in the current language.
-	* @return Returns the alert description.
-	*/
-	virtual std::string GetDescription() = 0;
-
-	/**
 	* IAlert::GetReadableContextInformation - Returns Alert Custom Information.
 	* @return Returns context information for the alert.
 	*/

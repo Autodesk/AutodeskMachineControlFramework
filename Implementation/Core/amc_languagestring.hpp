@@ -38,31 +38,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 	
-	class CLanguageHandler;
-	typedef std::shared_ptr<CLanguageHandler> PLanguageHandler;
-	typedef std::weak_ptr<CLanguageHandler> PWLanguageHandler;
-
 	class CLanguageDefinition;
+	typedef std::shared_ptr<CLanguageDefinition> PLanguageDefinition;
 
 	class CLanguageString {
 	private:
-		std::string m_sLanguageIdentifier;
+		std::string m_sStringIdentifier;
 		std::string m_sCustomValue;
 
-		PWLanguageHandler m_pLanguageHandler;
-	
 	public:
 
-		CLanguageString (const std::string & sLanguageIdentifier, const std::string & sCustomValue, PWLanguageHandler pLanguageHandler);
+		CLanguageString (const std::string & sStringIdentifier, const std::string & sCustomValue);
 		
 		virtual ~CLanguageString();
 		
-		std::string getLanguageIdentifier ();
+		std::string getStringIdentifier ();
 		
 		std::string getCustomValue ();
 
 		std::string getTranslatedString (CLanguageDefinition * pLanguageDefinition);
 
+		std::string getTranslatedString (PLanguageDefinition pLanguageDefinition);
+		
 	};
 
 	

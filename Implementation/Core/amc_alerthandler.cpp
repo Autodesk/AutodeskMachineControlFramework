@@ -30,15 +30,79 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_alerthandler.hpp"
+#include "amc_alertdefinition.hpp"
 
 #include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
 
-
-
 namespace AMC {
 
+	CAlertHandler::CAlertHandler()
+	{
 
+	}
+
+	CAlertHandler::~CAlertHandler()
+	{
+
+	}
+
+	PAlertDefinition CAlertHandler::findDefinition(const std::string& sIdentifier, bool bFailIfNotExisting)
+	{
+		if (sIdentifier.empty ())
+			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYALERTIDENTIFIER);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDALERTIDENTIFIER, sIdentifier);
+
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto iIter = m_AlertDefinitions.find(sIdentifier);
+		if (iIter == m_AlertDefinitions.end()) {
+			if (bFailIfNotExisting) 
+				throw ELibMCCustomException(LIBMC_ERROR_ALERTDEFINITIONNOTFOUND, sIdentifier);
+		
+			return nullptr;
+		}
+
+		return iIter->second;
+	}
+
+	bool CAlertHandler::hasDefinition(const std::string& sIdentifier)
+	{
+		if (sIdentifier.empty())
+			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYALERTIDENTIFIER);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDALERTIDENTIFIER, sIdentifier);
+
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto iIter = m_AlertDefinitions.find(sIdentifier);
+
+		return (iIter != m_AlertDefinitions.end());
+
+	}
+
+	PAlertDefinition CAlertHandler::addDefinition(const std::string& sIdentifier, LibMCData::eAlertLevel alertLevel, const CLanguageString& sDescription, bool bNeedsAcknowledgement)
+	{
+		if (sIdentifier.empty())
+			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYALERTIDENTIFIER);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDALERTIDENTIFIER, sIdentifier);
+
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto iIter = m_AlertDefinitions.find(sIdentifier);
+		if (iIter != m_AlertDefinitions.end())
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEALERTIDENTIFIER, sIdentifier);
+
+		auto pDefinition = std::make_shared<CAlertDefinition> (sIdentifier, alertLevel, sDescription, bNeedsAcknowledgement);
+		m_AlertDefinitions.insert(std::make_pair (sIdentifier, pDefinition));
+
+		return pDefinition;
+	}
 
 }
 

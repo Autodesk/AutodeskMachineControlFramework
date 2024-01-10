@@ -452,6 +452,7 @@ public:
 			case LIBMCENV_ERROR_DATASERIESTIMESTAMPSNOTINCREMENTING: return "DATASERIESTIMESTAMPSNOTINCREMENTING";
 			case LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES: return "INVALIDNUMBEROFSAMPLES";
 			case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "EMPTYALERTIDENTIFIER";
+			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "INVALIDALERTIDENTIFIER";
 		}
 		return "UNKNOWN";
 	}
@@ -595,6 +596,7 @@ public:
 			case LIBMCENV_ERROR_DATASERIESTIMESTAMPSNOTINCREMENTING: return "Data series time stamps not incrementing";
 			case LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES: return "Invalid number of samples";
 			case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
+			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
 		}
 		return "unknown error";
 	}
@@ -1697,7 +1699,6 @@ public:
 	inline std::string GetUUID();
 	inline eAlertLevel GetAlertLevel();
 	inline std::string GetIdentifier();
-	inline std::string GetDescription();
 	inline std::string GetReadableContextInformation();
 	inline bool NeedsAcknowledgement();
 	inline bool IsAcknowledged();
@@ -2410,7 +2411,6 @@ public:
 		pWrapperTable->m_Alert_GetUUID = nullptr;
 		pWrapperTable->m_Alert_GetAlertLevel = nullptr;
 		pWrapperTable->m_Alert_GetIdentifier = nullptr;
-		pWrapperTable->m_Alert_GetDescription = nullptr;
 		pWrapperTable->m_Alert_GetReadableContextInformation = nullptr;
 		pWrapperTable->m_Alert_NeedsAcknowledgement = nullptr;
 		pWrapperTable->m_Alert_IsAcknowledged = nullptr;
@@ -5856,15 +5856,6 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Alert_GetDescription = (PLibMCEnvAlert_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_alert_getdescription");
-		#else // _WIN32
-		pWrapperTable->m_Alert_GetDescription = (PLibMCEnvAlert_GetDescriptionPtr) dlsym(hLibrary, "libmcenv_alert_getdescription");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Alert_GetDescription == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_Alert_GetReadableContextInformation = (PLibMCEnvAlert_GetReadableContextInformationPtr) GetProcAddress(hLibrary, "libmcenv_alert_getreadablecontextinformation");
 		#else // _WIN32
 		pWrapperTable->m_Alert_GetReadableContextInformation = (PLibMCEnvAlert_GetReadableContextInformationPtr) dlsym(hLibrary, "libmcenv_alert_getreadablecontextinformation");
@@ -8781,10 +8772,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_alert_getidentifier", (void**)&(pWrapperTable->m_Alert_GetIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetIdentifier == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_alert_getdescription", (void**)&(pWrapperTable->m_Alert_GetDescription));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetDescription == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_alert_getreadablecontextinformation", (void**)&(pWrapperTable->m_Alert_GetReadableContextInformation));
@@ -14329,21 +14316,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
 		
 		return std::string(&bufferIdentifier[0]);
-	}
-	
-	/**
-	* CAlert::GetDescription - Returns Alert Description in the current language.
-	* @return Returns the alert description.
-	*/
-	std::string CAlert::GetDescription()
-	{
-		LibMCEnv_uint32 bytesNeededDescription = 0;
-		LibMCEnv_uint32 bytesWrittenDescription = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescription(m_pHandle, 0, &bytesNeededDescription, nullptr));
-		std::vector<char> bufferDescription(bytesNeededDescription);
-		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescription(m_pHandle, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
-		
-		return std::string(&bufferDescription[0]);
 	}
 	
 	/**

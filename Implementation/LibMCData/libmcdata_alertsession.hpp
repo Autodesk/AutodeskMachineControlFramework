@@ -68,6 +68,16 @@ public:
 
 	void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC) override;
 
+	bool HasAlert(const std::string& sUUID) override;
+
+	void GetAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC) override;
+
+	void AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
+
+	bool AlertHasBeenAcknowledged(const std::string& sUUID) override;
+
+	void GetAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC) override;
+
 };
 
 } // namespace Impl
