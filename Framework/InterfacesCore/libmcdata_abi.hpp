@@ -228,6 +228,81 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(L
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_addalert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, LibMCData::eAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC);
 
+/**
+* Checks if an alert with a certain UUID exists.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
+* @param[out] pAlertExists - Flag if alert exists
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_hasalert(LibMCData_AlertSession pAlertSession, const char * pUUID, bool * pAlertExists);
+
+/**
+* Retrieves information of an alert. Fails if alert does not exist.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Alert Identifier, may be NULL
+* @param[out] pLevel - Alert level.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Alert Description in default language, may be NULL
+* @param[in] nDescriptionIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionIdentifierBuffer -  buffer of Alert Description Identifier for internationalization. May be empty., may be NULL
+* @param[in] nReadableContextInformationBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReadableContextInformationNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReadableContextInformationBuffer -  buffer of Readable Context Information in default language, may be NULL
+* @param[out] pNeedsAcknowledgement - Flag if acknowledgement is needed
+* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_getalertinformation(LibMCData_AlertSession pAlertSession, const char * pUUID, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer, LibMCData::eAlertLevel * pLevel, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCData_uint32 nDescriptionIdentifierBufferSize, LibMCData_uint32* pDescriptionIdentifierNeededChars, char * pDescriptionIdentifierBuffer, const LibMCData_uint32 nReadableContextInformationBufferSize, LibMCData_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer, bool * pNeedsAcknowledgement, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+
+/**
+* Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
+* @param[in] pUserUUID - User UUID that acknowledged the alert.
+* @param[in] pUserComment - Comment of the user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment);
+
+/**
+* Checks if an alert has been acknowledged. Fails if alert does not exist.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
+* @param[out] pHasBeenAcknowledged - Flag if the alert has been acknowledged.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_alerthasbeenacknowledged(LibMCData_AlertSession pAlertSession, const char * pUUID, bool * pHasBeenAcknowledged);
+
+/**
+* Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of User UUID that acknowledged the alert., may be NULL
+* @param[in] nUserCommentBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserCommentNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserCommentBuffer -  buffer of Comment of the user., may be NULL
+* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_getacknowledgementinformation(LibMCData_AlertSession pAlertSession, const char * pUUID, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCData_uint32 nUserCommentBufferSize, LibMCData_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+
 /*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/

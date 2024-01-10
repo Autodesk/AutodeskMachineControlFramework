@@ -80,6 +80,7 @@ namespace AMC {
 	class CLanguageHandler;
 	class CMeshHandler;
 	class CDataSeriesHandler;
+	class CAlertHandler;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -93,6 +94,7 @@ namespace AMC {
 	typedef std::shared_ptr<CAccessControl> PAccessControl;
 	typedef std::shared_ptr<CStringResourceHandler> PStringResourceHandler;
 	typedef std::shared_ptr<CLanguageHandler> PLanguageHandler;
+	typedef std::shared_ptr<CAlertHandler> PAlertHandler;
 	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
 	typedef std::shared_ptr<CDataSeriesHandler> PDataSeriesHandler;
 
@@ -110,6 +112,7 @@ namespace AMC {
 		AMC::PStringResourceHandler m_pStringResourceHandler;
 		AMC::PLanguageHandler m_pLanguageHandler;
 		AMC::PMeshHandler m_pMeshHandler;
+		AMC::PAlertHandler m_pAlertHandler;
 		AMC::PDataSeriesHandler m_pDataSeriesHandler;
 
 		AMCCommon::PChrono m_pGlobalChrono;
@@ -140,8 +143,9 @@ namespace AMC {
 		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
 		CStateMachineData* stateMachineData();
-		AMC::CAccessControl * accessControl ();
-		AMC::CStringResourceHandler * stringResourceHandler ();
+		CAccessControl * accessControl ();
+		CStringResourceHandler * stringResourceHandler ();
+		CAlertHandler* alertHandler();
 
 		LibMCData::CStorage * storage();
 		LibMCData::CBuildJobHandler * buildJobHandler();
@@ -159,6 +163,7 @@ namespace AMC {
 		PLanguageHandler getLanguageHandlerInstance();
 		PMeshHandler getMeshHandlerInstance();
 		PDataSeriesHandler getDataSeriesHandlerInstance();
+		PAlertHandler getAlertHandlerInstance();
 
 		LibMCData::PStorage getStorageInstance();
 		LibMCData::PLoginHandler getLoginHandlerInstance();

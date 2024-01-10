@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_xmldocument.hpp"
 #include "amc_accesscontrol.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_alerthandler.hpp"
 #include "amc_dataserieshandler.hpp"
 
 #include "common_chrono.hpp"
@@ -635,7 +636,7 @@ void CStateEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 
 IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
 {
-	/*if (sIdentifier.empty())
+	if (sIdentifier.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
 
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sIdentifier))
@@ -643,11 +644,17 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 	auto sNewUUID = AMCCommon::CUtils::createUUID();
 	
+	AMCCommon::CChrono chrono;
+	auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
 
-	auto pAlertSession = m_pSystemState->createAlertSession();
-	//pAlertSession->AddAlert (sNewUUID, sIdentifier, ); */
+	auto pDefinition = m_pSystemState->alertHandler()->findDefinition(sIdentifier, true);
+	auto alertDescription = pDefinition->getDescription();
 
-	return new CAlert();
+	auto pAlertSession = m_pSystemState->createAlertSession ();
+
+	pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), pDefinition->getAlertLevel (), alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
+
+	return new CAlert (sNewUUID, pAlertSession);
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)

@@ -3940,17 +3940,6 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_GetAlertLevelPtr) (LibMCEnv_Alert pAlert
 typedef LibMCEnvResult (*PLibMCEnvAlert_GetIdentifierPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
 
 /**
-* Returns Alert Description in the current language.
-*
-* @param[in] pAlert - Alert instance.
-* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDescriptionBuffer -  buffer of Returns the alert description., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvAlert_GetDescriptionPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
-
-/**
 * Returns Alert Custom Information.
 *
 * @param[in] pAlert - Alert instance.
@@ -6150,7 +6139,6 @@ typedef struct {
 	PLibMCEnvAlert_GetUUIDPtr m_Alert_GetUUID;
 	PLibMCEnvAlert_GetAlertLevelPtr m_Alert_GetAlertLevel;
 	PLibMCEnvAlert_GetIdentifierPtr m_Alert_GetIdentifier;
-	PLibMCEnvAlert_GetDescriptionPtr m_Alert_GetDescription;
 	PLibMCEnvAlert_GetReadableContextInformationPtr m_Alert_GetReadableContextInformation;
 	PLibMCEnvAlert_NeedsAcknowledgementPtr m_Alert_NeedsAcknowledgement;
 	PLibMCEnvAlert_IsAcknowledgedPtr m_Alert_IsAcknowledged;

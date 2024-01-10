@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdata_dynamic.hpp"
 #include "amc_languagestring.hpp"
+#include "amc_accesspermission.hpp"
 
 namespace AMC {
 
@@ -48,27 +49,32 @@ namespace AMC {
 	private:
 	
 		std::string m_sIdentifier;
-		LibMCData::eAlertLevel m_nAlertLevel;
-		std::string m_sDescription;
+		LibMCData::eAlertLevel m_AlertLevel;
+		CLanguageString m_sDescription;
 		
 		bool m_bNeedAcknowledgement;
-		std::string m_sAckPermission;
+		std::string m_sAckPermissionIdentifier;
 		
 		
 	public:
 
-		CAlertDefinition (const std::string & sIdentifier, LibMCData::eAlertLevel alertLevel);
+		CAlertDefinition (const std::string & sIdentifier, LibMCData::eAlertLevel alertLevel, const CLanguageString & sDescription, bool bNeedsAcknowledgement);
 		
 		virtual ~CAlertDefinition();
 
 		std::string getIdentifier ();
 
-		uint32_t getAlertLevel ();
+		LibMCData::eAlertLevel getAlertLevel ();
 
-		std::string getDescription();
+		CLanguageString getDescription();
+
+		std::string getTranslatedDescription(CLanguageDefinition * pLanguage);
 		
 		bool needsAcknowledgement ();
-		std::string getAckPermission ();
+
+		void setAckPermissionIdentifier (std::string & sAckPermissionIdentifier);
+
+		std::string getAckPermissionIdentifier ();
 
 
 	};

@@ -29,59 +29,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "amc_languagestring.hpp"
-#include "amc_languagedefinition.hpp"
+#ifndef __AMC_LANGUAGEDEFINITION
+#define __AMC_LANGUAGEDEFINITION
 
-#include "common_utils.hpp"
-#include "libmc_exceptiontypes.hpp"
-
-
+#include <string>
+#include <map>
+#include <set>
+#include <memory>
 
 namespace AMC {
+	
+	class CLanguageDefinition;
+	typedef std::shared_ptr<CLanguageDefinition> PLanguageDefinition;
 
+	class CLanguageDefinition {
+	private:
+		std::string m_sLanguageIdentifier;
+		PLanguageDefinition m_pParentLanguage;
 
-	CLanguageString::CLanguageString(const std::string& sStringIdentifier, const std::string& sCustomValue)
-		: m_sStringIdentifier (sStringIdentifier), m_sCustomValue (sCustomValue)
-	{
-		if (!sStringIdentifier.empty()) {
-			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sStringIdentifier))
-				throw ELibMCCustomException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER, sStringIdentifier);
+		std::map <std::string, std::string> m_TranslationMap;
+		std::set <std::string> m_TranslationMisses;
 
-		}
+	public:
 
+		CLanguageDefinition (const std::string & sLanguageIdentifier, PLanguageDefinition pParentLanguage);
+		
+		virtual ~CLanguageDefinition();
+						
+		std::string getLanguageIdentifier ();
+		
+		PLanguageDefinition getParentLanguage ();
 
-	}
+		std::string getTranslatedString (const std::string & sStringIdentifier);
 
-	CLanguageString::~CLanguageString()
-	{
+		bool stringExists (const std::string& sStringIdentifier);
 
-	}
+		void addTranslation (const std::string& sStringIdentifier, const std::string & sValue);
+		
+	};
 
-	std::string CLanguageString::getStringIdentifier()
-	{
-		return m_sStringIdentifier;
-	}
-
-	std::string CLanguageString::getCustomValue()
-	{
-		return m_sCustomValue;
-	}
-
-	std::string CLanguageString::getTranslatedString(CLanguageDefinition* pLanguageDefinition)
-	{
-		if (pLanguageDefinition == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDLANGUAGEDEFINITION);
-
-		if (m_sStringIdentifier.empty())
-			return m_sCustomValue;
-
-		return pLanguageDefinition->getTranslatedString(m_sStringIdentifier);
-	}
-
-	std::string CLanguageString::getTranslatedString(PLanguageDefinition pLanguageDefinition)
-	{
-		return getTranslatedString(pLanguageDefinition.get ());
-	}
+	
 }
 
+
+#endif //__AMC_LANGUAGEDEFINITION
 

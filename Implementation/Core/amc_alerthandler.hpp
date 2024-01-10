@@ -36,6 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mutex>
 #include <map>
 
+namespace LibMCData {
+
+	class CAlertSession;
+	typedef std::shared_ptr<CAlertSession> PAlertSession;
+
+}
+
+
 namespace AMC {
 
 	class CAlertHandler;
@@ -48,7 +56,6 @@ namespace AMC {
 		std::mutex m_Mutex;
 		std::map<std::string, PAlertDefinition> m_AlertDefinitions;
 		
-
 	public:
 
 		CAlertHandler ();
@@ -59,7 +66,7 @@ namespace AMC {
 		
 		bool hasDefinition (const std::string & sIdentifier);
 		
-		void addDefinition (const std::string & sIdentifier, const std::string & sDescription);
+		PAlertDefinition addDefinition (const std::string& sIdentifier, LibMCData::eAlertLevel alertLevel, const CLanguageString& sDescription, bool bNeedsAcknowledgement);
 
 	};
 

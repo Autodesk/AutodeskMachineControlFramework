@@ -617,7 +617,8 @@ void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 
 IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
 {
-    return new CAlert();
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    //return new CAlert ();
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)

@@ -1064,6 +1064,11 @@ public:
 	}
 	
 	inline void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC);
+	inline bool HasAlert(const std::string & sUUID);
+	inline void GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC);
+	inline void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment);
+	inline bool AlertHasBeenAcknowledged(const std::string & sUUID);
+	inline void GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC);
 };
 	
 /*************************************************************************************************************************
@@ -1479,6 +1484,11 @@ public:
 		pWrapperTable->m_LogSession_GetMaxLogEntryID = nullptr;
 		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = nullptr;
 		pWrapperTable->m_AlertSession_AddAlert = nullptr;
+		pWrapperTable->m_AlertSession_HasAlert = nullptr;
+		pWrapperTable->m_AlertSession_GetAlertInformation = nullptr;
+		pWrapperTable->m_AlertSession_AcknowledgeAlert = nullptr;
+		pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged = nullptr;
+		pWrapperTable->m_AlertSession_GetAcknowledgementInformation = nullptr;
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkCapacity = nullptr;
 		pWrapperTable->m_JournalSession_GetFlushInterval = nullptr;
@@ -1762,6 +1772,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_AlertSession_AddAlert == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertSession_HasAlert = (PLibMCDataAlertSession_HasAlertPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_hasalert");
+		#else // _WIN32
+		pWrapperTable->m_AlertSession_HasAlert = (PLibMCDataAlertSession_HasAlertPtr) dlsym(hLibrary, "libmcdata_alertsession_hasalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertSession_HasAlert == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertSession_GetAlertInformation = (PLibMCDataAlertSession_GetAlertInformationPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_getalertinformation");
+		#else // _WIN32
+		pWrapperTable->m_AlertSession_GetAlertInformation = (PLibMCDataAlertSession_GetAlertInformationPtr) dlsym(hLibrary, "libmcdata_alertsession_getalertinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertSession_GetAlertInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertSession_AcknowledgeAlert = (PLibMCDataAlertSession_AcknowledgeAlertPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_acknowledgealert");
+		#else // _WIN32
+		pWrapperTable->m_AlertSession_AcknowledgeAlert = (PLibMCDataAlertSession_AcknowledgeAlertPtr) dlsym(hLibrary, "libmcdata_alertsession_acknowledgealert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertSession_AcknowledgeAlert == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged = (PLibMCDataAlertSession_AlertHasBeenAcknowledgedPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_alerthasbeenacknowledged");
+		#else // _WIN32
+		pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged = (PLibMCDataAlertSession_AlertHasBeenAcknowledgedPtr) dlsym(hLibrary, "libmcdata_alertsession_alerthasbeenacknowledged");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertSession_GetAcknowledgementInformation = (PLibMCDataAlertSession_GetAcknowledgementInformationPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_getacknowledgementinformation");
+		#else // _WIN32
+		pWrapperTable->m_AlertSession_GetAcknowledgementInformation = (PLibMCDataAlertSession_GetAcknowledgementInformationPtr) dlsym(hLibrary, "libmcdata_alertsession_getacknowledgementinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertSession_GetAcknowledgementInformation == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2894,6 +2949,26 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_AddAlert == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_alertsession_hasalert", (void**)&(pWrapperTable->m_AlertSession_HasAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_HasAlert == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alertsession_getalertinformation", (void**)&(pWrapperTable->m_AlertSession_GetAlertInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_GetAlertInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alertsession_acknowledgealert", (void**)&(pWrapperTable->m_AlertSession_AcknowledgeAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_AcknowledgeAlert == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alertsession_alerthasbeenacknowledged", (void**)&(pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alertsession_getacknowledgementinformation", (void**)&(pWrapperTable->m_AlertSession_GetAcknowledgementInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_GetAcknowledgementInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkintegerdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3591,6 +3666,105 @@ public:
 	void CAlertSession::AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AddAlert(m_pHandle, sUUID.c_str(), sIdentifier.c_str(), eLevel, sDescription.c_str(), sDescriptionIdentifier.c_str(), sReadableContextInformation.c_str(), bNeedsAcknowledgement, sTimestampUTC.c_str()));
+	}
+	
+	/**
+	* CAlertSession::HasAlert - Checks if an alert with a certain UUID exists.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @return Flag if alert exists
+	*/
+	bool CAlertSession::HasAlert(const std::string & sUUID)
+	{
+		bool resultAlertExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_HasAlert(m_pHandle, sUUID.c_str(), &resultAlertExists));
+		
+		return resultAlertExists;
+	}
+	
+	/**
+	* CAlertSession::GetAlertInformation - Retrieves information of an alert. Fails if alert does not exist.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[out] sIdentifier - Alert Identifier
+	* @param[out] eLevel - Alert level.
+	* @param[out] sDescription - Alert Description in default language
+	* @param[out] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+	* @param[out] sReadableContextInformation - Readable Context Information in default language
+	* @param[out] bNeedsAcknowledgement - Flag if acknowledgement is needed
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	void CAlertSession::GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC)
+	{
+		LibMCData_uint32 bytesNeededIdentifier = 0;
+		LibMCData_uint32 bytesWrittenIdentifier = 0;
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		LibMCData_uint32 bytesNeededDescriptionIdentifier = 0;
+		LibMCData_uint32 bytesWrittenDescriptionIdentifier = 0;
+		LibMCData_uint32 bytesNeededReadableContextInformation = 0;
+		LibMCData_uint32 bytesWrittenReadableContextInformation = 0;
+		LibMCData_uint32 bytesNeededTimestampUTC = 0;
+		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAlertInformation(m_pHandle, sUUID.c_str(), 0, &bytesNeededIdentifier, nullptr, &eLevel, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededDescriptionIdentifier, nullptr, 0, &bytesNeededReadableContextInformation, nullptr, &bNeedsAcknowledgement, 0, &bytesNeededTimestampUTC, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		std::vector<char> bufferDescriptionIdentifier(bytesNeededDescriptionIdentifier);
+		std::vector<char> bufferReadableContextInformation(bytesNeededReadableContextInformation);
+		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAlertInformation(m_pHandle, sUUID.c_str(), bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0], &eLevel, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededDescriptionIdentifier, &bytesWrittenDescriptionIdentifier, &bufferDescriptionIdentifier[0], bytesNeededReadableContextInformation, &bytesWrittenReadableContextInformation, &bufferReadableContextInformation[0], &bNeedsAcknowledgement, bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
+		sIdentifier = std::string(&bufferIdentifier[0]);
+		sDescription = std::string(&bufferDescription[0]);
+		sDescriptionIdentifier = std::string(&bufferDescriptionIdentifier[0]);
+		sReadableContextInformation = std::string(&bufferReadableContextInformation[0]);
+		sTimestampUTC = std::string(&bufferTimestampUTC[0]);
+	}
+	
+	/**
+	* CAlertSession::AcknowledgeAlert - Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[in] sUserUUID - User UUID that acknowledged the alert.
+	* @param[in] sUserComment - Comment of the user.
+	*/
+	void CAlertSession::AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str()));
+	}
+	
+	/**
+	* CAlertSession::AlertHasBeenAcknowledged - Checks if an alert has been acknowledged. Fails if alert does not exist.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @return Flag if the alert has been acknowledged.
+	*/
+	bool CAlertSession::AlertHasBeenAcknowledged(const std::string & sUUID)
+	{
+		bool resultHasBeenAcknowledged = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AlertHasBeenAcknowledged(m_pHandle, sUUID.c_str(), &resultHasBeenAcknowledged));
+		
+		return resultHasBeenAcknowledged;
+	}
+	
+	/**
+	* CAlertSession::GetAcknowledgementInformation - Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[out] sUserUUID - User UUID that acknowledged the alert.
+	* @param[out] sUserComment - Comment of the user.
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	void CAlertSession::GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC)
+	{
+		LibMCData_uint32 bytesNeededUserUUID = 0;
+		LibMCData_uint32 bytesWrittenUserUUID = 0;
+		LibMCData_uint32 bytesNeededUserComment = 0;
+		LibMCData_uint32 bytesWrittenUserComment = 0;
+		LibMCData_uint32 bytesNeededTimestampUTC = 0;
+		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAcknowledgementInformation(m_pHandle, sUUID.c_str(), 0, &bytesNeededUserUUID, nullptr, 0, &bytesNeededUserComment, nullptr, 0, &bytesNeededTimestampUTC, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		std::vector<char> bufferUserComment(bytesNeededUserComment);
+		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAcknowledgementInformation(m_pHandle, sUUID.c_str(), bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0], bytesNeededUserComment, &bytesWrittenUserComment, &bufferUserComment[0], bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
+		sUserUUID = std::string(&bufferUserUUID[0]);
+		sUserComment = std::string(&bufferUserComment[0]);
+		sTimestampUTC = std::string(&bufferTimestampUTC[0]);
 	}
 	
 	/**

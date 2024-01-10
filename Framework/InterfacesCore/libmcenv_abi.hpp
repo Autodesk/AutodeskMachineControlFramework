@@ -3953,17 +3953,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_alert_getalertlevel(LibMCEnv_Alert pAl
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_alert_getidentifier(LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
 
 /**
-* Returns Alert Description in the current language.
-*
-* @param[in] pAlert - Alert instance.
-* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDescriptionBuffer -  buffer of Returns the alert description., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_alert_getdescription(LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
-
-/**
 * Returns Alert Custom Information.
 *
 * @param[in] pAlert - Alert instance.

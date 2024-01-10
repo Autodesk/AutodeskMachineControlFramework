@@ -598,6 +598,15 @@
 		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="572" description="Invalid journal compute interval" />		
 		<error name="DATASERIESNOTFOUND" code="573" description="Data series not found" />		
 		<error name="DATASERIESISEMPTY" code="574" description="Data series is empty" />		
+		<error name="EMPTYALERTIDENTIFIER" code="575" description="Empty alert identifier"/>
+		<error name="INVALIDALERTIDENTIFIER" code="576" description="Invalid alert identifier"/>		
+		<error name="ALERTDEFINITIONNOTFOUND" code="577" description="Alert definition not found"/>		
+		<error name="DUPLICATEALERTIDENTIFIER" code="578" description="Duplicate alert identifier"/>		
+		<error name="EMPTYLANGUAGEIDENTIFIER" code="579" description="Empty language identifier"/>		
+		<error name="EMPTYLANGUAGESTRINGIDENTIFIER" code="580" description="Empty language string identifier"/>		
+		<error name="INVALIDLANGUAGEIDENTIFIER" code="581" description="Invalid language identifier"/>		
+		<error name="INVALIDLANGUAGESTRINGIDENTIFIER" code="582" description="Invalid language string identifier"/>		
+		<error name="INVALIDLANGUAGEDEFINITION" code="583" description="Invalid language definition"/>		
 		
 		
 	</errors>

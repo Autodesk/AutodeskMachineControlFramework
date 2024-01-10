@@ -204,6 +204,31 @@ namespace AMCData {
 	}
 
 
+	bool CJournal::hasAlert(const std::string& sUUID)
+	{
+		return false;
+	}
+
+	void CJournal::getAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC)
+	{
+
+	}
+
+	void CJournal::acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment)
+	{
+
+	}
+
+	bool CJournal::alertHasBeenAcknowledged(const std::string& sUUID)
+	{
+		return false;
+	}
+
+	void CJournal::getAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC)
+	{
+
+	}
+
 
 }
 

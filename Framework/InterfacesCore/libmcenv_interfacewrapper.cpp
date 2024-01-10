@@ -11503,54 +11503,6 @@ LibMCEnvResult libmcenv_alert_getidentifier(LibMCEnv_Alert pAlert, const LibMCEn
 	}
 }
 
-LibMCEnvResult libmcenv_alert_getdescription(LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pAlert;
-
-	try {
-		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sDescription("");
-		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
-		if (!pIAlert)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pDescriptionBuffer == nullptr);
-		if (isCacheCall) {
-			sDescription = pIAlert->GetDescription();
-
-			pIAlert->_setCache (new ParameterCache_1<std::string> (sDescription));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sDescription);
-			pIAlert->_setCache (nullptr);
-		}
-		
-		if (pDescriptionNeededChars)
-			*pDescriptionNeededChars = (LibMCEnv_uint32) (sDescription.size()+1);
-		if (pDescriptionBuffer) {
-			if (sDescription.size() >= nDescriptionBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
-				pDescriptionBuffer[iDescription] = sDescription[iDescription];
-			pDescriptionBuffer[sDescription.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCEnvResult libmcenv_alert_getreadablecontextinformation(LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nReadableContextInformationBufferSize, LibMCEnv_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pAlert;
@@ -18030,8 +17982,6 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_alert_getalertlevel;
 	if (sProcName == "libmcenv_alert_getidentifier") 
 		*ppProcAddress = (void*) &libmcenv_alert_getidentifier;
-	if (sProcName == "libmcenv_alert_getdescription") 
-		*ppProcAddress = (void*) &libmcenv_alert_getdescription;
 	if (sProcName == "libmcenv_alert_getreadablecontextinformation") 
 		*ppProcAddress = (void*) &libmcenv_alert_getreadablecontextinformation;
 	if (sProcName == "libmcenv_alert_needsacknowledgement") 

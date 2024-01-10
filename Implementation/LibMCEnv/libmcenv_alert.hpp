@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CAlert
 #define __LIBMCENV_ALERT
 
 #include "libmcenv_interfaces.hpp"
+#include "amc_languagestring.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -45,7 +46,7 @@ Abstract: This is the class declaration of CAlert
 #endif
 
 // Include custom headers here.
-
+#include "libmcdata_dynamic.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -58,34 +59,29 @@ namespace Impl {
 class CAlert : public virtual IAlert, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
+	std::string m_sAlertUUID;
 
-protected:
+	LibMCData::PAlertSession m_pAlertSession;
 
-	/**
-	* Put protected members here.
-	*/
+	LibMCEnv::eAlertLevel m_AlertLevel;
+
+	std::string m_sIdentifier;	
+
+	std::string m_sReadableContextInformation;
+
+	bool m_bNeedsAcknowledgement;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CAlert (const std::string & sAlertUUID, LibMCData::PAlertSession pAlertSession);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+	virtual ~CAlert();
 
 	std::string GetUUID() override;
 
 	LibMCEnv::eAlertLevel GetAlertLevel() override;
 
 	std::string GetIdentifier() override;
-
-	std::string GetDescription() override;
 
 	std::string GetReadableContextInformation() override;
 

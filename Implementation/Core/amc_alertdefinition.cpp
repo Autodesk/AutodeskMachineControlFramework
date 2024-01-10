@@ -38,6 +38,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+	CAlertDefinition::CAlertDefinition(const std::string& sIdentifier, LibMCData::eAlertLevel alertLevel, const CLanguageString& sDescription, bool bNeedsAcknowledgement)
+		: m_sIdentifier (sIdentifier), m_AlertLevel (alertLevel), m_sDescription (sDescription), m_bNeedAcknowledgement (bNeedsAcknowledgement)
+	{
+
+	}
+
+	CAlertDefinition::~CAlertDefinition()
+	{
+
+	}
+
+	std::string CAlertDefinition::getIdentifier()
+	{
+		return m_sIdentifier;
+	}
+
+	LibMCData::eAlertLevel CAlertDefinition::getAlertLevel()
+	{
+		return m_AlertLevel;
+	}
+
+	CLanguageString CAlertDefinition::getDescription()
+	{
+		return m_sDescription;
+	}
+
+	std::string CAlertDefinition::getTranslatedDescription(CLanguageDefinition* pLanguage)
+	{
+		return m_sDescription.getTranslatedString(pLanguage);
+	}
+
+	bool CAlertDefinition::needsAcknowledgement()
+	{
+		return m_bNeedAcknowledgement;
+	}
+
+	void CAlertDefinition::setAckPermissionIdentifier(std::string& sAckPermissionIdentifier)
+	{
+		m_sAckPermissionIdentifier = sAckPermissionIdentifier;
+	}
+
+	std::string CAlertDefinition::getAckPermissionIdentifier()
+	{
+		return m_sAckPermissionIdentifier;
+	}
 
 
 }

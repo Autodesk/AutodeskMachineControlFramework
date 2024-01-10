@@ -60,3 +60,28 @@ void CAlertSession::AddAlert(const std::string& sUUID, const std::string& sIdent
 {
     m_pJournal->addAlert(sUUID, sIdentifier, eLevel, sDescription, sDescriptionIdentifier, sReadableContextInformation, bNeedsAcknowledgement, sTimestampUTC);
 }
+
+bool CAlertSession::HasAlert(const std::string& sUUID)
+{
+    return m_pJournal->hasAlert(sUUID);
+}
+
+void CAlertSession::GetAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC)
+{
+    m_pJournal->getAlertInformation(sUUID, sIdentifier, eLevel, sDescription, sDescriptionIdentifier, sReadableContextInformation, bNeedsAcknowledgement, sTimestampUTC);
+}
+
+void CAlertSession::AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment)
+{
+    m_pJournal->acknowledgeAlert(sUUID, sUserUUID, sUserComment);
+}
+
+bool CAlertSession::AlertHasBeenAcknowledged(const std::string& sUUID)
+{
+    return m_pJournal->alertHasBeenAcknowledged(sUUID);
+}
+
+void CAlertSession::GetAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC)
+{
+    m_pJournal->getAcknowledgementInformation(sUUID, sUserUUID, sUserComment, sTimestampUTC);
+}

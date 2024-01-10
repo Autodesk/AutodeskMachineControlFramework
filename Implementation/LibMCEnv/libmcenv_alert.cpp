@@ -35,7 +35,7 @@ Abstract: This is a stub class definition of CAlert
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include "common_utils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -43,43 +43,55 @@ using namespace LibMCEnv::Impl;
  Class definition of CAlert 
 **************************************************************************************************************************/
 
+CAlert::CAlert(const std::string& sAlertUUID, LibMCData::PAlertSession pAlertSession)
+	: m_sAlertUUID (AMCCommon::CUtils::normalizeUUIDString (sAlertUUID)),
+	m_pAlertSession (pAlertSession),
+	m_bNeedsAcknowledgement (false),
+	m_AlertLevel (LibMCEnv::eAlertLevel::CriticalError)
+{
+	if (pAlertSession.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+
+}
+
+CAlert::~CAlert()
+{	
+}
+
+
 std::string CAlert::GetUUID()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_sAlertUUID;
 }
 
 LibMCEnv::eAlertLevel CAlert::GetAlertLevel()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_AlertLevel;
 }
 
 std::string CAlert::GetIdentifier()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
-
-std::string CAlert::GetDescription()
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_sIdentifier;
 }
 
 std::string CAlert::GetReadableContextInformation()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_sReadableContextInformation;
 }
 
 bool CAlert::NeedsAcknowledgement()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_bNeedsAcknowledgement;
 }
 
 bool CAlert::IsAcknowledged()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pAlertSession->AlertHasBeenAcknowledged(m_sAlertUUID);
 }
 
 void CAlert::GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_pAlertSession->GetAcknowledgementInformation(m_sAlertUUID, sUserUUID, sUserComment, sAckTime);
 }
 
