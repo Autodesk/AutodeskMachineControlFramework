@@ -379,6 +379,8 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER 352 /** Invalid alert identifier */
 #define LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER 353 /** Invalid alert description identifier */
 #define LIBMCDATA_ERROR_INVALIDALERTLEVEL 354 /** Invalid alert level */
+#define LIBMCDATA_ERROR_ALERTNOTFOUND 355 /** Alert not found */
+#define LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED 356 /** Alert has not been acknowledged. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -670,6 +672,8 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
     case LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER: return "Invalid alert description identifier";
     case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
+    case LIBMCDATA_ERROR_ALERTNOTFOUND: return "Alert not found";
+    case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "Alert has not been acknowledged.";
     default: return "unknown error";
   }
 }

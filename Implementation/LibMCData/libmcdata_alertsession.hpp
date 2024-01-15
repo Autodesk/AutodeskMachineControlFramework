@@ -72,7 +72,7 @@ public:
 
 	void GetAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC) override;
 
-	void AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
+	void AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, std::string& sTimestampUTC) override;
 
 	bool AlertHasBeenAcknowledged(const std::string& sUUID) override;
 

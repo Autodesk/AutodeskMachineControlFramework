@@ -504,6 +504,8 @@ public:
 			case LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER: return "INVALIDALERTIDENTIFIER";
 			case LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER: return "INVALIDALERTDESCRIPTIONIDENTIFIER";
 			case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "INVALIDALERTLEVEL";
+			case LIBMCDATA_ERROR_ALERTNOTFOUND: return "ALERTNOTFOUND";
+			case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "ALERTNOTACKNOWLEDGED";
 		}
 		return "UNKNOWN";
 	}
@@ -795,6 +797,8 @@ public:
 			case LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
 			case LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER: return "Invalid alert description identifier";
 			case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
+			case LIBMCDATA_ERROR_ALERTNOTFOUND: return "Alert not found";
+			case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "Alert has not been acknowledged.";
 		}
 		return "unknown error";
 	}
@@ -1066,7 +1070,7 @@ public:
 	inline void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC);
 	inline bool HasAlert(const std::string & sUUID);
 	inline void GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC);
-	inline void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment);
+	inline void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC);
 	inline bool AlertHasBeenAcknowledged(const std::string & sUUID);
 	inline void GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC);
 };
@@ -3723,10 +3727,16 @@ public:
 	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
 	* @param[in] sUserUUID - User UUID that acknowledged the alert.
 	* @param[in] sUserComment - Comment of the user.
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	void CAlertSession::AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment)
+	void CAlertSession::AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str()));
+		LibMCData_uint32 bytesNeededTimestampUTC = 0;
+		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str(), 0, &bytesNeededTimestampUTC, nullptr));
+		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str(), bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
+		sTimestampUTC = std::string(&bufferTimestampUTC[0]);
 	}
 	
 	/**

@@ -258,9 +258,12 @@ typedef LibMCDataResult (*PLibMCDataAlertSession_GetAlertInformationPtr) (LibMCD
 * @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
 * @param[in] pUserUUID - User UUID that acknowledged the alert.
 * @param[in] pUserComment - Comment of the user.
+* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataAlertSession_AcknowledgeAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment);
+typedef LibMCDataResult (*PLibMCDataAlertSession_AcknowledgeAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
 
 /**
 * Checks if an alert has been acknowledged. Fails if alert does not exist.

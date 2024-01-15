@@ -71,9 +71,9 @@ void CAlertSession::GetAlertInformation(const std::string& sUUID, std::string& s
     m_pJournal->getAlertInformation(sUUID, sIdentifier, eLevel, sDescription, sDescriptionIdentifier, sReadableContextInformation, bNeedsAcknowledgement, sTimestampUTC);
 }
 
-void CAlertSession::AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment)
+void CAlertSession::AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, std::string& sTimestampUTC)
 {
-    m_pJournal->acknowledgeAlert(sUUID, sUserUUID, sUserComment);
+    m_pJournal->acknowledgeAlert(sUUID, sUserUUID, sUserComment, sTimestampUTC);
 }
 
 bool CAlertSession::AlertHasBeenAcknowledged(const std::string& sUUID)

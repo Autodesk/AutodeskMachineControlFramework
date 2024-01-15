@@ -512,8 +512,9 @@ public:
 	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
 	* @param[in] sUserUUID - User UUID that acknowledged the alert.
 	* @param[in] sUserComment - Comment of the user.
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	virtual void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
+	virtual void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC) = 0;
 
 	/**
 	* IAlertSession::AlertHasBeenAcknowledged - Checks if an alert has been acknowledged. Fails if alert does not exist.

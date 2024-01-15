@@ -692,7 +692,7 @@ LibMCDataResult libmcdata_alertsession_getalertinformation(LibMCData_AlertSessio
 	}
 }
 
-LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment)
+LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pAlertSession;
 
@@ -703,15 +703,39 @@ LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession p
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserComment == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pTimestampUTCBuffer) && !(pTimestampUTCNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUUID(pUUID);
 		std::string sUserUUID(pUserUUID);
 		std::string sUserComment(pUserComment);
+		std::string sTimestampUTC("");
 		IAlertSession* pIAlertSession = dynamic_cast<IAlertSession*>(pIBaseClass);
 		if (!pIAlertSession)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIAlertSession->AcknowledgeAlert(sUUID, sUserUUID, sUserComment);
+		bool isCacheCall = (pTimestampUTCBuffer == nullptr);
+		if (isCacheCall) {
+			pIAlertSession->AcknowledgeAlert(sUUID, sUserUUID, sUserComment, sTimestampUTC);
 
+			pIAlertSession->_setCache (new ParameterCache_1<std::string> (sTimestampUTC));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlertSession->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sTimestampUTC);
+			pIAlertSession->_setCache (nullptr);
+		}
+		
+		if (pTimestampUTCNeededChars)
+			*pTimestampUTCNeededChars = (LibMCData_uint32) (sTimestampUTC.size()+1);
+		if (pTimestampUTCBuffer) {
+			if (sTimestampUTC.size() >= nTimestampUTCBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestampUTC = 0; iTimestampUTC < sTimestampUTC.size(); iTimestampUTC++)
+				pTimestampUTCBuffer[iTimestampUTC] = sTimestampUTC[iTimestampUTC];
+			pTimestampUTCBuffer[sTimestampUTC.size()] = 0;
+		}
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
