@@ -79,7 +79,7 @@ namespace AMCData {
 
 		void getAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC);
 
-		void acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment);
+		void acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string & sTimeStampUTC);
 
 		bool alertHasBeenAcknowledged(const std::string& sUUID);
 

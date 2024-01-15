@@ -51,9 +51,9 @@ namespace AMCData {
 		sQuery += "`subsystem`  varchar ( 8 ) NOT NULL, ";
 		sQuery += "`message`	TEXT DEFAULT `` )";
 
-		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
-		pStatement->execute();
-		pStatement = nullptr;
+		auto pLogStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pLogStatement->execute();
+		pLogStatement = nullptr;
 
 		std::string sJournalQuery = "CREATE TABLE `journal_chunks` (";
 		sJournalQuery += "`chunkindex` int DEFAULT 0, ";
@@ -62,21 +62,35 @@ namespace AMCData {
 		sJournalQuery += "`dataoffset` int DEFAULT 0, ";
 		sJournalQuery += "`datalength` int DEFAULT 0) ";
 
+		auto pJournalStatement = m_pSQLHandler->prepareStatement(sJournalQuery);
+		pJournalStatement->execute();
+		pJournalStatement = nullptr;
 
 		std::string sAlertQuery = "CREATE TABLE `alerts` (";
 		sAlertQuery += "`uuid`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`identifier`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`alertindex`	int DEFAULT 0, ";
-		sAlertQuery += "`alertlevel`	int DEFAULT 0,";
+		sAlertQuery += "`alertlevel`	varchar (64) NOT NULL,";
 		sAlertQuery += "`description`	TEXT DEFAULT ``,";
 		sAlertQuery += "`descriptionidentifier`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`contextinformation`	TEXT DEFAULT ``,";
 		sAlertQuery += "`needsacknowledgement`	int DEFAULT 0,";
 		sAlertQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 
-		auto pJournalStatement = m_pSQLHandler->prepareStatement(sJournalQuery);
-		pJournalStatement->execute();
-		pJournalStatement = nullptr;
+		auto pAlertStatement = m_pSQLHandler->prepareStatement(sAlertQuery);
+		pAlertStatement->execute();
+		pAlertStatement = nullptr;
+
+		std::string sAlertAckQuery = "CREATE TABLE `alertacknowledgements` (";
+		sAlertAckQuery += "`uuid`  varchar ( 64 ) NOT NULL, ";
+		sAlertAckQuery += "`alertuuid`  varchar ( 64 ) NOT NULL, ";
+		sAlertAckQuery += "`useruuid`  varchar ( 64 ) NOT NULL, ";
+		sAlertAckQuery += "`usercomment`  varchar ( 64 ) NOT NULL, ";
+		sAlertAckQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+
+		auto pAlertAckStatement = m_pSQLHandler->prepareStatement(sAlertAckQuery);
+		pAlertAckStatement->execute();
+		pAlertAckStatement = nullptr; 
 	}
 
 	CJournal::~CJournal()
@@ -117,58 +131,6 @@ namespace AMCData {
 		return m_pSQLHandler;
 	}
 
-	void CJournal::addAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC)
-	{
-		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-
-		if (sIdentifier.empty())
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER);
-
-		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER, "invalid alert identifier: " + sIdentifier);
-
-		if (!sDescriptionIdentifier.empty()) {
-			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sDescriptionIdentifier))
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER, "invalid alert description identifier: " + sDescriptionIdentifier);
-		}
-
-		switch (eLevel) {
-			case LibMCData::eAlertLevel::Warning:
-				break;
-
-			case LibMCData::eAlertLevel::Message:
-				break;
-
-			case LibMCData::eAlertLevel::FatalError:
-				break;
-
-			case LibMCData::eAlertLevel::CriticalError:
-				break;
-
-			default:
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTLEVEL, "invalid alert level: " + std::to_string ((int) eLevel));
-				
-		}
-
-		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
-
-		std::string sQuery = "INSERT INTO alert (uuid, identifier, alertindex, alertlevel, description, descriptionidentifier, contextinformation, needsacknowledgement, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
-		pStatement->setString(1, sNormalizedUUID);
-		pStatement->setString(2, sIdentifier);
-		pStatement->setInt(3, m_AlertID);
-		pStatement->setInt(4, (int)eLevel);
-		pStatement->setString(5, sDescription);
-		pStatement->setString(6, sDescriptionIdentifier);
-		pStatement->setString(7, sReadableContextInformation);
-		pStatement->setInt(8, bNeedsAcknowledgement);
-		pStatement->setString(9, sTimestampUTC);
-		pStatement->execute();
-		pStatement = nullptr;
-
-		m_AlertID++;
-	}
-
 
 	void CJournal::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer)
 	{
@@ -204,28 +166,191 @@ namespace AMCData {
 	}
 
 
+	void CJournal::addAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC)
+	{
+		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+		if (sIdentifier.empty())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER, "invalid alert identifier: " + sIdentifier);
+
+		if (!sDescriptionIdentifier.empty()) {
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sDescriptionIdentifier))
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER, "invalid alert description identifier: " + sDescriptionIdentifier);
+		}
+
+		std::string sLevel;
+
+		switch (eLevel) {
+		case LibMCData::eAlertLevel::Warning:
+			sLevel = "warning";
+			break;
+
+		case LibMCData::eAlertLevel::Message:
+			sLevel = "message";
+			break;
+
+		case LibMCData::eAlertLevel::FatalError:
+			sLevel = "fatalerror";
+			break;
+
+		case LibMCData::eAlertLevel::CriticalError:
+			sLevel = "criticalerror";
+			break;
+
+		case LibMCData::eAlertLevel::Unknown:
+			sLevel = "unknown";
+			break;
+
+		default:
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTLEVEL, "invalid alert level: " + std::to_string((int)eLevel));
+
+		}
+
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "INSERT INTO alerts (uuid, identifier, alertindex, alertlevel, description, descriptionidentifier, contextinformation, needsacknowledgement, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, sNormalizedUUID);
+		pStatement->setString(2, sIdentifier);
+		pStatement->setInt(3, m_AlertID);
+		pStatement->setInt(4, (int)eLevel);
+		pStatement->setString(5, sDescription);
+		pStatement->setString(6, sDescriptionIdentifier);
+		pStatement->setString(7, sReadableContextInformation);
+		pStatement->setInt(8, bNeedsAcknowledgement);
+		pStatement->setString(9, sTimestampUTC);
+		pStatement->execute();
+		pStatement = nullptr;
+
+		m_AlertID++;
+	}
+
+
 	bool CJournal::hasAlert(const std::string& sUUID)
 	{
-		return false;
+		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "SELECT uuid FROM alerts WHERE uuid=?";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, sNormalizedUUID);
+		return pStatement->nextRow();
+
+
 	}
 
 	void CJournal::getAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC)
 	{
+		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "SELECT identifier, alertlevel, description, descriptionidentifier, contextinformation, needsacknowledgement, timestamp FROM alerts WHERE uuid=?";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, sNormalizedUUID);
+
+		if (pStatement->nextRow()) {
+			sIdentifier = pStatement->getColumnString(1);
+			std::string sAlertLevel = pStatement->getColumnString(2);
+
+			if (sAlertLevel == "warning") {
+				eLevel = LibMCData::eAlertLevel::Warning;
+			}
+			else if (sAlertLevel == "message") {
+				eLevel = LibMCData::eAlertLevel::Message;
+			}
+			else if (sAlertLevel == "fatalerror") {
+				eLevel = LibMCData::eAlertLevel::FatalError;
+			}
+			else if (sAlertLevel == "criticalerror") {
+				eLevel = LibMCData::eAlertLevel::CriticalError;
+			}
+			else {
+				eLevel = LibMCData::eAlertLevel::Unknown;
+			}
+
+
+			sDescription = pStatement->getColumnString(3);
+			sDescriptionIdentifier = pStatement->getColumnString(4);
+			sReadableContextInformation = pStatement->getColumnString(5);
+			bNeedsAcknowledgement = pStatement->getColumnInt(6) != 0;
+			sTimestampUTC = pStatement->getColumnString(7);
+		}
+		else {
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+		}
+
 
 	}
 
-	void CJournal::acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment)
+	void CJournal::acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string& sTimeStampUTC)
 	{
+		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+		auto sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+		auto pTransaction = m_pSQLHandler->beginTransaction();
+
+		std::string sQuery = "SELECT uuid FROM alerts WHERE uuid=?";
+		auto pStatement = pTransaction->prepareStatement(sQuery);
+		pStatement->setString(1, sNormalizedUUID);
+		if (pStatement->nextRow()) {
+
+			std::string sNewAckUUID = AMCCommon::CUtils::createUUID();
+
+			std::string sQuery = "INSERT INTO alertacknowledgements (uuid, alertuuid, useruuid, usercomment, timestamp) VALUES (?, ?, ?, ?, ?)";
+			auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+			pStatement->setString(1, sNewAckUUID);
+			pStatement->setString(2, sNormalizedUUID);
+			pStatement->setString(3, sNormalizedUserUUID);
+			pStatement->setString(4, sUserComment);
+			pStatement->setString(5, sTimeStampUTC);
+			pStatement->execute();
+			pStatement = nullptr;
+
+			pTransaction->commit();
+
+		}
+		else {
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+		}
+
 
 	}
 
 	bool CJournal::alertHasBeenAcknowledged(const std::string& sUUID)
 	{
-		return false;
+		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "SELECT uuid FROM alertacknowledgements WHERE alertuuid=? ORDER BY timestamp LIMIT 1";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, sNormalizedUUID);
+		return pStatement->nextRow();
 	}
 
 	void CJournal::getAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC)
 	{
+		auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "SELECT useruuid, usercomment, timestamp FROM alertacknowledgements WHERE alertuuid=? ORDER BY timestamp LIMIT 1";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, sNormalizedUUID);
+		if (pStatement->nextRow()) {
+			sUserUUID = pStatement->getColumnString(1);
+			sUserComment = pStatement->getColumnString(2);
+			sTimestampUTC = pStatement->getColumnString(3);
+		}
+		else {
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED, "alert has not been acknowledged: " + sNormalizedUUID);
+
+		}
 
 	}
 
