@@ -43,8 +43,35 @@ using namespace LibMCDriver_TML::Impl;
  Class definition of CAxis 
 **************************************************************************************************************************/
 
+CAxis::CAxis(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+    : m_pTMLInstance (pTMLInstance), m_sChannelIdentifier (sChannelIdentifier), m_sAxisIdentifier (sAxisIdentifier)
+{
+    if (pTMLInstance.get () == nullptr)
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+
+    if (!CTMLInstance::checkIdentifierString(sChannelIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER);
+    if (!CTMLInstance::checkIdentifierString(sAxisIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER);
+}
+
+CAxis::~CAxis()
+{
+
+}
+
+
 void CAxis::SetPower(const bool bEnable)
 {
 	throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_NOTIMPLEMENTED);
 }
 
+std::string CAxis::GetIdentifier()
+{
+    return m_sAxisIdentifier;
+}
+
+std::string CAxis::GetChannelIdentifier()
+{
+    return m_sChannelIdentifier;
+}

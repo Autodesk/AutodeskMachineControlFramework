@@ -184,6 +184,27 @@ public:
 			case LIBMCDRIVER_TML_ERROR_INCOMPATIBLEBINARYVERSION: return "INCOMPATIBLEBINARYVERSION";
 			case LIBMCDRIVER_TML_ERROR_DRIVERERROR: return "DRIVERERROR";
 			case LIBMCDRIVER_TML_ERROR_SDKALREADYLOADED: return "SDKALREADYLOADED";
+			case LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCEDLLGIVEN: return "NOSDKLIBRESOURCEDLLGIVEN";
+			case LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCECOMMSGIVEN: return "NOSDKLIBRESOURCECOMMSGIVEN";
+			case LIBMCDRIVER_TML_ERROR_EMPTYCHANNELIDENTIFIER: return "EMPTYCHANNELIDENTIFIER";
+			case LIBMCDRIVER_TML_ERROR_CHANNELIDENTIFIERTOOLONG: return "CHANNELIDENTIFIERTOOLONG";
+			case LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER: return "INVALIDCHANNELIDENTIFIER";
+			case LIBMCDRIVER_TML_ERROR_CHANNELDOESNOTEXIST: return "CHANNELDOESNOTEXIST";
+			case LIBMCDRIVER_TML_ERROR_CHANNELALREADYEXISTS: return "CHANNELALREADYEXISTS";
+			case LIBMCDRIVER_TML_ERROR_EMPTYDEVICENAME: return "EMPTYDEVICENAME";
+			case LIBMCDRIVER_TML_ERROR_UNSUPPORTEDPROTOCOLTYPE: return "UNSUPPORTEDPROTOCOLTYPE";
+			case LIBMCDRIVER_TML_ERROR_UNSUPPORTEDCHANNELTYPE: return "UNSUPPORTEDCHANNELTYPE";
+			case LIBMCDRIVER_TML_ERROR_TMLSDKERROR: return "TMLSDKERROR";
+			case LIBMCDRIVER_TML_ERROR_UNKNOWNTMLSDKERROR: return "UNKNOWNTMLSDKERROR";
+			case LIBMCDRIVER_TML_ERROR_INVALIDHOSTID: return "INVALIDHOSTID";
+			case LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER: return "EMPTYAXISIDENTIFIER";
+			case LIBMCDRIVER_TML_ERROR_AXISIDENTIFIERTOOLONG: return "AXISIDENTIFIERTOOLONG";
+			case LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER: return "INVALIDAXISIDENTIFIER";
+			case LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER: return "INVALIDAXISCONFIGURATIONBUFFER";
+			case LIBMCDRIVER_TML_ERROR_AXISDOESNOTEXIST: return "AXISDOESNOTEXIST";
+			case LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID: return "INVALIDAXISHARDWAREID";
+			case LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS: return "AXISALREADYEXISTS";
+			case LIBMCDRIVER_TML_ERROR_AXISNOTFOUND: return "AXISNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -202,6 +223,27 @@ public:
 			case LIBMCDRIVER_TML_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
 			case LIBMCDRIVER_TML_ERROR_DRIVERERROR: return "a driver error occured";
 			case LIBMCDRIVER_TML_ERROR_SDKALREADYLOADED: return "SDK already loaded";
+			case LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCEDLLGIVEN: return "No SDK library resource DLL given";
+			case LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCECOMMSGIVEN: return "No SDK comms resource DLL given";
+			case LIBMCDRIVER_TML_ERROR_EMPTYCHANNELIDENTIFIER: return "Empty channel identifier";
+			case LIBMCDRIVER_TML_ERROR_CHANNELIDENTIFIERTOOLONG: return "Channel name too long";
+			case LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER: return "Invalid channel identifier";
+			case LIBMCDRIVER_TML_ERROR_CHANNELDOESNOTEXIST: return "Channel does not exist";
+			case LIBMCDRIVER_TML_ERROR_CHANNELALREADYEXISTS: return "Channel already exists";
+			case LIBMCDRIVER_TML_ERROR_EMPTYDEVICENAME: return "Empty device name";
+			case LIBMCDRIVER_TML_ERROR_UNSUPPORTEDPROTOCOLTYPE: return "Unsupported protocol type";
+			case LIBMCDRIVER_TML_ERROR_UNSUPPORTEDCHANNELTYPE: return "Unsupported channel type";
+			case LIBMCDRIVER_TML_ERROR_TMLSDKERROR: return "TML SDK Error";
+			case LIBMCDRIVER_TML_ERROR_UNKNOWNTMLSDKERROR: return "Unknown TML SDK Error";
+			case LIBMCDRIVER_TML_ERROR_INVALIDHOSTID: return "TML SDK Error";
+			case LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER: return "Empty Axis identifier";
+			case LIBMCDRIVER_TML_ERROR_AXISIDENTIFIERTOOLONG: return "Axis name too long";
+			case LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER: return "Invalid axis identifier";
+			case LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER: return "Invalid axis configuration buffer";
+			case LIBMCDRIVER_TML_ERROR_AXISDOESNOTEXIST: return "Axis does not exist";
+			case LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID: return "Invalid Axis Hardware ID";
+			case LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS: return "Axis already exists";
+			case LIBMCDRIVER_TML_ERROR_AXISNOTFOUND: return "Axis not found";
 		}
 		return "unknown error";
 	}
@@ -424,6 +466,8 @@ public:
 	{
 	}
 	
+	inline std::string GetIdentifier();
+	inline std::string GetChannelIdentifier();
 	inline void SetPower(const bool bEnable);
 };
 	
@@ -441,7 +485,10 @@ public:
 	{
 	}
 	
-	inline PAxis SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nIndexInSetup);
+	inline std::string GetIdentifier();
+	inline PAxis SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const CInputVector<LibMCDriver_TML_uint8> & ConfigurationBuffer);
+	inline PAxis FindAxis(const std::string & sIdentifier);
+	inline bool AxisExists(const std::string & sIdentifier);
 	inline void Close();
 };
 	
@@ -461,9 +508,9 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
-	inline void SetCustomSDKResource(const std::string & sResourceName);
-	inline void LoadSetup(const std::string & sSetupConfig, const std::string & sVariablesConfig);
+	inline void SetCustomSDKResource(const std::string & sLibResourceName, const std::string & sCommsResourceName);
 	inline PChannel OpenChannel(const std::string & sIdentifier, const std::string & sDeviceName, const eChannelType eChannelTypeToUse, const eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate);
+	inline bool ChannelExists(const std::string & sIdentifier);
 	inline PChannel FindChannel(const std::string & sIdentifier);
 };
 	
@@ -595,14 +642,19 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
+		pWrapperTable->m_Axis_GetIdentifier = nullptr;
+		pWrapperTable->m_Axis_GetChannelIdentifier = nullptr;
 		pWrapperTable->m_Axis_SetPower = nullptr;
+		pWrapperTable->m_Channel_GetIdentifier = nullptr;
 		pWrapperTable->m_Channel_SetupAxis = nullptr;
+		pWrapperTable->m_Channel_FindAxis = nullptr;
+		pWrapperTable->m_Channel_AxisExists = nullptr;
 		pWrapperTable->m_Channel_Close = nullptr;
 		pWrapperTable->m_Driver_TML_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_TML_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_TML_SetCustomSDKResource = nullptr;
-		pWrapperTable->m_Driver_TML_LoadSetup = nullptr;
 		pWrapperTable->m_Driver_TML_OpenChannel = nullptr;
+		pWrapperTable->m_Driver_TML_ChannelExists = nullptr;
 		pWrapperTable->m_Driver_TML_FindChannel = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -716,6 +768,24 @@ public:
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Axis_GetIdentifier = (PLibMCDriver_TMLAxis_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_getidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Axis_GetIdentifier = (PLibMCDriver_TMLAxis_GetIdentifierPtr) dlsym(hLibrary, "libmcdriver_tml_axis_getidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_GetIdentifier == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_GetChannelIdentifier = (PLibMCDriver_TMLAxis_GetChannelIdentifierPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_getchannelidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Axis_GetChannelIdentifier = (PLibMCDriver_TMLAxis_GetChannelIdentifierPtr) dlsym(hLibrary, "libmcdriver_tml_axis_getchannelidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_GetChannelIdentifier == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Axis_SetPower = (PLibMCDriver_TMLAxis_SetPowerPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_setpower");
 		#else // _WIN32
 		pWrapperTable->m_Axis_SetPower = (PLibMCDriver_TMLAxis_SetPowerPtr) dlsym(hLibrary, "libmcdriver_tml_axis_setpower");
@@ -725,12 +795,39 @@ public:
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Channel_GetIdentifier = (PLibMCDriver_TMLChannel_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcdriver_tml_channel_getidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Channel_GetIdentifier = (PLibMCDriver_TMLChannel_GetIdentifierPtr) dlsym(hLibrary, "libmcdriver_tml_channel_getidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Channel_GetIdentifier == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Channel_SetupAxis = (PLibMCDriver_TMLChannel_SetupAxisPtr) GetProcAddress(hLibrary, "libmcdriver_tml_channel_setupaxis");
 		#else // _WIN32
 		pWrapperTable->m_Channel_SetupAxis = (PLibMCDriver_TMLChannel_SetupAxisPtr) dlsym(hLibrary, "libmcdriver_tml_channel_setupaxis");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Channel_SetupAxis == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Channel_FindAxis = (PLibMCDriver_TMLChannel_FindAxisPtr) GetProcAddress(hLibrary, "libmcdriver_tml_channel_findaxis");
+		#else // _WIN32
+		pWrapperTable->m_Channel_FindAxis = (PLibMCDriver_TMLChannel_FindAxisPtr) dlsym(hLibrary, "libmcdriver_tml_channel_findaxis");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Channel_FindAxis == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Channel_AxisExists = (PLibMCDriver_TMLChannel_AxisExistsPtr) GetProcAddress(hLibrary, "libmcdriver_tml_channel_axisexists");
+		#else // _WIN32
+		pWrapperTable->m_Channel_AxisExists = (PLibMCDriver_TMLChannel_AxisExistsPtr) dlsym(hLibrary, "libmcdriver_tml_channel_axisexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Channel_AxisExists == nullptr)
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -770,21 +867,21 @@ public:
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_TML_LoadSetup = (PLibMCDriver_TMLDriver_TML_LoadSetupPtr) GetProcAddress(hLibrary, "libmcdriver_tml_driver_tml_loadsetup");
-		#else // _WIN32
-		pWrapperTable->m_Driver_TML_LoadSetup = (PLibMCDriver_TMLDriver_TML_LoadSetupPtr) dlsym(hLibrary, "libmcdriver_tml_driver_tml_loadsetup");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_TML_LoadSetup == nullptr)
-			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_Driver_TML_OpenChannel = (PLibMCDriver_TMLDriver_TML_OpenChannelPtr) GetProcAddress(hLibrary, "libmcdriver_tml_driver_tml_openchannel");
 		#else // _WIN32
 		pWrapperTable->m_Driver_TML_OpenChannel = (PLibMCDriver_TMLDriver_TML_OpenChannelPtr) dlsym(hLibrary, "libmcdriver_tml_driver_tml_openchannel");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_TML_OpenChannel == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_TML_ChannelExists = (PLibMCDriver_TMLDriver_TML_ChannelExistsPtr) GetProcAddress(hLibrary, "libmcdriver_tml_driver_tml_channelexists");
+		#else // _WIN32
+		pWrapperTable->m_Driver_TML_ChannelExists = (PLibMCDriver_TMLDriver_TML_ChannelExistsPtr) dlsym(hLibrary, "libmcdriver_tml_driver_tml_channelexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_TML_ChannelExists == nullptr)
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -899,12 +996,32 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParametersEx == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_getidentifier", (void**)&(pWrapperTable->m_Axis_GetIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetIdentifier == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_getchannelidentifier", (void**)&(pWrapperTable->m_Axis_GetChannelIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetChannelIdentifier == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_tml_axis_setpower", (void**)&(pWrapperTable->m_Axis_SetPower));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_SetPower == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_tml_channel_getidentifier", (void**)&(pWrapperTable->m_Channel_GetIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Channel_GetIdentifier == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_tml_channel_setupaxis", (void**)&(pWrapperTable->m_Channel_SetupAxis));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Channel_SetupAxis == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_channel_findaxis", (void**)&(pWrapperTable->m_Channel_FindAxis));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Channel_FindAxis == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_channel_axisexists", (void**)&(pWrapperTable->m_Channel_AxisExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Channel_AxisExists == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_tml_channel_close", (void**)&(pWrapperTable->m_Channel_Close));
@@ -923,12 +1040,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TML_SetCustomSDKResource == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_tml_driver_tml_loadsetup", (void**)&(pWrapperTable->m_Driver_TML_LoadSetup));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TML_LoadSetup == nullptr) )
-			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_tml_driver_tml_openchannel", (void**)&(pWrapperTable->m_Driver_TML_OpenChannel));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TML_OpenChannel == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_driver_tml_channelexists", (void**)&(pWrapperTable->m_Driver_TML_ChannelExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TML_ChannelExists == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_tml_driver_tml_findchannel", (void**)&(pWrapperTable->m_Driver_TML_FindChannel));
@@ -1055,6 +1172,36 @@ public:
 	 */
 	
 	/**
+	* CAxis::GetIdentifier - Returns the axis identifier.
+	* @return Axis identifier.
+	*/
+	std::string CAxis::GetIdentifier()
+	{
+		LibMCDriver_TML_uint32 bytesNeededIdentifier = 0;
+		LibMCDriver_TML_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CAxis::GetChannelIdentifier - Returns the identifier of the channel of the axis.
+	* @return Channel identifier.
+	*/
+	std::string CAxis::GetChannelIdentifier()
+	{
+		LibMCDriver_TML_uint32 bytesNeededIdentifier = 0;
+		LibMCDriver_TML_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetChannelIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetChannelIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
 	* CAxis::SetPower - Sets the power for an axis.
 	* @param[in] bEnable - Flag if the power is enabled or not enabled.
 	*/
@@ -1068,20 +1215,65 @@ public:
 	 */
 	
 	/**
-	* CChannel::SetupAxis - Setups an axis for this channel.
+	* CChannel::GetIdentifier - Returns the channel identifier.
+	* @return Channel identifier.
+	*/
+	std::string CChannel::GetIdentifier()
+	{
+		LibMCDriver_TML_uint32 bytesNeededIdentifier = 0;
+		LibMCDriver_TML_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Channel_GetIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_Channel_GetIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CChannel::SetupAxis - Setups an axis for this channel. The identifier MUST be globally unique.
 	* @param[in] sIdentifier - Identifier for the axis. Fails if axis already exist.
-	* @param[in] nIndexInSetup - Index of the setup to use for this axis.
+	* @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
+	* @param[in] ConfigurationBuffer - Configuration ZIP file for the axis.
 	* @return Returns the axis instance.
 	*/
-	PAxis CChannel::SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nIndexInSetup)
+	PAxis CChannel::SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const CInputVector<LibMCDriver_TML_uint8> & ConfigurationBuffer)
 	{
 		LibMCDriver_TMLHandle hAxisInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Channel_SetupAxis(m_pHandle, sIdentifier.c_str(), nIndexInSetup, &hAxisInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Channel_SetupAxis(m_pHandle, sIdentifier.c_str(), nAxisID, (LibMCDriver_TML_uint64)ConfigurationBuffer.size(), ConfigurationBuffer.data(), &hAxisInstance));
 		
 		if (!hAxisInstance) {
 			CheckError(LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAxis>(m_pWrapper, hAxisInstance);
+	}
+	
+	/**
+	* CChannel::FindAxis - Finds an existing axis of this channel.
+	* @param[in] sIdentifier - Identifier for the axis. Fails if axis already exist.
+	* @return Returns the axis instance.
+	*/
+	PAxis CChannel::FindAxis(const std::string & sIdentifier)
+	{
+		LibMCDriver_TMLHandle hAxisInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Channel_FindAxis(m_pHandle, sIdentifier.c_str(), &hAxisInstance));
+		
+		if (!hAxisInstance) {
+			CheckError(LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAxis>(m_pWrapper, hAxisInstance);
+	}
+	
+	/**
+	* CChannel::AxisExists - Returns if the axis exists on this channel.
+	* @param[in] sIdentifier - Identifier of the axis.
+	* @return Flag if the axis exists.
+	*/
+	bool CChannel::AxisExists(const std::string & sIdentifier)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Channel_AxisExists(m_pHandle, sIdentifier.c_str(), &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**
@@ -1118,21 +1310,12 @@ public:
 	
 	/**
 	* CDriver_TML::SetCustomSDKResource - Sets the machine resource name of the TML SDK to load. MUST be called before Connect or it has no effect.
-	* @param[in] sResourceName - Resource name of core machine package. Empty means standard naming applies.
+	* @param[in] sLibResourceName - Resource name of core machine package that contains the proprietary tml_lib.dll. Empty means standard naming applies.
+	* @param[in] sCommsResourceName - Resource name of core machine package that contains the proprietary tmlcomms.dll. Empty means standard naming applies.
 	*/
-	void CDriver_TML::SetCustomSDKResource(const std::string & sResourceName)
+	void CDriver_TML::SetCustomSDKResource(const std::string & sLibResourceName, const std::string & sCommsResourceName)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TML_SetCustomSDKResource(m_pHandle, sResourceName.c_str()));
-	}
-	
-	/**
-	* CDriver_TML::LoadSetup - Loads the driver configuration files manually.
-	* @param[in] sSetupConfig - Content of the setup config.
-	* @param[in] sVariablesConfig - Content of the variables config.
-	*/
-	void CDriver_TML::LoadSetup(const std::string & sSetupConfig, const std::string & sVariablesConfig)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TML_LoadSetup(m_pHandle, sSetupConfig.c_str(), sVariablesConfig.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TML_SetCustomSDKResource(m_pHandle, sLibResourceName.c_str(), sCommsResourceName.c_str()));
 	}
 	
 	/**
@@ -1157,7 +1340,20 @@ public:
 	}
 	
 	/**
-	* CDriver_TML::FindChannel - Find a communication channel by integer.
+	* CDriver_TML::ChannelExists - Returns if the channel exists..
+	* @param[in] sIdentifier - Identifier of the device.
+	* @return Flag if the channel exists.
+	*/
+	bool CDriver_TML::ChannelExists(const std::string & sIdentifier)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TML_ChannelExists(m_pHandle, sIdentifier.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriver_TML::FindChannel - Find a communication channel by integer. Fails if the channel does not exist.
 	* @param[in] sIdentifier - Identifier of the device.
 	* @return Returns the channel instance.
 	*/

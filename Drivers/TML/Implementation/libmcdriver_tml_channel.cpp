@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of CChannel
 */
 
 #include "libmcdriver_tml_channel.hpp"
+#include "libmcdriver_tml_axis.hpp"
 #include "libmcdriver_tml_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -43,13 +44,76 @@ using namespace LibMCDriver_TML::Impl;
  Class definition of CChannel 
 **************************************************************************************************************************/
 
-IAxis * CChannel::SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nIndexInSetup)
+CChannel::CChannel(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier)
+    : m_pTMLInstance (pTMLInstance), m_sChannelIdentifier(sChannelIdentifier)
 {
-	throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_NOTIMPLEMENTED);
+    if (pTMLInstance.get () == nullptr)
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+
+    if (sChannelIdentifier.empty())
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_EMPTYCHANNELIDENTIFIER);
+
+    if (!CTMLInstance::checkIdentifierString (sChannelIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sChannelIdentifier);
+
 }
+
+CChannel::~CChannel()
+{
+
+}
+
+std::string CChannel::GetIdentifier()
+{
+    return m_sChannelIdentifier;
+}
+
+IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer)
+{
+    if (sIdentifier.empty())
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER);
+
+    if (!CTMLInstance::checkIdentifierString(sIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER, "invalid axis identifier: " + sIdentifier);
+
+    if ((nConfigurationBufferSize == 0) || (pConfigurationBuffer == nullptr))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER);
+
+    m_pTMLInstance->setupAxis(sIdentifier, m_sChannelIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer);
+
+    return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier);
+
+}
+
+IAxis* CChannel::FindAxis(const std::string& sIdentifier)
+{
+    if (sIdentifier.empty())
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER);
+
+    if (!CTMLInstance::checkIdentifierString(sIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER, "invalid axis identifier: " + sIdentifier);
+
+    if (!m_pTMLInstance->axisExistsInChannel (m_sChannelIdentifier, sIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISDOESNOTEXIST, "axis does not exist: " + sIdentifier);
+
+    return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier);
+}
+
+
+bool CChannel::AxisExists(const std::string& sIdentifier)
+{
+    if (sIdentifier.empty())
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER);
+
+    if (!CTMLInstance::checkIdentifierString(sIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER, "invalid axis identifier: " + sIdentifier);
+
+    return m_pTMLInstance->axisExistsInChannel(m_sChannelIdentifier, sIdentifier);
+}
+
 
 void CChannel::Close()
 {
-	throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_NOTIMPLEMENTED);
+    m_pTMLInstance->closeChannel(m_sChannelIdentifier);
 }
 

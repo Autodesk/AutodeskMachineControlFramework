@@ -140,6 +140,22 @@ CTMLSDK::~CTMLSDK()
 void CTMLSDK::checkError(bool bSuccess)
 {
 	if (!bSuccess) {
+		raiseLastError();
+	}
+}
+
+void CTMLSDK::raiseLastError()
+{
+	const char* pLastErrorText = nullptr;
+	if (TS_GetLastErrorText != nullptr) {
+		pLastErrorText = TS_GetLastErrorText();
+	}
+
+	if (pLastErrorText != nullptr) {
+		throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_TMLSDKERROR, "TML SDK Error: " + std::string (pLastErrorText));
+	}
+	else {
+		throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_UNKNOWNTMLSDKERROR);
 	}
 
 }

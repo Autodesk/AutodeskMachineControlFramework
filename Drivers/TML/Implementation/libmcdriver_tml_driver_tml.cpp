@@ -68,13 +68,17 @@ bool CDriver_TML::IsSimulationMode()
     return m_bSimulationMode;
 }
 
-void CDriver_TML::SetCustomSDKResource(const std::string & sResourceName)
+void CDriver_TML::SetCustomSDKResource(const std::string& sLibResourceName, const std::string& sCommsResourceName)
 {
 	
     if (sdkIsLoaded())
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_SDKALREADYLOADED);
 
-    m_pDriverEnvironment->RetrieveMachineResourceData(sResourceName, m_SDKDLLBuffer);
+    m_SDKLibDLLBuffer.resize(0);
+    m_SDKCommsDLLBuffer.resize(0);
+
+    m_pDriverEnvironment->RetrieveMachineResourceData(sLibResourceName, m_SDKLibDLLBuffer);
+    m_pDriverEnvironment->RetrieveMachineResourceData(sCommsResourceName, m_SDKCommsDLLBuffer);
 
 }
 
@@ -89,30 +93,42 @@ void CDriver_TML::ensureSDKIsLoaded()
 
         m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
 
-        m_pTMLDLLLibrary = m_pWorkingDirectory->StoreCustomData("tml_lib.dll", m_SDKDLLBuffer);
+        if (m_SDKLibDLLBuffer.empty())
+            throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCEDLLGIVEN);
+        if (m_SDKCommsDLLBuffer.empty())
+            throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCECOMMSGIVEN);
 
-        m_pTMLSDK = std::make_shared<CTMLSDK> (m_pTMLDLLLibrary->GetAbsoluteFileName());
+#ifdef _WIN32        
+
+        m_pTMLLibDLLLibrary = m_pWorkingDirectory->StoreCustomData("TML_lib.dll", m_SDKLibDLLBuffer);
+
+        m_pTMLCommsDLLLibrary = m_pWorkingDirectory->StoreCustomData("tmlcomms.dll", m_SDKCommsDLLBuffer);
+
+#else
+
+        m_pTMLLibDLLLibrary = m_pWorkingDirectory->StoreCustomData("tml_lib.so", m_SDKLibDLLBuffer);
+
+        m_pTMLCommsDLLLibrary = m_pWorkingDirectory->StoreCustomData("tmlcomms.so", m_SDKCommsDLLBuffer);
+
+#endif
+
+        m_pTMLSDK = std::make_shared<CTMLSDK> (m_pTMLLibDLLLibrary->GetAbsoluteFileName());
+
+        m_pTMLInstance = std::make_shared<CTMLInstance>(m_pTMLSDK, m_pWorkingDirectory);
 
     }
 
 }
 
 
-void CDriver_TML::LoadSetup(const std::string & sSetupConfig, const std::string & sVariablesConfig)
-{
-    ensureSDKIsLoaded();
-    m_pWorkingDirectory->StoreCustomString("setup.cfg", sSetupConfig);
-    m_pWorkingDirectory->StoreCustomString("variables.cfg", sVariablesConfig);
-
-    int32_t nSetupIndex = m_pTMLSDK->TS_LoadSetup(m_pWorkingDirectory->GetAbsoluteFilePath().c_str());
-
-}
 
 IChannel * CDriver_TML::OpenChannel(const std::string & sIdentifier, const std::string & sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate)
 {
     ensureSDKIsLoaded();
 
-    return new CChannel();
+    m_pTMLInstance->openChannel (sIdentifier, sDeviceName, eChannelTypeToUse, eProtocolTypeToUse, nHostID, nBaudrate);
+
+    return new CChannel(m_pTMLInstance, sIdentifier);
 
 }
 
@@ -120,6 +136,19 @@ IChannel * CDriver_TML::FindChannel(const std::string & sIdentifier)
 {
     ensureSDKIsLoaded();
 
-    return new CChannel();
+    if (!m_pTMLInstance->checkIdentifierString (sIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sIdentifier);
+
+    if (!m_pTMLInstance->channelExists (sIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_CHANNELDOESNOTEXIST);
+
+    return new CChannel(m_pTMLInstance, sIdentifier);
 }
 
+bool CDriver_TML::ChannelExists(const std::string& sIdentifier)
+{
+    ensureSDKIsLoaded();
+
+    return m_pTMLInstance->channelExists(sIdentifier);
+
+}
