@@ -607,6 +607,10 @@
 		<error name="INVALIDLANGUAGEIDENTIFIER" code="581" description="Invalid language identifier"/>		
 		<error name="INVALIDLANGUAGESTRINGIDENTIFIER" code="582" description="Invalid language string identifier"/>		
 		<error name="INVALIDLANGUAGEDEFINITION" code="583" description="Invalid language definition"/>		
+		<error name="MISSINGALERTNAME" code="584" description="Missing alert name"/>		
+		<error name="MISSINGALERTLEVEL" code="585" description="Missing alert level"/>		
+		<error name="INVALIDALERTLEVEL" code="586" description="Invalid alert level"/>		
+		
 		
 		
 	</errors>

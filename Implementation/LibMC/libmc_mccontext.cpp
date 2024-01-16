@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_statemachineinstance.hpp"
 #include "amc_logger.hpp"
+#include "amc_alerthandler.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_logger_multi.hpp"
@@ -199,6 +200,14 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             m_pSystemState->accessControl()->setToNoAccessControl ();
         }
 
+
+        m_pSystemState->logger()->logMessage("Reading alert information", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        auto alertsNode = mainNode.child("alerts");
+        if (!alertsNode.empty()) {
+
+            loadAlertDefinitions(alertsNode);
+
+        }
 
         auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
         m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -616,11 +625,41 @@ void CMCContext::loadDriverParameterGroup(const pugi::xml_node& xmlNode, AMC::PP
 
 }
 
+void CMCContext::loadAlertDefinitions(const pugi::xml_node& xmlNode)
+{
+    auto alertHandler = m_pSystemState->alertHandler();
+
+    auto alertNodes = xmlNode.children("alert");
+    for (auto alertNode : alertNodes) {
+        std::string sName = alertNode.attribute("name").as_string();
+        std::string sLevel = alertNode.attribute("level").as_string();
+        std::string sAcknowledgePermission = alertNode.attribute("acknowledgepermission").as_string();
+
+        if (sName.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGALERTNAME);
+        if (sLevel.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGALERTLEVEL);
+
+        bool bNeedsAcknowledgement = !sAcknowledgePermission.empty();
+
+        LibMCData::eAlertLevel alertLevel = CAlertDefinition::stringToAlertLevel(sLevel, true);
+
+        AMC::CLanguageString description(alertNode, "description");
+
+        auto pDefinition = alertHandler->addDefinition(sName, alertLevel, description, bNeedsAcknowledgement);
+        if (bNeedsAcknowledgement) {
+            auto accessControl = m_pSystemState->accessControl();
+            auto pNeededPermission = accessControl->findPermission(sAcknowledgePermission, true);
+            pDefinition->setAckPermissionIdentifier(pNeededPermission->getIdentifier());
+        }
+
+    }
+
+}
+
 void CMCContext::loadAccessControl(const pugi::xml_node& xmlNode)
 {
     auto accessControl = m_pSystemState->accessControl();
-
-
 
     auto permissionsNode = xmlNode.child("permissions");
     if (permissionsNode.empty ())

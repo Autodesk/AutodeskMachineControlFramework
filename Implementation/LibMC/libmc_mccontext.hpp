@@ -98,6 +98,7 @@ private:
 	void loadParameterGroupDerives (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup, const std::string & sStateMachineInstance);
 	void loadDriverParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
 	void loadAccessControl(const pugi::xml_node& xmlNode);
+	void loadAlertDefinitions(const pugi::xml_node& xmlNode);
 
 	void readSignalParameters(const std::string & sSignalName, const pugi::xml_node& xmlNode, std::list<AMC::CStateSignalParameter> & Parameters, std::list<AMC::CStateSignalParameter>& Results);
 

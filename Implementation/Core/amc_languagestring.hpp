@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <memory>
 
+namespace pugi {
+	class xml_node;
+}
+
 namespace AMC {
 	
 	class CLanguageDefinition;
@@ -50,6 +54,8 @@ namespace AMC {
 
 		CLanguageString (const std::string & sStringIdentifier, const std::string & sCustomValue);
 		
+		CLanguageString(pugi::xml_node & xmlNode, const std::string& sAttributeName);
+
 		virtual ~CLanguageString();
 		
 		std::string getStringIdentifier ();

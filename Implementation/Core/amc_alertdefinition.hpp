@@ -76,6 +76,9 @@ namespace AMC {
 
 		std::string getAckPermissionIdentifier ();
 
+		static LibMCData::eAlertLevel stringToAlertLevel(const std::string & sAlertLevelString, bool bFailIfUnknown);
+
+		static std::string alertLevelToString(LibMCData::eAlertLevel alertLevel);
 
 	};
 
