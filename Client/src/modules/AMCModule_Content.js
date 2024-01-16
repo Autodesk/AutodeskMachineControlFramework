@@ -198,6 +198,84 @@ class AMCApplicationItem_Content_Image extends Common.AMCApplicationItem {
 }
 
 
+class AMCApplicationItem_Content_Chart extends Common.AMCApplicationItem {
+	
+	constructor (moduleInstance, itemJSON) 
+	{
+		Assert.ObjectValue (itemJSON);		
+		
+		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
+		this.registerClass ("amcItem_Chart");
+		
+		this.dataseries = Common.nullUUID ();
+		this.version = 0;
+		this.loadeddataseries = Common.nullUUID ();
+		this.loadedversion = 0;
+		
+		this.onChartDataUpdated = null;
+		this.chartData = [];
+		
+		this.updateFromJSON (itemJSON);
+		
+		this.setRefreshFlag ();
+	}
+
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);
+		
+		this.dataseries = Assert.UUIDValue (updateJSON.dataseries);
+		if (updateJSON.version) {
+			this.version = Assert.IntegerValue (updateJSON.version);
+		} else {
+			this.version = 0;
+		}
+		
+		if ((this.loadeddataseries != this.dataseries) || (this.loadedversion != this.version)) {
+			this.loadeddataseries = this.dataseries;
+			this.loadedversion = this.version;
+			this.refreshChartData ();
+		}
+				
+	}
+	
+	
+	refreshChartData ()
+	{
+		let application = this.getApplication ();
+		let normalizedUUID = this.dataseries;
+	
+		application.axiosGetArrayBufferRequest("/ui/chart/" + normalizedUUID)
+				.then(responseData => {
+					var floatView = new Float32Array(responseData.data);
+					let dataLength = floatView.length;
+					let pointCount = dataLength / 2;
+										
+					this.chartData = [];
+					for (let index = 0; index < pointCount; index++) {
+						let xvalue = floatView[index * 2];
+						let yvalue = floatView[index * 2 + 1];
+						this.chartData.push ([xvalue, yvalue]);
+					}
+					
+					if (this.onChartDataUpdated)
+						this.onChartDataUpdated ();
+										
+				})
+				.catch(err => {
+					this.loadeddataseries = Common.nullUUID ();
+					
+					if (err.response) {
+						console.log (err.response);
+					} else {
+						console.log ("fatal error while retrieving chart data " + normalizedUUID);
+					}
+				});			
+	
+	}
+
+}
+
 
 class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 	
@@ -219,7 +297,13 @@ class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 				remotevalue: entity.value,
 				disabled: entity.disabled,
 				readonly: entity.readonly,
-				changeevent: entity.changeevent
+				changeevent: entity.changeevent,
+				validation: entity.validation,
+				validationmessage: entity.validationmessage,
+				minvalue: entity.minvalue,
+				maxvalue: entity.maxvalue,
+				isProgrammaticChange: false
+				
 			};
 			
 			this.moduleInstance.page.application.AppContent.FormEntityMap.set (entity.uuid, entity);
@@ -246,6 +330,9 @@ class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 					
 					if (dataObject.remotevalue != entityJSON.value) {
 						dataObject.value = entityJSON.value;
+						dataObject.isProgrammaticChange = true;
+					} else {
+						dataObject.isProgrammaticChange = false;
 					}
 					dataObject.remotevalue = entityJSON.value;
 					dataObject.prefix = entityJSON.prefix;
@@ -363,6 +450,9 @@ export default class AMCApplicationModule_Content extends Common.AMCApplicationM
 			
 			if (itemJSON.type === "image") 
 				item = new AMCApplicationItem_Content_Image (this, itemJSON);
+
+			if (itemJSON.type === "chart") 
+				item = new AMCApplicationItem_Content_Chart (this, itemJSON);
 
 			if (itemJSON.type === "form") 
 				item = new AMCApplicationItem_Content_Form (this, itemJSON);

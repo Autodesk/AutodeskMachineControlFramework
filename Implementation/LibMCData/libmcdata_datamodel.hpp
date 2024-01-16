@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Include custom headers here.
 #include "amcdata_sqlhandler.hpp"
 #include "amcdata_storagepath.hpp"
+#include "amcdata_journal.hpp"
 
 namespace LibMCData {
 namespace Impl {
@@ -57,8 +58,11 @@ private:
 
 protected:
 
+	std::string m_sSessionUUID;
+
 	AMCData::PSQLHandler m_pSQLHandler;
 	AMCData::PStoragePath m_pStoragePath;
+	AMCData::PJournal m_pJournal;
 
 	LibMCData::eDataBaseType m_eDataBaseType;
 
@@ -66,6 +70,8 @@ protected:
 	std::string m_sInstallationSecret;
 
 	std::string m_sTempBasePath;
+	std::string m_sTimeFileName;
+	std::string m_sStartTime;
 
 	LibMCData::LogCallback m_pLogCallback;
 	LibMCData_pvoid m_pLogUserData;
@@ -85,6 +91,10 @@ public:
 	IStorage * CreateStorage() override;
 
 	ILogSession* CreateNewLogSession() override;
+
+	IJournalSession* CreateJournalSession() override;
+
+	IAlertSession* CreateAlertSession() override;
 
 	IBuildJobHandler* CreateBuildJobHandler() override;
 

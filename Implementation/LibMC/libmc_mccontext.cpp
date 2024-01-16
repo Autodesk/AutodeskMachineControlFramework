@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_accesscontrol.hpp"
 
 #include "amc_api_factory.hpp"
 #include "amc_api_sessionhandler.hpp"
@@ -70,8 +71,6 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 {
     LibMCAssertNotNull(pDataModel.get());
 
-    m_pStateJournal = std::make_shared<CStateJournal> (std::make_shared<CStateJournalStream> ());
-
     m_pEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
 
     // Create Log Multiplexer to StdOut and Database
@@ -80,8 +79,11 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     if (pDataModel->HasLogCallback())
         pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel));
 
+    // Create State Journal
+    m_pStateJournal = std::make_shared<CStateJournal>(std::make_shared<CStateJournalStream>(pDataModel->CreateJournalSession()));
+
     // Create system state
-    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, "./testoutput");
+    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput");
 
     // Create API Handlers for data model requests
     m_pAPI = std::make_shared<AMC::CAPI>();
@@ -183,6 +185,20 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         else {
             m_pSystemState->serviceHandler()->setMaxThreadCount(SERVICETHREADCOUNT_DEFAULT);            
         }
+
+
+        m_pSystemState->logger()->logMessage("Reading access control information", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        auto accessControlNode = mainNode.child("accesscontrol");
+        if (!accessControlNode.empty()) {
+
+            loadAccessControl(accessControlNode);
+
+        }
+        else {
+            // Fall back is a single role with no specific permissions
+            m_pSystemState->accessControl()->setToNoAccessControl ();
+        }
+
 
         auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
         m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -597,6 +613,65 @@ void CMCContext::loadDriverParameterGroup(const pugi::xml_node& xmlNode, AMC::PP
 
     auto driverGroup = m_pSystemState->driverHandler()->getDriverParameterGroup(driverNameAttrib.as_string ());
     pGroup->addDerivativesFromGroup(driverGroup);
+
+}
+
+void CMCContext::loadAccessControl(const pugi::xml_node& xmlNode)
+{
+    auto accessControl = m_pSystemState->accessControl();
+
+
+
+    auto permissionsNode = xmlNode.child("permissions");
+    if (permissionsNode.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGACCESSCONTROLPERMISSIONS);
+
+    auto permissionNodes = permissionsNode.children("permission");
+
+    for (pugi::xml_node permissionNode : permissionNodes) {
+        auto identifierAttrib = permissionNode.attribute("identifier");
+        CStringResource displaynameAttrib (&permissionNode, "displayname");
+        CStringResource descriptionAttrib(&permissionNode, "description");
+
+        accessControl->addPermission(identifierAttrib.as_string(), displaynameAttrib, descriptionAttrib);
+    }
+
+    auto rolesNode = xmlNode.child("roles");
+    if (rolesNode.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGACCESSCONTROLROLES);
+
+    auto defaultRoleAttrib = rolesNode.attribute("default");
+    if (defaultRoleAttrib.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGDEFAULTACCESSROLE);
+    std::string sDefaultRole = defaultRoleAttrib.as_string();
+    if (sDefaultRole.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGDEFAULTACCESSROLE);
+
+    auto roleNodes = rolesNode.children("role");
+    for (pugi::xml_node roleNode : roleNodes) {
+        auto identifierAttrib = roleNode.attribute("identifier");
+        CStringResource displaynameAttrib(&roleNode, "displayname");
+        CStringResource descriptionAttrib(&roleNode, "description");
+
+        auto pRole = accessControl->addRole(identifierAttrib.as_string(), displaynameAttrib, descriptionAttrib);
+
+        auto rolePermissionsNodes = roleNode.children("permission");
+        if (!rolePermissionsNodes.empty()) {
+
+            for (auto rolePermissionNode : rolePermissionsNodes) {
+                auto rolePermissionIdentifier = rolePermissionNode.attribute("identifier");
+
+                if (rolePermissionIdentifier.empty())
+                    throw ELibMCCustomException(LIBMC_ERROR_MISSINGROLEPERMISSIONIDENTIFIER, pRole->getIdentifier());
+
+                auto pPermission = accessControl->findPermission(rolePermissionIdentifier.as_string(), true);
+                pRole->addPermission(pPermission);
+            }
+        }
+    }
+
+
+    accessControl->setDefaultRole(sDefaultRole);
 
 }
 

@@ -32,9 +32,12 @@ cmake_minimum_required(VERSION 3.5)
 
 project("AMC Unit Tests")
 
+add_subdirectory(A3200Test)
 add_subdirectory(RayLaseTest)
 add_subdirectory(BuRTest)
 add_subdirectory(RasterizerTest)
+add_subdirectory(FieldData2DTest)
 add_subdirectory(ScanlabOIETest)
+add_subdirectory(ScanlabSMCTest)
 add_subdirectory(BK9xxxTest)
 add_subdirectory(CifXTest)

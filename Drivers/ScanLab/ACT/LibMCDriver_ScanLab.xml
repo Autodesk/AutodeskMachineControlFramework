@@ -102,6 +102,24 @@
 		<error name="NOVERSIONDEFINITION" code="1050" description="No version definition." />			
 		<error name="DUPLICATECONFIGURATIONPRESETNAME" code="1051" description="Duplicate configuration preset name." />					
 		<error name="OIEPIDVARIABLEOUTOFBOUNDS" code="1052" description="OIE PID Variable out of bounds." />		
+		<error name="TIMELAGMUSTBEAMULTIPLEOF10" code="1053" description="Timelag must be a multiple of 10 microseconds." />				
+		<error name="INVALIDENCODERSCALINGINX" code="1054" description="Invalid Encoder Scaling in X" />		
+		<error name="INVALIDENCODERSCALINGINY" code="1055" description="Invalid Encoder Scaling in Y" />		
+		<error name="ONTHEFLYMARKINGERROR" code="1056" description="On the fly marking error" />		
+		<error name="MARKONTHEFLYISDISABLED" code="1057" description="Mark on the fly is disabled" />		
+		<error name="INVALIDLASERFIELDCOORDINATES" code="1058" description="Invalid laser field coordinates" />		
+		<error name="NOLASERFIELDSET" code="1059" description="No laser field has been set." />
+		<error name="INVALIDFREEVARIABLEINDEX" code="1060" description="Invalid free variable index." />		
+		<error name="DUPLICATELASERPOWERCALIBRATIONSETPOINT" code="1061" description="Duplicate laser power calibration set point." />		
+		<error name="INVALIDPOWERCALIBRATIONSETPOINT" code="1062" description="Invalid power calibration set point." />		
+		<error name="INVALIDPOWERCALIBRATIONOUTPUTSCALING" code="1063" description="Invalid power calibration output scaling." />		
+		<error name="POWERCALIBRATIONLOOKUPFAILED" code="1064" description="Power calibration lookup failed." />		
+		<error name="INVALIDMODULATIONCALLBACK" code="1065" description="Invalid modulation callback." />		
+		<error name="INVALIDSUBDIVISIONTHRESHOLD" code="1066" description="Invalid subdivision threshold." />		
+		<error name="MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID" code="1067" description="Multiple laser ports are not compatible with PID control." />		
+		
+		
+					
 						
 	</errors>
 
@@ -121,6 +139,7 @@
 	   <option name="Port16bitDigital" value="2" />
 	   <option name="Port12BitAnalog1" value="3" />
 	   <option name="Port12BitAnalog2" value="4" />
+	   <option name="Port12BitAnalog1andAnalog2" value="5" />
 	</enum>
 
 
@@ -151,6 +170,23 @@
 		<member name="X2" type="single" />
 		<member name="Y2" type="single" />
 	</struct>
+
+	<struct name="LaserCalibrationPoint" description="The laser output calibration at a point will be calculated by ((PowerSetPointInPercent + PowerOffsetInPercent) * PowerOutputScaling). The result is clamped to [0, 100]">
+		<member name="PowerSetPointInPercent" type="double" description="Set point of the power in Percent." />
+		<member name="PowerOffsetInPercent" type="double" description="Additional offset of the Power value. ." />
+		<member name="PowerOutputScaling" type="double" description="Scaling factor of the laser output. MUST be positive." />
+	</struct>
+
+	<functiontype name="SpatialPowerModulationCallback" description="A callback function to modulate laser power depending on the position of the laser.">
+		<param name="StartX" type="double" pass="in" description="The X start position of the marking in mm"/>
+		<param name="StartY" type="double" pass="in" description="The Y start position of the marking in mm"/>
+		<param name="TargetX" type="double" pass="in" description="The X target position of the marking in mm"/>
+		<param name="TargetY" type="double" pass="in" description="The Y target position of the marking in mm"/>	
+		<param name="LaserPowerInPercent" type="double" pass="in" description="The nominal laser power to be used in percent."/>
+		<param name="ModulationType" type="int32" pass="in" description="A type ID from the build file that specifies the modulation type to use."/>	
+		<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+		<param name="AdjustedLaserPowerInPercent" type="double" pass="return" description="Returns the adjusted laser power in percent."/>
+	</functiontype>
 
 	
 <!--
@@ -285,6 +321,40 @@ Custom implementation
 			<param name="LaserIndex" type="uint32" pass="return" description="Returns laser index of board." />
 		</method>
 
+		<method name="SetLaserOrigin" description="Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.">
+			<param name="OriginX" type="double" pass="in" description="Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+			<param name="OriginY" type="double" pass="in" description="Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+		</method>
+
+		<method name="GetLaserOrigin" description="Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.">
+			<param name="OriginX" type="double" pass="out" description="Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+			<param name="OriginY" type="double" pass="out" description="Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X." />
+		</method>
+
+		<method name="SetLaserField" description="Sets the laser field limits in absolute coordinates.">
+			<param name="MinX" type="double" pass="in" description="Sets minimum laser X coordinate in mm." />
+			<param name="MinY" type="double" pass="in" description="Sets minimum laser Y coordinate in mm." />
+			<param name="MaxX" type="double" pass="in" description="Sets maximum laser X coordinate in mm." />
+			<param name="MaxY" type="double" pass="in" description="Sets maximum laser Y coordinate in mm." />
+		</method>
+
+		<method name="ResetLaserField" description="Resets the laser field to default values.">
+		</method>
+		
+		<method name="EnableRangeChecking" description="Enables range checking of the laser field. A laser field MUST have been set before.">
+		</method>
+
+		<method name="DisableRangeChecking" description="Disables range checking of the laser field.">
+		</method>
+
+		<method name="GetLaserField" description="Returns the laser field limits in absolute coordinates.">
+			<param name="MinX" type="double" pass="out" description="Sets minimum laser X coordinate in mm." />
+			<param name="MinY" type="double" pass="out" description="Sets minimum laser Y coordinate in mm." />
+			<param name="MaxX" type="double" pass="out" description="Sets maximum laser X coordinate in mm." />
+			<param name="MaxY" type="double" pass="out" description="Sets maximum laser Y coordinate in mm." />
+			<param name="HasLaserField" type="bool" pass="return" description="Returns true if a laser field has been set." />
+		</method>
+
 		<method name="SetStartList" description="Opens the list to write">
 			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
 			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
@@ -323,7 +393,7 @@ Custom implementation
 		<method name="DrawPolyline" description="Writes a polyline into the open list">
 			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
@@ -331,7 +401,7 @@ Custom implementation
 		<method name="DrawPolylineOIE" description="Writes a polyline into the open list with OIE Enabled.">
 			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
@@ -340,18 +410,92 @@ Custom implementation
 		<method name="DrawHatches" description="Writes a list of hatches into the open list">
 			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
+		
+		<method name="AddSetPower" description="adds a power change to the open list. MUST NOT be used for PID control.">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+
+		<method name="AddSetPowerForPIDControl" description="adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+		
+		<method name="AddSetJumpSpeed" description="adds a jump speed change to the open list">
+			<param name="JumpSpeedInMMPerSecond" type="single" pass="in" description="Jump speed in mm/s" />
+		</method>
+
+		<method name="AddSetMarkSpeed" description="adds a mark speed change to the open list">
+			<param name="MarkSpeedInMMPerSecond" type="single" pass="in" description="Mark speed in mm/s" />
+		</method>
+
+		<method name="AddJumpMovement" description="Adds a Jump movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddMarkMovement" description="Adds a Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddTimedMarkMovement" description="Adds a timed Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+			<param name="DurationInMicroseconds" type="double" pass="in" description="Duration of mark movement in Microseconds." />
+		</method>		
+
+		<method name="AddFreeVariable" description="Adds a free variable set to the open list">
+			<param name="VariableNo" type="uint32" pass="in" description="Number of the variable (0-7)." />
+			<param name="Value" type="uint32" pass="in" description="Value to set." />
+		</method>	
+		
+		<method name="GetCurrentFreeVariable" description="Returns the currently set free variable.">
+			<param name="VariableNo" type="uint32" pass="in" description="Number of the variable (0-7)." />
+			<param name="Value" type="uint32" pass="return" description="Value to return." />
+		</method>	
+
+		<method name="GetTimeStamp" description="Returns the current RTC time stamp.">
+			<param name="TimeStamp" type="uint32" pass="return" description="TimeStamp Value." />
+		</method>	
+
+		<method name="StopExecution" description="Stops the execution of the current list immediately.">
+		</method>	
 
 		<method name="DrawHatchesOIE" description="Writes a list of hatches into the open list with OIE Enabled.">
 			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
-			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
 			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
+		</method>
+
+		<method name="AddLayerToList" description="Adds a layer instance to the current open list.">
+			<param name="Layer" type="class" class="LibMCEnv:ToolpathLayer" pass="in" description="Instance of the layer to add to the lists." />
+			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, fails if there is a laser index that does not match." />
+		</method>
+
+		<method name="WaitForEncoderX" description="Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInMM" type="double" pass="in" description="Position Value to reach in mm." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
+		</method>
+
+		<method name="WaitForEncoderY" description="Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInMM" type="double" pass="in" description="Position Value to reach in mm." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
+		</method>
+
+		<method name="WaitForEncoderXSteps" description="Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInSteps" type="int32" pass="in" description="Position Value to reach in steps." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
+		</method>
+
+		<method name="WaitForEncoderYSteps" description="Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.">
+			<param name="PositionInSteps" type="int32" pass="in" description="Position Value to reach in steps." />
+			<param name="InPositiveHalfPlane" type="bool" pass="in" description="If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM." />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
@@ -422,7 +566,11 @@ Custom implementation
 		<method name="DisableOIE" description="Writes an OIE disabling command block to the open list.">
 		</method>
 				
-		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
+		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.">
+		</method>
+
+		<method name="StartOIEMeasurementEx" description="Writes an OIE measurement start command block to the open list, with parameterized LaserOn Trigger">
+			<param name="LaserOnTrigger" type="bool" pass="in" description="If true, only triggers a measurement, when the laser is on." />
 		</method>
 
 		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
@@ -430,6 +578,12 @@ Custom implementation
 		
 		<method name="SetOIEPIDMode" description="Sets OIE PID Index.">
 			<param name="OIEPIDIndex" type="uint32" pass="in" description="OIE PID Index. MUST be between 0 and 63. 0 means PID disabled." />
+		</method>
+
+		<method name="EnableOIEPIDControl" description="Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.">
+		</method>
+
+		<method name="DisableOIEPIDControl" description="Disables OIE PID Control.">
 		</method>
 
 		<method name="DisableSkyWriting" description="Disable skywriting.">
@@ -456,7 +610,117 @@ Custom implementation
 			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
 			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
 		</method>
+
+		<method name="EnableSkyWritingMode4" description="Enables skywriting on the list in mode 4. See Scanlab RTC Documentation for details.">
+			<param name="Timelag" type="double" pass="in" description="Skywriting Timelag" />
+			<param name="LaserOnShift" type="int64" pass="in" description="Skywriting Laser On Shift" />
+			<param name="NPrev" type="int64" pass="in" description="Duration of pre-motion in ticks" />
+			<param name="NPost" type="int64" pass="in" description="Duration of post-motion in ticks. " />
+			<param name="Limit" type="double" pass="in" description="Skywriting Angle limit" />
+		</method>
 		
+		<method name="SetTransformationAngle" description="Sets the transformation angle of the scan field.">
+			<param name="AngleInDegrees" type="double" pass="in" description="Angle in Degrees" />
+		</method>
+		
+		<method name="SetTransformationScale" description="Sets the transformation scale of the scan field.">
+			<param name="ScaleFactor" type="double" pass="in" description="Scale Factor (1.0 is no scaling). Allowed value is -16 to 16." />
+		</method>
+
+		<method name="SetTransformationOffset" description="Sets the transformation offset of the scan field.">
+			<param name="OffsetX" type="int32" pass="in" description="Offset in X (in bits)" />
+			<param name="OffsetY" type="int32" pass="in" description="Offset in X (in bits)" />
+		</method>
+
+		<method name="SetTransformationMatrix" description="Sets the transformation matrix of the scan field.">
+			<param name="M11" type="double" pass="in" description="Upper left field of the transformation matrix" />
+			<param name="M12" type="double" pass="in" description="Upper right field of the transformation matrix" />
+			<param name="M21" type="double" pass="in" description="Lower left field of the transformation matrix" />
+			<param name="M22" type="double" pass="in" description="Lower right field of the transformation matrix" />
+		</method>
+
+		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
+		</method>
+
+		<method name="EnableRecording" description="Enables recording of position data of the RTC Card. This is a list command.">
+		</method>
+
+		<method name="DisableRecording" description="Disables recording of position data of the RTC Card. This is a list command.">
+		</method>
+
+		<method name="ExecuteListWithRecording" description="Executes the list with recording the position data from the RTC card.">
+			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
+			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
+		</method>
+
+		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
+			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
+			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
+		</method>
+
+		<method name="DisableTimelagCompensation" description="Disables timelag compensation.">
+		</method>
+		
+		<method name="EnableMarkOnTheFly2D" description="Enables mark on the fly 2D. This is a list command.">
+			<param name="ScaleXInMMperEncoderStep" type="double" pass="in" description="Scale factor X in mm per encoder step" />
+			<param name="ScaleYInMMperEncoderStep" type="double" pass="in" description="Scale factor Y in mm per encoder step" />
+		</method>
+		
+		<method name="DisableMarkOnTheFly2D" description="Disable mark on the fly 2D. This is a list command.">
+		</method>
+
+		<method name="MarkOnTheFly2DIsEnabled" description="Returns if mark on the fly 2D has been enabled.">
+			<param name="IsEnabled" type="bool" pass="return" description="Returns true if mark on the fly 2D is enabled." />
+		</method>
+
+		<method name="Get2DMarkOnTheFlyPosition" description="Returns 2D mark on the fly position.">
+			<param name="PositionX" type="int32" pass="out" description="Mark on the fly position X" />
+			<param name="PositionY" type="int32" pass="out" description="Mark on the fly position Y" />
+		</method>
+		
+		<method name="CheckOnTheFlyError" description="Checks mark on the fly error.">
+			<param name="FailIfError" type="bool" pass="in" description="If true, the call will fail in case of an error." />
+			<param name="ErrorCode" type="uint32" pass="return" description="Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation." />
+		</method>
+
+		<method name="LaserPowerCalibrationIsEnabled" description="Returns if the laser power calibration table is non-empty.">
+			<param name="CalibrationEnabled" type="bool" pass="return" description="Laser Calibration Is Enabled" />			
+		</method>
+		
+		<method name="LaserPowerCalibrationIsLinear" description="Returns if the laser power calibration table has one entry.">
+			<param name="CalibrationIsLinear" type="bool" pass="return" description="Laser Calibration Is Affine Linear" />			
+		</method>
+
+		<method name="ClearLaserPowerCalibration" description="Clears the laser power calibration table.">
+		</method>
+
+		<method name="GetLaserPowerCalibration" description="Returns the laser power calibration table. Fails if laser calibration is not enabled.">
+			<param name="CalibrationPoints" type="structarray" class="LaserCalibrationPoint" pass="out" description="Laser Calibration Points" />			
+		</method>
+				
+		<method name="SetLinearLaserPowerCalibration" description="Enables the laser power calibration with an affine linear tranformation.">
+			<param name="PowerOffsetInPercent" type="double" pass="in" description="Additional offset of the Power value." />
+			<param name="PowerOutputScaling" type="double" pass="in" description="Scaling factor of the laser output." />			
+		</method>
+		
+		<method name="SetPiecewiseLinearLaserPowerCalibration" description="Enables the laser power calibration with multiple calibration point values. Table MUST NOT have negative power entries. Laser Power Output will be linear scaled with the given values within their respective intervals. Any laser power outside of the minimum or maximum Power values will be scaled according to the respective minimum or maximum scaling value.">
+			<param name="CalibrationPoints" type="structarray" class="LaserCalibrationPoint" pass="in" description="Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Percent)." />
+		</method>
+				
+		<method name="EnableSpatialLaserPowerModulation" description="Enables a spatial laser power modulation via callback.">
+			<param name="ModulationCallback" type="functiontype" class="SpatialPowerModulationCallback" pass="in" description="Callback to call for modulating the laser power."/>			
+			<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+		</method>
+
+		<method name="DisablePowerModulation" description="Disables all power modulation functions.">
+		</method>
+		
+		<method name="EnableLineSubdivision" description="If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.">
+			<param name="LengthThreshold" type="double" pass="in" description="Length threshold in mm." />			
+		</method>
+		
+		<method name="DisableLineSubdivision" description="Disables the subdivision of mark lines.">
+		</method>
 		
 	</class>
 
@@ -598,7 +862,7 @@ Custom implementation
 			<param name="TableNumberHeadB" type="uint32" pass="in" description="Table number of Head B." />
 		</method>		
 
-		<method name="ConfigureLaserMode" description="Configures the laser mode.">
+		<method name="ConfigureLaserMode" description="Configures the laser mode. MUST be called before any exposure.">
 			<param name="LaserMode" type="enum" class="LaserMode" pass="in" description="Laser Mode Enum" />
 			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser Port Enum" />
 			<param name="MaxLaserPower" type="double" pass="in" description="Maximum laser power." />
@@ -610,7 +874,7 @@ Custom implementation
 			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
 		</method>
 
-		<method name="ConfigureDelays" description="Configures the default laser and scanner delays.">
+		<method name="ConfigureDelays" description="Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!">
 			<param name="LaserOnDelay" type="double" pass="in" description="Laser On Delay in Microseconds" />
 			<param name="LaserOffDelay" type="double" pass="in" description="Laser Off Delay in Microseconds" />
 			<param name="MarkDelay" type="double" pass="in" description="Mark delay in microseconds (will be rounded to a multiple of 10)" />
@@ -626,6 +890,15 @@ Custom implementation
 			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="return" description="Recording mode enum" />
 		</method>
 
+		<method name="EnableAttributeFilter" description="Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of Attribute to filter for." />
+			<param name="AttributeName" type="string" pass="in" description="Name of Attribute to filter for." />
+			<param name="AttributeValue" type="int64" pass="in" description="Attribute Value to filter for." />
+		</method>
+
+		<method name="DisableAttributeFilter" description="Disables filtering of the segments by segment attributes.">
+		</method>
+
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
@@ -637,6 +910,13 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 						
+		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
+			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
+			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
+		</method>
+
+		<method name="DisableTimelagCompensation" description="Disables timelag compensation.">
+		</method>
 		
 	</class>
 
@@ -744,7 +1024,7 @@ Custom implementation
 			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
 		</method>
 
-		<method name="ConfigureDelays" description="Configures the default laser and scanner delays.">
+		<method name="ConfigureDelays" description="Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="LaserOnDelay" type="double" pass="in" description="Laser On Delay in Microseconds" />
 			<param name="LaserOffDelay" type="double" pass="in" description="Laser Off Delay in Microseconds" />
@@ -759,6 +1039,15 @@ Custom implementation
 
 		<method name="GetOIERecordingMode" description="Returns the recording mode for using the Open Interface extension, taking into account by DrawLayer. Default is No Recording.">
 			<param name="RecordingMode" type="enum" class="OIERecordingMode" pass="return" description="Recording mode enum" />
+		</method>
+
+		<method name="EnableAttributeFilter" description="Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of Attribute to filter for." />
+			<param name="AttributeName" type="string" pass="in" description="Name of Attribute to filter for." />
+			<param name="AttributeValue" type="int64" pass="in" description="Attribute Value to filter for." />
+		</method>
+
+		<method name="DisableAttributeFilter" description="Disables filtering of the segments by segment attributes.">
 		</method>
 
 		<method name="DrawLayer" description="Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if ">
@@ -781,6 +1070,15 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 						
+		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
+			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
+		</method>
+
+		<method name="DisableTimelagCompensation" description="Disables timelag compensation.">
+			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+		</method>
 
 	</class>
 

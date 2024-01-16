@@ -129,17 +129,27 @@ typedef void * Lib3MF_pvoid;
 #define LIB3MF_ERROR_UNKOWNPROGRESSIDENTIFIER 140 /** A progress identifier is unknown */
 #define LIB3MF_ERROR_ELEMENTCOUNTEXCEEDSLIMIT 141 /** An element buffer exceeds its spec limit */
 #define LIB3MF_ERROR_INVALIDRESOURCE 142 /** A resource is invalid */
+#define LIB3MF_ERROR_INVALIDNODEINDEX 143 /** Invalid node index */
+#define LIB3MF_ERROR_INVALIDATTRIBUTEINDEX 144 /** Invalid attribute index */
+#define LIB3MF_ERROR_DUPLICATECUSTOMDATA 145 /** Duplicate custom data */
+#define LIB3MF_ERROR_CUSTOMDATANOTFOUND 146 /** Custom data not found */
 #define LIB3MF_ERROR_BEAMLATTICE_INVALID_OBJECTTYPE 2000 /** This object type is not valid for beamlattices */
 #define LIB3MF_ERROR_INVALIDKEYSTORE 3000 /** The keystore object is invalid */
 #define LIB3MF_ERROR_INVALIDKEYSTORECONSUMER 3001 /** The consumer keystore object is invalid */
 #define LIB3MF_ERROR_KEYSTORECONSUMERNOTFOUND 3002 /** A consumer has not been found */
 #define LIB3MF_ERROR_KEYSTORERESOURCEDATANOTFOUND 3003 /** A resource data has not been found */
 #define LIB3MF_ERROR_SECURECONTEXTNOTREGISTERED 3004 /** A Key or Conentent encryption callback has not been registered */
-#define LIB3MF_ERROR_INVALIDKEYSIZE 3005 /** The key siue is invalid */
+#define LIB3MF_ERROR_INVALIDKEYSIZE 3005 /** The key size is invalid */
 #define LIB3MF_ERROR_TOOLPATH_NOTWRITINGHEADER 4000 /** Not in toolpath header writing mode */
 #define LIB3MF_ERROR_TOOLPATH_NOTWRITINGDATA 4001 /** Not in toolpath data writing mode */
 #define LIB3MF_ERROR_TOOLPATH_DATAHASBEENWRITTEN 4002 /** Toolpath has already been written out */
 #define LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT 4003 /** Toolpath has an invalid number of points */
+#define LIB3MF_ERROR_TOOLPATH_ATTRIBUTEALREADYDEFINED 4004 /** Toolpath attribute already defined */
+#define LIB3MF_ERROR_TOOLPATH_INVALIDATTRIBUTETYPE 4005 /** Toolpath attribute is of invalid type */
+#define LIB3MF_ERROR_EMPTYNAMESPACEPREFIX 4006 /** Empty namespace prefix. */
+#define LIB3MF_ERROR_EMPTYNAMESPACE 4007 /** Empty namespace. */
+#define LIB3MF_ERROR_INVALIDNAMESPACEPREFIX 4008 /** Invalid namespace prefix. */
+#define LIB3MF_ERROR_WRITERDOESNOTSUPPORTNAMESPACES 4009 /** Writer does not support namespaces. */
 
 /*************************************************************************************************************************
  Error strings for Lib3MF
@@ -184,17 +194,27 @@ inline const char * LIB3MF_GETERRORSTRING (Lib3MFResult nErrorCode) {
     case LIB3MF_ERROR_UNKOWNPROGRESSIDENTIFIER: return "A progress identifier is unknown";
     case LIB3MF_ERROR_ELEMENTCOUNTEXCEEDSLIMIT: return "An element buffer exceeds its spec limit";
     case LIB3MF_ERROR_INVALIDRESOURCE: return "A resource is invalid";
+    case LIB3MF_ERROR_INVALIDNODEINDEX: return "Invalid node index";
+    case LIB3MF_ERROR_INVALIDATTRIBUTEINDEX: return "Invalid attribute index";
+    case LIB3MF_ERROR_DUPLICATECUSTOMDATA: return "Duplicate custom data";
+    case LIB3MF_ERROR_CUSTOMDATANOTFOUND: return "Custom data not found";
     case LIB3MF_ERROR_BEAMLATTICE_INVALID_OBJECTTYPE: return "This object type is not valid for beamlattices";
     case LIB3MF_ERROR_INVALIDKEYSTORE: return "The keystore object is invalid";
     case LIB3MF_ERROR_INVALIDKEYSTORECONSUMER: return "The consumer keystore object is invalid";
     case LIB3MF_ERROR_KEYSTORECONSUMERNOTFOUND: return "A consumer has not been found";
     case LIB3MF_ERROR_KEYSTORERESOURCEDATANOTFOUND: return "A resource data has not been found";
     case LIB3MF_ERROR_SECURECONTEXTNOTREGISTERED: return "A Key or Conentent encryption callback has not been registered";
-    case LIB3MF_ERROR_INVALIDKEYSIZE: return "The key siue is invalid";
+    case LIB3MF_ERROR_INVALIDKEYSIZE: return "The key size is invalid";
     case LIB3MF_ERROR_TOOLPATH_NOTWRITINGHEADER: return "Not in toolpath header writing mode";
     case LIB3MF_ERROR_TOOLPATH_NOTWRITINGDATA: return "Not in toolpath data writing mode";
     case LIB3MF_ERROR_TOOLPATH_DATAHASBEENWRITTEN: return "Toolpath has already been written out";
     case LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT: return "Toolpath has an invalid number of points";
+    case LIB3MF_ERROR_TOOLPATH_ATTRIBUTEALREADYDEFINED: return "Toolpath attribute already defined";
+    case LIB3MF_ERROR_TOOLPATH_INVALIDATTRIBUTETYPE: return "Toolpath attribute is of invalid type";
+    case LIB3MF_ERROR_EMPTYNAMESPACEPREFIX: return "Empty namespace prefix.";
+    case LIB3MF_ERROR_EMPTYNAMESPACE: return "Empty namespace.";
+    case LIB3MF_ERROR_INVALIDNAMESPACEPREFIX: return "Invalid namespace prefix.";
+    case LIB3MF_ERROR_WRITERDOESNOTSUPPORTNAMESPACES: return "Writer does not support namespaces.";
     default: return "unknown error";
   }
 }
@@ -204,12 +224,17 @@ inline const char * LIB3MF_GETERRORSTRING (Lib3MFResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef Lib3MFHandle Lib3MF_Base;
+typedef Lib3MFHandle Lib3MF_BinaryStream;
 typedef Lib3MFHandle Lib3MF_Writer;
 typedef Lib3MFHandle Lib3MF_PersistentReaderSource;
 typedef Lib3MFHandle Lib3MF_Reader;
 typedef Lib3MFHandle Lib3MF_PackagePart;
 typedef Lib3MFHandle Lib3MF_Resource;
 typedef Lib3MFHandle Lib3MF_ResourceIterator;
+typedef Lib3MFHandle Lib3MF_CustomXMLAttribute;
+typedef Lib3MFHandle Lib3MF_CustomXMLNode;
+typedef Lib3MFHandle Lib3MF_CustomXMLNodes;
+typedef Lib3MFHandle Lib3MF_CustomDOMTree;
 typedef Lib3MFHandle Lib3MF_SliceStackIterator;
 typedef Lib3MFHandle Lib3MF_ObjectIterator;
 typedef Lib3MFHandle Lib3MF_MeshObjectIterator;
@@ -370,6 +395,12 @@ namespace Lib3MF {
     Hatch = 1,
     Loop = 2,
     Polyline = 3
+  };
+  
+  enum class eToolpathAttributeType : Lib3MF_int32 {
+    Unknown = 0,
+    Integer = 1,
+    Double = 2
   };
   
   enum class eEncryptionAlgorithm : Lib3MF_int32 {
@@ -560,6 +591,7 @@ typedef Lib3MF::eBeamLatticeBallMode eLib3MFBeamLatticeBallMode;
 typedef Lib3MF::eProgressIdentifier eLib3MFProgressIdentifier;
 typedef Lib3MF::eBlendMethod eLib3MFBlendMethod;
 typedef Lib3MF::eToolpathSegmentType eLib3MFToolpathSegmentType;
+typedef Lib3MF::eToolpathAttributeType eLib3MFToolpathAttributeType;
 typedef Lib3MF::eEncryptionAlgorithm eLib3MFEncryptionAlgorithm;
 typedef Lib3MF::eWrappingAlgorithm eLib3MFWrappingAlgorithm;
 typedef Lib3MF::eMgfAlgorithm eLib3MFMgfAlgorithm;

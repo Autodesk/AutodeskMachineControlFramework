@@ -46,7 +46,8 @@ Abstract: This is a stub class definition of CDriver_BuR
 
 using namespace LibMCDriver_BuR::Impl;
 
-
+#define BURDRIVER_PROTOCOLVERSION_LEGACY "http://schemas.autodesk.com/amc/burprotocol/2021/01"
+#define BURDRIVER_PROTOCOLVERSION_VERSION3 "http://schemas.autodesk.com/amc/burprotocol/2023/06"
 
 /*************************************************************************************************************************
  Class definition of CDriver_BuR 
@@ -123,11 +124,12 @@ CDriver_BuR::CDriver_BuR(const std::string& sName, LibMCEnv::PDriverEnvironment 
     :  m_sName(sName),
        m_pDriverEnvironment (pDriverEnvironment), 
        m_nWorkerThreadCount (1), 
+       m_ProtocolVersion (eDriver_BurProtocolVersion::Unknown),
+       m_nPacketSignature (0),
+       m_nMajorVersion (0),
+       m_nMinorVersion (0),
+       m_nBuildVersion (0),
        m_nMaxReceiveBufferSize (1024*1024),
-       m_nMajorVersion (0), 
-       m_nMinorVersion (0), 
-       m_nPatchVersion (0), 
-       m_nBuildVersion (0), 
        m_bIsQueryingParameters (false),
        m_SimulationMode (false),
        m_nMaxPacketQueueSize(1024),
@@ -165,24 +167,50 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
     if (burprotocolNode.empty())
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDDRIVERPROTOCOL);
 
-    pugi::xml_node versionNode = burprotocolNode.child("version");
-    if (versionNode.empty())
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOVERSIONDEFINITION);
+    auto xmlNSAttribute = burprotocolNode.attribute ("xmlns");
+    std::string sXMLNS = xmlNSAttribute.as_string ();
+    if (sXMLNS == BURDRIVER_PROTOCOLVERSION_VERSION3) {
+        m_ProtocolVersion = eDriver_BurProtocolVersion::Version3;
 
-    pugi::xml_attribute majorversionAttrib = versionNode.attribute("major");
-    if (majorversionAttrib.empty())
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOMAJORVERSION);
-    m_nMajorVersion = majorversionAttrib.as_uint(0);
+        pugi::xml_node protocolNode = burprotocolNode.child("protocol");
+        if (protocolNode.empty())
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTCPPROTOCOLNODE);
 
-    pugi::xml_attribute minorversionAttrib = versionNode.attribute("minor");
-    if (minorversionAttrib.empty())
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOMINORVERSION);
-    m_nMinorVersion = minorversionAttrib.as_uint(0);
+        pugi::xml_attribute packetSignatureAttrib = protocolNode.attribute("packetsignature");
+        m_nPacketSignature = packetSignatureAttrib.as_uint(0);               
+        if (m_nPacketSignature == 0)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPACKETSIGNATURE);
 
-    pugi::xml_attribute patchversionAttrib = versionNode.attribute("patch");
-    if (patchversionAttrib.empty())
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOPATCHVERSION);
-    m_nPatchVersion = patchversionAttrib.as_uint(0);
+    }
+    
+    if (sXMLNS == BURDRIVER_PROTOCOLVERSION_LEGACY) {
+        m_ProtocolVersion = eDriver_BurProtocolVersion::Legacy;
+
+        m_nPacketSignature = PACKET_SIGNATURE_LEGACY;
+
+        pugi::xml_node versionNode = burprotocolNode.child("version");
+        if (versionNode.empty())
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOVERSIONDEFINITION);
+
+        pugi::xml_attribute majorversionAttrib = versionNode.attribute("major");
+        if (majorversionAttrib.empty())
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOMAJORVERSION);
+        m_nMajorVersion = majorversionAttrib.as_uint(0);
+
+        pugi::xml_attribute minorversionAttrib = versionNode.attribute("minor");
+        if (minorversionAttrib.empty())
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOMINORVERSION);
+        m_nMinorVersion = minorversionAttrib.as_uint(0);
+
+        pugi::xml_attribute patchversionAttrib = versionNode.attribute("patch");
+        if (patchversionAttrib.empty())
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOPATCHVERSION);
+        m_nPatchVersion = patchversionAttrib.as_uint(0);
+
+    }
+
+    if (m_ProtocolVersion == eDriver_BurProtocolVersion::Unknown)
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_UNKNOWNDRIVERPROTOCOLVERSION);
 
     pugi::xml_node machineStatusNode = burprotocolNode.child("machinestatus");
     if (machineStatusNode.empty())
@@ -255,7 +283,7 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
 
     }
 
-    m_pConnector = std::make_shared<CDriver_BuRConnector>(m_nWorkerThreadCount, m_nMaxReceiveBufferSize, m_nMajorVersion, m_nMinorVersion, m_nPatchVersion, m_nBuildVersion, m_nMaxPacketQueueSize); 
+    m_pConnector = std::make_shared<CDriver_BuRConnector>(m_nWorkerThreadCount, m_nMaxReceiveBufferSize, m_nMajorVersion, m_nMinorVersion, m_nPatchVersion, m_nBuildVersion, m_nMaxPacketQueueSize, m_ProtocolVersion, m_nPacketSignature); 
 
 
 }
@@ -379,7 +407,7 @@ void CDriver_BuR::ReinitializeMachine()
         bool resetSuccessful = false;
         
         m_pConnector->sendCommandToPLC(m_InitMachineCommandID, [&resetSuccessful](CDriver_BuRPacket* pPacket) {
-            resetSuccessful = pPacket->readBool(0);
+            resetSuccessful = true;
         });
 
         if (!resetSuccessful)

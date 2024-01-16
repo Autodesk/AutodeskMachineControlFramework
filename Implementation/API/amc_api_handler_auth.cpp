@@ -33,8 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_handler.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include "libmcdata_dynamic.hpp"
 
+#include "amc_userinformation.hpp"
 #include "common_utils.hpp"
 
 #include <vector>
@@ -44,10 +46,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash)
-	: CAPIHandler (sClientHash), m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash)
+CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash, PAccessControl pAccessControl)
+	: CAPIHandler (sClientHash), m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash), m_pAccessControl (pAccessControl)
 {
 
+	if (pAccessControl.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pSessionHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pLoginHandler.get() == nullptr)
@@ -142,9 +146,19 @@ void CAPIHandler_Auth::handleNewSessionRequest(const uint8_t* pBodyData, const s
 	std::string sLoginSalt;
 	if (m_pLoginHandler->UserExists (sUserName)) {
 		std::string sHashedPassword;
+		std::string sUserUUID;
+		std::string sUserDescription;
+		std::string sUserRoleIdentifier;
+		std::string sUserLanguageIdentifier;
+
 		// password hash is calculateSHA256FromString(sLoginSalt + "password"); 
 		m_pLoginHandler->GetUserDetails(sUserName, sLoginSalt, sHashedPassword);
-		m_pSessionHandler->setUserDetailsForSession(pAuth->getSessionUUID(), sUserName, sHashedPassword);
+		m_pLoginHandler->GetUserProperties(sUserName, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
+				
+		if (sUserRoleIdentifier.empty())
+			sUserRoleIdentifier = m_pAccessControl->getDefaultRole()->getIdentifier();
+
+		m_pSessionHandler->setUserDetailsForSession(pAuth->getSessionUUID(), sUserName, sHashedPassword, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
 	}
 	else {
 		// If user has not been found, then generate a repeatable salt to not show that the user is not existing.
@@ -172,6 +186,18 @@ void CAPIHandler_Auth::handleAuthorizeRequest(const uint8_t* pBodyData, const si
 	m_pSessionHandler->authorizeSession (sSessionUUID, sSaltedPassword, sClientKey);
 
 	if (m_pSessionHandler->sessionIsAuthenticated(sSessionUUID)) {
+
+	
+
+		std::string sUsername;
+		std::string sUserUUID;
+		std::string sUserDescription;
+		std::string sUserRoleIdentifier;
+		std::string sUserLanguageIdentifier;
+		m_pSessionHandler->getUserDetailsForSession(sSessionUUID, sUsername, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
+		
+		if (!m_pAccessControl->hasRole(sUserRoleIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_USERHASUNKNOWNROLE, sSessionUUID);
 		
 		CJSONWriter tokenWriter;
 		tokenWriter.addString(AMC_API_KEY_TOKEN_SESSION, sSessionUUID);
@@ -180,6 +206,22 @@ void CAPIHandler_Auth::handleAuthorizeRequest(const uint8_t* pBodyData, const si
 		// Create Base64 token
 		std::string sToken = AMCCommon::CUtils::encodeBase64(tokenWriter.saveToString(), AMCCommon::eBase64Type::URL);
 		writer.addString(AMC_API_KEY_AUTH_TOKEN, sToken);
+
+		writer.addString(AMC_API_KEY_USERUUID, sUserUUID);
+		writer.addString(AMC_API_KEY_USERLOGIN, sUsername);
+		writer.addString(AMC_API_KEY_USERDESCRIPTION, sUserDescription);
+		writer.addString(AMC_API_KEY_USERROLE, sUserRoleIdentifier);
+		writer.addString(AMC_API_KEY_USERLANGUAGE, sUserLanguageIdentifier);
+
+		CJSONWriterArray permissionsArray(writer);	
+		std::set<std::string> permissionStrings;
+		m_pAccessControl->getPermissionsForRole(sUserRoleIdentifier, permissionStrings);
+
+		for (auto sPermission : permissionStrings)
+			permissionsArray.addString(sPermission);
+
+		writer.addArray(AMC_API_KEY_USERPERMISSIONS, permissionsArray);
+
 	}
 	else {
 		// this should not happen, but we want to be double sure here!

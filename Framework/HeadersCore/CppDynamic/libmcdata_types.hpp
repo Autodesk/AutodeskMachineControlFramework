@@ -360,6 +360,27 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DATATYPEMISMATCH 333 /** Datatype mismatch */
 #define LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY 334 /** Could not find log entry */
 #define LIBMCDATA_ERROR_NOLOGCALLBACK 335 /** No log callback */
+#define LIBMCDATA_ERROR_EMPTYUSERNAME 336 /** Empty user name */
+#define LIBMCDATA_ERROR_EMPTYUSERUUID 337 /** Empty user UUID */
+#define LIBMCDATA_ERROR_USERNOTUNIQUE 338 /** User not unique */
+#define LIBMCDATA_ERROR_EMPTYUSERROLE 339 /** Empty user role */
+#define LIBMCDATA_ERROR_EMPTYUSERSALT 340 /** Empty user salt */
+#define LIBMCDATA_ERROR_EMPTYUSERPASSWORD 341 /** Empty user password */
+#define LIBMCDATA_ERROR_INVALIDUSERROLE 342 /** Invalid user role */
+#define LIBMCDATA_ERROR_USERALREADYEXISTS 343 /** User already exists */
+#define LIBMCDATA_ERROR_INVALIDUSERLANGUAGE 344 /** Invalid user language */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE 345 /** Could not update user language */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE 346 /** Could not update user role */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION 347 /** Could not update user description */
+#define LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD 348 /** Could not update user password */
+#define LIBMCDATA_ERROR_INVALIDUSERINDEX 349 /** Invalid user index */
+#define LIBMCDATA_ERROR_INVALIDJOURNAL 350 /** Invalid journal */
+#define LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER 351 /** Empty alert identifier */
+#define LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER 352 /** Invalid alert identifier */
+#define LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER 353 /** Invalid alert description identifier */
+#define LIBMCDATA_ERROR_INVALIDALERTLEVEL 354 /** Invalid alert level */
+#define LIBMCDATA_ERROR_ALERTNOTFOUND 355 /** Alert not found */
+#define LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED 356 /** Alert has not been acknowledged. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -632,6 +653,27 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
     case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
     case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
+    case LIBMCDATA_ERROR_EMPTYUSERNAME: return "Empty user name";
+    case LIBMCDATA_ERROR_EMPTYUSERUUID: return "Empty user UUID";
+    case LIBMCDATA_ERROR_USERNOTUNIQUE: return "User not unique";
+    case LIBMCDATA_ERROR_EMPTYUSERROLE: return "Empty user role";
+    case LIBMCDATA_ERROR_EMPTYUSERSALT: return "Empty user salt";
+    case LIBMCDATA_ERROR_EMPTYUSERPASSWORD: return "Empty user password";
+    case LIBMCDATA_ERROR_INVALIDUSERROLE: return "Invalid user role";
+    case LIBMCDATA_ERROR_USERALREADYEXISTS: return "User already exists";
+    case LIBMCDATA_ERROR_INVALIDUSERLANGUAGE: return "Invalid user language";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERLANGUAGE: return "Could not update user language";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERROLE: return "Could not update user role";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERDESCRIPTION: return "Could not update user description";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEUSERPASSWORD: return "Could not update user password";
+    case LIBMCDATA_ERROR_INVALIDUSERINDEX: return "Invalid user index";
+    case LIBMCDATA_ERROR_INVALIDJOURNAL: return "Invalid journal";
+    case LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
+    case LIBMCDATA_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
+    case LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER: return "Invalid alert description identifier";
+    case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
+    case LIBMCDATA_ERROR_ALERTNOTFOUND: return "Alert not found";
+    case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "Alert has not been acknowledged.";
     default: return "unknown error";
   }
 }
@@ -644,6 +686,8 @@ typedef LibMCDataHandle LibMCData_Base;
 typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogEntryList;
 typedef LibMCDataHandle LibMCData_LogSession;
+typedef LibMCDataHandle LibMCData_AlertSession;
+typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
 typedef LibMCDataHandle LibMCData_BuildJobData;
@@ -651,6 +695,7 @@ typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
+typedef LibMCDataHandle LibMCData_UserList;
 typedef LibMCDataHandle LibMCData_LoginHandler;
 typedef LibMCDataHandle LibMCData_PersistencyHandler;
 typedef LibMCDataHandle LibMCData_DataModel;
@@ -660,6 +705,14 @@ namespace LibMCData {
   /*************************************************************************************************************************
    Declaration of enums
   **************************************************************************************************************************/
+  
+  enum class eAlertLevel : LibMCData_int32 {
+    FatalError = 1,
+    CriticalError = 2,
+    Warning = 3,
+    Message = 4,
+    Unknown = 7
+  };
   
   enum class eLogLevel : LibMCData_int32 {
     FatalError = 1,
@@ -705,6 +758,26 @@ namespace LibMCData {
   };
   
   /*************************************************************************************************************************
+   Declaration of structs
+  **************************************************************************************************************************/
+  
+  #pragma pack (1)
+  
+  typedef struct sJournalChunkVariableInfo {
+      LibMCData_uint32 m_VariableIndex;
+      LibMCData_uint32 m_VariableType;
+      LibMCData_uint32 m_EntryStartIndex;
+      LibMCData_uint32 m_EntryCount;
+  } sJournalChunkVariableInfo;
+  
+  typedef struct sJournalChunkIntegerEntry {
+      LibMCData_uint32 m_RelativeTimeStampInMicroseconds;
+      LibMCData_int64 m_IntegerValue;
+  } sJournalChunkIntegerEntry;
+  
+  #pragma pack ()
+  
+  /*************************************************************************************************************************
    Declaration of function pointers 
   **************************************************************************************************************************/
   
@@ -741,11 +814,14 @@ namespace LibMCData {
 } // namespace LibMCData;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCData::eAlertLevel eLibMCDataAlertLevel;
 typedef LibMCData::eLogLevel eLibMCDataLogLevel;
 typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
+typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
+typedef LibMCData::sJournalChunkIntegerEntry sLibMCDataJournalChunkIntegerEntry;
 typedef LibMCData::LogCallback LibMCDataLogCallback;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;

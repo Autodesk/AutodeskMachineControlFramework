@@ -37,9 +37,12 @@ Abstract: This is the class declaration of CUIEnvironment
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_logger.hpp"
-#include "amc_statemachinedata.hpp"
+#include "amc_ui_systemstate.hpp"
 #include "amc_statesignalhandler.hpp"
 #include "amc_ui_clientaction.hpp"
+#include "amc_systemstate.hpp"
+#include "amc_userinformation.hpp"
+#include "amc_ui_systemstate.hpp"
 
 #include <vector>
 
@@ -68,17 +71,16 @@ namespace Impl {
 class CUIEnvironment : public virtual IUIEnvironment, public virtual CBase {
 private:
 
-	AMC::PLogger m_pLogger;
-	AMC::PStateMachineData m_pStateMachineData;
-	AMC::PParameterHandler m_pClientVariableHandler;
-	AMC::PStateSignalHandler m_pSignalHandler;
 	AMC::CUIHandler * m_pUIHandler;
+	AMC::PUISystemState m_pUISystemState;
+	AMC::PLogger m_pLogger;
+
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
-	std::string m_sTestEnvironmentPath;
 
-	AMCCommon::CChrono m_Chrono;
+	AMC::PUserInformation m_pUserInformation;
+	AMC::PParameterHandler m_pClientVariableHandler;
 
 	std::vector<AMC::PUIClientAction> m_ClientActions;
 
@@ -86,7 +88,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string & sTestEnvironmentPath);
+	CUIEnvironment(AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandle, const std::string & sTestEnvironmentPath, AMC::PUserInformation pUserInformation);
 
 	virtual ~CUIEnvironment();
 
@@ -97,6 +99,8 @@ public:
 	void ActivatePage(const std::string& sPageName) override;
 
 	std::string RetrieveEventSender() override;
+
+	std::string RetrieveEventSenderPage() override;
 
 	std::string RetrieveEventSenderUUID() override;
 
@@ -147,6 +151,8 @@ public:
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
+	LibMCEnv_uint64 GetGlobalTimerInMicroseconds() override;
+
 	void LogOut() override;
 
 	void ShowHint(const std::string& sHint, const LibMCEnv_uint32 nTimeoutInMS) override;
@@ -167,6 +173,51 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
+	bool HasBuildJob(const std::string& sBuildUUID) override;
+
+	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
+
+	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
+
+	IDiscreteFieldData2D* CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) override;
+
+	bool CheckPermission(const std::string& sPermissionIdentifier) override;
+
+	std::string GetCurrentUserLogin() override;
+
+	std::string GetCurrentUserDescription() override;
+
+	std::string GetCurrentUserRole() override;
+
+	std::string GetCurrentUserLanguage() override;
+
+	std::string GetCurrentUserUUID() override;
+	
+	IUserManagementHandler* CreateUserManagement() override;
+
+	IJournalHandler* GetCurrentJournal() override;
+
+	IMeshObject* RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID) override;
+
+	bool MeshIsRegistered(const std::string& sMeshUUID) override;
+
+	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
+
+	IDataSeries* CreateDataSeries(const std::string& sName, const bool bBoundToLogin) override;
+
+	bool HasDataSeries(const std::string& sDataSeriesUUID) override;
+
+	IDataSeries* FindDataSeries(const std::string& sDataSeriesUUID) override;
+
+	void ReleaseDataSeries(const std::string& sDataSeriesUUID) override;
+
+	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation) override;
+
+	IAlert* FindAlert(const std::string& sUUID) override;
+
+	void AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment) override;
+
+	void AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
 
 };
 

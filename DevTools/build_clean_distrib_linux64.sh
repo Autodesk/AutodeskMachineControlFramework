@@ -15,7 +15,7 @@ DEVPACKAGE=$(<"./devpackage_version.txt")
 DEVPACKAGESHA=$(<"./devpackage_sha256_linux64.txt")
 
 echo "Verifying package ${DEVPACKAGE}"
-DevTools/packageManager.arm download "DevPackages/amcf_linux64_${DEVPACKAGE}.zip" "https://ssl.netfabb.com/amcf/" "linux64_${DEVPACKAGE}" "${DEVPACKAGESHA}"
+DevTools/packageManager.arm download "DevPackages/amcf_linux64_${DEVPACKAGE}.zip" "https://ssl.aleos.io/" "linux64_${DEVPACKAGE}" "${DEVPACKAGESHA}"
 
 echo "Using developer package linux64_${DEVPACKAGE}"
 

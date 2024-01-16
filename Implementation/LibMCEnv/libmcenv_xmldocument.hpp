@@ -82,6 +82,8 @@ public:
 
     std::string SaveToString(const bool bAddLineBreaks) override;
 
+    void ChangeNamespacePrefix(const std::string& sOldNamespacePrefix, const std::string& sNewNamespacePrefix) override;
+
 };
 
 } // namespace Impl

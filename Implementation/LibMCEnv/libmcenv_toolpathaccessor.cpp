@@ -33,9 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_toolpathlayer.hpp"
 #include "libmcenv_toolpathpart.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_xmldocument.hpp"
+#include "libmcenv_xmldocumentnode.hpp"
 
 // Include custom headers here.
-
+#include "Common/common_utils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -43,8 +45,10 @@ using namespace LibMCEnv::Impl;
  Class definition of CToolpathAccessor 
 **************************************************************************************************************************/
 
-CToolpathAccessor::CToolpathAccessor(const std::string& sStorageUUID, AMC::PToolpathHandler pToolpathHandler)
-	: m_sStorageUUID(sStorageUUID), m_pToolpathHandler(pToolpathHandler)
+CToolpathAccessor::CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler)
+	: m_sStorageUUID(AMCCommon::CUtils::normalizeUUIDString(sStorageUUID)), 
+	m_sBuildUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildUUID)),	
+	m_pToolpathHandler(pToolpathHandler)
 {
 	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -59,10 +63,22 @@ std::string CToolpathAccessor::GetStorageUUID()
 	return m_sStorageUUID;
 }
 
+std::string CToolpathAccessor::GetBuildUUID()
+{
+	return m_sBuildUUID;
+}
+
 LibMCEnv_uint32 CToolpathAccessor::GetLayerCount()
 {
 	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 	return pToolpathEntity->getLayerCount();
+
+}
+
+void CToolpathAccessor::RegisterCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	pToolpathEntity->registerCustomSegmentAttribute(sNameSpace, sAttributeName, eAttributeType);
 
 }
 
@@ -79,24 +95,6 @@ LibMCEnv_double CToolpathAccessor::GetUnits()
 	return pToolpathEntity->getUnits();
 }
 
-
-bool CToolpathAccessor::HasMetaData(const std::string& sNameSpace, const std::string& sName)
-{
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
-	return pToolpathEntity->hasMetaData(sNameSpace, sName);
-}
-
-std::string CToolpathAccessor::GetMetaDataValue(const std::string& sNameSpace, const std::string& sName)
-{
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
-	return pToolpathEntity->getMetaDataValue(sNameSpace, sName);
-}
-
-std::string CToolpathAccessor::GetMetaDataType(const std::string& sNameSpace, const std::string& sName)
-{
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
-	return pToolpathEntity->getMetaDataType(sNameSpace, sName);
-}
 
 LibMCEnv_uint32 CToolpathAccessor::GetPartCount()
 {
@@ -180,5 +178,52 @@ LibMCEnv_double CToolpathAccessor::GetZValueInMM(const LibMCEnv_uint32 nLayerInd
 
 	return pToolpathEntity->getLayerZInUnits(nLayerIndex) * pToolpathEntity->getUnits();
 
+}
+
+LibMCEnv_uint32 CToolpathAccessor::GetMetaDataCount()
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	return pToolpathEntity->getMetaDataCount();
+}
+
+void CToolpathAccessor::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	pToolpathEntity->getMetaDataInfo(nMetaDataIndex, sNamespace, sName);
+}
+
+IXMLDocumentNode* CToolpathAccessor::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	auto pXMLDocumentInstance = pToolpathEntity->getMetaData(nMetaDataIndex);
+	return new CXMLDocumentNode (pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode ());
+}
+
+bool CToolpathAccessor::HasUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	return pToolpathEntity->hasUniqueMetaData(sNamespace, sName);
+}
+
+IXMLDocumentNode* CToolpathAccessor::FindUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	auto pXMLDocumentInstance = pToolpathEntity->findUniqueMetaData(sNamespace, sName);
+	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
 }
 

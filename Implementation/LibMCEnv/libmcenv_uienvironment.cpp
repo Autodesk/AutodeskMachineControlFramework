@@ -34,14 +34,28 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_uienvironment.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_xmldocument.hpp"
+#include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_usermanagementhandler.hpp"
+#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_dataseries.hpp"
+#include "libmcenv_meshobject.hpp"
+#include "libmcenv_alert.hpp"
 
 #include "amc_systemstate.hpp"
+#include "amc_accesscontrol.hpp"
+#include "amc_meshhandler.hpp"
+#include "amc_dataserieshandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
+#include "libmcenv_build.hpp"
+#include "libmcenv_journalvariable.hpp"
+
+#include "amc_toolpathhandler.hpp"
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
+#include "libmcdata_dynamic.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -78,27 +92,24 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string& sTestEnvironmentPath)
+CUIEnvironment::CUIEnvironment(AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string& sTestEnvironmentPath, AMC::PUserInformation pUserInformation)
     : 
-      m_pLogger(pLogger),
-      m_pStateMachineData(pStateMachineData),
-      m_pSignalHandler (pSignalHandler),
       m_pUIHandler (pUIHandler),
       m_sLogSubSystem ("ui"),
       m_sSenderName (sSenderName),
-      m_pClientVariableHandler (pClientVariableHandler)
+      m_pClientVariableHandler (pClientVariableHandler),
+      m_pUserInformation (pUserInformation)
 {
 
-    if (pLogger.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pStateMachineData.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pSignalHandler.get() == nullptr)
+    if (pUserInformation.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pUIHandler == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    m_pUISystemState = pUIHandler->getUISystemState();
+    m_pLogger = m_pUISystemState->getLogger();
 
     if (!sSenderUUID.empty()) {
         m_sSenderUUID = (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID));
@@ -134,6 +145,18 @@ std::string CUIEnvironment::RetrieveEventSender()
     return m_sSenderName;
 }
 
+std::string CUIEnvironment::RetrieveEventSenderPage()
+{
+    std::vector<std::string> sPathNames;
+    AMCCommon::CUtils::splitString(m_sSenderName, ".", sPathNames);
+
+    if (sPathNames.empty())
+        return "";
+
+    return sPathNames.at(0);
+}
+
+
 std::string CUIEnvironment::RetrieveEventSenderUUID()
 {
     return m_sSenderUUID;
@@ -142,15 +165,15 @@ std::string CUIEnvironment::RetrieveEventSenderUUID()
 
 ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
 {
-    if (!m_pSignalHandler->hasSignalDefinition(sMachineInstance, sSignalName))
+    if (!m_pUISystemState->getSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
 
-    return new CSignalTrigger(m_pSignalHandler, sMachineInstance, sSignalName);
+    return new CSignalTrigger(m_pUISystemState->getSignalHandler(), sMachineInstance, sSignalName);
 }
 
 std::string CUIEnvironment::GetMachineState(const std::string & sMachineInstance)
 {
-    return m_pStateMachineData->getInstanceStateName (sMachineInstance);
+    return m_pUISystemState->getStateMachineData()->getInstanceStateName (sMachineInstance);
 }
 
 void CUIEnvironment::LogMessage(const std::string & sLogString)
@@ -172,35 +195,35 @@ void CUIEnvironment::LogInfo(const std::string & sLogString)
 
 std::string CUIEnvironment::GetMachineParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData ()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
 std::string CUIEnvironment::GetMachineParameterAsUUID(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
 LibMCEnv_double CUIEnvironment::GetMachineParameterAsDouble(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getDoubleParameterValueByName(sParameterName);
 }
 
 LibMCEnv_int64 CUIEnvironment::GetMachineParameterAsInteger(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getIntParameterValueByName(sParameterName);
 }
 
 bool CUIEnvironment::GetMachineParameterAsBool(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getBoolParameterValueByName(sParameterName);
 }
@@ -316,7 +339,12 @@ IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSiz
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_Chrono.getExistenceTimeInMilliseconds();
+    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+}
+
+LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMicroseconds()
+{
+    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
 }
 
 void CUIEnvironment::LogOut()
@@ -381,7 +409,7 @@ std::vector<AMC::PUIClientAction>& CUIEnvironment::getClientActions()
 
 ITestEnvironment* CUIEnvironment::GetTestEnvironment()
 {
-    return new CTestEnvironment(m_sTestEnvironmentPath);
+    return new CTestEnvironment(m_pUISystemState->getTestOutputPath ());
 }
 
 LibMCEnv::Impl::IXMLDocument* CUIEnvironment::CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace)
@@ -420,6 +448,191 @@ LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64
     }
 
     return new CXMLDocument(pDocument);
+
+}
+
+
+
+bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    try {
+        m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
+        return true;
+    }
+    catch (std::exception) {
+        return false;
+    }
+}
+
+IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    auto pBuildJob = m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(pBuildJob, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getStorage(), m_pUISystemState->getSystemUserID());
+}
+
+
+IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+{
+    AMC::PDiscreteFieldData2DInstance pInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, true);
+    return new CDiscreteFieldData2D(pInstance);
+}
+
+IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+{
+    if (pImageDataInstance == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    auto pImageDataImpl = dynamic_cast<CImageData*> (pImageDataInstance);
+    if (pImageDataImpl == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+    uint32_t nPixelSizeX, nPixelSizeY;
+    pImageDataImpl->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
+
+    double dDPIValueX, dDPIValueY;
+    pImageDataImpl->GetDPI(dDPIValueX, dDPIValueY);
+
+    AMC::PDiscreteFieldData2DInstance pFieldInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, 0.0, false);
+
+    auto pixelFormat = pImageDataImpl->GetPixelFormat();
+    auto& rawPixelData = pImageDataImpl->getPixelData();
+    pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
+    
+    return new CDiscreteFieldData2D(pFieldInstance);
+
+}
+
+
+bool CUIEnvironment::CheckPermission(const std::string& sPermissionIdentifier)
+{
+    return m_pUISystemState->getAccessControl()->checkPermissionInRole(m_pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
+}
+
+std::string CUIEnvironment::GetCurrentUserLogin()
+{
+    return m_pUserInformation->getLogin();
+}
+
+std::string CUIEnvironment::GetCurrentUserDescription()
+{
+    return m_pUserInformation->getDescription();
+}
+
+std::string CUIEnvironment::GetCurrentUserRole()
+{
+    return m_pUserInformation->getRoleIdentifier();
+
+}
+
+std::string CUIEnvironment::GetCurrentUserLanguage()
+{
+    return m_pUserInformation->getLanguageIdentifier();
+
+}
+
+std::string CUIEnvironment::GetCurrentUserUUID()
+{
+    return m_pUserInformation->getUUID();
+
+}
+
+IUserManagementHandler* CUIEnvironment::CreateUserManagement()
+{
+    return new CUserManagementHandler(m_pUISystemState->getLoginHandler(), m_pUISystemState->getAccessControl(), m_pUISystemState->getLanguageHandler());
+}
+
+IJournalHandler* CUIEnvironment::GetCurrentJournal()
+{
+    return new CJournalHandler(m_pUISystemState->getStateJournal());
+}
+
+IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
+{
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    auto pLib3MFWrapper = m_pUISystemState->getToolpathHandler()->getLib3MFWrapper();
+
+    auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName);
+
+    return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+bool CUIEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
+{
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    return pMeshHandler->hasMeshEntity(sMeshUUID);
+}
+
+IMeshObject* CUIEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
+{
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
+
+    if (pMeshEntity.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
+
+    return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+IDataSeries* CUIEnvironment::CreateDataSeries(const std::string& sName, const bool bBoundToLogin)
+{    
+    auto pDataSeriesHandler = m_pUISystemState->getDataSeriesHandler();
+    auto pDataSeries = pDataSeriesHandler->createDataSeries(sName);
+
+    return new CDataSeries(pDataSeries);
+
+}
+
+bool CUIEnvironment::HasDataSeries(const std::string& sDataSeriesUUID)
+{
+    auto pDataSeriesHandler = m_pUISystemState->getDataSeriesHandler();
+    return pDataSeriesHandler->hasDataSeries(sDataSeriesUUID);
+}
+
+IDataSeries* CUIEnvironment::FindDataSeries(const std::string& sDataSeriesUUID)
+{
+    auto pDataSeries = m_pUISystemState->getDataSeriesHandler()->findDataSeries(sDataSeriesUUID, true);
+
+    return new CDataSeries(pDataSeries);
+
+
+}
+
+void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
+{
+    auto pDataSeriesHandler = m_pUISystemState->getDataSeriesHandler();
+    pDataSeriesHandler->unloadDataSeries(sDataSeriesUUID);
+
+}
+
+IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    //return new CAlert ();
+}
+
+IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
+{
+    return nullptr;
+}
+
+void CUIEnvironment::AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment)
+{
+
+}
+
+void CUIEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
+{
 
 }
 

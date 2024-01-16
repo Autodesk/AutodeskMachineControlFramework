@@ -105,7 +105,22 @@ export default class AMCApplicationCustomPage extends AMCApplicationPage {
 	callEvent (eventName, parameters) 
 	{
 		Assert.IdentifierString (eventName);
-		Assert.IdentifierString (parameters);
+		Assert.ObjectValue (parameters);
+		
+		if (this.customModule) {
+			
+			let eventItem = this.customModule.findEvent (eventName);
+			
+			if (eventItem) {
+				
+				let eventValues = eventItem.prepareUIEvent (parameters);
+								
+				this.application.triggerUIEvent(eventItem.name, eventItem.uuid, eventValues); 				
+				
+			}			
+			
+		}
+		
 		
 	}
 

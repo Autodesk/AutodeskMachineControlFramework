@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include "amcdata_sqlhandler_sqlite.hpp"
+#include "common_exportstream_native.hpp"
+
+#include "amcdata_journal.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -41,53 +44,37 @@ using namespace LibMCData::Impl;
  Class definition of CLogSession 
 **************************************************************************************************************************/
 
-CLogSession::CLogSession(const std::string & sLogPath)
-	: m_LogID (1)
+CLogSession::CLogSession(AMCData::PJournal pJournal)
+	: m_pJournal (pJournal)
 {
-	m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sLogPath);
+	if (pJournal.get() == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+}
 
-	std::string sQuery = "CREATE TABLE `logs` (";
-	sQuery += "`logindex`	int DEFAULT 0, ";
-	sQuery += "`loglevel`	int DEFAULT 0,";
-	sQuery += "`timestamp`  varchar ( 64 ) NOT NULL, ";
-	sQuery += "`subsystem`  varchar ( 8 ) NOT NULL, ";
-	sQuery += "`message`	TEXT DEFAULT `` )";
-
-	auto pStatement = m_pSQLHandler->prepareStatement (sQuery);
-	pStatement->execute ();
-	pStatement = nullptr; 
+CLogSession::~CLogSession()
+{
 
 }
 
 void CLogSession::AddEntry(const std::string & sMessage, const std::string & sSubSystem, const LibMCData::eLogLevel logLevel, const std::string & sTimestamp)
 {
-	std::lock_guard<std::mutex> lockGuard(m_Mutex);
-
-	std::string sQuery = "INSERT INTO logs (logindex, loglevel, timestamp, subsystem, message) VALUES (?, ?, ?, ?, ?)";
-	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
-	pStatement->setInt(1, m_LogID);
-	pStatement->setInt(2, (int)logLevel);
-	pStatement->setString(3, sTimestamp);
-	pStatement->setString(4, sSubSystem);
-	pStatement->setString(5, sMessage);
-	pStatement->execute();
-	pStatement = nullptr;
-
-	m_LogID++;
+	m_pJournal->AddEntry(sMessage, sSubSystem, logLevel, sTimestamp);
 
 }
 
 LibMCData_uint32 CLogSession::GetMaxLogEntryID()
 {
-	return m_LogID;
+	return m_pJournal->GetMaxLogEntryID();
 }
 
 ILogEntryList* CLogSession::RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel)
 {
-	auto pLogEntryList = std::make_unique<CLogEntryList> ();
+	auto pSQLHandler = m_pJournal->getSQLHandler();
+
+	auto pLogEntryList = std::make_unique<CLogEntryList>();
 
 	std::string sQuery = "SELECT logindex, loglevel, timestamp, subsystem, message FROM logs WHERE logindex >= ? AND logindex <= ? AND loglevel <= ?";
-	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	auto pStatement = pSQLHandler->prepareStatement(sQuery);
 	pStatement->setInt(1, nMinLogID);
 	pStatement->setInt(2, nMaxLogID);
 	pStatement->setInt(3, (int)eMinLogLevel);
@@ -98,10 +85,9 @@ ILogEntryList* CLogSession::RetrieveLogEntriesByID(const LibMCData_uint32 nMinLo
 		std::string sSubSystem = pStatement->getColumnString(4);
 		std::string sMessage = pStatement->getColumnString(5);
 
-		pLogEntryList->addEntry (nLogID, sMessage, sSubSystem, (eLogLevel) nLogLevel, sTimeStamp);
+		pLogEntryList->addEntry(nLogID, sMessage, sSubSystem, (eLogLevel)nLogLevel, sTimeStamp);
 	}
 	pStatement = nullptr;
 
 	return pLogEntryList.release();
 }
-

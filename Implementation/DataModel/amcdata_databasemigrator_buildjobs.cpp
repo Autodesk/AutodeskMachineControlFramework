@@ -68,7 +68,13 @@ namespace AMCData {
 			break;
 		}
 
+		case 4: {
+			std::string sIdentifierAddQuery = "ALTER TABLE `buildjobdata` ADD `identifier` varchar ( 256 ) DEFAULT ``";
+			pTransaction->executeStatement(sIdentifierAddQuery);
 		}
+		}
+
+		
 	}
 
 

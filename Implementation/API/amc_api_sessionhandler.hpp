@@ -68,7 +68,9 @@ namespace AMC {
 
 		void authorizeSession (const std::string & sSessionUUID, const std::string & sSaltedPassword, const std::string & sClientKey);
 
-		void setUserDetailsForSession(const std::string& sSessionUUID, const std::string& sUsername, const std::string& sHashedPassword);
+		void setUserDetailsForSession(const std::string& sSessionUUID, const std::string& sUsername, const std::string& sHashedPassword, const std::string & sUserUUID, const std::string & sUserDescription, const std::string& sUserRoleIdentifier, const std::string & sUserLanguageIdentifier);
+		
+		void getUserDetailsForSession(const std::string& sSessionUUID, std::string& sUsername, std::string& sUserUUID, std::string& sUserDescription, std::string& sUserRoleIdentifier, std::string& sUserLanguageIdentifier);
 
 		std::string getSessionToken(const std::string& sSessionUUID);
 

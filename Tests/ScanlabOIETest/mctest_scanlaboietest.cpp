@@ -121,11 +121,11 @@ public:
 #else
 
 		std::string sOIEIniName = "oie_test1";
-		std::string sIP = "192.168.5.2";
+		std::string sIP = "192.168.178.60";
 		std::string sNetmask = "255.255.255.0";
-		std::string sOIEIPAddress = "192.168.5.8";
+		std::string sOIEIPAddress = "192.168.178.40";
 		uint32_t nTimeout = 4000;
-		uint32_t nSerial = 356266;
+		uint32_t nSerial = 349767;
 		double dMaxLaserPower = 300;
 		double dLaserOnDelay = 100;
 		double dLaserOffDelay = 100;
@@ -157,7 +157,7 @@ public:
 
 		auto pDeviceConfigurationInstance = pOIEDriver->ParseDeviceConfiguration(sDeviceConfig);
 
-		switch (pDeviceConfigurationInstance->GetDeviceType()) {
+		/*switch (pDeviceConfigurationInstance->GetDeviceType()) {
 		case LibMCDriver_ScanLabOIE::eRTCDeviceType::RTC5:
 			pStateEnvironment->LogMessage("Configured for RTC5");
 			break;
@@ -166,7 +166,7 @@ public:
 			break;
 		default:
 			throw std::runtime_error("Unknown RTC Card");
-		}
+		}*/
 
 		std::cout << "RTC Signal Count: " << pDeviceConfigurationInstance->GetRTCSignalCount() << std::endl;
 		std::cout << "Sensor Signal Count: " << pDeviceConfigurationInstance->GetSensorSignalCount() << std::endl;
@@ -184,7 +184,7 @@ public:
 		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
 		pRTC6Driver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
 
-		pRTC6Driver->SetCommunicationTimeouts(500, 3000, 1.2);
+		pRTC6Driver->SetCommunicationTimeouts(20, 10000, 1.3);
 
 		std::string sFirmwareResource;
 		if (sIP.empty()) {
@@ -268,7 +268,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByMinorVersion("AIB", 3, 0);
+		pDevice->StartAppByMinorVersion("AIB", 3, 2);
 
 		pStateEnvironment->LogMessage("Waiting..");
 
@@ -284,11 +284,17 @@ public:
 		{
 
 			pStateEnvironment->LogMessage("Running OIE Test..");
+			pRTC6Driver->SetOIERecordingMode(LibMCDriver_ScanLab::eOIERecordingMode::OIEEnableAndContinuousMeasurement);
 
+			pRTCContext->EnableOIEPIDControl();
 
 			pRTCContext->SetStartList(1, 0);
 			pRTCContext->EnableOIE();
 			pRTCContext->StartOIEMeasurement();
+
+			//pRTCContext->AddSetPowerForPIDControl(50);
+
+			//pRTCContext->SetOIEPIDMode(1);
 
 			std::vector<LibMCDriver_ScanLab::sPoint2D> ContourPoints;
 			//ContourPoints.resize(1000);
@@ -304,13 +310,18 @@ public:
 			std::cout << "How many points? " << ContourPoints.size() << std::endl;
 
 
-			pRTCContext->DrawPolyline(ContourPoints, 10.0, 100.0, 1.0, 0.0);
+			//pRTCContext->DrawPolyline(ContourPoints, 10.0, 100.0, 50.0, 0.0);
+			pRTCContext->DrawPolylineOIE(ContourPoints, 10.0, 100.0, 50.0, 0.0, 1);
+			//pRTCContext->SetOIEPIDMode(2);
+			//pRTCContext->DrawPolyline(ContourPoints, 10.0, 100.0, 50.0, 0.0);
+			pRTCContext->DrawPolylineOIE(ContourPoints, 10.0, 100.0, 50.0, 0.0, 2);
 
 			pRTCContext->StopOIEMeasurement();
 			pRTCContext->DisableOIE();
 
 			pRTCContext->SetEndOfList();
 			pRTCContext->ExecuteList(1, 0);
+			//pRTCContext->ExecuteListWithRecording(1, 0);
 
 			//pRTC6Driver->OIETest();
 
@@ -329,13 +340,27 @@ public:
 			pStateEnvironment->LogMessage("Storing as debug CSV..");
 			std::vector<double> XArrayBuffer;
 			std::vector<double> YArrayBuffer;
+			std::vector<int32_t> RTCBuffer1;
+			std::vector<int32_t> RTCBuffer2;
+			std::vector<int32_t> RTCBuffer3;
+			std::vector<int32_t> RTCBuffer4;
 			std::vector<int32_t> SignalsBuffer1;
 			std::vector<uint32_t> PacketNumbersBuffer;
 			//std::vector<int32_t> SignalsBuffer2;
+			std::vector<int32_t> AppBuffer1;
+			std::vector<int32_t> AppBuffer2;
+			std::vector<int32_t> AppBuffer3;
 			pRecording->GetAllCoordinates(XArrayBuffer, YArrayBuffer);
+			pRecording->GetAllRTCSignals(0, RTCBuffer1);
+			pRecording->GetAllRTCSignals(1, RTCBuffer2);
+			pRecording->GetAllRTCSignals(2, RTCBuffer3);
+			pRecording->GetAllRTCSignals(3, RTCBuffer4);
 			pRecording->GetAllSensorSignals(0, SignalsBuffer1);
 			//pRecording->GetAllSensorSignals(1, SignalsBuffer2);
 			pRecording->GetAllPacketNumbers(PacketNumbersBuffer);
+			pRecording->GetAllAdditionalSignals(0, AppBuffer1);
+			pRecording->GetAllAdditionalSignals(1, AppBuffer2);
+			pRecording->GetAllAdditionalSignals(2, AppBuffer3);
 
 			size_t nRecordCount = pRecording->GetRecordCount();
 
@@ -351,14 +376,26 @@ public:
 				throw std::runtime_error("retrieved invalid packet numbers data");
 
 			std::ofstream fStream;
-			fStream.open("debug.csv");
+			fStream.open("C:\\Users\\B.nock\\Desktop\\debug.csv");
 			if (!fStream.is_open())
 				throw std::runtime_error("could not write file");
 
-			fStream << "packet number, X, Y, Sensor Value 1, Sensor Value 2" << std::endl;
+			fStream << "packet number, X, Y, RTC Data 1, RTC Data 2, RTC Data 3, RTC Data 4, RTC Data 4 (Analog1), RTC Data 4 (Analog2), Sensor Value 1, App Data 0, App Data 1, App Data 2," << std::endl;
 
 			for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
-				fStream << PacketNumbersBuffer[nRecordIndex] << ", " << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer1[nRecordIndex] << ", " << std::endl;
+				fStream << PacketNumbersBuffer[nRecordIndex] << ", " << 
+					XArrayBuffer[nRecordIndex] << ", " << 
+					YArrayBuffer[nRecordIndex] << ", " << 
+					RTCBuffer1[nRecordIndex] << ", " << 
+					RTCBuffer2[nRecordIndex] << ", " << 
+					RTCBuffer3[nRecordIndex] << ", " << 
+					RTCBuffer4[nRecordIndex] << ", " << 
+					(RTCBuffer4[nRecordIndex] & 0xffff) << ", " << 
+					(RTCBuffer4[nRecordIndex] & 0xffff0000) << ", " << 
+					SignalsBuffer1[nRecordIndex] << ", " << 
+					AppBuffer1[nRecordIndex] << ", " << 
+					AppBuffer2[nRecordIndex] << ", " << 
+					AppBuffer3[nRecordIndex] << ", " << std::endl;
 			}
 
 			pStateEnvironment->LogMessage("Waiting..");

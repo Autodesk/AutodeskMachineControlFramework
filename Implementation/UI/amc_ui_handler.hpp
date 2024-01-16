@@ -51,6 +51,8 @@ namespace LibMCUI {
 
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+	amcDeclareDependingClass(CStorage, PStorage);
+	amcDeclareDependingClass(CLoginHandler, PLoginHandler);
 }
 
 namespace LibMCEnv {
@@ -70,6 +72,8 @@ namespace AMC {
 	amcDeclareDependingClass(CUICustomPage, PUICustomPage);
 	amcDeclareDependingClass(CUIDialog, PUIDialog);
 	amcDeclareDependingClass(CLogger, PLogger);
+	amcDeclareDependingClass(CSystemState, PSystemState);
+	amcDeclareDependingClass(CStateJournal, PStateJournal);
 	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);	
@@ -77,7 +81,15 @@ namespace AMC {
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
+	amcDeclareDependingClass(CToolpathHandler, PToolpathHandler);
+	amcDeclareDependingClass(CMeshHandler, PMeshHandler);
+	amcDeclareDependingClass(CUserInformation, PUserInformation);
+	amcDeclareDependingClass(CAccessControl, PAccessControl);
+	amcDeclareDependingClass(CLanguageHandler, PLanguageHandler);
+	amcDeclareDependingClass(CUISystemState, PUISystemState);
 
+
+	
 
 	class CUIHandleEventResponse {
 	private:
@@ -111,11 +123,8 @@ namespace AMC {
 		CUIExpression m_LoginWelcomeMessage;
 
 		std::string m_sMainPageName;
-		std::string m_sTestOutputPath;
 
-		PStateMachineData m_pStateMachineData;
-		PStateSignalHandler m_pSignalHandler;
-		PLogger m_pLogger;
+		PUISystemState m_pUISystemState;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
@@ -132,6 +141,7 @@ namespace AMC {
 		LibMCUI::PEventHandler m_pUIEventHandler;
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
+
 		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string & sDescription, const std::string& sTargetPage, const std::string & sEventName);
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName);
 
@@ -143,7 +153,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, const std::string & sTestOutputPath);
+		CUIHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PUISystemState pUISystemState);
 		
 		virtual ~CUIHandler();
 		
@@ -163,7 +173,7 @@ namespace AMC {
 
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler);
+		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler, PUserInformation pUserInformation);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 
@@ -171,6 +181,8 @@ namespace AMC {
 
 		PUIPage findPage(const std::string& sName);
 		PUIDialog findDialog(const std::string& sName);
+
+		AMC::PUISystemState getUISystemState();
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

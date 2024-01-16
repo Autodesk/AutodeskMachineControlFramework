@@ -17,6 +17,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project("AMCDrivers")
 
+add_subdirectory(A3200)
+add_subdirectory(GRPC)
 add_subdirectory(ADS)
 add_subdirectory(BK9xxx)
 add_subdirectory(BuR)
@@ -30,6 +32,8 @@ add_subdirectory(RayLase)
 add_subdirectory(S7Net)
 add_subdirectory(ScanLab)
 add_subdirectory(ScanLabOIE)
+add_subdirectory(ScanLabSMC)
 add_subdirectory(TCPIP)
 add_subdirectory(Ximc)
+add_subdirectory(TML)
 

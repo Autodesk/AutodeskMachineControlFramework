@@ -45,10 +45,12 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab::CDriver_ScanLab(LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_pDriverEnvironment (pDriverEnvironment)
+    : m_pDriverEnvironment (pDriverEnvironment), m_nDLLVersion (0)
 {
     if (pDriverEnvironment.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+    m_pOwnerData = std::make_shared<CRTCContextOwnerData>();
 
 }
 
@@ -58,7 +60,7 @@ IRTCSelector * CDriver_ScanLab::CreateRTCSelector()
     if (m_pScanLabSDK.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKNOTLOADED);
 
-    return new CRTCSelector(m_pScanLabSDK, m_pDriverEnvironment);
+    return new CRTCSelector(m_pOwnerData, m_pDriverEnvironment);
 }
 
 
@@ -92,6 +94,13 @@ void CDriver_ScanLab::LoadSDK(const std::string& sResourceName)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK);
 
     m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
+    m_pOwnerData->setScanLabSDK(m_pScanLabSDK);
+
+    //m_pScanLabSDK->setJournal(std::make_shared<CScanLabSDKJournal>("C:/Temp/journal.txt"));
+
+    m_nDLLVersion = m_pScanLabSDK->get_dll_version();
+
+    updateDLLVersionParameter(m_nDLLVersion);
 
 }
 
@@ -113,5 +122,15 @@ void CDriver_ScanLab::LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLL
     m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
     m_pSDKLibraryFile = m_pWorkingDirectory->StoreCustomData(sFileName, LibMCEnv::CInputVector<uint8_t> (pScanlabDLLBuffer, nScanlabDLLBufferSize));
     m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
+    m_pOwnerData->setScanLabSDK(m_pScanLabSDK);
 
+    m_nDLLVersion = m_pScanLabSDK->get_dll_version();
+
+    updateDLLVersionParameter(m_nDLLVersion);
+
+}
+
+uint32_t CDriver_ScanLab::getDLLVersion()
+{
+    return m_nDLLVersion;
 }

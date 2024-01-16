@@ -31,16 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcplugin_impl.hpp"
 #include "libmcdriver_scanlab_dynamic.hpp"
 #include "libmcdriver_raylase_dynamic.hpp"
+#include "libmcdriver_scanlabsmc_dynamic.hpp"
 
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
 LIBMC_IMPORTDRIVERCLASSES(ScanLab, ScanLab_RTC6)
 LIBMC_IMPORTDRIVERCLASSES(Raylase, Raylase)
+LIBMC_IMPORTDRIVERCLASSES(ScanLabSMC, ScanLabSMC)
 
 __BEGINDRIVERIMPORT
 __IMPORTDRIVER(ScanLab_RTC6, "scanlab");
 __IMPORTDRIVER(Raylase, "raylase");
+__IMPORTDRIVER(ScanLabSMC, "scanlabsmc");
 __ENDDRIVERIMPORT
 
 
@@ -83,6 +86,7 @@ void InitialiseScanlabDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDri
 
 	if (!pDriver->IsSimulationMode()) {
 		pDriver->LoadSDK("rtc6dllx64");
+		//pDriver->LoadSDK("rtcsimdll");
 	}
 
 	auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
@@ -136,6 +140,28 @@ void InitialiseScanlabDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDri
 
 }
 
+void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_ScanLabSMC pDriver)
+{
+	pStateEnvironment->LogMessage("Initialising Scanlab SMC Driver");
+
+	auto sIPAddress = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
+	auto nSerial = pStateEnvironment->GetIntegerParameter("cardconfig", "serial");
+	auto sCorrectionResourceName = pStateEnvironment->GetStringParameter("correction", "resourcename");
+
+	auto pConfiguration = pDriver->CreateEmptyConfiguration();
+
+	pConfiguration->SetDynamicViolationReaction(LibMCDriver_ScanLabSMC::eDynamicViolationReaction::StopAndReport);
+
+	pConfiguration->SetSerialNumber((uint32_t) nSerial);
+	pConfiguration->SetIPAddress(sIPAddress);
+	pConfiguration->SetCorrectionFileResource(sCorrectionResourceName);
+	pConfiguration->SetFirmwareResources("rtc6eth", "rtc6rbf", "rtc6dat");
+
+	auto pContext = pDriver->CreateContext("smccontext", pConfiguration);
+
+}
+
+
 /*************************************************************************************************************************
   State definitions
 **************************************************************************************************************************/
@@ -147,6 +173,10 @@ __DECLARESTATE(init)
 	if (sCardType == "scanlab")
 	{
 		InitialiseScanlabDriver(pStateEnvironment, __acquireDriver(ScanLab_RTC6));
+	}
+	else if (sCardType == "scanlabsmc")
+	{
+		InitialiseScanlabSMCDriver(pStateEnvironment, __acquireDriver(ScanLabSMC));
 	}
 	else if (sCardType == "raylase") {
 		InitialiseRaylaseDriver(pStateEnvironment, __acquireDriver(Raylase));
@@ -167,6 +197,10 @@ __DECLARESTATE(idle)
 	}
 	else if (sCardType == "raylase") {
 		auto pDriver = __acquireDriver(Raylase);
+		pDriver->QueryParameters();
+	}
+	else if (sCardType == "scanlabsmc") {
+		auto pDriver = __acquireDriver(ScanLabSMC);
 		pDriver->QueryParameters();
 	}
 
@@ -208,6 +242,15 @@ __DECLARESTATE(exposure)
 		}
 
 		pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+	}
+	else if (sCardType == "scanlabsmc")
+	{
+		auto pDriver = __acquireDriver(ScanLabSMC);
+
+		auto pContext = pDriver->FindContext("smccontext");
+		pContext->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+
+		
 	}
 	else if (sCardType == "raylase") {
 		auto pDriver = __acquireDriver(Raylase);

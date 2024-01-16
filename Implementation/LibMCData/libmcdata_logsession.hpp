@@ -43,6 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include "amcdata_sqlhandler.hpp"
+#include "amcdata_journal.hpp"
+
+#include "common_exportstream.hpp"
 
 #include <thread>
 #include <mutex>
@@ -59,22 +62,19 @@ namespace Impl {
 class CLogSession : public virtual ILogSession, public virtual CBase {
 private:
 
-protected:
-
-	AMCData::PSQLHandler m_pSQLHandler;
-	std::mutex m_Mutex;
-	uint32_t m_LogID;
+	AMCData::PJournal m_pJournal;
 
 public:
 
-	CLogSession(const std::string& sLogPath);
+	CLogSession(AMCData::PJournal pJournal);
+
+	virtual ~CLogSession();
 
 	void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp) override;
 
 	LibMCData_uint32 GetMaxLogEntryID() override;
 
 	ILogEntryList* RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel) override;
-
 
 };
 

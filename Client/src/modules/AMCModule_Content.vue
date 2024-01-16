@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 										
 					<ContentItem_Image :key="moduleitem.uuid" v-if="(moduleitem.type=='image')" :moduleitem="moduleitem" :Application="Application" />
 					
+					<ContentItem_Chart :key="moduleitem.uuid" v-if="(moduleitem.type=='chart')" :moduleitem="moduleitem" :Application="Application" />
+
 					<ContentItem_Upload :key="moduleitem.uuid" v-if="(moduleitem.type=='upload')" :moduleitem="moduleitem" :Application="Application" />
 																
 					<ContentItem_BuildList :key="moduleitem.uuid" v-if="(moduleitem.type=='buildlist')" :moduleitem="moduleitem" :Application="Application" />										
@@ -69,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	import ContentItem_Paragraph from '../modules/AMCModule_ContentItem_Paragraph.vue';
 	import ContentItem_Image from '../modules/AMCModule_ContentItem_Image.vue';
+	import ContentItem_Chart from '../modules/AMCModule_ContentItem_Chart.vue';
 	import ContentItem_Upload from '../modules/AMCModule_ContentItem_Upload.vue';
 	import ContentItem_BuildList from '../modules/AMCModule_ContentItem_BuildList.vue';
 	import ContentItem_ParameterList from '../modules/AMCModule_ContentItem_ParameterList.vue';
@@ -82,6 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		components: {
 			ContentItem_Paragraph,
 			ContentItem_Image,
+			ContentItem_Chart,
 			ContentItem_Upload,
 			ContentItem_BuildList,
 			ContentItem_ParameterList,

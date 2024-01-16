@@ -57,7 +57,13 @@ namespace Impl {
 class IBase;
 class IIterator;
 class ITestEnvironment;
+class IPNGImageStoreOptions;
+class IPNGImageData;
 class IImageData;
+class IDiscreteFieldData2DStoreOptions;
+class IDiscreteFieldData2D;
+class IDataSeries;
+class IMeshObject;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
@@ -79,7 +85,15 @@ class IDriverStatusUpdateSession;
 class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
+class IUniformJournalSampling;
+class IJournalVariable;
+class IAlert;
+class IAlertIterator;
+class IJournalHandler;
+class IUserDetailList;
+class IUserManagementHandler;
 class IStateEnvironment;
+class IUIItem;
 class IUIEnvironment;
 
 
@@ -141,6 +155,50 @@ template <class T1, class T2, class T3> class ParameterCache_3 : public Paramete
 			param1 = m_param1;
 			param2 = m_param2;
 			param3 = m_param3;
+		}
+};
+
+template <class T1, class T2, class T3, class T4> class ParameterCache_4 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+	public:
+		ParameterCache_4 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
 		}
 };
 
@@ -322,6 +380,48 @@ typedef IBaseSharedPtr<ITestEnvironment> PITestEnvironment;
 
 
 /*************************************************************************************************************************
+ Class interface for PNGImageStoreOptions 
+**************************************************************************************************************************/
+
+class IPNGImageStoreOptions : public virtual IBase {
+public:
+	/**
+	* IPNGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	virtual void ResetToDefaults() = 0;
+
+};
+
+typedef IBaseSharedPtr<IPNGImageStoreOptions> PIPNGImageStoreOptions;
+
+
+/*************************************************************************************************************************
+ Class interface for PNGImageData 
+**************************************************************************************************************************/
+
+class IPNGImageData : public virtual IBase {
+public:
+	/**
+	* IPNGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
+	*/
+	virtual void GetPNGDataStream(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IPNGImageData> PIPNGImageData;
+
+
+/*************************************************************************************************************************
  Class interface for ImageData 
 **************************************************************************************************************************/
 
@@ -377,18 +477,24 @@ public:
 	/**
 	* IImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
 	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
+	* @param[in] pPNGDataBuffer - PNG Data stream.
 	*/
-	virtual void LoadPNG(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
+	virtual void LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer) = 0;
 
 	/**
-	* IImageData::EncodePNG - Encodes PNG and stores data stream in image object.
+	* IImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
+	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
+	*/
+	virtual IPNGImageData * CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) = 0;
+
+	/**
+	* IImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
 	*/
 	virtual void EncodePNG() = 0;
 
 	/**
-	* IImageData::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+	* IImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
 	* @param[in] nPNGDataBufferSize - Number of elements in buffer
 	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
@@ -396,7 +502,7 @@ public:
 	virtual void GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
 
 	/**
-	* IImageData::ClearEncodedPNGData - Releases encoded data stream of image object.
+	* IImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
 	*/
 	virtual void ClearEncodedPNGData() = 0;
 
@@ -430,7 +536,7 @@ public:
 	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
 	* @param[in] nValueBufferSize - Number of elements in buffer
 	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
 	*/
 	virtual void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer) = 0;
 
@@ -448,6 +554,326 @@ public:
 };
 
 typedef IBaseSharedPtr<IImageData> PIImageData;
+
+
+/*************************************************************************************************************************
+ Class interface for DiscreteFieldData2DStoreOptions 
+**************************************************************************************************************************/
+
+class IDiscreteFieldData2DStoreOptions : public virtual IBase {
+public:
+	/**
+	* IDiscreteFieldData2DStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	virtual void ResetToDefaults() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDiscreteFieldData2DStoreOptions> PIDiscreteFieldData2DStoreOptions;
+
+
+/*************************************************************************************************************************
+ Class interface for DiscreteFieldData2D 
+**************************************************************************************************************************/
+
+class IDiscreteFieldData2D : public virtual IBase {
+public:
+	/**
+	* IDiscreteFieldData2D::GetDPI - Returns DPI values in X and Y.
+	* @param[out] dDPIValueX - DPI value in X
+	* @param[out] dDPIValueY - DPI value in Y
+	*/
+	virtual void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetDPI - Sets DPI values in X and Y.
+	* @param[in] dDPIValueX - new DPI value in X. MUST be positive.
+	* @param[in] dDPIValueY - new DPI value in Y. MUST be positive.
+	*/
+	virtual void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetOriginInMM - Returns field origin in mm.
+	* @param[out] dOriginX - Origin in X in mm
+	* @param[out] dOriginY - Origin in Y in mm
+	*/
+	virtual void GetOriginInMM(LibMCEnv_double & dOriginX, LibMCEnv_double & dOriginY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetOriginInMM - Set field origin in mm.
+	* @param[in] dOriginX - Origin in X in mm
+	* @param[in] dOriginY - Origin in Y in mm
+	*/
+	virtual void SetOriginInMM(const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetSizeInMM - Returns field sizes in mm.
+	* @param[out] dSizeX - Size in X in mm
+	* @param[out] dSizeY - Size in Y in mm
+	*/
+	virtual void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetSizeInPixels - Returns field pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::ResizeField - Resizes field pixel data.
+	* @param[in] nPixelSizeX - Number of pixels in X
+	* @param[in] nPixelSizeY - Number of pixels in Y
+	* @param[in] dDefaultValue - Default Pixel value.
+	*/
+	virtual void ResizeField(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Clear - Sets all pixels to a single value.
+	* @param[in] dValue - Pixel value.
+	*/
+	virtual void Clear(const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Clamp - Clamps all pixels to a certain interval.
+	* @param[in] dMinValue - Minimum value. MUST be smaller or equal than MaxValue.
+	* @param[in] dMaxValue - Maximum value. MUST be larger or equal than MinValue.
+	*/
+	virtual void Clamp(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetPixel - Returns one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @return Pixel value at this position
+	*/
+	virtual LibMCEnv_double GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetPixel - Sets one pixel of an field. Fails if outside of field size.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @param[in] dValue - New Pixel value at this position
+	*/
+	virtual void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDiscreteFieldData2D::GetPixelRange - Returns a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValueBuffer - double buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size.
+	*/
+	virtual void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_double * pValueBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::SetPixelRange - Exchanges a subset of an field or the whole field data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within field bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within field bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[in] pValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
+	*/
+	virtual void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_double * pValueBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::RenderAveragePointValues - Renders and array of average point values into the field. 
+	* @param[in] dDefaultValue - If a pixel does not contain any value, fall back to this given value.
+	* @param[in] eSamplingMode - Sampling mode of point values.
+	* @param[in] dSampleSizeX - How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] dSampleSizeY - How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise.
+	* @param[in] nPointValuesBufferSize - Number of elements in buffer
+	* @param[in] pPointValuesBuffer - Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels.
+	*/
+	virtual void RenderAveragePointValues(const LibMCEnv_double dDefaultValue, const LibMCEnv::eFieldSamplingMode eSamplingMode, const LibMCEnv_double dSampleSizeX, const LibMCEnv_double dSampleSizeY, const LibMCEnv_uint64 nPointValuesBufferSize, const LibMCEnv::sFieldData2DPoint * pPointValuesBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::ScaleFieldDown - Scales the field to a smaller size.
+	* @param[in] nFactorX - The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX
+	* @param[in] nFactorY - The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY
+	* @return Scaled Field Instance
+	*/
+	virtual IDiscreteFieldData2D * ScaleFieldDown(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::ScaleFieldUp - Scales the field to a larger size.
+	* @param[in] nFactorX - The new field will be this factor larger in X. MUST be positive.
+	* @param[in] nFactorY - The new field will be this factor larger in Y. MUST be positive.
+	* @return Scaled Field Instance
+	*/
+	virtual IDiscreteFieldData2D * ScaleFieldUp(const LibMCEnv_uint32 nFactorX, const LibMCEnv_uint32 nFactorY) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Discretize - Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.
+	* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+	* @param[in] pDiscreteValuesBuffer - An array of values. MUST NOT be empty.
+	*/
+	virtual void Discretize(const LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::DiscretizeWithMapping - Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.
+	* @param[in] nDiscreteValuesBufferSize - Number of elements in buffer
+	* @param[in] pDiscreteValuesBuffer - An array of values. MUST NOT be empty.  
+	* @param[in] nNewValuesBufferSize - Number of elements in buffer
+	* @param[in] pNewValuesBuffer - An array of values. MUST have the same cardinality as DiscreteValues.
+	*/
+	virtual void DiscretizeWithMapping(const LibMCEnv_uint64 nDiscreteValuesBufferSize, const LibMCEnv_double * pDiscreteValuesBuffer, const LibMCEnv_uint64 nNewValuesBufferSize, const LibMCEnv_double * pNewValuesBuffer) = 0;
+
+	/**
+	* IDiscreteFieldData2D::RenderToImageRaw - Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.
+	* @param[in] dMinValue - Min point value. Values smaller than MinValue will be clamped to MinValue.
+	* @param[in] MinColor - The color assigned to MinValue.
+	* @param[in] dMidValue - Mid point value. MUST be at least 1E-6 larger than MinValue.
+	* @param[in] MidColor - The color assigned to MidValue
+	* @param[in] dMaxValue - Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue.
+	* @param[in] MaxColor - The color assigned to MaxValue
+	* @return New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit.
+	*/
+	virtual IImageData * RenderToImageRaw(const LibMCEnv_double dMinValue, const LibMCEnv::sColorRGB MinColor, const LibMCEnv_double dMidValue, const LibMCEnv::sColorRGB MidColor, const LibMCEnv_double dMaxValue, const LibMCEnv::sColorRGB MaxColor) = 0;
+
+	/**
+	* IDiscreteFieldData2D::TransformField - Scales the field values with a factor and a translation.
+	* @param[in] dScale - A scaling factor will be applied to all values in the field.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	virtual void TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset) = 0;
+
+	/**
+	* IDiscreteFieldData2D::AddField - Adds another field to the field. Both fields MUST have the same pixel extensions.
+	* @param[in] pOtherField - Field Instance to add
+	* @param[in] dScale - A scaling factor will be applied to all values in the other field before adding.
+	* @param[in] dOffset - The offset will be applied to all values in the field after scaling.
+	*/
+	virtual void AddField(IDiscreteFieldData2D* pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset) = 0;
+
+	/**
+	* IDiscreteFieldData2D::Duplicate - Creates a copy of the field.
+	* @return Scaled Field Instance
+	*/
+	virtual IDiscreteFieldData2D * Duplicate() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDiscreteFieldData2D> PIDiscreteFieldData2D;
+
+
+/*************************************************************************************************************************
+ Class interface for DataSeries 
+**************************************************************************************************************************/
+
+class IDataSeries : public virtual IBase {
+public:
+	/**
+	* IDataSeries::GetName - Returns the name of the data series.
+	* @return Returns the name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IDataSeries::GetUUID - Returns the UUID of the data series.
+	* @return Returns uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IDataSeries::Clear - Clears all entries of the data series.
+	*/
+	virtual void Clear() = 0;
+
+	/**
+	* IDataSeries::IsEmpty - Checks if data series is empty.
+	* @return Returns true if data series has no entries.
+	*/
+	virtual bool IsEmpty() = 0;
+
+	/**
+	* IDataSeries::GetMinimum - Returns the minimum time stamp of the data series. Fails if data series is empty.
+	* @return Minimum time stamp in microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetMinimum() = 0;
+
+	/**
+	* IDataSeries::GetMaximum - Returns the maximum time stamp of the data series. Fails if data series is empty.
+	* @return Maximum time stamp in microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetMaximum() = 0;
+
+	/**
+	* IDataSeries::GetAllEntries - Returns all entries of the data series. Fails if data series is empty.
+	* @param[in] nEntryArrayBufferSize - Number of elements in buffer
+	* @param[out] pEntryArrayNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pEntryArrayBuffer - TimeStreamEntry buffer of Data series entries will be written in this array.
+	*/
+	virtual void GetAllEntries(LibMCEnv_uint64 nEntryArrayBufferSize, LibMCEnv_uint64* pEntryArrayNeededCount, LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer) = 0;
+
+	/**
+	* IDataSeries::SetAllEntries - Sets all entries of the data series. The time stamp array MUST be sorted in incrementing order, with no two time stamps being equal.
+	* @param[in] nEntryArrayBufferSize - Number of elements in buffer
+	* @param[in] pEntryArrayBuffer - Data series entries to use.
+	*/
+	virtual void SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, const LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer) = 0;
+
+	/**
+	* IDataSeries::SampleJournalVariable - Samples a journal variable.
+	* @param[in] pJournalVariable - Journal variable to sample.
+	* @param[in] nNumberOfSamples - Number of samples to generate.
+	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	*/
+	virtual void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta) = 0;
+
+	/**
+	* IDataSeries::GetVersion - Returns the incrementing change version of the data series.
+	* @return Version number. Increases with every change to the data.
+	*/
+	virtual LibMCEnv_uint32 GetVersion() = 0;
+
+	/**
+	* IDataSeries::IncreaseVersion - Increases the version number of the data series.
+	*/
+	virtual void IncreaseVersion() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataSeries> PIDataSeries;
+
+
+/*************************************************************************************************************************
+ Class interface for MeshObject 
+**************************************************************************************************************************/
+
+class IMeshObject : public virtual IBase {
+public:
+	/**
+	* IMeshObject::GetName - Returns the name of the Mesh Object.
+	* @return Returns the name of the mesh object.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IMeshObject::GetUUID - Returns the UUID of the mesh object.
+	* @return Returns mesh uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IMeshObject::GetTriangleCount - Returns the number of triangles.
+	* @return Number of triangles.
+	*/
+	virtual LibMCEnv_uint32 GetTriangleCount() = 0;
+
+	/**
+	* IMeshObject::GetVertexCount - Returns the number of vertices.
+	* @return Number of vertices.
+	*/
+	virtual LibMCEnv_uint32 GetVertexCount() = 0;
+
+};
+
+typedef IBaseSharedPtr<IMeshObject> PIMeshObject;
 
 
 /*************************************************************************************************************************
@@ -517,6 +943,55 @@ public:
 	* @return Segment Type
 	*/
 	virtual LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentIntegerAttribute - Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	virtual LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentDoubleAttribute - Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
+	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] nAttributeID - ID of the attribute.
+	* @return Attribute Value.
+	*/
+	virtual LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) = 0;
+
+	/**
+	* IToolpathLayer::HasCustomSegmentAttribute - Checks if a segment attribute is registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Flag if attribute is registered.
+	*/
+	virtual bool HasCustomSegmentAttribute(const std::string & sNamespace, const std::string & sAttributeName) = 0;
+
+	/**
+	* IToolpathLayer::FindCustomSegmentAttributeID - Finds a segment attribute ID. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return ID of the attribute.
+	*/
+	virtual LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName) = 0;
+
+	/**
+	* IToolpathLayer::FindCustomSegmentAttributeType - Finds a segment attribute type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @return Type of the attribute.
+	*/
+	virtual LibMCEnv::eToolpathAttributeType FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName) = 0;
+
+	/**
+	* IToolpathLayer::FindCustomSegmentAttributeInfo - Finds a segment attribute ID and type. Fails if attribute is not registered.
+	* @param[in] sNamespace - Namespace of the attribute.
+	* @param[in] sAttributeName - Name of the attribute.
+	* @param[out] nAttributeID - ID of the attribute.
+	* @param[out] eAttributeType - Type of the attribute.
+	*/
+	virtual void FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, LibMCEnv::eToolpathAttributeType & eAttributeType) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
@@ -702,6 +1177,43 @@ public:
 	*/
 	virtual LibMCEnv_double GetUnits() = 0;
 
+	/**
+	* IToolpathLayer::GetMetaDataCount - Retrieves the number of metadata nodes in the build file.
+	* @return Meta Data information.
+	*/
+	virtual LibMCEnv_uint32 GetMetaDataCount() = 0;
+
+	/**
+	* IToolpathLayer::GetMetaDataInfo - Returns the namespace and identifier of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @param[out] sNamespace - Namespace of the metadata
+	* @param[out] sName - Name of the metadata
+	*/
+	virtual void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName) = 0;
+
+	/**
+	* IToolpathLayer::GetMetaDataContent - Returns the metadata XML content of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex) = 0;
+
+	/**
+	* IToolpathLayer::HasUniqueMetaData - Checks if a metadata exists in the build file.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return Returns true if metadata exists and is unique.
+	*/
+	virtual bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathLayer::FindUniqueMetaData - Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * FindUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
+
 };
 
 typedef IBaseSharedPtr<IToolpathLayer> PIToolpathLayer;
@@ -720,10 +1232,24 @@ public:
 	virtual std::string GetStorageUUID() = 0;
 
 	/**
+	* IToolpathAccessor::GetBuildUUID - Returns UUID of the toolpath's build file.
+	* @return Returns build uuid.
+	*/
+	virtual std::string GetBuildUUID() = 0;
+
+	/**
 	* IToolpathAccessor::GetLayerCount - Returns layer count.
 	* @return Returns layer count.
 	*/
 	virtual LibMCEnv_uint32 GetLayerCount() = 0;
+
+	/**
+	* IToolpathAccessor::RegisterCustomSegmentAttribute - Registers a new custom segment attribute to be read.
+	* @param[in] sNameSpace - Namespace of the custom attribute.
+	* @param[in] sAttributeName - Name of the custom attribute.
+	* @param[in] eAttributeType - Attribute Type.
+	*/
+	virtual void RegisterCustomSegmentAttribute(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType) = 0;
 
 	/**
 	* IToolpathAccessor::LoadLayer - Reads and returns a layer object.
@@ -737,30 +1263,6 @@ public:
 	* @return Toolpath units.
 	*/
 	virtual LibMCEnv_double GetUnits() = 0;
-
-	/**
-	* IToolpathAccessor::HasMetaData - Checks if a metadata value exists for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns if metadata exists.
-	*/
-	virtual bool HasMetaData(const std::string & sNameSpace, const std::string & sName) = 0;
-
-	/**
-	* IToolpathAccessor::GetMetaDataValue - Returns the value of a metadata for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns the value
-	*/
-	virtual std::string GetMetaDataValue(const std::string & sNameSpace, const std::string & sName) = 0;
-
-	/**
-	* IToolpathAccessor::GetMetaDataType - Returns the type of a metadata for this toolpath model.
-	* @param[in] sNameSpace - Namespace of metadata.
-	* @param[in] sName - Name of metadata.
-	* @return Returns the type
-	*/
-	virtual std::string GetMetaDataType(const std::string & sNameSpace, const std::string & sName) = 0;
 
 	/**
 	* IToolpathAccessor::GetPartCount - Retrieves the number of parts in the toolpath.
@@ -807,6 +1309,43 @@ public:
 	* @return Z Value of the layer in mm.
 	*/
 	virtual LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataCount - Retrieves the number of metadata nodes in the build file.
+	* @return Meta Data information.
+	*/
+	virtual LibMCEnv_uint32 GetMetaDataCount() = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataInfo - Returns the namespace and identifier of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @param[out] sNamespace - Namespace of the metadata
+	* @param[out] sName - Name of the metadata
+	*/
+	virtual void GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string & sNamespace, std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataContent - Returns the metadata XML content of the given metadata index.
+	* @param[in] nMetaDataIndex - Index of metadata to return (0-based).
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex) = 0;
+
+	/**
+	* IToolpathAccessor::HasUniqueMetaData - Checks if a metadata exists in the build file.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return Returns true if metadata exists and is unique.
+	*/
+	virtual bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::FindUniqueMetaData - Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.
+	* @param[in] sNamespace - Namespace of the metadata
+	* @param[in] sName - Name of the metadata
+	* @return XML Metadata Object
+	*/
+	virtual IXMLDocumentNode * FindUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
 
 };
 
@@ -886,13 +1425,62 @@ public:
 
 	/**
 	* IBuild::AddBinaryData - Adds binary data to store with the build.
-	* @param[in] sName - Name of the attache data block.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+
+	/**
+	* IBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) = 0;
+
+	/**
+	* IBuild::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
+
+	/**
+	* IBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
 
 };
 
@@ -1131,6 +1719,18 @@ public:
 	virtual std::string GetValue() = 0;
 
 	/**
+	* IXMLDocumentAttribute::IsValidUUID - Checks if the value is a valid UUID string.
+	* @return returns if the value is a valid UUID string.
+	*/
+	virtual bool IsValidUUID() = 0;
+
+	/**
+	* IXMLDocumentAttribute::GetUUIDValue - Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.
+	* @return returns the value of the attribute as normalized UUID string.
+	*/
+	virtual std::string GetUUIDValue() = 0;
+
+	/**
 	* IXMLDocumentAttribute::IsValidInteger - Checks if the value is a valid integer in the given range.
 	* @param[in] nMinValue - Minimum allowed value
 	* @param[in] nMaxValue - Maximum allowed value
@@ -1170,17 +1770,21 @@ public:
 
 	/**
 	* IXMLDocumentAttribute::GetBoolValue - Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.
-	* @param[in] dMinValue - Minimum allowed value
-	* @param[in] dMaxValue - Maximum allowed value
 	* @return returns the value .
 	*/
-	virtual bool GetBoolValue(const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+	virtual bool GetBoolValue() = 0;
 
 	/**
 	* IXMLDocumentAttribute::SetValue - Sets the value of the attribute as string.
 	* @param[in] sValue - new value of the attribute.
 	*/
 	virtual void SetValue(const std::string & sValue) = 0;
+
+	/**
+	* IXMLDocumentAttribute::SetUUIDValue - Sets the value of the attribute as UUID string.
+	* @param[in] sValue - new value of the attribute. Fails if Value is not a UUID.
+	*/
+	virtual void SetUUIDValue(const std::string & sValue) = 0;
 
 	/**
 	* IXMLDocumentAttribute::SetIntegerValue - Sets the value of the attribute as integer.
@@ -1229,6 +1833,18 @@ public:
 	virtual std::string GetNameSpace() = 0;
 
 	/**
+	* IXMLDocumentNode::GetTextContent - Retrieves the text content of the node. A node with text content MUST NOT have children.
+	* @return returns the text content of the node.
+	*/
+	virtual std::string GetTextContent() = 0;
+
+	/**
+	* IXMLDocumentNode::SetTextContent - Sets the text content of the node. Call will fail if node has children.
+	* @param[in] sTextContent - the new text content of the node.
+	*/
+	virtual void SetTextContent(const std::string & sTextContent) = 0;
+
+	/**
 	* IXMLDocumentNode::GetAttributeCount - Returns number of attributes.
 	* @return returns the number of attributes.
 	*/
@@ -1257,6 +1873,99 @@ public:
 	* @return XML Document attribute.
 	*/
 	virtual IXMLDocumentAttribute * FindAttribute(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeValue - Returns string value of an attribute. Fails if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeIntegerValue - Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_int64 GetAttributeIntegerValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeDoubleValue - Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_double GetAttributeDoubleValue(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeBoolValue - Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	virtual bool GetAttributeBoolValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeUUIDValue - Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeUUIDValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeValueDef - Returns string value of an attribute. Returns default value if attribute does not exist.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeIntegerValueDef - Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_int64 GetAttributeIntegerValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeDoubleValueDef - Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] dMinValue - Minimum allowed value
+	* @param[in] dMaxValue - Maximum allowed value
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Attribute value.
+	*/
+	virtual LibMCEnv_double GetAttributeDoubleValueDef(const std::string & sNameSpace, const std::string & sName, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeBoolValueDef - Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] bDefaultValue - Default value.
+	* @return Attribute value.
+	*/
+	virtual bool GetAttributeBoolValueDef(const std::string & sNameSpace, const std::string & sName, const bool bDefaultValue) = 0;
+
+	/**
+	* IXMLDocumentNode::GetAttributeUUIDValueDef - Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.
+	* @param[in] sNameSpace - Namespace of the attribute. If empty, it inherits the namespace of the node.
+	* @param[in] sName - Name of the attribute.
+	* @param[in] sDefaultValue - Attribute value. MUST be a valid UUID
+	* @return Attribute value.
+	*/
+	virtual std::string GetAttributeUUIDValueDef(const std::string & sNameSpace, const std::string & sName, const std::string & sDefaultValue) = 0;
 
 	/**
 	* IXMLDocumentNode::RemoveAttribute - Removes the attribute with a specific name. Does nothing if attribute does not exist.
@@ -1351,12 +2060,21 @@ public:
 	virtual IXMLDocumentNode * FindChild(const std::string & sNameSpace, const std::string & sName, const bool bMustExist) = 0;
 
 	/**
-	* IXMLDocumentNode::AddChild - Adds a new child with a specific name.
+	* IXMLDocumentNode::AddChild - Adds a new child with a specific name. Fails if node has a non-empty text content.
 	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
 	* @param[in] sName - Name of the child.
 	* @return returns child instance.
 	*/
 	virtual IXMLDocumentNode * AddChild(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IXMLDocumentNode::AddChildText - Adds a new child with text content and a specific name. Fails if node has a non-empty text content.
+	* @param[in] sNameSpace - New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document.
+	* @param[in] sName - Name of the child.
+	* @param[in] sTextContent - Text content of the child.
+	* @return returns child instance.
+	*/
+	virtual IXMLDocumentNode * AddChildText(const std::string & sNameSpace, const std::string & sName, const std::string & sTextContent) = 0;
 
 	/**
 	* IXMLDocumentNode::RemoveChild - Removes a child with a specific name. All subsequent calls to the child will fail after the call.
@@ -1492,6 +2210,13 @@ public:
 	* @param[in] sNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
 	*/
 	virtual void RegisterNamespace(const std::string & sNamespace, const std::string & sNamespacePrefix) = 0;
+
+	/**
+	* IXMLDocument::ChangeNamespacePrefix - Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.
+	* @param[in] sOldNamespacePrefix - name space prefix that is currently in use.
+	* @param[in] sNewNamespacePrefix - name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters.
+	*/
+	virtual void ChangeNamespacePrefix(const std::string & sOldNamespacePrefix, const std::string & sNewNamespacePrefix) = 0;
 
 	/**
 	* IXMLDocument::GetRootNode - Returns root node of the document.
@@ -1854,8 +2579,8 @@ public:
 	virtual void LogInfo(const std::string & sLogString) = 0;
 
 	/**
-	* IDriverStatusUpdateSession::Sleep - Sleeps for a definite amount of time.
-	* @param[in] nDelay - Milliseconds to sleep.
+	* IDriverStatusUpdateSession::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
 	*/
 	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
 
@@ -2066,6 +2791,12 @@ public:
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
 	/**
+	* IDriverEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
+
+	/**
 	* IDriverEnvironment::LogMessage - logs a string as message
 	* @param[in] sLogString - String to Log
 	*/
@@ -2104,6 +2835,44 @@ public:
 	* @return Image instance containing the PNG image.
 	*/
 	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
+
+	/**
+	* IDriverEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	virtual bool HasBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IDriverEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
+	*/
+	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 };
 
@@ -2332,6 +3101,488 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for UniformJournalSampling 
+**************************************************************************************************************************/
+
+class IUniformJournalSampling : public virtual IBase {
+public:
+	/**
+	* IUniformJournalSampling::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	virtual std::string GetVariableName() = 0;
+
+	/**
+	* IUniformJournalSampling::GetNumberOfSamples - Returns the number of samples in the interval.
+	* @return Number of samples in the sampling.
+	*/
+	virtual LibMCEnv_uint32 GetNumberOfSamples() = 0;
+
+	/**
+	* IUniformJournalSampling::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
+
+	/**
+	* IUniformJournalSampling::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
+
+	/**
+	* IUniformJournalSampling::GetSample - Returns the timestamp and value of the given sample.
+	* @param[in] nIndex - Index of the sample. 0-based. MUST be smaller than NumberOfSamples.
+	* @param[out] nTimeStamp - TimeStamp of the sample in MicroSeconds.
+	* @param[out] dValue - Value of the sample in ms.
+	*/
+	virtual void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue) = 0;
+
+	/**
+	* IUniformJournalSampling::GetAllSamples - Returns all timestamps and values of the sampling.
+	* @param[in] nSamplesBufferSize - Number of elements in buffer
+	* @param[out] pSamplesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSamplesBuffer - TimeStreamEntry buffer of Array of Timestream entries, in increasing order.
+	*/
+	virtual void GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry * pSamplesBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUniformJournalSampling> PIUniformJournalSampling;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalVariable 
+**************************************************************************************************************************/
+
+class IJournalVariable : public virtual IBase {
+public:
+	/**
+	* IJournalVariable::GetVariableName - returns the name of the recorded variable.
+	* @return Path or name.
+	*/
+	virtual std::string GetVariableName() = 0;
+
+	/**
+	* IJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return Start Timestamp of Recording in microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
+
+	/**
+	* IJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
+	* @return End Timestamp of Recording in microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
+
+	/**
+	* IJournalVariable::ComputeFullAverage - Calculates the average value over the full available time interval.
+	* @return Average value of the variable.
+	*/
+	virtual LibMCEnv_double ComputeFullAverage() = 0;
+
+	/**
+	* IJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
+	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
+	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Average value of the variable.
+	*/
+	virtual LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval) = 0;
+
+	/**
+	* IJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
+	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
+	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
+	* @return Returns an instance with the sampling results.
+	*/
+	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
+
+	/**
+	* IJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
+	* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
+	* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry buffer of All change events of the variable in the accessed interval.
+	*/
+	virtual void ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalVariable> PIJournalVariable;
+
+
+/*************************************************************************************************************************
+ Class interface for Alert 
+**************************************************************************************************************************/
+
+class IAlert : public virtual IBase {
+public:
+	/**
+	* IAlert::GetUUID - Returns Alert UUID.
+	* @return Returns the alert uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IAlert::GetAlertLevel - Returns Alert Level.
+	* @return Returns the alert level.
+	*/
+	virtual LibMCEnv::eAlertLevel GetAlertLevel() = 0;
+
+	/**
+	* IAlert::GetIdentifier - Returns Alert Identifier.
+	* @return Returns the alert identifier.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IAlert::GetReadableContextInformation - Returns Alert Custom Information.
+	* @return Returns context information for the alert.
+	*/
+	virtual std::string GetReadableContextInformation() = 0;
+
+	/**
+	* IAlert::NeedsAcknowledgement - Returns if the alert needs acknowledgement.
+	* @return Flag if alert needs acknowledgement.
+	*/
+	virtual bool NeedsAcknowledgement() = 0;
+
+	/**
+	* IAlert::IsAcknowledged - Returns if the alert is acknowledged.
+	* @return Flag if alert is acknowledged.
+	*/
+	virtual bool IsAcknowledged() = 0;
+
+	/**
+	* IAlert::GetAcknowledgementInformation - Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+	* @param[out] sUserUUID - User who acknowledged the alert.
+	* @param[out] sUserComment - Comment of the acknowledgement.
+	* @param[out] sAckTime - Timestamp in ISO8601 UTC format.
+	*/
+	virtual void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlert> PIAlert;
+
+
+/*************************************************************************************************************************
+ Class interface for AlertIterator 
+**************************************************************************************************************************/
+
+class IAlertIterator : public virtual IIterator {
+public:
+	/**
+	* IAlertIterator::GetCurrentAlert - Returns the alert the iterator points at.
+	* @return returns the Alert instance.
+	*/
+	virtual IAlert * GetCurrentAlert() = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlertIterator> PIAlertIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalHandler 
+**************************************************************************************************************************/
+
+class IJournalHandler : public virtual IBase {
+public:
+	/**
+	* IJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @return Journal Instance.
+	*/
+	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
+
+	/**
+	* IJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
+	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @return Journal Instance.
+	*/
+	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
+
+	/**
+	* IJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
+	* @return Returns the stored time stamp in microseconds.
+	*/
+	virtual LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
+
+	/**
+	* IJournalHandler::HasJournalMarker - Checks if a journal marker tag exists.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @return Returns true if the marker exists.
+	*/
+	virtual bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName) = 0;
+
+	/**
+	* IJournalHandler::RetrieveJournalMarker - Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
+	* @return Returns the time stamp in microseconds.
+	*/
+	virtual LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
+
+	/**
+	* IJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
+	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
+	* @param[in] nTimeStampsBufferSize - Number of elements in buffer
+	* @param[out] pTimeStampsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTimeStampsBuffer - uint64 buffer of Returns an array of time stamps in microseconds.
+	*/
+	virtual void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalHandler> PIJournalHandler;
+
+
+/*************************************************************************************************************************
+ Class interface for UserDetailList 
+**************************************************************************************************************************/
+
+class IUserDetailList : public virtual IBase {
+public:
+	/**
+	* IUserDetailList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	virtual LibMCEnv_uint32 Count() = 0;
+
+	/**
+	* IUserDetailList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const LibMCEnv_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserDetailList::GetUsername - Retrieves the user name of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return User name
+	*/
+	virtual std::string GetUsername(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetUUID - Retrieves the UUID of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return UUID of the user.
+	*/
+	virtual std::string GetUUID(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetDescription - Retrieves the description of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Description of the user.
+	*/
+	virtual std::string GetDescription(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetRole - Retrieves the role of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Role of the user.
+	*/
+	virtual std::string GetRole(const LibMCEnv_uint32 nUserIndex) = 0;
+
+	/**
+	* IUserDetailList::GetLanguage - Retrieves the language identifier of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @return Language Identifier of the user.
+	*/
+	virtual std::string GetLanguage(const LibMCEnv_uint32 nUserIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUserDetailList> PIUserDetailList;
+
+
+/*************************************************************************************************************************
+ Class interface for UserManagementHandler 
+**************************************************************************************************************************/
+
+class IUserManagementHandler : public virtual IBase {
+public:
+	/**
+	* IUserManagementHandler::UserExists - Checks if a user exist.
+	* @param[in] sUsername - User name
+	* @return Flag if users exists
+	*/
+	virtual bool UserExists(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserProperties - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserPropertiesByUUID - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[out] sUsername - User name
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return User name
+	*/
+	virtual std::string GetUsernameByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserUUID - Retrieves a users UUID. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return UUID of the user.
+	*/
+	virtual std::string GetUserUUID(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserDescription - Retrieves a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescription(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserDescriptionByUUID - Retrieves a users description by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescriptionByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRole(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserRoleByUUID - Retrieves a users role by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRoleByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguage(const std::string & sUsername) = 0;
+
+	/**
+	* IUserManagementHandler::GetUserLanguageByUUID - Retrieves a users language preference by user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguageByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IUserManagementHandler::CreateUser - Creates a new user. Fails if the user already exists.
+	* @param[in] sUsername - User name to create. MUST be alphanumeric and not empty.
+	* @param[in] sRole - Role of the new user. MUST NOT be empty.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	* @param[in] sDescription - Description of the new user.
+	* @return UUID of the new user.
+	*/
+	virtual std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserLanguage - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserRole - Updates a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sUserRole - New Role identifier of the user.
+	*/
+	virtual void SetUserRole(const std::string & sUsername, const std::string & sUserRole) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sDescription - New Description of the user.
+	*/
+	virtual void SetUserDescription(const std::string & sUsername, const std::string & sDescription) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserPassword - Updates a users password. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserLanguageByUUID - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sUserRole - New Role identifier of the user.
+	*/
+	virtual void SetUserRoleByUUID(const std::string & sUUID, const std::string & sUserRole) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sDescription - New Description identifier of the user.
+	*/
+	virtual void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription) = 0;
+
+	/**
+	* IUserManagementHandler::SetUserPasswordByUUID - Updates a users password. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* IUserManagementHandler::GetActiveUsers - Returns a list of all users.
+	* @return Instance of active users.
+	*/
+	virtual IUserDetailList * GetActiveUsers() = 0;
+
+};
+
+typedef IBaseSharedPtr<IUserManagementHandler> PIUserManagementHandler;
+
+
+/*************************************************************************************************************************
  Class interface for StateEnvironment 
 **************************************************************************************************************************/
 
@@ -2392,7 +3643,14 @@ public:
 	virtual void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle) = 0;
 
 	/**
-	* IStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* IStateEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	virtual bool HasBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IStateEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
 	* @param[in] sBuildUUID - UUID of the build entity.
 	* @return Build instance
 	*/
@@ -2578,10 +3836,40 @@ public:
 	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
+	* IStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IStateEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
+
+	/**
 	* IStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
+
+	/**
+	* IStateEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
 
 	/**
 	* IStateEnvironment::GetTestEnvironment - Returns a test environment instance.
@@ -2612,9 +3900,129 @@ public:
 	*/
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
+	/**
+	* IStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
+	* @param[in] sUserLogin - Login of user to check
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	virtual bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier) = 0;
+
+	/**
+	* IStateEnvironment::CreateUserManagement - Returns a user management handler instance.
+	* @return Returns a user management handler.
+	*/
+	virtual IUserManagementHandler * CreateUserManagement() = 0;
+
+	/**
+	* IStateEnvironment::GetCurrentJournal - Returns the journal instance of the current session.
+	* @return Journal instance.
+	*/
+	virtual IJournalHandler * GetCurrentJournal() = 0;
+
+	/**
+	* IStateEnvironment::RegisterMeshFrom3MFResource - Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+	* @param[in] sResourceName - Resource name to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName) = 0;
+
+	/**
+	* IStateEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IStateEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IStateEnvironment::CreateDataSeries - Creates a new empty data series object.
+	* @param[in] sName - Name to use for this data series. MUST NOT be an empty string.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * CreateDataSeries(const std::string & sName) = 0;
+
+	/**
+	* IStateEnvironment::HasDataSeries - Checks if a data series exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return returns true if series exists.
+	*/
+	virtual bool HasDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IStateEnvironment::FindDataSeries - Finds a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * FindDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IStateEnvironment::ReleaseDataSeries - Releases the memory of a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to release.
+	*/
+	virtual void ReleaseDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IStateEnvironment::CreateAlert - creates a new alert
+	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
+	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @return Alert instance.
+	*/
+	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
+
+	/**
+	* IStateEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return Alert instance.
+	*/
+	virtual IAlert * FindAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IStateEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
+
+
+/*************************************************************************************************************************
+ Class interface for UIItem 
+**************************************************************************************************************************/
+
+class IUIItem : public virtual IBase {
+public:
+	/**
+	* IUIItem::GetName - Returns the name of the user interface item. MUST be unique within its siblings.
+	* @return Returns the name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IUIItem::GetPath - Returns the full path of the user interface item. MUST be unique.
+	* @return Returns the path.
+	*/
+	virtual std::string GetPath() = 0;
+
+	/**
+	* IUIItem::GetUUID - Returns the UUID of the time stream chart object.
+	* @return Returns uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+};
+
+typedef IBaseSharedPtr<IUIItem> PIUIItem;
 
 
 /*************************************************************************************************************************
@@ -2679,10 +4087,16 @@ public:
 	virtual std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const LibMCEnv::eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent) = 0;
 
 	/**
-	* IUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
-	* @return Name of the sender element.
+	* IUIEnvironment::RetrieveEventSender - returns path of the UI control that triggered the event.
+	* @return Path of the sender element.
 	*/
 	virtual std::string RetrieveEventSender() = 0;
+
+	/**
+	* IUIEnvironment::RetrieveEventSenderPage - returns name of the page of the UI control that triggered the event.
+	* @return Page of the sender element.
+	*/
+	virtual std::string RetrieveEventSenderPage() = 0;
 
 	/**
 	* IUIEnvironment::RetrieveEventSenderUUID - returns uuid of the UI control that triggered the event.
@@ -2877,6 +4291,12 @@ public:
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
 	/**
+	* IUIEnvironment::GetGlobalTimerInMicroseconds - Returns the global timer in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
+
+	/**
 	* IUIEnvironment::GetTestEnvironment - Returns a test environment instance.
 	* @return Test Environment Instance
 	*/
@@ -2904,6 +4324,173 @@ public:
 	* @return XML Document Instance.
 	*/
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
+
+	/**
+	* IUIEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Returns true if build exists
+	*/
+	virtual bool HasBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IUIEnvironment::GetBuildJob - Returns a instance of a build object. Fails if build uuid does not exist.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
+	*/
+	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
+	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
+	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @param[in] dDefaultValue - Default value of the field.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IUIEnvironment::CreateDiscreteField2DFromImage - Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.
+	* @param[in] pImageDataInstance - Image instance containing the pixel data.
+	* @param[in] dBlackValue - Value that the minimum color (black) shall be mapped to.
+	* @param[in] dWhiteValue - Value that the maximum color (white) shall be mapped to.
+	* @param[in] dOriginX - Origin X of the field in mm.
+	* @param[in] dOriginY - Origin Y of the field in mm.
+	* @return Empty field instance.
+	*/
+	virtual IDiscreteFieldData2D * CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) = 0;
+
+	/**
+	* IUIEnvironment::CheckPermission - Returns if the current user has a certain permission. Fails if permission is not known to the system.
+	* @param[in] sPermissionIdentifier - Permission identifier
+	* @return Returns if the user has permission
+	*/
+	virtual bool CheckPermission(const std::string & sPermissionIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserLogin - Returns the current user login name.
+	* @return Returns the current users login name.
+	*/
+	virtual std::string GetCurrentUserLogin() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserDescription - Returns the current user description.
+	* @return Returns the current users description.
+	*/
+	virtual std::string GetCurrentUserDescription() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserRole - Returns the current user role identifier.
+	* @return Returns the current users role identifier.
+	*/
+	virtual std::string GetCurrentUserRole() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserLanguage - Returns the current users language identifier.
+	* @return Returns the current users language identifier.
+	*/
+	virtual std::string GetCurrentUserLanguage() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentUserUUID - Returns the current user UUID.
+	* @return Returns the current user UUID.
+	*/
+	virtual std::string GetCurrentUserUUID() = 0;
+
+	/**
+	* IUIEnvironment::CreateUserManagement - Returns a user management handler instance.
+	* @return Returns a user management handler.
+	*/
+	virtual IUserManagementHandler * CreateUserManagement() = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentJournal - Returns the journal instance of the current session.
+	* @return Journal instance.
+	*/
+	virtual IJournalHandler * GetCurrentJournal() = 0;
+
+	/**
+	* IUIEnvironment::RegisterMeshFrom3MFResource - Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+	* @param[in] sResourceName - Resource name to load.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID) = 0;
+
+	/**
+	* IUIEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IUIEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+
+	/**
+	* IUIEnvironment::CreateDataSeries - Creates a new empty data series object.
+	* @param[in] sName - Name to use for this data series. MUST NOT be an empty string.
+	* @param[in] bBoundToLogin - If true, the data series is tied to the current user login session. If false, the data series will persist until explicitely released. This can be dangerous for the overall machine stability.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * CreateDataSeries(const std::string & sName, const bool bBoundToLogin) = 0;
+
+	/**
+	* IUIEnvironment::HasDataSeries - Checks if a data series exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return returns true if series exists.
+	*/
+	virtual bool HasDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IUIEnvironment::FindDataSeries - Finds a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to find.
+	* @return Data series instance.
+	*/
+	virtual IDataSeries * FindDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IUIEnvironment::ReleaseDataSeries - Releases the memory of a data series. Fails if data series does not exist.
+	* @param[in] sDataSeriesUUID - UUID to release.
+	*/
+	virtual void ReleaseDataSeries(const std::string & sDataSeriesUUID) = 0;
+
+	/**
+	* IUIEnvironment::CreateAlert - creates a new alert
+	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
+	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @return Alert instance.
+	*/
+	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
+
+	/**
+	* IUIEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return Alert instance.
+	*/
+	virtual IAlert * FindAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IUIEnvironment::AcknowledgeAlert - Acknowledges an alert for the current user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeAlert(const std::string & sAlertUUID, const std::string & sUserComment) = 0;
+
+	/**
+	* IUIEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
+	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
 
 };
 

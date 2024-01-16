@@ -51,6 +51,7 @@ import AMCUpload from "./AMCImplementation_Upload.js"
 import AMCApplicationDialog from "./AMCDialog.js"
 
 export default class AMCApplication extends Common.AMCObject {
+	
 
     constructor(apiBaseURL, uiResizeEvent) {
 		
@@ -62,7 +63,13 @@ export default class AMCApplication extends Common.AMCObject {
         this.API = {
             baseURL: apiBaseURL,
             authToken: Common.nullToken (),
-            unsuccessfulUpdateCounter: 0
+            unsuccessfulUpdateCounter: 0,
+			userUUID: Common.nullUUID (),
+			userLogin: "",
+			userDescription: "",
+			userRole: "",
+			userLanguage: "",
+			userPermissions: new Set ()
         }
 
         this.AppState = {
@@ -82,6 +89,7 @@ export default class AMCApplication extends Common.AMCObject {
             LogoAspectRatio: 1.0,
 			LoginBackgroundImageUUID: "",
 			LoginWelcomeMessage: "",
+			FirstLaunchMode: false,
             Colors: {}
         }
 
@@ -135,6 +143,22 @@ export default class AMCApplication extends Common.AMCObject {
             url: this.API.baseURL + subURL
         });
     }
+
+    axiosGetArrayBufferRequest(subURL) {
+        let headers = {}
+        let authToken = this.API.authToken;
+
+        if (authToken != Common.nullToken ())
+            headers.Authorization = "Bearer " + authToken;
+
+        return Axios({
+            method: "GET",
+            "headers": headers,
+			"responseType": "arraybuffer",
+            url: this.API.baseURL + subURL
+        });
+    }
+
 
     axiosPostRequest(subURL, data) {
         let headers = {}
@@ -210,9 +234,17 @@ export default class AMCApplication extends Common.AMCObject {
     performLogout() {
         this.API.authToken = Common.nullToken ();
         this.API.unsuccessfulUpdateCounter = 0;
+		this.API.userUUID = Common.nullUUID ();
+		this.API.userLogin = "";
+		this.API.userDescription = "";
+		this.API.userRole = "";
+		this.API.userLanguage = "";
+		this.API.userPermissions = new Set ();
     }
 
     requestLogin(userName, userPassword) {
+
+		this.performLogout ();
 
         this.axiosPostRequest("/auth/", {
             "username": userName
@@ -234,7 +266,19 @@ export default class AMCApplication extends Common.AMCObject {
             })
 
             .then(resultAuthenticate => {
-                this.API.authToken = resultAuthenticate.data.token;
+                this.API.authToken = Assert.SHA256Value (resultAuthenticate.data.token);
+				this.API.userUUID = Assert.UUIDValue (resultAuthenticate.data.useruuid);
+				this.API.userLogin = Assert.IdentifierString (resultAuthenticate.data.userlogin);
+				this.API.userDescription = Assert.StringValue (resultAuthenticate.data.userdescription);
+				this.API.userRole = Assert.IdentifierString (resultAuthenticate.data.userrole);
+				//this.API.userLanguage = Assert.IdentifierString (resultAuthenticate.data.userlanguage);
+				this.API.userPermissions = new Set ();
+				
+				let permissionArray = Assert.ArrayValue (resultAuthenticate.data.userpermissions);
+				for (let permission of permissionArray) {
+					this.API.userPermissions.add (permission);
+				}
+				
                 this.setStatus("ready");
 
                 this.retrieveStateUpdate();
@@ -364,26 +408,7 @@ export default class AMCApplication extends Common.AMCObject {
         });
     }
 
-    updateContentItemResult(uuid, content) {
-		
-		Assert.UUIDValue (uuid);
-		Assert.ObjectValue (content);
-		Assert.ArrayValue (content.entries);
-		
-        if (uuid) {
-            if (content) {
-                if (content.entries) {
-					
-					if (this.AppContent.ItemMap.has (uuid)) {
-						let item = this.AppContent.ItemMap.get (uuid);
-						item.updateFromJSON (content);
-					}
-
-				}			
-			}
-        }
-    }
-	
+   
 	
     updateContentItem(item) {
 		
@@ -609,8 +634,13 @@ export default class AMCApplication extends Common.AMCObject {
     getImageURL(uuid) {
         return this.API.baseURL + '/ui/image/' + uuid;
     }
+	
+    getChartURL(uuid) {
+        return this.API.baseURL + '/ui/chart/' + uuid;
+    }
+	
 
-    triggerUIEvent(eventname, senderuuid, eventValues) {
+    triggerUIEvent(eventname, senderuuid, eventValues, executionCallback) {
 
         this.axiosPostRequest("/ui/event", {
             "eventname": eventname,
@@ -637,6 +667,10 @@ export default class AMCApplication extends Common.AMCObject {
 					}
 				}
 			}
+			
+			if (executionCallback) {
+				executionCallback ();
+			}				
 			
         })
         .catch(err => {
@@ -672,5 +706,115 @@ export default class AMCApplication extends Common.AMCObject {
     storeWebGLInstance(uuid, instance) {
         this.AppState.WebGLInstances[uuid] = instance;
     }
+	
+	findPage (pageName) {
+		
+		if (this.PageMap.has (pageName))
+			return this.PageMap.get (pageName);
+		
+		return null;
+		
+	}
+
+	findCustomPage (pageName) {
+		
+		if (this.CustomPageMap.has (pageName))
+			return this.CustomPageMap.get (pageName);
+		
+		return null;
+		
+	}
+	
+	userIsLoggedIn ()
+	{
+		return (this.API.authToken !== Common.nullToken ());
+	}
+
+	userUUID ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user UUID: user is not logged in";
+			
+		return this.API.userUUID;
+	}
+
+	userLogin ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user login: user is not logged in";
+
+		return this.API.userLogin;
+	}
+
+	userDescription ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user description: user is not logged in";
+
+		return this.API.userDescription;
+	}
+
+	userRole ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user role: user is not logged in";
+		
+		return this.API.userRole;
+	}
+
+	userLanguage ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user language: user is not logged in";
+		
+		return this.API.userLanguage;
+	}
+
+	userPermissions ()
+	{
+		if (!this.userIsLoggedIn ())
+			throw "could not get user permissions: user is not logged in";
+		
+		return new Set(this.API.userPermissions);
+	}
+	
+	checkPermission (permissionIdentifier)
+	{
+		if (!this.userIsLoggedIn ())
+			return false;
+		
+		return this.API.userPermissions.has (Assert.IdentifierString (permissionIdentifier));
+	}
+	
+	generateUserPassword (clearTextPassword)
+	{
+		if (!clearTextPassword.isString ()) 
+			throw "could not set user password: invalid input string";
+		
+		let trimmedPassword = clearTextPassword.trim ();
+		
+		if (trimmedPassword.length < Common.minimumPasswordLength ())
+			throw "could not set user password: invalid user password length";
+					
+		if (!this.userIsLoggedIn ())
+			throw "could not get user permissions: user is not logged in";
+		
+		const randomArray = new Uint32Array(1024);
+		asmCrypto.random.getValues( randomArray );
+		
+		let randomString = this.API.authToken;
+		for (let value in randomArray)
+			randomString = randomString + value.toString ();
+
+		let passwordSalt = asmCrypto.SHA256.hex(randomString);
+		let passwordHash = asmCrypto.SHA256.hex(passwordSalt + trimmedPassword);
+		
+		return {
+			"salt": passwordSalt,
+			"hash": passwordHash
+		}
+		
+	}
+
 
 }

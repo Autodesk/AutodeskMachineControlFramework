@@ -56,6 +56,12 @@ std::string CXMLDocumentNameSpace::getPrefix()
 	return m_sPrefix;
 }
 
+bool CXMLDocumentNameSpace::hasPrefix()
+{
+	return !m_sPrefix.empty();
+}
+
+
 bool CXMLDocumentNameSpace::checkXMLNameSpaceName(const std::string& sNodeName)
 {
 	return true;
@@ -66,3 +72,7 @@ bool CXMLDocumentNameSpace::checkXMLNameSpacePrefixName(const std::string& sPref
 	return true;
 }
 
+void CXMLDocumentNameSpace::changePrefix(const std::string& sNewNamespacePrefix)
+{
+	m_sPrefix = sNewNamespacePrefix;
+}

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_session.hpp"
 #include "amc_parameterhandler.hpp"
 #include "common_utils.hpp"
+#include "amc_userinformation.hpp"
 
 #include "libmc_interfaceexception.hpp"
 
@@ -42,9 +43,10 @@ using namespace AMC;
 
 CAPISession::CAPISession()
 	: m_sUUID(AMCCommon::CUtils::createUUID()),
-	m_sKey(AMCCommon::CUtils::calculateRandomSHA256String (APISESSION_RANDOMKEYITERATIONS)),
+	m_sKey(AMCCommon::CUtils::calculateRandomSHA256String(APISESSION_RANDOMKEYITERATIONS)),
 	m_sToken(AMCCommon::CUtils::calculateRandomSHA256String(APISESSION_RANDOMKEYITERATIONS)),
 	m_sUserName(""),
+	m_sUserUUID(AMCCommon::CUtils::createUUID ()),
 	m_bAuthenticated(false)
 {
 
@@ -77,6 +79,34 @@ std::string CAPISession::getUserName()
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	return m_sUserName;
+}
+
+std::string CAPISession::getUserUUID()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserUUID;
+}
+
+std::string CAPISession::getUserDescription()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserDescription;
+}
+
+std::string CAPISession::getUserLanguageIdentifier()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserLanguageIdentifier;
+}
+
+std::string CAPISession::getUserRoleIdentifier()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_sUserRoleIdentifier;
 }
 
 bool CAPISession::isAuthenticated()
@@ -117,15 +147,25 @@ void CAPISession::authorizeSessionByPassword(const std::string& sSaltedPasswordH
 
 }
 
-void CAPISession::setUserDetails(const std::string& sUserName, const std::string& sHashedPassword)
+void CAPISession::setUserDetails(const std::string& sUserName, const std::string& sHashedPassword, const std::string& sUserUUID, const std::string& sUserDescription, const std::string& sUserRoleIdentifier, const std::string& sUserLanguageIdentifier)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	m_sUserName = sUserName;
 	m_sHashedPassword = sHashedPassword;
+	m_sUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+		
+	m_sUserDescription = sUserDescription;
+	m_sUserRoleIdentifier = sUserRoleIdentifier;
+	m_sUserLanguageIdentifier = sUserLanguageIdentifier;
 }
 
 PParameterHandler CAPISession::getClientVariableHandler()
 {
 	return m_pClientVariableHandler;
+}
+
+PUserInformation CAPISession::createUserInformation()
+{
+	return std::make_shared<CUserInformation> (m_sUserUUID, m_sUserName, m_sUserDescription, m_sUserRoleIdentifier, m_sUserLanguageIdentifier);
 }

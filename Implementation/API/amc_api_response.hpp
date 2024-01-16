@@ -74,6 +74,24 @@ namespace AMC {
 	};
 
 
+	class CAPIFixedFloatBufferResponse : public CAPIResponse {
+	private:
+
+		size_t m_nWriteIndex;
+
+	public:
+
+		CAPIFixedFloatBufferResponse(const std::string& sContentType);
+
+		void resizeTo (size_t nFloatCount);
+
+		void resetWriting ();
+
+		void addFloat (float fValue);
+
+	};
+
+
 	class CAPIFixedBufferResponse : public CAPIResponse {
 	private:
 

@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_toolpathlayerdata.hpp"
 #include "amc_toolpathpart.hpp"
+#include "amc_xmldocument.hpp"
+
 #include "lib3mf/lib3mf_dynamic.hpp"
 #include "libmcdata_dynamic.hpp"
 
@@ -64,7 +66,12 @@ namespace AMC {
 		std::map<std::string, PToolpathPart> m_PartMap;
 		std::vector<PToolpathPart> m_PartList;
 
+		std::map<std::pair<std::string, std::string>, PToolpathCustomSegmentAttribute> m_CustomSegmentAttributeMap;
+		std::vector<PToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
+
 		std::string m_sDebugName;
+
+		void copyMetaDataNode (AMC::PXMLDocumentNodeInstance pTargetNodeInstance, Lib3MF::PCustomXMLNode pSourceNodeInstance);
 
 	public:
 
@@ -82,16 +89,19 @@ namespace AMC {
 
 		std::string getDebugName ();
 		
-		std::string getMetaDataValue (const std::string & sNameSpace, const std::string & sName);
-		std::string getMetaDataType (const std::string& sNameSpace, const std::string& sName);
-		bool hasMetaData (const std::string& sNameSpace, const std::string& sName);
-
 		uint32_t getPartCount();
 		PToolpathPart getPart(uint32_t nIndex);
 		PToolpathPart findPartByUUID(const std::string & sUUID);
 
 		uint32_t getLayerZInUnits(uint32_t nLayerIndex);
 
+		uint32_t getMetaDataCount ();
+		void getMetaDataInfo (uint32_t nMetaDataIndex, std::string & sNameSpace, std::string& sName);
+		PXMLDocumentInstance getMetaData (uint32_t nMetaDataIndex);
+		bool hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
+		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
+
+		void registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType);
 	};
 
 	

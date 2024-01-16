@@ -81,6 +81,8 @@ public:
 
 	ISignalHandler* GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist) override;
 
+	bool HasBuildJob(const std::string& sBuildUUID) override;
+
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
 	void UnloadAllToolpathes() override;
@@ -139,6 +141,8 @@ public:
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
+	LibMCEnv_uint64 GetGlobalTimerInMicroseconds() override;
+
 	ITestEnvironment* GetTestEnvironment() override;
 
 	IXMLDocument* CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace) override;
@@ -146,6 +150,36 @@ public:
 	IXMLDocument* ParseXMLString(const std::string& sXMLString) override;
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
+
+	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;	
+
+	IDiscreteFieldData2D* CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) override;
+
+	bool CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier) override;
+
+	IUserManagementHandler * CreateUserManagement() override;
+
+	IJournalHandler* GetCurrentJournal() override;
+
+	IMeshObject* RegisterMeshFrom3MFResource(const std::string& sResourceName) override;
+
+	bool MeshIsRegistered(const std::string& sMeshUUID) override;
+
+	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
+
+	IDataSeries* CreateDataSeries(const std::string& sName) override;
+
+	bool HasDataSeries(const std::string& sDataSeriesUUID) override;
+
+	IDataSeries* FindDataSeries(const std::string& sDataSeriesUUID) override;
+
+	void ReleaseDataSeries(const std::string& sDataSeriesUUID) override;
+
+	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation) override;
+
+	IAlert* FindAlert(const std::string& sUUID) override;
+
+	void AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
 
 };
 

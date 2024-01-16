@@ -65,7 +65,7 @@ namespace AMC {
 		// TODO: Check Toolpath Entity Integrity
 		CToolpathEntity toolpathEntity (pStorageStream, m_p3MFWrapper, m_pBuildJob->GetName ());		
 		m_pBuildJob->FinishValidating (toolpathEntity.getLayerCount ());
-		m_pBuildJob->AddJobData(pStorageStream->GetName(), pStorageStream, LibMCData::eBuildJobDataType::Toolpath, m_sUserID);
+		m_pBuildJob->AddJobData(pStorageStream->GetContextIdentifier (),  pStorageStream->GetName(), pStorageStream, LibMCData::eBuildJobDataType::Toolpath, m_sUserID);
 		
 
 	}

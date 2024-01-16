@@ -55,11 +55,10 @@ namespace AMC {
 		Lib3MF::PWrapper m_pLib3MFWrapper;
 
 		LibMCData::PStorage m_pStorage;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 
 	public:
 
-		CToolpathHandler(LibMCData::PStorage pStorage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CToolpathHandler(LibMCData::PStorage pStorage);
 		virtual ~CToolpathHandler();
 
 		CToolpathEntity * findToolpathEntity(const std::string & sStreamUUID, bool bFailIfNotExistent);

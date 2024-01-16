@@ -29,9 +29,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 import * as THREE from 'three';
-import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
+import * as Assert from "./AMCAsserts.js";
 
-const RAYCAST_LINE_THRESHOLD = 3;
+import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+//const RAYCAST_LINE_THRESHOLD = 3;
 
 class WebGLElement {
 
@@ -159,6 +162,208 @@ class WebGLLinesElement extends WebGLElement {
 
 }
 
+
+class WebGLBoxElement extends WebGLElement {
+
+    constructor(paramWidth, paramHeight, paramDepth) {
+        super();
+
+		let dWidth = Assert.NumberValue (paramWidth);
+		let dHeight = Assert.NumberValue (paramHeight);
+		let dDepth = Assert.NumberValue (paramDepth);
+		
+		this.material = new THREE.MeshPhongMaterial( {
+			color: 0x808080,
+			shininess: 50,
+			specular: 0x111111
+		} );
+
+
+        const meshpositions = [];
+        meshpositions.push (dWidth, dHeight, 0.0);		
+        meshpositions.push (dWidth, 0.0, 0.0);
+        meshpositions.push (0.0, 0.0, 0.0);
+        meshpositions.push (0.0, 0.0, 0.0);
+        meshpositions.push (0.0, dHeight, 0.0);
+        meshpositions.push (dWidth, dHeight, 0.0);
+		
+        meshpositions.push (0.0, 0.0, dDepth);
+        meshpositions.push (dWidth, 0.0, dDepth);
+        meshpositions.push (dWidth, dHeight, dDepth);		
+        meshpositions.push (dWidth, dHeight, dDepth);
+        meshpositions.push (0.0, dHeight, dDepth);
+        meshpositions.push (0.0, 0.0, dDepth);
+		
+        meshpositions.push (0.0, 0.0, 0.0);
+        meshpositions.push (dWidth, 0.0, 0.0);
+        meshpositions.push (dWidth, 0.0, dDepth);		
+        meshpositions.push (dWidth, 0.0, dDepth);
+        meshpositions.push (0.0, 0.0, dDepth);
+        meshpositions.push (0.0, 0.0, 0.0);
+
+        meshpositions.push (dWidth, 0.0, 0.0);
+        meshpositions.push (dWidth, dHeight, 0.0);
+        meshpositions.push (dWidth, dHeight, dDepth);
+        meshpositions.push (dWidth, dHeight, dDepth);
+        meshpositions.push (dWidth, 0.0, dDepth);
+        meshpositions.push (dWidth, 0.0, 0.0);
+
+        meshpositions.push (dWidth, dHeight, 0.0);
+        meshpositions.push (0.0, dHeight, 0.0);
+        meshpositions.push (0.0, dHeight, dDepth);
+        meshpositions.push (0.0, dHeight, dDepth);
+        meshpositions.push (dWidth, dHeight, dDepth);
+        meshpositions.push (dWidth, dHeight, 0.0);
+		
+        meshpositions.push (0.0, dHeight, 0.0);
+        meshpositions.push (0.0, 0.0, 0.0);
+        meshpositions.push (0.0, 0.0, dDepth);
+        meshpositions.push (0.0, 0.0, dDepth);
+        meshpositions.push (0.0, dHeight, dDepth);
+        meshpositions.push (0.0, dHeight, 0.0);
+
+		
+        this.meshgeometry = new THREE.BufferGeometry();
+		this.meshgeometry.setAttribute('position', new THREE.Float32BufferAttribute(meshpositions, 3));
+		this.meshgeometry.computeVertexNormals ();
+		this.meshelement = new THREE.Mesh( this.meshgeometry, this.material );
+		this.meshelement.castShadow = true;
+		this.meshelement.receiveShadow = true;
+		
+        let linegeometry = new THREE.BufferGeometry();
+        const linematerial = new THREE.LineBasicMaterial({
+            linewidth: 1,
+            color: 0x000000,
+			transparent: true,
+			opacity: 0.5
+        })
+
+        const positions = [];
+
+        positions.push (0.0, 0.0, 0.0);
+        positions.push (dWidth, 0.0, 0.0);
+        positions.push (dWidth, 0.0, 0.0);
+        positions.push (dWidth, dHeight, 0.0);
+        positions.push (dWidth, dHeight, 0.0);
+        positions.push (0.0, dHeight, 0.0);
+        positions.push (0.0, dHeight, 0.0);
+        positions.push (0.0, 0.0, 0.0);
+		
+        positions.push (0.0, 0.0, dDepth);
+        positions.push (dWidth, 0.0, dDepth);
+        positions.push (dWidth, 0.0, dDepth);
+        positions.push (dWidth, dHeight, dDepth);
+        positions.push (dWidth, dHeight, dDepth);
+        positions.push (0.0, dHeight, dDepth);
+        positions.push (0.0, dHeight, dDepth);
+        positions.push (0.0, 0.0, dDepth);
+		
+		positions.push (0.0, 0.0, 0.0);
+		positions.push (0.0, 0.0, dDepth);
+		positions.push (dWidth, 0.0, 0.0);
+		positions.push (dWidth, 0.0, dDepth);
+		positions.push (dWidth, dHeight, 0.0);
+		positions.push (dWidth, dHeight, dDepth);
+		positions.push (0.0, dHeight, 0.0);
+		positions.push (0.0, dHeight, dDepth);
+
+        linegeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        linegeometry.computeBoundingSphere(); 
+
+		let group = new THREE.Group()
+        this.edgeselement = new THREE.LineSegments(linegeometry, linematerial);
+
+        group.add(this.edgeselement);
+		group.add(this.meshelement);
+
+        this.glelement = group; 
+		
+		
+		
+    }
+
+}
+
+
+class WebGLMeshElement extends WebGLElement {
+
+    constructor(applicationInstance, meshUUID, meshcolor) {
+		
+        super();
+
+		let normalizedUUID = Assert.UUIDValue (meshUUID);
+		this.meshUUID = normalizedUUID;
+		
+		if (!meshcolor)
+			meshcolor = 0x808080;
+		
+		this.material = new THREE.MeshPhongMaterial( {
+			color: 0x808080,
+			shininess: 50,
+			specular: 0x111111
+		} );
+		
+		let materialToUse = this.material;
+		
+		let group = new THREE.Group()
+
+        this.glelement = group; 
+		
+		applicationInstance.axiosGetArrayBufferRequest("/ui/meshgeometry/" + normalizedUUID)
+		.then(responseData => {
+			let meshpositions = responseData.data;
+			
+			let meshgeometry = new THREE.BufferGeometry();
+			meshgeometry.setAttribute('position', new THREE.Float32BufferAttribute(meshpositions, 3));
+			meshgeometry.computeVertexNormals ();
+			let meshelement = new THREE.Mesh( meshgeometry, materialToUse );
+			meshelement.castShadow = true;
+			meshelement.receiveShadow = true;
+						
+			group.add(meshelement);			
+			
+		})
+		.catch(err => {
+			if (err.response) {
+				console.log (err.response);
+			} else {
+				console.log ("fatal error while retrieving mesh geometry " + normalizedUUID);
+			}
+		});
+				
+		applicationInstance.axiosGetArrayBufferRequest("/ui/meshedges/" + normalizedUUID)
+		.then(responseData => {
+			let linepositions = responseData.data;
+			
+			let linegeometry = new THREE.BufferGeometry();
+			const linematerial = new THREE.LineBasicMaterial({
+				linewidth: 1,
+				color: 0x000000,
+				transparent: true,
+				opacity: 0.5
+			});
+			
+			linegeometry.setAttribute('position', new THREE.Float32BufferAttribute(linepositions, 3));
+			linegeometry.computeBoundingSphere(); 
+			
+			let edgeselement = new THREE.LineSegments(linegeometry, linematerial);
+						
+			group.add(edgeselement);			
+			
+		})
+		.catch(err => {
+			if (err.response) {
+				console.log (err.response);
+			} else {
+				console.log ("fatal error while retrieving edges " + normalizedUUID);
+			}
+		});
+				
+    }
+
+}
+
+
 class WebGLGridElement extends WebGLElement {
 
     constructor(width, height, zValue, factor) {
@@ -222,7 +427,7 @@ class WebGLGridElement extends WebGLElement {
         group.add(this.lineElement3.glelement);
 
         this.glelement = group;
-
+	
     }
 
 }
@@ -315,32 +520,98 @@ class WebGLSVGElement extends WebGLElement {
 
 }
 
+
+class WebGLAmbientLight extends WebGLElement {
+
+    constructor (paramColor, paramIntensity) {
+        super();
+
+		let dColor = Assert.NumberValue (paramColor);
+		let dIntensity = Assert.NumberValue (paramIntensity);
+
+        this.glelement = new THREE.AmbientLight( dColor, dIntensity );
+
+    }
+
+}
+
+
 class WebGLImpl {
 
     constructor() {
+		
         this.renderer = new THREE.WebGLRenderer({
             antialias: true
         });
+		
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0xffffff);
 		
-		this.raycaster = new THREE.Raycaster();
-		this.raycaster.params.Line.threshold = RAYCAST_LINE_THRESHOLD;
+		//this.raycaster = new THREE.Raycaster();
+		//this.raycaster.params.Line.threshold = RAYCAST_LINE_THRESHOLD;
 
         this.renderElements = new Map();
+		
+		this.camera = null;
+		this.hasPerspectiveView = false;
+		
+		this.controls = null;
     }
 
-    setup2DView(sizex, sizey, near, far) {
-        this.camera = new THREE.OrthographicCamera(0, sizex, 0, sizey, near, far);
-        this.camera.position.z = far * 0.99;
+    setup2DView(paramSizeX, paramSizeY, paramNear, paramFar) 
+	{
+		let dSizeX = Assert.NumberValue (paramSizeX);
+		let dSizeY = Assert.NumberValue (paramSizeY);
+		let dNear = Assert.NumberValue (paramNear);
+		let dFar = Assert.NumberValue (paramFar);
+		
+        this.camera = new THREE.OrthographicCamera(0, dSizeX, 0, dSizeY, dNear, dFar);
+        this.camera.position.z = dFar * 0.99;
     }
 
-    setupOrthoView(sizex, sizey, near, far) {
-        this.camera = new THREE.OrthographicCamera(-sizex * 0.5, sizex * 0.5, -sizey * 0.5, sizey * 0.5, near, far);
-        this.camera.position.z = far * 0.99;
+
+
+    setupOrthoView(paramSizeX, paramSizeY, paramNear, paramFar) 
+	{
+		let dSizeX = Assert.NumberValue (paramSizeX);
+		let dSizeY = Assert.NumberValue (paramSizeY);
+		let dNear = Assert.NumberValue (paramNear);
+		let dFar = Assert.NumberValue (paramFar);
+
+        this.camera = new THREE.OrthographicCamera(-dSizeX * 0.5, dSizeX * 0.5, -dSizeY * 0.5, dSizeY * 0.5, dNear, dFar);
+        this.camera.position.z = dFar * 0.99;
     }
+	
+    setupPerspectiveView(paramFieldOfView, paramAspectRatio, paramNear, paramFar) 
+	{
+				
+		let dFieldOfView = Assert.NumberValue (paramFieldOfView);
+		let dAspectRatio = Assert.NumberValue (paramAspectRatio);
+		let dNear = Assert.NumberValue (paramNear);
+		let dFar = Assert.NumberValue (paramFar);
+		
+        this.camera = new THREE.PerspectiveCamera( dFieldOfView, dAspectRatio, dNear, dFar );
+		this.camera.up.set (0, 0, 1); // Set Z up
+		this.hasPerspectiveView = true;
+	}
+
+	setCameraPosition (paramX, paramY, paramZ) 
+	{	
+		if (!this.camera)
+			throw "Camera has not been set up";
+
+		let dX = Assert.NumberValue (paramX);
+		let dY = Assert.NumberValue (paramY);
+		let dZ = Assert.NumberValue (paramZ);
+
+		this.camera.position.set( dX, dY, dZ );
+	}
+
 
     setupDOMElement(domelement) {
+		if (!domelement)
+			throw "No DOM Element to attach to";
+
         domelement.append(this.renderer.domElement);
     }
 
@@ -348,6 +619,15 @@ class WebGLImpl {
         if (this.renderer) {
             this.renderer.setSize(sizex, sizey);
         }
+		
+		if (this.camera && this.hasPerspectiveView) {
+			if ((sizex > 0) && (sizey > 0)) {
+				this.camera.aspect = sizex / sizey;
+				this.camera.updateProjectionMatrix ();
+			}
+			
+		}
+		
     }
 
     renderScene() {
@@ -463,6 +743,42 @@ class WebGLImpl {
 
     }
 	
+	addAmbientLight (identifier, color, intensity)
+	{
+        if (!identifier)
+            return;
+		
+		let lightElement = new WebGLAmbientLight (color, intensity);
+				
+		this.addElement(identifier, lightElement);
+		
+		return lightElement;
+	}
+	
+	addBoxElement (identifier, width, height, depth)
+	{
+        if (!identifier)
+            return;
+		
+		let boxElement = new WebGLBoxElement (width, height, depth);
+				
+		this.addElement(identifier, boxElement);
+		
+		return boxElement;
+	}
+
+	addMeshElement (identifier, applicationInstance, meshUUID, meshColor)
+	{
+        if (!identifier)
+            return;
+		
+		let meshElement = new WebGLMeshElement (applicationInstance, meshUUID, meshColor);
+				
+		this.addElement(identifier, meshElement);
+		
+		return meshElement;
+	}
+
 	
 	pick2DElement (x, y)
 	{		
@@ -486,148 +802,100 @@ class WebGLImpl {
 	}
 
     setupDemoScene() {
-        this.camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 1, 3500);
-        this.camera.position.z = 2750;
 
-        //this.scene.background = new THREE.Color( 0x050505 );
-        this.scene.fog = new THREE.Fog(0x050505, 2000, 3500);
+		// Lights
 
-        this.scene.add(new THREE.AmbientLight(0x444444));
+		//this.scene.add(  );
 
-        const light1 = new THREE.DirectionalLight(0xffffff, 0.5);
-        light1.position.set(1, 1, 1);
-        this.scene.add(light1);
+		this.spotLight = new THREE.SpotLight( 0xffffff, 500 );
+		this.spotLight.name = 'Spot Light';
+		this.spotLight.angle = Math.PI / 5;
+		this.spotLight.penumbra = 0.3;
+		this.spotLight.position.set( 10, 5, 10 );
+		this.spotLight.castShadow = true;
+		this.spotLight.shadow.camera.near = 8;
+		this.spotLight.shadow.camera.far = 30;
+		this.spotLight.shadow.mapSize.width = 1024;
+		this.spotLight.shadow.mapSize.height = 1024;
+		this.scene.add( this.spotLight );
 
-        const light2 = new THREE.DirectionalLight(0xffffff, 1.5);
-        light2.position.set(0,  - 1, 0);
-        this.scene.add(light2);
 
-        //
+		this.dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+		this.dirLight.name = 'Dir. Light';
+		this.dirLight.position.set( 10, 0, 10 );
+		this.dirLight.castShadow = true;
+		this.dirLight.shadow.camera.near = 1;
+		this.dirLight.shadow.camera.far = 10;
+		this.dirLight.shadow.camera.right = 15;
+		this.dirLight.shadow.camera.left = - 15;
+		this.dirLight.shadow.camera.top	= 15;
+		this.dirLight.shadow.camera.bottom = - 15;
+		this.dirLight.shadow.mapSize.width = 1024;
+		this.dirLight.shadow.mapSize.height = 1024;
+		this.scene.add( this.dirLight );
 
-        const triangles = 5000;
 
-        let geometry = new THREE.BufferGeometry();
+		// Geometry
+		/*let geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
+		let material = new THREE.MeshPhongMaterial( {
+			color: 0xff0000,
+			shininess: 150,
+			specular: 0x222222
+		} ); */
 
-        const positions = new Float32Array(triangles * 3 * 3);
-        const normals = new Float32Array(triangles * 3 * 3);
-        const colors = new Float32Array(triangles * 3 * 3);
+		/*this.torusKnot = new THREE.Mesh( geometry, material );
+		this.torusKnot.scale.multiplyScalar( 1 / 18 );
+		this.torusKnot.position.z = 3;
+		this.torusKnot.castShadow = true;
+		this.torusKnot.receiveShadow = true;
+		this.scene.add( this.torusKnot ); */
 
-        const color = new THREE.Color();
 
-        const n = 800,
-        n2 = n / 2; // triangles spread in the cube
-        const d = 120,
-        d2 = d / 2; // individual triangle size
+/*		let geometry = new THREE.BoxGeometry( 30, 30, 1 );
+		let material = new THREE.MeshPhongMaterial( {
+			color: 0xa0adaf,
+			shininess: 150,
+			specular: 0x111111
+		} );
 
-        const pA = new THREE.Vector3();
-        const pB = new THREE.Vector3();
-        const pC = new THREE.Vector3();
+		const ground = new THREE.Mesh( geometry, material );
+		ground.castShadow = false;
+		ground.receiveShadow = true;
+		ground.position.z = -6.5;
+		this.scene.add( ground );  */
+		
+		this.scene.background = new THREE.Color( 0xffffff );
+		
+		const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 300, 300 ), new THREE.MeshPhongMaterial( { color: 0xc0c0c0, depthWrite: false } ) );
+				//mesh.rotation.x = - Math.PI / 2;
+				mesh.position.z = -6;
+				//mesh.receiveShadow = true;	
+				this.scene.add( mesh );
+				
+		
+		this.scene.fog = new THREE.Fog( 0xffffff, 1505, 1650 );
+		
+		const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 3 );
+		hemiLight.position.set( 0, 500, 0 );
+		this.scene.add( hemiLight );
+		
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.BasicShadowMap;
 
-        const cb = new THREE.Vector3();
-        const ab = new THREE.Vector3();
+		// Mouse control
+		const controls = new OrbitControls( this.camera, this.renderer.domElement );
+		controls.mouseButtons = {
+			LEFT: THREE.MOUSE.NONE,
+			MIDDLE: THREE.MOUSE.PAN,
+			RIGHT: THREE.MOUSE.ROTATE
+		}		
+		
+		controls.target.set( 0, 0, 2 );
+		controls.update();
 
-        for (let i = 0; i < positions.length; i += 9) {
-
-            // positions
-
-            const x = Math.random() * n - n2;
-            const y = Math.random() * n - n2;
-            const z = (Math.random() * n - n2) * 0.1;
-
-            const ax = x + Math.random() * d - d2;
-            const ay = y + Math.random() * d - d2;
-            const az = z + Math.random() * d - d2;
-
-            const bx = x + Math.random() * d - d2;
-            const by = y + Math.random() * d - d2;
-            const bz = z + Math.random() * d - d2;
-
-            const cx = x + Math.random() * d - d2;
-            const cy = y + Math.random() * d - d2;
-            const cz = z + Math.random() * d - d2;
-
-            positions[i] = ax;
-            positions[i + 1] = ay;
-            positions[i + 2] = az;
-
-            positions[i + 3] = bx;
-            positions[i + 4] = by;
-            positions[i + 5] = bz;
-
-            positions[i + 6] = cx;
-            positions[i + 7] = cy;
-            positions[i + 8] = cz;
-
-            // flat face normals
-
-            pA.set(ax, ay, az);
-            pB.set(bx, by, bz);
-            pC.set(cx, cy, cz);
-
-            cb.subVectors(pC, pB);
-            ab.subVectors(pA, pB);
-            cb.cross(ab);
-
-            cb.normalize();
-
-            const nx = cb.x;
-            const ny = cb.y;
-            const nz = cb.z;
-
-            normals[i] = nx;
-            normals[i + 1] = ny;
-            normals[i + 2] = nz;
-
-            normals[i + 3] = nx;
-            normals[i + 4] = ny;
-            normals[i + 5] = nz;
-
-            normals[i + 6] = nx;
-            normals[i + 7] = ny;
-            normals[i + 8] = nz;
-
-            // colors
-
-            const vx = (x / n) + 0.5;
-            const vy = (y / n) + 0.5;
-            const vz = (z / n) + 0.5;
-
-            color.setRGB(vx, vy, vz);
-
-            colors[i] = color.r;
-            colors[i + 1] = color.g;
-            colors[i + 2] = color.b;
-
-            colors[i + 3] = color.r;
-            colors[i + 4] = color.g;
-            colors[i + 5] = color.b;
-
-            colors[i + 6] = color.r;
-            colors[i + 7] = color.g;
-            colors[i + 8] = color.b;
-
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-        geometry.computeBoundingSphere();
-
-        let material = new THREE.MeshPhongMaterial({
-            color: 0xaaaaaa,
-            specular: 0xffffff,
-            shininess: 250,
-            side: THREE.DoubleSide,
-            vertexColors: true
-        });
-
-        let mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(mesh);
-
-        this.renderScene();
-
-        return mesh;
+		this.clock = new THREE.Clock();
+				
+		return;
     }
 
 }

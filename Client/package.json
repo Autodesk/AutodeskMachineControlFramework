@@ -9,13 +9,15 @@
   },
   "dependencies": {
     "@mdi/font": "^7.1.96",
+    "apexcharts": "^3.44.0",
     "asmcrypto-lite": "^1.1.0",
     "axios": "^0.24.0",
     "luxon": "^3.2.1",
     "roboto-fontface": "^0.10.0",
-    "three": "^0.150.0",
+    "three": "^0.156.1",
     "three-svg-loader": "^0.3.1",
     "vue": "^2.7.14",
+    "vue-apexcharts": "^1.6.2",
     "vuetify": "^2.6.14"
   },
   "eslintConfig": {
@@ -32,7 +34,7 @@
     },
     "rules": {
       "no-mixed-spaces-and-tabs": 0,
-	  "vue/no-mutating-props": 0
+      "vue/no-mutating-props": 0
     }
   },
   "browserslist": [
