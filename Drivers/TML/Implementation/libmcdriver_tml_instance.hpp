@@ -32,20 +32,13 @@ Abstract: This is the class declaration of CChannel
 */
 
 
-#ifndef __LIBMCDRIVER_TML_CHANNEL
-#define __LIBMCDRIVER_TML_CHANNEL
+#ifndef __LIBMCDRIVER_TML_INSTANCE
+#define __LIBMCDRIVER_TML_INSTANCE
 
-#include "libmcdriver_tml_interfaces.hpp"
-
-// Parent classes
 #include "libmcdriver_tml_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcdriver_tml_sdk.hpp"
 
-// Include custom headers here.
-#include "libmcdriver_tml_instance.hpp"
+#include <map>
 
 namespace LibMCDriver_TML {
 namespace Impl {
@@ -55,34 +48,65 @@ namespace Impl {
  Class declaration of CChannel 
 **************************************************************************************************************************/
 
-class CChannel : public virtual IChannel, public virtual CBase {
+class CTMLAxisInstance {
 private:
 
-    PTMLInstance m_pTMLInstance;
+    std::string m_sAxisIdentifier;
     std::string m_sChannelIdentifier;
+    uint8_t m_nHardwareID;
 
 public:
 
-    CChannel(PTMLInstance pTMLInstance, const std::string & sChannelIdentifier);
+    CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID);
 
-    virtual ~CChannel();
+    virtual ~CTMLAxisInstance();
 
-    std::string GetIdentifier() override;
+    std::string getAxisIdentifier ();
 
-    IAxis* SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer) override;
+    std::string getChannelIdentifier ();
 
-    IAxis* FindAxis(const std::string& sIdentifier) override;
-
-    bool AxisExists(const std::string& sIdentifier) override;
-
-	void Close() override;
+    uint8_t getHardwareID ();
 
 };
 
-} // namespace Impl
-} // namespace LibMCDriver_TML
+class CTMLInstance {
+private:
+    PTMLSDK m_pTMLSDK;
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_TML_CHANNEL
+    LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+
+    std::map<std::string, int32_t> m_ChannelFileDescriptorMap;
+
+    std::map<std::string, CTMLAxisInstance> m_AxisMap;
+
+public:
+
+    CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory);
+
+    virtual ~CTMLInstance();
+
+    void openChannel(const std::string& sIdentifier, const std::string& sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate);
+
+    void closeChannel(const std::string& sIdentifier);
+
+    bool channelExists(const std::string& sIdentifier);
+
+    static bool checkIdentifierString(const std::string& sIdentifier);
+
+    bool axisExistsInChannel(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+
+    bool axisExists(const std::string& sAxisIdentifier);
+
+    void setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer);
+
+    void selectAxisInternal(const std::string& sAxisIdentifier);
+
+};
+
+typedef std::shared_ptr<CTMLInstance> PTMLInstance;
+
+} // namespace Impl
+} // namespace __LIBMCDRIVER_TML_INSTANCE
+
+
+#endif // __LIBMCDRIVER_TML_INSTANCE

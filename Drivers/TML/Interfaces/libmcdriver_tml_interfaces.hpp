@@ -317,6 +317,18 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IAxis : public virtual IBase {
 public:
 	/**
+	* IAxis::GetIdentifier - Returns the axis identifier.
+	* @return Axis identifier.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IAxis::GetChannelIdentifier - Returns the identifier of the channel of the axis.
+	* @return Channel identifier.
+	*/
+	virtual std::string GetChannelIdentifier() = 0;
+
+	/**
 	* IAxis::SetPower - Sets the power for an axis.
 	* @param[in] bEnable - Flag if the power is enabled or not enabled.
 	*/
@@ -334,12 +346,34 @@ typedef IBaseSharedPtr<IAxis> PIAxis;
 class IChannel : public virtual IBase {
 public:
 	/**
-	* IChannel::SetupAxis - Setups an axis for this channel.
+	* IChannel::GetIdentifier - Returns the channel identifier.
+	* @return Channel identifier.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IChannel::SetupAxis - Setups an axis for this channel. The identifier MUST be globally unique.
 	* @param[in] sIdentifier - Identifier for the axis. Fails if axis already exist.
-	* @param[in] nIndexInSetup - Index of the setup to use for this axis.
+	* @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
+	* @param[in] nConfigurationBufferSize - Number of elements in buffer
+	* @param[in] pConfigurationBuffer - Configuration ZIP file for the axis.
 	* @return Returns the axis instance.
 	*/
-	virtual IAxis * SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nIndexInSetup) = 0;
+	virtual IAxis * SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer) = 0;
+
+	/**
+	* IChannel::FindAxis - Finds an existing axis of this channel.
+	* @param[in] sIdentifier - Identifier for the axis. Fails if axis already exist.
+	* @return Returns the axis instance.
+	*/
+	virtual IAxis * FindAxis(const std::string & sIdentifier) = 0;
+
+	/**
+	* IChannel::AxisExists - Returns if the axis exists on this channel.
+	* @param[in] sIdentifier - Identifier of the axis.
+	* @return Flag if the axis exists.
+	*/
+	virtual bool AxisExists(const std::string & sIdentifier) = 0;
 
 	/**
 	* IChannel::Close - Closes the channel. Any other call will fail after closing.
@@ -370,16 +404,10 @@ public:
 
 	/**
 	* IDriver_TML::SetCustomSDKResource - Sets the machine resource name of the TML SDK to load. MUST be called before Connect or it has no effect.
-	* @param[in] sResourceName - Resource name of core machine package. Empty means standard naming applies.
+	* @param[in] sLibResourceName - Resource name of core machine package that contains the proprietary tml_lib.dll. Empty means standard naming applies.
+	* @param[in] sCommsResourceName - Resource name of core machine package that contains the proprietary tmlcomms.dll. Empty means standard naming applies.
 	*/
-	virtual void SetCustomSDKResource(const std::string & sResourceName) = 0;
-
-	/**
-	* IDriver_TML::LoadSetup - Loads the driver configuration files manually.
-	* @param[in] sSetupConfig - Content of the setup config.
-	* @param[in] sVariablesConfig - Content of the variables config.
-	*/
-	virtual void LoadSetup(const std::string & sSetupConfig, const std::string & sVariablesConfig) = 0;
+	virtual void SetCustomSDKResource(const std::string & sLibResourceName, const std::string & sCommsResourceName) = 0;
 
 	/**
 	* IDriver_TML::OpenChannel - Opens a communication channel.
@@ -394,7 +422,14 @@ public:
 	virtual IChannel * OpenChannel(const std::string & sIdentifier, const std::string & sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate) = 0;
 
 	/**
-	* IDriver_TML::FindChannel - Find a communication channel by integer.
+	* IDriver_TML::ChannelExists - Returns if the channel exists..
+	* @param[in] sIdentifier - Identifier of the device.
+	* @return Flag if the channel exists.
+	*/
+	virtual bool ChannelExists(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDriver_TML::FindChannel - Find a communication channel by integer. Fails if the channel does not exist.
 	* @param[in] sIdentifier - Identifier of the device.
 	* @return Returns the channel instance.
 	*/

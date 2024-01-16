@@ -317,6 +317,102 @@ LibMCDriver_TMLResult libmcdriver_tml_driver_queryparametersex(LibMCDriver_TML_D
 /*************************************************************************************************************************
  Class implementation for Axis
 **************************************************************************************************************************/
+LibMCDriver_TMLResult libmcdriver_tml_axis_getidentifier(LibMCDriver_TML_Axis pAxis, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAxis;
+
+	try {
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		std::string sIdentifier("");
+		IAxis* pIAxis = dynamic_cast<IAxis*>(pIBaseClass);
+		if (!pIAxis)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sIdentifier = pIAxis->GetIdentifier();
+
+			pIAxis->_setCache (new ParameterCache_1<std::string> (sIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAxis->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+			cache->retrieveData (sIdentifier);
+			pIAxis->_setCache (nullptr);
+		}
+		
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCDriver_TML_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TMLResult libmcdriver_tml_axis_getchannelidentifier(LibMCDriver_TML_Axis pAxis, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAxis;
+
+	try {
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		std::string sIdentifier("");
+		IAxis* pIAxis = dynamic_cast<IAxis*>(pIBaseClass);
+		if (!pIAxis)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sIdentifier = pIAxis->GetChannelIdentifier();
+
+			pIAxis->_setCache (new ParameterCache_1<std::string> (sIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAxis->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+			cache->retrieveData (sIdentifier);
+			pIAxis->_setCache (nullptr);
+		}
+		
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCDriver_TML_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_TMLResult libmcdriver_tml_axis_setpower(LibMCDriver_TML_Axis pAxis, bool bEnable)
 {
 	IBase* pIBaseClass = (IBase *)pAxis;
@@ -345,7 +441,88 @@ LibMCDriver_TMLResult libmcdriver_tml_axis_setpower(LibMCDriver_TML_Axis pAxis, 
 /*************************************************************************************************************************
  Class implementation for Channel
 **************************************************************************************************************************/
-LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nIndexInSetup, LibMCDriver_TML_Axis * pAxisInstance)
+LibMCDriver_TMLResult libmcdriver_tml_channel_getidentifier(LibMCDriver_TML_Channel pChannel, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pChannel;
+
+	try {
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		std::string sIdentifier("");
+		IChannel* pIChannel = dynamic_cast<IChannel*>(pIBaseClass);
+		if (!pIChannel)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sIdentifier = pIChannel->GetIdentifier();
+
+			pIChannel->_setCache (new ParameterCache_1<std::string> (sIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIChannel->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+			cache->retrieveData (sIdentifier);
+			pIChannel->_setCache (nullptr);
+		}
+		
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCDriver_TML_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_Axis * pAxisInstance)
+{
+	IBase* pIBaseClass = (IBase *)pChannel;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		if ( (!pConfigurationBuffer) && (nConfigurationBufferSize>0))
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		if (pAxisInstance == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IBase* pBaseAxisInstance(nullptr);
+		IChannel* pIChannel = dynamic_cast<IChannel*>(pIBaseClass);
+		if (!pIChannel)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		pBaseAxisInstance = pIChannel->SetupAxis(sIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer);
+
+		*pAxisInstance = (IBase*)(pBaseAxisInstance);
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TMLResult libmcdriver_tml_channel_findaxis(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_Axis * pAxisInstance)
 {
 	IBase* pIBaseClass = (IBase *)pChannel;
 
@@ -360,9 +537,38 @@ LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel 
 		if (!pIChannel)
 			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
 		
-		pBaseAxisInstance = pIChannel->SetupAxis(sIdentifier, nIndexInSetup);
+		pBaseAxisInstance = pIChannel->FindAxis(sIdentifier);
 
 		*pAxisInstance = (IBase*)(pBaseAxisInstance);
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TMLResult libmcdriver_tml_channel_axisexists(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pChannel;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IChannel* pIChannel = dynamic_cast<IChannel*>(pIBaseClass);
+		if (!pIChannel)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		*pValue = pIChannel->AxisExists(sIdentifier);
+
 		return LIBMCDRIVER_TML_SUCCESS;
 	}
 	catch (ELibMCDriver_TMLInterfaceException & Exception) {
@@ -454,49 +660,22 @@ LibMCDriver_TMLResult libmcdriver_tml_driver_tml_issimulationmode(LibMCDriver_TM
 	}
 }
 
-LibMCDriver_TMLResult libmcdriver_tml_driver_tml_setcustomsdkresource(LibMCDriver_TML_Driver_TML pDriver_TML, const char * pResourceName)
+LibMCDriver_TMLResult libmcdriver_tml_driver_tml_setcustomsdkresource(LibMCDriver_TML_Driver_TML pDriver_TML, const char * pLibResourceName, const char * pCommsResourceName)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_TML;
 
 	try {
-		if (pResourceName == nullptr)
+		if (pLibResourceName == nullptr)
 			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
-		std::string sResourceName(pResourceName);
+		if (pCommsResourceName == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		std::string sLibResourceName(pLibResourceName);
+		std::string sCommsResourceName(pCommsResourceName);
 		IDriver_TML* pIDriver_TML = dynamic_cast<IDriver_TML*>(pIBaseClass);
 		if (!pIDriver_TML)
 			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
 		
-		pIDriver_TML->SetCustomSDKResource(sResourceName);
-
-		return LIBMCDRIVER_TML_SUCCESS;
-	}
-	catch (ELibMCDriver_TMLInterfaceException & Exception) {
-		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_TMLResult libmcdriver_tml_driver_tml_loadsetup(LibMCDriver_TML_Driver_TML pDriver_TML, const char * pSetupConfig, const char * pVariablesConfig)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_TML;
-
-	try {
-		if (pSetupConfig == nullptr)
-			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
-		if (pVariablesConfig == nullptr)
-			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
-		std::string sSetupConfig(pSetupConfig);
-		std::string sVariablesConfig(pVariablesConfig);
-		IDriver_TML* pIDriver_TML = dynamic_cast<IDriver_TML*>(pIBaseClass);
-		if (!pIDriver_TML)
-			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
-		
-		pIDriver_TML->LoadSetup(sSetupConfig, sVariablesConfig);
+		pIDriver_TML->SetCustomSDKResource(sLibResourceName, sCommsResourceName);
 
 		return LIBMCDRIVER_TML_SUCCESS;
 	}
@@ -532,6 +711,35 @@ LibMCDriver_TMLResult libmcdriver_tml_driver_tml_openchannel(LibMCDriver_TML_Dri
 		pBaseChannelInstance = pIDriver_TML->OpenChannel(sIdentifier, sDeviceName, eChannelTypeToUse, eProtocolTypeToUse, nHostID, nBaudrate);
 
 		*pChannelInstance = (IBase*)(pBaseChannelInstance);
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TMLResult libmcdriver_tml_driver_tml_channelexists(LibMCDriver_TML_Driver_TML pDriver_TML, const char * pIdentifier, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_TML;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IDriver_TML* pIDriver_TML = dynamic_cast<IDriver_TML*>(pIBaseClass);
+		if (!pIDriver_TML)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		*pValue = pIDriver_TML->ChannelExists(sIdentifier);
+
 		return LIBMCDRIVER_TML_SUCCESS;
 	}
 	catch (ELibMCDriver_TMLInterfaceException & Exception) {
@@ -603,10 +811,20 @@ LibMCDriver_TMLResult LibMCDriver_TML::Impl::LibMCDriver_TML_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_queryparameters;
 	if (sProcName == "libmcdriver_tml_driver_queryparametersex") 
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_queryparametersex;
+	if (sProcName == "libmcdriver_tml_axis_getidentifier") 
+		*ppProcAddress = (void*) &libmcdriver_tml_axis_getidentifier;
+	if (sProcName == "libmcdriver_tml_axis_getchannelidentifier") 
+		*ppProcAddress = (void*) &libmcdriver_tml_axis_getchannelidentifier;
 	if (sProcName == "libmcdriver_tml_axis_setpower") 
 		*ppProcAddress = (void*) &libmcdriver_tml_axis_setpower;
+	if (sProcName == "libmcdriver_tml_channel_getidentifier") 
+		*ppProcAddress = (void*) &libmcdriver_tml_channel_getidentifier;
 	if (sProcName == "libmcdriver_tml_channel_setupaxis") 
 		*ppProcAddress = (void*) &libmcdriver_tml_channel_setupaxis;
+	if (sProcName == "libmcdriver_tml_channel_findaxis") 
+		*ppProcAddress = (void*) &libmcdriver_tml_channel_findaxis;
+	if (sProcName == "libmcdriver_tml_channel_axisexists") 
+		*ppProcAddress = (void*) &libmcdriver_tml_channel_axisexists;
 	if (sProcName == "libmcdriver_tml_channel_close") 
 		*ppProcAddress = (void*) &libmcdriver_tml_channel_close;
 	if (sProcName == "libmcdriver_tml_driver_tml_settosimulationmode") 
@@ -615,10 +833,10 @@ LibMCDriver_TMLResult LibMCDriver_TML::Impl::LibMCDriver_TML_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_tml_issimulationmode;
 	if (sProcName == "libmcdriver_tml_driver_tml_setcustomsdkresource") 
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_tml_setcustomsdkresource;
-	if (sProcName == "libmcdriver_tml_driver_tml_loadsetup") 
-		*ppProcAddress = (void*) &libmcdriver_tml_driver_tml_loadsetup;
 	if (sProcName == "libmcdriver_tml_driver_tml_openchannel") 
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_tml_openchannel;
+	if (sProcName == "libmcdriver_tml_driver_tml_channelexists") 
+		*ppProcAddress = (void*) &libmcdriver_tml_driver_tml_channelexists;
 	if (sProcName == "libmcdriver_tml_driver_tml_findchannel") 
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_tml_findchannel;
 	if (sProcName == "libmcdriver_tml_getversion") 

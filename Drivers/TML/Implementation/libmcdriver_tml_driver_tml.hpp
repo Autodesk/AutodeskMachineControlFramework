@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CDriver_TML
 #define __LIBMCDRIVER_TML_DRIVER_TML
 
 #include "libmcdriver_tml_interfaces.hpp"
+#include "libmcdriver_tml_instance.hpp"
 
 // Parent classes
 #include "libmcdriver_tml_driver.hpp"
@@ -65,11 +66,14 @@ private:
     bool m_bSimulationMode;
      
     PTMLSDK m_pTMLSDK;
+    PTMLInstance m_pTMLInstance;
 
-    std::vector<uint8_t> m_SDKDLLBuffer;
+    std::vector<uint8_t> m_SDKLibDLLBuffer;
+    std::vector<uint8_t> m_SDKCommsDLLBuffer;
 
     LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
-    LibMCEnv::PWorkingFile m_pTMLDLLLibrary;
+    LibMCEnv::PWorkingFile m_pTMLLibDLLLibrary;
+    LibMCEnv::PWorkingFile m_pTMLCommsDLLLibrary;
 
     bool sdkIsLoaded();
 
@@ -85,13 +89,13 @@ public:
 
 	bool IsSimulationMode() override;
 
-	void SetCustomSDKResource(const std::string & sResourceName) override;
-
-	void LoadSetup(const std::string & sSetupConfig, const std::string & sVariablesConfig) override;
+	void SetCustomSDKResource(const std::string& sLibResourceName, const std::string& sCommsResourceName) override;
 
 	IChannel * OpenChannel(const std::string & sIdentifier, const std::string & sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate) override;
 
 	IChannel * FindChannel(const std::string & sIdentifier) override;
+
+    bool ChannelExists(const std::string& sIdentifier) override;
 
 };
 

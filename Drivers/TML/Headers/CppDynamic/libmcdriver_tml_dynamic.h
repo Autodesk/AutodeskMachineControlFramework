@@ -119,6 +119,28 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_QueryParametersExPtr) (Li
 **************************************************************************************************************************/
 
 /**
+* Returns the axis identifier.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Axis identifier., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetIdentifierPtr) (LibMCDriver_TML_Axis pAxis, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the identifier of the channel of the axis.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetChannelIdentifierPtr) (LibMCDriver_TML_Axis pAxis, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
 * Sets the power for an axis.
 *
 * @param[in] pAxis - Axis instance.
@@ -132,15 +154,48 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_SetPowerPtr) (LibMCDriver_T
 **************************************************************************************************************************/
 
 /**
-* Setups an axis for this channel.
+* Returns the channel identifier.
+*
+* @param[in] pChannel - Channel instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_GetIdentifierPtr) (LibMCDriver_TML_Channel pChannel, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Setups an axis for this channel. The identifier MUST be globally unique.
 *
 * @param[in] pChannel - Channel instance.
 * @param[in] pIdentifier - Identifier for the axis. Fails if axis already exist.
-* @param[in] nIndexInSetup - Index of the setup to use for this axis.
+* @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
+* @param[in] nConfigurationBufferSize - Number of elements in buffer
+* @param[in] pConfigurationBuffer - uint8 buffer of Configuration ZIP file for the axis.
 * @param[out] pAxisInstance - Returns the axis instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_SetupAxisPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nIndexInSetup, LibMCDriver_TML_Axis * pAxisInstance);
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_SetupAxisPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_Axis * pAxisInstance);
+
+/**
+* Finds an existing axis of this channel.
+*
+* @param[in] pChannel - Channel instance.
+* @param[in] pIdentifier - Identifier for the axis. Fails if axis already exist.
+* @param[out] pAxisInstance - Returns the axis instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_FindAxisPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_Axis * pAxisInstance);
+
+/**
+* Returns if the axis exists on this channel.
+*
+* @param[in] pChannel - Channel instance.
+* @param[in] pIdentifier - Identifier of the axis.
+* @param[out] pValue - Flag if the axis exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_AxisExistsPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, bool * pValue);
 
 /**
 * Closes the channel. Any other call will fail after closing.
@@ -175,20 +230,11 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_TML_IsSimulationModePtr) 
 * Sets the machine resource name of the TML SDK to load. MUST be called before Connect or it has no effect.
 *
 * @param[in] pDriver_TML - Driver_TML instance.
-* @param[in] pResourceName - Resource name of core machine package. Empty means standard naming applies.
+* @param[in] pLibResourceName - Resource name of core machine package that contains the proprietary tml_lib.dll. Empty means standard naming applies.
+* @param[in] pCommsResourceName - Resource name of core machine package that contains the proprietary tmlcomms.dll. Empty means standard naming applies.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_TML_SetCustomSDKResourcePtr) (LibMCDriver_TML_Driver_TML pDriver_TML, const char * pResourceName);
-
-/**
-* Loads the driver configuration files manually.
-*
-* @param[in] pDriver_TML - Driver_TML instance.
-* @param[in] pSetupConfig - Content of the setup config.
-* @param[in] pVariablesConfig - Content of the variables config.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_TML_LoadSetupPtr) (LibMCDriver_TML_Driver_TML pDriver_TML, const char * pSetupConfig, const char * pVariablesConfig);
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_TML_SetCustomSDKResourcePtr) (LibMCDriver_TML_Driver_TML pDriver_TML, const char * pLibResourceName, const char * pCommsResourceName);
 
 /**
 * Opens a communication channel.
@@ -206,7 +252,17 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_TML_LoadSetupPtr) (LibMCD
 typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_TML_OpenChannelPtr) (LibMCDriver_TML_Driver_TML pDriver_TML, const char * pIdentifier, const char * pDeviceName, LibMCDriver_TML::eChannelType eChannelTypeToUse, LibMCDriver_TML::eProtocolType eProtocolTypeToUse, LibMCDriver_TML_uint32 nHostID, LibMCDriver_TML_uint32 nBaudrate, LibMCDriver_TML_Channel * pChannelInstance);
 
 /**
-* Find a communication channel by integer.
+* Returns if the channel exists..
+*
+* @param[in] pDriver_TML - Driver_TML instance.
+* @param[in] pIdentifier - Identifier of the device.
+* @param[out] pValue - Flag if the channel exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_TML_ChannelExistsPtr) (LibMCDriver_TML_Driver_TML pDriver_TML, const char * pIdentifier, bool * pValue);
+
+/**
+* Find a communication channel by integer. Fails if the channel does not exist.
 *
 * @param[in] pDriver_TML - Driver_TML instance.
 * @param[in] pIdentifier - Identifier of the device.
@@ -297,14 +353,19 @@ typedef struct {
 	PLibMCDriver_TMLDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_TMLDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_TMLDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
+	PLibMCDriver_TMLAxis_GetIdentifierPtr m_Axis_GetIdentifier;
+	PLibMCDriver_TMLAxis_GetChannelIdentifierPtr m_Axis_GetChannelIdentifier;
 	PLibMCDriver_TMLAxis_SetPowerPtr m_Axis_SetPower;
+	PLibMCDriver_TMLChannel_GetIdentifierPtr m_Channel_GetIdentifier;
 	PLibMCDriver_TMLChannel_SetupAxisPtr m_Channel_SetupAxis;
+	PLibMCDriver_TMLChannel_FindAxisPtr m_Channel_FindAxis;
+	PLibMCDriver_TMLChannel_AxisExistsPtr m_Channel_AxisExists;
 	PLibMCDriver_TMLChannel_ClosePtr m_Channel_Close;
 	PLibMCDriver_TMLDriver_TML_SetToSimulationModePtr m_Driver_TML_SetToSimulationMode;
 	PLibMCDriver_TMLDriver_TML_IsSimulationModePtr m_Driver_TML_IsSimulationMode;
 	PLibMCDriver_TMLDriver_TML_SetCustomSDKResourcePtr m_Driver_TML_SetCustomSDKResource;
-	PLibMCDriver_TMLDriver_TML_LoadSetupPtr m_Driver_TML_LoadSetup;
 	PLibMCDriver_TMLDriver_TML_OpenChannelPtr m_Driver_TML_OpenChannel;
+	PLibMCDriver_TMLDriver_TML_ChannelExistsPtr m_Driver_TML_ChannelExists;
 	PLibMCDriver_TMLDriver_TML_FindChannelPtr m_Driver_TML_FindChannel;
 	PLibMCDriver_TMLGetVersionPtr m_GetVersion;
 	PLibMCDriver_TMLGetLastErrorPtr m_GetLastError;

@@ -59,7 +59,7 @@ namespace LibMCDriver_TML {
 		typedef const char* tmlLPCSTR;
 
 		typedef tmlInt (TML_CALLINGCONVENTION* PTS_LoadSetup) (const char * pszSetupPath);
-		typedef tmlInt (TML_CALLINGCONVENTION* PTS_OpenChannel) (char * pszDeviceName, uint8_t nType, uint8_t nHostID, uint32_t nBaudRate);		
+		typedef tmlInt (TML_CALLINGCONVENTION* PTS_OpenChannel) (const char * pszDeviceName, uint8_t nType, uint8_t nHostID, uint32_t nBaudRate);		
 		typedef void(TML_CALLINGCONVENTION* PTS_CloseChannel) (tmlInt nFileDescriptor);		
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_DriveInitialisation) ();
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_SetupAxis) (tmlByte nAxisID, tmlInt nSetupID);
@@ -93,6 +93,7 @@ namespace LibMCDriver_TML {
 			virtual ~CTMLSDK();
 
 			void checkError(bool bSuccess);
+			void raiseLastError();
 
 		};
 

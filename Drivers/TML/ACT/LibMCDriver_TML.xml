@@ -50,7 +50,31 @@
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
-		<error name="SDKALREADYLOADED" code="1001" description="SDK already loaded" />		
+		<error name="SDKALREADYLOADED" code="1001" description="SDK already loaded" />
+		<error name="NOSDKLIBRESOURCEDLLGIVEN" code="1002" description="No SDK library resource DLL given" />
+		<error name="NOSDKLIBRESOURCECOMMSGIVEN" code="1003" description="No SDK comms resource DLL given" />
+		<error name="EMPTYCHANNELIDENTIFIER" code="1004" description="Empty channel identifier" />
+		<error name="CHANNELIDENTIFIERTOOLONG" code="1005" description="Channel name too long" />
+		<error name="INVALIDCHANNELIDENTIFIER" code="1006" description="Invalid channel identifier" />
+		<error name="CHANNELDOESNOTEXIST" code="1007" description="Channel does not exist" />
+		<error name="CHANNELALREADYEXISTS" code="1008" description="Channel already exists" />
+		<error name="EMPTYDEVICENAME" code="1009" description="Empty device name" />
+		<error name="UNSUPPORTEDPROTOCOLTYPE" code="1010" description="Unsupported protocol type" />				
+		<error name="UNSUPPORTEDCHANNELTYPE" code="1011" description="Unsupported channel type" />				
+		<error name="TMLSDKERROR" code="1012" description="TML SDK Error" />				
+		<error name="UNKNOWNTMLSDKERROR" code="1013" description="Unknown TML SDK Error" />				
+		<error name="INVALIDHOSTID" code="1014" description="TML SDK Error" />				
+		<error name="EMPTYAXISIDENTIFIER" code="1015" description="Empty Axis identifier" />
+		<error name="AXISIDENTIFIERTOOLONG" code="1016" description="Axis name too long" />
+		<error name="INVALIDAXISIDENTIFIER" code="1017" description="Invalid axis identifier" />		
+		<error name="INVALIDAXISCONFIGURATIONBUFFER" code="1018" description="Invalid axis configuration buffer" />
+		<error name="AXISDOESNOTEXIST" code="1019" description="Axis does not exist" />
+		<error name="INVALIDAXISHARDWAREID" code="1020" description="Invalid Axis Hardware ID" />
+		<error name="AXISALREADYEXISTS" code="1021" description="Axis already exists" />
+		<error name="AXISNOTFOUND" code="1022" description="Axis not found" />
+		
+		
+		
 			
 	</errors>
 
@@ -125,6 +149,14 @@ Custom implementation
 
 	<class name="Axis" parent="Base" description="An axis of a TML Channel.">
 
+		<method name="GetIdentifier" description="Returns the axis identifier.">		
+			<param name="Identifier" type="string" pass="return" description="Axis identifier." />
+		</method>	
+		
+		<method name="GetChannelIdentifier" description="Returns the identifier of the channel of the axis.">		
+			<param name="Identifier" type="string" pass="return" description="Channel identifier." />
+		</method>			
+		
 		<method name="SetPower" description="Sets the power for an axis.">		
 			<param name="Enable" type="bool" pass="in" description="Flag if the power is enabled or not enabled." />
 		</method>	
@@ -135,11 +167,26 @@ Custom implementation
 
 	<class name="Channel" parent="Base" description="A Channel of a TML Connection.">
 	
-		<method name="SetupAxis" description="Setups an axis for this channel.">		
+		<method name="GetIdentifier" description="Returns the channel identifier.">		
+			<param name="Identifier" type="string" pass="return" description="Channel identifier." />
+		</method>	
+		
+		<method name="SetupAxis" description="Setups an axis for this channel. The identifier MUST be globally unique.">		
 			<param name="Identifier" type="string" pass="in" description="Identifier for the axis. Fails if axis already exist." />
-			<param name="IndexInSetup" type="uint32" pass="in" description="Index of the setup to use for this axis." />
+			<param name="AxisID" type="uint32" pass="in" description="Hardware ID of the axis. MUST be unique in the channel." />
+			<param name="Configuration" type="basicarray" class="uint8" pass="in" description="Configuration ZIP file for the axis." />
 			<param name="AxisInstance" type="class" class="Axis" pass="return" description="Returns the axis instance." />
 		</method>	
+
+		<method name="FindAxis" description="Finds an existing axis of this channel.">		
+			<param name="Identifier" type="string" pass="in" description="Identifier for the axis. Fails if axis already exist." />
+			<param name="AxisInstance" type="class" class="Axis" pass="return" description="Returns the axis instance." />
+		</method>	
+		
+		<method name="AxisExists" description= "Returns if the axis exists on this channel.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the axis." />
+			<param name="Value" type="bool" pass="return" description="Flag if the axis exists." />
+		</method>		
 
 		<method name="Close" description="Closes the channel. Any other call will fail after closing.">		
 		</method>	
@@ -157,13 +204,9 @@ Custom implementation
 		</method>	
 		
 		<method name="SetCustomSDKResource" description="Sets the machine resource name of the TML SDK to load. MUST be called before Connect or it has no effect.">
-			<param name="ResourceName" type="string" pass="in" description="Resource name of core machine package. Empty means standard naming applies." />
+			<param name="LibResourceName" type="string" pass="in" description="Resource name of core machine package that contains the proprietary tml_lib.dll. Empty means standard naming applies." />
+			<param name="CommsResourceName" type="string" pass="in" description="Resource name of core machine package that contains the proprietary tmlcomms.dll. Empty means standard naming applies." />
 		</method>		
-
-		<method name="LoadSetup" description= "Loads the driver configuration files manually.">
-			<param name="SetupConfig" type="string" pass="in" description="Content of the setup config." />
-			<param name="VariablesConfig" type="string" pass="in" description="Content of the variables config." />
-		</method>
 
 		<method name="OpenChannel" description= "Opens a communication channel.">
 			<param name="Identifier" type="string" pass="in" description="Identifier of the device." />
@@ -175,7 +218,12 @@ Custom implementation
 			<param name="ChannelInstance" type="class" class="Channel" pass="return" description="Returns the channel instance." />
 		</method>
 
-		<method name="FindChannel" description= "Find a communication channel by integer.">
+		<method name="ChannelExists" description= "Returns if the channel exists..">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the device." />
+			<param name="Value" type="bool" pass="return" description="Flag if the channel exists." />
+		</method>
+
+		<method name="FindChannel" description= "Find a communication channel by integer. Fails if the channel does not exist.">
 			<param name="Identifier" type="string" pass="in" description="Identifier of the device." />
 			<param name="ChannelInstance" type="class" class="Channel" pass="return" description="Returns the channel instance." />
 		</method>

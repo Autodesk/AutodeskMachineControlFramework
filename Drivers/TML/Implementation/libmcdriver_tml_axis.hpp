@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CAxis
 #define __LIBMCDRIVER_TML_AXIS
 
 #include "libmcdriver_tml_interfaces.hpp"
+#include "libmcdriver_tml_instance.hpp"
 
 // Parent classes
 #include "libmcdriver_tml_base.hpp"
@@ -58,28 +59,23 @@ namespace Impl {
 class CAxis : public virtual IAxis, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
+    PTMLInstance m_pTMLInstance;
+    std::string m_sChannelIdentifier;
+    std::string m_sAxisIdentifier;
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
-
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    CAxis(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, const std::string & sAxisIdentifier);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+    virtual ~CAxis();
 
 	void SetPower(const bool bEnable) override;
+
+    std::string GetIdentifier() override;
+
+    std::string GetChannelIdentifier() override;
 
 };
 

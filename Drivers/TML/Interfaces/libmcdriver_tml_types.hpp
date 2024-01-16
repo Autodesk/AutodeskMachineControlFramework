@@ -106,6 +106,27 @@ typedef void * LibMCDriver_TML_pvoid;
 #define LIBMCDRIVER_TML_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
 #define LIBMCDRIVER_TML_ERROR_DRIVERERROR 1000 /** a driver error occured */
 #define LIBMCDRIVER_TML_ERROR_SDKALREADYLOADED 1001 /** SDK already loaded */
+#define LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCEDLLGIVEN 1002 /** No SDK library resource DLL given */
+#define LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCECOMMSGIVEN 1003 /** No SDK comms resource DLL given */
+#define LIBMCDRIVER_TML_ERROR_EMPTYCHANNELIDENTIFIER 1004 /** Empty channel identifier */
+#define LIBMCDRIVER_TML_ERROR_CHANNELIDENTIFIERTOOLONG 1005 /** Channel name too long */
+#define LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER 1006 /** Invalid channel identifier */
+#define LIBMCDRIVER_TML_ERROR_CHANNELDOESNOTEXIST 1007 /** Channel does not exist */
+#define LIBMCDRIVER_TML_ERROR_CHANNELALREADYEXISTS 1008 /** Channel already exists */
+#define LIBMCDRIVER_TML_ERROR_EMPTYDEVICENAME 1009 /** Empty device name */
+#define LIBMCDRIVER_TML_ERROR_UNSUPPORTEDPROTOCOLTYPE 1010 /** Unsupported protocol type */
+#define LIBMCDRIVER_TML_ERROR_UNSUPPORTEDCHANNELTYPE 1011 /** Unsupported channel type */
+#define LIBMCDRIVER_TML_ERROR_TMLSDKERROR 1012 /** TML SDK Error */
+#define LIBMCDRIVER_TML_ERROR_UNKNOWNTMLSDKERROR 1013 /** Unknown TML SDK Error */
+#define LIBMCDRIVER_TML_ERROR_INVALIDHOSTID 1014 /** TML SDK Error */
+#define LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER 1015 /** Empty Axis identifier */
+#define LIBMCDRIVER_TML_ERROR_AXISIDENTIFIERTOOLONG 1016 /** Axis name too long */
+#define LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER 1017 /** Invalid axis identifier */
+#define LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER 1018 /** Invalid axis configuration buffer */
+#define LIBMCDRIVER_TML_ERROR_AXISDOESNOTEXIST 1019 /** Axis does not exist */
+#define LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID 1020 /** Invalid Axis Hardware ID */
+#define LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS 1021 /** Axis already exists */
+#define LIBMCDRIVER_TML_ERROR_AXISNOTFOUND 1022 /** Axis not found */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_TML
@@ -124,6 +145,27 @@ inline const char * LIBMCDRIVER_TML_GETERRORSTRING (LibMCDriver_TMLResult nError
     case LIBMCDRIVER_TML_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
     case LIBMCDRIVER_TML_ERROR_DRIVERERROR: return "a driver error occured";
     case LIBMCDRIVER_TML_ERROR_SDKALREADYLOADED: return "SDK already loaded";
+    case LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCEDLLGIVEN: return "No SDK library resource DLL given";
+    case LIBMCDRIVER_TML_ERROR_NOSDKLIBRESOURCECOMMSGIVEN: return "No SDK comms resource DLL given";
+    case LIBMCDRIVER_TML_ERROR_EMPTYCHANNELIDENTIFIER: return "Empty channel identifier";
+    case LIBMCDRIVER_TML_ERROR_CHANNELIDENTIFIERTOOLONG: return "Channel name too long";
+    case LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER: return "Invalid channel identifier";
+    case LIBMCDRIVER_TML_ERROR_CHANNELDOESNOTEXIST: return "Channel does not exist";
+    case LIBMCDRIVER_TML_ERROR_CHANNELALREADYEXISTS: return "Channel already exists";
+    case LIBMCDRIVER_TML_ERROR_EMPTYDEVICENAME: return "Empty device name";
+    case LIBMCDRIVER_TML_ERROR_UNSUPPORTEDPROTOCOLTYPE: return "Unsupported protocol type";
+    case LIBMCDRIVER_TML_ERROR_UNSUPPORTEDCHANNELTYPE: return "Unsupported channel type";
+    case LIBMCDRIVER_TML_ERROR_TMLSDKERROR: return "TML SDK Error";
+    case LIBMCDRIVER_TML_ERROR_UNKNOWNTMLSDKERROR: return "Unknown TML SDK Error";
+    case LIBMCDRIVER_TML_ERROR_INVALIDHOSTID: return "TML SDK Error";
+    case LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER: return "Empty Axis identifier";
+    case LIBMCDRIVER_TML_ERROR_AXISIDENTIFIERTOOLONG: return "Axis name too long";
+    case LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER: return "Invalid axis identifier";
+    case LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER: return "Invalid axis configuration buffer";
+    case LIBMCDRIVER_TML_ERROR_AXISDOESNOTEXIST: return "Axis does not exist";
+    case LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID: return "Invalid Axis Hardware ID";
+    case LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS: return "Axis already exists";
+    case LIBMCDRIVER_TML_ERROR_AXISNOTFOUND: return "Axis not found";
     default: return "unknown error";
   }
 }
