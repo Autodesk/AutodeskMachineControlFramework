@@ -108,7 +108,7 @@ namespace LibMCDriver_A3200 {
 
 			void resetFunctionPtrs ();
 
-			PA3200SDK_DLLDirectoryCache CA3200SDK::cacheDllDirectory();
+			PA3200SDK_DLLDirectoryCache cacheDllDirectory();
 
 		public:
 			PA3200Connect A3200Connect = nullptr;
