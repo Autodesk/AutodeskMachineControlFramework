@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcui_eventhandler.hpp"
 #include "libmcui_event.hpp"
 
+#include <cmath>
+
 using namespace LibMCUI::Impl;
 
 #ifdef _MSC_VER
