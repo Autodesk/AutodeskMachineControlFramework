@@ -40,20 +40,22 @@ dirs_to_make[9]="$builddir/DevPackage/Framework/InterfacesDev"
 dirs_to_make[10]="$builddir/DevPackage/Framework/PluginCpp"
 dirs_to_make[11]="$builddir/DevPackage/Framework/PluginPython"
 dirs_to_make[12]="$builddir/DevPackage/Framework/Dist"
-dirs_to_make[13]="$builddir/Framework"
-dirs_to_make[14]="$builddir/Framework/HeadersDev"
-dirs_to_make[15]="$builddir/Framework/HeadersDev/CppDynamic"
-dirs_to_make[16]="$builddir/Framework/HeadersDriver"
-dirs_to_make[17]="$builddir/Framework/HeadersDriver/CppDynamic"
-dirs_to_make[18]="$builddir/Framework/InterfacesDev"
-dirs_to_make[19]="$builddir/Framework/PluginCpp"
-dirs_to_make[20]="$builddir/Client"
-dirs_to_make[21]="$builddir/Client/public"
-dirs_to_make[22]="$builddir/Client/src"
-dirs_to_make[23]="$builddir/Client/src/plugins"
-dirs_to_make[24]="$builddir/Client/dist"
-dirs_to_make[25]="$builddir/Artifacts"
-dirs_to_make[26]="$outputdir/data"
+dirs_to_make[13]="$builddir/DevPackage/Framework/ClientSource"
+dirs_to_make[14]="$builddir/Framework"
+dirs_to_make[15]="$builddir/Framework/HeadersDev"
+dirs_to_make[16]="$builddir/Framework/HeadersDev/CppDynamic"
+dirs_to_make[17]="$builddir/Framework/HeadersDriver"
+dirs_to_make[18]="$builddir/Framework/HeadersDriver/CppDynamic"
+dirs_to_make[19]="$builddir/Framework/InterfacesDev"
+dirs_to_make[20]="$builddir/Framework/PluginCpp"
+dirs_to_make[21]="$builddir/Framework/ClientSource"
+dirs_to_make[22]="$builddir/Client"
+dirs_to_make[23]="$builddir/Client/public"
+dirs_to_make[24]="$builddir/Client/src"
+dirs_to_make[25]="$builddir/Client/src/plugins"
+dirs_to_make[26]="$builddir/Client/dist"
+dirs_to_make[27]="$builddir/Artifacts"
+dirs_to_make[28]="$outputdir/data"
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -174,5 +176,21 @@ cd $builddir
 go run "$basepath/BuildScripts/createDevPackage.go" ./DevPackage/Framework ./DevPackage ${LONGGITHASH} $PLATFORMNAME
 
 cp "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "$builddir/Artifacts/devpackage_${PLATFORMNAME}.zip"
+
+if [[ -z "${AMCF_PACKAGE_REPOSITORY}" ]]; then
+  echo "No AMCF package repository given!"
+
+else
+  echo "AMCF package repository: ${AMCF_PACKAGE_REPOSITORY}"
+  if [[ -z "${AMCF_PACKAGE_REPOSITORY_KEYFILE}" ]]; then
+    echo "No AMCF package repository key file given!"
+
+  else
+    echo "AMCF package key file: ${AMCF_PACKAGE_REPOSITORY_KEYFILE}"
+    echo "Uploading package to server..."
+    scp -i "${AMCF_PACKAGE_REPOSITORY_KEYFILE}" "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "${AMCF_PACKAGE_REPOSITORY}"
+    echo "Upload finished."
+  fi
+fi
 
 echo "Build done!"

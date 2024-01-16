@@ -178,6 +178,10 @@ typedef void * LibMCDriver_BuR_pvoid;
 #define LIBMCDRIVER_BUR_ERROR_COULDNOTWRITETOPAYLOAD 1080 /** Could not write to payload. */
 #define LIBMCDRIVER_BUR_ERROR_INVALIDPAYLOADADDRESS 1081 /** Invalid payload address. */
 #define LIBMCDRIVER_BUR_ERROR_COULDNOTREINITIALIZEMACHINE 1082 /** Could not reinitialize machine. */
+#define LIBMCDRIVER_BUR_ERROR_UNKNOWNDRIVERPROTOCOLVERSION 1083 /** Unknown driver protocol version. */
+#define LIBMCDRIVER_BUR_ERROR_NOTCPPROTOCOLNODE 1084 /** No TCP Protocol Node. */
+#define LIBMCDRIVER_BUR_ERROR_NOPACKETSIGNATURE 1085 /** No Packet Signature. */
+#define LIBMCDRIVER_BUR_ERROR_INVALIDPACKETSIGNATURE 1086 /** Invalid Packet Signature. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_BuR
@@ -268,6 +272,10 @@ inline const char * LIBMCDRIVER_BUR_GETERRORSTRING (LibMCDriver_BuRResult nError
     case LIBMCDRIVER_BUR_ERROR_COULDNOTWRITETOPAYLOAD: return "Could not write to payload.";
     case LIBMCDRIVER_BUR_ERROR_INVALIDPAYLOADADDRESS: return "Invalid payload address.";
     case LIBMCDRIVER_BUR_ERROR_COULDNOTREINITIALIZEMACHINE: return "Could not reinitialize machine.";
+    case LIBMCDRIVER_BUR_ERROR_UNKNOWNDRIVERPROTOCOLVERSION: return "Unknown driver protocol version.";
+    case LIBMCDRIVER_BUR_ERROR_NOTCPPROTOCOLNODE: return "No TCP Protocol Node.";
+    case LIBMCDRIVER_BUR_ERROR_NOPACKETSIGNATURE: return "No Packet Signature.";
+    case LIBMCDRIVER_BUR_ERROR_INVALIDPACKETSIGNATURE: return "Invalid Packet Signature.";
     default: return "unknown error";
   }
 }

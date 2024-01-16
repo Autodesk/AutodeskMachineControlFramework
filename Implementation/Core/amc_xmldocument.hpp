@@ -84,6 +84,8 @@ namespace AMC {
 
 		PXMLDocumentNodeInstance GetRootNode();
 
+		void ChangeNamespacePrefix(const std::string& sOldNamespacePrefix, const std::string& sNewNamespacePrefix);
+
 		std::string SaveToString(const bool bAddLineBreaks);
 
 	};

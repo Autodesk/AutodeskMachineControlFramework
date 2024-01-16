@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_sessionhandler.hpp"
 #include "amc_logger.hpp"
 #include "amc_api_response.hpp"
+#include "amc_accesscontrol.hpp"
 #include "libmcdata_dynamic.hpp"
 
 namespace AMC {
@@ -54,6 +55,7 @@ namespace AMC {
 
 		PAPISessionHandler m_pSessionHandler;
 		LibMCData::PLoginHandler m_pLoginHandler;
+		PAccessControl m_pAccessControl;
 
 		APIHandler_AuthType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sSessionUUID);
 
@@ -62,7 +64,7 @@ namespace AMC {
 
 	public:
 
-		CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string & sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash);
+		CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string & sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash, PAccessControl pAccessControl);
 
 		virtual ~CAPIHandler_Auth();
 				

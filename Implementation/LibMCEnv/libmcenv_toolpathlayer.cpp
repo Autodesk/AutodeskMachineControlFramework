@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_toolpathlayer.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_xmldocument.hpp"
+#include "libmcenv_xmldocumentnode.hpp"
 
 // Include custom headers here.
 #include "Common/common_utils.hpp"
@@ -72,6 +74,57 @@ LibMCEnv::eToolpathSegmentType CToolpathLayer::GetSegmentType(const LibMCEnv_uin
 LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nIndex)
 {
 	return m_pToolpathLayerData->getSegmentPointCount(nIndex);
+}
+
+LibMCEnv_int64 CToolpathLayer::GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+{
+	return m_pToolpathLayerData->getSegmentIntegerAttribute(nIndex, nAttributeID);
+}
+
+LibMCEnv_double CToolpathLayer::GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID)
+{
+	return m_pToolpathLayerData->getSegmentDoubleAttribute(nIndex, nAttributeID);
+}
+
+bool CToolpathLayer::HasCustomSegmentAttribute(const std::string& sNamespace, const std::string& sAttributeName)
+{
+	uint32_t nAttributeID = 0;
+	LibMCEnv::eToolpathAttributeType attributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	return m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, attributeType);
+}
+
+LibMCEnv_uint32 CToolpathLayer::FindCustomSegmentAttributeID(const std::string& sNamespace, const std::string& sAttributeName)
+{
+	uint32_t nAttributeID = 0;
+	LibMCEnv::eToolpathAttributeType attributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	if (!m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, attributeType))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND, "segment attribute not found: " + sNamespace + "/" + sAttributeName);
+
+	return nAttributeID;
+}
+
+LibMCEnv::eToolpathAttributeType CToolpathLayer::FindCustomSegmentAttributeType(const std::string& sNamespace, const std::string& sAttributeName)
+{
+	uint32_t nAttributeID = 0;
+	LibMCEnv::eToolpathAttributeType attributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	if (!m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, attributeType))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND, "segment attribute not found: " + sNamespace + "/" + sAttributeName);
+
+	return attributeType;
+
+}
+
+void CToolpathLayer::FindCustomSegmentAttributeInfo(const std::string& sNamespace, const std::string& sAttributeName, LibMCEnv_uint32& nAttributeID, LibMCEnv::eToolpathAttributeType& eAttributeType)
+{
+	nAttributeID = 0;
+	eAttributeType = LibMCEnv::eToolpathAttributeType::Unknown;
+
+	if (!m_pToolpathLayerData->findCustomSegmentAttribute(sNamespace, sAttributeName, nAttributeID, eAttributeType))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTATTRIBUTENOTFOUND, "segment attribute not found: " + sNamespace + "/" + sAttributeName);
+
 }
 
 LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)
@@ -333,4 +386,35 @@ LibMCEnv_int32 CToolpathLayer::GetZValue()
 LibMCEnv_double CToolpathLayer::GetZValueInMM()
 {
 	return m_pToolpathLayerData->getUnits() * m_pToolpathLayerData->getZValue();
+}
+
+LibMCEnv_uint32 CToolpathLayer::GetMetaDataCount()
+{
+	return m_pToolpathLayerData->getMetaDataCount();
+}
+
+void CToolpathLayer::GetMetaDataInfo(const LibMCEnv_uint32 nMetaDataIndex, std::string& sNamespace, std::string& sName)
+{
+	m_pToolpathLayerData->getMetaDataInfo(nMetaDataIndex, sNamespace, sName);
+
+}
+
+IXMLDocumentNode* CToolpathLayer::GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex)
+{
+	auto pXMLDocumentInstance = m_pToolpathLayerData->getMetaData(nMetaDataIndex);
+	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
+
+}
+
+bool CToolpathLayer::HasUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	return m_pToolpathLayerData->hasUniqueMetaData(sNamespace, sName);
+
+}
+
+IXMLDocumentNode* CToolpathLayer::FindUniqueMetaData(const std::string& sNamespace, const std::string& sName)
+{
+	auto pXMLDocumentInstance = m_pToolpathLayerData->findUniqueMetaData(sNamespace, sName);
+	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
+
 }

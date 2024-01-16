@@ -36,7 +36,6 @@ Abstract: This is a stub class definition of CDeviceConfiguration
 
 // Include custom headers here.
 
-
 using namespace LibMCDriver_ScanLabOIE::Impl;
 
 #define OIE_MAX_SIGNALCOUNT 1024
@@ -46,7 +45,7 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
 **************************************************************************************************************************/
 
 CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::string& sDeviceConfigString, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_pSDK (pSDK), m_RTCDeviceType (LibMCDriver_ScanLabOIE::eRTCDeviceType::Unknown), m_sDeviceConfigString (sDeviceConfigString)
+    : m_pSDK (pSDK), m_RTCDeviceType (LibMCDriver_ScanLabOIE::eRTCDeviceType::RTC5), m_sDeviceConfigString (sDeviceConfigString)
 {
     if (pSDK.get () == nullptr)
         throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
@@ -67,6 +66,8 @@ CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::strin
             m_RTCDeviceType = eRTCDeviceType::RTC5;
         if (rtcType == 1)
             m_RTCDeviceType = eRTCDeviceType::RTC6;
+        if (rtcType == 2)
+            m_RTCDeviceType = eRTCDeviceType::RTC6Ethernet;
 
         std::vector<uint32_t> buffer;
         buffer.resize(OIE_MAX_SIGNALCOUNT);
@@ -95,6 +96,23 @@ CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::strin
         m_pSDK->checkError(m_pSDK->oie_get_sensor_signals(sTempFileName.c_str(), buffer.data(), &nSensorSignalBufferSize));
         for (uint32_t nIndex = 0; nIndex < nSensorSignalBufferSize; nIndex++)
             m_SensorSignalIDs.push_back(buffer.at(nIndex));
+
+        std::vector<oie_signalinfo> signalInfoBuffer;
+        signalInfoBuffer.resize(OIE_MAX_SIGNALCOUNT);
+        uint32_t nAdditionalSignalBufferSize = OIE_MAX_SIGNALCOUNT;
+
+        m_pSDK->checkError(m_pSDK->oie_get_additional_app_data_signals(sTempFileName.c_str(), signalInfoBuffer.data(), &nAdditionalSignalBufferSize));
+        for (uint32_t nIndex = 0; nIndex < nAdditionalSignalBufferSize; nIndex++) {
+            auto& signalInfo = signalInfoBuffer.at(nIndex);
+            signalInfo.name[127] = 0;
+            std::string sSignalName (signalInfo.name);
+
+            //std::cout << "Found Additional Signal #" << signalInfo.nr << ": " << sSignalName << std::endl;
+
+            m_AdditionalSignalIDs.push_back(std::make_pair (signalInfo.nr, sSignalName));
+
+            
+        }
 
         pWorkingFile = nullptr;
         pWorkingDirectory = nullptr;
@@ -128,6 +146,12 @@ LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetSensorSignalCount()
     return (uint32_t)m_SensorSignalIDs.size();
 }
 
+LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetAdditionalSignalCount()
+{
+    return (uint32_t)m_AdditionalSignalIDs.size();
+}
+
+
 void CDeviceConfiguration::GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer)
 {
     if (pSignalIDsNeededCount != nullptr)
@@ -157,6 +181,31 @@ void CDeviceConfiguration::GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSig
             pSignalIDsBuffer[nIndex] = m_SensorSignalIDs.at(nIndex);
 
     }
+}
+
+void CDeviceConfiguration::GetAdditionalSignalIDs(LibMCDriver_ScanLabOIE_uint64 nAdditionalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32* pAdditionalIDsBuffer)
+{
+    if (pAdditionalIDsNeededCount != nullptr)
+        *pAdditionalIDsNeededCount = m_AdditionalSignalIDs.size();
+
+    if (pAdditionalIDsBuffer != nullptr) {
+        if (nAdditionalIDsBufferSize < m_AdditionalSignalIDs.size())
+            throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+        for (size_t nIndex = 0; nIndex < m_AdditionalSignalIDs.size(); nIndex++)
+            pAdditionalIDsBuffer[nIndex] = m_AdditionalSignalIDs.at(nIndex).first;
+
+    }
+}
+
+void CDeviceConfiguration::GetAdditionalSignalInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32& nSignalID, std::string& sSignalName) 
+{
+    if (nIndex >= m_AdditionalSignalIDs.size())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX);
+
+    auto& signalInfo = m_AdditionalSignalIDs.at(nIndex);
+    nSignalID = signalInfo.first;
+    sSignalName = signalInfo.second;
 }
 
 

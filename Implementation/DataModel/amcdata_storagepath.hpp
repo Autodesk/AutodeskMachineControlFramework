@@ -42,22 +42,26 @@ namespace AMCData {
  Class declaration of CStoragePath
 **************************************************************************************************************************/
 
-typedef enum {
+enum class eStorageStreamStatus : int32_t {
     sssNew = 0,
     sssValidated = 1,
     sssArchived = 2
-} eStorageStreamStatus;
+};
 
 class CStoragePath {
 private:
     std::string m_sDataPath;
+    
 
 public:
 
     CStoragePath(const std::string & sDataPath);
 
     std::string getStreamPath(const std::string& sStreamUUID);
-    std::string getLogPath();
+    std::string getJournalPath(const std::string& sTimeFileName);
+    std::string getJournalDataPath(const std::string& sTimeFileName);
+    std::string getJournalFileName(const std::string& sTimeFileName);
+    std::string getJournalDataFileName(const std::string& sTimeFileName);
 
     static std::string storageStreamStatusToString(eStorageStreamStatus eStatus);
     static eStorageStreamStatus stringToStorageStreamStatus(const std::string & sStatus);

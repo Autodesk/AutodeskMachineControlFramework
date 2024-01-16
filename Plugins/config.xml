@@ -1,25 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02">
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02" xmlns:i18n="http://schemas.autodesk.com/amc/internationalization/2023/08">
 	<services threadcount="32"/>
+
+  <internationalization default="en">
+		<language identifier="en" name="English" resource="language_english" />
+		<language identifier="de" name="Deutsch" resource="language_german" />
+  </internationalization>
+
+  <accesscontrol>
+
+    <defaultusers>
+      <defaultuser name="test" salt="f735faa2ac49ac0a68dbf41d9cd57cfb426ef91eb19726afd8f075ac625cccb2" passwordhash="556080937385d8eb21ea0e8707d7cf3e94b79ed234596ba8a2ac98da1ff4fee3" description="This is a test user." />
+    </defaultusers>
+
+    <permissions>
+      <permission identifier="permission_view_builds" displayname="View Builds" description="Can view build files on machine." />
+      <permission identifier="permission_start_build" displayname="Start Build" description="Can start a new build on machine." />
+      <permission identifier="permission_user_management" displayname="User Management" description="Can create/edit local users." />
+      <permission identifier="permission_that_nobody_has" displayname="Permission that nobody has" description="." />
+    </permissions>
+
+
+    <roles default="operator">
+
+      <role identifier="observer" displayname="Observer" description="Machine Observer - can not change anything">
+        <permission identifier="permission_view_builds" />
+      </role>
+
+      <role identifier="oldrole" displayname="Depreciated role" description="Depreciated role - not possible to use anymore" migrateto="operator" />
+
+      <role identifier="operator" displayname="Operator" description="Machine Operator Access">
+        <permission identifier="permission_view_builds" />
+        <permission identifier="permission_start_build" />
+      </role>
+
+      <role identifier="administrator" displayname="Administrator" description="Machine Administration Access">
+        <permission identifier="permission_view_builds" />
+        <permission identifier="permission_start_build" />
+        <permission identifier="permission_user_management" />
+      </role>
+
+    </roles>
+    
+    
+  </accesscontrol>
 
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol"/>
 	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
 	<driver name="raylase" library="driver_raylase" type="raylase"/>
+  <driver name="scanlabsmc" library="driver_scanlabsmc" type="scanlab-smc-0.6">
 
-	<statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
+    <preset name="smc_laser_1">
+			<general DynamicViolationReaction="WarningOnly" />
+    </preset>
+
+
+
+  </driver>
+    
+
+  <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
 		<parametergroup name="jobinfo" description="Job Information">
 			<parameter name="jobname" description="Job Name" default="Job Name" type="string"/>
 			<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string"/>
 			<parameter name="layercount" description="Layer Count" default="0" type="int"/>
 			<parameter name="currentlayer" description="Current Layer" default="0" type="int"/>
-			<parameter name="totalheight" description="Total Height" default="0" type="double"/>
+			<parameter name="totalheight" description="Total Height" default="0" type="double" />
 			<parameter name="currentheight" description="Current Height" default="0" type="double"/>
 			<parameter name="autostart" description="Automatically start job after init" default="0" type="bool"/>
 			<parameter name="printinprogress" description="Print is in progress" default="0" type="bool"/>
 			<parameter name="recoatingtimeout" description="Recoating Timeout" default="60000" type="int"/>
 			<parameter name="exposuretimeout" description="Exposure Timeout" default="300000" type="int"/>
-		</parametergroup>
+      <parameter name="countertest" description="Countertest" default="0" type="double"/>
+    </parametergroup>
 
 		<parametergroup name="ui" description="User interface">
 			<parameter name="currentlayerdisplay" description="Current Layer Display" default="" type="string"/>
@@ -27,10 +81,10 @@
 			<parameter name="build_canbepaused" description="Build can be paused" default="0" type="bool"/>
 			<parameter name="build_canbecanceled" description="Build can be paused" default="0" type="bool"/>
 			<parameter name="build_canbestarted" description="Build can be started" default="1" type="bool"/>
-		</parametergroup>
+    </parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
-			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
+			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
 			<parameter name="simulateplc" description="Simulate PLC behaviour" default="1" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9"/>
 		</parametergroup>
 
@@ -52,11 +106,11 @@
 			<parameter name="simulateplc" type="bool"/>
 		</signaldefinition>
 
-		<state name="init" repeatdelay="100">
+		<state name="init" repeatdelay="10">
 			<outstate target="idle"/>
 		</state>
 
-		<state name="idle" repeatdelay="1000">
+		<state name="idle" repeatdelay="10">
 			<outstate target="idle"/>
 			<outstate target="initbuild"/>
 		</state>
@@ -111,7 +165,7 @@
 		<parametergroup name="cardconfig" description="Scanner Card Config">
 			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlab" type="string"/>
 			<parameter name="serial" description="Serial" default="341731" type="int"/>
-			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.10.2" type="string"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.0.1" type="string"/>
 			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
 			<parameter name="port" description="Port" default="49374" type="int"/>
 			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
@@ -125,7 +179,7 @@
 		</parametergroup>
 
 		<parametergroup name="correction" description="Scanlab Correction Data">
-			<parameter name="resourcename" description="Correction resource name" default="d2_1987" type="string"/>
+			<parameter name="resourcename" description="Correction resource name" default="d2_1238" type="string"/>
 			<parameter name="tableindex" description="Correction table index" default="1" type="int"/>
 			<parameter name="dimension" description="Correction file dimension" default="3" type="int"/>
 			<parameter name="tablenumbera" description="Table number head A" default="1" type="int"/>
@@ -268,11 +322,17 @@
 					<paragraph text="Autodesk example machine"/>
 					<paragraph text="."/>
 
-					<form name="machinestateinforform">
+          <chart name="chart1">
+            
+          </chart>
+					
+
+          <form name="machinestateinforform">
 						<edit name="mainstatename" caption="Main System" readonly="1" sync:value="main.$state"/>
 						<edit name="scannerstatename" caption="Scanner System" readonly="1" sync:value="laser.$state"/>
 						<edit name="plcstatename" caption="PLC System" readonly="1" sync:value="plc.$state"/>
-					</form>
+            <edit name="test" caption="Test" sync:value="main.jobinfo.countertest" format:value="test %.2f" validation="double" minvalue="10" maxvalue="20" validationmessage="Invalid value!"/>
+          </form>
 
 
 				</content>
@@ -288,7 +348,11 @@
 
 				<content name="settings" columnstart="1" rowstart="3" columnend="2" rowend="3">
 
-					<form name="simulationparameters">
+          <buttongroup distribution="equal">
+            <button name="testjounral" caption="Test Journal" event="testjournal" />
+          </buttongroup>
+
+          <form name="simulationparameters">
 						<switch name="simulatelaser" caption="Simulate Laser Control" sync:value="main.configuration.simulatelaser" changeevent="changesimulationparameter"/>
 						<switch name="simulateplc" caption="Simulate PLC behaviour" sync:value="main.configuration.simulateplc" changeevent="changesimulationparameter"/>
 					</form>
@@ -470,10 +534,6 @@
 
 		<page name="buildreport">
 
-			<glscene name="manualcontrol3">
-
-			</glscene>
-
 
 		</page>
 
@@ -501,7 +561,46 @@
 
 		</page>
 
-		<page name="settings">
+
+
+    <page name="modelview">
+
+      <glscene name="glscene1">
+
+        <models>
+          <model name="platform" resource="bptest" />
+        </models>
+
+        <lights>
+          <spotlight name="spotlight">
+
+          </spotlight>
+        </lights>
+
+
+        <fog>
+          
+        </fog>
+
+
+        <scene>
+          
+          <instance name="platform_view" model="platform" visible="1">
+            <color red="0.8" green="0.9" blue="0.5" shininess="50" specular_red="0.1" specular_green="0.1" specular_blue="0.1" />
+            
+            <position x="100" y="20" z="30" />
+            <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
+            
+          </instance>
+
+
+        </scene>
+
+      </glscene>
+
+    </page>
+
+		<page name="settings" permission="permission_view_builds">
 
 			<content name="settings" title="System Settings">
 			</content>
@@ -509,11 +608,12 @@
 		</page>
 
 		<menu>
-			<item id="buildlist" icon="mdi-library" description="Upload build files and start build jobs." caption="Build Library" targetpage="buildlist"/>
+			<item id="buildlist" icon="mdi-library" permission="permission_view_builds" description="Upload build files and start build jobs." caption="Build Library" targetpage="buildlist"/>
 			<item id="buildprocess" icon="mdi-printer-3d" caption="Build Process" description="Manage and monitor current build process" targetpage="buildstatus"/>
 			<item id="systemstatus" icon="mdi-factory" caption="Current Status" description="Display current machine status." targetpage="systemstatus"/>
 			<item id="systemlog" icon="mdi-book-open-variant" caption="System Logs" description="Browse and display stored system log files." targetpage="systemlog"/>
-		</menu>
+      <item id="modelview" icon="mdi-book-open-variant" caption="3D Model View" description="View Build Job in 3D." targetpage="modelview"/>
+    </menu>
 
 
 		<toolbar logoresource="ui_toolbarlogo">

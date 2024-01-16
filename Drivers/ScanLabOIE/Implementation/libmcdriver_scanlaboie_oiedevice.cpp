@@ -111,7 +111,8 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	  m_nDeviceID (0),
 	  m_bHasCorrectionData (false),
 	  m_nRTCSignalCount (0),
-	  m_nSensorSignalCount (0)
+	  m_nSensorSignalCount (0),
+	  m_nAdditionalSignalCount (0)
 
 {
 	if ((pOIESDK.get() == nullptr) || (pInstance == nullptr) || (pWorkingDirectory.get () == nullptr) || (pDeviceConfiguration == nullptr))
@@ -127,6 +128,7 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 
 	m_nRTCSignalCount = pDeviceConfiguration->GetRTCSignalCount (); 
 	m_nSensorSignalCount = pDeviceConfiguration->GetSensorSignalCount();
+	m_nAdditionalSignalCount = pDeviceConfiguration->GetAdditionalSignalCount();
 
 
 	if (m_pConfigurationFile == nullptr)
@@ -219,6 +221,8 @@ void COIEDeviceInstance::buildDeviceConfig(IDeviceConfiguration* pDeviceConfigur
 		if (checkIniKey(sLine, "BackwardTransformation\\enabled")) {
 			if (sCorrectionFileName.empty())
 				sLine = "BackwardTransformation\\enabled=false";
+			else
+				sLine = "BackwardTransformation\\enabled=true";
 		}
 
 		sFilteredDeviceConfigStream << sLine << std::endl;
@@ -449,7 +453,7 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 
 	{
 		std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
-		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(m_nRTCSignalCount + m_nSensorSignalCount, m_nRTCSignalCount, 1024);
+		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(m_nSensorSignalCount, m_nRTCSignalCount, m_nAdditionalSignalCount, 1024);
 	}
 
 }
@@ -627,7 +631,7 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 				if (m_bHasCorrectionData) {
 					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY));
-				}
+				}				
 
 				//std::cout << "Packet: " << " X: " << dX << " Y: " << dY << std::endl;
 
@@ -636,16 +640,7 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 				m_pCurrentDataRecording->startRecord(*pPacketNumber, dX, dY);
 
-				uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
-				//std::cout << "RTC signal count" << rtcSignalCount << std::endl;
-				for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
-				{
-					int32_t nValue = 0;
-					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
-
-					m_pCurrentDataRecording->recordValue(nValue);
-				}
-
+				// Record sensor values first.
 				uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
 				//std::cout << "Sensor signal count" << sensorSignalCount << std::endl;
 
@@ -656,22 +651,47 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 					m_pCurrentDataRecording->recordValue(nValue);
 				}
 
+				// record RTC values second
+				uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
+				//std::cout << "RTC signal count" << rtcSignalCount << std::endl;
+				for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
+				{
+					int32_t nValue = 0;
+					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
+
+					m_pCurrentDataRecording->recordValue(nValue);
+				}
+
+				// Record additional values last
+				uint32_t additionalSignalCount = m_pOIESDK->oie_pkt_get_app_data_count(pkt);
+				//std::cout << "Additional signal count" << additionalSignalCount << " (packetNr " << *pPacketNumber << ")" << std::endl;
+
+				for (uint32_t additionalSignalIndex = 0; additionalSignalIndex < additionalSignalCount; additionalSignalIndex++)
+				{
+					int32_t nValue = 0;
+					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_app_data(pkt, additionalSignalIndex, &nValue));
+					//std::cout << "   - index #" << additionalSignalIndex << ": " << nValue << std::endl;
+
+					m_pCurrentDataRecording->recordValue(nValue);
+				}
+
+
 				m_pCurrentDataRecording->finishRecord();
 
 			}
 		}
 		else {
-			std::cout << "Packet event: with null" << std::endl;
+			//std::cout << "Packet event: with null" << std::endl;
 		}
 
 	}
-	catch (std::exception & E)
+	/*catch (std::exception & E)
 	{
 		std::cout << "error getting data:" << E.what () << std::endl;
 
-	}
+	} */
 	catch (...) {
-		std::cout << "error getting data" << std::endl;
+		//std::cout << "error getting data" << std::endl;
 	}
 }
 
@@ -679,7 +699,7 @@ void COIEDeviceInstance::onErrorEvent(oie_device device, oie_error error, int32_
 {
 	try {
 		if (device == m_pDevice) {
-			std::cout << "Error event: " << error << " value: " << value << std::endl;
+			//std::cout << "Error event: " << error << " value: " << value << std::endl;
 		}
 	}
 	catch (...)

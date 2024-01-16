@@ -55,15 +55,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		methods: {
 			    animate: function () {
 					requestAnimationFrame(this.animate);
-					
-					if (this.mesh) {
-						const time = Date.now() * 0.001;
-
-						this.mesh.rotation.y = time * 0.4;
-					}
-
+									
 					if (this.glInstance)
 						this.glInstance.renderScene ();
+						
+					//const delta = this.glInstance.clock.getDelta();
+
 
 				},
 				
@@ -72,10 +69,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					if (!domelement) 
 						return;	
 						
-					if (!this.LayerViewerInstance) 
+					if (!this.glInstance) 
 						return;
 						
-					this.LayerViewerInstance.updateSize (domelement.clientWidth, domelement.clientHeight);
+					this.glInstance.resizeTo (domelement.clientWidth, domelement.clientHeight);
 				},
 		},
 		
@@ -97,10 +94,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				var width = glDiv.clientWidth;
 				var height = glDiv.clientHeight;
 				if ((width > 0) && (height > 0)) {
-					this.glInstance.setup2DView (width, height, 0.1, 100);					
+					this.glInstance.setupPerspectiveView (45, width / height, 1, 3000);
+					this.glInstance.setCameraPosition (150, 150, 150);
 					this.glInstance.resizeTo (width, height);
 					this.glInstance.setupDOMElement (glDiv);														
-					this.mesh = this.glInstance.setupDemoScene ();
+					
+					
+					this.glInstance.addAmbientLight ("ambientlight", 0x808080, 3);
+
+					
+					/*this.mesh1 = this.glInstance.addMeshElement ("mesh1", this.Application, "fff71800-4b1d-489e-8679-1f90b9b26646");
+					this.mesh1.setPosition (0,0, 0.0, 0.0);
+
+					this.mesh2 = this.glInstance.addMeshElement ("mesh2", this.Application, "e7cf4193-c77d-49b3-b8e3-edf266454a50", 0xc0c0c0);
+					this.mesh2.setPosition (0,0, 0.0, 0.0); */
+					
+					let scene = this.module.scene;
+					for (let instance of scene.instances) {
+						let mesh = this.glInstance.addMeshElement (instance.instancename, this.Application, instance.meshuuid);
+						mesh.setPosition (0,0, 0.0, 0.0);
+					
+					}
+					 
+					
+					this.glInstance.setupDemoScene ();
 					this.animate();
 				}
 				

@@ -514,8 +514,101 @@
 		<error name="CUSTOMPAGEPROPERTYNAMEMISSING" code="491" description="custom page property name missing." />
 		<error name="CUSTOMPAGEPROPERTYTYPEMISSING" code="492" description="custom page property type missing." />
 		
+		<error name="EMTPYEVENTNAME" code="493" description="empty event name." />
+		<error name="INVALIDEVENTNAME" code="494" description="invalid event name." />
+		<error name="INVALIDEVENTPATH" code="495" description="invalid event path." />
 		
-
+		<error name="CUSTOMPAGEVENTNAMEMISSING" code="496" description="custom page event name missing." />
+		<error name="INVALIDCUSTOMPAGEVENTNAME" code="497" description="invalid custom page event name." />
+		<error name="DUPLICATECUSTOMPAGEVENTNAME" code="498" description="duplicate custom page event name." />
+		<error name="INVALIDEVENTPARAMETERNAME" code="499" description="invalid event parameter name." />
+		<error name="INVALIDMETADATAINDEX" code="500" description="invalid metadata index." />
+		<error name="METADATAISNOTUNIQUE" code="501" description="metadata is not unique." />
+		<error name="METADATANOTFOUND" code="502" description="metadata not found." />
+		<error name="TIMESTAMPISNOTINCREMENTING" code="503" description="Time stamp is not incrementing." />
+		
+		<error name="INVALIDTIMESTAMPINTERVAL" code="504" description="Invalid time stamp interval." />
+		<error name="TIMESTREAMISEMPTY" code="505" description="Time stream is empty." />
+		<error name="INVALIDTOOLPATHATTRIBUTETYPE" code="506" description="Invalid toolpath attribute type." />
+		<error name="INVALIDSEGMENTINDEX" code="507" description="Invalid segment index." />		
+		<error name="INVALIDTOOLPATHATTRIBUTEID" code="508" description="Invalid toolpath attribute ID." />
+		<error name="AMBIGUOUSSEGMENTATTRIBUTETYPE" code="509" description="Ambiguous segment attribute type." />
+		<error name="XMLNODEHASCHILDREN" code="510" description="XML Node has children"/>
+		<error name="XMLNODEHASTEXTCONTENT" code="511" description="XML Node has text content"/>
+		<error name="STRINGHANDLERNOTAVAILABLE" code="512" description="String handler not available"/>
+		<error name="DUPLICATEROLEPERMISSION" code="513" description="Duplicate role permission"/>
+		<error name="EMPTYACCESSROLEIDENTIFIER" code="514" description="Empty access role identifier"/>
+		<error name="INVALIDACCESSROLEIDENTIFIER" code="515" description="Invalid access role identifier"/>
+		<error name="EMPTYACCESSROLEDISPLAYNAME" code="516" description="Empty access role display name"/>
+		<error name="EMPTYACCESSPERMISSIONIDENTIFIER" code="517" description="Empty access permission identifier"/>
+		<error name="INVALIDACCESSPERMISSIONIDENTIFIER" code="518" description="Invalid access permission identifier"/>
+		<error name="EMPTYACCESSPERMISSIONDISPLAYNAME" code="519" description="Empty access permission display name"/>
+		<error name="EMPTYSTRINGRESOURCENAME" code="520" description="Empty string resource name"/>
+		<error name="DUPLICATESTRINGRESOURCENAME" code="521" description="Duplicate string resource name"/>
+		<error name="INVALIDSTRINGRESOURCENAMEIDENTIFIER" code="522" description="Invalid string resource name identifier"/>
+		<error name="STRINGRESOURCENOTFOUND" code="523" description="String resource not found"/>
+		<error name="LANGUAGEIDNOTFOUND" code="524" description="Language ID not found"/>
+		<error name="DUPLICATEPERMISSIONIDENTIFIER" code="525" description="Duplicate Permission Identifier"/>
+		<error name="DUPLICATEROLEIDENTIFIER" code="526" description="Duplicate Role Identifier"/>
+		<error name="PERMISSIONNOTFOUND" code="527" description="Permission not found"/>
+		<error name="ROLENOTFOUND" code="528" description="Role not found"/>
+		<error name="MISSINGACCESSCONTROLPERMISSIONS" code="529" description="Missing access control permissions"/>
+		<error name="MISSINGACCESSCONTROLROLES" code="530" description="Missing access control roles"/>
+		<error name="MISSINGACCESSCONTROLROLEPERMISSIONS" code="531" description="Missing access control role permissions"/>
+		<error name="MISSINGROLEPERMISSIONIDENTIFIER" code="532" description="Missing role permission identifier"/>
+		<error name="INVALIDDISCRETEFIELDBUFFER" code="533" description="Invalid discrete field buffer"/>
+		<error name="INVALIDDISCRETEFIELDFILESIGN" code="534" description="Invalid discrete field file sign"/>
+		<error name="INCOMPATIBLEDISCRETEFIELDFILEVERSION" code="535" description="Incompatible discrete field file version"/>
+		<error name="TOONEWDISCRETEFIELDFILEVERSION" code="536" description="Too new discrete field file version"/>
+		<error name="TOONEWDISCRETEFIELDSTREAMTYPE" code="537" description="Too new discrete field stream type"/>
+		<error name="INVALIDDISCRETEFIELDDATAOFFSET" code="538" description="Invalid discrete field data offset"/>		
+		<error name="INVALIDDISCRETEFIELDSTREAMSIZE" code="539" description="Invalid discrete field stream size"/>		
+		<error name="INVALIDDISCRETEFIELDINTERNALDATA" code="540" description="Invalid discrete field internal data"/>		
+		<error name="DEFAULTROLEHASNOTBEENSET" code="541" description="Default role has not been set"/>		
+		<error name="EMPTYROLEIDENTIFIER" code="542" description="Empty role identifier"/>		
+		<error name="EMPTYPERMISSIONIDENTIFIER" code="543" description="Empty permission identifier"/>		
+		<error name="USERHASUNKNOWNROLE" code="544" description="User has unknown role"/>		
+		<error name="MISSINGDEFAULTACCESSROLE" code="545" description="Missing default access role"/>				
+		<error name="FIXEDFLOATBUFFEROVERRUN" code="546" description="Fixed float buffer overrun"/>		
+		<error name="MESHENTITYNOTLOADED" code="547" description="Mesh entity not loaded"/>		
+		<error name="MESHENTITYALREADYLOADED" code="548" description="Mesh entity already loaded"/>		
+		<error name="INVALIDMESHFACEID" code="549" description="Invalid face ID"/>		
+		<error name="MESH3MFRESOURCEISEMPTY" code="550" description="Mesh 3MF resource is empty"/>		
+		<error name="INVALIDMESHEDGEID" code="551" description="Invalid edge ID"/>		
+		<error name="INVALIDMESHNODEID" code="552" description="Invalid node ID"/>			
+		<error name="INVALIDGLSCENEMODELNAME" code="553" description="Invalid GL scene model name"/>			
+		<error name="INVALIDGLSCENEINSTANCENAME" code="554" description="Invalid GL scene instance name"/>			
+		<error name="EMPTYGLMODELNAME" code="555" description="Empty GL model name"/>			
+		<error name="INVALIDGLMODELNAME" code="556" description="Invalid GL model name"/>			
+		<error name="DUPLICATEGLMODELNAME" code="557" description="Duplicate GL model name"/>			
+		<error name="MODELGLRESOURCENOTFOUND" code="558" description="Model GL Resource not found"/>			
+		<error name="EMPTYGLINSTANCENAME" code="559" description="Empty GL instance name"/>			
+		<error name="INVALIDGLINSTANCENAME" code="560" description="Invalid GL instance name"/>			
+		<error name="EMPTYGLINSTANCEMODEL" code="561" description="Empty GL instance model"/>			
+		<error name="INVALIDGLINSTANCEMODEL" code="562" description="Invalid GL instance model"/>			
+		<error name="GLINSTANCEMODELNOTFOUND" code="563" description="GL instance model not found"/>
+		<error name="DUPLICATEGLINSTANCENAME" code="564" description="Duplicate GL instance name"/>			
+		<error name="INVALIDJOURNALSTREAMCAPACITY" code="565" description="Invalid journal stream capacity"/>			
+		<error name="INVALIDUIFORMAT" code="566" description="Invalid UI format" />
+		<error name="INVALIDJOURNALTIMESTAMP" code="567" description="Invalid Journal Timestamp" />		
+		<error name="CHUNKTIMESTREAMNOTCONTINUOUS" code="568" description="Chunk time stream not continuous" />
+		<error name="JOURNALVARIABLENOTFOUND" code="569" description="Journal Variable not found" />		
+		<error name="INVALIDJOURNALSTREAMQUERY" code="570" description="Invalid journal stream query" />		
+		<error name="INVALIDJOURNALCOMPUTEDATA" code="571" description="Invalid journal compute data" />		
+		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="572" description="Invalid journal compute interval" />		
+		<error name="DATASERIESNOTFOUND" code="573" description="Data series not found" />		
+		<error name="DATASERIESISEMPTY" code="574" description="Data series is empty" />		
+		<error name="EMPTYALERTIDENTIFIER" code="575" description="Empty alert identifier"/>
+		<error name="INVALIDALERTIDENTIFIER" code="576" description="Invalid alert identifier"/>		
+		<error name="ALERTDEFINITIONNOTFOUND" code="577" description="Alert definition not found"/>		
+		<error name="DUPLICATEALERTIDENTIFIER" code="578" description="Duplicate alert identifier"/>		
+		<error name="EMPTYLANGUAGEIDENTIFIER" code="579" description="Empty language identifier"/>		
+		<error name="EMPTYLANGUAGESTRINGIDENTIFIER" code="580" description="Empty language string identifier"/>		
+		<error name="INVALIDLANGUAGEIDENTIFIER" code="581" description="Invalid language identifier"/>		
+		<error name="INVALIDLANGUAGESTRINGIDENTIFIER" code="582" description="Invalid language string identifier"/>		
+		<error name="INVALIDLANGUAGEDEFINITION" code="583" description="Invalid language definition"/>		
+		
+		
 	</errors>
 	
 	

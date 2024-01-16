@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+
+	<statemachine name="fielddata2dtest" description="FieldData 2D Test" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_fielddata2dtest">
+	
+		<state name="init" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="success" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="100">
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+	<libraries>
+		<library name="plugin_fielddata2dtest" dll="%githash%_test_fielddata2dtest" />
+	</libraries>
+		
+	<test description="FieldData2D Test">			
+	
+		<instance name="fielddata2dtest" />
+		
+	</test>
+	
+			
+
+</testdefinition>

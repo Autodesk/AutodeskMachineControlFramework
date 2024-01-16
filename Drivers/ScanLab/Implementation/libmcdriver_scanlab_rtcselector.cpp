@@ -39,11 +39,15 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCSelector 
 **************************************************************************************************************************/
 
-CRTCSelector::CRTCSelector(PScanLabSDK pScanLabSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment) :
-	m_pScanLabSDK(pScanLabSDK), m_pDriverEnvironment (pDriverEnvironment)
+CRTCSelector::CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment) :
+	 m_pDriverEnvironment (pDriverEnvironment), m_pRTCContextOwnerData (pRTCContextOwnerData)
 
 {
-	if (pScanLabSDK.get() == nullptr)
+	if (pRTCContextOwnerData == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	m_pScanLabSDK = pRTCContextOwnerData->getScanLabSDK();
+	if (m_pScanLabSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -66,6 +70,7 @@ LibMCDriver_ScanLab_uint32 CRTCSelector::SearchCards(const std::string & sIP, co
 	if (nNetMask == 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNETMASK);
 
+	// eth search cards timeout ethernet
 	m_pScanLabSDK->eth_set_search_cards_timeout(nTimeout);
 
 	uint32_t nCount = m_pScanLabSDK->eth_search_cards(nIP, nNetMask);
@@ -116,7 +121,7 @@ IRTCContext* CRTCSelector::acquireCardEx(const LibMCDriver_ScanLab_uint32 nNumbe
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYACQUIRED);
 	}
 
-	return new CRTCContext(m_pScanLabSDK, cardNo, bIsNetworkCard, m_pDriverEnvironment);
+	return new CRTCContext(m_pRTCContextOwnerData, cardNo, bIsNetworkCard, m_pDriverEnvironment);
 }
 
 IRTCContext* CRTCSelector::AcquireCard(const LibMCDriver_ScanLab_uint32 nNumber)

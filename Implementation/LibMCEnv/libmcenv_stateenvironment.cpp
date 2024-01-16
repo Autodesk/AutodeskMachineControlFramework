@@ -35,9 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_dataseries.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_journalvariable.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
+#include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_usermanagementhandler.hpp"
+#include "libmcenv_meshobject.hpp"
+#include "libmcenv_alert.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -45,6 +52,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_handler.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_xmldocument.hpp"
+#include "amc_accesscontrol.hpp"
+#include "amc_meshhandler.hpp"
+#include "amc_alerthandler.hpp"
+#include "amc_dataserieshandler.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -143,12 +154,27 @@ ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& s
 
 }
 
+bool CStateEnvironment::HasBuildJob(const std::string& sBuildUUID)
+{
+	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	try {
+		pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+		return true;
+	}
+	catch (std::exception) {
+		return false;
+	}
+}
 
 IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
+	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
 	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
-	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
-	return new CBuild(pBuildJob, m_pSystemState);
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+	return new CBuild(pBuildJob, m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getStorageInstance(), m_pSystemState->getSystemUserID ());
 }
 
 
@@ -422,6 +448,11 @@ LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
 	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
 }
 
+LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMicroseconds()
+{
+	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+}
+
 ITestEnvironment* CStateEnvironment::GetTestEnvironment()
 {
 	return new CTestEnvironment(m_pSystemState->getTestEnvironmentPath ());
@@ -465,3 +496,173 @@ LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uin
 	return new CXMLDocument(pDocument);
 
 }
+
+IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+{
+	AMC::PDiscreteFieldData2DInstance pInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, true);
+	return new CDiscreteFieldData2D(pInstance);
+}
+
+IDiscreteFieldData2D* CStateEnvironment::CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+{
+	if (pImageDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto pImageDataImpl = dynamic_cast<CImageData*> (pImageDataInstance);
+	if (pImageDataImpl == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+	uint32_t nPixelSizeX, nPixelSizeY;
+	pImageDataImpl->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
+
+	double dDPIValueX, dDPIValueY;
+	pImageDataImpl->GetDPI(dDPIValueX, dDPIValueY);
+
+	AMC::PDiscreteFieldData2DInstance pFieldInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, 0.0, false);
+
+	auto pixelFormat = pImageDataImpl->GetPixelFormat();
+	auto& rawPixelData = pImageDataImpl->getPixelData();
+	
+	pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
+
+	return new CDiscreteFieldData2D(pFieldInstance);
+
+}
+
+bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const std::string& sPermissionIdentifier)
+{
+	if (sUserLogin.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYUSERLOGIN);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sUserLogin))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, sUserLogin);
+
+	if (sPermissionIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPERMISSIONIDENTIFIER);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPermissionIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER, sPermissionIdentifier);
+
+	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pAccessControl = m_pSystemState->accessControl();
+
+	std::string sUserRole = pLoginHandler->GetUserRole (sUserLogin);
+	AMC::PAccessRole pRole;
+	if (sUserRole.empty())
+		pRole = pAccessControl->findRole(sUserRole, true);
+	else
+		pRole = pAccessControl->getDefaultRole();
+
+	return pRole->hasPermission(sPermissionIdentifier);
+}
+
+IUserManagementHandler* CStateEnvironment::CreateUserManagement()
+{
+	return new CUserManagementHandler (m_pSystemState->getLoginHandlerInstance (), m_pSystemState->getAccessControlInstance (), m_pSystemState->getLanguageHandlerInstance ());
+}
+
+IJournalHandler* CStateEnvironment::GetCurrentJournal()
+{
+	return new CJournalHandler(m_pSystemState->getStateJournalInstance());
+}
+
+IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	auto pLib3MFWrapper = m_pSystemState->getToolpathHandlerInstance()->getLib3MFWrapper();
+	
+	auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName);
+
+	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+bool CStateEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
+{
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	return pMeshHandler->hasMeshEntity(sMeshUUID);
+}
+
+IMeshObject* CStateEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
+{
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
+
+	if (pMeshEntity.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
+
+	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+IDataSeries* CStateEnvironment::CreateDataSeries(const std::string& sName)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	auto pDataSeries = pDataSeriesHandler->createDataSeries(sName);
+
+	return new CDataSeries(pDataSeries);
+
+}
+
+bool CStateEnvironment::HasDataSeries(const std::string& sDataSeriesUUID)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	return pDataSeriesHandler->hasDataSeries(sDataSeriesUUID);
+}
+
+IDataSeries* CStateEnvironment::FindDataSeries(const std::string& sDataSeriesUUID)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	auto pDataSeries = pDataSeriesHandler->findDataSeries(sDataSeriesUUID, true);
+
+	return new CDataSeries(pDataSeries);
+
+
+}
+
+void CStateEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
+{
+	auto pDataSeriesHandler = m_pSystemState->getDataSeriesHandlerInstance();
+	pDataSeriesHandler->unloadDataSeries(sDataSeriesUUID);
+
+}
+
+
+IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+{
+	if (sIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDALERTIDENTIFIER, "invalid alert identifier: " + sIdentifier);
+
+	auto sNewUUID = AMCCommon::CUtils::createUUID();
+	
+	AMCCommon::CChrono chrono;
+	auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+
+	auto pDefinition = m_pSystemState->alertHandler()->findDefinition(sIdentifier, true);
+	auto alertDescription = pDefinition->getDescription();
+
+	auto pAlertSession = m_pSystemState->createAlertSession ();
+
+	pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), pDefinition->getAlertLevel (), alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
+
+	return new CAlert (sNewUUID, pAlertSession);
+}
+
+IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
+{
+	return nullptr;
+}
+
+void CStateEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
+{
+}
+

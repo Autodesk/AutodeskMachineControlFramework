@@ -58,7 +58,6 @@ namespace Impl {
 /*************************************************************************************************************************
  Class declaration of CDriver_ScanLab_RTC6xN 
 **************************************************************************************************************************/
-
 class CDriver_ScanLab_RTC6xN : public virtual IDriver_ScanLab_RTC6xN, public virtual CDriver_ScanLab {
 private:
 
@@ -69,7 +68,6 @@ private:
 
 	bool m_SimulationMode;
 
-	float m_fMaxLaserPowerInWatts;
 
 	act_managed_ptr<IRTCSelector> m_pRTCSelector;
 	
@@ -78,13 +76,15 @@ private:
 
 	std::map<std::string, PDriver_ScanLab_RTC6ConfigurationPreset> m_ConfigurationPresets;
 
-	LibMCDriver_ScanLab::eOIERecordingMode m_OIERecordingMode;
-
 	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
 	act_managed_ptr<IRTCContext> getRTCContextForScannerIndex(uint32_t nScannerIndex, bool bFailIfNotExisting);
 
 	act_managed_ptr<IRTCContext> getRTCContextForLaserIndex(uint32_t nLaserIndex, bool bFailIfNotExisting);
+
+protected:
+
+	virtual void updateDLLVersionParameter(uint32_t nDLLVersionParameter) override;
 
 public:
 
@@ -143,6 +143,10 @@ public:
 
 	LibMCDriver_ScanLab::eOIERecordingMode GetOIERecordingMode() override;
 
+	void EnableAttributeFilter(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue) override;
+
+	void DisableAttributeFilter() override;
+
 	void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists) override;
 
 	void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) override;
@@ -150,6 +154,11 @@ public:
 	void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) override;
 
 	PDriver_ScanLab_RTC6ConfigurationPreset findPresetByName(const std::string& sPresetName, bool bMustExist);
+
+	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
+
+	void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex) override;
+
 
 };
 

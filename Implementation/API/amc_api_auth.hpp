@@ -44,26 +44,30 @@ namespace AMC {
 	class CParameterHandler;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
 
+	class CUserInformation;
+	typedef std::shared_ptr<CUserInformation> PUserInformation;
 
 	class CAPIAuth {
 	private:
 
 		std::string m_sSessionUUID;
 		std::string m_sSessionKey;
-		std::string m_sUserName;
 		bool m_bIsAuthorized;
 
+		PUserInformation m_pUserInformation;
 		PParameterHandler m_pClientVariableHandler;
 
 	protected:
 
 	public:
 
-		CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string & sUserName, bool bIsAuthorized, PParameterHandler pClientVariableHandler);
+		CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, PUserInformation pUserInformation, bool bIsAuthorized, PParameterHandler pClientVariableHandler);
 
 		virtual ~CAPIAuth();
 		
-		std::string getUserName ();
+		PUserInformation getUserInformation ();
+
+		std::string getUserName();
 
 		std::string getSessionUUID();
 

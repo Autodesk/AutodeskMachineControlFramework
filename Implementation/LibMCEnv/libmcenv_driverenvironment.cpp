@@ -40,6 +40,8 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_modbustcpconnection.hpp"
 #include "libmcenv_driverstatusupdatesession.hpp"
 #include "libmcenv_xmldocument.hpp"
+#include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_build.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -55,8 +57,9 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, const std::string& sDriverName)
-    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pDriverResourcePackage (pDriverResourcePackage), m_pMachineResourcePackage (pMachineResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName)
+    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pDriverResourcePackage (pDriverResourcePackage), m_pMachineResourcePackage (pMachineResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName), m_pBuildJobHandler (pBuildJobHandler),
+    m_pStorage (pStorage), m_sSystemUserID (sSystemUserID), m_pGlobalChrono (pGlobalChrono)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -64,7 +67,13 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pToolpathHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pBuildJobHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
+    if (pStorage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pLogger.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pGlobalChrono.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (sBaseTempPath.empty ())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -173,7 +182,7 @@ void CDriverEnvironment::RetrieveMachineResourceData(const std::string& sIdentif
 
 IToolpathAccessor* CDriverEnvironment::CreateToolpathAccessor(const std::string& sStreamUUID)
 {
-    return new CToolpathAccessor (sStreamUUID, m_pToolpathHandler);
+    return new CToolpathAccessor (sStreamUUID, AMCCommon::CUtils::createEmptyUUID(), m_pToolpathHandler);
 }
 
 bool CDriverEnvironment::ParameterNameIsValid(const std::string& sParameterName)
@@ -255,12 +264,17 @@ void CDriverEnvironment::setIsInitializing(bool bIsInitializing)
 
 void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 {
-    m_Chrono.sleepMilliseconds(nDelay);
+    m_pGlobalChrono->sleepMilliseconds(nDelay);
 }
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_Chrono.getExistenceTimeInMilliseconds();
+    return m_pGlobalChrono->getExistenceTimeInMilliseconds();
+}
+
+LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMicroseconds()
+{
+    return m_pGlobalChrono->getExistenceTimeInMicroseconds();
 }
 
 void CDriverEnvironment::LogMessage(const std::string& sLogString)
@@ -327,4 +341,57 @@ LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::ParseXMLData(const LibMCEnv_ui
 
     return new CXMLDocument(pDocument);
 
+}
+
+IDiscreteFieldData2D* CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
+{
+    AMC::PDiscreteFieldData2DInstance pInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, true);
+    return new CDiscreteFieldData2D(pInstance);
+}
+
+IDiscreteFieldData2D* CDriverEnvironment::CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY)
+{
+    if (pImageDataInstance == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    auto pImageDataImpl = dynamic_cast<CImageData*> (pImageDataInstance);
+    if (pImageDataImpl == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+    uint32_t nPixelSizeX, nPixelSizeY;
+    pImageDataImpl->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
+
+    double dDPIValueX, dDPIValueY;
+    pImageDataImpl->GetDPI(dDPIValueX, dDPIValueY);
+
+    AMC::PDiscreteFieldData2DInstance pFieldInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, 0.0, false);
+
+    auto pixelFormat = pImageDataImpl->GetPixelFormat();
+    auto& rawPixelData = pImageDataImpl->getPixelData();
+
+    pFieldInstance->loadFromRawPixelData (rawPixelData, pixelFormat, dBlackValue, dWhiteValue);
+
+    return new CDiscreteFieldData2D(pFieldInstance);
+
+}
+
+bool CDriverEnvironment::HasBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    try {
+        m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+        return true;
+    }
+    catch (std::exception) {
+        return false;
+    }
+}
+
+IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
+{
+    std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
+
+    auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(pBuildJob, m_pToolpathHandler, m_pStorage, m_sSystemUserID);
 }

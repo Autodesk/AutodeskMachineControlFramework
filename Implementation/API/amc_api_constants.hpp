@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_PROTOCOL_SETUP "com.autodesk.machinecontrol.setup"
 #define AMC_API_PROTOCOL_UPLOAD "com.autodesk.machinecontrol.upload"
 #define AMC_API_PROTOCOL_BUILD "com.autodesk.machinecontrol.build"
+#define AMC_API_PROTOCOL_MESH "com.autodesk.machinecontrol.mesh"
 #define AMC_API_PROTOCOL_SIGNAL "com.autodesk.machinecontrol.signal"
 #define AMC_API_PROTOCOL_AUTH "com.autodesk.machinecontrol.auth"
 #define AMC_API_PROTOCOL_UI "com.autodesk.machinecontrol.ui"
@@ -109,6 +110,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_ICON "icon"
 #define AMC_API_KEY_UI_ID "id"
 #define AMC_API_KEY_UI_UUID "uuid"
+#define AMC_API_KEY_UI_MESHUUID "meshuuid"
 #define AMC_API_KEY_UI_CAPTION "caption"
 #define AMC_API_KEY_UI_DESCRIPTION "description"
 #define AMC_API_KEY_UI_VERTICALSPLIT "verticalsplit"
@@ -221,6 +223,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_FORMDISABLED "disabled"
 #define AMC_API_KEY_UI_FORMPREFIX "prefix"
 #define AMC_API_KEY_UI_FORMSUFFIX "suffix"
+#define AMC_API_KEY_UI_FORMVALIDATION "validation"
+#define AMC_API_KEY_UI_FORMVALIDATIONMESSAGE "validationmessage"
+#define AMC_API_KEY_UI_FORMMINVALUE "minvalue"
+#define AMC_API_KEY_UI_FORMMAXVALUE "maxvalue"
 #define AMC_API_KEY_UI_FORMREADONLY "readonly"
 #define AMC_API_KEY_UI_FORMCAPTION "caption"
 #define AMC_API_KEY_UI_FORMENTITIES "entities"
@@ -236,6 +242,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_EVENTCLOSEDIALOGS "closedialogs"
 #define AMC_API_KEY_UI_EVENTPAGETOACTIVATE "pagetoactivate"
 #define AMC_API_KEY_UI_CONTENTUPDATE "contentupdate"
+#define AMC_API_KEY_UI_INSTANCES "instances"
+#define AMC_API_KEY_UI_INSTANCENAME "instancename"
+#define AMC_API_KEY_UI_SCENE "scene"
+#define AMC_API_KEY_UI_DATASERIES "dataseries"
+#define AMC_API_KEY_UI_VERSION "version"
 
 #define AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE 4
 #define AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE 1024
@@ -274,6 +285,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define AMC_API_KEY_TOKEN_SESSION "session"
 #define AMC_API_KEY_TOKEN_TOKEN "token"
+
+#define AMC_API_KEY_USERUUID "useruuid"
+#define AMC_API_KEY_USERLOGIN "userlogin"
+#define AMC_API_KEY_USERDESCRIPTION "userdescription"
+#define AMC_API_KEY_USERROLE "userrole"
+#define AMC_API_KEY_USERLANGUAGE "userlanguage"
+#define AMC_API_KEY_USERPERMISSIONS "userpermissions"
 
 #endif //__AMC_API_CONSTANTS
 

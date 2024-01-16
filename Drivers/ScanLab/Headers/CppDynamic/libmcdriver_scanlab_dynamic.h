@@ -278,6 +278,75 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetSerialNumb
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserIndexPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pLaserIndex);
 
 /**
+* Sets the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dOriginX - Sets laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @param[in] dOriginY - Sets laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserOriginPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dOriginX, LibMCDriver_ScanLab_double dOriginY);
+
+/**
+* Returns the laser origin in absolute coordinates. This origin will be used to relatively position lasers to one another.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pOriginX - Laser origin X coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @param[out] pOriginY - Laser origin Y coordinate of the laser in mm. All laser movements will be moved by that minus that amount in X.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserOriginPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pOriginX, LibMCDriver_ScanLab_double * pOriginY);
+
+/**
+* Sets the laser field limits in absolute coordinates.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dMinX - Sets minimum laser X coordinate in mm.
+* @param[in] dMinY - Sets minimum laser Y coordinate in mm.
+* @param[in] dMaxX - Sets maximum laser X coordinate in mm.
+* @param[in] dMaxY - Sets maximum laser Y coordinate in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserFieldPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dMinX, LibMCDriver_ScanLab_double dMinY, LibMCDriver_ScanLab_double dMaxX, LibMCDriver_ScanLab_double dMaxY);
+
+/**
+* Resets the laser field to default values.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ResetLaserFieldPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables range checking of the laser field. A laser field MUST have been set before.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableRangeCheckingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables range checking of the laser field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableRangeCheckingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns the laser field limits in absolute coordinates.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pMinX - Sets minimum laser X coordinate in mm.
+* @param[out] pMinY - Sets minimum laser Y coordinate in mm.
+* @param[out] pMaxX - Sets maximum laser X coordinate in mm.
+* @param[out] pMaxY - Sets maximum laser Y coordinate in mm.
+* @param[out] pHasLaserField - Returns true if a laser field has been set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserFieldPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pMinX, LibMCDriver_ScanLab_double * pMinY, LibMCDriver_ScanLab_double * pMaxX, LibMCDriver_ScanLab_double * pMaxY, bool * pHasLaserField);
+
+/**
 * Opens the list to write
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -352,7 +421,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserDelay
 * @param[in] nPointsBufferSize - Number of elements in buffer
 * @param[in] pPointsBuffer - Point2D buffer of Points of polyline to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
@@ -366,7 +435,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineP
 * @param[in] nPointsBufferSize - Number of elements in buffer
 * @param[in] pPointsBuffer - Point2D buffer of Points of polyline to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
@@ -381,12 +450,116 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineO
 * @param[in] nHatchesBufferSize - Number of elements in buffer
 * @param[in] pHatchesBuffer - Hatch2D buffer of Hatches to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
+
+/**
+* adds a power change to the open list. MUST NOT be used for PID control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fPowerInPercent - Laser power in percent
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent);
+
+/**
+* adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fPowerInPercent - Laser power in percent
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent);
+
+/**
+* adds a jump speed change to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fJumpSpeedInMMPerSecond - Jump speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetJumpSpeedPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
+
+/**
+* adds a mark speed change to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] fMarkSpeedInMMPerSecond - Mark speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddSetMarkSpeedPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
+
+/**
+* Adds a Jump movement to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY);
+
+/**
+* Adds a Mark movement to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY);
+
+/**
+* Adds a timed Mark movement to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @param[in] dDurationInMicroseconds - Duration of mark movement in Microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddTimedMarkMovementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY, LibMCDriver_ScanLab_double dDurationInMicroseconds);
+
+/**
+* Adds a free variable set to the open list
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nVariableNo - Number of the variable (0-7).
+* @param[in] nValue - Value to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 nValue);
+
+/**
+* Returns the currently set free variable.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nVariableNo - Number of the variable (0-7).
+* @param[out] pValue - Value to return.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 * pValue);
+
+/**
+* Returns the current RTC time stamp.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pTimeStamp - TimeStamp Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pTimeStamp);
+
+/**
+* Stops the execution of the current list immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StopExecutionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
 * Writes a list of hatches into the open list with OIE Enabled.
@@ -395,13 +568,63 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPt
 * @param[in] nHatchesBufferSize - Number of elements in buffer
 * @param[in] pHatchesBuffer - Hatch2D buffer of Hatches to draw.
 * @param[in] fMarkSpeed - Mark speed in mm/s
-* @param[in] fJumpSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
 * @param[in] fPower - Laser power in percent
 * @param[in] fZValue - Focus Z Value
 * @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue, LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
+
+/**
+* Adds a layer instance to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pLayer - Instance of the layer to add to the lists.
+* @param[in] bFailIfNonAssignedDataExists - If true, fails if there is a laser index that does not match.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCEnv_ToolpathLayer pLayer, bool bFailIfNonAssignedDataExists);
+
+/**
+* Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dPositionInMM - Position Value to reach in mm.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM, bool bInPositiveHalfPlane);
+
+/**
+* Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dPositionInMM - Position Value to reach in mm.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderYPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPositionInMM, bool bInPositiveHalfPlane);
+
+/**
+* Adds a command to wait for the encoder for reaching an X axis position. Fails if Mark on the Fly is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nPositionInSteps - Position Value to reach in steps.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderXStepsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps, bool bInPositiveHalfPlane);
+
+/**
+* Adds a command to wait for the encoder for reaching an Y axis position. Fails if Mark on the Fly is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nPositionInSteps - Position Value to reach in steps.
+* @param[in] bInPositiveHalfPlane - If true, waits for the encoder reaching a value that is larger than PositionInMM. If false, waits for the encoder reaching a value that is smaller than PositionInMM.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WaitForEncoderYStepsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nPositionInSteps, bool bInPositiveHalfPlane);
 
 /**
 * Adds a custom delay to the list
@@ -533,12 +756,21 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPtr)
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
-* Writes an OIE measurement start command block to the open list.
+* Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Writes an OIE measurement start command block to the open list, with parameterized LaserOn Trigger
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bLaserOnTrigger - If true, only triggers a measurement, when the laser is on.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOnTrigger);
 
 /**
 * Writes an OIE measurement start command block to the open list.
@@ -556,6 +788,22 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StopOIEMeasur
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetOIEPIDModePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nOIEPIDIndex);
+
+/**
+* Enables OIE PID Control. Affects only subsequent layers that are drawn into lists.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables OIE PID Control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
 * Disable skywriting.
@@ -601,6 +849,250 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWrit
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
+
+/**
+* Enables skywriting on the list in mode 4. See Scanlab RTC Documentation for details.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dTimelag - Skywriting Timelag
+* @param[in] nLaserOnShift - Skywriting Laser On Shift
+* @param[in] nNPrev - Duration of pre-motion in ticks
+* @param[in] nNPost - Duration of post-motion in ticks. 
+* @param[in] dLimit - Skywriting Angle limit
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode4Ptr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dTimelag, LibMCDriver_ScanLab_int64 nLaserOnShift, LibMCDriver_ScanLab_int64 nNPrev, LibMCDriver_ScanLab_int64 nNPost, LibMCDriver_ScanLab_double dLimit);
+
+/**
+* Sets the transformation angle of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dAngleInDegrees - Angle in Degrees
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dAngleInDegrees);
+
+/**
+* Sets the transformation scale of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dScaleFactor - Scale Factor (1.0 is no scaling). Allowed value is -16 to 16.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dScaleFactor);
+
+/**
+* Sets the transformation offset of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nOffsetX - Offset in X (in bits)
+* @param[in] nOffsetY - Offset in X (in bits)
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nOffsetX, LibMCDriver_ScanLab_int32 nOffsetY);
+
+/**
+* Sets the transformation matrix of the scan field.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dM11 - Upper left field of the transformation matrix
+* @param[in] dM12 - Upper right field of the transformation matrix
+* @param[in] dM21 - Lower left field of the transformation matrix
+* @param[in] dM22 - Lower right field of the transformation matrix
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dM11, LibMCDriver_ScanLab_double dM12, LibMCDriver_ScanLab_double dM21, LibMCDriver_ScanLab_double dM22);
+
+/**
+* Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables recording of position data of the RTC Card. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables recording of position data of the RTC Card. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Executes the list with recording the position data from the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nListIndex - Index of List (1 or 2).
+* @param[in] nPosition - Relative Position in List.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ExecuteListWithRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition);
+
+/**
+* Enables timelag compensation.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableTimelagCompensationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+
+/**
+* Disables timelag compensation.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableTimelagCompensationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables mark on the fly 2D. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dScaleXInMMperEncoderStep - Scale factor X in mm per encoder step
+* @param[in] dScaleYInMMperEncoderStep - Scale factor Y in mm per encoder step
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableMarkOnTheFly2DPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep);
+
+/**
+* Disable mark on the fly 2D. This is a list command.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableMarkOnTheFly2DPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns if mark on the fly 2D has been enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pIsEnabled - Returns true if mark on the fly 2D is enabled.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2DIsEnabledPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled);
+
+/**
+* Returns 2D mark on the fly position.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pPositionX - Mark on the fly position X
+* @param[out] pPositionY - Mark on the fly position Y
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 * pPositionX, LibMCDriver_ScanLab_int32 * pPositionY);
+
+/**
+* Checks mark on the fly error.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bFailIfError - If true, the call will fail in case of an error.
+* @param[out] pErrorCode - Bitfield corresponding to the get_marking_info call, as described in the RTC SDK Documentation.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_CheckOnTheFlyErrorPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bFailIfError, LibMCDriver_ScanLab_uint32 * pErrorCode);
+
+/**
+* Returns if the laser power calibration table is non-empty.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pCalibrationEnabled - Laser Calibration Is Enabled
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LaserPowerCalibrationIsEnabledPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pCalibrationEnabled);
+
+/**
+* Returns if the laser power calibration table has one entry.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pCalibrationIsLinear - Laser Calibration Is Affine Linear
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LaserPowerCalibrationIsLinearPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pCalibrationIsLinear);
+
+/**
+* Clears the laser power calibration table.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ClearLaserPowerCalibrationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns the laser power calibration table. Fails if laser calibration is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[out] pCalibrationPointsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pCalibrationPointsBuffer - LaserCalibrationPoint  buffer of Laser Calibration Points
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserPowerCalibrationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer);
+
+/**
+* Enables the laser power calibration with an affine linear tranformation.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dPowerOffsetInPercent - Additional offset of the Power value.
+* @param[in] dPowerOutputScaling - Scaling factor of the laser output.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLinearLaserPowerCalibrationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dPowerOffsetInPercent, LibMCDriver_ScanLab_double dPowerOutputScaling);
+
+/**
+* Enables the laser power calibration with multiple calibration point values. Table MUST NOT have negative power entries. Laser Power Output will be linear scaled with the given values within their respective intervals. Any laser power outside of the minimum or maximum Power values will be scaled according to the respective minimum or maximum scaling value.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[in] pCalibrationPointsBuffer - LaserCalibrationPoint buffer of Laser Calibration Points. Array will be sorted by Laser Power Keys. Array MUST NOT be empty. Array MUST NOT have duplicate entries (to an accuracy of 0.01 Percent).
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearLaserPowerCalibrationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sLaserCalibrationPoint * pCalibrationPointsBuffer);
+
+/**
+* Enables a spatial laser power modulation via callback.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pModulationCallback - Callback to call for modulating the laser power.
+* @param[in] pUserData - Userdata that is passed to the callback function
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableSpatialLaserPowerModulationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, LibMCDriver_ScanLab_pvoid pUserData);
+
+/**
+* Disables all power modulation functions.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* If this function is enabled, all mark lines will be subdivided so that the maximum length is small than the threshold.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLengthThreshold - Length threshold in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLengthThreshold);
+
+/**
+* Disables the subdivision of mark lines.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /*************************************************************************************************************************
  Class definition for RTCSelector
@@ -871,7 +1363,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Load
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCorrectionFilePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension, LibMCDriver_ScanLab_uint32 nTableNumberHeadA, LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 
 /**
-* Configures the laser mode.
+* Configures the laser mode. MUST be called before any exposure.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] eLaserMode - Laser Mode Enum
@@ -888,7 +1380,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetC
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureLaserModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
-* Configures the default laser and scanner delays.
+* Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] dLaserOnDelay - Laser On Delay in Microseconds
@@ -919,6 +1411,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetO
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetOIERecordingModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
 
 /**
+* Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] pNameSpace - Namespace of Attribute to filter for.
+* @param[in] pAttributeName - Name of Attribute to filter for.
+* @param[in] nAttributeValue - Attribute Value to filter for.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableAttributeFilterPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pNameSpace, const char * pAttributeName, LibMCDriver_ScanLab_int64 nAttributeValue);
+
+/**
+* Disables filtering of the segments by segment attributes.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableAttributeFilterPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
+
+/**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
@@ -938,6 +1449,24 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Draw
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
+/**
+* Enables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableTimelagCompensationPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+
+/**
+* Disables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableTimelagCompensationPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_RTC6xN
@@ -1136,7 +1665,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Se
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureLaserModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
-* Configures the default laser and scanner delays.
+* Configures the default laser and scanner delays. ATTENTION: Will create and overwrite execution list 1!
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
 * @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
@@ -1166,6 +1695,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Se
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab::eOIERecordingMode * pRecordingMode);
+
+/**
+* Enables filtering of the segments by segment attributes. A segment will only be drawn if the given integer attribute has the given value.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] pNameSpace - Namespace of Attribute to filter for.
+* @param[in] pAttributeName - Name of Attribute to filter for.
+* @param[in] nAttributeValue - Attribute Value to filter for.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableAttributeFilterPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, const char * pNameSpace, const char * pAttributeName, LibMCDriver_ScanLab_int64 nAttributeValue);
+
+/**
+* Disables filtering of the segments by segment attributes.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableAttributeFilterPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN);
 
 /**
 * Draws a layer of a build stream on List 1. Blocks until the layer is drawn. Laser Indices are automatically assigned. Will fail if 
@@ -1201,6 +1749,26 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Se
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
+/**
+* Enables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @param[in] nTimeLagXYInMicroseconds - Time lag of XY axes (in microseconds). MUST be a multiple of 10.
+* @param[in] nTimeLagZInMicroseconds - Time lag of Z axis (in microseconds). MUST be a multiple of 10.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableTimelagCompensationPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
+
+/**
+* Disables timelag compensation.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableTimelagCompensationPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex);
 
 /*************************************************************************************************************************
  Global functions
@@ -1299,6 +1867,13 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_GetNetmaskPtr m_RTCContext_GetNetmask;
 	PLibMCDriver_ScanLabRTCContext_GetSerialNumberPtr m_RTCContext_GetSerialNumber;
 	PLibMCDriver_ScanLabRTCContext_GetLaserIndexPtr m_RTCContext_GetLaserIndex;
+	PLibMCDriver_ScanLabRTCContext_SetLaserOriginPtr m_RTCContext_SetLaserOrigin;
+	PLibMCDriver_ScanLabRTCContext_GetLaserOriginPtr m_RTCContext_GetLaserOrigin;
+	PLibMCDriver_ScanLabRTCContext_SetLaserFieldPtr m_RTCContext_SetLaserField;
+	PLibMCDriver_ScanLabRTCContext_ResetLaserFieldPtr m_RTCContext_ResetLaserField;
+	PLibMCDriver_ScanLabRTCContext_EnableRangeCheckingPtr m_RTCContext_EnableRangeChecking;
+	PLibMCDriver_ScanLabRTCContext_DisableRangeCheckingPtr m_RTCContext_DisableRangeChecking;
+	PLibMCDriver_ScanLabRTCContext_GetLaserFieldPtr m_RTCContext_GetLaserField;
 	PLibMCDriver_ScanLabRTCContext_SetStartListPtr m_RTCContext_SetStartList;
 	PLibMCDriver_ScanLabRTCContext_SetEndOfListPtr m_RTCContext_SetEndOfList;
 	PLibMCDriver_ScanLabRTCContext_ExecuteListPtr m_RTCContext_ExecuteList;
@@ -1309,7 +1884,23 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DrawPolylinePtr m_RTCContext_DrawPolyline;
 	PLibMCDriver_ScanLabRTCContext_DrawPolylineOIEPtr m_RTCContext_DrawPolylineOIE;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr m_RTCContext_DrawHatches;
+	PLibMCDriver_ScanLabRTCContext_AddSetPowerPtr m_RTCContext_AddSetPower;
+	PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr m_RTCContext_AddSetPowerForPIDControl;
+	PLibMCDriver_ScanLabRTCContext_AddSetJumpSpeedPtr m_RTCContext_AddSetJumpSpeed;
+	PLibMCDriver_ScanLabRTCContext_AddSetMarkSpeedPtr m_RTCContext_AddSetMarkSpeed;
+	PLibMCDriver_ScanLabRTCContext_AddJumpMovementPtr m_RTCContext_AddJumpMovement;
+	PLibMCDriver_ScanLabRTCContext_AddMarkMovementPtr m_RTCContext_AddMarkMovement;
+	PLibMCDriver_ScanLabRTCContext_AddTimedMarkMovementPtr m_RTCContext_AddTimedMarkMovement;
+	PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr m_RTCContext_AddFreeVariable;
+	PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr m_RTCContext_GetCurrentFreeVariable;
+	PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr m_RTCContext_GetTimeStamp;
+	PLibMCDriver_ScanLabRTCContext_StopExecutionPtr m_RTCContext_StopExecution;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr m_RTCContext_DrawHatchesOIE;
+	PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr m_RTCContext_AddLayerToList;
+	PLibMCDriver_ScanLabRTCContext_WaitForEncoderXPtr m_RTCContext_WaitForEncoderX;
+	PLibMCDriver_ScanLabRTCContext_WaitForEncoderYPtr m_RTCContext_WaitForEncoderY;
+	PLibMCDriver_ScanLabRTCContext_WaitForEncoderXStepsPtr m_RTCContext_WaitForEncoderXSteps;
+	PLibMCDriver_ScanLabRTCContext_WaitForEncoderYStepsPtr m_RTCContext_WaitForEncoderYSteps;
 	PLibMCDriver_ScanLabRTCContext_AddCustomDelayPtr m_RTCContext_AddCustomDelay;
 	PLibMCDriver_ScanLabRTCContext_GetCorrectionFactorPtr m_RTCContext_GetCorrectionFactor;
 	PLibMCDriver_ScanLabRTCContext_GetStatusPtr m_RTCContext_GetStatus;
@@ -1323,12 +1914,41 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;
+	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr m_RTCContext_StartOIEMeasurementEx;
 	PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr m_RTCContext_StopOIEMeasurement;
 	PLibMCDriver_ScanLabRTCContext_SetOIEPIDModePtr m_RTCContext_SetOIEPIDMode;
+	PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr m_RTCContext_EnableOIEPIDControl;
+	PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr m_RTCContext_DisableOIEPIDControl;
 	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr m_RTCContext_EnableSkyWritingMode2;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode3Ptr m_RTCContext_EnableSkyWritingMode3;
+	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode4Ptr m_RTCContext_EnableSkyWritingMode4;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationAnglePtr m_RTCContext_SetTransformationAngle;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr m_RTCContext_SetTransformationScale;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr m_RTCContext_SetTransformationOffset;
+	PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr m_RTCContext_SetTransformationMatrix;
+	PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr m_RTCContext_PrepareRecording;
+	PLibMCDriver_ScanLabRTCContext_EnableRecordingPtr m_RTCContext_EnableRecording;
+	PLibMCDriver_ScanLabRTCContext_DisableRecordingPtr m_RTCContext_DisableRecording;
+	PLibMCDriver_ScanLabRTCContext_ExecuteListWithRecordingPtr m_RTCContext_ExecuteListWithRecording;
+	PLibMCDriver_ScanLabRTCContext_EnableTimelagCompensationPtr m_RTCContext_EnableTimelagCompensation;
+	PLibMCDriver_ScanLabRTCContext_DisableTimelagCompensationPtr m_RTCContext_DisableTimelagCompensation;
+	PLibMCDriver_ScanLabRTCContext_EnableMarkOnTheFly2DPtr m_RTCContext_EnableMarkOnTheFly2D;
+	PLibMCDriver_ScanLabRTCContext_DisableMarkOnTheFly2DPtr m_RTCContext_DisableMarkOnTheFly2D;
+	PLibMCDriver_ScanLabRTCContext_MarkOnTheFly2DIsEnabledPtr m_RTCContext_MarkOnTheFly2DIsEnabled;
+	PLibMCDriver_ScanLabRTCContext_Get2DMarkOnTheFlyPositionPtr m_RTCContext_Get2DMarkOnTheFlyPosition;
+	PLibMCDriver_ScanLabRTCContext_CheckOnTheFlyErrorPtr m_RTCContext_CheckOnTheFlyError;
+	PLibMCDriver_ScanLabRTCContext_LaserPowerCalibrationIsEnabledPtr m_RTCContext_LaserPowerCalibrationIsEnabled;
+	PLibMCDriver_ScanLabRTCContext_LaserPowerCalibrationIsLinearPtr m_RTCContext_LaserPowerCalibrationIsLinear;
+	PLibMCDriver_ScanLabRTCContext_ClearLaserPowerCalibrationPtr m_RTCContext_ClearLaserPowerCalibration;
+	PLibMCDriver_ScanLabRTCContext_GetLaserPowerCalibrationPtr m_RTCContext_GetLaserPowerCalibration;
+	PLibMCDriver_ScanLabRTCContext_SetLinearLaserPowerCalibrationPtr m_RTCContext_SetLinearLaserPowerCalibration;
+	PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearLaserPowerCalibrationPtr m_RTCContext_SetPiecewiseLinearLaserPowerCalibration;
+	PLibMCDriver_ScanLabRTCContext_EnableSpatialLaserPowerModulationPtr m_RTCContext_EnableSpatialLaserPowerModulation;
+	PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr m_RTCContext_DisablePowerModulation;
+	PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr m_RTCContext_EnableLineSubdivision;
+	PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr m_RTCContext_DisableLineSubdivision;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;
@@ -1358,8 +1978,12 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureDelaysPtr m_Driver_ScanLab_RTC6_ConfigureDelays;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetOIERecordingModePtr m_Driver_ScanLab_RTC6_SetOIERecordingMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetOIERecordingModePtr m_Driver_ScanLab_RTC6_GetOIERecordingMode;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableAttributeFilterPtr m_Driver_ScanLab_RTC6_EnableAttributeFilter;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableAttributeFilterPtr m_Driver_ScanLab_RTC6_DisableAttributeFilter;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr m_Driver_ScanLab_RTC6_DrawLayer;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_GetCommunicationTimeouts;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableTimelagCompensationPtr m_Driver_ScanLab_RTC6_EnableTimelagCompensation;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableTimelagCompensationPtr m_Driver_ScanLab_RTC6_DisableTimelagCompensation;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetToSimulationModePtr m_Driver_ScanLab_RTC6xN_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsSimulationModePtr m_Driver_ScanLab_RTC6xN_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_IsInitializedPtr m_Driver_ScanLab_RTC6xN_IsInitialized;
@@ -1380,9 +2004,13 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_ConfigureDelaysPtr m_Driver_ScanLab_RTC6xN_ConfigureDelays;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetOIERecordingModePtr m_Driver_ScanLab_RTC6xN_SetOIERecordingMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetOIERecordingModePtr m_Driver_ScanLab_RTC6xN_GetOIERecordingMode;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableAttributeFilterPtr m_Driver_ScanLab_RTC6xN_EnableAttributeFilter;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableAttributeFilterPtr m_Driver_ScanLab_RTC6xN_DisableAttributeFilter;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DrawLayerPtr m_Driver_ScanLab_RTC6xN_DrawLayer;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableTimelagCompensationPtr m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableTimelagCompensationPtr m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation;
 	PLibMCDriver_ScanLabGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabReleaseInstancePtr m_ReleaseInstance;

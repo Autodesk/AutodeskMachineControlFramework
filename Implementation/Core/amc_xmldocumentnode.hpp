@@ -58,6 +58,7 @@ namespace AMC {
 		CXMLDocumentInstance* m_pDocument;
 		CXMLDocumentNodeInstance* m_pParentNode;
 		std::string m_sNodeName;
+		std::string m_sTextContent;
 		PXMLDocumentNameSpace m_pNameSpace;
 
 		std::vector<PXMLDocumentAttributeInstance> m_Attributes;
@@ -92,6 +93,10 @@ namespace AMC {
 		bool compareName(const std::string& sNameSpace, const std::string& sName);
 
 		PXMLDocumentNameSpace GetNameSpace();
+
+		std::string GetTextContent();
+
+		void SetTextContent(const std::string & sTextContent);
 
 		uint64_t GetAttributeCount();
 

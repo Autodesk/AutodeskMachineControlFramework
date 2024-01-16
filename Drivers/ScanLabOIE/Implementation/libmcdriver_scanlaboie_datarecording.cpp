@@ -65,6 +65,12 @@ LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetSensorSignalCount()
 	return m_pDataRecordingInstance->getSensorValuesPerRecord();
 }
 
+LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetAdditionalSignalCount()
+{
+	return m_pDataRecordingInstance->getAdditionalValuesPerRecord();
+}
+
+
 LibMCDriver_ScanLabOIE_uint64 CDataRecording::GetRecordCount()
 {
 	return m_pDataRecordingInstance->getRecordCount();
@@ -102,7 +108,7 @@ void CDataRecording::GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint3
 	if (nIndex >= m_pDataRecordingInstance->getRecordCount())
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX);
 
-	uint32_t nSensorValueCount = m_pDataRecordingInstance->getRTCValuesPerRecord();
+	uint32_t nSensorValueCount = m_pDataRecordingInstance->getSensorValuesPerRecord();
 
 	if (pSensorSignalsNeededCount != nullptr)
 		*pSensorSignalsNeededCount = nSensorValueCount;
@@ -115,6 +121,27 @@ void CDataRecording::GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint3
 	}
 
 }
+
+void CDataRecording::GetAdditionalSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nAdditionalSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pAdditionalSignalsNeededCount, LibMCDriver_ScanLabOIE_int32* pAdditionalSignalsBuffer) 
+{
+	if (nIndex >= m_pDataRecordingInstance->getRecordCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX);
+
+	uint32_t nAdditionalValueCount = m_pDataRecordingInstance->getAdditionalValuesPerRecord();
+
+	if (pAdditionalSignalsNeededCount != nullptr)
+		*pAdditionalSignalsNeededCount = nAdditionalValueCount;
+
+	if (pAdditionalSignalsBuffer != nullptr) {
+		if (nAdditionalSignalsBufferSize < (size_t)nAdditionalValueCount)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+		m_pDataRecordingInstance->copyAdditionalSignals(nIndex, pAdditionalSignalsBuffer, nAdditionalSignalsBufferSize);
+	}
+
+}
+
+
 
 void CDataRecording::GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pXArrayNeededCount, LibMCDriver_ScanLabOIE_double * pXArrayBuffer, LibMCDriver_ScanLabOIE_uint64 nYArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pYArrayNeededCount, LibMCDriver_ScanLabOIE_double * pYArrayBuffer)
 {
@@ -159,6 +186,17 @@ void CDataRecording::GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSi
 
 	if (pSignalsBuffer != nullptr)
 		m_pDataRecordingInstance->copyAllSensorSignalsByIndex(nSignalIndex, pSignalsBuffer, nSignalsBufferSize);
+}
+
+void CDataRecording::GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32* pSignalsBuffer)
+{
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (pSignalsNeededCount != nullptr)
+		*pSignalsNeededCount = nRecordCount;
+
+	if (pSignalsBuffer != nullptr)
+		m_pDataRecordingInstance->copyAllAdditionalSignalsByIndex(nAdditionalIndex, pSignalsBuffer, nSignalsBufferSize);
+
 }
 
 std::string CDataRecording::StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild)

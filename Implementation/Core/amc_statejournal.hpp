@@ -55,13 +55,25 @@ namespace AMC {
 	};
 
 
+	typedef struct _sStateJournalStatistics {
+		sStateJournalInterval m_Interval;
+
+		double m_dMinValue;
+		double m_dMaxValue;
+		double m_dAverageValue;
+		double m_dAverageSquaredValue;
+		double m_dVariance;
+
+	} sStateJournalStatistics;
+
+
 	class CStateJournal;
 	typedef std::shared_ptr<CStateJournal> PStateJournal;
 
 	class CStateJournalImpl;
 	typedef std::shared_ptr<CStateJournalImpl> PStateJournalImpl;
 
-	
+
 	class CStateJournal {		
 	protected:
 		PStateJournalImpl m_pImpl;
@@ -84,7 +96,11 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		uint32_t registerState (const std::string& sName);
+		void readDoubleTimeStream (const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
+
+		sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
+		
+		void retrieveRecentInterval (uint64_t nLastMilliSeconds, sStateJournalInterval& interval);
 
 	};
 

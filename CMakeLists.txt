@@ -35,7 +35,10 @@ project(LibMC)
 
 add_subdirectory(Drivers)
 add_subdirectory(Plugins)
+
+if(INCLUDE_TESTS)
 add_subdirectory(Tests)
+endif()
 
 set (CMAKE_CXX_STANDARD 17)
 

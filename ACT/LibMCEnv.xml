@@ -132,9 +132,58 @@
 		<error name="INVALIDINTEGERVALUEATTRIBUTE" code="10092" description="Invalid integer value attribute." />				
 		<error name="INTEGERVALUEATTRIBUTEOUTOFRANGE" code="10093" description="Integer value attribute out of range." />				
 		<error name="INVALIDDOUBLEVALUEATTRIBUTE" code="10094" description="Invalid double value attribute." />				
-		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />				
-									
+		<error name="DOUBLEVALUEATTRIBUTEOUTOFRANGE" code="10095" description="Double value attribute out of range." />						
+		<error name="INVALIDDEFAULTIMAGEVALUE" code="10096" description="Invalid default image value." />
+		<error name="INVALIDPIXELMEMORYSIZE" code="10097" description="Invalid pixel memory size." />
+		<error name="INVALIDFIELDBUFFER" code="10098" description="Invalid field buffer." />
+		<error name="INTERNALFIELDSIZEERROR" code="10099" description="Internal field size error." />
+		<error name="INVALIDFIELDSIZE" code="10100" description="Invalid field size." />
+		<error name="INVALIDFIELDSCALINGFACTOR" code="10101" description="Invalid field scaling factor." />
+		<error name="SCALINGEXCEEDSMAXIMUMPIXELCOUNT" code="10102" description="Scaling exceeds maximum pixel count." />
+		<error name="INTERNALSCALINGERROR" code="10103" description="Internal scaling error." />
+		<error name="INVALIDCOLORRANGE" code="10104" description="Invalid color range." />
+		<error name="EMPTYJOURNALVARIABLENAME" code="10105" description="Empty journal variable name." />
+		<error name="INVALIDJOURNALVARIABLEINTERVAL" code="10106" description="Invalid journal variable interval." />
+		<error name="JOURNALVARIABLENOTFOUND" code="10107" description="Journal variable not found." />
+		<error name="COMPUTATIONOUTSIDEOFJOURNALDATA" code="10108" description="Computation outside of journal data." />
+		<error name="INVALIDJOURNALCOMPUTEINTERVAL" code="10109" description="Invalid Journal compute interval." />
+		<error name="INVALIDJOURNALCOMPUTEDATA" code="10110" description="Invalid Journal compute data." />
+		<error name="INVALIDSEGMENTATTRIBUTETYPE" code="10111" description="Invalid Segment Attribute Type." />
+		<error name="SEGMENTATTRIBUTENOTFOUND" code="10112" description="Segment Attribute not Found." />
+		<error name="UNSUPPORTEDFIELDSAMPLINGMODE" code="10113" description="Unsupported field sampling mode." />
+		<error name="SAMPLEPOINTCOUNTEXCEEDSMAXIMUM" code="10114" description="Sample point count exceeds maximum"/>
+		<error name="INVALIDCLAMPINTERVAL" code="10115" description="Invalid clamp interval"/>
+		<error name="COULDNOTRETRIEVEPNGSTREAM" code="10116" description="Could not retrieve PNG stream"/>
+		<error name="COULDNOTSTOREFIELDDATA" code="10117" description="Could not store field data"/>
+		<error name="DISCRETEFIELDDATANOTFOUND" code="10118" description="Discrete field data not found"/>
+		<error name="EMPTYUSERLOGIN" code="10119" description="Empty user login"/>
+		<error name="INVALIDUSERLOGIN" code="10120" description="Invalid user login"/>
+		<error name="EMPTYPERMISSIONIDENTIFIER" code="10121" description="Empty permission identifier"/>
+		<error name="INVALIDPERMISSIONIDENTIFIER" code="10122" description="Invalid permission identifier"/>
+		<error name="EMPTYUSERROLE" code="10123" description="Empty user role"/>
+		<error name="INVALIDUSERROLE" code="10124" description="Invalid user role"/>
+		<error name="EMPTYUSERLANGUAGE" code="10125" description="Empty user language"/>
+		<error name="INVALIDUSERLANGUAGE" code="10126" description="Invalid user language"/>
+		<error name="ORIGINOUTOFRANGE" code="10127" description="Origin out of range"/>
+		<error name="RAWPIXELDATASIZEMISMATCH" code="10128" description="Raw pixel data size mismatch"/>		
+		<error name="EMPTYPNGSTREAM" code="10129" description="Empty PNG Stream"/>
+		<error name="COULDNOTLOADPNGIMAGE" code="10130" description="Could not load PNG image"/>
+		<error name="INVALIDPIXELSIZE" code="10131" description="Invalid pixel size"/>
+		<error name="MESHISNOTREGISTERED" code="10132" description="Mesh is not registered"/>
+		<error name="INVALIDUSERINDEX" code="10133" description="Invalid user index"/>
+		<error name="DATASERIESTIMESTAMPSNOTINCREMENTING" code="10134" description="Data series time stamps not incrementing" />		
+		<error name="INVALIDNUMBEROFSAMPLES" code="10135" description="Invalid number of samples"/>
+		<error name="EMPTYALERTIDENTIFIER" code="10136" description="Empty alert identifier"/>
+		<error name="INVALIDALERTIDENTIFIER" code="10137" description="Invalid alert identifier"/>
+
 	</errors>
+
+	<enum name="AlertLevel">
+		<option name="FatalError" value="1"/>
+		<option name="CriticalError" value="2"/>
+		<option name="Warning" value="3"/>
+		<option name="Message" value="4"/>
+	</enum>	
 
 
 	<enum name="ImagePixelFormat">
@@ -144,6 +193,15 @@
 		<option name="RGBA32bit" value="3" />
 	</enum>
 	
+	<enum name="FieldSamplingMode">
+		<option name="Unknown" value="0" description="Field sampling mode is invalid." />
+		<option name="FloorCoordinate" value="1" description="Point Coordinates are rounded down to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is nearer to the origin." />
+		<option name="CeilCoordinate" value="2" description="Point Coordinates are rounded up to the nearest pixel and the point value is fully attached to this pixel. Points on a border will be attached to the pixel which is farer from the origin." />
+		<option name="WeightByRectangleArea" value="3" description="Point values are valued by a rectangle shape area and its overlap with each pixel (with the center as the given coordinate)." />
+		<option name="WeightByEllipseArea" value="4" description="Point values are valued by a ellipse shape area that its overlap with each pixel (with the center as the given coordinate)." />
+	</enum>
+	
+	
 	<enum name="ToolpathSegmentType">
 		<option name="Unknown" value="0" />
 		<option name="Hatch" value="1" />
@@ -151,6 +209,12 @@
 		<option name="Polyline" value="3" />
 	</enum>
 	
+	<enum name="ToolpathAttributeType">
+		<option name="Unknown" value="0" />
+		<option name="Integer" value="1" />
+		<option name="Double" value="2" />
+	</enum>
+
 	<enum name="ToolpathProfileValueType">
 		<option name="Custom" value="0" />
 		<option name="Speed" value="1" />
@@ -192,6 +256,16 @@
 		<member name="Coordinates" type="double" rows="2"/>
 	</struct>
 
+	<struct name="FieldData2DPoint">
+		<member name="Coordinates" type="double" rows="2"/>
+		<member name="Value" type="double" />
+	</struct>
+
+	<struct name="FieldData3DPoint">
+		<member name="Coordinates" type="double" rows="3"/>
+		<member name="Value" type="double" />
+	</struct>
+
 	<struct name="FloatHatch2D">
 		<member name="X1" type="double" />
 		<member name="Y1" type="double" />
@@ -206,9 +280,14 @@
 	</struct>
 
 	<struct name="ColorRGB">
-		<member name="Red" type="double" />
-		<member name="Green" type="double" />
-		<member name="Blue" type="double" />
+		<member name="Red" type="double" description="Red value of color (0..1)" />
+		<member name="Green" type="double" description="Green value of color (0..1)"/>
+		<member name="Blue" type="double" description="Blue value of color (0..1)" />
+	</struct>
+
+	<struct name="TimeStreamEntry" description="Entry of a time stream.">
+		<member name="TimestampInMicroSeconds" type="uint64" />
+		<member name="Value" type="double" />
 	</struct>
 
 	
@@ -244,6 +323,27 @@
 		
 	</class>
 
+	
+	<class name="PNGImageStoreOptions" parent="Base" description="Option class to parametrize saving of PNG Images.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+	
+	
+	<class name="PNGImageData" parent="Base" description="Binary representation of PNG Data.">
+
+		<method name="GetSizeInPixels" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="GetPNGDataStream" description="Retrieves encoded data stream of image object.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>
+
+	</class>
 	
 	<class name="ImageData" parent="Base" description="In memory representation of an image.">
 
@@ -281,18 +381,23 @@
 		</method>		
 
 		<method name="LoadPNG" description="Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="PNG Data stream." />
 		</method>		
 
-		<method name="EncodePNG" description="Encodes PNG and stores data stream in image object.">
-		</method>		
+		<method name="CreatePNGImage" description="Creates PNG Image out of the pixel data.">		
+			<param name="PNGStorageOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
+			<param name="PNGImage" type="class" class="PNGImageData" pass="return" description="Image data." />		
+		</method>
 
-		<method name="GetEncodedPNGData" description="Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
+		<method name="EncodePNG" description="Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.">
+		</method>
+
+		<method name="GetEncodedPNGData" description="Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
 			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
-		</method>		
+		</method>
 		
-		<method name="ClearEncodedPNGData" description="Releases encoded data stream of image object.">
-		</method>		
+		<method name="ClearEncodedPNGData" description="Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.">
+		</method>
 		
 		<method name="Clear" description="Sets all pixels to a single value.">
 			<param name="Value" type="uint32" pass="in" description="Pixel value." />
@@ -315,7 +420,7 @@
 			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
 			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
 			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
-			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
 		</method>		
 
 		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
@@ -328,6 +433,217 @@
 	
 	</class>
 	
+	<class name="DiscreteFieldData2DStoreOptions" parent="Base" description="Option class to parametrize saving of Field Data.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+
+
+	<class name="DiscreteFieldData2D" parent="Base" description="In-memory representation of discrete field in space.">
+
+		<method name="GetDPI" description="Returns DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
+			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
+		</method>
+
+		<method name="SetDPI" description="Sets DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="in" description="new DPI value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="new DPI value in Y. MUST be positive." />
+		</method>
+
+		<method name="GetOriginInMM" description="Returns field origin in mm.">
+			<param name="OriginX" type="double" pass="out" description="Origin in X in mm" />
+			<param name="OriginY" type="double" pass="out" description="Origin in Y in mm" />
+		</method>
+
+		<method name="SetOriginInMM" description="Set field origin in mm.">
+			<param name="OriginX" type="double" pass="in" description="Origin in X in mm" />
+			<param name="OriginY" type="double" pass="in" description="Origin in Y in mm" />
+		</method>
+		
+		<method name="GetSizeInMM" description="Returns field sizes in mm.">
+			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
+			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
+		</method>
+
+		<method name="GetSizeInPixels" description="Returns field pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="ResizeField" description="Resizes field pixel data.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Number of pixels in Y" />
+			<param name="DefaultValue" type="double" pass="in" description="Default Pixel value." />
+		</method>
+
+		<method name="Clear" description="Sets all pixels to a single value.">
+			<param name="Value" type="double" pass="in" description="Pixel value." />
+		</method>		
+
+		<method name="Clamp" description="Clamps all pixels to a certain interval.">
+			<param name="MinValue" type="double" pass="in" description="Minimum value. MUST be smaller or equal than MaxValue." />
+			<param name="MaxValue" type="double" pass="in" description="Maximum value. MUST be larger or equal than MinValue." />
+		</method>		
+
+		<method name="GetPixel" description="Returns one pixel of an field. Fails if outside of field size.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="double" pass="return" description="Pixel value at this position" />
+		</method>		
+
+		<method name="SetPixel" description="Sets one pixel of an field. Fails if outside of field size.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="double" pass="in" description="New Pixel value at this position" />
+		</method>		
+
+		<method name="GetPixelRange" description="Returns a subset of an field or the whole field data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within field bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within field bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="double" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size." />
+		</method>		
+
+		<method name="SetPixelRange" description="Exchanges a subset of an field or the whole field data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within field bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within field bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within field bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within field bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="double" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size." />
+		</method>
+		
+		<method name="RenderAveragePointValues" description="Renders and array of average point values into the field. ">
+			<param name="DefaultValue" type="double" pass="in" description="If a pixel does not contain any value, fall back to this given value." />
+			<param name="SamplingMode" type="enum" class="FieldSamplingMode" pass="in" description="Sampling mode of point values." />
+			<param name="SampleSizeX" type="double" pass="in" description="How large a sample point should be drawn in Pixel widths. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise." />
+			<param name="SampleSizeY" type="double" pass="in" description="How large a sample point should be drawn in Pixel heights. This determines the weighting when a point value overlaps multiple pixels. Ignored if SamplingMode is equal FloorCoordinate or CeilCoordinate. MUST be positive otherwise." />
+			<param name="PointValues" type="structarray" class="FieldData2DPoint" pass="in" description="Array of Field Data Points that are sorted into the grid. If a point lies on a grid border, it will be counted to all adjacent pixels." />
+		</method>
+		
+		<method name="ScaleFieldDown" description="Scales the field to a smaller size.">
+			<param name="FactorX" type="uint32" pass="in" description="The new field will be this factor smaller in X. MUST be positive and smaller than PixelSizeX" />
+			<param name="FactorY" type="uint32" pass="in" description="The new field will be this factor smaller in Y. MUST be positive and smaller than PixelSizeY" />
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+		
+		<method name="ScaleFieldUp" description="Scales the field to a larger size.">
+			<param name="FactorX" type="uint32" pass="in" description="The new field will be this factor larger in X. MUST be positive." />
+			<param name="FactorY" type="uint32" pass="in" description="The new field will be this factor larger in Y. MUST be positive." />
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+
+		<method name="Discretize" description="Discretizes the field into a finite set of values. All field values will be set to the nearest value in the given array. Equivalent to DiscretizeWithMapping with two identical parameters.">
+			<param name="DiscreteValues" type="basicarray" class="double" pass="in" description="An array of values. MUST NOT be empty." />
+		</method>
+		
+		<method name="DiscretizeWithMapping" description="Discretizes the field into a finite set of DiscreteValues. For each field value the nearest DiscreteValue is determined, and the field is set to the element of NewValues with the same index.">
+			<param name="DiscreteValues" type="basicarray" class="double" pass="in" description="An array of values. MUST NOT be empty.  " />
+			<param name="NewValues" type="basicarray" class="double" pass="in" description="An array of values. MUST have the same cardinality as DiscreteValues." />
+		</method>
+
+		<method name="RenderToImageRaw" description="Renders the field into a PNG image. The colors will be linearly interpolated into a given color scheme.">
+			<param name="MinValue" type="double" pass="in" description="Min point value. Values smaller than MinValue will be clamped to MinValue." />
+			<param name="MinColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MinValue." />
+			<param name="MidValue" type="double" pass="in" description="Mid point value. MUST be at least 1E-6 larger than MinValue." />
+			<param name="MidColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MidValue" />
+			<param name="MaxValue" type="double" pass="in" description="Max point value. MUST be at least 1E-6 larger than MidValue. Values larger than MaxValue will be clamped to MaxValue." />
+			<param name="MaxColor" type="struct" class="ColorRGB" pass="in" description="The color assigned to MaxValue" />
+			<param name="NewImage" type="class" class="ImageData" pass="return" description="New Image with the according data. Pixel size and DPI will be equal to the field. Pixel format will be RGB24bit." />
+		</method>		
+		
+		<method name="TransformField" description="Scales the field values with a factor and a translation.">
+			<param name="Scale" type="double" pass="in" description="A scaling factor will be applied to all values in the field." />
+			<param name="Offset" type="double" pass="in" description="The offset will be applied to all values in the field after scaling." />
+		</method>		
+
+		<method name="AddField" description="Adds another field to the field. Both fields MUST have the same pixel extensions.">
+			<param name="OtherField" type="class" class="DiscreteFieldData2D" pass="in" description="Field Instance to add" />
+			<param name="Scale" type="double" pass="in" description="A scaling factor will be applied to all values in the other field before adding." />
+			<param name="Offset" type="double" pass="in" description="The offset will be applied to all values in the field after scaling." />
+		</method>		
+
+		<method name="Duplicate" description="Creates a copy of the field.">
+			<param name="NewField" type="class" class="DiscreteFieldData2D" pass="return" description="Scaled Field Instance" />
+		</method>		
+
+	</class>
+
+
+	<class name="DataSeries" parent="Base" description="A data series of points.">
+	
+		<method name="GetName" description="Returns the name of the data series.">
+			<param name="Name" type="string" pass="return" description="Returns the name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns the UUID of the data series.">
+			<param name="UUID" type="string" pass="return" description="Returns uuid." />
+		</method>
+
+		<method name="Clear" description="Clears all entries of the data series.">
+		</method>
+
+		<method name="IsEmpty" description="Checks if data series is empty.">
+			<param name="EmptyValue" type="bool" pass="return" description="Returns true if data series has no entries." />
+		</method>
+
+		<method name="GetMinimum" description="Returns the minimum time stamp of the data series. Fails if data series is empty.">
+			<param name="MinimumInMicroSeconds" type="uint64" pass="return" description="Minimum time stamp in microseconds." />
+		</method>
+		
+		<method name="GetMaximum" description="Returns the maximum time stamp of the data series. Fails if data series is empty.">
+			<param name="MaximumInMicroSeconds" type="uint64" pass="return" description="Maximum time stamp in microseconds." />
+		</method>
+		
+		<method name="GetAllEntries" description="Returns all entries of the data series. Fails if data series is empty.">
+			<param name="EntryArray" type="structarray" class="TimeStreamEntry" pass="out" description="Data series entries will be written in this array." />
+		</method>
+		
+		<method name="SetAllEntries" description="Sets all entries of the data series. The time stamp array MUST be sorted in incrementing order, with no two time stamps being equal.">
+			<param name="EntryArray" type="structarray" class="TimeStreamEntry" pass="in" description="Data series entries to use." />
+		</method>
+		
+		<method name="SampleJournalVariable" description="Samples a journal variable.">
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="in" description="Journal variable to sample." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to generate." />
+			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
+		</method>
+		
+		<method name="GetVersion" description="Returns the incrementing change version of the data series.">
+			<param name="Version" type="uint32" pass="return" description="Version number. Increases with every change to the data." />
+		</method>
+
+		<method name="IncreaseVersion" description="Increases the version number of the data series.">
+		</method>
+
+		
+	</class>
+
+
+
+	<class name="MeshObject" parent="Base">
+	
+		<method name="GetName" description="Returns the name of the Mesh Object.">
+			<param name="Name" type="string" pass="return" description="Returns the name of the mesh object." />
+		</method>
+	
+		<method name="GetUUID" description="Returns the UUID of the mesh object.">
+			<param name="UUID" type="string" pass="return" description="Returns mesh uuid." />
+		</method>
+
+		<method name="GetTriangleCount" description="Returns the number of triangles.">
+			<param name="TriangleCount" type="uint32" pass="return" description="Number of triangles." />
+		</method>
+	
+		<method name="GetVertexCount" description="Returns the number of vertices.">
+			<param name="VertexCount" type="uint32" pass="return" description="Number of vertices." />
+		</method>
+
+	</class>
+
 
 	<class name="ToolpathPart" parent="Base">
 	
@@ -369,6 +685,43 @@
 		<method name="GetSegmentType" description="Retrieves the segment type.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Type" type="enum" class="ToolpathSegmentType" pass="return" description="Segment Type" />
+		</method>
+
+		<method name="GetSegmentIntegerAttribute" description="Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
+			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
+			<param name="Value" type="int64" pass="return" description="Attribute Value." />
+		</method>
+
+		<method name="GetSegmentDoubleAttribute" description="Retrieves the segment double attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
+			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
+			<param name="Value" type="double" pass="return" description="Attribute Value." />
+		</method>
+
+		<method name="HasCustomSegmentAttribute" description="Checks if a segment attribute is registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="ValueExists" type="bool" pass="return" description="Flag if attribute is registered." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeID" description="Finds a segment attribute ID. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeID" type="uint32" pass="return" description="ID of the attribute." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeType" description="Finds a segment attribute type. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="return" description="Type of the attribute." />
+		</method>
+
+		<method name="FindCustomSegmentAttributeInfo" description="Finds a segment attribute ID and type. Fails if attribute is not registered.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the attribute." />
+			<param name="AttributeID" type="uint32" pass="out" description="ID of the attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="out" description="Type of the attribute." />
 		</method>
 
 		<method name="GetSegmentPointCount" description="Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.">
@@ -504,6 +857,33 @@
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
+
+		<method name="GetMetaDataCount" description="Retrieves the number of metadata nodes in the build file.">
+			<param name="MetaDataCount" type="uint32" pass="return" description="Meta Data information." />
+		</method>		
+
+		<method name="GetMetaDataInfo" description="Returns the namespace and identifier of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="Namespace" type="string" pass="out" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="out" description="Name of the metadata" />
+		</method>		
+
+		<method name="GetMetaDataContent" description="Returns the metadata XML content of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
+		<method name="HasUniqueMetaData" description="Checks if a metadata exists in the build file.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="MetaDataExists" type="bool" pass="return" description="Returns true if metadata exists and is unique." />
+		</method>		
+
+		<method name="FindUniqueMetaData" description="Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
 		
 	</class>
 
@@ -514,8 +894,18 @@
 			<param name="StorageUUID" type="string" pass="return" description="Returns toolpath storage uuid." />
 		</method>
 	
+		<method name="GetBuildUUID" description="Returns UUID of the toolpath's build file.">
+			<param name="BuildUUID" type="string" pass="return" description="Returns build uuid." />
+		</method>
+
 		<method name="GetLayerCount" description="Returns layer count.">
 			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
+		</method>
+
+		<method name="RegisterCustomSegmentAttribute" description="Registers a new custom segment attribute to be read.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the custom attribute." />
+			<param name="AttributeName" type="string" pass="in" description="Name of the custom attribute." />
+			<param name="AttributeType" type="enum" class="ToolpathAttributeType" pass="in" description="Attribute Type." />
 		</method>
 
 		<method name="LoadLayer" description="Reads and returns a layer object.">
@@ -525,24 +915,6 @@
 		
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
-		</method>
-
-		<method name="HasMetaData" description="Checks if a metadata value exists for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="Exists" type="bool" pass="return" description="Returns if metadata exists." />
-		</method>
-
-		<method name="GetMetaDataValue" description="Returns the value of a metadata for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="MetaDataValue" type="string" pass="return" description="Returns the value" />
-		</method>
-			
-		<method name="GetMetaDataType" description="Returns the type of a metadata for this toolpath model.">
-			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
-			<param name="Name" type="string" pass="in" description="Name of metadata." />
-			<param name="MetaDataType" type="string" pass="return" description="Returns the type" />
 		</method>
 
 		<method name="GetPartCount" description="Retrieves the number of parts in the toolpath.">
@@ -576,6 +948,34 @@
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index to return." />
 			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
 		</method>		
+
+		<method name="GetMetaDataCount" description="Retrieves the number of metadata nodes in the build file.">
+			<param name="MetaDataCount" type="uint32" pass="return" description="Meta Data information." />
+		</method>		
+
+		<method name="GetMetaDataInfo" description="Returns the namespace and identifier of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="Namespace" type="string" pass="out" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="out" description="Name of the metadata" />
+		</method>		
+
+		<method name="GetMetaDataContent" description="Returns the metadata XML content of the given metadata index.">
+			<param name="MetaDataIndex" type="uint32" pass="in" description="Index of metadata to return (0-based)." />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
+		<method name="HasUniqueMetaData" description="Checks if a metadata exists in the build file.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="MetaDataExists" type="bool" pass="return" description="Returns true if metadata exists and is unique." />
+		</method>		
+
+		<method name="FindUniqueMetaData" description="Returns the given metadata XML content of the build file. Fails if metadata content does not exist or is not unique.">
+			<param name="Namespace" type="string" pass="in" description="Namespace of the metadata" />
+			<param name="Name" type="string" pass="in" description="Name of the metadata" />
+			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
+		</method>		
+
 
 	</class>
 
@@ -626,11 +1026,48 @@
 		</method>
 
 		<method name="AddBinaryData" description="Adds binary data to store with the build.">
-			<param name="Name" type="string" pass="in" description="Name of the attache data block." />
+			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
+			<param name="Name" type="string" pass="in" description="Name of the attache data" />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
+		
+		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+		
+		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+
+		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
+			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
+
+		<method name="LoadPNGImageByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+		
+		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+
+		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
+			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
 
 				
 	</class>
@@ -780,6 +1217,14 @@
 			<param name="Value" type="string" pass="return" description="returns the value of the attribute." />
 		</method>
 
+		<method name="IsValidUUID" description="Checks if the value is a valid UUID string.">
+			<param name="IsValid" type="bool" pass="return" description="returns if the value is a valid UUID string." />
+		</method>
+		
+		<method name="GetUUIDValue" description="Retrieves value of the attribute as UUID string. Fails if value is not a UUID string.">
+			<param name="Value" type="string" pass="return" description="returns the value of the attribute as normalized UUID string." />
+		</method>
+
 		<method name="IsValidInteger" description="Checks if the value is a valid integer in the given range.">
 			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value" />
 			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value" />
@@ -810,8 +1255,6 @@
 		</method>
 
 		<method name="GetBoolValue" description="Returns the value as bool. Fails if the value is not a valid boolean value, meaning an integer or true or false as string. The value will be trimmed and any character will be converted to lowercase.">
-			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
-			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
 			<param name="Value" type="bool" pass="return" description="returns the value ." />
 		</method>
 
@@ -819,6 +1262,10 @@
 			<param name="Value" type="string" pass="in" description="new value of the attribute." />
 		</method>
 		
+		<method name="SetUUIDValue" description="Sets the value of the attribute as UUID string.">
+			<param name="Value" type="string" pass="in" description="new value of the attribute. Fails if Value is not a UUID." />
+		</method>
+
 		<method name="SetIntegerValue" description="Sets the value of the attribute as integer.">
 			<param name="Value" type="int64" pass="in" description="new value of the attribute." />
 		</method>
@@ -847,6 +1294,14 @@
 			<param name="NameSpace" type="string" pass="return" description="returns the namespace of the node." />
 		</method>
 
+		<method name="GetTextContent" description="Retrieves the text content of the node. A node with text content MUST NOT have children.">
+			<param name="TextContent" type="string" pass="return" description="returns the text content of the node." />
+		</method>
+
+		<method name="SetTextContent" description="Sets the text content of the node. Call will fail if node has children.">
+			<param name="TextContent" type="string" pass="in" description="the new text content of the node." />
+		</method>
+
 		<method name="GetAttributeCount" description="Returns number of attributes.">
 			<param name="Count" type="uint64" pass="return" description="returns the number of attributes." />
 		</method>
@@ -867,6 +1322,79 @@
 			<param name="Name" type="string" pass="in" description="Name of the attribute." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if attribute does not exist. If falls, the call will return null if the attribute does not exist." />			
 			<param name="AttributeInstance" type="optionalclass" class="XMLDocumentAttribute" pass="return" description="XML Document attribute." />
+		</method>
+
+		<method name="GetAttributeValue" description="Returns string value of an attribute. Fails if attribute does not exist.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeIntegerValue" description="Returns integer value of an attribute. Fails if attribute does not exist or attribute is not an integer .">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="Value" type="int64" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeDoubleValue" description="Returns double value of an attribute. Fails if attribute does not exist or attribute is not a double value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
+			<param name="Value" type="double" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeBoolValue" description="Returns bool value of an attribute. Fails if attribute does not exist or attribute is not a boolean value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="bool" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeUUIDValue" description="Returns UUID value of an attribute. Fails if attribute does not exist or attribute value is not a UUID.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeValueDef" description="Returns string value of an attribute. Returns default value if attribute does not exist.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="string" pass="in" description="Default value." />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeIntegerValueDef" description="Returns integer value of an attribute. Returns default value if attribute does not exist or attribute is not an integer .">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="DefaultValue" type="int64" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="int64" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeDoubleValueDef" description="Returns double value of an attribute. Returns default value if attribute does not exist or attribute is not a double value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value" />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value" />
+			<param name="DefaultValue" type="double" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="double" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeBoolValueDef" description="Returns bool value of an attribute. Returns default value if attribute does not exist or attribute is not a boolean value.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="bool" pass="in" description="Default value." />
+			<param name="Value" type="bool" pass="return" description="Attribute value." />
+		</method>
+
+		<method name="GetAttributeUUIDValueDef" description="Returns UUID value of an attribute. Returns default value if attribute does not exist or attribute value is not a UUID.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of the attribute. If empty, it inherits the namespace of the node." />
+			<param name="Name" type="string" pass="in" description="Name of the attribute." />
+			<param name="DefaultValue" type="string" pass="in" description="Attribute value. MUST be a valid UUID" />
+			<param name="Value" type="string" pass="return" description="Attribute value." />
 		</method>
 
 		<method name="RemoveAttribute" description="Removes the attribute with a specific name. Does nothing if attribute does not exist.">
@@ -937,9 +1465,16 @@
 			<param name="ChildInstance" type="optionalclass" class="XMLDocumentNode" pass="return" description="returns child instance or null." />
 		</method>
 		
-		<method name="AddChild" description="Adds a new child with a specific name.">
+		<method name="AddChild" description="Adds a new child with a specific name. Fails if node has a non-empty text content.">
 			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
 			<param name="Name" type="string" pass="in" description="Name of the child." />
+			<param name="ChildInstance" type="class" class="XMLDocumentNode" pass="return" description="returns child instance." />
+		</method>
+
+		<method name="AddChildText" description="Adds a new child with text content and a specific name. Fails if node has a non-empty text content.">
+			<param name="NameSpace" type="string" pass="in" description="New namespace of the child. MUST be either an empty string for the root namespace, or previously being registered with the document." />
+			<param name="Name" type="string" pass="in" description="Name of the child." />
+			<param name="TextContent" type="string" pass="in" description="Text content of the child." />
 			<param name="ChildInstance" type="class" class="XMLDocumentNode" pass="return" description="returns child instance." />
 		</method>
 
@@ -1034,6 +1569,11 @@
 		<method name="RegisterNamespace" description="Registers a custom namespace prefix. Given Namespace MUST NOT have been in use before calling this function.">
 			<param name="Namespace" type="string" pass="in" description="name space to register" />
 			<param name="NamespacePrefix" type="string" pass="in" description="name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters." />
+		</method>	
+
+		<method name="ChangeNamespacePrefix" description="Changes the prefix of an existing Namespace. New Namespace MUST NOT have been in use before calling this function.">
+			<param name="OldNamespacePrefix" type="string" pass="in" description="name space prefix that is currently in use." />
+			<param name="NewNamespacePrefix" type="string" pass="in" description="name space prefix to use for the namespace. MUST NOT be in use, MUST NOT be an empty string or contain non-alphanumeric characters." />
 		</method>	
 			
 		<method name="GetRootNode" description="Returns root node of the document.">
@@ -1260,10 +1800,10 @@
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
 
-		<method name="Sleep" description="Sleeps for a definite amount of time.">
-			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleep." />
+		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
 		</method>
-		
+
 	</class>
 
 
@@ -1406,6 +1946,10 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
+		<method name="GetGlobalTimerInMicroseconds" description="Returns the global timer in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
 		<method name="LogMessage" description="logs a string as message">
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
@@ -1433,6 +1977,36 @@
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
 			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+		<method name="CreateDiscreteField2DFromImage" description="Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.">
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image instance containing the pixel data." />
+			<param name="BlackValue" type="double" pass="in" description="Value that the minimum color (black) shall be mapped to." />
+			<param name="WhiteValue" type="double" pass="in" description="Value that the maximum color (white) shall be mapped to." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
+
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
 	</class>
@@ -1590,6 +2164,326 @@
 	</class>
 
 
+	<class name="UniformJournalSampling" parent="Base" description="Result class for Journal Sampling">
+
+		<method name="GetVariableName" description="returns the name of the recorded variable.">
+			<param name="Name" type="string" pass="return" description="Path or name." />
+		</method>
+
+		<method name="GetNumberOfSamples" description="Returns the number of samples in the interval.">
+			<param name="NumberOfSamples" type="uint32" pass="return" description="Number of samples in the sampling." />
+		</method>
+
+		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="StartTimeStampInMicroSeconds" type="uint64" pass="return" description="Start Timestamp of Recording in microseconds." />
+		</method>
+	
+		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="EndTimeStampInMicroSeconds" type="uint64" pass="return" description="End Timestamp of Recording in microseconds." />
+		</method>
+
+		<method name="GetSample" description="Returns the timestamp and value of the given sample.">
+			<param name="Index" type="uint32" pass="in" description="Index of the sample. 0-based. MUST be smaller than NumberOfSamples." />
+			<param name="TimeStamp" type="uint64" pass="out" description="TimeStamp of the sample in MicroSeconds." />
+			<param name="Value" type="double" pass="out" description="Value of the sample in ms." />
+		</method>
+
+		<method name="GetAllSamples" description="Returns all timestamps and values of the sampling.">
+			<param name="Samples" type="structarray" class="TimeStreamEntry" pass="out" description="Array of Timestream entries, in increasing order." />
+		</method>
+
+	</class>
+
+
+	<class name="JournalVariable" parent="Base" description="Class for accessing journal statistics">
+	
+		<method name="GetVariableName" description="returns the name of the recorded variable.">
+			<param name="Name" type="string" pass="return" description="Path or name." />
+		</method>
+		
+		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="RecordingStartInMicroSeconds" type="uint64" pass="return" description="Start Timestamp of Recording in microseconds." />
+		</method>
+	
+		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
+			<param name="RecordingEndInMicroSeconds" type="uint64" pass="return" description="End Timestamp of Recording in microseconds." />
+		</method>
+
+		<method name="ComputeFullAverage" description="Calculates the average value over the full available time interval.">
+			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
+		</method>
+		
+		<method name="ComputeAverage" description="Calculates the average value over a time interval. Fails if no data is available in this time interval.">
+			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
+			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in ms. MUST be larger than Timestamp." />
+			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />
+			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
+		</method>
+		
+		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
+			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
+			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in microseconds." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
+			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
+			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
+			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
+		</method>
+
+		<method name="ReceiveRawTimeStream" description="Retrieves the raw timestream data of the variable.">
+			<param name="TimeStreamEntries" type="structarray" class="TimeStreamEntry" pass="out" description="All change events of the variable in the accessed interval." />
+		</method>
+		
+	</class>
+
+	<class name="Alert" parent="Base">
+	
+		<method name="GetUUID" description="Returns Alert UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns the alert uuid." />
+		</method>
+
+		<method name="GetAlertLevel" description="Returns Alert Level.">
+			<param name="Level" type="enum" class="AlertLevel" pass="return" description="Returns the alert level." />
+		</method>
+
+		<method name="GetIdentifier" description="Returns Alert Identifier.">
+			<param name="Identifier" type="string" pass="return" description="Returns the alert identifier." />
+		</method>
+	
+		<method name="GetReadableContextInformation" description="Returns Alert Custom Information.">
+			<param name="ReadableContextInformation" type="string" pass="return" description="Returns context information for the alert." />
+		</method>
+
+		<method name="NeedsAcknowledgement" description="Returns if the alert needs acknowledgement.">
+			<param name="Value" type="bool" pass="return" description="Flag if alert needs acknowledgement." />
+		</method>
+	
+		<method name="IsAcknowledged" description="Returns if the alert is acknowledged.">
+			<param name="Value" type="bool" pass="return" description="Flag if alert is acknowledged." />
+		</method>
+
+		<method name="GetAcknowledgementInformation" description="Returns details about the acknowledgement. Fails if the alert is not acknowledged.">
+			<param name="UserUUID" type="string" pass="out" description="User who acknowledged the alert." />
+			<param name="UserComment" type="string" pass="out" description="Comment of the acknowledgement." />
+			<param name="AckTime" type="string" pass="out" description="Timestamp in ISO8601 UTC format." />
+		</method>
+
+	</class>
+
+	<class name="AlertIterator" parent="Iterator">
+		<method name="GetCurrentAlert" description="Returns the alert the iterator points at.">
+			<param name="AlertInstance" type="handle" class="Alert" pass="return" description="returns the Alert instance."/>
+		</method>
+	</class>
+
+
+	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
+
+		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
+			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
+			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
+		</method>
+				
+		<method name="RetrieveJournalVariableFromTimeInterval" description = "Retrieves the history of a given variable in the system journal for an arbitrary time interval.">
+			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
+		</method>
+				
+		
+		<method name="StoreJournalMarker" description="Stores a journal marker tag at the current time stamp.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal." />
+			<param name="TimeStamp" type="uint64" pass="return" description="Returns the stored time stamp in microseconds." />
+		</method>
+
+		<method name="HasJournalMarker" description="Checks if a journal marker tag exists.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerExists" type="bool" pass="return" description="Returns true if the marker exists." />
+		</method>
+
+		<method name="RetrieveJournalMarker" description="Retrieves the first existing journal marker time stamp. Fails if marker does not exist.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple." />
+			<param name="TimeStampInMicroSeconds" type="uint64" pass="return" description="Returns the time stamp in microseconds." />
+		</method>
+		
+		<method name="RetrieveJournalMarkers" description="Retrieves all existing journal marker time stamps. Fails if no marker exists.">
+			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
+			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Returns an array of time stamps in microseconds." />
+		</method>
+		
+	
+	</class>
+
+	<class name="UserDetailList" parent="Base" description="List of user details at a certain snapshot time.">
+
+		<method name="Count" description="Result Number of Users in the list.">
+			<param name="UserCount" type="uint32" pass="return" description="Number of users in the list" />
+		</method>
+
+		<method name="GetUserProperties" description="Retrieves all the data of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+		
+		<method name="GetUsername" description="Retrieves the user name of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Username" type="string" pass="return" description="User name" />
+		</method>
+
+		<method name="GetUUID" description="Retrieves the UUID of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="UUID" type="string" pass="return" description="UUID of the user." />
+		</method>
+
+		<method name="GetDescription" description="Retrieves the description of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetRole" description="Retrieves the role of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetLanguage" description="Retrieves the language identifier of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language Identifier of the user." />
+		</method>
+		
+	</class>
+	
+	<class name="UserManagementHandler" parent="Base" description="Login handler instance">
+	
+		<method name="UserExists" description="Checks if a user exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
+		</method>
+	
+		<method name="GetUserProperties" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+		<method name="GetUserPropertiesByUUID" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+		<method name="GetUsernameByUUID" description="Retrieves a users name with a given UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="return" description="User name" />
+		</method>
+
+		<method name="GetUserUUID" description="Retrieves a users UUID. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="return" description="UUID of the user." />
+		</method>
+
+		<method name="GetUserDescription" description="Retrieves a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetUserDescriptionByUUID" description="Retrieves a users description by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetUserRole" description="Retrieves a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserRoleByUUID" description="Retrieves a users role by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserLanguage" description="Retrieves a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>
+		
+		<method name="GetUserLanguageByUUID" description="Retrieves a users language preference by user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>		
+
+		<method name="CreateUser" description="Creates a new user. Fails if the user already exists.">
+			<param name="Username" type="string" pass="in" description="User name to create. MUST be alphanumeric and not empty." />
+			<param name="Role" type="string" pass="in" description="Role of the new user. MUST NOT be empty." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+			<param name="Description" type="string" pass="in" description="Description of the new user." />
+			<param name="UUID" type="string" pass="return" description="UUID of the new user." />
+		</method>
+
+		<method name="SetUserLanguage" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserRole" description="Updates a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UserRole" type="string" pass="in" description="New Role identifier of the user." />
+		</method>
+
+		<method name="SetUserDescription" description="Updates a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="in" description="New Description of the user." />
+		</method>
+		
+		<method name="SetUserPassword" description="Updates a users password. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
+		<method name="SetUserLanguageByUUID" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserRoleByUUID" description="Updates a users role. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="UserRole" type="string" pass="in" description="New Role identifier of the user." />
+		</method>
+
+		<method name="SetUserDescriptionByUUID" description="Updates a users description. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="in" description="New Description identifier of the user." />
+		</method>
+		
+		<method name="SetUserPasswordByUUID" description="Updates a users password. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+		
+		<method name="GetActiveUsers" description="Returns a list of all users.">
+			<param name="ListInstance" type="class" class="UserDetailList" pass="return" description="Instance of active users." />		
+		</method>
+		
+
+	</class>	
+
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
 
 		<method name="GetMachineState" description="Retrieves the machine state">
@@ -1633,7 +2527,12 @@
 			<param name="DriverHandle" type="pointer" pass="out" description="Handle of the driver." />
 		</method>
 
-		<method name="GetBuildJob" description="Returns a instance of a build object.">
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
+
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
@@ -1771,8 +2670,32 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />	
 		</method>
 
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+		<method name="CreateDiscreteField2DFromImage" description="Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.">
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image instance containing the pixel data." />
+			<param name="BlackValue" type="double" pass="in" description="Value that the minimum color (black) shall be mapped to." />
+			<param name="WhiteValue" type="double" pass="in" description="Value that the maximum color (white) shall be mapped to." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>
+		
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetGlobalTimerInMicroseconds" description="Returns the global timer in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
 		</method>
 
 		<method name="GetTestEnvironment" description="Returns a test environment instance.">
@@ -1796,8 +2719,88 @@
 		</method>
 		
 
+		<method name="CheckUserPermission" description="Returns if the a user has a certain permission. Fails if user or permission is not known to the system.">
+			<param name="UserLogin" type="string" pass="in" description="Login of user to check" />
+			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
+			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
+		</method>
+		
+		<method name="CreateUserManagement" description="Returns a user management handler instance.">
+			<param name="UserManagementInstance" type="class" class="UserManagementHandler" pass="return" description="Returns a user management handler." />
+		</method>	
+		
+		<method name="GetCurrentJournal" description="Returns the journal instance of the current session.">
+			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
+		</method>	
+						
+		<method name="RegisterMeshFrom3MFResource" description="Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+
+		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
+		</method>	
+
+		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+				
+		<method name="CreateDataSeries" description="Creates a new empty data series object.">
+			<param name="Name" type="string" pass="in" description="Name to use for this data series. MUST NOT be an empty string." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="HasDataSeries" description="Checks if a data series exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="DataSeriesExists" type="bool" pass="return" description="returns true if series exists." />
+		</method>	
+
+		<method name="FindDataSeries" description="Finds a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="ReleaseDataSeries" description="Releases the memory of a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to release." />
+		</method>	
+		
+		<method name="CreateAlert" description="creates a new alert">
+			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
+			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
+			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+5
 	</class>
 
+	<class name="UIItem" parent="Base" description="Base item that represents a user interface element.">
+	
+		<method name="GetName" description="Returns the name of the user interface item. MUST be unique within its siblings.">
+			<param name="Name" type="string" pass="return" description="Returns the name." />
+		</method>
+	
+		<method name="GetPath" description="Returns the full path of the user interface item. MUST be unique.">
+			<param name="Path" type="string" pass="return" description="Returns the path." />
+		</method>
+
+		<method name="GetUUID" description="Returns the UUID of the time stream chart object.">
+			<param name="UUID" type="string" pass="return" description="Returns uuid." />
+		</method>
+	
+	</class>
 
 
 	<class name="UIEnvironment" parent="Base" description="Environment of the UI">
@@ -1841,13 +2844,18 @@
 			<param name="DialogUUID" type="string" pass="return" description="Dialog UUID. Will be set as sender for triggered events." />
 		</method>
 
-		<method name="RetrieveEventSender" description="returns name of the UI control that triggered the event.">
-			<param name="SenderName" type="string" pass="return" description="Name of the sender element." />
+		<method name="RetrieveEventSender" description="returns path of the UI control that triggered the event.">
+			<param name="SenderPath" type="string" pass="return" description="Path of the sender element." />
+		</method>
+
+		<method name="RetrieveEventSenderPage" description="returns name of the page of the UI control that triggered the event.">
+			<param name="PageName" type="string" pass="return" description="Page of the sender element." />
 		</method>
 
 		<method name="RetrieveEventSenderUUID" description="returns uuid of the UI control that triggered the event.">
 			<param name="SenderUUID" type="string" pass="return" description="Name of the sender uuid." />
 		</method>
+				
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
@@ -1992,6 +3000,10 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 		
+		<method name="GetGlobalTimerInMicroseconds" description="Returns the global timer in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
 		<method name="GetTestEnvironment" description="Returns a test environment instance.">
 			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
 		</method>
@@ -2011,7 +3023,127 @@
 			<param name="XMLData" type="basicarray" class="uint8" pass="in" description="XML Binary data." />
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
+
+		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
+		</method>
 		
+		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
+		</method>		
+	
+		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
+			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
+			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value of the field." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>	
+
+		<method name="CreateDiscreteField2DFromImage" description="Creates a discrete field from the greyscale values of an image. RGB colors in the image will be averaged to obtain a greyscale color.">
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image instance containing the pixel data." />
+			<param name="BlackValue" type="double" pass="in" description="Value that the minimum color (black) shall be mapped to." />
+			<param name="WhiteValue" type="double" pass="in" description="Value that the maximum color (white) shall be mapped to." />
+			<param name="OriginX" type="double" pass="in" description="Origin X of the field in mm." />
+			<param name="OriginY" type="double" pass="in" description="Origin Y of the field in mm." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Empty field instance." />
+		</method>
+		
+		<method name="CheckPermission" description="Returns if the current user has a certain permission. Fails if permission is not known to the system.">
+			<param name="PermissionIdentifier" type="string" pass="in" description="Permission identifier" />
+			<param name="UserHasPermission" type="bool" pass="return" description="Returns if the user has permission" />
+		</method>		
+		
+		<method name="GetCurrentUserLogin" description="Returns the current user login name.">
+			<param name="UserLogin" type="string" pass="return" description="Returns the current users login name." />
+		</method>	
+
+		<method name="GetCurrentUserDescription" description="Returns the current user description.">
+			<param name="UserDescription" type="string" pass="return" description="Returns the current users description." />
+		</method>	
+
+		<method name="GetCurrentUserRole" description="Returns the current user role identifier.">
+			<param name="UserRole" type="string" pass="return" description="Returns the current users role identifier." />
+		</method>		
+
+		<method name="GetCurrentUserLanguage" description="Returns the current users language identifier.">
+			<param name="UserLanguage" type="string" pass="return" description="Returns the current users language identifier." />
+		</method>		
+
+		<method name="GetCurrentUserUUID" description="Returns the current user UUID.">
+			<param name="UserUUID" type="string" pass="return" description="Returns the current user UUID." />
+		</method>		
+
+		<method name="CreateUserManagement" description="Returns a user management handler instance.">
+			<param name="UserManagementInstance" type="class" class="UserManagementHandler" pass="return" description="Returns a user management handler." />
+		</method>	
+		
+		<method name="GetCurrentJournal" description="Returns the journal instance of the current session.">
+			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
+		</method>	
+
+		<method name="RegisterMeshFrom3MFResource" description="Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+
+		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
+		</method>	
+
+		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+
+		<method name="CreateDataSeries" description="Creates a new empty data series object.">
+			<param name="Name" type="string" pass="in" description="Name to use for this data series. MUST NOT be an empty string." />
+			<param name="BoundToLogin" type="bool" pass="in" description="If true, the data series is tied to the current user login session. If false, the data series will persist until explicitely released. This can be dangerous for the overall machine stability." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="HasDataSeries" description="Checks if a data series exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="DataSeriesExists" type="bool" pass="return" description="returns true if series exists." />
+		</method>	
+
+		<method name="FindDataSeries" description="Finds a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to find." />
+			<param name="Instance" type="class" class="DataSeries" pass="return" description="Data series instance." />
+		</method>	
+
+		<method name="ReleaseDataSeries" description="Releases the memory of a data series. Fails if data series does not exist.">
+			<param name="DataSeriesUUID" type="string" pass="in" description="UUID to release." />
+		</method>	
+		
+		<method name="CreateAlert" description="creates a new alert">
+			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
+			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="AcknowledgeAlert" description="Acknowledges an alert for the current user. ">
+			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+		
+		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
+			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
 		
 	</class>
 

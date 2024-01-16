@@ -36,10 +36,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "amc_statesignalhandler.hpp"
 #include "amc_driverhandler.hpp"
+#include "amc_alerthandler.hpp"
+#include "amc_dataserieshandler.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_ui_systemstate.hpp"
 #include "amc_statemachinedata.hpp"
+#include "amc_accesscontrol.hpp"
+#include "amc_stringresourcehandler.hpp"
+#include "amc_languagehandler.hpp"
+#include "amc_meshhandler.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -51,12 +58,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, const std::string& sTestEnvironmentPath)
-		: m_sTestEnvironmentPath (sTestEnvironmentPath)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath)
+		: m_sTestEnvironmentPath (sTestEnvironmentPath), m_pStateJournal (pStateJournal)
 	{
 		LibMCAssertNotNull(pLogger.get());
 		LibMCAssertNotNull(pDataModel.get());
 		LibMCAssertNotNull(pEnvWrapper.get());
+		LibMCAssertNotNull(pStateJournal.get());
 
 		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
 
@@ -66,18 +74,27 @@ namespace AMC {
 		// Retrieve Installation UUID and Secret
 		m_pDataModel->GetInstallationInformation(m_sInstallationUUID, m_sInstallationSecret);
 
+		m_pAccessControl = std::make_shared<CAccessControl> ();
+		m_pStringResourceHandler = std::make_shared<CStringResourceHandler> ();
+
 		// Create Data Model Instances
 		m_pStorage = m_pDataModel->CreateStorage();
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
 		m_pPersistencyHandler = m_pDataModel->CreatePersistencyHandler();
 
-		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger);
+		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger, m_pBuildJobHandler, m_pStorage, m_pGlobalChrono, getSystemUserID ());
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger, getTestEnvironmentPath ());
+		m_pLanguageHandler = std::make_shared<CLanguageHandler>();
+		m_pMeshHandler = std::make_shared<CMeshHandler>();
+		m_pDataSeriesHandler = std::make_shared<CDataSeriesHandler>();
+		m_pAlertHandler = std::make_shared<CAlertHandler>();
+
+		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono);
+		m_pUIHandler = std::make_shared<CUIHandler>(pEnvWrapper, pUISystemState);
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
 		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
@@ -93,6 +110,21 @@ namespace AMC {
 
 	CSystemState::~CSystemState()
 	{
+		m_pDriverHandler = nullptr;
+		m_pUIHandler = nullptr;
+		m_pStateMachineData = nullptr;
+		m_pToolpathHandler = nullptr;
+		m_pServiceHandler = nullptr;
+		m_pSignalHandler = nullptr;
+		m_pAlertHandler = nullptr;
+
+		m_pPersistencyHandler = nullptr;
+		m_pLoginHandler = nullptr;
+		m_pBuildJobHandler = nullptr;
+		m_pStorage = nullptr;
+		m_pDataModel = nullptr;
+
+		m_pLogger = nullptr;
 	}
 
 	CLogger* CSystemState::logger()
@@ -129,9 +161,22 @@ namespace AMC {
 	CStateMachineData* CSystemState::stateMachineData()
 	{
 		return m_pStateMachineData.get();
-
 	}
 
+	CAccessControl* CSystemState::accessControl()
+	{
+		return m_pAccessControl.get();
+	}
+
+	CAlertHandler* CSystemState::alertHandler()
+	{
+		return m_pAlertHandler.get();
+	}
+
+	AMC::CStringResourceHandler* CSystemState::stringResourceHandler()
+	{
+		return m_pStringResourceHandler.get();
+	}
 
 
 	PLogger CSystemState::getLoggerInstance()
@@ -154,6 +199,38 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
+	PStateJournal CSystemState::getStateJournalInstance()
+	{
+		return m_pStateJournal;
+	}
+
+	PAccessControl CSystemState::getAccessControlInstance()
+	{
+		return m_pAccessControl;
+	}
+
+	PLanguageHandler CSystemState::getLanguageHandlerInstance()
+	{
+		return m_pLanguageHandler;
+	}
+
+	PMeshHandler CSystemState::getMeshHandlerInstance()
+	{
+		return m_pMeshHandler;
+	}
+
+	PDataSeriesHandler CSystemState::getDataSeriesHandlerInstance()
+	{
+		return m_pDataSeriesHandler;
+	}
+
+	PAlertHandler CSystemState::getAlertHandlerInstance()
+	{
+		return m_pAlertHandler;
+	}
+
+
+
 	PStateMachineData CSystemState::getStateMachineData()
 	{
 		return m_pStateMachineData;
@@ -163,6 +240,11 @@ namespace AMC {
 	LibMCData::PLoginHandler CSystemState::getLoginHandlerInstance()
 	{
 		return m_pLoginHandler;
+	}
+
+	LibMCData::PStorage CSystemState::getStorageInstance()
+	{
+		return m_pStorage;
 	}
 
 	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()
@@ -178,8 +260,14 @@ namespace AMC {
 	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
 	{
 		return m_pGlobalChrono;
-
 	}
+
+	LibMCData::PAlertSession CSystemState::createAlertSession()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_DataModelMutex);
+		return m_pDataModel->CreateAlertSession();
+	}
+
 
 	LibMCData::CStorage * CSystemState::storage()
 	{

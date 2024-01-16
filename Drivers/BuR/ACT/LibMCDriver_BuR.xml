@@ -136,6 +136,10 @@
 		<error name="COULDNOTWRITETOPAYLOAD" code="1080" description="Could not write to payload." />
 		<error name="INVALIDPAYLOADADDRESS" code="1081" description="Invalid payload address." />
 		<error name="COULDNOTREINITIALIZEMACHINE" code="1082" description="Could not reinitialize machine." />						
+		<error name="UNKNOWNDRIVERPROTOCOLVERSION" code="1083" description="Unknown driver protocol version." />						
+		<error name="NOTCPPROTOCOLNODE" code="1084" description="No TCP Protocol Node." />						
+		<error name="NOPACKETSIGNATURE" code="1085" description="No Packet Signature." />						
+		<error name="INVALIDPACKETSIGNATURE" code="1086" description="Invalid Packet Signature." />						
 		
 		
 	</errors>

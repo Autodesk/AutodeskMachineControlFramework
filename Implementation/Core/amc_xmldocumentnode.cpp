@@ -99,12 +99,19 @@ void CXMLDocumentNodeInstance::storeToPugiNode(pugi::xml_document* pXMLDocument,
 		attribute.set_value(sAttributeValue.c_str());
 	}
 
-	for (auto pChild : m_Children) {
-		std::string sChildName = pChild->getPrefixedName();
+	if (m_sTextContent.empty()) {
+		for (auto pChild : m_Children) {
+			std::string sChildName = pChild->getPrefixedName();
 
-		auto child = pXMLNode->append_child(sChildName.c_str());
-		pChild->storeToPugiNode(pXMLDocument, &child);
+			auto child = pXMLNode->append_child(sChildName.c_str());
+			pChild->storeToPugiNode(pXMLDocument, &child);
+		}
 	}
+	else {
+		pXMLNode->text().set (m_sTextContent.c_str());
+	}
+
+	
 }
 
 CXMLDocumentInstance* CXMLDocumentNodeInstance::getDocument()
@@ -128,6 +135,28 @@ PXMLDocumentNameSpace CXMLDocumentNodeInstance::GetNameSpace()
 {
 	return m_pNameSpace;
 }
+
+
+std::string CXMLDocumentNodeInstance::GetTextContent()
+{
+	return m_sTextContent;
+}
+
+void CXMLDocumentNodeInstance::SetTextContent(const std::string& sTextContent)
+{
+	if (sTextContent.empty())
+	{
+		m_sTextContent = "";
+	}
+	else {
+		if (m_Children.size() > 0)
+			throw ELibMCInterfaceException(LIBMC_ERROR_XMLNODEHASCHILDREN);
+
+		m_sTextContent = sTextContent;
+
+	}
+}
+
 
 uint64_t CXMLDocumentNodeInstance::GetAttributeCount()
 {	
@@ -285,6 +314,9 @@ PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(PXMLDocumentNameSpac
 {
 	if (pNameSpace.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	if (!m_sTextContent.empty ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_XMLNODEHASTEXTCONTENT);
 
 	auto pNode = std::make_shared<CXMLDocumentNodeInstance>(m_pDocument, this, pNameSpace, sName);
 

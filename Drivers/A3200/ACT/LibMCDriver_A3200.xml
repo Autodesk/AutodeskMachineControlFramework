@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="MC Driver A3200" namespace="LibMCDriver_A3200" copyright="Autodesk Inc." year="2023" basename="libmcdriver_a3200"
+	version="2.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1001" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="1002" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="1003" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="1004" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="1005" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="1006" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="1007" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="1008" description="the version of the binary interface does not match the bindings interface" />
+		<error name="DRIVERERROR" code="1009" description="a driver error occured" />
+		<error name="DRIVERNOTINITIALISED" code="1010" description="the driver is not initialised" />
+		<error name="DRIVERNOTCONNECTED" code="1011" description="the driver is not connected" />
+		<error name="INVALIDDRIVERPROTOCOL" code="1012" description="invalid driver protocol definition" />
+		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1013" description="could not parse driver protocol" />		
+		<error name="NOWORKINGDIRECTORY" code="1015" description="No working directory" />				
+		<error name="INVALIDTASKID" code="1016" description="Invalid task ID" />				
+		<error name="VERSIONMISMATCH" code="1" description="An incompatible version was detected" />
+		<error name="FEATURELOCKED" code="2" description="A license error occurred" />
+		<error name="UNSUPPORTEDHARDWARE" code="3" description="A connected hardware type is no longer supported" />
+		<error name="RESETTIMEOUT" code="6" description="A timeout occurred while waiting for the controller reset to finish." />
+		<error name="ALLOCATIONFAILED" code="8" description="An attempt to allocate memory on the SMC failed" />
+		<error name="NOTCONNECTED" code="9" description="The specified controller handle is invalid" />
+		<error name="INVALIDAXISINDEX" code="10" description="The specified axis index is invalid." />
+		<error name="TOOLTABLEERROR" code="11" description="A problem occurred with a tool table" />
+		<error name="DRIVECOMMANDLOST" code="12" description="A drive command was overwritten and lost." />
+		<error name="DRIVECOMMANDRESPONSE" code="13" description="A timeout occurred while waiting for a drive response" />
+		<error name="FIREWIREISONCHRONOUSERROR" code="14" description="An error occurred with isochronous communication" />
+		<error name="FIREWIREASYNCHRONOUSERROR" code="15" description="An error occurred during an asynchronous communication" />
+		<error name="PCMODBUSERROR" code="16" description="An error occurred with PC Modbus communication" />
+		<error name="COMMUNICATIONLOST" code="17" description="FireWire communications were interrupted." />
+		<error name="ETHERNETCOMMUNICATIONLOST" code="18" description="Ethernet communications were interrupted." />
+		<error name="SERVICECOMMUNICATIONLOST" code="19" description="Communication Service communications were interrupted." />
+		<error name="FIREWIRECARDCONFIGURATION" code="20" description="The FireWire card configuration is invalid." />
+		<error name="PCICARDERROR" code="21" description="A problem exists with PCI card configuration." />
+		<error name="AXISMISMATCH" code="22" description="An incorrect number of axes are attached." />
+		<error name="TASKMISMATCH" code="23" description="An insufficient number of tasks are enabled." />
+		<error name="INVALIDCOMMANDLINE" code="24" description="An invalid SMC command line argument was specified." />
+		<error name="MACHINECONFIGURATION" code="25" description="An error occurred while accessing the machine configuration." />
+		<error name="FIREWIRECONFIGURATION" code="28" description="An error was detected in the FireWire configuration." />
+		<error name="GANTRYCONFIGURATION" code="29" description="An error gantry configuration was detected." />
+		<error name="CALLBACKTIMEOUT" code="31" description="A timeout occurred while responding to a callback." />
+		<error name="CALLBACKERROR" code="32" description="A timeout occurred while responding to a callback." />
+		<error name="TOOMANYSTATUSITEMS" code="33" description="The maximum number of status items was exceeded." />
+		<error name="PROGRAMERROR" code="34" description="An error occurred in program execution." />
+		<error name="STRINGOVERFLOW" code="35" description="The maximum string length was exceeded." />
+		<error name="DIVIDEBYZERO" code="36" description="A divide-by-zero was detected." />
+		<error name="PROGRAMTIMEOUT" code="37" description="A program timeout occurred." />
+		<error name="PROFILEQUEUEERROR" code="38" description="An error occurred in the execution queue" />
+		<error name="INVALIDARGUMENT" code="39" description="An invalid argument was specified." />
+		<error name="PARAMETERNOTPASSED" code="40" description="A callstack argument was not passed to a subroutine." />
+		<error name="QUEUEBUFFERFULL" code="41" description="The buffered program queue is full." />
+		<error name="NULLPROGRAMLINE" code="42" description="A NULL code line pointer was specified." />
+		<error name="PROGRAMNUMBEROUTOFBOUNDS" code="43" description="The specified program number is outside of the valid range of values." />
+		<error name="CANNEDFUNCTIONERROR" code="44" description="An error occurred with a canned function." />
+		<error name="ZEROSPEED" code="46" description="The move speed is zero." />
+		<error name="STACKERROR" code="47" description="A stack error occurred." />
+		<error name="SLICEERROR" code="48" description="An error occurred while executing the SLICE command." />
+		<error name="LOOKAHEADERROR" code="49" description="A error occurred while performing lookahead." />
+		<error name="RETRACEERROR" code="50" description="An error occurred while doing retrace." />
+		<error name="AXISINFAULT" code="51" description="An axis fault occurred." />
+		<error name="AXISNOTENABLED" code="52" description="The axis is not enabled." />
+		<error name="MOTIONERROR" code="53" description="An error occurred with a motion command." />
+		<error name="GANTRYMOTIONERROR" code="54" description="An error occurred while performing gantry motion." />
+		<error name="CUTTERCOMPENSATIONERROR" code="55" description="An error occurred while peforming cutter compensation." />
+		<error name="CIRCULARMOTIONERROR" code="56" description="An error occurred while performing circular motion." />
+		<error name="CIRCULARRADIUSERROR" code="57" description="A circular radius error occurred." />
+		<error name="NORMALCYERROR" code="58" description="An error occurred while performing normalcy." />
+		<error name="MOTIONTYPEMISMATCH" code="59" description="A LINEAR move is required to execute this command." />
+		<error name="SPINDLENUMBERNOTASSIGNED" code="60" description="The specified spindle is not assigned to an axis." />
+		<error name="ELLIPTICALMOTIONERROR" code="61" description="An error occurred while performing elliptical motion." />
+		<error name="MOTIONACTIVE" code="62" description="Motion is already active." />
+		<error name="AXISNOTDEPENDENT" code="63" description="This feature is only available on dependent axes." />
+		<error name="AXISNOTDOMINANT" code="64" description="This feature is only available on dominant axes." />
+		<error name="NOJOYSTICKGROUPS" code="65" description="No joystick groups have been specified." />
+		<error name="TRANSFORMATIONERROR" code="66" description="An error occurred performing a transformation." />
+		<error name="CALIBRATIONTABLEERROR" code="67" description="An error occurred with a calibration table." />
+		<error name="CAMTABLEERROR" code="68" description="An error occurred with a cam table command." />
+
+	</errors>
+
+	
+<!--
+
+This base Driver interface MUST be in Sync with LibMCDriver.xml
+
+-->
+	
+	<class name="Base">
+	</class>
+
+	
+	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
+	
+		<method name="GetName" description = "returns the name identifier of the driver">
+			<param name="Name" type="string" pass="return" description="Name of the driver." />
+		</method>
+
+		<method name="GetType" description = "returns the type identifier of the driver">
+			<param name="Type" type="string" pass="return" description="Type of the driver." />
+		</method>
+
+		<method name="GetVersion" description = "returns the version identifiers of the driver">
+			<param name="Major" type="uint32" pass="out" description="Major version." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version." />
+			<param name="Micro" type="uint32" pass="out" description="Micro version." />
+			<param name="Build" type="string" pass="out" description="Build identifier." />
+		</method>
+				
+		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should only be called in the driver thread.">
+		</method>
+		
+		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
+			<param name="DriverUpdateInstance" type="class" class="LibMCEnv:DriverStatusUpdateSession" pass="in" description="Status update instance." />
+		</method>
+	
+	</class>
+
+<!--
+
+End Interface
+
+-->
+
+
+<!--
+
+Custom implementation
+
+-->
+
+
+	<class name="Driver_A3200" parent="Driver" description="A Driver for a Aerotech A3200 machine controller system.">
+
+		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
+		</method>
+		
+		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
+			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
+		</method>	
+		
+		<method name="SetCustomSDKResource" description="Sets the machine resource name of the A3200 SDK to load. MUST be called before Connect or it has no effect.">
+			<param name="CoreResourceName" type="string" pass="in" description="Resource name of core library DLL. Empty means standard naming a3200c64 applies." />
+			<param name="SystemResourceName" type="string" pass="in" description="Resource name of system library DLL. Empty means standard naming a32sys64 applies." />
+			<param name="CompilerResourceName" type="string" pass="in" description="Resource name of compiler library DLL. Empty means standard naming a32cmplr64 applies." />
+			<param name="UtilitiesResourceName" type="string" pass="in" description="Resource name of utilities library DLL. Empty means standard naming aerutilities64 applies." />
+			<param name="LicenseDecoderResourceName" type="string" pass="in" description="Resource name of license decoder library DLL. Empty means standard naming licensedecoder64 applies." />
+		</method>		
+
+		<method name="SetCustomSDK" description="Sets the machine resource name of the A3200 SDK to load. MUST be called before Connect or it has no effect.">
+			<param name="CoreSDKBuffer" type="basicarray" class="uint8" pass="in" description="Binary array of core library DLL. Empty means standard resource naming a3200c64 applies." />
+			<param name="SystemSDKBuffer" type="basicarray" class="uint8" pass="in" description="Binary array of system library DLL. Empty means standard resource naming a32sys64 applies." />
+			<param name="CompilerSDKBuffer" type="basicarray" class="uint8" pass="in" description="Binary array of compiler library DLL. Empty means standard resource naming a32cmplr64 applies." />
+			<param name="UtilitiesSDKBuffer" type="basicarray" class="uint8" pass="in" description="Binary array of utilities library DLL. Empty means standard resource naming aerutilities64 applies." />
+			<param name="LicenseDecoderSDKBuffer" type="basicarray" class="uint8" pass="in" description="Binary array of license decoder library DLL. Empty means resource standard naming licensedecoder64 applies." />
+		</method>		
+
+		<method name="Connect" description= "Connects to the A3200 PLC Controller.">
+		</method>
+
+		<method name="Disconnect" description= "Disconnects from the A3200 PLC Controller.">
+		</method>
+
+		<method name="RunScript" description="Runs an AeroBasic script on a PLC task.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID to run the script on. MUST be between 1 and 31." />
+			<param name="Script" type="string" pass="in" description="AeroBasic script as string." />				
+		</method>
+		
+		<method name="RunCommand" description="Runs a single AeroBasic command on a PLC task.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID to run the script on. MUST be between 1 and 31." />
+			<param name="Command" type="string" pass="in" description="AeroBasic command as string." />				
+		</method>
+
+		<method name="StopProgram" description="Stops a running program on a task.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID to stop. MUST be between 1 and 31." />
+			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+		</method>
+
+		<method name="ReadGlobalNumberVariable" description="Returns a global number variable.">
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="double" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteGlobalNumberVariable" description="Sets a global number variable.">
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="double" pass="in" description="Value of variable to set." />				
+		</method>
+
+		<method name="ReadGlobalStringVariable" description="Returns a global string variable.">
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="string" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteGlobalStringVariable" description="Sets a global string variable.">
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="string" pass="in" description="Value of variable to set." />				
+		</method>
+
+		<method name="ReadTaskNumberVariable" description="Returns a task number variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="double" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteTaskNumberVariable" description="Sets a task number variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="double" pass="in" description="Value of variable to set." />				
+		</method>
+
+		<method name="ReadTaskStringVariable" description="Returns a task string variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to return" />				
+			<param name="Value" type="string" pass="return" description="Value of variable" />				
+		</method>
+
+		<method name="WriteTaskStringVariable" description="Sets a task string variable.">
+			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
+			<param name="Name" type="string" pass="in" description="Variable to set" />				
+			<param name="Value" type="string" pass="in" description="Value of variable to set." />				
+		</method>
+
+	</class>
+
+
+
+
+<!--
+
+End of Custom implementation
+
+-->
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
+			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
+			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="Instance" type="optionalclass" class="Driver" pass="return" description="New Driver instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

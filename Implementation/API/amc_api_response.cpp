@@ -98,3 +98,41 @@ std::vector<uint8_t>& CAPIFixedBufferResponse::getBuffer()
 {
 	return m_StreamData;
 }
+
+CAPIFixedFloatBufferResponse::CAPIFixedFloatBufferResponse(const std::string& sContentType)
+	: CAPIResponse(AMC_API_HTTP_SUCCESS, sContentType), m_nWriteIndex (0)
+{
+
+}
+
+void CAPIFixedFloatBufferResponse::resizeTo(size_t nFloatCount)
+{
+	size_t nByteCount = sizeof(float) * nFloatCount;
+	m_StreamData.resize(nByteCount);
+
+	for (auto& it : m_StreamData)
+		it = 0;
+}
+
+void CAPIFixedFloatBufferResponse::resetWriting()
+{
+	m_nWriteIndex = 0;
+}
+
+void CAPIFixedFloatBufferResponse::addFloat(float fValue)
+{
+	size_t nStartAddress = m_nWriteIndex * 4;
+	if ((nStartAddress + 4) > m_StreamData.size())
+		throw ELibMCInterfaceException(LIBMC_ERROR_FIXEDFLOATBUFFEROVERRUN);
+
+	uint8_t* pTarget = &m_StreamData.at(nStartAddress);
+	uint8_t* pSource = (uint8_t*)&fValue;
+
+	for (size_t nIndex = 0; nIndex < 4; nIndex++)
+		pTarget[nIndex] = pSource[nIndex];
+
+	m_nWriteIndex++;
+
+
+
+}

@@ -51,8 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <script>
 
 	export default {
-	  props: ["Application", "moduleitem"],
-	  
+	  props: ["Application", "moduleitem"]
+	 
 	};
 	
 </script>

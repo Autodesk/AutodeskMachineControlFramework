@@ -157,6 +157,21 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION 1050 /** No version definition. */
 #define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME 1051 /** Duplicate configuration preset name. */
 #define LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS 1052 /** OIE PID Variable out of bounds. */
+#define LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10 1053 /** Timelag must be a multiple of 10 microseconds. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX 1054 /** Invalid Encoder Scaling in X */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY 1055 /** Invalid Encoder Scaling in Y */
+#define LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR 1056 /** On the fly marking error */
+#define LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED 1057 /** Mark on the fly is disabled */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES 1058 /** Invalid laser field coordinates */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET 1059 /** No laser field has been set. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX 1060 /** Invalid free variable index. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT 1061 /** Duplicate laser power calibration set point. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT 1062 /** Invalid power calibration set point. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING 1063 /** Invalid power calibration output scaling. */
+#define LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED 1064 /** Power calibration lookup failed. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK 1065 /** Invalid modulation callback. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD 1066 /** Invalid subdivision threshold. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID 1067 /** Multiple laser ports are not compatible with PID control. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -226,6 +241,21 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_NOVERSIONDEFINITION: return "No version definition.";
     case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECONFIGURATIONPRESETNAME: return "Duplicate configuration preset name.";
     case LIBMCDRIVER_SCANLAB_ERROR_OIEPIDVARIABLEOUTOFBOUNDS: return "OIE PID Variable out of bounds.";
+    case LIBMCDRIVER_SCANLAB_ERROR_TIMELAGMUSTBEAMULTIPLEOF10: return "Timelag must be a multiple of 10 microseconds.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX: return "Invalid Encoder Scaling in X";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY: return "Invalid Encoder Scaling in Y";
+    case LIBMCDRIVER_SCANLAB_ERROR_ONTHEFLYMARKINGERROR: return "On the fly marking error";
+    case LIBMCDRIVER_SCANLAB_ERROR_MARKONTHEFLYISDISABLED: return "Mark on the fly is disabled";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES: return "Invalid laser field coordinates";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOLASERFIELDSET: return "No laser field has been set.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDFREEVARIABLEINDEX: return "Invalid free variable index.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT: return "Duplicate laser power calibration set point.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONSETPOINT: return "Invalid power calibration set point.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOWERCALIBRATIONOUTPUTSCALING: return "Invalid power calibration output scaling.";
+    case LIBMCDRIVER_SCANLAB_ERROR_POWERCALIBRATIONLOOKUPFAILED: return "Power calibration lookup failed.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMODULATIONCALLBACK: return "Invalid modulation callback.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "Invalid subdivision threshold.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID: return "Multiple laser ports are not compatible with PID control.";
     default: return "unknown error";
   }
 }
@@ -262,7 +292,8 @@ namespace LibMCDriver_ScanLab {
     Port8bitDigital = 1,
     Port16bitDigital = 2,
     Port12BitAnalog1 = 3,
-    Port12BitAnalog2 = 4
+    Port12BitAnalog2 = 4,
+    Port12BitAnalog1andAnalog2 = 5
   };
   
   enum class eOIEOperationMode : LibMCDriver_ScanLab_int32 {
@@ -298,7 +329,31 @@ namespace LibMCDriver_ScanLab {
       LibMCDriver_ScanLab_single m_Y2;
   } sHatch2D;
   
+  typedef struct sLaserCalibrationPoint {
+      LibMCDriver_ScanLab_double m_PowerSetPointInPercent;
+      LibMCDriver_ScanLab_double m_PowerOffsetInPercent;
+      LibMCDriver_ScanLab_double m_PowerOutputScaling;
+  } sLaserCalibrationPoint;
+  
   #pragma pack ()
+  
+  /*************************************************************************************************************************
+   Declaration of function pointers 
+  **************************************************************************************************************************/
+  
+  /**
+  * SpatialPowerModulationCallback - A callback function to modulate laser power depending on the position of the laser.
+  *
+  * @param[in] dStartX - The X start position of the marking in mm
+  * @param[in] dStartY - The Y start position of the marking in mm
+  * @param[in] dTargetX - The X target position of the marking in mm
+  * @param[in] dTargetY - The Y target position of the marking in mm
+  * @param[in] dLaserPowerInPercent - The nominal laser power to be used in percent.
+  * @param[in] nModulationType - A type ID from the build file that specifies the modulation type to use.
+  * @param[in] pUserData - Userdata that is passed to the callback function
+  * @param[out] pAdjustedLaserPowerInPercent - Returns the adjusted laser power in percent.
+  */
+  typedef void(*SpatialPowerModulationCallback)(LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_double, LibMCDriver_ScanLab_int32, LibMCDriver_ScanLab_pvoid, LibMCDriver_ScanLab_double *);
   
 } // namespace LibMCDriver_ScanLab;
 
@@ -309,5 +364,7 @@ typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationM
 typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;
+typedef LibMCDriver_ScanLab::sLaserCalibrationPoint sLibMCDriver_ScanLabLaserCalibrationPoint;
+typedef LibMCDriver_ScanLab::SpatialPowerModulationCallback LibMCDriver_ScanLabSpatialPowerModulationCallback;
 
 #endif // __LIBMCDRIVER_SCANLAB_TYPES_HEADER_CPP

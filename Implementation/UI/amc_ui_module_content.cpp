@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_contentitem_paragraph.hpp"
 #include "amc_ui_module_contentitem_image.hpp"
+#include "amc_ui_module_contentitem_chart.hpp"
 #include "amc_ui_module_contentitem_buttongroup.hpp"
 #include "amc_ui_module_contentitem_buildlist.hpp"
 #include "amc_ui_module_contentitem_parameterlist.hpp"
@@ -94,6 +95,8 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, const std::string&
 			addItem(CUIModule_ContentParagraph::makeFromXML(childNode, sItemName, m_sModulePath));
 		if (sChildName == "image") 
 			addItem(CUIModule_ContentImage::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "chart")
+			addItem(CUIModule_ContentChart::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
 		if (sChildName == "form")
 			addItem(CUIModule_ContentForm::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
 		if (sChildName == "buildlist")

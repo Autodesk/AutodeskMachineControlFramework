@@ -59,7 +59,7 @@ export default class AMCUpload extends Common.AMCObject {
 		
 		// Get upload size and chunk count
 		this.fileSize = Assert.IntegerValue (this.fileToUpload.size);
-		this.chunkSize = 128 * 1024;		
+		this.chunkSize = 16 * 1024 * 1024;		
 		if (this.fileSize <= 0)
 			throw "invalid upload size";		
 		this.chunkCount = Math.floor ((this.fileSize + this.chunkSize - 1) / this.chunkSize);

@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CAPISession, PAPISession);
+	amcDeclareDependingClass(CUserInformation, PUserInformation);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CAPISession {
@@ -58,6 +59,11 @@ namespace AMC {
 		std::string m_sToken;
 		PParameterHandler m_pClientVariableHandler;
 
+		std::string m_sUserUUID;
+		std::string m_sUserDescription;
+		std::string m_sUserLanguageIdentifier;
+		std::string m_sUserRoleIdentifier;
+
 		bool m_bAuthenticated;		
 					
 	public:
@@ -68,13 +74,19 @@ namespace AMC {
 		std::string getUUID ();		
 		std::string getKey ();
 		std::string getUserName ();
+		std::string getUserUUID();
+		std::string getUserDescription();
+		std::string getUserLanguageIdentifier();
+		std::string getUserRoleIdentifier();
 		std::string getToken ();
 		bool isAuthenticated ();
 		
 		void authorizeSessionByPassword(const std::string & sSaltedPasswordHash, const std::string & sClientKey);
-		void setUserDetails(const std::string& sUserName, const std::string & sHashedPassword);
+		void setUserDetails(const std::string& sUserName, const std::string & sHashedPassword, const std::string& sUserUUID, const std::string& sUserDescription, const std::string& sUserRoleIdentifier, const std::string& sUserLanguageIdentifier);
 
 		PParameterHandler getClientVariableHandler();
+
+		PUserInformation createUserInformation();
 								
 	};
 

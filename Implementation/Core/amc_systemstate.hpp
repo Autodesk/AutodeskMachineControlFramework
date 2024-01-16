@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <map>
+#include <mutex>
 #include <string>
 
 namespace LibMCData {
@@ -42,12 +43,14 @@ namespace LibMCData {
 	class CBuildJobHandler;
 	class CLoginHandler;
 	class CPersistencyHandler;
+	class CAlertSession;
 
 	typedef std::shared_ptr<CDataModel> PDataModel;
 	typedef std::shared_ptr<CStorage> PStorage;
 	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
 	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
+	typedef std::shared_ptr<CAlertSession> PAlertSession;
 }
 
 
@@ -68,9 +71,16 @@ namespace AMC {
 	class CDriverHandler;
 	class CToolpathHandler;
 	class CServiceHandler;
+	class CStateJournal;
 	class CUIHandler;
 	class CParameterHandler;
 	class CStateMachineData;
+	class CAccessControl;
+	class CStringResourceHandler;
+	class CLanguageHandler;
+	class CMeshHandler;
+	class CDataSeriesHandler;
+	class CAlertHandler;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -78,8 +88,15 @@ namespace AMC {
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
+	typedef std::shared_ptr<CStateJournal> PStateJournal;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
 	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
+	typedef std::shared_ptr<CAccessControl> PAccessControl;
+	typedef std::shared_ptr<CStringResourceHandler> PStringResourceHandler;
+	typedef std::shared_ptr<CLanguageHandler> PLanguageHandler;
+	typedef std::shared_ptr<CAlertHandler> PAlertHandler;
+	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
+	typedef std::shared_ptr<CDataSeriesHandler> PDataSeriesHandler;
 
 	class CSystemState {
 	private:
@@ -89,10 +106,18 @@ namespace AMC {
 		AMC::PToolpathHandler m_pToolpathHandler;
 		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
+		AMC::PStateJournal m_pStateJournal;
 		AMC::PStateMachineData m_pStateMachineData;
+		AMC::PAccessControl m_pAccessControl;
+		AMC::PStringResourceHandler m_pStringResourceHandler;
+		AMC::PLanguageHandler m_pLanguageHandler;
+		AMC::PMeshHandler m_pMeshHandler;
+		AMC::PAlertHandler m_pAlertHandler;
+		AMC::PDataSeriesHandler m_pDataSeriesHandler;
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
+		std::mutex m_DataModelMutex;
 		LibMCData::PDataModel m_pDataModel;
 		LibMCData::PStorage m_pStorage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
@@ -107,7 +132,7 @@ namespace AMC {
 
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, const std::string & sTestEnvironmentPath);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath);
 
 		virtual ~CSystemState();
 
@@ -118,6 +143,9 @@ namespace AMC {
 		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
 		CStateMachineData* stateMachineData();
+		CAccessControl * accessControl ();
+		CStringResourceHandler * stringResourceHandler ();
+		CAlertHandler* alertHandler();
 
 		LibMCData::CStorage * storage();
 		LibMCData::CBuildJobHandler * buildJobHandler();
@@ -130,11 +158,20 @@ namespace AMC {
 		PDriverHandler getDriverHandlerInstance();
 		PToolpathHandler getToolpathHandlerInstance();
 		PStateMachineData getStateMachineData ();
+		PStateJournal getStateJournalInstance();
+		PAccessControl getAccessControlInstance();
+		PLanguageHandler getLanguageHandlerInstance();
+		PMeshHandler getMeshHandlerInstance();
+		PDataSeriesHandler getDataSeriesHandlerInstance();
+		PAlertHandler getAlertHandlerInstance();
 
+		LibMCData::PStorage getStorageInstance();
 		LibMCData::PLoginHandler getLoginHandlerInstance();
 		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
 		LibMCData::PPersistencyHandler getPersistencyHandler();
 		AMCCommon::PChrono getGlobalChronoInstance();
+
+		LibMCData::PAlertSession createAlertSession();
 
 		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);
 		std::string getLibraryPath(const std::string& sLibraryName);

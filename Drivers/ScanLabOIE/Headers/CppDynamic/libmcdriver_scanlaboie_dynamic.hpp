@@ -235,6 +235,11 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION: return "UNSUPPORTEDOIESDKVERSION";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION: return "INVALIDDEVICECONFIGURATION";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION: return "OIESDKLIBRARYRETURNSINVALIDVERSION";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALSIGNALCOUNT: return "INVALIDADDITIONALSIGNALCOUNT";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NORTCVALUESAVAILABLE: return "NORTCVALUESAVAILABLE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "NOSENSORVALUESAVAILABLE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "NOADDITIONALVALUESAVAILABLE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "INVALIDADDITIONALINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -300,6 +305,11 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_UNSUPPORTEDOIESDKVERSION: return "Unsupported OIE SDK Version.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICECONFIGURATION: return "Invalid device configuration.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_OIESDKLIBRARYRETURNSINVALIDVERSION: return "OIE SDK Library returns invalid version.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALSIGNALCOUNT: return "Invalid Additional signal count.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NORTCVALUESAVAILABLE: return "No RTC values available.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "No Sensor values available.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "No Additional values available.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "Invalid additional index.";
 		}
 		return "unknown error";
 	}
@@ -526,8 +536,11 @@ public:
 	inline eRTCDeviceType GetDeviceType();
 	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
 	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
+	inline LibMCDriver_ScanLabOIE_uint32 GetAdditionalSignalCount();
 	inline void GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
 	inline void GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
+	inline void GetAdditionalSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & AdditionalIDsBuffer);
+	inline void GetAdditionalSignalInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nSignalID, std::string & sSignalName);
 	inline std::string GetDeviceConfigurationString();
 };
 	
@@ -547,14 +560,17 @@ public:
 	
 	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
 	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
+	inline LibMCDriver_ScanLabOIE_uint32 GetAdditionalSignalCount();
 	inline LibMCDriver_ScanLabOIE_uint64 GetRecordCount();
 	inline void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY);
 	inline void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & RTCSignalsBuffer);
 	inline void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SensorSignalsBuffer);
+	inline void GetAdditionalSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & AdditionalSignalsBuffer);
 	inline void GetAllCoordinates(std::vector<LibMCDriver_ScanLabOIE_double> & XArrayBuffer, std::vector<LibMCDriver_ScanLabOIE_double> & YArrayBuffer);
 	inline void GetAllPacketNumbers(std::vector<LibMCDriver_ScanLabOIE_uint32> & PacketNumersBuffer);
 	inline void GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
 	inline void GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
+	inline void GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
 	inline std::string StoreAsBuildData(const std::string & sName, classParam<LibMCEnv::CBuild> pBuild);
 };
 	
@@ -761,19 +777,25 @@ public:
 		pWrapperTable->m_DeviceConfiguration_GetDeviceType = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalCount = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalIDs = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalInfo = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = nullptr;
 		pWrapperTable->m_DataRecording_GetRTCSignalCount = nullptr;
 		pWrapperTable->m_DataRecording_GetSensorSignalCount = nullptr;
+		pWrapperTable->m_DataRecording_GetAdditionalSignalCount = nullptr;
 		pWrapperTable->m_DataRecording_GetRecordCount = nullptr;
 		pWrapperTable->m_DataRecording_GetRecordInformation = nullptr;
 		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord = nullptr;
+		pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetAllCoordinates = nullptr;
 		pWrapperTable->m_DataRecording_GetAllPacketNumbers = nullptr;
 		pWrapperTable->m_DataRecording_GetAllRTCSignals = nullptr;
 		pWrapperTable->m_DataRecording_GetAllSensorSignals = nullptr;
+		pWrapperTable->m_DataRecording_GetAllAdditionalSignals = nullptr;
 		pWrapperTable->m_DataRecording_StoreAsBuildData = nullptr;
 		pWrapperTable->m_OIEDevice_GetDeviceName = nullptr;
 		pWrapperTable->m_OIEDevice_SetHostName = nullptr;
@@ -954,6 +976,15 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
 		#else // _WIN32
 		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
@@ -969,6 +1000,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalids");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalIDs == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalInfo = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalInfoPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalinfo");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalInfo = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetAdditionalSignalInfoPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalinfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalInfo == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -996,6 +1045,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataRecording_GetSensorSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAdditionalSignalCount = (PLibMCDriver_ScanLabOIEDataRecording_GetAdditionalSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getadditionalsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAdditionalSignalCount = (PLibMCDriver_ScanLabOIEDataRecording_GetAdditionalSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getadditionalsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAdditionalSignalCount == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1035,6 +1093,15 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetAdditionalSignalsOfRecordPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getadditionalsignalsofrecord");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetAdditionalSignalsOfRecordPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getadditionalsignalsofrecord");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataRecording_GetAllCoordinates = (PLibMCDriver_ScanLabOIEDataRecording_GetAllCoordinatesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallcoordinates");
 		#else // _WIN32
 		pWrapperTable->m_DataRecording_GetAllCoordinates = (PLibMCDriver_ScanLabOIEDataRecording_GetAllCoordinatesPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallcoordinates");
@@ -1068,6 +1135,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataRecording_GetAllSensorSignals == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAllAdditionalSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllAdditionalSignalsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getalladditionalsignals");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAllAdditionalSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllAdditionalSignalsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getalladditionalsignals");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAllAdditionalSignals == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1554,12 +1630,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalcount", (void**)&(pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalIDs == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getadditionalsignalinfo", (void**)&(pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetAdditionalSignalInfo == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring", (void**)&(pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString));
@@ -1572,6 +1660,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getsensorsignalcount", (void**)&(pWrapperTable->m_DataRecording_GetSensorSignalCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetSensorSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getadditionalsignalcount", (void**)&(pWrapperTable->m_DataRecording_GetAdditionalSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAdditionalSignalCount == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getrecordcount", (void**)&(pWrapperTable->m_DataRecording_GetRecordCount));
@@ -1590,6 +1682,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getadditionalsignalsofrecord", (void**)&(pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallcoordinates", (void**)&(pWrapperTable->m_DataRecording_GetAllCoordinates));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllCoordinates == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1604,6 +1700,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallsensorsignals", (void**)&(pWrapperTable->m_DataRecording_GetAllSensorSignals));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllSensorSignals == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getalladditionalsignals", (void**)&(pWrapperTable->m_DataRecording_GetAllAdditionalSignals));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllAdditionalSignals == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_storeasbuilddata", (void**)&(pWrapperTable->m_DataRecording_StoreAsBuildData));
@@ -1926,6 +2026,18 @@ public:
 	}
 	
 	/**
+	* CDeviceConfiguration::GetAdditionalSignalCount - Returns the configured Additional signal count of the configuration.
+	* @return Additional Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetAdditionalSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetAdditionalSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
 	* CDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
 	* @param[out] SignalIDsBuffer - RTC Signal IDs
 	*/
@@ -1949,6 +2061,35 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
 		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
 		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
+	}
+	
+	/**
+	* CDeviceConfiguration::GetAdditionalSignalIDs - Returns the configured Additional signal IDs of the configuration.
+	* @param[out] AdditionalIDsBuffer - Additional Signal IDs
+	*/
+	void CDeviceConfiguration::GetAdditionalSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & AdditionalIDsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededAdditionalIDs = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenAdditionalIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetAdditionalSignalIDs(m_pHandle, 0, &elementsNeededAdditionalIDs, nullptr));
+		AdditionalIDsBuffer.resize((size_t) elementsNeededAdditionalIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetAdditionalSignalIDs(m_pHandle, elementsNeededAdditionalIDs, &elementsWrittenAdditionalIDs, AdditionalIDsBuffer.data()));
+	}
+	
+	/**
+	* CDeviceConfiguration::GetAdditionalSignalInfo - Returns the configured Additional signal information.
+	* @param[in] nIndex - Index of additional signal. 0-based.
+	* @param[out] nSignalID - ID of additional signal.
+	* @param[out] sSignalName - Name of additional signal.
+	*/
+	void CDeviceConfiguration::GetAdditionalSignalInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nSignalID, std::string & sSignalName)
+	{
+		LibMCDriver_ScanLabOIE_uint32 bytesNeededSignalName = 0;
+		LibMCDriver_ScanLabOIE_uint32 bytesWrittenSignalName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetAdditionalSignalInfo(m_pHandle, nIndex, &nSignalID, 0, &bytesNeededSignalName, nullptr));
+		std::vector<char> bufferSignalName(bytesNeededSignalName);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetAdditionalSignalInfo(m_pHandle, nIndex, &nSignalID, bytesNeededSignalName, &bytesWrittenSignalName, &bufferSignalName[0]));
+		sSignalName = std::string(&bufferSignalName[0]);
 	}
 	
 	/**
@@ -1990,6 +2131,18 @@ public:
 	{
 		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetSensorSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
+	* CDataRecording::GetAdditionalSignalCount - Returns the configured Additional data signal count of the configuration.
+	* @return Sensor Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetAdditionalSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAdditionalSignalCount(m_pHandle, &resultSignalCount));
 		
 		return resultSignalCount;
 	}
@@ -2044,6 +2197,20 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetSensorSignalsOfRecord(m_pHandle, nIndex, 0, &elementsNeededSensorSignals, nullptr));
 		SensorSignalsBuffer.resize((size_t) elementsNeededSensorSignals);
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetSensorSignalsOfRecord(m_pHandle, nIndex, elementsNeededSensorSignals, &elementsWrittenSensorSignals, SensorSignalsBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetAdditionalSignalsOfRecord - Returns the additional signals of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[out] AdditionalSignalsBuffer - Recorded Additional Signals
+	*/
+	void CDataRecording::GetAdditionalSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & AdditionalSignalsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededAdditionalSignals = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenAdditionalSignals = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAdditionalSignalsOfRecord(m_pHandle, nIndex, 0, &elementsNeededAdditionalSignals, nullptr));
+		AdditionalSignalsBuffer.resize((size_t) elementsNeededAdditionalSignals);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAdditionalSignalsOfRecord(m_pHandle, nIndex, elementsNeededAdditionalSignals, &elementsWrittenAdditionalSignals, AdditionalSignalsBuffer.data()));
 	}
 	
 	/**
@@ -2102,6 +2269,20 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllSensorSignals(m_pHandle, nSignalIndex, 0, &elementsNeededSignals, nullptr));
 		SignalsBuffer.resize((size_t) elementsNeededSignals);
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllSensorSignals(m_pHandle, nSignalIndex, elementsNeededSignals, &elementsWrittenSignals, SignalsBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetAllAdditionalSignals - Returns an array of all additional signals of a specific index.
+	* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+	* @param[out] SignalsBuffer - Array of the Indexed RTC Signal of all records.
+	*/
+	void CDataRecording::GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignals = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignals = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllAdditionalSignals(m_pHandle, nAdditionalIndex, 0, &elementsNeededSignals, nullptr));
+		SignalsBuffer.resize((size_t) elementsNeededSignals);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllAdditionalSignals(m_pHandle, nAdditionalIndex, elementsNeededSignals, &elementsWrittenSignals, SignalsBuffer.data()));
 	}
 	
 	/**

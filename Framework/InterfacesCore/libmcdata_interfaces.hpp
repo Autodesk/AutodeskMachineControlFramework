@@ -58,6 +58,8 @@ class IBase;
 class IIterator;
 class ILogEntryList;
 class ILogSession;
+class IAlertSession;
+class IJournalSession;
 class IStorageStream;
 class IStorage;
 class IBuildJobData;
@@ -65,6 +67,7 @@ class IBuildJobDataIterator;
 class IBuildJob;
 class IBuildJobIterator;
 class IBuildJobHandler;
+class IUserList;
 class ILoginHandler;
 class IPersistencyHandler;
 class IDataModel;
@@ -172,6 +175,58 @@ template <class T1, class T2, class T3, class T4, class T5> class ParameterCache
 			param3 = m_param3;
 			param4 = m_param4;
 			param5 = m_param5;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7> class ParameterCache_7 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+	public:
+		ParameterCache_7 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
 		}
 };
 
@@ -389,9 +444,9 @@ public:
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
 	* @param[in] eLogLevel - Log Level
-	* @param[in] sTimestamp - Timestamp in ISO8601 UTC format
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	virtual void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string & sTimestamp) = 0;
+	virtual void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string & sTimestampUTC) = 0;
 
 	/**
 	* ILogSession::GetMaxLogEntryID - retrieves the maximum log entry ID in the log.
@@ -414,6 +469,110 @@ typedef IBaseSharedPtr<ILogSession> PILogSession;
 
 
 /*************************************************************************************************************************
+ Class interface for AlertSession 
+**************************************************************************************************************************/
+
+class IAlertSession : public virtual IBase {
+public:
+	/**
+	* IAlertSession::AddAlert - adds a new alert entry.
+	* @param[in] sUUID - Alert UUID
+	* @param[in] sIdentifier - Alert Identifier
+	* @param[in] eLevel - Alert level.
+	* @param[in] sDescription - Alert Description in default language
+	* @param[in] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+	* @param[in] sReadableContextInformation - Readable Context Information in default language
+	* @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	virtual void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC) = 0;
+
+	/**
+	* IAlertSession::HasAlert - Checks if an alert with a certain UUID exists.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @return Flag if alert exists
+	*/
+	virtual bool HasAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IAlertSession::GetAlertInformation - Retrieves information of an alert. Fails if alert does not exist.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[out] sIdentifier - Alert Identifier
+	* @param[out] eLevel - Alert level.
+	* @param[out] sDescription - Alert Description in default language
+	* @param[out] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
+	* @param[out] sReadableContextInformation - Readable Context Information in default language
+	* @param[out] bNeedsAcknowledgement - Flag if acknowledgement is needed
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	virtual void GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, LibMCData::eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC) = 0;
+
+	/**
+	* IAlertSession::AcknowledgeAlert - Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[in] sUserUUID - User UUID that acknowledged the alert.
+	* @param[in] sUserComment - Comment of the user.
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	virtual void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC) = 0;
+
+	/**
+	* IAlertSession::AlertHasBeenAcknowledged - Checks if an alert has been acknowledged. Fails if alert does not exist.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @return Flag if the alert has been acknowledged.
+	*/
+	virtual bool AlertHasBeenAcknowledged(const std::string & sUUID) = 0;
+
+	/**
+	* IAlertSession::GetAcknowledgementInformation - Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @param[out] sUserUUID - User UUID that acknowledged the alert.
+	* @param[out] sUserComment - Comment of the user.
+	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	*/
+	virtual void GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC) = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlertSession> PIAlertSession;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalSession 
+**************************************************************************************************************************/
+
+class IJournalSession : public virtual IBase {
+public:
+	/**
+	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
+	* @param[in] nChunkIndex - Index of the Chunk to write
+	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
+	* @param[in] nEndTimeStamp - End Timestamp of the chunk (in microseconds)
+	* @param[in] nVariableInfoBufferSize - Number of elements in buffer
+	* @param[in] pVariableInfoBuffer - Variable information.
+	* @param[in] nEntryDataBufferSize - Number of elements in buffer
+	* @param[in] pEntryDataBuffer - Entry bulk data.
+	*/
+	virtual void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry * pEntryDataBuffer) = 0;
+
+	/**
+	* IJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.
+	* @return Maximum Chunk Capacity in Journal in Bytes
+	*/
+	virtual LibMCData_uint32 GetChunkCapacity() = 0;
+
+	/**
+	* IJournalSession::GetFlushInterval - Returns the flush interval of the session journal.
+	* @return The interval determines how often a session journal chunk is written to disk. In Seconds.
+	*/
+	virtual LibMCData_uint32 GetFlushInterval() = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalSession> PIJournalSession;
+
+
+/*************************************************************************************************************************
  Class interface for StorageStream 
 **************************************************************************************************************************/
 
@@ -432,7 +591,13 @@ public:
 	virtual std::string GetTimeStamp() = 0;
 
 	/**
-	* IStorageStream::GetName - returns the name of a storage stream.
+	* IStorageStream::GetContextIdentifier - returns the context identifier of a storage stream.
+	* @return Context Identifier String
+	*/
+	virtual std::string GetContextIdentifier() = 0;
+
+	/**
+	* IStorageStream::GetName - returns the name description of a storage stream.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
@@ -500,24 +665,26 @@ public:
 	* IStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
 	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
-	* @param[in] sName - Name of the stream.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Data of stream
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID) = 0;
+	virtual void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID) = 0;
 
 	/**
 	* IStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
 	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID) = 0;
+	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID) = 0;
 
 	/**
 	* IStorage::StorePartialStream - stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -586,13 +753,19 @@ public:
 	virtual std::string GetJobUUID() = 0;
 
 	/**
-	* IBuildJobData::GetName - returns the name of a build job uuid.
+	* IBuildJobData::GetName - returns the name of the job data.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
 
 	/**
-	* IBuildJobData::GetTimeStamp - returns the timestamp when the job was created.
+	* IBuildJobData::GetContextIdentifier - returns the unique context identifier of the job data.
+	* @return Context Identifier String
+	*/
+	virtual std::string GetContextIdentifier() = 0;
+
+	/**
+	* IBuildJobData::GetTimeStamp - returns the timestamp when the job data was created.
 	* @return Timestamp in ISO8601 UTC format
 	*/
 	virtual std::string GetTimeStamp() = 0;
@@ -704,12 +877,6 @@ public:
 	virtual std::string GetStorageStreamUUID() = 0;
 
 	/**
-	* IBuildJob::GetBuildJobLogger - creates a build job log session access class.
-	* @return LogSession class instance.
-	*/
-	virtual ILogSession * GetBuildJobLogger() = 0;
-
-	/**
 	* IBuildJob::StartValidating - Starts validation of a build job.
 	*/
 	virtual void StartValidating() = 0;
@@ -743,12 +910,13 @@ public:
 
 	/**
 	* IBuildJob::AddJobData - Adds additional data to the Job. Job MUST be of state validated in order to add job data.
-	* @param[in] sName - Name of the job
+	* @param[in] sIdentifier - Unique identifier for the job data.
+	* @param[in] sName - Name of the job data
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void AddJobData(const std::string & sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string & sUserID) = 0;
+	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string & sUserID) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
@@ -849,6 +1017,34 @@ typedef IBaseSharedPtr<IBuildJobHandler> PIBuildJobHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for UserList 
+**************************************************************************************************************************/
+
+class IUserList : public virtual IBase {
+public:
+	/**
+	* IUserList::Count - Result Number of Users in the list.
+	* @return Number of users in the list
+	*/
+	virtual LibMCData_uint32 Count() = 0;
+
+	/**
+	* IUserList::GetUserProperties - Retrieves all the data of a user in the list. 
+	* @param[in] nUserIndex - Index of users in the list (0-based). Call will fail if invalid index is provided.
+	* @param[out] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const LibMCData_uint32 nUserIndex, std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUserList> PIUserList;
+
+
+/*************************************************************************************************************************
  Class interface for LoginHandler 
 **************************************************************************************************************************/
 
@@ -862,12 +1058,163 @@ public:
 	virtual bool UserExists(const std::string & sUsername) = 0;
 
 	/**
-	* ILoginHandler::GetUserDetails - Retrieves a users data.
+	* ILoginHandler::GetUserDetails - Retrieves login relevant users data. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @param[out] sSalt - Salt of the user.
 	* @param[out] sHashedPassword - Hashed Password.
 	*/
 	virtual void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) = 0;
+
+	/**
+	* ILoginHandler::GetUserProperties - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[out] sUUID - UUID of the user.
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::GetUserPropertiesByUUID - Retrieves all users data with one Transaction. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[out] sUsername - User name
+	* @param[out] sDescription - Description of the user.
+	* @param[out] sRole - Role of the user.
+	* @param[out] sLanguageIdentifier - LanguageIdentifier of the user.
+	*/
+	virtual void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::GetUsernameByUUID - Retrieves a users name with a given UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return User name
+	*/
+	virtual std::string GetUsernameByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* ILoginHandler::GetUserUUID - Retrieves a users UUID. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return UUID of the user.
+	*/
+	virtual std::string GetUserUUID(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserDescription - Retrieves a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescription(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserDescriptionByUUID - Retrieves a users description by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Description of the user.
+	*/
+	virtual std::string GetUserDescriptionByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* ILoginHandler::GetUserRole - Retrieves a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRole(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserRoleByUUID - Retrieves a users role by the user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Role of the user.
+	*/
+	virtual std::string GetUserRoleByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* ILoginHandler::GetUserLanguage - Retrieves a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguage(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserLanguageByUUID - Retrieves a users language preference by user UUID. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Language identifier of the user.
+	*/
+	virtual std::string GetUserLanguageByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* ILoginHandler::CreateUser - Creates a new user. Fails if the user already exists.
+	* @param[in] sUsername - User name to create. MUST be alphanumeric and not empty.
+	* @param[in] sRole - Role of the new user. MUST NOT be empty.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	* @param[in] sDescription - Description of the new user.
+	* @return UUID of the new user.
+	*/
+	virtual std::string CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription) = 0;
+
+	/**
+	* ILoginHandler::SetUserLanguage - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::SetUserRole - Updates a users role. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sRole - New Role identifier of the user.
+	*/
+	virtual void SetUserRole(const std::string & sUsername, const std::string & sRole) = 0;
+
+	/**
+	* ILoginHandler::SetUserDescription - Updates a users description. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sDescription - New Description of the user.
+	*/
+	virtual void SetUserDescription(const std::string & sUsername, const std::string & sDescription) = 0;
+
+	/**
+	* ILoginHandler::SetUserPassword - Updates a users password. Fails if user does not exist.
+	* @param[in] sUsername - User name
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* ILoginHandler::SetUserLanguageByUUID - Updates a users language preference. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sLanguageIdentifier - New Language identifier of the user.
+	*/
+	virtual void SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier) = 0;
+
+	/**
+	* ILoginHandler::SetUserRoleByUUID - Updates a users role. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sRole - New Role identifier of the user.
+	*/
+	virtual void SetUserRoleByUUID(const std::string & sUUID, const std::string & sRole) = 0;
+
+	/**
+	* ILoginHandler::SetUserDescriptionByUUID - Updates a users description. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sDescription - New Language identifier of the user.
+	*/
+	virtual void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription) = 0;
+
+	/**
+	* ILoginHandler::SetUserPasswordByUUID - Updates a users password. Fails if user does not exist.
+	* @param[in] sUUID - UUID of the user.
+	* @param[in] sSalt - Salt of the user. MUST NOT be empty. MUST be an SHA256 string.
+	* @param[in] sHashedPassword - Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt.
+	*/
+	virtual void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword) = 0;
+
+	/**
+	* ILoginHandler::GetActiveUsers - Returns a list of active users.
+	* @return New instance of active users.
+	*/
+	virtual IUserList * GetActiveUsers() = 0;
 
 };
 
@@ -1035,6 +1382,18 @@ public:
 	* @return LogSession class instance.
 	*/
 	virtual ILogSession * CreateNewLogSession() = 0;
+
+	/**
+	* IDataModel::CreateJournalSession - creates a global journal session access class.
+	* @return JournalSession class instance.
+	*/
+	virtual IJournalSession * CreateJournalSession() = 0;
+
+	/**
+	* IDataModel::CreateAlertSession - creates a global alert session access class.
+	* @return AlertSession class instance.
+	*/
+	virtual IAlertSession * CreateAlertSession() = 0;
 
 	/**
 	* IDataModel::CreateLoginHandler - creates a login handler instance.

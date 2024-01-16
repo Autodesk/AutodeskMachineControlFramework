@@ -108,8 +108,6 @@ public:
 
     std::string GetStorageStreamUUID() override;
 
-    ILogSession * GetBuildJobLogger() override;
-
     void StartValidating() override;
 
     void FinishValidating(const LibMCData_uint32 nLayerCount) override;
@@ -121,9 +119,9 @@ public:
     void DeleteJob() override;
     
     bool JobCanBeArchived() override;
-
-    void AddJobData(const std::string& sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string& sUserID) override;
-
+    
+    void AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string& sUserID) override;
+    
     IBuildJobDataIterator* ListJobDataByType(const LibMCData::eBuildJobDataType eDataType) override;
 
     IBuildJobDataIterator* ListJobData() override;

@@ -331,10 +331,58 @@
 		<error name="COULDNOTFINDLOGENTRY" code="334" description="Could not find log entry" />			
 
 		<error name="NOLOGCALLBACK" code="335" description="No log callback" />			
-								
+		<error name="EMPTYUSERNAME" code="336" description="Empty user name" />			
+		<error name="EMPTYUSERUUID" code="337" description="Empty user UUID" />			
+		<error name="USERNOTUNIQUE" code="338" description="User not unique" />
+		
+		<error name="EMPTYUSERROLE" code="339" description="Empty user role" />
+		<error name="EMPTYUSERSALT" code="340" description="Empty user salt" />
+		<error name="EMPTYUSERPASSWORD" code="341" description="Empty user password" />
+		<error name="INVALIDUSERROLE" code="342" description="Invalid user role" />
+		<error name="USERALREADYEXISTS" code="343" description="User already exists" />		
+		<error name="INVALIDUSERLANGUAGE" code="344" description="Invalid user language" />
+		<error name="COULDNOTUPDATEUSERLANGUAGE" code="345" description="Could not update user language" />
+		<error name="COULDNOTUPDATEUSERROLE" code="346" description="Could not update user role" />
+		<error name="COULDNOTUPDATEUSERDESCRIPTION" code="347" description="Could not update user description" />
+		<error name="COULDNOTUPDATEUSERPASSWORD" code="348" description="Could not update user password" />
+		<error name="INVALIDUSERINDEX" code="349" description="Invalid user index" />		
+		<error name="INVALIDJOURNAL" code="350" description="Invalid journal" />
+		
+		<error name="EMPTYALERTIDENTIFIER" code="351" description="Empty alert identifier" />
+		<error name="INVALIDALERTIDENTIFIER" code="352" description="Invalid alert identifier" />
+		<error name="INVALIDALERTDESCRIPTIONIDENTIFIER" code="353" description="Invalid alert description identifier" />
+		<error name="INVALIDALERTLEVEL" code="354" description="Invalid alert level" />
+		<error name="ALERTNOTFOUND" code="355" description="Alert not found" />
+		<error name="ALERTNOTACKNOWLEDGED" code="356" description="Alert has not been acknowledged." />
+		
+		
+		
+		
+		
+										
 	</errors>
 	
 		
+	<struct name="JournalChunkVariableInfo">
+		<member name="VariableIndex" type="uint32" />
+		<member name="VariableType" type="uint32" />
+		<member name="EntryStartIndex" type="uint32" />
+		<member name="EntryCount" type="uint32" />
+	</struct>
+
+	<struct name="JournalChunkIntegerEntry">
+		<member name="RelativeTimeStampInMicroseconds" type="uint32" />
+		<member name="IntegerValue" type="int64" />
+	</struct>
+
+	<enum name="AlertLevel">
+		<option name="FatalError" value="1"/>
+		<option name="CriticalError" value="2"/>
+		<option name="Warning" value="3"/>
+		<option name="Message" value="4"/>
+		<option name="Unknown" value="7"/>
+	</enum>	
+
 	<enum name="LogLevel">
 		<option name="FatalError" value="1"/>
 		<option name="CriticalError" value="2"/>
@@ -460,7 +508,7 @@
 			<param name="Message" type="string" pass="in" description="Log Message" />	
 			<param name="SubSystem" type="string" pass="in" description="Sub System identifier" />	
 			<param name="LogLevel" type="enum" class="LogLevel" pass="in" description="Log Level" />	
-			<param name="Timestamp" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
+			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
 		</method>	
 
 		<method name="GetMaxLogEntryID" description="retrieves the maximum log entry ID in the log.">
@@ -474,6 +522,78 @@
 			<param name="LogEntryList" type="class" class="LogEntryList" pass="return" description="Log Entry List." />
 		</method>	
 				
+		
+	</class>
+
+	<class name="AlertSession" parent="Base" description="Alert Session Instance">
+	
+		<method name="AddAlert" description="adds a new alert entry.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID" />	
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier" />	
+			<param name="Level" type="enum" class="AlertLevel" pass="in" description="Alert level." />
+			<param name="Description" type="string" pass="in" description="Alert Description in default language" />	
+			<param name="DescriptionIdentifier" type="string" pass="in" description="Alert Description Identifier for internationalization. May be empty." />	
+			<param name="ReadableContextInformation" type="string" pass="in" description="Readable Context Information in default language" />	
+			<param name="NeedsAcknowledgement" type="bool" pass="in" description="Flag if acknowledgement is needed" />	
+			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
+		</method>	
+		
+		<method name="HasAlert" description="Checks if an alert with a certain UUID exists.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
+			<param name="AlertExists" type="bool" pass="return" description="Flag if alert exists" />	
+		</method>	
+
+		<method name="GetAlertInformation" description="Retrieves information of an alert. Fails if alert does not exist.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
+			<param name="Identifier" type="string" pass="out" description="Alert Identifier" />	
+			<param name="Level" type="enum" class="AlertLevel" pass="out" description="Alert level." />
+			<param name="Description" type="string" pass="out" description="Alert Description in default language" />	
+			<param name="DescriptionIdentifier" type="string" pass="out" description="Alert Description Identifier for internationalization. May be empty." />	
+			<param name="ReadableContextInformation" type="string" pass="out" description="Readable Context Information in default language" />	
+			<param name="NeedsAcknowledgement" type="bool" pass="out" description="Flag if acknowledgement is needed" />	
+			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+		</method>	
+
+		<method name="AcknowledgeAlert" description="Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
+			<param name="UserUUID" type="string" pass="in" description="User UUID that acknowledged the alert." />	
+			<param name="UserComment" type="string" pass="in" description="Comment of the user." />	
+			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+		</method>	
+
+		<method name="AlertHasBeenAcknowledged" description="Checks if an alert has been acknowledged. Fails if alert does not exist.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
+			<param name="HasBeenAcknowledged" type="bool" pass="return" description="Flag if the alert has been acknowledged." />	
+		</method>	
+		
+		<method name="GetAcknowledgementInformation" description="Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
+			<param name="UserUUID" type="string" pass="out" description="User UUID that acknowledged the alert." />	
+			<param name="UserComment" type="string" pass="out" description="Comment of the user." />	
+			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+		</method>	
+		
+	</class>
+
+
+	<class name="JournalSession" parent="Base" description="Journaling Instance">
+
+		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start Timestamp of the chunk (in microseconds)" />	
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End Timestamp of the chunk (in microseconds)" />	
+			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="in" description="Variable information." />	
+			<param name="EntryData" type="structarray" class="JournalChunkIntegerEntry" pass="in" description="Entry bulk data." />	
+		</method>
+		
+		<method name="GetChunkCapacity" description="Returns the chunk capacity of the session journal.">
+			<param name="ChunkCapacity" type="uint32" pass="return" description="Maximum Chunk Capacity in Journal in Bytes" />	
+		</method>
+		
+		<method name="GetFlushInterval" description="Returns the flush interval of the session journal.">
+			<param name="FlushInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk. In Seconds." />	
+		</method>
+				
 	</class>
 
 	<class name="StorageStream" parent="Base" description="Storage Stream Instance">
@@ -486,7 +606,11 @@
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
 
-		<method name="GetName" description="returns the name of a storage stream.">
+		<method name="GetContextIdentifier" description="returns the context identifier of a storage stream.">
+			<param name="ContextIdentifier" type="string" pass="return" description="Context Identifier String" />	
+		</method>
+
+		<method name="GetName" description="returns the name description of a storage stream.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
@@ -530,7 +654,8 @@
 		<method name="StoreNewStream" description="stores a new stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. Must be unique and newly generated." />	
 			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
-			<param name="Name" type="string" pass="in" description="Name of the stream." />
+			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
+			<param name="Name" type="string" pass="in" description="Name Description of the stream." />
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Data of stream" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
@@ -539,6 +664,7 @@
 		<method name="BeginPartialStream" description="starts storing a stream with partial uploads.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
 			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
@@ -587,11 +713,15 @@
 			<param name="UUID" type="string" pass="return" description="UUID String" />	
 		</method>
 
-		<method name="GetName" description="returns the name of a build job uuid.">
+		<method name="GetName" description="returns the name of the job data.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
-		<method name="GetTimeStamp" description="returns the timestamp when the job was created.">
+		<method name="GetContextIdentifier" description="returns the unique context identifier of the job data.">
+			<param name="ContextIdentifier" type="string" pass="return" description="Context Identifier String" />	
+		</method>
+
+		<method name="GetTimeStamp" description="returns the timestamp when the job data was created.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
 				
@@ -656,11 +786,7 @@
 
 		<method name="GetStorageStreamUUID" description="returns the storage stream uuid of the build.">
 			<param name="StreamUUID" type="string" pass="return" description="Stream UUID." />
-		</method>
-		
-		<method name="GetBuildJobLogger" description="creates a build job log session access class.">
-			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
-		</method>
+		</method>	
 		
 		<method name="StartValidating" description="Starts validation of a build job.">
 		</method>
@@ -683,7 +809,8 @@
 		</method>
 
 		<method name="AddJobData" description="Adds additional data to the Job. Job MUST be of state validated in order to add job data.">
-			<param name="Name" type="string" pass="in" description="Name of the job" />
+			<param name="Identifier" type="string" pass="in" description="Unique identifier for the job data." />
+			<param name="Name" type="string" pass="in" description="Name of the job data" />
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
 			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
@@ -753,6 +880,23 @@
 
 
 
+	<class name="UserList" parent="Base" description="List of users">
+	
+		<method name="Count" description="Result Number of Users in the list.">
+			<param name="UserCount" type="uint32" pass="return" description="Number of users in the list" />
+		</method>
+
+		<method name="GetUserProperties" description="Retrieves all the data of a user in the list. ">
+			<param name="UserIndex" type="uint32" pass="in" description="Index of users in the list (0-based). Call will fail if invalid index is provided." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+	
+	</class>
 
 	<class name="LoginHandler" parent="Base" description="Login handler instance">
 	
@@ -761,12 +905,123 @@
 			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
 		</method>
 	
-		<method name="GetUserDetails" description="Retrieves a users data.">
+		<method name="GetUserDetails" description="Retrieves login relevant users data. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="Salt" type="string" pass="out" description="Salt of the user." />
 			<param name="HashedPassword" type="string" pass="out" description="Hashed Password." />
 		</method>
-	
+
+		<method name="GetUserProperties" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="out" description="UUID of the user." />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+		<method name="GetUserPropertiesByUUID" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="out" description="User name" />
+			<param name="Description" type="string" pass="out" description="Description of the user." />
+			<param name="Role" type="string" pass="out" description="Role of the user." />
+			<param name="LanguageIdentifier" type="string" pass="out" description="LanguageIdentifier of the user." />
+		</method>
+
+		<method name="GetUsernameByUUID" description="Retrieves a users name with a given UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Username" type="string" pass="return" description="User name" />
+		</method>
+
+		<method name="GetUserUUID" description="Retrieves a users UUID. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UUID" type="string" pass="return" description="UUID of the user." />
+		</method>
+
+		<method name="GetUserDescription" description="Retrieves a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetUserDescriptionByUUID" description="Retrieves a users description by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="return" description="Description of the user." />
+		</method>
+
+		<method name="GetUserRole" description="Retrieves a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserRoleByUUID" description="Retrieves a users role by the user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Role" type="string" pass="return" description="Role of the user." />
+		</method>
+
+		<method name="GetUserLanguage" description="Retrieves a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>
+		
+		<method name="GetUserLanguageByUUID" description="Retrieves a users language preference by user UUID. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="return" description="Language identifier of the user." />
+		</method>		
+
+		<method name="CreateUser" description="Creates a new user. Fails if the user already exists.">
+			<param name="Username" type="string" pass="in" description="User name to create. MUST be alphanumeric and not empty." />
+			<param name="Role" type="string" pass="in" description="Role of the new user. MUST NOT be empty." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+			<param name="Description" type="string" pass="in" description="Description of the new user." />
+			<param name="UUID" type="string" pass="return" description="UUID of the new user." />
+		</method>
+
+		<method name="SetUserLanguage" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserRole" description="Updates a users role. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Role" type="string" pass="in" description="New Role identifier of the user." />
+		</method>
+
+		<method name="SetUserDescription" description="Updates a users description. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Description" type="string" pass="in" description="New Description of the user." />
+		</method>
+		
+		<method name="SetUserPassword" description="Updates a users password. Fails if user does not exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
+		<method name="SetUserLanguageByUUID" description="Updates a users language preference. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="LanguageIdentifier" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserRoleByUUID" description="Updates a users role. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Role" type="string" pass="in" description="New Role identifier of the user." />
+		</method>
+
+		<method name="SetUserDescriptionByUUID" description="Updates a users description. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Description" type="string" pass="in" description="New Language identifier of the user." />
+		</method>
+		
+		<method name="SetUserPasswordByUUID" description="Updates a users password. Fails if user does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="Salt" type="string" pass="in" description="Salt of the user. MUST NOT be empty. MUST be an SHA256 string." />
+			<param name="HashedPassword" type="string" pass="in" description="Hashed Password. MUST be an SHA256 string. HashedPassword MUST NOT be the hash some of the given salt." />
+		</method>
+
+		<method name="GetActiveUsers" description="Returns a list of active users.">
+			<param name="ActiveUsers" type="class" class="UserList" pass="return" description="New instance of active users." />
+		</method>
+
 	</class>
 
 
@@ -884,6 +1139,14 @@
 			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
 		</method>
 		
+		<method name="CreateJournalSession" description="creates a global journal session access class.">
+			<param name="JournalSession" type="class" class="JournalSession" pass="return" description="JournalSession class instance." />	
+		</method>
+
+		<method name="CreateAlertSession" description="creates a global alert session access class.">
+			<param name="AlertSession" type="class" class="AlertSession" pass="return" description="AlertSession class instance." />	
+		</method>
+
 		<method name="CreateLoginHandler" description="creates a login handler instance.">
 			<param name="LoginHandler" type="class" class="LoginHandler" pass="return" description="LoginHandler instance." />	
 		</method>

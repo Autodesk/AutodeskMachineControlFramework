@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
+#include "amc_ui_systemstate.hpp"
 #include "amc_ui_custompage.hpp"
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module.hpp"
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_custom.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_ui_expression.hpp"
+#include "amc_toolpathhandler.hpp"
 
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
@@ -54,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_item.hpp"
 #include "amc_logger.hpp"
 #include "amc_statesignalhandler.hpp"
+#include "amc_userinformation.hpp"
 
 #include "amc_api_constants.hpp"
 
@@ -93,23 +96,17 @@ std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
 
 
 
-CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, const std::string& sTestOutputPath)
+
+
+CUIHandler::CUIHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PUISystemState pUISystemState)
     : m_dLogoAspectRatio (1.0), 
-    m_pStateMachineData(pStateMachineData),
-    m_pEnvironmentWrapper (pEnvironmentWrapper),
-    m_pSignalHandler (pSignalHandler),
-    m_sTestOutputPath (sTestOutputPath),
-    m_pLogger(pLogger)
+    m_pUISystemState (pUISystemState),
+    m_pEnvironmentWrapper (pEnvironmentWrapper)
 {
-    if (pStateMachineData.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pEnvironmentWrapper.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pSignalHandler.get() == nullptr)
+    if (pUISystemState.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pLogger.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
 }
 
 CUIHandler::~CUIHandler()
@@ -180,6 +177,8 @@ PUIPage CUIHandler::findPage(const std::string& sName)
 
 void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler)
 {
+    auto pStateMachineData = m_pUISystemState->getStateMachineData();
+
     writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
     writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
     writer.addString(AMC_API_KEY_UI_MAINPAGE, m_sMainPageName);
@@ -192,11 +191,11 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler
         writer.addString(AMC_API_KEY_UI_TOOLBARLOGOUUID, pToolbarLogoResource->getUUID());
     }
 
-    if (!m_LoginBackgroundUUID.isEmpty(m_pStateMachineData)) {
-        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(m_LoginBackgroundUUID.evaluateStringValue (m_pStateMachineData), true);
+    if (!m_LoginBackgroundUUID.isEmpty(pStateMachineData)) {
+        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(m_LoginBackgroundUUID.evaluateStringValue (pStateMachineData), true);
         writer.addString(AMC_API_KEY_UI_LOGINBACKGROUNDUUID, pResourceEntry->getUUID ());
     }
-    writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(m_pStateMachineData));
+    writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(pStateMachineData));
 
     CJSONWriterObject colorsObject(writer);
     for (auto color : m_Colors) {
@@ -370,6 +369,12 @@ void CUIHandler::setCoreResourcePackage(PResourcePackage pCoreResourcePackage)
 
 void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
 {
+    auto pStateMachineData = m_pUISystemState->getStateMachineData();
+    auto pLogger = m_pUISystemState->getLogger();
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    auto pToolpathHandler = m_pUISystemState->getToolpathHandler();
+    auto pDataSeriesHandler = m_pUISystemState->getDataSeriesHandler();
+
     if (m_pCoreResourcePackage.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
 
@@ -497,7 +502,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger);
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pUISystemState, pPage.get(), m_pCoreResourcePackage);
             auto pModule = CUIModuleFactory::createModule(pageChild, sPageName, pModuleEnvironment);
             pPage->addModule(pModule);
 
@@ -522,7 +527,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
 
         auto pPage = addCustomPage_Unsafe(sPageName, sComponentName);
 
-        auto pCustomModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger);
+        auto pCustomModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pUISystemState, pPage.get(), m_pCoreResourcePackage);
         auto pCustomModule = std::make_shared<CUIModule_Custom>(custompageNode, sPageName, pCustomModuleEnvironment);
         pPage->addModule(pCustomModule);
 
@@ -532,7 +537,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
             auto modulesChildren = modulesNode.children();
             for (pugi::xml_node moduleChild : modulesChildren) {
 
-                auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger);
+                auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pUISystemState, pPage.get(), m_pCoreResourcePackage);
                 auto pModule = CUIModuleFactory::createModule(moduleChild, sPageName, pModuleEnvironment);
                 pPage->addModule(pModule);
 
@@ -559,7 +564,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         auto dialogChildren = dialogNode.children();
         for (pugi::xml_node dialogChild : dialogChildren) {
 
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get(), m_pLogger);
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pUISystemState, pDialog.get(), m_pCoreResourcePackage);
             auto pModule = CUIModuleFactory::createModule(dialogChild, sDialogName, pModuleEnvironment);
             pDialog->addModule(pModule);
 
@@ -666,7 +671,7 @@ PUIPage CUIHandler::findPageOfModuleItem(const std::string& sUUID)
             return pPage.second;
     }
 
-    for (auto pCustomPage : m_Pages) {
+    for (auto pCustomPage : m_CustomPages) {
         auto pModuleItem = pCustomPage.second->findModuleItemByUUID(sUUID);
         if (pModuleItem.get() != nullptr)
             return pCustomPage.second;
@@ -707,7 +712,7 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 
     auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, "", pDummyClientVariableHandler, m_sTestOutputPath);
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, "", pDummyClientVariableHandler, m_pUISystemState->getTestOutputPath (), CUserInformation::makeEmpty ());
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -741,8 +746,9 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
 }
 
 
-CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler)
+CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler, PUserInformation pUserInformation)
 {
+    auto pLogger = m_pUISystemState->getLogger();
 
     uint32_t nErrorCode = 0;
     std::string sErrorMessage;
@@ -775,7 +781,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         }
 
-        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, sSenderPath, pClientVariableHandler, m_sTestOutputPath);
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pUISystemState->getTestOutputPath (), pUserInformation);
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
@@ -844,13 +850,18 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
  
 
     if (nErrorCode) {
-        m_pLogger->logMessage(sErrorMessage, "ui", AMC::eLogLevel::Message);
+        pLogger->logMessage(sErrorMessage, "ui", AMC::eLogLevel::Message);
 
     }
 
     return CUIHandleEventResponse (nErrorCode, sErrorMessage, clientActions);
        
 
+}
+
+AMC::PUISystemState CUIHandler::getUISystemState()
+{
+    return m_pUISystemState;
 }
 
 
