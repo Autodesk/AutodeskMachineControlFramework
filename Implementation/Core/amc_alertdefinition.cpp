@@ -74,7 +74,7 @@ namespace AMC {
 		return m_bNeedAcknowledgement;
 	}
 
-	void CAlertDefinition::setAckPermissionIdentifier(std::string& sAckPermissionIdentifier)
+	void CAlertDefinition::setAckPermissionIdentifier(const std::string& sAckPermissionIdentifier)
 	{
 		m_sAckPermissionIdentifier = sAckPermissionIdentifier;
 	}
@@ -83,6 +83,7 @@ namespace AMC {
 	{
 		return m_sAckPermissionIdentifier;
 	}
+
 	LibMCData::eAlertLevel CAlertDefinition::stringToAlertLevel(const std::string& sAlertLevelString, bool bFailIfUnknown)
 	{
 		if (sAlertLevelString == "fatalerror") {
