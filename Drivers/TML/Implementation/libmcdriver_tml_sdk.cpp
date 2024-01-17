@@ -74,7 +74,7 @@ void* _loadTMLAddress(void * hLibrary, const char* pSymbolName, uint32_t nParame
 
 
 
-CTMLSDK::CTMLSDK(const std::string& sDLLNameUTF8)
+CTMLSDK::CTMLSDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirectoryUTF8)
 	: m_LibraryHandle (nullptr)
 {
 
@@ -92,6 +92,17 @@ CTMLSDK::CTMLSDK(const std::string& sDLLNameUTF8)
 	int nResult = MultiByteToWideChar(CP_UTF8, 0, sDLLNameUTF8.c_str(), nLength, &wsLibraryFileName[0], nBufferSize);
 	if (nResult == 0)
 		throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_COULDNOTLOADLIBRARY);
+
+	int nPathLength = (int)sDLLDirectoryUTF8.length();
+	int nPathBufferSize = nPathLength * 2 + 2;
+	std::vector<wchar_t> wsDLLPath(nPathBufferSize);
+	int nPathResult = MultiByteToWideChar(CP_UTF8, 0, sDLLDirectoryUTF8.c_str(), nPathLength, &wsDLLPath[0], nPathBufferSize);
+	if (nPathResult == 0)
+		throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_COULDNOTLOADLIBRARY);
+
+	m_sDLLDirectoryW = std::wstring(wsDLLPath.data());
+
+	auto pDirectoryCache = cacheDllDirectory();
 
 	HMODULE hLibrary = LoadLibraryW(wsLibraryFileName.data());
 	if (hLibrary == 0)
@@ -175,3 +186,35 @@ void CTMLSDK::resetFunctionPtrs()
 
 }
 
+PTMLSDK_DLLDirectoryCache CTMLSDK::cacheDllDirectory()
+{
+	auto pCache = std::make_shared<CTMLSDK_DLLDirectoryCache>();
+
+#ifdef _WIN32
+	SetDllDirectoryW(m_sDLLDirectoryW.c_str());
+#endif // _WIN32
+
+	return pCache;
+
+}
+
+CTMLSDK_DLLDirectoryCache::CTMLSDK_DLLDirectoryCache()
+{
+#ifdef _WIN32
+	std::vector<wchar_t> buffer;
+	buffer.resize(MAX_PATH + 1);
+	GetDllDirectoryW(MAX_PATH, buffer.data());
+
+	buffer.at(MAX_PATH) = 0;
+	m_sCachedDLLDirectoryW = std::wstring(buffer.data());
+#endif // _WIN32
+}
+
+CTMLSDK_DLLDirectoryCache::~CTMLSDK_DLLDirectoryCache()
+{
+#ifdef _WIN32
+	if (!m_sCachedDLLDirectoryW.empty()) {
+		SetDllDirectoryW(m_sCachedDLLDirectoryW.c_str());
+	}
+#endif // _WIN32
+}

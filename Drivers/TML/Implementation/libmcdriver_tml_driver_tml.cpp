@@ -38,7 +38,6 @@ Abstract: This is a stub class definition of CDriver_TML
 
 // Include custom headers here.
 
-
 using namespace LibMCDriver_TML::Impl;
 
 /*************************************************************************************************************************
@@ -71,9 +70,6 @@ bool CDriver_TML::IsSimulationMode()
 void CDriver_TML::SetCustomSDKResource(const std::string& sLibResourceName, const std::string& sCommsResourceName)
 {
 	
-    if (sdkIsLoaded())
-        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_SDKALREADYLOADED);
-
     m_SDKLibDLLBuffer.resize(0);
     m_SDKCommsDLLBuffer.resize(0);
 
@@ -102,8 +98,8 @@ void CDriver_TML::ensureSDKIsLoaded()
 
         m_pTMLLibDLLLibrary = m_pWorkingDirectory->StoreCustomData("TML_lib.dll", m_SDKLibDLLBuffer);
 
-        m_pTMLCommsDLLLibrary = m_pWorkingDirectory->StoreCustomData("tmlcomms.dll", m_SDKCommsDLLBuffer);
-
+        m_pTMLCommsDLLLibrary = m_pWorkingDirectory->StoreCustomData("tmlcomm.dll", m_SDKCommsDLLBuffer);
+        
 #else
 
         m_pTMLLibDLLLibrary = m_pWorkingDirectory->StoreCustomData("tml_lib.so", m_SDKLibDLLBuffer);
@@ -112,7 +108,7 @@ void CDriver_TML::ensureSDKIsLoaded()
 
 #endif
 
-        m_pTMLSDK = std::make_shared<CTMLSDK> (m_pTMLLibDLLLibrary->GetAbsoluteFileName());
+        m_pTMLSDK = std::make_shared<CTMLSDK> (m_pTMLLibDLLLibrary->GetAbsoluteFileName(), m_pWorkingDirectory->GetAbsoluteFilePath ());
 
         m_pTMLInstance = std::make_shared<CTMLInstance>(m_pTMLSDK, m_pWorkingDirectory);
 

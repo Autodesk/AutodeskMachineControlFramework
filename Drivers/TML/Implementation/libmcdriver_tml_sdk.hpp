@@ -70,12 +70,28 @@ namespace LibMCDriver_TML {
 		typedef tmlLPCSTR(TML_CALLINGCONVENTION* PTS_GetLastErrorText) ();
 		
 		
+		class CTMLSDK_DLLDirectoryCache {
+		private:
+#ifdef _WIN32
+			std::wstring m_sCachedDLLDirectoryW;
+#endif // _WIN32
 
+		public:
+			CTMLSDK_DLLDirectoryCache();
+			virtual ~CTMLSDK_DLLDirectoryCache();
+
+		};
+
+		typedef std::shared_ptr<CTMLSDK_DLLDirectoryCache> PTMLSDK_DLLDirectoryCache;
 
 		class CTMLSDK {
 		private:
+			std::wstring m_sDLLDirectoryW;
+
 			void* m_LibraryHandle;
 			void resetFunctionPtrs ();
+
+			PTMLSDK_DLLDirectoryCache cacheDllDirectory();
 		public:
 
 			PTS_LoadSetup TS_LoadSetup = nullptr;
@@ -89,7 +105,7 @@ namespace LibMCDriver_TML {
 			PTS_ReadStatus TS_ReadStatus = nullptr;
 			PTS_GetLastErrorText TS_GetLastErrorText = nullptr;
 
-			CTMLSDK(const std::string & sDLLNameUTF8);			
+			CTMLSDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);			
 			virtual ~CTMLSDK();
 
 			void checkError(bool bSuccess);
