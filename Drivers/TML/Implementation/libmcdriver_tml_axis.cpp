@@ -63,7 +63,7 @@ CAxis::~CAxis()
 
 void CAxis::SetPower(const bool bEnable)
 {
-	throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_NOTIMPLEMENTED);
+    m_pTMLInstance->setAxisPower(m_sChannelIdentifier, m_sAxisIdentifier, bEnable);
 }
 
 std::string CAxis::GetIdentifier()

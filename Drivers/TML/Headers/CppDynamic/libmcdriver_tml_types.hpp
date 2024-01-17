@@ -127,6 +127,7 @@ typedef void * LibMCDriver_TML_pvoid;
 #define LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID 1020 /** Invalid Axis Hardware ID */
 #define LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS 1021 /** Axis already exists */
 #define LIBMCDRIVER_TML_ERROR_AXISNOTFOUND 1022 /** Axis not found */
+#define LIBMCDRIVER_TML_ERROR_AXISNOTINCHANNEL 1023 /** Axis not in channel */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_TML
@@ -166,6 +167,7 @@ inline const char * LIBMCDRIVER_TML_GETERRORSTRING (LibMCDriver_TMLResult nError
     case LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID: return "Invalid Axis Hardware ID";
     case LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS: return "Axis already exists";
     case LIBMCDRIVER_TML_ERROR_AXISNOTFOUND: return "Axis not found";
+    case LIBMCDRIVER_TML_ERROR_AXISNOTINCHANNEL: return "Axis not in channel";
     default: return "unknown error";
   }
 }

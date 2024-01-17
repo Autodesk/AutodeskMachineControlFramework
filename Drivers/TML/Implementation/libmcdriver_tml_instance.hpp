@@ -79,6 +79,8 @@ private:
 
     std::map<std::string, CTMLAxisInstance> m_AxisMap;
 
+    void ensureAxisExistsInChannel(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+
 public:
 
     CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory);
@@ -100,6 +102,8 @@ public:
     void setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer);
 
     void selectAxisInternal(const std::string& sAxisIdentifier);
+
+    void setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable);
 
 };
 

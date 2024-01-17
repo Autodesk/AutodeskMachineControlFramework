@@ -72,9 +72,7 @@
 		<error name="INVALIDAXISHARDWAREID" code="1020" description="Invalid Axis Hardware ID" />
 		<error name="AXISALREADYEXISTS" code="1021" description="Axis already exists" />
 		<error name="AXISNOTFOUND" code="1022" description="Axis not found" />
-		
-		
-		
+		<error name="AXISNOTINCHANNEL" code="1023" description="Axis not in channel" />
 			
 	</errors>
 

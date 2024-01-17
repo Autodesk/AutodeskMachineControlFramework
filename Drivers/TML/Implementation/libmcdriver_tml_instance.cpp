@@ -265,5 +265,30 @@ void CTMLInstance::selectAxisInternal(const std::string& sAxisIdentifier)
     m_pTMLSDK->checkError(m_pTMLSDK->TS_SelectAxis(iIter->second.getHardwareID ()));
 }
 
+void CTMLInstance::ensureAxisExistsInChannel(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+{
+    if (!checkIdentifierString(sChannelIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sChannelIdentifier);
+    if (!checkIdentifierString(sAxisIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER, "invalid axis identifier: " + sAxisIdentifier);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+    if (iIter == m_AxisMap.end()) {
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISNOTFOUND, "axis not found: " + sAxisIdentifier);
+    } else {
+        if (iIter->second.getChannelIdentifier() != sChannelIdentifier) {
+            throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISNOTINCHANNEL, "axis " + sAxisIdentifier + " is not in channel " + sChannelIdentifier);
+        }
+    }
+
+}
 
 
+
+void CTMLInstance::setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+
+    m_pTMLSDK->TS_Power(bEnable);
+}
