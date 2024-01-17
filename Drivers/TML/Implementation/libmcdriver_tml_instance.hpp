@@ -91,6 +91,8 @@ public:
 
     void closeChannel(const std::string& sIdentifier);
 
+    void closeAllChannels();
+
     bool channelExists(const std::string& sIdentifier);
 
     static bool checkIdentifierString(const std::string& sIdentifier);

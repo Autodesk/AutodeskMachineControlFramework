@@ -52,6 +52,7 @@ namespace LibMCDriver_TML {
 
 
 		typedef int32_t tmlInt;
+		typedef int32_t tmlLong;		
 		typedef int32_t tmlBool;
 		typedef int8_t tmlByte;
 		typedef int16_t tmlShort;
@@ -60,7 +61,7 @@ namespace LibMCDriver_TML {
 
 		typedef tmlInt (TML_CALLINGCONVENTION* PTS_LoadSetup) (const char * pszSetupPath);
 		typedef tmlInt (TML_CALLINGCONVENTION* PTS_OpenChannel) (const char * pszDeviceName, uint8_t nType, uint8_t nHostID, uint32_t nBaudRate);		
-		typedef void(TML_CALLINGCONVENTION* PTS_CloseChannel) (tmlInt nFileDescriptor);		
+		typedef void(TML_CALLINGCONVENTION* PTS_CloseChannel) (tmlInt nFileDescriptor);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_DriveInitialisation) ();
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_SetupAxis) (tmlByte nAxisID, tmlInt nSetupID);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_SelectAxis) (tmlByte nAxisID);
@@ -68,7 +69,19 @@ namespace LibMCDriver_TML {
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_Power) (tmlBool bEnable);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_ReadStatus) (tmlShort nSelectionIndex, tmlWord & nStatus);
 		typedef tmlLPCSTR(TML_CALLINGCONVENTION* PTS_GetLastErrorText) ();
+
+		typedef bool(TML_CALLINGCONVENTION* PTS_SelectChannel) (tmlInt nFileDescriptor);
+		typedef bool(TML_CALLINGCONVENTION* PTS_MoveAbsolute) (tmlLong nAbsPosition, double dSpeed, double dAcceleration, tmlShort nMoveMoment, tmlShort nReferenceBase);
+		typedef bool(TML_CALLINGCONVENTION* PTS_MoveRelative) (tmlLong nRelativePosition, double dSpeed, double dAcceleration, tmlBool isAdditive, tmlShort nMoveMoment, tmlShort nReferenceBase);
+		typedef bool(TML_CALLINGCONVENTION* PTS_MoveVelocity) (double dSpeed, double dAcceleration, tmlShort nMoveMoment, tmlShort nReferenceBase);
+		typedef bool(TML_CALLINGCONVENTION* PTS_Stop) ();
+		typedef bool(TML_CALLINGCONVENTION* PTS_SetPosition) (tmlLong nPositionValue);
+		typedef bool(TML_CALLINGCONVENTION* PTS_SetTargetPositionToActual) ();
+		typedef bool(TML_CALLINGCONVENTION* PTS_CancelableCALL_Label) (const char * pszFunctionName);
+		typedef bool(TML_CALLINGCONVENTION* PTS_ABORT) ();
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetInput) (tmlByte nIO, tmlByte & nInValue);				
 		
+
 		
 		class CTMLSDK_DLLDirectoryCache {
 		private:

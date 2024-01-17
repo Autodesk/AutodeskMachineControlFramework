@@ -100,7 +100,7 @@ CTMLInstance::CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorking
 
 CTMLInstance::~CTMLInstance()
 {
-
+    closeAllChannels();
 }
 
 void CTMLInstance::openChannel(const std::string& sIdentifier, const std::string& sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate)
@@ -166,9 +166,30 @@ void CTMLInstance::closeChannel(const std::string& sIdentifier)
     if (!checkIdentifierString(sIdentifier))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sIdentifier);
 
+    auto iChannelIter = m_ChannelFileDescriptorMap.find(sIdentifier);
+    if (iChannelIter != m_ChannelFileDescriptorMap.end ()) {
+        m_pTMLSDK->TS_CloseChannel(iChannelIter->second);
+    }
+
     m_ChannelFileDescriptorMap.erase(sIdentifier);
 
+    // TODO: Delete all axes...
+
 }
+
+void CTMLInstance::closeAllChannels()
+{
+    if (m_pTMLSDK.get() != nullptr) {
+        if (m_pTMLSDK->TS_CloseChannel != nullptr) {
+            for (auto iChannel : m_ChannelFileDescriptorMap)
+                m_pTMLSDK->TS_CloseChannel(iChannel.second);
+        }
+    }
+
+    m_AxisMap.clear();
+    m_ChannelFileDescriptorMap.clear();
+}
+
 
 bool CTMLInstance::channelExists(const std::string& sIdentifier)
 {
