@@ -453,6 +453,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES: return "INVALIDNUMBEROFSAMPLES";
 			case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "EMPTYALERTIDENTIFIER";
 			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "INVALIDALERTIDENTIFIER";
+			case LIBMCENV_ERROR_ALERTNOTFOUND: return "ALERTNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -597,6 +598,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES: return "Invalid number of samples";
 			case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
 			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
+			case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
 		}
 		return "unknown error";
 	}
@@ -1871,6 +1873,7 @@ public:
 	inline void ReleaseDataSeries(const std::string & sDataSeriesUUID);
 	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation);
 	inline PAlert FindAlert(const std::string & sUUID);
+	inline bool AlertExists(const std::string & sUUID);
 	inline void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment);
 };
 	
@@ -1967,6 +1970,7 @@ public:
 	inline void ReleaseDataSeries(const std::string & sDataSeriesUUID);
 	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation);
 	inline PAlert FindAlert(const std::string & sUUID);
+	inline bool AlertExists(const std::string & sUUID);
 	inline void AcknowledgeAlert(const std::string & sAlertUUID, const std::string & sUserComment);
 	inline void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment);
 };
@@ -2503,6 +2507,7 @@ public:
 		pWrapperTable->m_StateEnvironment_ReleaseDataSeries = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateAlert = nullptr;
 		pWrapperTable->m_StateEnvironment_FindAlert = nullptr;
+		pWrapperTable->m_StateEnvironment_AlertExists = nullptr;
 		pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
@@ -2567,6 +2572,7 @@ public:
 		pWrapperTable->m_UIEnvironment_ReleaseDataSeries = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateAlert = nullptr;
 		pWrapperTable->m_UIEnvironment_FindAlert = nullptr;
+		pWrapperTable->m_UIEnvironment_AlertExists = nullptr;
 		pWrapperTable->m_UIEnvironment_AcknowledgeAlert = nullptr;
 		pWrapperTable->m_UIEnvironment_AcknowledgeAlertForUser = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -6684,6 +6690,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_AlertExists = (PLibMCEnvStateEnvironment_AlertExistsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_alertexists");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_AlertExists = (PLibMCEnvStateEnvironment_AlertExistsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_alertexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_AlertExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser = (PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_acknowledgealertforuser");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser = (PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr) dlsym(hLibrary, "libmcenv_stateenvironment_acknowledgealertforuser");
@@ -7257,6 +7272,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_FindAlert == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_AlertExists = (PLibMCEnvUIEnvironment_AlertExistsPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_alertexists");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_AlertExists = (PLibMCEnvUIEnvironment_AlertExistsPtr) dlsym(hLibrary, "libmcenv_uienvironment_alertexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_AlertExists == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9142,6 +9166,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindAlert == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_alertexists", (void**)&(pWrapperTable->m_StateEnvironment_AlertExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_AlertExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_acknowledgealertforuser", (void**)&(pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_AcknowledgeAlertForUser == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9396,6 +9424,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_findalert", (void**)&(pWrapperTable->m_UIEnvironment_FindAlert));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindAlert == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_alertexists", (void**)&(pWrapperTable->m_UIEnvironment_AlertExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_AlertExists == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_acknowledgealert", (void**)&(pWrapperTable->m_UIEnvironment_AcknowledgeAlert));
@@ -15692,7 +15724,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* CStateEnvironment::FindAlert - finds an alert by UUID. Fails if alert does not exist.
 	* @param[in] sUUID - UUID of the alert to return.
 	* @return Alert instance.
 	*/
@@ -15701,11 +15733,23 @@ public:
 		LibMCEnvHandle hAlert = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindAlert(m_pHandle, sUUID.c_str(), &hAlert));
 		
-		if (hAlert) {
-			return std::make_shared<CAlert>(m_pWrapper, hAlert);
-		} else {
-			return nullptr;
+		if (!hAlert) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
+		return std::make_shared<CAlert>(m_pWrapper, hAlert);
+	}
+	
+	/**
+	* CStateEnvironment::AlertExists - Checks if a certain alert exists.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return True if alert exists.
+	*/
+	bool CStateEnvironment::AlertExists(const std::string & sUUID)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_AlertExists(m_pHandle, sUUID.c_str(), &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**
@@ -16610,7 +16654,7 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* CUIEnvironment::FindAlert - finds an alert by UUID. Fails if alert does not exist.
 	* @param[in] sUUID - UUID of the alert to return.
 	* @return Alert instance.
 	*/
@@ -16619,11 +16663,23 @@ public:
 		LibMCEnvHandle hAlert = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindAlert(m_pHandle, sUUID.c_str(), &hAlert));
 		
-		if (hAlert) {
-			return std::make_shared<CAlert>(m_pWrapper, hAlert);
-		} else {
-			return nullptr;
+		if (!hAlert) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
+		return std::make_shared<CAlert>(m_pWrapper, hAlert);
+	}
+	
+	/**
+	* CUIEnvironment::AlertExists - Checks if a certain alert exists.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return True if alert exists.
+	*/
+	bool CUIEnvironment::AlertExists(const std::string & sUUID)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_AlertExists(m_pHandle, sUUID.c_str(), &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**

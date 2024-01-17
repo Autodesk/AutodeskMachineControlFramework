@@ -4988,7 +4988,7 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr) (LibMCE
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateAlertPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
 
 /**
-* finds an alert by UUID. Returns null if alert does not exist.
+* finds an alert by UUID. Fails if alert does not exist.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pUUID - UUID of the alert to return.
@@ -4996,6 +4996,16 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateAlertPtr) (LibMCEnv_Sta
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindAlertPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, LibMCEnv_Alert * pAlert);
+
+/**
+* Checks if a certain alert exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUUID - UUID of the alert to return.
+* @param[out] pValue - True if alert exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_AlertExistsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool * pValue);
 
 /**
 * Acknowledges an alert for a specific user. 
@@ -5694,7 +5704,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ReleaseDataSeriesPtr) (LibMCEnv_
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
 
 /**
-* finds an alert by UUID. Returns null if alert does not exist.
+* finds an alert by UUID. Fails if alert does not exist.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pUUID - UUID of the alert to return.
@@ -5702,6 +5712,16 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateAlertPtr) (LibMCEnv_UIEnvi
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, LibMCEnv_Alert * pAlert);
+
+/**
+* Checks if a certain alert exists.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pUUID - UUID of the alert to return.
+* @param[out] pValue - True if alert exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AlertExistsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool * pValue);
 
 /**
 * Acknowledges an alert for the current user. 
@@ -6231,6 +6251,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr m_StateEnvironment_ReleaseDataSeries;
 	PLibMCEnvStateEnvironment_CreateAlertPtr m_StateEnvironment_CreateAlert;
 	PLibMCEnvStateEnvironment_FindAlertPtr m_StateEnvironment_FindAlert;
+	PLibMCEnvStateEnvironment_AlertExistsPtr m_StateEnvironment_AlertExists;
 	PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr m_StateEnvironment_AcknowledgeAlertForUser;
 	PLibMCEnvUIItem_GetNamePtr m_UIItem_GetName;
 	PLibMCEnvUIItem_GetPathPtr m_UIItem_GetPath;
@@ -6295,6 +6316,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_ReleaseDataSeriesPtr m_UIEnvironment_ReleaseDataSeries;
 	PLibMCEnvUIEnvironment_CreateAlertPtr m_UIEnvironment_CreateAlert;
 	PLibMCEnvUIEnvironment_FindAlertPtr m_UIEnvironment_FindAlert;
+	PLibMCEnvUIEnvironment_AlertExistsPtr m_UIEnvironment_AlertExists;
 	PLibMCEnvUIEnvironment_AcknowledgeAlertPtr m_UIEnvironment_AcknowledgeAlert;
 	PLibMCEnvUIEnvironment_AcknowledgeAlertForUserPtr m_UIEnvironment_AcknowledgeAlertForUser;
 	PLibMCEnvGetVersionPtr m_GetVersion;

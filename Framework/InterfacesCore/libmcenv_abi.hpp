@@ -5001,7 +5001,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_releasedataseries(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createalert(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
 
 /**
-* finds an alert by UUID. Returns null if alert does not exist.
+* finds an alert by UUID. Fails if alert does not exist.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pUUID - UUID of the alert to return.
@@ -5009,6 +5009,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createalert(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findalert(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, LibMCEnv_Alert * pAlert);
+
+/**
+* Checks if a certain alert exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUUID - UUID of the alert to return.
+* @param[out] pValue - True if alert exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_alertexists(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool * pValue);
 
 /**
 * Acknowledges an alert for a specific user. 
@@ -5707,7 +5717,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_releasedataseries(LibMCE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createalert(LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
 
 /**
-* finds an alert by UUID. Returns null if alert does not exist.
+* finds an alert by UUID. Fails if alert does not exist.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pUUID - UUID of the alert to return.
@@ -5715,6 +5725,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createalert(LibMCEnv_UIE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findalert(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, LibMCEnv_Alert * pAlert);
+
+/**
+* Checks if a certain alert exists.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pUUID - UUID of the alert to return.
+* @param[out] pValue - True if alert exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_alertexists(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool * pValue);
 
 /**
 * Acknowledges an alert for the current user. 

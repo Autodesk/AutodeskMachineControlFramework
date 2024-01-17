@@ -3977,11 +3977,18 @@ public:
 	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
 
 	/**
-	* IStateEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* IStateEnvironment::FindAlert - finds an alert by UUID. Fails if alert does not exist.
 	* @param[in] sUUID - UUID of the alert to return.
 	* @return Alert instance.
 	*/
 	virtual IAlert * FindAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IStateEnvironment::AlertExists - Checks if a certain alert exists.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return True if alert exists.
+	*/
+	virtual bool AlertExists(const std::string & sUUID) = 0;
 
 	/**
 	* IStateEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
@@ -4471,11 +4478,18 @@ public:
 	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
 
 	/**
-	* IUIEnvironment::FindAlert - finds an alert by UUID. Returns null if alert does not exist.
+	* IUIEnvironment::FindAlert - finds an alert by UUID. Fails if alert does not exist.
 	* @param[in] sUUID - UUID of the alert to return.
 	* @return Alert instance.
 	*/
 	virtual IAlert * FindAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IUIEnvironment::AlertExists - Checks if a certain alert exists.
+	* @param[in] sUUID - UUID of the alert to return.
+	* @return True if alert exists.
+	*/
+	virtual bool AlertExists(const std::string & sUUID) = 0;
 
 	/**
 	* IUIEnvironment::AcknowledgeAlert - Acknowledges an alert for the current user. 

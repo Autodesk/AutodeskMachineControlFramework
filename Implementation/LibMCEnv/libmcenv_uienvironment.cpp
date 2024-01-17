@@ -45,6 +45,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "amc_accesscontrol.hpp"
 #include "amc_meshhandler.hpp"
 #include "amc_dataserieshandler.hpp"
+#include "amc_alerthandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
@@ -617,13 +618,47 @@ void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 
 IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-    //return new CAlert ();
+    if (sIdentifier.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
+
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDALERTIDENTIFIER, "invalid alert identifier: " + sIdentifier);
+
+    auto sNewUUID = AMCCommon::CUtils::createUUID();
+
+    AMCCommon::CChrono chrono;
+    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+
+    auto pDefinition = m_pUISystemState->getAlertHandler()->findDefinition(sIdentifier, true);
+    auto alertDescription = pDefinition->getDescription();
+
+    auto pAlertSession = m_pUISystemState->getAlertSession();
+    pAlertSession->AddAlert(sNewUUID, pDefinition->getIdentifier(), pDefinition->getAlertLevel(), alertDescription.getCustomValue(), alertDescription.getStringIdentifier(), sReadableContextInformation, pDefinition->needsAcknowledgement(), sTimeStamp);
+
+    return new CAlert(sNewUUID, pAlertSession);
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
 {
-    return nullptr;
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pAlertSession = m_pUISystemState->getAlertSession();
+
+    if (!pAlertSession->HasAlert(sNormalizedUUID))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+
+    return new CAlert(sNormalizedUUID, pAlertSession);
+
+}
+
+bool CUIEnvironment::AlertExists(const std::string& sUUID)
+{
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pAlertSession = m_pUISystemState->getAlertSession();
+
+    return pAlertSession->HasAlert(sNormalizedUUID);
+
 }
 
 void CUIEnvironment::AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment)

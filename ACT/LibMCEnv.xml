@@ -175,6 +175,8 @@
 		<error name="INVALIDNUMBEROFSAMPLES" code="10135" description="Invalid number of samples"/>
 		<error name="EMPTYALERTIDENTIFIER" code="10136" description="Empty alert identifier"/>
 		<error name="INVALIDALERTIDENTIFIER" code="10137" description="Invalid alert identifier"/>
+		<error name="ALERTNOTFOUND" code="10138" description="Alert not found."/>
+		
 
 	</errors>
 
@@ -2773,9 +2775,14 @@
 			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 
-		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+		<method name="FindAlert" description="finds an alert by UUID. Fails if alert does not exist.">
 			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
-			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="AlertExists" description="Checks if a certain alert exists.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Value" type="bool" pass="return" description="True if alert exists." />
 		</method>
 
 		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
@@ -3129,9 +3136,14 @@
 			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 
-		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+		<method name="FindAlert" description="finds an alert by UUID. Fails if alert does not exist.">
 			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
-			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
+		</method>
+
+		<method name="AlertExists" description="Checks if a certain alert exists.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Value" type="bool" pass="return" description="True if alert exists." />
 		</method>
 
 		<method name="AcknowledgeAlert" description="Acknowledges an alert for the current user. ">

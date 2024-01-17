@@ -659,7 +659,25 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 {
-	return nullptr;
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	auto pAlertSession = m_pSystemState->createAlertSession();
+
+	if (!pAlertSession->HasAlert(sNormalizedUUID))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+
+	return new CAlert(sNormalizedUUID, pAlertSession);
+
+}
+
+bool CStateEnvironment::AlertExists(const std::string& sUUID)
+{
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	auto pAlertSession = m_pSystemState->createAlertSession();
+
+	return pAlertSession->HasAlert(sNormalizedUUID);
+
 }
 
 void CStateEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)

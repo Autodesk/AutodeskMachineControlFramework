@@ -14913,6 +14913,35 @@ LibMCEnvResult libmcenv_stateenvironment_findalert(LibMCEnv_StateEnvironment pSt
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_alertexists(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIStateEnvironment->AlertExists(sUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_acknowledgealertforuser(LibMCEnv_StateEnvironment pStateEnvironment, const char * pAlertUUID, const char * pUserUUID, const char * pUserComment)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -17186,6 +17215,35 @@ LibMCEnvResult libmcenv_uienvironment_findalert(LibMCEnv_UIEnvironment pUIEnviro
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_alertexists(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIUIEnvironment->AlertExists(sUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_acknowledgealert(LibMCEnv_UIEnvironment pUIEnvironment, const char * pAlertUUID, const char * pUserComment)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -18166,6 +18224,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createalert;
 	if (sProcName == "libmcenv_stateenvironment_findalert") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_findalert;
+	if (sProcName == "libmcenv_stateenvironment_alertexists") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_alertexists;
 	if (sProcName == "libmcenv_stateenvironment_acknowledgealertforuser") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_acknowledgealertforuser;
 	if (sProcName == "libmcenv_uiitem_getname") 
@@ -18294,6 +18354,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createalert;
 	if (sProcName == "libmcenv_uienvironment_findalert") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_findalert;
+	if (sProcName == "libmcenv_uienvironment_alertexists") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_alertexists;
 	if (sProcName == "libmcenv_uienvironment_acknowledgealert") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_acknowledgealert;
 	if (sProcName == "libmcenv_uienvironment_acknowledgealertforuser") 

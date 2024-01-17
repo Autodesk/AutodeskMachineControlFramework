@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance)
+CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PAlertSession pAlertSession)
     : m_pStateMachineData(pStateMachineData),
     m_pSignalHandler(pSignalHandler),
     m_pBuildJobHandler(pBuildJobHandler),
@@ -50,7 +50,9 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
     m_pLoginHandler(pLoginHandler),
     m_pMeshHandler(pMeshHandler),
     m_pDataSeriesHandler (pDataSeriesHandler),
-    m_pGlobalChronoInstance (pGlobalChronoInstance)
+    m_pGlobalChronoInstance (pGlobalChronoInstance),
+    m_pAlertHandler (pAlertHandler),
+    m_pAlertSession (pAlertSession)
 {
     if (pStateMachineData.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -77,6 +79,10 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
     if (pDataSeriesHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pGlobalChronoInstance.get () == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pAlertHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pAlertSession.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 
@@ -105,6 +111,11 @@ PLogger CUISystemState::getLogger()
 PStateJournal CUISystemState::getStateJournal()
 {
     return m_pStateJournal;
+}
+
+PAlertHandler CUISystemState::getAlertHandler()
+{
+    return m_pAlertHandler;
 }
 
 
@@ -152,6 +163,12 @@ LibMCData::PStorage CUISystemState::getStorage()
 {
     return m_pStorage;
 }
+
+LibMCData::PAlertSession CUISystemState::getAlertSession()
+{
+    return m_pAlertSession;
+}
+
 
 PDataSeriesHandler CUISystemState::getDataSeriesHandler()
 {

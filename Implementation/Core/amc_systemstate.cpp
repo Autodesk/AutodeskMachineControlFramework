@@ -93,7 +93,7 @@ namespace AMC {
 		m_pDataSeriesHandler = std::make_shared<CDataSeriesHandler>();
 		m_pAlertHandler = std::make_shared<CAlertHandler>();
 
-		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono);
+		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono, m_pAlertHandler, createAlertSession ());
 		m_pUIHandler = std::make_shared<CUIHandler>(pEnvWrapper, pUISystemState);
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");

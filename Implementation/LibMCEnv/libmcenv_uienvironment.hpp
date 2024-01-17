@@ -215,6 +215,8 @@ public:
 
 	IAlert* FindAlert(const std::string& sUUID) override;
 
+	bool AlertExists(const std::string& sUUID) override;
+
 	void AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment) override;
 
 	void AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
