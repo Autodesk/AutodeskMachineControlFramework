@@ -334,6 +334,19 @@ public:
 	*/
 	virtual void SetPower(const bool bEnable) = 0;
 
+	/**
+	* IAxis::ReadRegister - Reads the selected register of an axis.
+	* @param[in] nRegister - Selected register.
+	* @return Value inside register.
+	*/
+	virtual LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister) = 0;
+
+	/**
+	* IAxis::CheckPower - Checks the power of the selected axis.
+	* @return True for power on.
+	*/
+	virtual bool CheckPower() = 0;
+
 };
 
 typedef IBaseSharedPtr<IAxis> PIAxis;

@@ -311,5 +311,18 @@ void CTMLInstance::setAxisPower(const std::string& sChannelIdentifier, const std
     ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
     selectAxisInternal(sAxisIdentifier);
 
-    m_pTMLSDK->TS_Power(bEnable);
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_Power(bEnable));
+}
+
+
+tmlWord CTMLInstance::readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+
+    tmlWord pStatus = 0;
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_ReadStatus(sReadRegister, pStatus));
+
+    return pStatus;
 }

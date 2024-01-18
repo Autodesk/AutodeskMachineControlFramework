@@ -71,7 +71,9 @@ public:
 
     virtual ~CAxis();
 
-	void SetPower(const bool bEnable) override;
+    void SetPower(const bool bEnable) override;
+    LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister) override;
+    bool CheckPower() override;
 
     std::string GetIdentifier() override;
 

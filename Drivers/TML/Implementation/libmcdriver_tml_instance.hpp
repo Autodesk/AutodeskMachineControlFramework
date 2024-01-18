@@ -40,6 +40,9 @@ Abstract: This is the class declaration of CChannel
 
 #include <map>
 
+#define TML_REG_SRL 3UL
+#define TML_REG_SRL_POWERBIT (1UL<<15)
+
 namespace LibMCDriver_TML {
 namespace Impl {
 
@@ -106,6 +109,8 @@ public:
     void selectAxisInternal(const std::string& sAxisIdentifier);
 
     void setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable);
+
+    tmlWord readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister);
 
 };
 

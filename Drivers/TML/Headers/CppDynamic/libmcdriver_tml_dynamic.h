@@ -149,6 +149,25 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetChannelIdentifierPtr) (L
 */
 typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_SetPowerPtr) (LibMCDriver_TML_Axis pAxis, bool bEnable);
 
+/**
+* Reads the selected register of an axis.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] nRegister - Selected register.
+* @param[out] pData - Value inside register.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_ReadRegisterPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_uint32 nRegister, LibMCDriver_TML_uint32 * pData);
+
+/**
+* Checks the power of the selected axis.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pData - True for power on.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_CheckPowerPtr) (LibMCDriver_TML_Axis pAxis, bool * pData);
+
 /*************************************************************************************************************************
  Class definition for Channel
 **************************************************************************************************************************/
@@ -356,6 +375,8 @@ typedef struct {
 	PLibMCDriver_TMLAxis_GetIdentifierPtr m_Axis_GetIdentifier;
 	PLibMCDriver_TMLAxis_GetChannelIdentifierPtr m_Axis_GetChannelIdentifier;
 	PLibMCDriver_TMLAxis_SetPowerPtr m_Axis_SetPower;
+	PLibMCDriver_TMLAxis_ReadRegisterPtr m_Axis_ReadRegister;
+	PLibMCDriver_TMLAxis_CheckPowerPtr m_Axis_CheckPower;
 	PLibMCDriver_TMLChannel_GetIdentifierPtr m_Channel_GetIdentifier;
 	PLibMCDriver_TMLChannel_SetupAxisPtr m_Channel_SetupAxis;
 	PLibMCDriver_TMLChannel_FindAxisPtr m_Channel_FindAxis;

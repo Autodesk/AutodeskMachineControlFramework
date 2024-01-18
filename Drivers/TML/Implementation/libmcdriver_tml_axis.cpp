@@ -66,6 +66,26 @@ void CAxis::SetPower(const bool bEnable)
     m_pTMLInstance->setAxisPower(m_sChannelIdentifier, m_sAxisIdentifier, bEnable);
 }
 
+bool CAxis::CheckPower(void)
+{
+    LibMCDriver_TML_uint32 register_value = m_pTMLInstance->readAxisStatus(m_sChannelIdentifier, m_sAxisIdentifier, TML_REG_SRL);
+
+    
+    if ((register_value & TML_REG_SRL_POWERBIT) != 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+
+LibMCDriver_TML_uint32 CAxis::ReadRegister(const LibMCDriver_TML_uint32 nRegister)
+{
+    return m_pTMLInstance->readAxisStatus(m_sChannelIdentifier, m_sAxisIdentifier, nRegister);
+}
+
 std::string CAxis::GetIdentifier()
 {
     return m_sAxisIdentifier;
