@@ -79,7 +79,7 @@ IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML
     if ((nConfigurationBufferSize == 0) || (pConfigurationBuffer == nullptr))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER);
 
-    m_pTMLInstance->setupAxis(sIdentifier, m_sChannelIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer);
+    m_pTMLInstance->setupAxis(m_sChannelIdentifier, sIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer);
 
     return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier);
 
