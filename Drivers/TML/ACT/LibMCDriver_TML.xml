@@ -158,6 +158,16 @@ Custom implementation
 		<method name="SetPower" description="Sets the power for an axis.">		
 			<param name="Enable" type="bool" pass="in" description="Flag if the power is enabled or not enabled." />
 		</method>	
+		
+		<method name="ReadRegister" description="Reads the selected register of an axis.">		
+			<param name="Register" type="uint32" pass="in" description="Selected register." />
+			<param name="Data" type="uint32" pass="return" description="Value inside register." />
+		</method>	
+
+		<method name="CheckPower" description="Checks the power of the selected axis.">		
+			<param name="Data" type="bool" pass="return" description="True for power on." />
+		</method>	
+
 
 		
 	</class>

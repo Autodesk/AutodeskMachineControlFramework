@@ -162,6 +162,25 @@ LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_getchannelid
 */
 LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_setpower(LibMCDriver_TML_Axis pAxis, bool bEnable);
 
+/**
+* Reads the selected register of an axis.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] nRegister - Selected register.
+* @param[out] pData - Value inside register.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_readregister(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_uint32 nRegister, LibMCDriver_TML_uint32 * pData);
+
+/**
+* Checks the power of the selected axis.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pData - True for power on.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_checkpower(LibMCDriver_TML_Axis pAxis, bool * pData);
+
 /*************************************************************************************************************************
  Class definition for Channel
 **************************************************************************************************************************/

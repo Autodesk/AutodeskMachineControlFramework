@@ -471,6 +471,8 @@ public:
 	inline std::string GetIdentifier();
 	inline std::string GetChannelIdentifier();
 	inline void SetPower(const bool bEnable);
+	inline LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister);
+	inline bool CheckPower();
 };
 	
 /*************************************************************************************************************************
@@ -647,6 +649,8 @@ public:
 		pWrapperTable->m_Axis_GetIdentifier = nullptr;
 		pWrapperTable->m_Axis_GetChannelIdentifier = nullptr;
 		pWrapperTable->m_Axis_SetPower = nullptr;
+		pWrapperTable->m_Axis_ReadRegister = nullptr;
+		pWrapperTable->m_Axis_CheckPower = nullptr;
 		pWrapperTable->m_Channel_GetIdentifier = nullptr;
 		pWrapperTable->m_Channel_SetupAxis = nullptr;
 		pWrapperTable->m_Channel_FindAxis = nullptr;
@@ -794,6 +798,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Axis_SetPower == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_ReadRegister = (PLibMCDriver_TMLAxis_ReadRegisterPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_readregister");
+		#else // _WIN32
+		pWrapperTable->m_Axis_ReadRegister = (PLibMCDriver_TMLAxis_ReadRegisterPtr) dlsym(hLibrary, "libmcdriver_tml_axis_readregister");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_ReadRegister == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_CheckPower = (PLibMCDriver_TMLAxis_CheckPowerPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_checkpower");
+		#else // _WIN32
+		pWrapperTable->m_Axis_CheckPower = (PLibMCDriver_TMLAxis_CheckPowerPtr) dlsym(hLibrary, "libmcdriver_tml_axis_checkpower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_CheckPower == nullptr)
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1010,6 +1032,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_SetPower == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_readregister", (void**)&(pWrapperTable->m_Axis_ReadRegister));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_ReadRegister == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_checkpower", (void**)&(pWrapperTable->m_Axis_CheckPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_CheckPower == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_tml_channel_getidentifier", (void**)&(pWrapperTable->m_Channel_GetIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Channel_GetIdentifier == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1210,6 +1240,31 @@ public:
 	void CAxis::SetPower(const bool bEnable)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Axis_SetPower(m_pHandle, bEnable));
+	}
+	
+	/**
+	* CAxis::ReadRegister - Reads the selected register of an axis.
+	* @param[in] nRegister - Selected register.
+	* @return Value inside register.
+	*/
+	LibMCDriver_TML_uint32 CAxis::ReadRegister(const LibMCDriver_TML_uint32 nRegister)
+	{
+		LibMCDriver_TML_uint32 resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_ReadRegister(m_pHandle, nRegister, &resultData));
+		
+		return resultData;
+	}
+	
+	/**
+	* CAxis::CheckPower - Checks the power of the selected axis.
+	* @return True for power on.
+	*/
+	bool CAxis::CheckPower()
+	{
+		bool resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_CheckPower(m_pHandle, &resultData));
+		
+		return resultData;
 	}
 	
 	/**
