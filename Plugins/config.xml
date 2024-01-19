@@ -45,6 +45,13 @@
     
   </accesscontrol>
 
+  <alerts>
+    <alert name="testalert"	level="warning"	description="Test alert on PLC" acknowledgepermission="permission_acknowledgealerts" />
+    <alert name="dooropen"	level="criticalerror"	description="Door is open" acknowledgepermission="permission_acknowledgealerts" />
+    <alert name="halfemptysomething"	level="message"	description="Something reached 50% fill level" />
+    <alert name="recoatercrashed"	level="fatalerror"	description="Recoater crashed" acknowledgepermission="permission_acknowledgealerts" />
+  </alerts>
+  
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol"/>
 	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
 	<driver name="raylase" library="driver_raylase" type="raylase"/>
@@ -331,7 +338,7 @@
 						<edit name="mainstatename" caption="Main System" readonly="1" sync:value="main.$state"/>
 						<edit name="scannerstatename" caption="Scanner System" readonly="1" sync:value="laser.$state"/>
 						<edit name="plcstatename" caption="PLC System" readonly="1" sync:value="plc.$state"/>
-            <edit name="test" caption="Test" sync:value="main.jobinfo.countertest" format:value="test %.2f" validation="double" minvalue="10" maxvalue="20" validationmessage="Invalid value!"/>
+            <edit name="test" caption="Test" sync:value="main.jobinfo.countertest" validation="double" minvalue="10" maxvalue="20" validationmessage="Invalid value!"/>
           </form>
 
 
@@ -554,7 +561,7 @@
 
 		</page>
 
-		<page name="systemlog">
+    <page name="systemlog">
 
 			<logs name="systemlog" caption="Log Messages">
 			</logs>
