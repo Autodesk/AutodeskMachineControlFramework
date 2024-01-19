@@ -275,7 +275,7 @@ void CStateEnvironment::SetStringParameter(const std::string& sParameterGroup, c
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setParameterValueByName(sParameterName, sValue);
 }
@@ -288,7 +288,7 @@ void CStateEnvironment::SetUUIDParameter(const std::string& sParameterGroup, con
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
 }
@@ -301,7 +301,7 @@ void CStateEnvironment::SetDoubleParameter(const std::string& sParameterGroup, c
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setDoubleParameterValueByName(sParameterName, dValue);
 }
@@ -313,7 +313,7 @@ void CStateEnvironment::SetIntegerParameter(const std::string& sParameterGroup, 
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setIntParameterValueByName(sParameterName, nValue);
 }
@@ -325,7 +325,7 @@ void CStateEnvironment::SetBoolParameter(const std::string& sParameterGroup, con
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setBoolParameterValueByName(sParameterName, bValue);
 }
@@ -337,7 +337,7 @@ std::string CStateEnvironment::GetStringParameter(const std::string& sParameterG
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getParameterValueByName(sParameterName);
 }
@@ -350,7 +350,7 @@ std::string CStateEnvironment::GetUUIDParameter(const std::string& sParameterGro
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sParameterName));
 }
@@ -362,7 +362,7 @@ LibMCEnv_double CStateEnvironment::GetDoubleParameter(const std::string& sParame
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getDoubleParameterValueByName(sParameterName);
 }
@@ -374,7 +374,7 @@ LibMCEnv_int64 CStateEnvironment::GetIntegerParameter(const std::string& sParame
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getIntParameterValueByName(sParameterName);
 }
@@ -386,7 +386,7 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
