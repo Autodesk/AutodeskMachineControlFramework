@@ -698,6 +698,7 @@ typedef LibMCDataHandle LibMCData_BuildJobHandler;
 typedef LibMCDataHandle LibMCData_UserList;
 typedef LibMCDataHandle LibMCData_LoginHandler;
 typedef LibMCDataHandle LibMCData_PersistencyHandler;
+typedef LibMCDataHandle LibMCData_InstallationInformation;
 typedef LibMCDataHandle LibMCData_DataModel;
 
 namespace LibMCData {

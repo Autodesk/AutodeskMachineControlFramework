@@ -453,6 +453,8 @@
 	</class>
 
 
+    <!-- The Iterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+ 
 	<class name="Iterator" parent="Base">
 		<method name="MoveNext" description="Iterates to the next resource in the list.">
 			<param name="HasNext" type="bool" pass="return" description="Iterates to the next resource in the list."/>
@@ -471,6 +473,7 @@
 		</method>
 	</class>
 
+    <!-- The LogEntryList class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="LogEntryList" parent="Base" description="List of retrieved log entries">
 	
 		<method name="Count" description="Returns the number of log entries in the list.">
@@ -501,7 +504,7 @@
 
 	</class>
 
-
+    <!-- The LogSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="LogSession" parent="Base" description="Logging Instance">
 	
 		<method name="AddEntry" description="adds a new log entry.">
@@ -525,6 +528,7 @@
 		
 	</class>
 
+    <!-- The AlertSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="AlertSession" parent="Base" description="Alert Session Instance">
 	
 		<method name="AddAlert" description="adds a new alert entry.">
@@ -558,7 +562,7 @@
 			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
 			<param name="UserUUID" type="string" pass="in" description="User UUID that acknowledged the alert." />	
 			<param name="UserComment" type="string" pass="in" description="Comment of the user." />	
-			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
 		</method>	
 
 		<method name="AlertHasBeenAcknowledged" description="Checks if an alert has been acknowledged. Fails if alert does not exist.">
@@ -576,6 +580,7 @@
 	</class>
 
 
+    <!-- The JournalSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
 
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
@@ -596,6 +601,7 @@
 				
 	</class>
 
+    <!-- The StorageStream class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="StorageStream" parent="Base" description="Storage Stream Instance">
 
 		<method name="GetUUID" description="returns the uuid of a storage stream.">
@@ -639,6 +645,7 @@
 	</class>
 
 
+    <!-- The Storage class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="Storage" parent="Base" description="Storage Handler Instance">
 
 		<method name="StreamIsReady" description="checks if a stream exists and is written to disk.">
@@ -703,6 +710,7 @@
 	</class>
 
 
+    <!-- The BuildJobData class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobData" parent="Base" description="Build Job Data instance">
 
 		<method name="GetDataUUID" description="returns the uuid of a build job data.">
@@ -751,6 +759,7 @@
 
 	</class>
 
+    <!-- The BuildJobDataIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobDataIterator" parent="Iterator">
 		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
 			<param name="CurrentInstance" type="handle" class="BuildJobData" pass="return" description="returns the build job instance."/>
@@ -758,6 +767,7 @@
 	</class>
 
 
+    <!-- The BuildJob class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJob" parent="Base" description="Build Job instance">
 
 		<method name="GetUUID" description="returns the uuid of a build job.">
@@ -833,6 +843,7 @@
 									
 	</class>
 
+    <!-- The BuildJobIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobIterator" parent="Iterator">
 		<method name="GetCurrentJob" description="Returns the build job the iterator points at.">
 			<param name="CurrentInstance" type="handle" class="BuildJob" pass="return" description="returns the build job instance."/>
@@ -840,6 +851,7 @@
 	</class>
 
 
+    <!-- The BuildJobHandler class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobHandler" parent="Base" description="Build Job handler">
 
 		<method name="CreateJob" description="Creates a new build job.">
@@ -880,6 +892,7 @@
 
 
 
+    <!-- The UserList class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="UserList" parent="Base" description="List of users">
 	
 		<method name="Count" description="Result Number of Users in the list.">
@@ -898,7 +911,8 @@
 	
 	</class>
 
-	<class name="LoginHandler" parent="Base" description="Login handler instance">
+    <!-- The LoginHandler class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="LoginHandler" parent="Base" description="Login handler instance" multithread="true">
 	
 		<method name="UserExists" description="Checks if a user exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
@@ -1025,6 +1039,7 @@
 	</class>
 
 
+    <!-- The PersistencyHandler class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="PersistencyHandler" parent="Base" description="Persistent parameter handler instance">
 		
 		<method name="HasPersistentParameter" description="Retrieves if a persistent parameter has been stored.">
@@ -1109,7 +1124,25 @@
 
 	</class>
 
+    <!-- The InstallationInformation class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="InstallationInformation" parent="Base" description="Installation information instance. Gives a snapshot of the installation information at creation of the instance. Does not update in the unlikely event of them changing.">
+	
+		<method name="GetInstallationUUID" description="Returns the installation UUID.">
+			<param name="InstallationUUID" type="string" pass="return" description="Installation UUID. Public value to document which installation was used for something." />	
+		</method>
 
+		<method name="GetInstallationSecret" description="Returns the installation Secret.">
+			<param name="InstallationSecret" type="string" pass="return" description="Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application." />	
+		</method>
+
+		<method name="GetBaseTempDirectory" description="Returns a custom base temp directory. An empty string defaults to the system temp directory.">
+			<param name="TempDirectory" type="string" pass="return" description="Temp directory path." />	
+		</method>
+		
+	</class>
+
+
+    <!-- The DataModel class is supposed to be thread safe. A methode MUST NOT return or out a string or a basicarray ever. -->
 	<class name="DataModel" parent="Base" description="MC DataModel Instance">
 
 		<method name="InitialiseDatabase" description="initializes the database connection.">
@@ -1122,9 +1155,13 @@
 			<param name="Version" type="uint32" pass="return" description="Data model version." />	
 		</method>
 
-		<method name="GetInstallationInformation" description="returns unique identifiers for the current installation.">
-			<param name="InstallationUUID" type="string" pass="out" description="Installation UUID. Public value to document which installation was used for something." />	
-			<param name="InstallationSecret" type="string" pass="out" description="Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application." />	
+		<method name="GetInstallationInformation" description="DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.">
+			<param name="DEPRECIATEDInstallationUUID" type="string" pass="out" description="DEPRECIATED Installation UUID. Public value to document which installation was used for something." />	
+			<param name="DEPRECIATEDInstallationSecret" type="string" pass="out" description="DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application." />	
+		</method>
+
+		<method name="GetInstallationInformationObject" description="returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.">
+			<param name="InstallationInformation" type="class" class="InstallationInformation" pass="return" description="Installation information instance." />	
 		</method>
 
 		<method name="CreateStorage" description="creates a storage access class.">
@@ -1159,7 +1196,7 @@
 			<param name="TempDirectory" type="string" pass="in" description="Temp directory path to use. SHOULD be an absolute path, if not empty. Directory MUST exist, if not empty." />	
 		</method>
 
-		<method name="GetBaseTempDirectory" description="Returns a custom base temp directory. An empty string defaults to the system temp directory.">
+		<method name="GetBaseTempDirectory" description="DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.">
 			<param name="TempDirectory" type="string" pass="return" description="Temp directory path." />	
 		</method>
 

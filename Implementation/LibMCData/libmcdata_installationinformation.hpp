@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CAlertSession
+Abstract: This is the class declaration of CInstallationInformation
 
 */
 
 
-#ifndef __LIBMCDATA_ALERTSESSION
-#define __LIBMCDATA_ALERTSESSION
+#ifndef __LIBMCDATA_INSTALLATIONINFORMATION
+#define __LIBMCDATA_INSTALLATIONINFORMATION
 
 #include "libmcdata_interfaces.hpp"
 
@@ -45,38 +45,34 @@ Abstract: This is the class declaration of CAlertSession
 #endif
 
 // Include custom headers here.
-#include "amcdata_journal.hpp"
+
 
 namespace LibMCData {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CAlertSession 
+ Class declaration of CInstallationInformation 
 **************************************************************************************************************************/
 
-class CAlertSession : public virtual IAlertSession, public virtual CBase {
+class CInstallationInformation : public virtual IInstallationInformation, public virtual CBase {
 private:
 
-    AMCData::PJournal m_pJournal;
+    std::string m_sInstallationUUID;
+    std::string m_sInstallationSecret;
+    std::string m_sBaseTempDirectory;
 
 public:
 
-    CAlertSession(AMCData::PJournal pJournalSession);
+	CInstallationInformation(const std::string & sInstallationUUID, const std::string & sInstallationSecret, const std::string & sBaseTempDirectory);
 
-    virtual ~CAlertSession();
+	virtual ~CInstallationInformation();
 
-	void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC) override;
+	std::string GetInstallationUUID() override;
 
-	bool HasAlert(const std::string& sUUID) override;
+	std::string GetInstallationSecret() override;
 
-	void GetAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC) override;
-
-	void AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string& sTimestampUTC) override;
-
-	bool AlertHasBeenAcknowledged(const std::string& sUUID) override;
-
-	void GetAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC) override;
+	std::string GetBaseTempDirectory() override;
 
 };
 
@@ -86,4 +82,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_ALERTSESSION
+#endif // __LIBMCDATA_INSTALLATIONINFORMATION

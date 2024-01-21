@@ -75,6 +75,7 @@ class CBuildJobHandler;
 class CUserList;
 class CLoginHandler;
 class CPersistencyHandler;
+class CInstallationInformation;
 class CDataModel;
 
 /*************************************************************************************************************************
@@ -97,6 +98,7 @@ typedef CBuildJobHandler CLibMCDataBuildJobHandler;
 typedef CUserList CLibMCDataUserList;
 typedef CLoginHandler CLibMCDataLoginHandler;
 typedef CPersistencyHandler CLibMCDataPersistencyHandler;
+typedef CInstallationInformation CLibMCDataInstallationInformation;
 typedef CDataModel CLibMCDataDataModel;
 
 /*************************************************************************************************************************
@@ -119,6 +121,7 @@ typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
 typedef std::shared_ptr<CUserList> PUserList;
 typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
+typedef std::shared_ptr<CInstallationInformation> PInstallationInformation;
 typedef std::shared_ptr<CDataModel> PDataModel;
 
 /*************************************************************************************************************************
@@ -141,6 +144,7 @@ typedef PBuildJobHandler PLibMCDataBuildJobHandler;
 typedef PUserList PLibMCDataUserList;
 typedef PLoginHandler PLibMCDataLoginHandler;
 typedef PPersistencyHandler PLibMCDataPersistencyHandler;
+typedef PInstallationInformation PLibMCDataInstallationInformation;
 typedef PDataModel PLibMCDataDataModel;
 
 
@@ -932,6 +936,7 @@ private:
 	friend class CUserList;
 	friend class CLoginHandler;
 	friend class CPersistencyHandler;
+	friend class CInstallationInformation;
 	friend class CDataModel;
 
 };
@@ -1070,7 +1075,7 @@ public:
 	inline void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC);
 	inline bool HasAlert(const std::string & sUUID);
 	inline void GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC);
-	inline void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC);
+	inline void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC);
 	inline bool AlertHasBeenAcknowledged(const std::string & sUUID);
 	inline void GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC);
 };
@@ -1348,6 +1353,25 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CInstallationInformation 
+**************************************************************************************************************************/
+class CInstallationInformation : public CBase {
+public:
+	
+	/**
+	* CInstallationInformation::CInstallationInformation - Constructor for InstallationInformation class.
+	*/
+	CInstallationInformation(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetInstallationUUID();
+	inline std::string GetInstallationSecret();
+	inline std::string GetBaseTempDirectory();
+};
+	
+/*************************************************************************************************************************
  Class CDataModel 
 **************************************************************************************************************************/
 class CDataModel : public CBase {
@@ -1363,7 +1387,8 @@ public:
 	
 	inline void InitialiseDatabase(const std::string & sDataDirectory, const eDataBaseType eDataBaseType, const std::string & sConnectionString);
 	inline LibMCData_uint32 GetDataModelVersion();
-	inline void GetInstallationInformation(std::string & sInstallationUUID, std::string & sInstallationSecret);
+	inline void GetInstallationInformation(std::string & sDEPRECIATEDInstallationUUID, std::string & sDEPRECIATEDInstallationSecret);
+	inline PInstallationInformation GetInstallationInformationObject();
 	inline PStorage CreateStorage();
 	inline PBuildJobHandler CreateBuildJobHandler();
 	inline PLogSession CreateNewLogSession();
@@ -1589,9 +1614,13 @@ public:
 		pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter = nullptr;
+		pWrapperTable->m_InstallationInformation_GetInstallationUUID = nullptr;
+		pWrapperTable->m_InstallationInformation_GetInstallationSecret = nullptr;
+		pWrapperTable->m_InstallationInformation_GetBaseTempDirectory = nullptr;
 		pWrapperTable->m_DataModel_InitialiseDatabase = nullptr;
 		pWrapperTable->m_DataModel_GetDataModelVersion = nullptr;
 		pWrapperTable->m_DataModel_GetInstallationInformation = nullptr;
+		pWrapperTable->m_DataModel_GetInstallationInformationObject = nullptr;
 		pWrapperTable->m_DataModel_CreateStorage = nullptr;
 		pWrapperTable->m_DataModel_CreateBuildJobHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
@@ -2688,6 +2717,33 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationUUID = (PLibMCDataInstallationInformation_GetInstallationUUIDPtr) GetProcAddress(hLibrary, "libmcdata_installationinformation_getinstallationuuid");
+		#else // _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationUUID = (PLibMCDataInstallationInformation_GetInstallationUUIDPtr) dlsym(hLibrary, "libmcdata_installationinformation_getinstallationuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_InstallationInformation_GetInstallationUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationSecret = (PLibMCDataInstallationInformation_GetInstallationSecretPtr) GetProcAddress(hLibrary, "libmcdata_installationinformation_getinstallationsecret");
+		#else // _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationSecret = (PLibMCDataInstallationInformation_GetInstallationSecretPtr) dlsym(hLibrary, "libmcdata_installationinformation_getinstallationsecret");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_InstallationInformation_GetInstallationSecret == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_InstallationInformation_GetBaseTempDirectory = (PLibMCDataInstallationInformation_GetBaseTempDirectoryPtr) GetProcAddress(hLibrary, "libmcdata_installationinformation_getbasetempdirectory");
+		#else // _WIN32
+		pWrapperTable->m_InstallationInformation_GetBaseTempDirectory = (PLibMCDataInstallationInformation_GetBaseTempDirectoryPtr) dlsym(hLibrary, "libmcdata_installationinformation_getbasetempdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_InstallationInformation_GetBaseTempDirectory == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataModel_InitialiseDatabase = (PLibMCDataDataModel_InitialiseDatabasePtr) GetProcAddress(hLibrary, "libmcdata_datamodel_initialisedatabase");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_InitialiseDatabase = (PLibMCDataDataModel_InitialiseDatabasePtr) dlsym(hLibrary, "libmcdata_datamodel_initialisedatabase");
@@ -2712,6 +2768,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataModel_GetInstallationInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_GetInstallationInformationObject = (PLibMCDataDataModel_GetInstallationInformationObjectPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_getinstallationinformationobject");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_GetInstallationInformationObject = (PLibMCDataDataModel_GetInstallationInformationObjectPtr) dlsym(hLibrary, "libmcdata_datamodel_getinstallationinformationobject");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_GetInstallationInformationObject == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3357,6 +3422,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_installationinformation_getinstallationuuid", (void**)&(pWrapperTable->m_InstallationInformation_GetInstallationUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_InstallationInformation_GetInstallationUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_installationinformation_getinstallationsecret", (void**)&(pWrapperTable->m_InstallationInformation_GetInstallationSecret));
+		if ( (eLookupError != 0) || (pWrapperTable->m_InstallationInformation_GetInstallationSecret == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_installationinformation_getbasetempdirectory", (void**)&(pWrapperTable->m_InstallationInformation_GetBaseTempDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_InstallationInformation_GetBaseTempDirectory == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_datamodel_initialisedatabase", (void**)&(pWrapperTable->m_DataModel_InitialiseDatabase));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_InitialiseDatabase == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3367,6 +3444,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_getinstallationinformation", (void**)&(pWrapperTable->m_DataModel_GetInstallationInformation));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_GetInstallationInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_getinstallationinformationobject", (void**)&(pWrapperTable->m_DataModel_GetInstallationInformationObject));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_GetInstallationInformationObject == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createstorage", (void**)&(pWrapperTable->m_DataModel_CreateStorage));
@@ -3727,16 +3808,11 @@ public:
 	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
 	* @param[in] sUserUUID - User UUID that acknowledged the alert.
 	* @param[in] sUserComment - Comment of the user.
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	void CAlertSession::AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC)
+	void CAlertSession::AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC)
 	{
-		LibMCData_uint32 bytesNeededTimestampUTC = 0;
-		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str(), 0, &bytesNeededTimestampUTC, nullptr));
-		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str(), bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
-		sTimestampUTC = std::string(&bufferTimestampUTC[0]);
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str(), sTimestampUTC.c_str()));
 	}
 	
 	/**
@@ -5176,6 +5252,55 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CInstallationInformation
+	 */
+	
+	/**
+	* CInstallationInformation::GetInstallationUUID - Returns the installation UUID.
+	* @return Installation UUID. Public value to document which installation was used for something.
+	*/
+	std::string CInstallationInformation::GetInstallationUUID()
+	{
+		LibMCData_uint32 bytesNeededInstallationUUID = 0;
+		LibMCData_uint32 bytesWrittenInstallationUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationUUID(m_pHandle, 0, &bytesNeededInstallationUUID, nullptr));
+		std::vector<char> bufferInstallationUUID(bytesNeededInstallationUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationUUID(m_pHandle, bytesNeededInstallationUUID, &bytesWrittenInstallationUUID, &bufferInstallationUUID[0]));
+		
+		return std::string(&bufferInstallationUUID[0]);
+	}
+	
+	/**
+	* CInstallationInformation::GetInstallationSecret - Returns the installation Secret.
+	* @return Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	*/
+	std::string CInstallationInformation::GetInstallationSecret()
+	{
+		LibMCData_uint32 bytesNeededInstallationSecret = 0;
+		LibMCData_uint32 bytesWrittenInstallationSecret = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationSecret(m_pHandle, 0, &bytesNeededInstallationSecret, nullptr));
+		std::vector<char> bufferInstallationSecret(bytesNeededInstallationSecret);
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationSecret(m_pHandle, bytesNeededInstallationSecret, &bytesWrittenInstallationSecret, &bufferInstallationSecret[0]));
+		
+		return std::string(&bufferInstallationSecret[0]);
+	}
+	
+	/**
+	* CInstallationInformation::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* @return Temp directory path.
+	*/
+	std::string CInstallationInformation::GetBaseTempDirectory()
+	{
+		LibMCData_uint32 bytesNeededTempDirectory = 0;
+		LibMCData_uint32 bytesWrittenTempDirectory = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetBaseTempDirectory(m_pHandle, 0, &bytesNeededTempDirectory, nullptr));
+		std::vector<char> bufferTempDirectory(bytesNeededTempDirectory);
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetBaseTempDirectory(m_pHandle, bytesNeededTempDirectory, &bytesWrittenTempDirectory, &bufferTempDirectory[0]));
+		
+		return std::string(&bufferTempDirectory[0]);
+	}
+	
+	/**
 	 * Method definitions for class CDataModel
 	 */
 	
@@ -5203,22 +5328,37 @@ public:
 	}
 	
 	/**
-	* CDataModel::GetInstallationInformation - returns unique identifiers for the current installation.
-	* @param[out] sInstallationUUID - Installation UUID. Public value to document which installation was used for something.
-	* @param[out] sInstallationSecret - Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	* CDataModel::GetInstallationInformation - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.
+	* @param[out] sDEPRECIATEDInstallationUUID - DEPRECIATED Installation UUID. Public value to document which installation was used for something.
+	* @param[out] sDEPRECIATEDInstallationSecret - DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
 	*/
-	void CDataModel::GetInstallationInformation(std::string & sInstallationUUID, std::string & sInstallationSecret)
+	void CDataModel::GetInstallationInformation(std::string & sDEPRECIATEDInstallationUUID, std::string & sDEPRECIATEDInstallationSecret)
 	{
-		LibMCData_uint32 bytesNeededInstallationUUID = 0;
-		LibMCData_uint32 bytesWrittenInstallationUUID = 0;
-		LibMCData_uint32 bytesNeededInstallationSecret = 0;
-		LibMCData_uint32 bytesWrittenInstallationSecret = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, 0, &bytesNeededInstallationUUID, nullptr, 0, &bytesNeededInstallationSecret, nullptr));
-		std::vector<char> bufferInstallationUUID(bytesNeededInstallationUUID);
-		std::vector<char> bufferInstallationSecret(bytesNeededInstallationSecret);
-		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, bytesNeededInstallationUUID, &bytesWrittenInstallationUUID, &bufferInstallationUUID[0], bytesNeededInstallationSecret, &bytesWrittenInstallationSecret, &bufferInstallationSecret[0]));
-		sInstallationUUID = std::string(&bufferInstallationUUID[0]);
-		sInstallationSecret = std::string(&bufferInstallationSecret[0]);
+		LibMCData_uint32 bytesNeededDEPRECIATEDInstallationUUID = 0;
+		LibMCData_uint32 bytesWrittenDEPRECIATEDInstallationUUID = 0;
+		LibMCData_uint32 bytesNeededDEPRECIATEDInstallationSecret = 0;
+		LibMCData_uint32 bytesWrittenDEPRECIATEDInstallationSecret = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, 0, &bytesNeededDEPRECIATEDInstallationUUID, nullptr, 0, &bytesNeededDEPRECIATEDInstallationSecret, nullptr));
+		std::vector<char> bufferDEPRECIATEDInstallationUUID(bytesNeededDEPRECIATEDInstallationUUID);
+		std::vector<char> bufferDEPRECIATEDInstallationSecret(bytesNeededDEPRECIATEDInstallationSecret);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, bytesNeededDEPRECIATEDInstallationUUID, &bytesWrittenDEPRECIATEDInstallationUUID, &bufferDEPRECIATEDInstallationUUID[0], bytesNeededDEPRECIATEDInstallationSecret, &bytesWrittenDEPRECIATEDInstallationSecret, &bufferDEPRECIATEDInstallationSecret[0]));
+		sDEPRECIATEDInstallationUUID = std::string(&bufferDEPRECIATEDInstallationUUID[0]);
+		sDEPRECIATEDInstallationSecret = std::string(&bufferDEPRECIATEDInstallationSecret[0]);
+	}
+	
+	/**
+	* CDataModel::GetInstallationInformationObject - returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.
+	* @return Installation information instance.
+	*/
+	PInstallationInformation CDataModel::GetInstallationInformationObject()
+	{
+		LibMCDataHandle hInstallationInformation = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformationObject(m_pHandle, &hInstallationInformation));
+		
+		if (!hInstallationInformation) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CInstallationInformation>(m_pWrapper, hInstallationInformation);
 	}
 	
 	/**
@@ -5336,7 +5476,7 @@ public:
 	}
 	
 	/**
-	* CDataModel::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* CDataModel::GetBaseTempDirectory - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.
 	* @return Temp directory path.
 	*/
 	std::string CDataModel::GetBaseTempDirectory()

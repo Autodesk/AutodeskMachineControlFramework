@@ -86,7 +86,10 @@ public:
 
 	LibMCData_uint32 GetDataModelVersion() override;
 
+	// DEPRECIATED! DO NOT USE. Use GetInstallationInformationObject instead!
 	void GetInstallationInformation(std::string& sInstallationUUID, std::string& sInstallationSecret) override;
+
+	IInstallationInformation* GetInstallationInformationObject() override;
 
 	IStorage * CreateStorage() override;
 
@@ -104,6 +107,7 @@ public:
 
 	void SetBaseTempDirectory(const std::string& sTempDirectory) override;
 
+	// DEPRECIATED! DO NOT USE. Use GetInstallationInformationObject instead!
 	std::string GetBaseTempDirectory() override;
 
 	void SetLogCallback(const LibMCData::LogCallback pLogCallback, const LibMCData_pvoid pUserData) override;

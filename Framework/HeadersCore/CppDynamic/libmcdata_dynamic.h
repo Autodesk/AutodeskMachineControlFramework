@@ -258,12 +258,10 @@ typedef LibMCDataResult (*PLibMCDataAlertSession_GetAlertInformationPtr) (LibMCD
 * @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
 * @param[in] pUserUUID - User UUID that acknowledged the alert.
 * @param[in] pUserComment - Comment of the user.
-* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataAlertSession_AcknowledgeAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+typedef LibMCDataResult (*PLibMCDataAlertSession_AcknowledgeAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const char * pTimestampUTC);
 
 /**
 * Checks if an alert has been acknowledged. Fails if alert does not exist.
@@ -1398,6 +1396,43 @@ typedef LibMCDataResult (*PLibMCDataPersistencyHandler_RetrievePersistentInteger
 typedef LibMCDataResult (*PLibMCDataPersistencyHandler_RetrievePersistentBoolParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pValue);
 
 /*************************************************************************************************************************
+ Class definition for InstallationInformation
+**************************************************************************************************************************/
+
+/**
+* Returns the installation UUID.
+*
+* @param[in] pInstallationInformation - InstallationInformation instance.
+* @param[in] nInstallationUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pInstallationUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pInstallationUUIDBuffer -  buffer of Installation UUID. Public value to document which installation was used for something., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataInstallationInformation_GetInstallationUUIDPtr) (LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nInstallationUUIDBufferSize, LibMCData_uint32* pInstallationUUIDNeededChars, char * pInstallationUUIDBuffer);
+
+/**
+* Returns the installation Secret.
+*
+* @param[in] pInstallationInformation - InstallationInformation instance.
+* @param[in] nInstallationSecretBufferSize - size of the buffer (including trailing 0)
+* @param[out] pInstallationSecretNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pInstallationSecretBuffer -  buffer of Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataInstallationInformation_GetInstallationSecretPtr) (LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nInstallationSecretBufferSize, LibMCData_uint32* pInstallationSecretNeededChars, char * pInstallationSecretBuffer);
+
+/**
+* Returns a custom base temp directory. An empty string defaults to the system temp directory.
+*
+* @param[in] pInstallationInformation - InstallationInformation instance.
+* @param[in] nTempDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTempDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTempDirectoryBuffer -  buffer of Temp directory path., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataInstallationInformation_GetBaseTempDirectoryPtr) (LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer);
+
+/*************************************************************************************************************************
  Class definition for DataModel
 **************************************************************************************************************************/
 
@@ -1422,18 +1457,27 @@ typedef LibMCDataResult (*PLibMCDataDataModel_InitialiseDatabasePtr) (LibMCData_
 typedef LibMCDataResult (*PLibMCDataDataModel_GetDataModelVersionPtr) (LibMCData_DataModel pDataModel, LibMCData_uint32 * pVersion);
 
 /**
-* returns unique identifiers for the current installation.
+* DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.
 *
 * @param[in] pDataModel - DataModel instance.
-* @param[in] nInstallationUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pInstallationUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pInstallationUUIDBuffer -  buffer of Installation UUID. Public value to document which installation was used for something., may be NULL
-* @param[in] nInstallationSecretBufferSize - size of the buffer (including trailing 0)
-* @param[out] pInstallationSecretNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pInstallationSecretBuffer -  buffer of Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application., may be NULL
+* @param[in] nDEPRECIATEDInstallationUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDEPRECIATEDInstallationUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDEPRECIATEDInstallationUUIDBuffer -  buffer of DEPRECIATED Installation UUID. Public value to document which installation was used for something., may be NULL
+* @param[in] nDEPRECIATEDInstallationSecretBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDEPRECIATEDInstallationSecretNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDEPRECIATEDInstallationSecretBuffer -  buffer of DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataDataModel_GetInstallationInformationPtr) (LibMCData_DataModel pDataModel, const LibMCData_uint32 nInstallationUUIDBufferSize, LibMCData_uint32* pInstallationUUIDNeededChars, char * pInstallationUUIDBuffer, const LibMCData_uint32 nInstallationSecretBufferSize, LibMCData_uint32* pInstallationSecretNeededChars, char * pInstallationSecretBuffer);
+typedef LibMCDataResult (*PLibMCDataDataModel_GetInstallationInformationPtr) (LibMCData_DataModel pDataModel, const LibMCData_uint32 nDEPRECIATEDInstallationUUIDBufferSize, LibMCData_uint32* pDEPRECIATEDInstallationUUIDNeededChars, char * pDEPRECIATEDInstallationUUIDBuffer, const LibMCData_uint32 nDEPRECIATEDInstallationSecretBufferSize, LibMCData_uint32* pDEPRECIATEDInstallationSecretNeededChars, char * pDEPRECIATEDInstallationSecretBuffer);
+
+/**
+* returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pInstallationInformation - Installation information instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_GetInstallationInformationObjectPtr) (LibMCData_DataModel pDataModel, LibMCData_InstallationInformation * pInstallationInformation);
 
 /**
 * creates a storage access class.
@@ -1508,7 +1552,7 @@ typedef LibMCDataResult (*PLibMCDataDataModel_CreatePersistencyHandlerPtr) (LibM
 typedef LibMCDataResult (*PLibMCDataDataModel_SetBaseTempDirectoryPtr) (LibMCData_DataModel pDataModel, const char * pTempDirectory);
 
 /**
-* Returns a custom base temp directory. An empty string defaults to the system temp directory.
+* DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.
 *
 * @param[in] pDataModel - DataModel instance.
 * @param[in] nTempDirectoryBufferSize - size of the buffer (including trailing 0)
@@ -1735,9 +1779,13 @@ typedef struct {
 	PLibMCDataPersistencyHandler_RetrievePersistentDoubleParameterPtr m_PersistencyHandler_RetrievePersistentDoubleParameter;
 	PLibMCDataPersistencyHandler_RetrievePersistentIntegerParameterPtr m_PersistencyHandler_RetrievePersistentIntegerParameter;
 	PLibMCDataPersistencyHandler_RetrievePersistentBoolParameterPtr m_PersistencyHandler_RetrievePersistentBoolParameter;
+	PLibMCDataInstallationInformation_GetInstallationUUIDPtr m_InstallationInformation_GetInstallationUUID;
+	PLibMCDataInstallationInformation_GetInstallationSecretPtr m_InstallationInformation_GetInstallationSecret;
+	PLibMCDataInstallationInformation_GetBaseTempDirectoryPtr m_InstallationInformation_GetBaseTempDirectory;
 	PLibMCDataDataModel_InitialiseDatabasePtr m_DataModel_InitialiseDatabase;
 	PLibMCDataDataModel_GetDataModelVersionPtr m_DataModel_GetDataModelVersion;
 	PLibMCDataDataModel_GetInstallationInformationPtr m_DataModel_GetInstallationInformation;
+	PLibMCDataDataModel_GetInstallationInformationObjectPtr m_DataModel_GetInstallationInformationObject;
 	PLibMCDataDataModel_CreateStoragePtr m_DataModel_CreateStorage;
 	PLibMCDataDataModel_CreateBuildJobHandlerPtr m_DataModel_CreateBuildJobHandler;
 	PLibMCDataDataModel_CreateNewLogSessionPtr m_DataModel_CreateNewLogSession;

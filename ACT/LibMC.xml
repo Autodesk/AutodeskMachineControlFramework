@@ -611,6 +611,7 @@
 		<error name="MISSINGALERTLEVEL" code="585" description="Missing alert level"/>		
 		<error name="INVALIDALERTLEVEL" code="586" description="Invalid alert level"/>		
 		
+		<error name="ALERTLISTNAMEMISSING" code="587" description="Alert list name missing" />		
 		
 		
 	</errors>

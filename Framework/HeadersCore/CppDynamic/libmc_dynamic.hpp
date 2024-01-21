@@ -671,6 +671,7 @@ public:
 			case LIBMC_ERROR_MISSINGALERTNAME: return "MISSINGALERTNAME";
 			case LIBMC_ERROR_MISSINGALERTLEVEL: return "MISSINGALERTLEVEL";
 			case LIBMC_ERROR_INVALIDALERTLEVEL: return "INVALIDALERTLEVEL";
+			case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "ALERTLISTNAMEMISSING";
 		}
 		return "UNKNOWN";
 	}
@@ -1184,6 +1185,7 @@ public:
 			case LIBMC_ERROR_MISSINGALERTNAME: return "Missing alert name";
 			case LIBMC_ERROR_MISSINGALERTLEVEL: return "Missing alert level";
 			case LIBMC_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
+			case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "Alert list name missing";
 		}
 		return "unknown error";
 	}

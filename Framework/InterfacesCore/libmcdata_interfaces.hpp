@@ -70,6 +70,7 @@ class IBuildJobHandler;
 class IUserList;
 class ILoginHandler;
 class IPersistencyHandler;
+class IInstallationInformation;
 class IDataModel;
 
 
@@ -512,9 +513,9 @@ public:
 	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
 	* @param[in] sUserUUID - User UUID that acknowledged the alert.
 	* @param[in] sUserComment - Comment of the user.
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
 	*/
-	virtual void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC) = 0;
+	virtual void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC) = 0;
 
 	/**
 	* IAlertSession::AlertHasBeenAcknowledged - Checks if an alert has been acknowledged. Fails if alert does not exist.
@@ -1339,6 +1340,35 @@ typedef IBaseSharedPtr<IPersistencyHandler> PIPersistencyHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for InstallationInformation 
+**************************************************************************************************************************/
+
+class IInstallationInformation : public virtual IBase {
+public:
+	/**
+	* IInstallationInformation::GetInstallationUUID - Returns the installation UUID.
+	* @return Installation UUID. Public value to document which installation was used for something.
+	*/
+	virtual std::string GetInstallationUUID() = 0;
+
+	/**
+	* IInstallationInformation::GetInstallationSecret - Returns the installation Secret.
+	* @return Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	*/
+	virtual std::string GetInstallationSecret() = 0;
+
+	/**
+	* IInstallationInformation::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* @return Temp directory path.
+	*/
+	virtual std::string GetBaseTempDirectory() = 0;
+
+};
+
+typedef IBaseSharedPtr<IInstallationInformation> PIInstallationInformation;
+
+
+/*************************************************************************************************************************
  Class interface for DataModel 
 **************************************************************************************************************************/
 
@@ -1359,11 +1389,17 @@ public:
 	virtual LibMCData_uint32 GetDataModelVersion() = 0;
 
 	/**
-	* IDataModel::GetInstallationInformation - returns unique identifiers for the current installation.
-	* @param[out] sInstallationUUID - Installation UUID. Public value to document which installation was used for something.
-	* @param[out] sInstallationSecret - Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	* IDataModel::GetInstallationInformation - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.
+	* @param[out] sDEPRECIATEDInstallationUUID - DEPRECIATED Installation UUID. Public value to document which installation was used for something.
+	* @param[out] sDEPRECIATEDInstallationSecret - DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
 	*/
-	virtual void GetInstallationInformation(std::string & sInstallationUUID, std::string & sInstallationSecret) = 0;
+	virtual void GetInstallationInformation(std::string & sDEPRECIATEDInstallationUUID, std::string & sDEPRECIATEDInstallationSecret) = 0;
+
+	/**
+	* IDataModel::GetInstallationInformationObject - returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.
+	* @return Installation information instance.
+	*/
+	virtual IInstallationInformation * GetInstallationInformationObject() = 0;
 
 	/**
 	* IDataModel::CreateStorage - creates a storage access class.
@@ -1414,7 +1450,7 @@ public:
 	virtual void SetBaseTempDirectory(const std::string & sTempDirectory) = 0;
 
 	/**
-	* IDataModel::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* IDataModel::GetBaseTempDirectory - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.
 	* @return Temp directory path.
 	*/
 	virtual std::string GetBaseTempDirectory() = 0;

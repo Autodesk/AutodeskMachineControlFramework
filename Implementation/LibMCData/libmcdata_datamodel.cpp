@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
 #include "libmcdata_persistencyhandler.hpp"
+#include "libmcdata_installationinformation.hpp"
 
 #include "amcdata_databasemigrator.hpp"
 #include "amcdata_sqlhandler_sqlite.hpp"
@@ -124,12 +125,19 @@ LibMCData_uint32 CDataModel::GetDataModelVersion()
 
 void CDataModel::GetInstallationInformation(std::string& sInstallationUUID, std::string& sInstallationSecret)
 {
+    /* DEPRECIATED! use GetInstallationInformationObject instead! */
+
     if (m_eDataBaseType == eDataBaseType::Unknown)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATABASETYPE);
 
     sInstallationUUID = AMCCommon::CUtils::normalizeUUIDString (m_sInstallationUUID);
     sInstallationSecret = AMCCommon::CUtils::normalizeSHA256String (m_sInstallationSecret);
 
+}
+
+IInstallationInformation* CDataModel::GetInstallationInformationObject()
+{
+    return new CInstallationInformation(m_sInstallationUUID, m_sInstallationSecret, m_sTempBasePath);
 }
 
 IStorage * CDataModel::CreateStorage()
@@ -209,6 +217,7 @@ void CDataModel::SetBaseTempDirectory(const std::string& sTempDirectory)
 
 std::string CDataModel::GetBaseTempDirectory()
 {
+    // DEPRECIATED. Use GetInstallationInformationObject instead!
     return m_sTempBasePath;
 }
 

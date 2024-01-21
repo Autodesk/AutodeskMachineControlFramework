@@ -692,7 +692,7 @@ LibMCDataResult libmcdata_alertsession_getalertinformation(LibMCData_AlertSessio
 	}
 }
 
-LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer)
+LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const char * pTimestampUTC)
 {
 	IBase* pIBaseClass = (IBase *)pAlertSession;
 
@@ -703,39 +703,18 @@ LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession p
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserComment == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if ( (!pTimestampUTCBuffer) && !(pTimestampUTCNeededChars) )
+		if (pTimestampUTC == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUUID(pUUID);
 		std::string sUserUUID(pUserUUID);
 		std::string sUserComment(pUserComment);
-		std::string sTimestampUTC("");
+		std::string sTimestampUTC(pTimestampUTC);
 		IAlertSession* pIAlertSession = dynamic_cast<IAlertSession*>(pIBaseClass);
 		if (!pIAlertSession)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pTimestampUTCBuffer == nullptr);
-		if (isCacheCall) {
-			pIAlertSession->AcknowledgeAlert(sUUID, sUserUUID, sUserComment, sTimestampUTC);
+		pIAlertSession->AcknowledgeAlert(sUUID, sUserUUID, sUserComment, sTimestampUTC);
 
-			pIAlertSession->_setCache (new ParameterCache_1<std::string> (sTimestampUTC));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlertSession->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-			cache->retrieveData (sTimestampUTC);
-			pIAlertSession->_setCache (nullptr);
-		}
-		
-		if (pTimestampUTCNeededChars)
-			*pTimestampUTCNeededChars = (LibMCData_uint32) (sTimestampUTC.size()+1);
-		if (pTimestampUTCBuffer) {
-			if (sTimestampUTC.size() >= nTimestampUTCBufferSize)
-				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
-			for (size_t iTimestampUTC = 0; iTimestampUTC < sTimestampUTC.size(); iTimestampUTC++)
-				pTimestampUTCBuffer[iTimestampUTC] = sTimestampUTC[iTimestampUTC];
-			pTimestampUTCBuffer[sTimestampUTC.size()] = 0;
-		}
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -4560,6 +4539,154 @@ LibMCDataResult libmcdata_persistencyhandler_retrievepersistentboolparameter(Lib
 
 
 /*************************************************************************************************************************
+ Class implementation for InstallationInformation
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_installationinformation_getinstallationuuid(LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nInstallationUUIDBufferSize, LibMCData_uint32* pInstallationUUIDNeededChars, char * pInstallationUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pInstallationInformation;
+
+	try {
+		if ( (!pInstallationUUIDBuffer) && !(pInstallationUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sInstallationUUID("");
+		IInstallationInformation* pIInstallationInformation = dynamic_cast<IInstallationInformation*>(pIBaseClass);
+		if (!pIInstallationInformation)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pInstallationUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sInstallationUUID = pIInstallationInformation->GetInstallationUUID();
+
+			pIInstallationInformation->_setCache (new ParameterCache_1<std::string> (sInstallationUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIInstallationInformation->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sInstallationUUID);
+			pIInstallationInformation->_setCache (nullptr);
+		}
+		
+		if (pInstallationUUIDNeededChars)
+			*pInstallationUUIDNeededChars = (LibMCData_uint32) (sInstallationUUID.size()+1);
+		if (pInstallationUUIDBuffer) {
+			if (sInstallationUUID.size() >= nInstallationUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iInstallationUUID = 0; iInstallationUUID < sInstallationUUID.size(); iInstallationUUID++)
+				pInstallationUUIDBuffer[iInstallationUUID] = sInstallationUUID[iInstallationUUID];
+			pInstallationUUIDBuffer[sInstallationUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_installationinformation_getinstallationsecret(LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nInstallationSecretBufferSize, LibMCData_uint32* pInstallationSecretNeededChars, char * pInstallationSecretBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pInstallationInformation;
+
+	try {
+		if ( (!pInstallationSecretBuffer) && !(pInstallationSecretNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sInstallationSecret("");
+		IInstallationInformation* pIInstallationInformation = dynamic_cast<IInstallationInformation*>(pIBaseClass);
+		if (!pIInstallationInformation)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pInstallationSecretBuffer == nullptr);
+		if (isCacheCall) {
+			sInstallationSecret = pIInstallationInformation->GetInstallationSecret();
+
+			pIInstallationInformation->_setCache (new ParameterCache_1<std::string> (sInstallationSecret));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIInstallationInformation->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sInstallationSecret);
+			pIInstallationInformation->_setCache (nullptr);
+		}
+		
+		if (pInstallationSecretNeededChars)
+			*pInstallationSecretNeededChars = (LibMCData_uint32) (sInstallationSecret.size()+1);
+		if (pInstallationSecretBuffer) {
+			if (sInstallationSecret.size() >= nInstallationSecretBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iInstallationSecret = 0; iInstallationSecret < sInstallationSecret.size(); iInstallationSecret++)
+				pInstallationSecretBuffer[iInstallationSecret] = sInstallationSecret[iInstallationSecret];
+			pInstallationSecretBuffer[sInstallationSecret.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_installationinformation_getbasetempdirectory(LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pInstallationInformation;
+
+	try {
+		if ( (!pTempDirectoryBuffer) && !(pTempDirectoryNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTempDirectory("");
+		IInstallationInformation* pIInstallationInformation = dynamic_cast<IInstallationInformation*>(pIBaseClass);
+		if (!pIInstallationInformation)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTempDirectoryBuffer == nullptr);
+		if (isCacheCall) {
+			sTempDirectory = pIInstallationInformation->GetBaseTempDirectory();
+
+			pIInstallationInformation->_setCache (new ParameterCache_1<std::string> (sTempDirectory));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIInstallationInformation->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sTempDirectory);
+			pIInstallationInformation->_setCache (nullptr);
+		}
+		
+		if (pTempDirectoryNeededChars)
+			*pTempDirectoryNeededChars = (LibMCData_uint32) (sTempDirectory.size()+1);
+		if (pTempDirectoryBuffer) {
+			if (sTempDirectory.size() >= nTempDirectoryBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTempDirectory = 0; iTempDirectory < sTempDirectory.size(); iTempDirectory++)
+				pTempDirectoryBuffer[iTempDirectory] = sTempDirectory[iTempDirectory];
+			pTempDirectoryBuffer[sTempDirectory.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DataModel
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_datamodel_initialisedatabase(LibMCData_DataModel pDataModel, const char * pDataDirectory, eLibMCDataDataBaseType eDataBaseType, const char * pConnectionString)
@@ -4618,53 +4745,81 @@ LibMCDataResult libmcdata_datamodel_getdatamodelversion(LibMCData_DataModel pDat
 	}
 }
 
-LibMCDataResult libmcdata_datamodel_getinstallationinformation(LibMCData_DataModel pDataModel, const LibMCData_uint32 nInstallationUUIDBufferSize, LibMCData_uint32* pInstallationUUIDNeededChars, char * pInstallationUUIDBuffer, const LibMCData_uint32 nInstallationSecretBufferSize, LibMCData_uint32* pInstallationSecretNeededChars, char * pInstallationSecretBuffer)
+LibMCDataResult libmcdata_datamodel_getinstallationinformation(LibMCData_DataModel pDataModel, const LibMCData_uint32 nDEPRECIATEDInstallationUUIDBufferSize, LibMCData_uint32* pDEPRECIATEDInstallationUUIDNeededChars, char * pDEPRECIATEDInstallationUUIDBuffer, const LibMCData_uint32 nDEPRECIATEDInstallationSecretBufferSize, LibMCData_uint32* pDEPRECIATEDInstallationSecretNeededChars, char * pDEPRECIATEDInstallationSecretBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDataModel;
 
 	try {
-		if ( (!pInstallationUUIDBuffer) && !(pInstallationUUIDNeededChars) )
+		if ( (!pDEPRECIATEDInstallationUUIDBuffer) && !(pDEPRECIATEDInstallationUUIDNeededChars) )
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if ( (!pInstallationSecretBuffer) && !(pInstallationSecretNeededChars) )
+		if ( (!pDEPRECIATEDInstallationSecretBuffer) && !(pDEPRECIATEDInstallationSecretNeededChars) )
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		std::string sInstallationUUID("");
-		std::string sInstallationSecret("");
+		std::string sDEPRECIATEDInstallationUUID("");
+		std::string sDEPRECIATEDInstallationSecret("");
 		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
 		if (!pIDataModel)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pInstallationUUIDBuffer == nullptr) || (pInstallationSecretBuffer == nullptr);
+		bool isCacheCall = (pDEPRECIATEDInstallationUUIDBuffer == nullptr) || (pDEPRECIATEDInstallationSecretBuffer == nullptr);
 		if (isCacheCall) {
-			pIDataModel->GetInstallationInformation(sInstallationUUID, sInstallationSecret);
+			pIDataModel->GetInstallationInformation(sDEPRECIATEDInstallationUUID, sDEPRECIATEDInstallationSecret);
 
-			pIDataModel->_setCache (new ParameterCache_2<std::string, std::string> (sInstallationUUID, sInstallationSecret));
+			pIDataModel->_setCache (new ParameterCache_2<std::string, std::string> (sDEPRECIATEDInstallationUUID, sDEPRECIATEDInstallationSecret));
 		}
 		else {
 			auto cache = dynamic_cast<ParameterCache_2<std::string, std::string>*> (pIDataModel->_getCache ());
 			if (cache == nullptr)
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-			cache->retrieveData (sInstallationUUID, sInstallationSecret);
+			cache->retrieveData (sDEPRECIATEDInstallationUUID, sDEPRECIATEDInstallationSecret);
 			pIDataModel->_setCache (nullptr);
 		}
 		
-		if (pInstallationUUIDNeededChars)
-			*pInstallationUUIDNeededChars = (LibMCData_uint32) (sInstallationUUID.size()+1);
-		if (pInstallationUUIDBuffer) {
-			if (sInstallationUUID.size() >= nInstallationUUIDBufferSize)
+		if (pDEPRECIATEDInstallationUUIDNeededChars)
+			*pDEPRECIATEDInstallationUUIDNeededChars = (LibMCData_uint32) (sDEPRECIATEDInstallationUUID.size()+1);
+		if (pDEPRECIATEDInstallationUUIDBuffer) {
+			if (sDEPRECIATEDInstallationUUID.size() >= nDEPRECIATEDInstallationUUIDBufferSize)
 				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
-			for (size_t iInstallationUUID = 0; iInstallationUUID < sInstallationUUID.size(); iInstallationUUID++)
-				pInstallationUUIDBuffer[iInstallationUUID] = sInstallationUUID[iInstallationUUID];
-			pInstallationUUIDBuffer[sInstallationUUID.size()] = 0;
+			for (size_t iDEPRECIATEDInstallationUUID = 0; iDEPRECIATEDInstallationUUID < sDEPRECIATEDInstallationUUID.size(); iDEPRECIATEDInstallationUUID++)
+				pDEPRECIATEDInstallationUUIDBuffer[iDEPRECIATEDInstallationUUID] = sDEPRECIATEDInstallationUUID[iDEPRECIATEDInstallationUUID];
+			pDEPRECIATEDInstallationUUIDBuffer[sDEPRECIATEDInstallationUUID.size()] = 0;
 		}
-		if (pInstallationSecretNeededChars)
-			*pInstallationSecretNeededChars = (LibMCData_uint32) (sInstallationSecret.size()+1);
-		if (pInstallationSecretBuffer) {
-			if (sInstallationSecret.size() >= nInstallationSecretBufferSize)
+		if (pDEPRECIATEDInstallationSecretNeededChars)
+			*pDEPRECIATEDInstallationSecretNeededChars = (LibMCData_uint32) (sDEPRECIATEDInstallationSecret.size()+1);
+		if (pDEPRECIATEDInstallationSecretBuffer) {
+			if (sDEPRECIATEDInstallationSecret.size() >= nDEPRECIATEDInstallationSecretBufferSize)
 				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
-			for (size_t iInstallationSecret = 0; iInstallationSecret < sInstallationSecret.size(); iInstallationSecret++)
-				pInstallationSecretBuffer[iInstallationSecret] = sInstallationSecret[iInstallationSecret];
-			pInstallationSecretBuffer[sInstallationSecret.size()] = 0;
+			for (size_t iDEPRECIATEDInstallationSecret = 0; iDEPRECIATEDInstallationSecret < sDEPRECIATEDInstallationSecret.size(); iDEPRECIATEDInstallationSecret++)
+				pDEPRECIATEDInstallationSecretBuffer[iDEPRECIATEDInstallationSecret] = sDEPRECIATEDInstallationSecret[iDEPRECIATEDInstallationSecret];
+			pDEPRECIATEDInstallationSecretBuffer[sDEPRECIATEDInstallationSecret.size()] = 0;
 		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_getinstallationinformationobject(LibMCData_DataModel pDataModel, LibMCData_InstallationInformation * pInstallationInformation)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pInstallationInformation == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseInstallationInformation(nullptr);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseInstallationInformation = pIDataModel->GetInstallationInformationObject();
+
+		*pInstallationInformation = (IBase*)(pBaseInstallationInformation);
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -5299,12 +5454,20 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentintegerparameter;
 	if (sProcName == "libmcdata_persistencyhandler_retrievepersistentboolparameter") 
 		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentboolparameter;
+	if (sProcName == "libmcdata_installationinformation_getinstallationuuid") 
+		*ppProcAddress = (void*) &libmcdata_installationinformation_getinstallationuuid;
+	if (sProcName == "libmcdata_installationinformation_getinstallationsecret") 
+		*ppProcAddress = (void*) &libmcdata_installationinformation_getinstallationsecret;
+	if (sProcName == "libmcdata_installationinformation_getbasetempdirectory") 
+		*ppProcAddress = (void*) &libmcdata_installationinformation_getbasetempdirectory;
 	if (sProcName == "libmcdata_datamodel_initialisedatabase") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_initialisedatabase;
 	if (sProcName == "libmcdata_datamodel_getdatamodelversion") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_getdatamodelversion;
 	if (sProcName == "libmcdata_datamodel_getinstallationinformation") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_getinstallationinformation;
+	if (sProcName == "libmcdata_datamodel_getinstallationinformationobject") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_getinstallationinformationobject;
 	if (sProcName == "libmcdata_datamodel_createstorage") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_createstorage;
 	if (sProcName == "libmcdata_datamodel_createbuildjobhandler") 
