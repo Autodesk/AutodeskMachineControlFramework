@@ -158,7 +158,8 @@ bool CStateEnvironment::HasBuildJob(const std::string& sBuildUUID)
 {
 	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	try {
 		pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
 		return true;
@@ -172,9 +173,10 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
 	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-	return new CBuild(pBuildJob, m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getStorageInstance(), m_pSystemState->getSystemUserID ());
+	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getSystemUserID ());
 }
 
 
@@ -541,7 +543,8 @@ bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPermissionIdentifier))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER, sPermissionIdentifier);
 
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pLoginHandler = pDataModel->CreateLoginHandler();
 	auto pAccessControl = m_pSystemState->accessControl();
 
 	std::string sUserRole = pLoginHandler->GetUserRole (sUserLogin);
@@ -556,7 +559,7 @@ bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const
 
 IUserManagementHandler* CStateEnvironment::CreateUserManagement()
 {
-	return new CUserManagementHandler (m_pSystemState->getLoginHandlerInstance (), m_pSystemState->getAccessControlInstance (), m_pSystemState->getLanguageHandlerInstance ());
+	return new CUserManagementHandler (m_pSystemState->getDataModelInstance (), m_pSystemState->getAccessControlInstance (), m_pSystemState->getLanguageHandlerInstance ());
 }
 
 IJournalHandler* CStateEnvironment::GetCurrentJournal()
@@ -650,23 +653,25 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 	auto pDefinition = m_pSystemState->alertHandler()->findDefinition(sIdentifier, true);
 	auto alertDescription = pDefinition->getDescription();
 
-	auto pAlertSession = m_pSystemState->createAlertSession ();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
 
 	pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), pDefinition->getAlertLevel (), alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
 
-	return new CAlert (sNewUUID, pAlertSession);
+	return new CAlert (sNewUUID, pDataModel);
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-	auto pAlertSession = m_pSystemState->createAlertSession();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
 
 	if (!pAlertSession->HasAlert(sNormalizedUUID))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
 
-	return new CAlert(sNormalizedUUID, pAlertSession);
+	return new CAlert(sNormalizedUUID, pDataModel);
 
 }
 
@@ -674,7 +679,8 @@ bool CStateEnvironment::AlertExists(const std::string& sUUID)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-	auto pAlertSession = m_pSystemState->createAlertSession();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
 
 	return pAlertSession->HasAlert(sNormalizedUUID);
 

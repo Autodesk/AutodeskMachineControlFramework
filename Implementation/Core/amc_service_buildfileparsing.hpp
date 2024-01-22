@@ -45,7 +45,9 @@ namespace AMC {
 
 	class CService_BuildFileParsing : public CService {
 	private:
-		LibMCData::PBuildJob m_pBuildJob;
+		LibMCData::PDataModel m_pDataModel;
+		std::string m_sBuildJobUUID;
+		
 		Lib3MF::PWrapper m_p3MFWrapper;
 		Lib3MF::PModel m_p3MFModel;
 		std::string m_sUserID;
@@ -53,7 +55,7 @@ namespace AMC {
 	protected:
 	public:
 
-		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PBuildJob pBuildJob, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserID);
+		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserID);
 		virtual ~CService_BuildFileParsing();
 
 		virtual void executeBlocking() override;

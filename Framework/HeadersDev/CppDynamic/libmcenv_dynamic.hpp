@@ -454,6 +454,7 @@ public:
 			case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "EMPTYALERTIDENTIFIER";
 			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "INVALIDALERTIDENTIFIER";
 			case LIBMCENV_ERROR_ALERTNOTFOUND: return "ALERTNOTFOUND";
+			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "USERDOESNOTEXIST";
 		}
 		return "UNKNOWN";
 	}
@@ -599,6 +600,7 @@ public:
 			case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
 			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
 			case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
+			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
 		}
 		return "unknown error";
 	}
@@ -1784,6 +1786,7 @@ public:
 	}
 	
 	inline bool UserExists(const std::string & sUsername);
+	inline bool UserUUIDExists(const std::string & sUUID);
 	inline void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
 	inline void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
 	inline std::string GetUsernameByUUID(const std::string & sUUID);
@@ -2434,6 +2437,7 @@ public:
 		pWrapperTable->m_UserDetailList_GetRole = nullptr;
 		pWrapperTable->m_UserDetailList_GetLanguage = nullptr;
 		pWrapperTable->m_UserManagementHandler_UserExists = nullptr;
+		pWrapperTable->m_UserManagementHandler_UserUUIDExists = nullptr;
 		pWrapperTable->m_UserManagementHandler_GetUserProperties = nullptr;
 		pWrapperTable->m_UserManagementHandler_GetUserPropertiesByUUID = nullptr;
 		pWrapperTable->m_UserManagementHandler_GetUsernameByUUID = nullptr;
@@ -6033,6 +6037,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UserManagementHandler_UserUUIDExists = (PLibMCEnvUserManagementHandler_UserUUIDExistsPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_useruuidexists");
+		#else // _WIN32
+		pWrapperTable->m_UserManagementHandler_UserUUIDExists = (PLibMCEnvUserManagementHandler_UserUUIDExistsPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_useruuidexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UserManagementHandler_UserUUIDExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UserManagementHandler_GetUserProperties = (PLibMCEnvUserManagementHandler_GetUserPropertiesPtr) GetProcAddress(hLibrary, "libmcenv_usermanagementhandler_getuserproperties");
 		#else // _WIN32
 		pWrapperTable->m_UserManagementHandler_GetUserProperties = (PLibMCEnvUserManagementHandler_GetUserPropertiesPtr) dlsym(hLibrary, "libmcenv_usermanagementhandler_getuserproperties");
@@ -8872,6 +8885,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_userexists", (void**)&(pWrapperTable->m_UserManagementHandler_UserExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_UserExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_useruuidexists", (void**)&(pWrapperTable->m_UserManagementHandler_UserUUIDExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UserManagementHandler_UserUUIDExists == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_usermanagementhandler_getuserproperties", (void**)&(pWrapperTable->m_UserManagementHandler_GetUserProperties));
@@ -14674,6 +14691,19 @@ public:
 	{
 		bool resultUserExists = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_UserExists(m_pHandle, sUsername.c_str(), &resultUserExists));
+		
+		return resultUserExists;
+	}
+	
+	/**
+	* CUserManagementHandler::UserUUIDExists - Checks if a user uuid exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Flag if users exists
+	*/
+	bool CUserManagementHandler::UserUUIDExists(const std::string & sUUID)
+	{
+		bool resultUserExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UserManagementHandler_UserUUIDExists(m_pHandle, sUUID.c_str(), &resultUserExists));
 		
 		return resultUserExists;
 	}

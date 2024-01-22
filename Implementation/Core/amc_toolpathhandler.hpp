@@ -54,11 +54,11 @@ namespace AMC {
 		std::string m_sLib3MFPath;
 		Lib3MF::PWrapper m_pLib3MFWrapper;
 
-		LibMCData::PStorage m_pStorage;
+		LibMCData::PDataModel m_pDataModel;
 
 	public:
 
-		CToolpathHandler(LibMCData::PStorage pStorage);
+		CToolpathHandler(LibMCData::PDataModel pDataModel);
 		virtual ~CToolpathHandler();
 
 		CToolpathEntity * findToolpathEntity(const std::string & sStreamUUID, bool bFailIfNotExistent);

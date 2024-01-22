@@ -991,6 +991,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_userlist_getuserproperties(LibMCDat
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_LoginHandler pLoginHandler, const char * pUsername, bool * pUserExists);
 
 /**
+* Checks if a user UUID exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[out] pUserExists - Flag if users exists
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_useruuidexists(LibMCData_LoginHandler pLoginHandler, const char * pUUID, bool * pUserExists);
+
+/**
 * Retrieves login relevant users data. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.

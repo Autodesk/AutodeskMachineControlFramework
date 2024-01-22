@@ -47,6 +47,7 @@ Abstract: This is the class declaration of CAlert
 
 // Include custom headers here.
 #include "libmcdata_dynamic.hpp"
+#include <mutex>
 
 namespace LibMCEnv {
 namespace Impl {
@@ -61,6 +62,9 @@ private:
 
 	std::string m_sAlertUUID;
 
+	// ATTENTION: Alert Session is not thread safe.
+	// So the Alert session needs to be private and surrounded by a mutex
+	std::mutex m_AlertSessionMutex;
 	LibMCData::PAlertSession m_pAlertSession;
 
 	LibMCEnv::eAlertLevel m_AlertLevel;
@@ -73,7 +77,7 @@ private:
 
 public:
 
-	CAlert (const std::string & sAlertUUID, LibMCData::PAlertSession pAlertSession);
+	CAlert(const std::string& sAlertUUID, LibMCData::PDataModel pDataModel);
 
 	virtual ~CAlert();
 

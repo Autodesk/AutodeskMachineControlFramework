@@ -35,34 +35,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PAlertSession pAlertSession)
+CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel)
     : m_pStateMachineData(pStateMachineData),
     m_pSignalHandler(pSignalHandler),
-    m_pBuildJobHandler(pBuildJobHandler),
+    m_pDataModel(pDataModel),
     m_pToolpathHandler(pToolpathHandler),
-    m_pStorage(pStorage),
     m_pStateJournal(pStateJournal),
     m_sTestOutputPath(sTestOutputPath),
     m_pLogger(pLogger),
     m_sSystemUserID(sSystemUserID),
     m_pAccessControl(pAccessControl),
     m_pLanguageHandler(pLanguageHandler),
-    m_pLoginHandler(pLoginHandler),
     m_pMeshHandler(pMeshHandler),
     m_pDataSeriesHandler (pDataSeriesHandler),
     m_pGlobalChronoInstance (pGlobalChronoInstance),
-    m_pAlertHandler (pAlertHandler),
-    m_pAlertSession (pAlertSession)
+    m_pAlertHandler (pAlertHandler)
 {
     if (pStateMachineData.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pBuildJobHandler.get() == nullptr)
+    if (pDataModel.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pToolpathHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pStorage.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pLogger.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -72,8 +67,6 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pLanguageHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pLoginHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pMeshHandler.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pDataSeriesHandler.get() == nullptr)
@@ -81,8 +74,6 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
     if (pGlobalChronoInstance.get () == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pAlertHandler.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pAlertSession.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 
@@ -139,10 +130,6 @@ PLanguageHandler CUISystemState::getLanguageHandler()
     return m_pLanguageHandler;
 }
 
-LibMCData::PLoginHandler CUISystemState::getLoginHandler()
-{
-    return m_pLoginHandler;
-}
 
 PToolpathHandler CUISystemState::getToolpathHandler()
 {
@@ -154,19 +141,9 @@ PMeshHandler CUISystemState::getMeshHandler()
     return m_pMeshHandler;
 }
 
-LibMCData::PBuildJobHandler CUISystemState::getBuildJobHandler()
+LibMCData::PDataModel CUISystemState::getDataModel()
 {
-    return m_pBuildJobHandler;
-}
-
-LibMCData::PStorage CUISystemState::getStorage()
-{
-    return m_pStorage;
-}
-
-LibMCData::PAlertSession CUISystemState::getAlertSession()
-{
-    return m_pAlertSession;
+    return m_pDataModel;
 }
 
 

@@ -60,14 +60,14 @@ class CBuild : public virtual IBuild, public virtual CBase {
 private:
 
 	AMC::PToolpathHandler m_pToolpathHandler;
-	LibMCData::PBuildJob m_pBuildJob;
-	LibMCData::PStorage m_pStorage;
+	LibMCData::PDataModel m_pDataModel;
+	std::string m_sBuildJobUUID;
 	std::string m_sSystemUserID;
 
 
 public:
 
-	CBuild(LibMCData::PBuildJob pBuildJob, AMC::PToolpathHandler pToolpathHandler, LibMCData::PStorage pStorage, const std::string & sSystemUserID);
+	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID);
 
 	virtual ~CBuild();
 

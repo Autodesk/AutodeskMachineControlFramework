@@ -176,6 +176,8 @@
 		<error name="EMPTYALERTIDENTIFIER" code="10136" description="Empty alert identifier"/>
 		<error name="INVALIDALERTIDENTIFIER" code="10137" description="Invalid alert identifier"/>
 		<error name="ALERTNOTFOUND" code="10138" description="Alert not found."/>
+		<error name="USERDOESNOTEXIST" code="10139" description="User does not exist."/>
+		
 		
 
 	</errors>
@@ -2372,6 +2374,11 @@
 			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
 		</method>
 	
+		<method name="UserUUIDExists" description="Checks if a user uuid exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
+		</method>
+
 		<method name="GetUserProperties" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="UUID" type="string" pass="out" description="UUID of the user." />

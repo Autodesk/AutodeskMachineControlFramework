@@ -158,10 +158,64 @@ class AMCApplicationItem_Content_BuildList extends Common.AMCApplicationItem {
 		
 	}
 	
+		
+}
+
+
+class AMCApplicationItem_Content_AlertList extends Common.AMCApplicationItem {
+	
+	constructor (moduleInstance, itemJSON) 
+	{
+		Assert.ObjectValue (itemJSON);		
+		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
+		this.registerClass ("amcItem_AlertList");
+
+		this.entries = [];
+				
+		// TODO: check validity
+		this.headers = itemJSON.headers;
+		this.loadingtext = "";
+		this.selectevent = "";
+		this.selectionvalueuuid = Common.nullUUID ();
+		this.entriesperpage = 25;
+		
+		this.updateFromJSON (itemJSON);
+		
+		this.setRefreshFlag ();
+								
+	}
+	
+	
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);
+		Assert.ArrayValue (updateJSON.entries);
+		
+		if (updateJSON.loadingtext)
+			this.loadingtext = Assert.StringValue (updateJSON.loadingtext);
+		if (updateJSON.selectevent)
+			this.selectevent = Assert.IdentifierString (updateJSON.selectevent);		
+		if (updateJSON.selectionvalueuuid)
+			this.selectionvalueuuid = Assert.IdentifierString (updateJSON.selectionvalueuuid);
+		if (updateJSON.entriesperpage)
+			this.entriesperpage = Assert.IntegerValue (updateJSON.entriesperpage);
+
+		let oldEntryCount = this.entries.length;
+		for (let index = 0; index < oldEntryCount; index++) {
+			this.entries.pop();
+		}
+
+		for (let entry of updateJSON.entries) {
+			this.entries.push(entry);
+		}
+		
+	}
+	
 	
 
 		
 }
+
 
 class AMCApplicationItem_Content_Paragraph extends Common.AMCApplicationItem {
 	
@@ -442,6 +496,9 @@ export default class AMCApplicationModule_Content extends Common.AMCApplicationM
 			if (itemJSON.type === "buildlist") 
 				item = new AMCApplicationItem_Content_BuildList (this, itemJSON);
 			
+			if (itemJSON.type === "alertlist") 
+				item = new AMCApplicationItem_Content_AlertList (this, itemJSON);
+
 			if (itemJSON.type === "buttongroup") 
 				item = new AMCApplicationItem_Content_ButtonGroup (this, itemJSON);
 			

@@ -978,6 +978,16 @@ typedef LibMCDataResult (*PLibMCDataUserList_GetUserPropertiesPtr) (LibMCData_Us
 typedef LibMCDataResult (*PLibMCDataLoginHandler_UserExistsPtr) (LibMCData_LoginHandler pLoginHandler, const char * pUsername, bool * pUserExists);
 
 /**
+* Checks if a user UUID exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[out] pUserExists - Flag if users exists
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_UserUUIDExistsPtr) (LibMCData_LoginHandler pLoginHandler, const char * pUUID, bool * pUserExists);
+
+/**
 * Retrieves login relevant users data. Fails if user does not exist.
 *
 * @param[in] pLoginHandler - LoginHandler instance.
@@ -1744,6 +1754,7 @@ typedef struct {
 	PLibMCDataUserList_CountPtr m_UserList_Count;
 	PLibMCDataUserList_GetUserPropertiesPtr m_UserList_GetUserProperties;
 	PLibMCDataLoginHandler_UserExistsPtr m_LoginHandler_UserExists;
+	PLibMCDataLoginHandler_UserUUIDExistsPtr m_LoginHandler_UserUUIDExists;
 	PLibMCDataLoginHandler_GetUserDetailsPtr m_LoginHandler_GetUserDetails;
 	PLibMCDataLoginHandler_GetUserPropertiesPtr m_LoginHandler_GetUserProperties;
 	PLibMCDataLoginHandler_GetUserPropertiesByUUIDPtr m_LoginHandler_GetUserPropertiesByUUID;

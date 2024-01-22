@@ -142,7 +142,8 @@ void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8
 
 	auto sBuildUUID = jsonRequest.getUUID(AMC_API_KEY_BUILDUUID, LIBMC_ERROR_INVALIDBUILDUUID);
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
 
 	pBuildJob->StartValidating();
@@ -150,7 +151,7 @@ void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8
 	auto pServiceHandler = m_pSystemState->serviceHandler();
 	auto pLib3MFWrapper = m_pSystemState->toolpathHandler()->getLib3MFWrapper();
 
-	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pBuildJob, pLib3MFWrapper, pAuth->getUserName()));
+	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pDataModel, pBuildJob->GetUUID(), pLib3MFWrapper, pAuth->getUserName()));
 
 	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName());
 
@@ -172,7 +173,9 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 	if (sBuildUUID != AMCCommon::CUtils::createEmptyUUID()) {
 
 
-		auto pBuildJob = m_pSystemState->buildJobHandler()->RetrieveJob(sBuildUUID);
+		auto pDataModel = m_pSystemState->getDataModelInstance();
+		auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+		auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
 		auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
 
 
@@ -253,7 +256,8 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJobIterator = pBuildJobHandler->ListJobsByStatus(LibMCData::eBuildJobStatus::Validated);
 
 	CJSONWriterArray jobJSONArray(writer);
@@ -278,7 +282,8 @@ void CAPIHandler_Build::handleListBuildDataRequest(CJSONWriter& writer, PAPIAuth
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(buildUUID);
 
 	CJSONWriterArray dataJSONArray(writer);
@@ -316,7 +321,8 @@ PAPIResponse CAPIHandler_Build::handleGetBuildDataRequest(PAPIAuth pAuth, std::s
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->FindJobOfData(buildDataUUID);
 	auto pBuildJobData = pBuildJob->RetrieveJobData(buildDataUUID);
 

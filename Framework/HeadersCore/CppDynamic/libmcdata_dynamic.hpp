@@ -1299,6 +1299,7 @@ public:
 	}
 	
 	inline bool UserExists(const std::string & sUsername);
+	inline bool UserUUIDExists(const std::string & sUUID);
 	inline void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword);
 	inline void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
 	inline void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
@@ -1579,6 +1580,7 @@ public:
 		pWrapperTable->m_UserList_Count = nullptr;
 		pWrapperTable->m_UserList_GetUserProperties = nullptr;
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
+		pWrapperTable->m_LoginHandler_UserUUIDExists = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDetails = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserProperties = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = nullptr;
@@ -2399,6 +2401,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LoginHandler_UserExists == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_UserUUIDExists = (PLibMCDataLoginHandler_UserUUIDExistsPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_useruuidexists");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_UserUUIDExists = (PLibMCDataLoginHandler_UserUUIDExistsPtr) dlsym(hLibrary, "libmcdata_loginhandler_useruuidexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_UserUUIDExists == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3280,6 +3291,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_userexists", (void**)&(pWrapperTable->m_LoginHandler_UserExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UserExists == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_useruuidexists", (void**)&(pWrapperTable->m_LoginHandler_UserUUIDExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UserUUIDExists == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserdetails", (void**)&(pWrapperTable->m_LoginHandler_GetUserDetails));
@@ -4738,6 +4753,19 @@ public:
 	{
 		bool resultUserExists = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_UserExists(m_pHandle, sUsername.c_str(), &resultUserExists));
+		
+		return resultUserExists;
+	}
+	
+	/**
+	* CLoginHandler::UserUUIDExists - Checks if a user UUID exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Flag if users exists
+	*/
+	bool CLoginHandler::UserUUIDExists(const std::string & sUUID)
+	{
+		bool resultUserExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_UserUUIDExists(m_pHandle, sUUID.c_str(), &resultUserExists));
 		
 		return resultUserExists;
 	}

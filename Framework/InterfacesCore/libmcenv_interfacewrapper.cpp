@@ -12300,6 +12300,35 @@ LibMCEnvResult libmcenv_usermanagementhandler_userexists(LibMCEnv_UserManagement
 	}
 }
 
+LibMCEnvResult libmcenv_usermanagementhandler_useruuidexists(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, bool * pUserExists)
+{
+	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IUserManagementHandler* pIUserManagementHandler = dynamic_cast<IUserManagementHandler*>(pIBaseClass);
+		if (!pIUserManagementHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pUserExists = pIUserManagementHandler->UserUUIDExists(sUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_usermanagementhandler_getuserproperties(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCEnv_uint32 nRoleBufferSize, LibMCEnv_uint32* pRoleNeededChars, char * pRoleBuffer, const LibMCEnv_uint32 nLanguageIdentifierBufferSize, LibMCEnv_uint32* pLanguageIdentifierNeededChars, char * pLanguageIdentifierBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUserManagementHandler;
@@ -18078,6 +18107,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_userdetaillist_getlanguage;
 	if (sProcName == "libmcenv_usermanagementhandler_userexists") 
 		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_userexists;
+	if (sProcName == "libmcenv_usermanagementhandler_useruuidexists") 
+		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_useruuidexists;
 	if (sProcName == "libmcenv_usermanagementhandler_getuserproperties") 
 		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getuserproperties;
 	if (sProcName == "libmcenv_usermanagementhandler_getuserpropertiesbyuuid") 

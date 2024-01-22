@@ -156,7 +156,8 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 
 	auto sUUID = AMCCommon::CUtils::createUUID();
 
-	auto pStorage = m_pSystemState->storage();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
 
 	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
 
@@ -196,7 +197,8 @@ void CAPIHandler_Upload::handleFinishUploadRequest(CJSONWriter& writer, const ui
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto pStorage = m_pSystemState->storage();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
 
 	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
 
@@ -241,7 +243,8 @@ void CAPIHandler_Upload::handleStreamUploadRequest(CJSONWriter& writer, CAPIForm
 	if (nSize != (uint64_t)pData->size())
 		throw ELibMCInterfaceException(LIBMC_ERROR_UPLOADSIZEMISMATCH);
 
-	auto pStorage = m_pSystemState->storage();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
 	pStorage->StorePartialStream(sStreamUUID, nOffset, *pData);
 
 }
@@ -292,7 +295,8 @@ std::string CAPIHandler_Upload::createNewBuild(const std::string& sName, const s
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	std::string sBuildUUID = AMCCommon::CUtils::createUUID();
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	pBuildJobHandler->CreateJob(sBuildUUID, sName, pAuth->getUserName(), sStorageStreamUUID);
 
 	return sBuildUUID;

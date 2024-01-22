@@ -163,7 +163,7 @@ namespace AMC {
 		void writeConfigurationToJSON (CJSONWriter & writer, CParameterHandler* pClientVariableHandler);
 		void writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler);
 
-		void loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
+		void loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath);
 
 		void setCoreResourcePackage(PResourcePackage pCoreResourcePackage);
 

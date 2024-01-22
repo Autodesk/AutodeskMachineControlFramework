@@ -282,7 +282,8 @@ PAPIResponse CAPIHandler_UI::handleImageRequest(const std::string& sParameterUUI
 	}
 
 	// Then look in storage for uuid
-	auto pStorage = m_pSystemState->storage();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
 	if (pStorage->StreamIsImage(sParameterUUID)) {
 
 		auto pStream = pStorage->RetrieveStream(sParameterUUID);

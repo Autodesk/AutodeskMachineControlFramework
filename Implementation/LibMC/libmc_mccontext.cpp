@@ -76,7 +76,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 
     // Create Log Multiplexer to StdOut and Database
     auto pMultiLogger = std::make_shared<AMC::CLogger_Multi>();
-    pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel->CreateNewLogSession ()));
+    pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel));
     if (pDataModel->HasLogCallback())
         pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel));
 
@@ -94,7 +94,9 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>(m_pSystemState->getClientHash ());
     m_pAPI->registerHandler (m_pClientDistHandler);
 
-    std::string sTempPath = pDataModel->GetBaseTempDirectory();
+    // Proper threadsafe reading out of Base Temp directory (even if it might not matter at startup).
+    auto pInstallationInformation = pDataModel->GetInstallationInformationObject();
+    std::string sTempPath = pInstallationInformation->GetBaseTempDirectory();
 
     if (sTempPath.empty()) {
         // Set Temporary Path (as default value)
@@ -236,8 +238,10 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         m_pStateJournal->startRecording();
 
         // Load persistent parameters
+        auto pDataModel = m_pSystemState->getDataModelInstance();
+        auto pPersistencyHandler = pDataModel->CreatePersistencyHandler();
         for (auto pStateMachineInstance : m_InstanceList)
-            pStateMachineInstance->getParameterHandler()->loadPersistentParameters(m_pSystemState->getPersistencyHandler ());
+            pStateMachineInstance->getParameterHandler()->loadPersistentParameters(pPersistencyHandler);
 
         // Load User Interface
         auto userInterfaceNode = mainNode.child("userinterface");
@@ -260,7 +264,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
 
             m_pSystemState->logger()->logMessage("Loading UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
             m_pSystemState->uiHandler()->setCoreResourcePackage(m_pCoreResourcePackage);
-            m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
+            m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, sUILibraryPath);
         }
 
     }

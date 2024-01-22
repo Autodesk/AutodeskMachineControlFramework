@@ -4198,6 +4198,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_userdetaillist_getlanguage(LibMCEnv_Us
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_usermanagementhandler_userexists(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, bool * pUserExists);
 
 /**
+* Checks if a user uuid exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[out] pUserExists - Flag if users exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_usermanagementhandler_useruuidexists(LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, bool * pUserExists);
+
+/**
 * Retrieves all users data with one Transaction. Fails if user does not exist.
 *
 * @param[in] pUserManagementHandler - UserManagementHandler instance.

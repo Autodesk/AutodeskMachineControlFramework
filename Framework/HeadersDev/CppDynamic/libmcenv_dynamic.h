@@ -4185,6 +4185,16 @@ typedef LibMCEnvResult (*PLibMCEnvUserDetailList_GetLanguagePtr) (LibMCEnv_UserD
 typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_UserExistsPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUsername, bool * pUserExists);
 
 /**
+* Checks if a user uuid exist.
+*
+* @param[in] pUserManagementHandler - UserManagementHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[out] pUserExists - Flag if users exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_UserUUIDExistsPtr) (LibMCEnv_UserManagementHandler pUserManagementHandler, const char * pUUID, bool * pUserExists);
+
+/**
 * Retrieves all users data with one Transaction. Fails if user does not exist.
 *
 * @param[in] pUserManagementHandler - UserManagementHandler instance.
@@ -6178,6 +6188,7 @@ typedef struct {
 	PLibMCEnvUserDetailList_GetRolePtr m_UserDetailList_GetRole;
 	PLibMCEnvUserDetailList_GetLanguagePtr m_UserDetailList_GetLanguage;
 	PLibMCEnvUserManagementHandler_UserExistsPtr m_UserManagementHandler_UserExists;
+	PLibMCEnvUserManagementHandler_UserUUIDExistsPtr m_UserManagementHandler_UserUUIDExists;
 	PLibMCEnvUserManagementHandler_GetUserPropertiesPtr m_UserManagementHandler_GetUserProperties;
 	PLibMCEnvUserManagementHandler_GetUserPropertiesByUUIDPtr m_UserManagementHandler_GetUserPropertiesByUUID;
 	PLibMCEnvUserManagementHandler_GetUsernameByUUIDPtr m_UserManagementHandler_GetUsernameByUUID;

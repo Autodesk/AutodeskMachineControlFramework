@@ -57,9 +57,18 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName)
-    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pDriverResourcePackage (pDriverResourcePackage), m_pMachineResourcePackage (pMachineResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName), m_pBuildJobHandler (pBuildJobHandler),
-    m_pStorage (pStorage), m_sSystemUserID (sSystemUserID), m_pGlobalChrono (pGlobalChrono)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName)
+    : m_bIsInitializing(false), 
+    m_pParameterGroup(pParameterGroup), 
+    m_pDriverResourcePackage (pDriverResourcePackage), 
+    m_pMachineResourcePackage (pMachineResourcePackage),
+    m_sBaseTempPath(sBaseTempPath), 
+    m_pToolpathHandler (pToolpathHandler), 
+    m_pLogger (pLogger), 
+    m_sDriverName (sDriverName), 
+    m_pDataModel (pDataModel), 
+    m_sSystemUserID (sSystemUserID), 
+    m_pGlobalChrono (pGlobalChrono)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -67,9 +76,7 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pToolpathHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pBuildJobHandler.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
-    if (pStorage.get() == nullptr)
+    if (pDataModel.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pLogger.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -380,7 +387,8 @@ bool CDriverEnvironment::HasBuildJob(const std::string& sBuildUUID)
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
     try {
-        m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+        auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+        pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
         return true;
     }
     catch (std::exception) {
@@ -392,6 +400,7 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-    auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pBuildJob, m_pToolpathHandler, m_pStorage, m_sSystemUserID);
+    auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+    auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID);
 }

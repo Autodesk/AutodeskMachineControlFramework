@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 
-	CToolpathHandler::CToolpathHandler(LibMCData::PStorage pStorage)
-		: m_pStorage (pStorage)
+	CToolpathHandler::CToolpathHandler(LibMCData::PDataModel pDataModel)
+		: m_pDataModel(pDataModel)
 	{
-		LibMCAssertNotNull(pStorage.get());
+		LibMCAssertNotNull(pDataModel.get());
 	
 	}
 
@@ -71,9 +71,10 @@ namespace AMC {
 		auto pToolpathEntity = findToolpathEntity(sStreamUUID, false);
 		if (pToolpathEntity == nullptr) {
 
-			auto pStorageStream = m_pStorage->RetrieveStream(sStreamUUID);
+			auto pStorage = m_pDataModel->CreateStorage();
+			auto pStorageStream = pStorage->RetrieveStream(sStreamUUID);
 
-			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pStorageStream, getLib3MFWrapper(), pStorageStream->GetName ());
+			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(m_pDataModel, sStreamUUID, getLib3MFWrapper(), pStorageStream->GetName ());
 			pNewToolpathEntity->IncRef();
 			m_Entities.insert(std::make_pair(sStreamUUID, pNewToolpathEntity));
 			return pNewToolpathEntity.get();

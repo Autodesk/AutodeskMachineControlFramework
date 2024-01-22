@@ -367,7 +367,7 @@ void CUIHandler::setCoreResourcePackage(PResourcePackage pCoreResourcePackage)
 }
 
 
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath)
 {
     auto pStateMachineData = m_pUISystemState->getStateMachineData();
     auto pLogger = m_pUISystemState->getLogger();

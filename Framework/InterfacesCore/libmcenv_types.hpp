@@ -233,6 +233,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_EMPTYALERTIDENTIFIER 10136 /** Empty alert identifier */
 #define LIBMCENV_ERROR_INVALIDALERTIDENTIFIER 10137 /** Invalid alert identifier */
 #define LIBMCENV_ERROR_ALERTNOTFOUND 10138 /** Alert not found. */
+#define LIBMCENV_ERROR_USERDOESNOTEXIST 10139 /** User does not exist. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -378,6 +379,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
     case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
     case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
+    case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
     default: return "unknown error";
   }
 }

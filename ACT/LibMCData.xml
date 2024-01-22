@@ -919,6 +919,11 @@
 			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
 		</method>
 	
+		<method name="UserUUIDExists" description="Checks if a user UUID exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
+		</method>
+
 		<method name="GetUserDetails" description="Retrieves login relevant users data. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="Salt" type="string" pass="out" description="Salt of the user." />

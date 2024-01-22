@@ -3062,6 +3062,35 @@ LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_LoginHandler pLoginH
 	}
 }
 
+LibMCDataResult libmcdata_loginhandler_useruuidexists(LibMCData_LoginHandler pLoginHandler, const char * pUUID, bool * pUserExists)
+{
+	IBase* pIBaseClass = (IBase *)pLoginHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUserExists == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		ILoginHandler* pILoginHandler = dynamic_cast<ILoginHandler*>(pIBaseClass);
+		if (!pILoginHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pUserExists = pILoginHandler->UserUUIDExists(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nSaltBufferSize, LibMCData_uint32* pSaltNeededChars, char * pSaltBuffer, const LibMCData_uint32 nHashedPasswordBufferSize, LibMCData_uint32* pHashedPasswordNeededChars, char * pHashedPasswordBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pLoginHandler;
@@ -5384,6 +5413,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_userlist_getuserproperties;
 	if (sProcName == "libmcdata_loginhandler_userexists") 
 		*ppProcAddress = (void*) &libmcdata_loginhandler_userexists;
+	if (sProcName == "libmcdata_loginhandler_useruuidexists") 
+		*ppProcAddress = (void*) &libmcdata_loginhandler_useruuidexists;
 	if (sProcName == "libmcdata_loginhandler_getuserdetails") 
 		*ppProcAddress = (void*) &libmcdata_loginhandler_getuserdetails;
 	if (sProcName == "libmcdata_loginhandler_getuserproperties") 

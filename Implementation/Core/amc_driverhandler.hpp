@@ -45,11 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMCPACKAGE_SCHEMANAMESPACE "http://schemas.autodesk.com/amc/resourcepackage/2020/07"
 
 namespace LibMCData {
-	class CBuildJobHandler;
-	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
-
-	class CStorage;
-	typedef std::shared_ptr<CStorage> PStorage;
+	class CDataModel;
+	typedef std::shared_ptr<CDataModel> PDataModel;
 }
 
 namespace AMC {
@@ -76,8 +73,7 @@ namespace AMC {
 		std::string m_sTempBasePath;
 		PToolpathHandler m_pToolpathHandler;
 		PLogger m_pLogger;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-		LibMCData::PStorage m_pStorage;
+		LibMCData::PDataModel m_pDataModel;
 		AMCCommon::PChrono m_pGlobalChrono;
 
 		std::string m_sSystemUserID;
@@ -96,7 +92,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID);
 
 		virtual ~CDriverHandler();
 

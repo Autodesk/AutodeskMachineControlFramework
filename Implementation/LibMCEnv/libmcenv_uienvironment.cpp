@@ -459,7 +459,10 @@ bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
     try {
-        m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
+        auto pDataModel = m_pUISystemState->getDataModel();
+        auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+        auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+
         return true;
     }
     catch (std::exception) {
@@ -471,8 +474,10 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-    auto pBuildJob = m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pBuildJob, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getStorage(), m_pUISystemState->getSystemUserID());
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+    auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID());
 }
 
 
@@ -543,7 +548,7 @@ std::string CUIEnvironment::GetCurrentUserUUID()
 
 IUserManagementHandler* CUIEnvironment::CreateUserManagement()
 {
-    return new CUserManagementHandler(m_pUISystemState->getLoginHandler(), m_pUISystemState->getAccessControl(), m_pUISystemState->getLanguageHandler());
+    return new CUserManagementHandler(m_pUISystemState->getDataModel(), m_pUISystemState->getAccessControl(), m_pUISystemState->getLanguageHandler());
 }
 
 IJournalHandler* CUIEnvironment::GetCurrentJournal()
@@ -632,22 +637,24 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
     auto pDefinition = m_pUISystemState->getAlertHandler()->findDefinition(sIdentifier, true);
     auto alertDescription = pDefinition->getDescription();
 
-    auto pAlertSession = m_pUISystemState->getAlertSession();
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
     pAlertSession->AddAlert(sNewUUID, pDefinition->getIdentifier(), pDefinition->getAlertLevel(), alertDescription.getCustomValue(), alertDescription.getStringIdentifier(), sReadableContextInformation, pDefinition->needsAcknowledgement(), sTimeStamp);
 
-    return new CAlert(sNewUUID, pAlertSession);
+    return new CAlert(sNewUUID, pDataModel);
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-    auto pAlertSession = m_pUISystemState->getAlertSession();
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
 
     if (!pAlertSession->HasAlert(sNormalizedUUID))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
 
-    return new CAlert(sNormalizedUUID, pAlertSession);
+    return new CAlert(sNormalizedUUID, pDataModel);
 
 }
 
@@ -655,7 +662,8 @@ bool CUIEnvironment::AlertExists(const std::string& sUUID)
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-    auto pAlertSession = m_pUISystemState->getAlertSession();
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
 
     return pAlertSession->HasAlert(sNormalizedUUID);
 
@@ -663,11 +671,32 @@ bool CUIEnvironment::AlertExists(const std::string& sUUID)
 
 void CUIEnvironment::AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment)
 {
+    std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    AMCCommon::CChrono chrono;
+
+    pAlertSession->AcknowledgeAlert(sNormalizedAlertUUID, m_pUserInformation->getUUID(), sUserComment, chrono.getStartTimeISO8601TimeUTC());
 
 }
 
 void CUIEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
 {
+    std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
+    std::string sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pLoginHandler = pDataModel->CreateLoginHandler();
+    if (!pLoginHandler->UserUUIDExists(sNormalizedUserUUID))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_USERDOESNOTEXIST, "user does not exist: " + sNormalizedUserUUID);
+
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    AMCCommon::CChrono chrono;
+
+    pAlertSession->AcknowledgeAlert(sNormalizedAlertUUID, sNormalizedUserUUID, sUserComment, chrono.getStartTimeISO8601TimeUTC());
 
 }
 

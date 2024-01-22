@@ -43,15 +43,15 @@ using namespace LibMCEnv::Impl;
  Class definition of CAlert 
 **************************************************************************************************************************/
 
-CAlert::CAlert(const std::string& sAlertUUID, LibMCData::PAlertSession pAlertSession)
-	: m_sAlertUUID (AMCCommon::CUtils::normalizeUUIDString (sAlertUUID)),
-	m_pAlertSession (pAlertSession),
+CAlert::CAlert(const std::string& sAlertUUID, LibMCData::PDataModel pDataModel)
+	: m_sAlertUUID (AMCCommon::CUtils::normalizeUUIDString (sAlertUUID)),	
 	m_bNeedsAcknowledgement (false),
 	m_AlertLevel (LibMCEnv::eAlertLevel::CriticalError)
 {
-	if (pAlertSession.get() == nullptr)
+	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+	m_pAlertSession = pDataModel->CreateAlertSession();
 
 }
 
@@ -87,11 +87,13 @@ bool CAlert::NeedsAcknowledgement()
 
 bool CAlert::IsAcknowledged()
 {
+	std::lock_guard<std::mutex> lockGuard(m_AlertSessionMutex);
 	return m_pAlertSession->AlertHasBeenAcknowledged(m_sAlertUUID);
 }
 
 void CAlert::GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime)
 {
+	std::lock_guard<std::mutex> lockGuard(m_AlertSessionMutex);
 	m_pAlertSession->GetAcknowledgementInformation(m_sAlertUUID, sUserUUID, sUserComment, sAckTime);
 }
 

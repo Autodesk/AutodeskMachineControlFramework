@@ -37,17 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_chrono.hpp"
 
 namespace LibMCData {
-	class CStorage;
-	class CBuildJobHandler;
-	class CLoginHandler;
-	class CPersistencyHandler;
-	class CAlertSession;
+	class CDataModel;
 
-	typedef std::shared_ptr<CStorage> PStorage;
-	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
-	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
-	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
-	typedef std::shared_ptr<CAlertSession> PAlertSession;
+	typedef std::shared_ptr<CDataModel> PDataModel;
 }
 
 
@@ -85,23 +77,21 @@ namespace AMC {
 
 		PAccessControl m_pAccessControl;
 		PLanguageHandler m_pLanguageHandler;
-		LibMCData::PLoginHandler m_pLoginHandler;
 		PDataSeriesHandler m_pDataSeriesHandler;
 		PAlertHandler m_pAlertHandler;
-		
+				
+		// LibMCData::PDataModel is thread safe, so it can be shared between contexts.
+		LibMCData::PDataModel m_pDataModel;
 
 		PToolpathHandler m_pToolpathHandler;
 		PMeshHandler m_pMeshHandler;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-		LibMCData::PStorage m_pStorage;
-		LibMCData::PAlertSession m_pAlertSession;
 		AMCCommon::PChrono m_pGlobalChronoInstance;
 
 		std::string m_sTestOutputPath;
 		std::string m_sSystemUserID;
 
 	public:
-		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, LibMCData::PLoginHandler pLoginHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PAlertSession pAlertSession);
+		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel);
 
 		virtual ~CUISystemState();
 
@@ -113,13 +103,11 @@ namespace AMC {
 
 		PAccessControl getAccessControl();
 		PLanguageHandler getLanguageHandler();
-		LibMCData::PLoginHandler getLoginHandler();
+
+		LibMCData::PDataModel getDataModel();
 
 		PToolpathHandler getToolpathHandler();
 		PMeshHandler getMeshHandler();
-		LibMCData::PBuildJobHandler getBuildJobHandler();
-		LibMCData::PStorage getStorage();
-		LibMCData::PAlertSession getAlertSession();
 		PDataSeriesHandler getDataSeriesHandler();
 		AMCCommon::PChrono getGlobalChronoInstance();
 

@@ -1059,6 +1059,13 @@ public:
 	virtual bool UserExists(const std::string & sUsername) = 0;
 
 	/**
+	* ILoginHandler::UserUUIDExists - Checks if a user UUID exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Flag if users exists
+	*/
+	virtual bool UserUUIDExists(const std::string & sUUID) = 0;
+
+	/**
 	* ILoginHandler::GetUserDetails - Retrieves login relevant users data. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @param[out] sSalt - Salt of the user.

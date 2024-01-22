@@ -3427,6 +3427,13 @@ public:
 	virtual bool UserExists(const std::string & sUsername) = 0;
 
 	/**
+	* IUserManagementHandler::UserUUIDExists - Checks if a user uuid exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Flag if users exists
+	*/
+	virtual bool UserUUIDExists(const std::string & sUUID) = 0;
+
+	/**
 	* IUserManagementHandler::GetUserProperties - Retrieves all users data with one Transaction. Fails if user does not exist.
 	* @param[in] sUsername - User name
 	* @param[out] sUUID - UUID of the user.

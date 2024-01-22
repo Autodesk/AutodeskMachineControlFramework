@@ -1,4 +1,4 @@
-/*++
+<!--
 
 Copyright (C) 2020 Autodesk Inc.
 
@@ -26,54 +26,50 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+!-->
 
-#ifndef __AMC_LOGGER_DATABASE
-#define __AMC_LOGGER_DATABASE
+<template>
 
-#include <memory>
-#include <string>
-#include <mutex>
-#include <vector>
+<div v-if="(moduleitem.type=='alertlist')">  	
 
-#include "amc_logger.hpp"
-#include "amc_loggerentry.hpp"
+	<v-data-table
+		:headers="moduleitem.headers"
+		:items="moduleitem.entries"
+		:items-per-page="moduleitem.entriesperpage"
+		class="elevation-1"
+		disable-pagination
+		hide-default-footer
+		search 
+		width="100%"
+		loadingText="moduleitem.loadingtext"
+		@click:row="uiModuleAlertListClick"
+		>													
+										
+	</v-data-table>		
 
-#include "libmcdata_dynamic.hpp"
+</div>
 
-namespace AMC {
+</template>
 
-	class CLogger_Database;
-	typedef std::shared_ptr<CLogger_Database> PLogger_Database;
+<script>
 
-
-	class CLogger_Database : public CLogger {
-	private:
-
-		// Attention! PLogSession is not thread safe, so always keep private in this class
-		// And always put a mutex around the instance!
-		LibMCData::PLogSession m_pLogSession;
-		std::mutex m_DBMutex;
-
-		uint32_t m_MaxLogMessageRequestCount;
-
-	public:
-
-		CLogger_Database(LibMCData::PDataModel pDataModel);
-		virtual ~CLogger_Database();
-
-		void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) override;
-
-		bool supportsLogMessagesRetrieval() override;
-
-		void retrieveLogMessages (std::vector<CLoggerEntry> & entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel) override;
-
-		uint32_t getLogMessageHeadID() override;
+	export default {
+	  props: ["Application", "moduleitem"],
+	  
+	  methods: {	
+	  
+		uiModuleAlertListClick: function (item) {
+			if (item) {
+				if (this.moduleitem.selectevent && this.moduleitem.selectionvalueuuid) {
+					var eventValues = {}
+					eventValues[this.moduleitem.selectionvalueuuid] = item.buildUUID;
+			
+					this.Application.triggerUIEvent (this.moduleitem.selectevent, this.moduleitem.uuid, eventValues);
+				}
+			}
+		},
+				
+	  }
 	};
-
 	
-}
-
-
-#endif //__AMC_LOGGER_DATABASE
-
+</script>
