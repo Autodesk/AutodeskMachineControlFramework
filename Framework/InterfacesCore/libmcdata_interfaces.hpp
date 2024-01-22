@@ -58,6 +58,8 @@ class IBase;
 class IIterator;
 class ILogEntryList;
 class ILogSession;
+class IAlert;
+class IAlertIterator;
 class IAlertSession;
 class IJournalSession;
 class IStorageStream;
@@ -470,6 +472,88 @@ typedef IBaseSharedPtr<ILogSession> PILogSession;
 
 
 /*************************************************************************************************************************
+ Class interface for Alert 
+**************************************************************************************************************************/
+
+class IAlert : public virtual IBase {
+public:
+	/**
+	* IAlert::GetUUID - Returns the Alert UUID.
+	* @return Value.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IAlert::GetIdentifier - Returns the Alert Identifier.
+	* @return Value.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IAlert::GetLevel - Returns the Alert Level.
+	* @return Value.
+	*/
+	virtual LibMCData::eAlertLevel GetLevel() = 0;
+
+	/**
+	* IAlert::GetDescription - Returns the Alert Description.
+	* @return Value.
+	*/
+	virtual std::string GetDescription() = 0;
+
+	/**
+	* IAlert::GetDescriptionIdentifier - Returns the Alert DescriptionIdentifier.
+	* @return Value.
+	*/
+	virtual std::string GetDescriptionIdentifier() = 0;
+
+	/**
+	* IAlert::GetReadableContextInformation - Returns the Alert ReadableContextInformation.
+	* @return Value.
+	*/
+	virtual std::string GetReadableContextInformation() = 0;
+
+	/**
+	* IAlert::GetNeedsAcknowledgement - Returns if the Alert needs acknowledgement.
+	* @return Value.
+	*/
+	virtual bool GetNeedsAcknowledgement() = 0;
+
+	/**
+	* IAlert::GetTimestampUTC - Returns the Alert Timestamp in UTC file format.
+	* @return Value.
+	*/
+	virtual std::string GetTimestampUTC() = 0;
+
+	/**
+	* IAlert::HasBeenAcknowledged - Checks if the alert has been acknowledged.
+	* @return Flag if the alert has been acknowledged.
+	*/
+	virtual bool HasBeenAcknowledged() = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlert> PIAlert;
+
+
+/*************************************************************************************************************************
+ Class interface for AlertIterator 
+**************************************************************************************************************************/
+
+class IAlertIterator : public virtual IIterator {
+public:
+	/**
+	* IAlertIterator::GetCurrentAlert - Returns the alert the iterator points at.
+	* @return returns the Alert instance.
+	*/
+	virtual IAlert * GetCurrentAlert() = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlertIterator> PIAlertIterator;
+
+
+/*************************************************************************************************************************
  Class interface for AlertSession 
 **************************************************************************************************************************/
 
@@ -494,6 +578,25 @@ public:
 	* @return Flag if alert exists
 	*/
 	virtual bool HasAlert(const std::string & sUUID) = 0;
+
+	/**
+	* IAlertSession::GetAlertByUUID - Retrieves the alert object. Fails if alert does not exist.
+	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
+	* @return Alert Instance
+	*/
+	virtual IAlert * GetAlertByUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IAlertSession::RetrieveAllAlerts - Retrieves all alerts.
+	* @return AlertIterator Instance
+	*/
+	virtual IAlertIterator * RetrieveAllAlerts() = 0;
+
+	/**
+	* IAlertSession::RetrieveAllOpenAlerts - Retrieves all alerts which have not been acknowledged.
+	* @return AlertIterator Instance
+	*/
+	virtual IAlertIterator * RetrieveAllOpenAlerts() = 0;
 
 	/**
 	* IAlertSession::GetAlertInformation - Retrieves information of an alert. Fails if alert does not exist.

@@ -33,6 +33,10 @@ Abstract: This is a stub class definition of CAlertSession
 
 #include "libmcdata_alertsession.hpp"
 #include "libmcdata_interfaceexception.hpp"
+#include "libmcdata_alert.hpp"
+#include "libmcdata_alertiterator.hpp"
+
+#include "common_utils.hpp"
 
 // Include custom headers here.
 
@@ -64,6 +68,22 @@ void CAlertSession::AddAlert(const std::string& sUUID, const std::string& sIdent
 bool CAlertSession::HasAlert(const std::string& sUUID)
 {
     return m_pJournal->hasAlert(sUUID);
+}
+
+IAlert* CAlertSession::GetAlertByUUID(const std::string& sUUID)
+{
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    return new CAlert (m_pJournal, sUUID);
+}
+
+IAlertIterator* CAlertSession::RetrieveAllAlerts()
+{
+    return new CAlertIterator();
+}
+
+IAlertIterator* CAlertSession::RetrieveAllOpenAlerts()
+{
+    return new CAlertIterator();
 }
 
 void CAlertSession::GetAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC)

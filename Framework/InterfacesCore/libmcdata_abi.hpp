@@ -209,6 +209,116 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_getmaxlogentryid(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
 
 /*************************************************************************************************************************
+ Class definition for Alert
+**************************************************************************************************************************/
+
+/**
+* Returns the Alert UUID.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getuuid(LibMCData_Alert pAlert, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the Alert Identifier.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getidentifier(LibMCData_Alert pAlert, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the Alert Level.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pLevel - Value.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getlevel(LibMCData_Alert pAlert, LibMCData::eAlertLevel * pLevel);
+
+/**
+* Returns the Alert Description.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getdescription(LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Returns the Alert DescriptionIdentifier.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nDescriptionIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionIdentifierBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getdescriptionidentifier(LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionIdentifierBufferSize, LibMCData_uint32* pDescriptionIdentifierNeededChars, char * pDescriptionIdentifierBuffer);
+
+/**
+* Returns the Alert ReadableContextInformation.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nReadableContextInformationBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReadableContextInformationNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReadableContextInformationBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getreadablecontextinformation(LibMCData_Alert pAlert, const LibMCData_uint32 nReadableContextInformationBufferSize, LibMCData_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer);
+
+/**
+* Returns if the Alert needs acknowledgement.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pNeedsAcknowledgement - Value.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getneedsacknowledgement(LibMCData_Alert pAlert, bool * pNeedsAcknowledgement);
+
+/**
+* Returns the Alert Timestamp in UTC file format.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampUTCBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_gettimestamputc(LibMCData_Alert pAlert, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+
+/**
+* Checks if the alert has been acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pHasBeenAcknowledged - Flag if the alert has been acknowledged.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_hasbeenacknowledged(LibMCData_Alert pAlert, bool * pHasBeenAcknowledged);
+
+/*************************************************************************************************************************
+ Class definition for AlertIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the alert the iterator points at.
+*
+* @param[in] pAlertIterator - AlertIterator instance.
+* @param[out] pCurrentInstance - returns the Alert instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertiterator_getcurrentalert(LibMCData_AlertIterator pAlertIterator, LibMCData_Alert * pCurrentInstance);
+
+/*************************************************************************************************************************
  Class definition for AlertSession
 **************************************************************************************************************************/
 
@@ -237,6 +347,34 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_addalert(LibMCData_Ale
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_hasalert(LibMCData_AlertSession pAlertSession, const char * pUUID, bool * pAlertExists);
+
+/**
+* Retrieves the alert object. Fails if alert does not exist.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
+* @param[out] pAlertInstance - Alert Instance
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_getalertbyuuid(LibMCData_AlertSession pAlertSession, const char * pUUID, LibMCData_Alert * pAlertInstance);
+
+/**
+* Retrieves all alerts.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[out] pIteratorInstance - AlertIterator Instance
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrieveallalerts(LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance);
+
+/**
+* Retrieves all alerts which have not been acknowledged.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[out] pIteratorInstance - AlertIterator Instance
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrieveallopenalerts(LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance);
 
 /**
 * Retrieves information of an alert. Fails if alert does not exist.

@@ -196,6 +196,116 @@ typedef LibMCDataResult (*PLibMCDataLogSession_GetMaxLogEntryIDPtr) (LibMCData_L
 typedef LibMCDataResult (*PLibMCDataLogSession_RetrieveLogEntriesByIDPtr) (LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
 
 /*************************************************************************************************************************
+ Class definition for Alert
+**************************************************************************************************************************/
+
+/**
+* Returns the Alert UUID.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetUUIDPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the Alert Identifier.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetIdentifierPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the Alert Level.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pLevel - Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetLevelPtr) (LibMCData_Alert pAlert, LibMCData::eAlertLevel * pLevel);
+
+/**
+* Returns the Alert Description.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetDescriptionPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Returns the Alert DescriptionIdentifier.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nDescriptionIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionIdentifierBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetDescriptionIdentifierPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionIdentifierBufferSize, LibMCData_uint32* pDescriptionIdentifierNeededChars, char * pDescriptionIdentifierBuffer);
+
+/**
+* Returns the Alert ReadableContextInformation.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nReadableContextInformationBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReadableContextInformationNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReadableContextInformationBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetReadableContextInformationPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nReadableContextInformationBufferSize, LibMCData_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer);
+
+/**
+* Returns if the Alert needs acknowledgement.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pNeedsAcknowledgement - Value.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetNeedsAcknowledgementPtr) (LibMCData_Alert pAlert, bool * pNeedsAcknowledgement);
+
+/**
+* Returns the Alert Timestamp in UTC file format.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampUTCBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetTimestampUTCPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+
+/**
+* Checks if the alert has been acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pHasBeenAcknowledged - Flag if the alert has been acknowledged.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_HasBeenAcknowledgedPtr) (LibMCData_Alert pAlert, bool * pHasBeenAcknowledged);
+
+/*************************************************************************************************************************
+ Class definition for AlertIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the alert the iterator points at.
+*
+* @param[in] pAlertIterator - AlertIterator instance.
+* @param[out] pCurrentInstance - returns the Alert instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlertIterator_GetCurrentAlertPtr) (LibMCData_AlertIterator pAlertIterator, LibMCData_Alert * pCurrentInstance);
+
+/*************************************************************************************************************************
  Class definition for AlertSession
 **************************************************************************************************************************/
 
@@ -224,6 +334,34 @@ typedef LibMCDataResult (*PLibMCDataAlertSession_AddAlertPtr) (LibMCData_AlertSe
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataAlertSession_HasAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, bool * pAlertExists);
+
+/**
+* Retrieves the alert object. Fails if alert does not exist.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
+* @param[out] pAlertInstance - Alert Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlertSession_GetAlertByUUIDPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, LibMCData_Alert * pAlertInstance);
+
+/**
+* Retrieves all alerts.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[out] pIteratorInstance - AlertIterator Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAllAlertsPtr) (LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance);
+
+/**
+* Retrieves all alerts which have not been acknowledged.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[out] pIteratorInstance - AlertIterator Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAllOpenAlertsPtr) (LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance);
 
 /**
 * Retrieves information of an alert. Fails if alert does not exist.
@@ -1687,8 +1825,21 @@ typedef struct {
 	PLibMCDataLogSession_AddEntryPtr m_LogSession_AddEntry;
 	PLibMCDataLogSession_GetMaxLogEntryIDPtr m_LogSession_GetMaxLogEntryID;
 	PLibMCDataLogSession_RetrieveLogEntriesByIDPtr m_LogSession_RetrieveLogEntriesByID;
+	PLibMCDataAlert_GetUUIDPtr m_Alert_GetUUID;
+	PLibMCDataAlert_GetIdentifierPtr m_Alert_GetIdentifier;
+	PLibMCDataAlert_GetLevelPtr m_Alert_GetLevel;
+	PLibMCDataAlert_GetDescriptionPtr m_Alert_GetDescription;
+	PLibMCDataAlert_GetDescriptionIdentifierPtr m_Alert_GetDescriptionIdentifier;
+	PLibMCDataAlert_GetReadableContextInformationPtr m_Alert_GetReadableContextInformation;
+	PLibMCDataAlert_GetNeedsAcknowledgementPtr m_Alert_GetNeedsAcknowledgement;
+	PLibMCDataAlert_GetTimestampUTCPtr m_Alert_GetTimestampUTC;
+	PLibMCDataAlert_HasBeenAcknowledgedPtr m_Alert_HasBeenAcknowledged;
+	PLibMCDataAlertIterator_GetCurrentAlertPtr m_AlertIterator_GetCurrentAlert;
 	PLibMCDataAlertSession_AddAlertPtr m_AlertSession_AddAlert;
 	PLibMCDataAlertSession_HasAlertPtr m_AlertSession_HasAlert;
+	PLibMCDataAlertSession_GetAlertByUUIDPtr m_AlertSession_GetAlertByUUID;
+	PLibMCDataAlertSession_RetrieveAllAlertsPtr m_AlertSession_RetrieveAllAlerts;
+	PLibMCDataAlertSession_RetrieveAllOpenAlertsPtr m_AlertSession_RetrieveAllOpenAlerts;
 	PLibMCDataAlertSession_GetAlertInformationPtr m_AlertSession_GetAlertInformation;
 	PLibMCDataAlertSession_AcknowledgeAlertPtr m_AlertSession_AcknowledgeAlert;
 	PLibMCDataAlertSession_AlertHasBeenAcknowledgedPtr m_AlertSession_AlertHasBeenAcknowledged;

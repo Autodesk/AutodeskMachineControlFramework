@@ -516,6 +516,408 @@ LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession
 
 
 /*************************************************************************************************************************
+ Class implementation for Alert
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_alert_getuuid(LibMCData_Alert pAlert, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIAlert->GetUUID();
+
+			pIAlert->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIAlert->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCData_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_getidentifier(LibMCData_Alert pAlert, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sIdentifier("");
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sIdentifier = pIAlert->GetIdentifier();
+
+			pIAlert->_setCache (new ParameterCache_1<std::string> (sIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sIdentifier);
+			pIAlert->_setCache (nullptr);
+		}
+		
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCData_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_getlevel(LibMCData_Alert pAlert, eLibMCDataAlertLevel * pLevel)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if (pLevel == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pLevel = pIAlert->GetLevel();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_getdescription(LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sDescription("");
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDescriptionBuffer == nullptr);
+		if (isCacheCall) {
+			sDescription = pIAlert->GetDescription();
+
+			pIAlert->_setCache (new ParameterCache_1<std::string> (sDescription));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sDescription);
+			pIAlert->_setCache (nullptr);
+		}
+		
+		if (pDescriptionNeededChars)
+			*pDescriptionNeededChars = (LibMCData_uint32) (sDescription.size()+1);
+		if (pDescriptionBuffer) {
+			if (sDescription.size() >= nDescriptionBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
+				pDescriptionBuffer[iDescription] = sDescription[iDescription];
+			pDescriptionBuffer[sDescription.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_getdescriptionidentifier(LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionIdentifierBufferSize, LibMCData_uint32* pDescriptionIdentifierNeededChars, char * pDescriptionIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if ( (!pDescriptionIdentifierBuffer) && !(pDescriptionIdentifierNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sDescriptionIdentifier("");
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDescriptionIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sDescriptionIdentifier = pIAlert->GetDescriptionIdentifier();
+
+			pIAlert->_setCache (new ParameterCache_1<std::string> (sDescriptionIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sDescriptionIdentifier);
+			pIAlert->_setCache (nullptr);
+		}
+		
+		if (pDescriptionIdentifierNeededChars)
+			*pDescriptionIdentifierNeededChars = (LibMCData_uint32) (sDescriptionIdentifier.size()+1);
+		if (pDescriptionIdentifierBuffer) {
+			if (sDescriptionIdentifier.size() >= nDescriptionIdentifierBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescriptionIdentifier = 0; iDescriptionIdentifier < sDescriptionIdentifier.size(); iDescriptionIdentifier++)
+				pDescriptionIdentifierBuffer[iDescriptionIdentifier] = sDescriptionIdentifier[iDescriptionIdentifier];
+			pDescriptionIdentifierBuffer[sDescriptionIdentifier.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_getreadablecontextinformation(LibMCData_Alert pAlert, const LibMCData_uint32 nReadableContextInformationBufferSize, LibMCData_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if ( (!pReadableContextInformationBuffer) && !(pReadableContextInformationNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sReadableContextInformation("");
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pReadableContextInformationBuffer == nullptr);
+		if (isCacheCall) {
+			sReadableContextInformation = pIAlert->GetReadableContextInformation();
+
+			pIAlert->_setCache (new ParameterCache_1<std::string> (sReadableContextInformation));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sReadableContextInformation);
+			pIAlert->_setCache (nullptr);
+		}
+		
+		if (pReadableContextInformationNeededChars)
+			*pReadableContextInformationNeededChars = (LibMCData_uint32) (sReadableContextInformation.size()+1);
+		if (pReadableContextInformationBuffer) {
+			if (sReadableContextInformation.size() >= nReadableContextInformationBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iReadableContextInformation = 0; iReadableContextInformation < sReadableContextInformation.size(); iReadableContextInformation++)
+				pReadableContextInformationBuffer[iReadableContextInformation] = sReadableContextInformation[iReadableContextInformation];
+			pReadableContextInformationBuffer[sReadableContextInformation.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_getneedsacknowledgement(LibMCData_Alert pAlert, bool * pNeedsAcknowledgement)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if (pNeedsAcknowledgement == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pNeedsAcknowledgement = pIAlert->GetNeedsAcknowledgement();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_gettimestamputc(LibMCData_Alert pAlert, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if ( (!pTimestampUTCBuffer) && !(pTimestampUTCNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTimestampUTC("");
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTimestampUTCBuffer == nullptr);
+		if (isCacheCall) {
+			sTimestampUTC = pIAlert->GetTimestampUTC();
+
+			pIAlert->_setCache (new ParameterCache_1<std::string> (sTimestampUTC));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sTimestampUTC);
+			pIAlert->_setCache (nullptr);
+		}
+		
+		if (pTimestampUTCNeededChars)
+			*pTimestampUTCNeededChars = (LibMCData_uint32) (sTimestampUTC.size()+1);
+		if (pTimestampUTCBuffer) {
+			if (sTimestampUTC.size() >= nTimestampUTCBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestampUTC = 0; iTimestampUTC < sTimestampUTC.size(); iTimestampUTC++)
+				pTimestampUTCBuffer[iTimestampUTC] = sTimestampUTC[iTimestampUTC];
+			pTimestampUTCBuffer[sTimestampUTC.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alert_hasbeenacknowledged(LibMCData_Alert pAlert, bool * pHasBeenAcknowledged)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if (pHasBeenAcknowledged == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pHasBeenAcknowledged = pIAlert->HasBeenAcknowledged();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for AlertIterator
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_alertiterator_getcurrentalert(LibMCData_AlertIterator pAlertIterator, LibMCData_Alert * pCurrentInstance)
+{
+	IBase* pIBaseClass = (IBase *)pAlertIterator;
+
+	try {
+		if (pCurrentInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseCurrentInstance(nullptr);
+		IAlertIterator* pIAlertIterator = dynamic_cast<IAlertIterator*>(pIBaseClass);
+		if (!pIAlertIterator)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseCurrentInstance = pIAlertIterator->GetCurrentAlert();
+
+		*pCurrentInstance = (IBase*)(pBaseCurrentInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for AlertSession
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_alertsession_addalert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, eLibMCDataAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC)
@@ -576,6 +978,93 @@ LibMCDataResult libmcdata_alertsession_hasalert(LibMCData_AlertSession pAlertSes
 		
 		*pAlertExists = pIAlertSession->HasAlert(sUUID);
 
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alertsession_getalertbyuuid(LibMCData_AlertSession pAlertSession, const char * pUUID, LibMCData_Alert * pAlertInstance)
+{
+	IBase* pIBaseClass = (IBase *)pAlertSession;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pAlertInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IBase* pBaseAlertInstance(nullptr);
+		IAlertSession* pIAlertSession = dynamic_cast<IAlertSession*>(pIBaseClass);
+		if (!pIAlertSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseAlertInstance = pIAlertSession->GetAlertByUUID(sUUID);
+
+		*pAlertInstance = (IBase*)(pBaseAlertInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alertsession_retrieveallalerts(LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pAlertSession;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IAlertSession* pIAlertSession = dynamic_cast<IAlertSession*>(pIBaseClass);
+		if (!pIAlertSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIAlertSession->RetrieveAllAlerts();
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alertsession_retrieveallopenalerts(LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pAlertSession;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IAlertSession* pIAlertSession = dynamic_cast<IAlertSession*>(pIBaseClass);
+		if (!pIAlertSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIAlertSession->RetrieveAllOpenAlerts();
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -5279,10 +5768,36 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_logsession_getmaxlogentryid;
 	if (sProcName == "libmcdata_logsession_retrievelogentriesbyid") 
 		*ppProcAddress = (void*) &libmcdata_logsession_retrievelogentriesbyid;
+	if (sProcName == "libmcdata_alert_getuuid") 
+		*ppProcAddress = (void*) &libmcdata_alert_getuuid;
+	if (sProcName == "libmcdata_alert_getidentifier") 
+		*ppProcAddress = (void*) &libmcdata_alert_getidentifier;
+	if (sProcName == "libmcdata_alert_getlevel") 
+		*ppProcAddress = (void*) &libmcdata_alert_getlevel;
+	if (sProcName == "libmcdata_alert_getdescription") 
+		*ppProcAddress = (void*) &libmcdata_alert_getdescription;
+	if (sProcName == "libmcdata_alert_getdescriptionidentifier") 
+		*ppProcAddress = (void*) &libmcdata_alert_getdescriptionidentifier;
+	if (sProcName == "libmcdata_alert_getreadablecontextinformation") 
+		*ppProcAddress = (void*) &libmcdata_alert_getreadablecontextinformation;
+	if (sProcName == "libmcdata_alert_getneedsacknowledgement") 
+		*ppProcAddress = (void*) &libmcdata_alert_getneedsacknowledgement;
+	if (sProcName == "libmcdata_alert_gettimestamputc") 
+		*ppProcAddress = (void*) &libmcdata_alert_gettimestamputc;
+	if (sProcName == "libmcdata_alert_hasbeenacknowledged") 
+		*ppProcAddress = (void*) &libmcdata_alert_hasbeenacknowledged;
+	if (sProcName == "libmcdata_alertiterator_getcurrentalert") 
+		*ppProcAddress = (void*) &libmcdata_alertiterator_getcurrentalert;
 	if (sProcName == "libmcdata_alertsession_addalert") 
 		*ppProcAddress = (void*) &libmcdata_alertsession_addalert;
 	if (sProcName == "libmcdata_alertsession_hasalert") 
 		*ppProcAddress = (void*) &libmcdata_alertsession_hasalert;
+	if (sProcName == "libmcdata_alertsession_getalertbyuuid") 
+		*ppProcAddress = (void*) &libmcdata_alertsession_getalertbyuuid;
+	if (sProcName == "libmcdata_alertsession_retrieveallalerts") 
+		*ppProcAddress = (void*) &libmcdata_alertsession_retrieveallalerts;
+	if (sProcName == "libmcdata_alertsession_retrieveallopenalerts") 
+		*ppProcAddress = (void*) &libmcdata_alertsession_retrieveallopenalerts;
 	if (sProcName == "libmcdata_alertsession_getalertinformation") 
 		*ppProcAddress = (void*) &libmcdata_alertsession_getalertinformation;
 	if (sProcName == "libmcdata_alertsession_acknowledgealert") 

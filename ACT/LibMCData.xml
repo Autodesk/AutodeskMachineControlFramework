@@ -528,6 +528,57 @@
 		
 	</class>
 
+
+    <!-- The Alert class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="Alert" parent="Base" description="Alert Instance. Snapshot of an alert at a certain time.">
+
+		<method name="GetUUID" description="Returns the Alert UUID.">
+			<param name="UUID" type="string" pass="return" description="Value." />	
+		</method>	
+		
+		<method name="GetIdentifier" description="Returns the Alert Identifier.">
+			<param name="Identifier" type="string" pass="return" description="Value." />	
+		</method>	
+
+		<method name="GetLevel" description="Returns the Alert Level.">
+			<param name="Level" type="enum" class="AlertLevel" pass="return" description="Value." />
+		</method>	
+		
+		<method name="GetDescription" description="Returns the Alert Description.">
+			<param name="Description" type="string" pass="return" description="Value." />	
+		</method>	
+		
+		<method name="GetDescriptionIdentifier" description="Returns the Alert DescriptionIdentifier.">
+			<param name="DescriptionIdentifier" type="string" pass="return" description="Value." />	
+		</method>	
+
+		<method name="GetReadableContextInformation" description="Returns the Alert ReadableContextInformation.">
+			<param name="ReadableContextInformation" type="string" pass="return" description="Value." />	
+		</method>	
+
+		<method name="GetNeedsAcknowledgement" description="Returns if the Alert needs acknowledgement.">
+			<param name="NeedsAcknowledgement" type="bool" pass="return" description="Value." />	
+		</method>	
+
+		<method name="GetTimestampUTC" description="Returns the Alert Timestamp in UTC file format.">
+			<param name="TimestampUTC" type="string" pass="return" description="Value." />	
+		</method>	
+		
+		<method name="HasBeenAcknowledged" description="Checks if the alert has been acknowledged.">
+			<param name="HasBeenAcknowledged" type="bool" pass="return" description="Flag if the alert has been acknowledged." />	
+		</method>			
+		
+	</class>
+
+
+    <!-- The AlertIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="AlertIterator" parent="Iterator">
+		<method name="GetCurrentAlert" description="Returns the alert the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="Alert" pass="return" description="returns the Alert instance."/>
+		</method>
+	</class>
+
+
     <!-- The AlertSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="AlertSession" parent="Base" description="Alert Session Instance">
 	
@@ -547,6 +598,19 @@
 			<param name="AlertExists" type="bool" pass="return" description="Flag if alert exists" />	
 		</method>	
 
+		<method name="GetAlertByUUID" description="Retrieves the alert object. Fails if alert does not exist.">
+			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
+			<param name="AlertInstance" type="class" class="Alert" pass="return" description="Alert Instance" />	
+		</method>	
+
+		<method name="RetrieveAllAlerts" description="Retrieves all alerts.">
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>	
+
+		<method name="RetrieveAllOpenAlerts" description="Retrieves all alerts which have not been acknowledged.">
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>	
+		
 		<method name="GetAlertInformation" description="Retrieves information of an alert. Fails if alert does not exist.">
 			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
 			<param name="Identifier" type="string" pass="out" description="Alert Identifier" />	
