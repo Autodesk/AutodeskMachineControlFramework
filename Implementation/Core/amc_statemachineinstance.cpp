@@ -323,6 +323,8 @@ namespace AMC {
 		// Wait for thread to finish
 		m_Thread.join();
 
+		m_pSystemState->logger()->logMessage("instance thread terminated", m_sName, eLogLevel::Message);
+
 		// Clean up signals
 		m_TerminateFuture = std::future<void>();
 		m_TerminateSignal = std::promise<void>();

@@ -297,6 +297,7 @@ namespace AMC {
 	public:
 
 		CStateJournalImpl(PStateJournalStream pStream);
+		virtual ~CStateJournalImpl();
 
 		PStateJournalImplVariable generateVariable(const eStateJournalVariableType eVariableType, const std::string& sName);
 
@@ -328,6 +329,16 @@ namespace AMC {
 		LibMCAssertNotNull(pStream.get());
 		m_nChunkIntervalInMilliseconds = 60000;
 		m_nChunkWriteIntervalInSeconds = 10;
+	}
+
+	CStateJournalImpl::~CStateJournalImpl()
+	{
+
+		// Close thread
+		m_ThreadStopFlag = true;
+		if (m_ThreadFuture.valid())
+			m_ThreadFuture.wait();
+		m_ThreadStopFlag = false;
 	}
 
 
@@ -432,7 +443,13 @@ namespace AMC {
 				throw;
 			}
 
-			std::this_thread::sleep_for(std::chrono::seconds (m_nChunkWriteIntervalInSeconds));
+			uint64_t nIntervalTimeInMilliseconds = (uint64_t) m_nChunkWriteIntervalInSeconds * 1000;
+			uint32_t nThreadSleepTimeInMilliseconds = 1;
+
+			AMCCommon::CChrono chrono;
+			while ((!m_ThreadStopFlag) && (chrono.getExistenceTimeInMilliseconds () < nIntervalTimeInMilliseconds)) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(nThreadSleepTimeInMilliseconds));
+			}
 		}
 	}
 
@@ -532,7 +549,6 @@ namespace AMC {
 
 	CStateJournal::~CStateJournal()
 	{
-
 	}
 
 	void CStateJournal::startRecording()

@@ -78,7 +78,8 @@ IAlert* CAlertSession::GetAlertByUUID(const std::string& sUUID)
 
 IAlertIterator* CAlertSession::RetrieveAllAlerts()
 {
-    return new CAlertIterator();
+    std::unique_ptr<CAlertIterator> pResultIterator (new CAlertIterator());
+    return pResultIterator.release ();
 }
 
 IAlertIterator* CAlertSession::RetrieveAllOpenAlerts()
