@@ -353,11 +353,10 @@
 		<error name="INVALIDALERTDESCRIPTIONIDENTIFIER" code="353" description="Invalid alert description identifier" />
 		<error name="INVALIDALERTLEVEL" code="354" description="Invalid alert level" />
 		<error name="ALERTNOTFOUND" code="355" description="Alert not found" />
-		<error name="ALERTNOTACKNOWLEDGED" code="356" description="Alert has not been acknowledged." />
-		
-		
-		
-		
+		<error name="ALERTNOTACKNOWLEDGED" code="356" description="Alert has not been acknowledged." />		
+		<error name="INVALIDSTORAGESTATE" code="357" description="Invalid storage state." />		
+		<error name="STORAGEWRITERALREADYEXISTS" code="358" description="Storage writer already exists." />		
+		<error name="STORAGEWRITERDOESNOTEXIST" code="359" description="Storage writer does not exist." />		
 		
 										
 	</errors>

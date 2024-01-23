@@ -381,6 +381,9 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDALERTLEVEL 354 /** Invalid alert level */
 #define LIBMCDATA_ERROR_ALERTNOTFOUND 355 /** Alert not found */
 #define LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED 356 /** Alert has not been acknowledged. */
+#define LIBMCDATA_ERROR_INVALIDSTORAGESTATE 357 /** Invalid storage state. */
+#define LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS 358 /** Storage writer already exists. */
+#define LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST 359 /** Storage writer does not exist. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -674,6 +677,9 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
     case LIBMCDATA_ERROR_ALERTNOTFOUND: return "Alert not found";
     case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "Alert has not been acknowledged.";
+    case LIBMCDATA_ERROR_INVALIDSTORAGESTATE: return "Invalid storage state.";
+    case LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS: return "Storage writer already exists.";
+    case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "Storage writer does not exist.";
     default: return "unknown error";
   }
 }

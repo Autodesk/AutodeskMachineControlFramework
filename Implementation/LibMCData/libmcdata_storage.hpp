@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CStorage
 #endif
 
 // Include custom headers here.
-#include "amcdata_storagepath.hpp"
+#include "amcdata_storagestate.hpp"
 #include "amcdata_sqlhandler.hpp"
 #include "amcdata_storagewriter.hpp"
 
@@ -65,14 +65,8 @@ namespace Impl {
 
 class CStorage : public virtual IStorage, public virtual CBase {
 private:
-    AMCData::PStoragePath m_pStoragePath;
+    AMCData::PStorageState m_pStorageState;
     AMCData::PSQLHandler m_pSQLHandler;
-
-    std::mutex m_StorageWriteMutex;
-    std::map<std::string, AMCData::PStorageWriter> m_PartialWriters;
-
-    std::set<std::string> m_AcceptedContentTypes;
-    std::set<std::string> m_ImageContentTypes;
 
     void insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID);
 
@@ -82,7 +76,7 @@ protected:
 
 public:
 
-    CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
     bool StreamIsReady(const std::string& sUUID) override;
 

@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagepath.hpp"
+#include "amcdata_storagestate.hpp"
 #include "amcdata_journal.hpp"
 
 namespace LibMCData {
@@ -61,7 +61,7 @@ protected:
 	std::string m_sSessionUUID;
 
 	AMCData::PSQLHandler m_pSQLHandler;
-	AMCData::PStoragePath m_pStoragePath;
+	AMCData::PStorageState m_pStorageState;
 	AMCData::PJournal m_pJournal;
 
 	LibMCData::eDataBaseType m_eDataBaseType;

@@ -56,8 +56,6 @@ namespace AMCData {
 
 		void* m_pDBHandle;
 
-		std::mutex m_TransactionMutex;
-
 	public:
 
 		CSQLHandler_SQLite() = delete;

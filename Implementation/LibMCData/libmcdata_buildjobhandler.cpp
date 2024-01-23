@@ -48,12 +48,12 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 
-CBuildJobHandler::CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath)
-    : m_pSQLHandler (pSQLHandler), m_pStoragePath(pStoragePath)
+CBuildJobHandler::CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+    : m_pSQLHandler (pSQLHandler), m_pStorageState(pStorageState)
 {
     if (pSQLHandler.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
-    if (pStoragePath.get() == nullptr)
+    if (pStorageState.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
 }
@@ -88,13 +88,13 @@ IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::s
     pInsertStatement->setString(6, sUserID);
     pInsertStatement->execute();
 
-    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, 0, m_pSQLHandler, m_pStoragePath);
+    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, 0, m_pSQLHandler, m_pStorageState);
     
 }
 
 IBuildJob * CBuildJobHandler::RetrieveJob(const std::string & sJobUUID)
 {
-    return CBuildJob::makeFromDatabase(sJobUUID, m_pSQLHandler, m_pStoragePath);
+    return CBuildJob::makeFromDatabase(sJobUUID, m_pSQLHandler, m_pStorageState);
 }
 
 IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus)
@@ -115,7 +115,7 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
         auto nLayerCount = pStatement->getColumnInt(6);
         auto sUserID = pStatement->getColumnString(7);
     
-        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, nLayerCount, m_pSQLHandler, m_pStoragePath));
+        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, nLayerCount, m_pSQLHandler, m_pStorageState));
     }
 
     return pJobIterator.release();

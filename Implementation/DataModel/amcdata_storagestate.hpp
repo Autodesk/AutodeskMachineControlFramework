@@ -29,17 +29,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMCDATA_STORAGEPATH
-#define __AMCDATA_STORAGEPATH
+#ifndef __AMCDATA_STORAGESTATE
+#define __AMCDATA_STORAGESTATE
 
 #include <string>
 #include <memory>
+#include <map>
+#include <set>
+#include <mutex>
 
 namespace AMCData {
 
 
 /*************************************************************************************************************************
- Class declaration of CStoragePath
+ Class declaration of CStorageState
 **************************************************************************************************************************/
 
 enum class eStorageStreamStatus : int32_t {
@@ -48,14 +51,23 @@ enum class eStorageStreamStatus : int32_t {
     sssArchived = 2
 };
 
-class CStoragePath {
+class CStorageWriter;
+typedef std::shared_ptr<CStorageWriter> PStorageWriter;
+
+class CStorageState {
 private:
     std::string m_sDataPath;
     
+    std::mutex m_WriterMutex;
+    std::map<std::string, AMCData::PStorageWriter> m_PartialWriters;
+    std::set<std::string> m_AcceptedContentTypes;
+    std::set<std::string> m_ImageContentTypes;
 
 public:
 
-    CStoragePath(const std::string & sDataPath);
+    CStorageState(const std::string & sDataPath);
+
+    virtual ~CStorageState();
 
     std::string getStreamPath(const std::string& sStreamUUID);
     std::string getJournalPath(const std::string& sTimeFileName);
@@ -66,10 +78,21 @@ public:
     static std::string storageStreamStatusToString(eStorageStreamStatus eStatus);
     static eStorageStreamStatus stringToStorageStreamStatus(const std::string & sStatus);
 
+    void addAcceptedContent (const std::string & sContentType);
+    void addImageContent (const std::string& sContentType);
+
+    bool isAcceptedContent(const std::string& sContentType);
+    bool isImageContent(const std::string& sContentType);
+
+    void addPartialWriter (PStorageWriter pWriter);
+    bool hasPartialWriter (const std::string & sUUID);
+    PStorageWriter findPartialWriter(const std::string& sUUID, bool bFailIfNotExisting);
+    void deletePartialWriter(const std::string& sUUID);
+
 };
 
-typedef std::shared_ptr <CStoragePath> PStoragePath;
+typedef std::shared_ptr <CStorageState> PStorageState;
 
 } // namespace AMCDATA
 
-#endif // __AMCDATA_STORAGEPATH
+#endif // __AMCDATA_STORAGESTATE

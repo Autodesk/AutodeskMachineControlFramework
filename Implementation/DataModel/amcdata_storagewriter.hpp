@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <memory>
+#include <mutex>
 #include "common_exportstream.hpp"
 
 namespace AMCData {
@@ -50,13 +51,17 @@ private:
 	uint64_t m_nSize;
     AMCCommon::PExportStream m_pExportStream;
 
+    std::mutex m_WriteMutex;
+
 public:
 
     CStorageWriter(const std::string & sUUID, const std::string & sPath, uint64_t nSize);
 
     ~CStorageWriter();
 	
-	void writeChunkAsync (const uint8_t * pChunkData, const uint64_t nChunkSize, const uint64_t nOffset);
+    std::string getUUID();
+
+    void writeChunkAsync (const uint8_t * pChunkData, const uint64_t nChunkSize, const uint64_t nOffset);
 
     void finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256);
 

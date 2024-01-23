@@ -54,8 +54,17 @@ namespace AMCData {
 		}
 	}
 
+	std::string CStorageWriter::getUUID()
+	{
+		return m_sUUID;
+	}
+
+
 	void CStorageWriter::writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset)
 	{
+
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
 		if (nChunkSize > 0) {
 			m_pExportStream->seekFromEnd(0, true);
 			auto nSize = m_pExportStream->getPosition();
@@ -76,7 +85,9 @@ namespace AMCData {
 
 	void CStorageWriter::finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string & sCalculatedSHA256, std::string & sCalculatedBlockSHA256)
 	{
-		if (m_pExportStream.get() == nullptr) 
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (m_pExportStream.get() == nullptr)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
 		
 		try {	
