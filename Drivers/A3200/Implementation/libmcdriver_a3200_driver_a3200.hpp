@@ -49,6 +49,8 @@ Abstract: This is the class declaration of CDriver_A3200
 
 #include <vector>
 
+#define A3200_MINAXISID 0
+#define A3200_MAXAXISID 31
 #define A3200_MINTASKID 1
 #define A3200_MAXTASKID 31
 #define A3200_MAXSTRINGLENGTH 32767
@@ -148,6 +150,16 @@ public:
 	std::string ReadTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName) override;
 
 	void WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string& sName, const std::string& sValue) override;
+
+	LibMCDriver_A3200_double ReadAxisPosition(const LibMCDriver_A3200_uint32 nAxisID) override;
+
+	LibMCDriver_A3200_double ReadAxisTargetPosition(const LibMCDriver_A3200_uint32 nAxisID) override;
+
+	LibMCDriver_A3200_double ReadAxisVelocity(const LibMCDriver_A3200_uint32 nAxisID) override;
+
+	LibMCDriver_A3200_double ReadAxisTargetVelocity(const LibMCDriver_A3200_uint32 nAxisID) override;
+
+	void ReadAxisInformation(const LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double& dCurrentPositionValue, LibMCDriver_A3200_double& dTargetPositionValue, LibMCDriver_A3200_double& dPositionErrorValue, LibMCDriver_A3200_double& dCurrentVelocityValue, LibMCDriver_A3200_double& dTargetVelocityValue, LibMCDriver_A3200_double& dVelocityErrorValue) override;
 
 
 };

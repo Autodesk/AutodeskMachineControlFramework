@@ -41,6 +41,13 @@ Abstract: This is a stub class definition of CDriver_A3200
 
 using namespace LibMCDriver_A3200::Impl;
 
+#define STATUSITEM_PositionFeedback 0
+#define STATUSITEM_PositionCommand 1
+#define STATUSITEM_PositionError 2
+#define STATUSITEM_VelocityFeedback 3
+#define STATUSITEM_VelocityCommand 4
+#define STATUSITEM_VelocityError 5
+
 /*************************************************************************************************************************
  Class definition of CDriver_A3200 
 **************************************************************************************************************************/
@@ -369,4 +376,115 @@ void CDriver_A3200::WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTask
 		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDTASKID);
 
 	m_pSDK->checkError(m_pSDK->A3200VariableSetValueStringByName(m_pHandle, nTaskID, sName.c_str(), sValue.c_str()));
+}
+
+
+LibMCDriver_A3200_double CDriver_A3200::ReadAxisPosition(const LibMCDriver_A3200_uint32 nAxisID)
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nAxisID < A3200_MINAXISID) || (nAxisID > A3200_MINAXISID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDAXISID);
+
+	double dValue = 0.0;
+	m_pSDK->checkError(m_pSDK->A3200StatusGetItem (m_pHandle, (uint32_t) nAxisID, STATUSITEM_PositionFeedback, 0, &dValue));
+
+	return dValue;
+}
+
+LibMCDriver_A3200_double CDriver_A3200::ReadAxisTargetPosition(const LibMCDriver_A3200_uint32 nAxisID)
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nAxisID < A3200_MINAXISID) || (nAxisID > A3200_MINAXISID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDAXISID);
+
+	double dValue = 0.0;
+	m_pSDK->checkError(m_pSDK->A3200StatusGetItem(m_pHandle, (uint32_t)nAxisID, STATUSITEM_PositionCommand, 0, &dValue));
+
+	return dValue;
+
+}
+
+LibMCDriver_A3200_double CDriver_A3200::ReadAxisVelocity(const LibMCDriver_A3200_uint32 nAxisID)
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nAxisID < A3200_MINAXISID) || (nAxisID > A3200_MINAXISID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDAXISID);
+
+	double dValue = 0.0;
+	m_pSDK->checkError(m_pSDK->A3200StatusGetItem(m_pHandle, (uint32_t)nAxisID, STATUSITEM_VelocityFeedback, 0, &dValue));
+
+	return dValue;
+}
+
+LibMCDriver_A3200_double CDriver_A3200::ReadAxisTargetVelocity(const LibMCDriver_A3200_uint32 nAxisID)
+{
+	if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+	if ((nAxisID < A3200_MINAXISID) || (nAxisID > A3200_MINAXISID))
+		throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDAXISID);
+
+	double dValue = 0.0;
+	m_pSDK->checkError(m_pSDK->A3200StatusGetItem(m_pHandle, (uint32_t)nAxisID, STATUSITEM_VelocityCommand, 0, &dValue));
+
+	return dValue;
+}
+
+void CDriver_A3200::ReadAxisInformation(const LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double& dCurrentPositionValue, LibMCDriver_A3200_double& dTargetPositionValue, LibMCDriver_A3200_double& dPositionErrorValue, LibMCDriver_A3200_double& dCurrentVelocityValue, LibMCDriver_A3200_double& dTargetVelocityValue, LibMCDriver_A3200_double& dVelocityErrorValue)
+{
+	{
+		if ((m_pHandle == nullptr) || (m_pSDK.get() == nullptr))
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_NOTCONNECTED);
+		if ((nAxisID < A3200_MINAXISID) || (nAxisID > A3200_MINAXISID))
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDAXISID);
+
+		double dCurrentPositionValue = 0.0;
+		std::vector<uint16_t> axisIDs;
+		std::vector<uint32_t> itemCodes;
+		std::vector<uint32_t> itemExtras;
+		std::vector<double> itemValues;
+
+		axisIDs.push_back(nAxisID);
+		itemCodes.push_back(STATUSITEM_PositionFeedback);
+		itemExtras.push_back(0);
+		itemValues.push_back(0.0);
+
+		axisIDs.push_back(nAxisID);
+		itemCodes.push_back(STATUSITEM_PositionCommand);
+		itemExtras.push_back(0);
+		itemValues.push_back(0.0);
+
+		axisIDs.push_back(nAxisID);
+		itemCodes.push_back(STATUSITEM_PositionError);
+		itemExtras.push_back(0);
+		itemValues.push_back(0.0);
+
+		axisIDs.push_back(nAxisID);
+		itemCodes.push_back(STATUSITEM_VelocityFeedback);
+		itemExtras.push_back(0);
+		itemValues.push_back(0.0);
+
+		axisIDs.push_back(nAxisID);
+		itemCodes.push_back(STATUSITEM_VelocityCommand);
+		itemExtras.push_back(0);
+		itemValues.push_back(0.0);
+
+		axisIDs.push_back(nAxisID);
+		itemCodes.push_back(STATUSITEM_VelocityError);
+		itemExtras.push_back(0);
+		itemValues.push_back(0.0);
+
+		m_pSDK->checkError(m_pSDK->A3200StatusGetItems(m_pHandle, 6, axisIDs.data (), itemCodes.data (), itemExtras.data(), itemValues.data ()));
+
+		dCurrentPositionValue = itemValues.at(0);
+		dTargetPositionValue = itemValues.at(1);
+		dPositionErrorValue = itemValues.at(2);
+		dCurrentVelocityValue = itemValues.at(3);
+		dTargetVelocityValue = itemValues.at(4);
+		dVelocityErrorValue = itemValues.at(5);
+
+	}
+
 }

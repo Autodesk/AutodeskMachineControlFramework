@@ -87,6 +87,10 @@ namespace LibMCDriver_A3200 {
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200VariableGetValueByName) (A3200Handle pHandle, uint32_t nTaskID, const char* pszVariableName, double * pdValue);
 		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200VariableSetValueByName) (A3200Handle pHandle, uint32_t nTaskID, const char* pszVariableName, double dValue);
 
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200StatusGetItems) (A3200Handle pHandle, uint32_t numberOfItems, uint16_t* itemIndexArray, uint32_t* itemCodeArray, uint32_t* itemExtrasArray, double* itemValuesArray);
+		typedef A3200Bool(A3200_CALLINGCONVENTION* PA3200StatusGetItem) (A3200Handle pHandle, uint16_t itemIndex, uint32_t itemCode, uint32_t itemExtra, double* itemValue);
+			
+			
 		class CA3200SDK_DLLDirectoryCache {
 		private:
 #ifdef _WIN32
@@ -125,6 +129,8 @@ namespace LibMCDriver_A3200 {
 			PA3200VariableGetValueByName A3200VariableGetValueByName = nullptr;
 			PA3200VariableSetValueByName A3200VariableSetValueByName = nullptr;
 			PA3200InformationGetLibraryVersion A3200InformationGetLibraryVersion = nullptr;
+			PA3200StatusGetItems A3200StatusGetItems = nullptr;
+			PA3200StatusGetItem A3200StatusGetItem = nullptr;
 
 			CA3200SDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectory);
 			~CA3200SDK();
