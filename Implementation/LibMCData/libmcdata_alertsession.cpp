@@ -73,18 +73,36 @@ bool CAlertSession::HasAlert(const std::string& sUUID)
 IAlert* CAlertSession::GetAlertByUUID(const std::string& sUUID)
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    if (!m_pJournal->hasAlert(sNormalizedUUID))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+
     return new CAlert (m_pJournal, sUUID);
 }
 
 IAlertIterator* CAlertSession::RetrieveAllAlerts()
 {
     std::unique_ptr<CAlertIterator> pResultIterator (new CAlertIterator());
+    std::vector<std::string> alertUUIDs;
+
+    m_pJournal->retrieveAllAlerts (alertUUIDs);
+
+    for (auto sUUID : alertUUIDs)
+        pResultIterator->AddAlert(std::make_shared<CAlert>(m_pJournal, sUUID));
+
     return pResultIterator.release ();
 }
 
 IAlertIterator* CAlertSession::RetrieveAllOpenAlerts()
 {
-    return new CAlertIterator();
+    std::unique_ptr<CAlertIterator> pResultIterator(new CAlertIterator());
+    std::vector<std::string> alertUUIDs;
+
+    m_pJournal->retrieveAllOpenAlerts(alertUUIDs);
+
+    for (auto sUUID : alertUUIDs)
+        pResultIterator->AddAlert(std::make_shared<CAlert>(m_pJournal, sUUID));
+
+    return pResultIterator.release();
 }
 
 void CAlertSession::GetAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC)
