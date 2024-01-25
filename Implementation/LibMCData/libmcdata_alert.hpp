@@ -60,6 +60,19 @@ private:
 	AMCData::PJournal m_pJournal;
 	std::string m_sAlertUUID;
 
+	bool m_bNeedsRefresh;
+
+	std::string m_sIdentifier;
+	LibMCData::eAlertLevel m_AlertLevel;
+	std::string m_sDescription;
+	std::string m_sDescriptionIdentifier;
+	std::string m_sReadableContextInformation;
+	bool m_bNeedsAcknowledgement;
+	std::string m_sTimestampUTC;
+
+	void refreshIfNeeded ();
+	void forceRefresh ();
+
 public:
 
 	static CAlert* makeFrom(CAlert * pAlert);

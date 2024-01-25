@@ -119,11 +119,6 @@ void CUIModule_ContentAlertList::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 	headerObject2.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTCAPTION);
 	headersArray.addObject(headerObject2);
 
-	CJSONWriterObject headerObject3(writer);
-	headerObject3.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertDescriptionCaption);
-	headerObject3.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTDESCRIPTION);
-	headersArray.addObject(headerObject3);
-
 	CJSONWriterObject headerObject4(writer);
 	headerObject4.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertContextCaption);
 	headerObject4.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTCONTEXT);
@@ -145,14 +140,34 @@ void CUIModule_ContentAlertList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 
 	CJSONWriterArray entryArray(writer);
 
+	auto pAlertSession = m_pDataModel->CreateAlertSession();
+	auto pAlertIterator = pAlertSession->RetrieveAllAlerts();
+
+	while (pAlertIterator->MoveNext ())
 	{
+		auto pAlert = pAlertIterator->GetCurrentAlert();
+
+		std::string sAlertCaption;
+		std::string sDescriptionIdentifier = pAlert->GetDescriptionIdentifier();
+		if (!sDescriptionIdentifier.empty()) {
+			sAlertCaption = sDescriptionIdentifier;
+		}
+		else {
+			sAlertCaption = pAlert->GetDescription();
+		}
+
+		std::string sContextInformation = pAlert->GetReadableContextInformation();
+
+		std::string sTimeStamp = pAlert->GetTimestampUTC();
+
+		bool bNeedsAcknowledgement = pAlert->GetNeedsAcknowledgement ();
+
 
 		CJSONWriterObject entryObject(writer);
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTTIMESTAMP, "12:30:23");
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCAPTION, "Alert Test");
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTDESCRIPTION, "Alert Description");
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCONTEXT, "Alert Context");
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTACKNOWLEDGE, "Alert Acknowledge");
+		entryObject.addString(AMC_API_KEY_UI_ITEMALERTTIMESTAMP, sTimeStamp);
+		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCAPTION, sAlertCaption);
+		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCONTEXT, sContextInformation);
+		entryObject.addBool(AMC_API_KEY_UI_ITEMALERTACKNOWLEDGE, bNeedsAcknowledgement);
 
 		entryArray.addObject(entryObject);
 

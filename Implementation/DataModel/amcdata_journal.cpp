@@ -74,6 +74,7 @@ namespace AMCData {
 		sAlertQuery += "`description`	TEXT DEFAULT ``,";
 		sAlertQuery += "`descriptionidentifier`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`contextinformation`	TEXT DEFAULT ``,";
+		sAlertQuery += "`active`	int DEFAULT 0,";
 		sAlertQuery += "`needsacknowledgement`	int DEFAULT 0,";
 		sAlertQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 
@@ -301,8 +302,14 @@ namespace AMCData {
 
 			std::string sNewAckUUID = AMCCommon::CUtils::createUUID();
 
-			std::string sQuery = "INSERT INTO alertacknowledgements (uuid, alertuuid, useruuid, usercomment, timestamp) VALUES (?, ?, ?, ?, ?)";
-			auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+			std::string sAlertQuery = "UPDATE alerts SET active=0 WHERE uuid=?";
+			auto pAlertStatement = m_pSQLHandler->prepareStatement(sAlertQuery);
+			pAlertStatement->setString(1, sNormalizedUUID);
+			pAlertStatement->execute();
+			pAlertStatement = nullptr;
+
+			std::string sAckQuery = "INSERT INTO alertacknowledgements (uuid, alertuuid, useruuid, usercomment, timestamp) VALUES (?, ?, ?, ?, ?)";
+			auto pStatement = m_pSQLHandler->prepareStatement(sAckQuery);
 			pStatement->setString(1, sNewAckUUID);
 			pStatement->setString(2, sNormalizedUUID);
 			pStatement->setString(3, sNormalizedUserUUID);
@@ -353,6 +360,32 @@ namespace AMCData {
 		}
 
 	}
+
+	void CJournal::retrieveAllAlerts(std::vector<std::string>& alertUUIDs)
+	{
+		auto pTransaction = m_pSQLHandler->beginTransaction();
+
+		std::string sQuery = "SELECT uuid FROM alerts ORDER BY timestamp";
+		auto pStatement = pTransaction->prepareStatement(sQuery);
+		while (pStatement->nextRow()) {
+			alertUUIDs.push_back (pStatement->getColumnString (1));
+		}
+
+	}
+
+	void CJournal::retrieveAllOpenAlerts(std::vector<std::string>& alertUUIDs)
+	{
+		auto pTransaction = m_pSQLHandler->beginTransaction();
+
+		std::string sQuery = "SELECT uuid FROM alerts WHERE active=? ORDER BY timestamp";
+		auto pStatement = pTransaction->prepareStatement(sQuery);
+		pStatement->setInt(1, 1);
+		while (pStatement->nextRow()) {
+			alertUUIDs.push_back(pStatement->getColumnString(1));
+		}
+
+	}
+
 
 
 }

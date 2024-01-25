@@ -44,7 +44,11 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 CAlert::CAlert(AMCData::PJournal pJournal, const std::string& sAlertUUID)
-	: m_pJournal (pJournal), m_sAlertUUID (AMCCommon::CUtils::normalizeUUIDString (sAlertUUID))
+	: m_pJournal (pJournal), 
+	m_sAlertUUID (AMCCommon::CUtils::normalizeUUIDString (sAlertUUID)), 
+	m_bNeedsAcknowledgement (false), 
+	m_AlertLevel (LibMCData::eAlertLevel::Unknown),
+	m_bNeedsRefresh (true)
 {
 	if (pJournal.get () == nullptr)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -70,6 +74,19 @@ std::shared_ptr<CAlert> CAlert::makeSharedFrom(CAlert* pAlert)
 	return std::shared_ptr<CAlert>(makeFrom(pAlert));
 }
 
+void CAlert::refreshIfNeeded()
+{
+	if (m_bNeedsRefresh)
+		forceRefresh();
+}
+
+void CAlert::forceRefresh()
+{
+	m_pJournal->getAlertInformation(m_sAlertUUID, m_sIdentifier, m_AlertLevel, m_sDescription, m_sDescriptionIdentifier, m_sReadableContextInformation, m_bNeedsAcknowledgement, m_sTimestampUTC);
+	m_bNeedsRefresh = false;
+}
+
+
 std::string CAlert::GetUUID()
 {
 	return m_sAlertUUID;
@@ -77,42 +94,49 @@ std::string CAlert::GetUUID()
 
 std::string CAlert::GetIdentifier()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	refreshIfNeeded();
+	return m_sIdentifier;
 }
 
 LibMCData::eAlertLevel CAlert::GetLevel()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	refreshIfNeeded();
+	return m_AlertLevel;
 }
 
 std::string CAlert::GetDescription()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	refreshIfNeeded();
+	return m_sDescription;
 }
 
 std::string CAlert::GetDescriptionIdentifier()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	refreshIfNeeded();
+	return m_sDescriptionIdentifier;
 }
 
 std::string CAlert::GetReadableContextInformation()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	refreshIfNeeded();
+	return m_sReadableContextInformation;
 }
 
 bool CAlert::GetNeedsAcknowledgement()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	refreshIfNeeded();
+	return m_bNeedsAcknowledgement;
 }
 
 std::string CAlert::GetTimestampUTC()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	refreshIfNeeded();
+	return m_sTimestampUTC;
 }
 
 bool CAlert::HasBeenAcknowledged()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	return m_pJournal->alertHasBeenAcknowledged(m_sAlertUUID);
 }
 
 AMCData::PJournal CAlert::getJournal()
