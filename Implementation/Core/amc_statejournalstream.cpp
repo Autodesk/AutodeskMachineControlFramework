@@ -83,10 +83,67 @@ namespace AMC {
 		void readRawIntegerData(uint32_t nStorageIndex, uint64_t nIntervalStartTimeStampInMicroSeconds, uint64_t nIntervalEndTimeStampInMicroSeconds, std::vector<sJournalTimeStreamInt64Entry>& rawTimeStream) override
 		{
 
+			uint64_t nTimeOffset = m_nStartTimeStampInMicroSeconds;
+
+			uint64_t nClampedIntervalStartTime = nIntervalStartTimeStampInMicroSeconds;
+			if (nClampedIntervalStartTime < m_nStartTimeStampInMicroSeconds)
+				nClampedIntervalStartTime = m_nStartTimeStampInMicroSeconds;
+			if (nClampedIntervalStartTime > m_nEndTimeStampInMicroSeconds)
+				nClampedIntervalStartTime = m_nEndTimeStampInMicroSeconds;
+
+			uint64_t nClampedIntervalEndTime = nIntervalEndTimeStampInMicroSeconds;
+			if (nClampedIntervalEndTime < m_nStartTimeStampInMicroSeconds)
+				nClampedIntervalEndTime = m_nStartTimeStampInMicroSeconds;
+			if (nClampedIntervalEndTime > m_nEndTimeStampInMicroSeconds)
+				nClampedIntervalEndTime = m_nEndTimeStampInMicroSeconds;
+
+			uint64_t nRelativeIntervalStartTime = nClampedIntervalStartTime - nTimeOffset;
+			uint64_t nRelativeIntervalEndTime = nClampedIntervalEndTime - nTimeOffset;
+
 			if (nStorageIndex >= m_Entries.size())
 				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND);
 
-			throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+			int64_t nCurrentValue = 0;
+			uint64_t nCurrentRelativeTime = 0;
+			bool isFirst = true;
+
+			auto& variable = m_Entries.at(nStorageIndex);
+			for (auto& entry : variable) {
+				if (entry.m_RelativeTimeStampInMicroseconds <= nRelativeIntervalEndTime) {
+					if (entry.m_RelativeTimeStampInMicroseconds > nRelativeIntervalStartTime) {
+
+						if (isFirst) {
+							sJournalTimeStreamInt64Entry firstEntry;
+							firstEntry.m_nTimeStampInMicroSeconds = nRelativeIntervalStartTime + nTimeOffset;
+							firstEntry.m_nValue = nCurrentValue;
+							rawTimeStream.push_back(firstEntry);
+
+							isFirst = false;
+						}
+
+						sJournalTimeStreamInt64Entry resultEntry;
+						resultEntry.m_nTimeStampInMicroSeconds = entry.m_RelativeTimeStampInMicroseconds + nTimeOffset;
+						resultEntry.m_nValue = entry.m_IntegerValue;
+						rawTimeStream.push_back(resultEntry);
+					}
+
+					nCurrentRelativeTime = entry.m_RelativeTimeStampInMicroseconds;
+					nCurrentValue = entry.m_IntegerValue;
+
+				}
+				else {
+					break;
+				}
+
+			}
+
+			if (nCurrentRelativeTime < nRelativeIntervalEndTime) {
+				sJournalTimeStreamInt64Entry lastEntry;
+				lastEntry.m_nTimeStampInMicroSeconds = nRelativeIntervalEndTime + nTimeOffset;
+				lastEntry.m_nValue = nCurrentValue;
+				rawTimeStream.push_back(lastEntry);
+			}
+
 		}
 
 

@@ -277,6 +277,7 @@ namespace AMC {
 	class CStateJournalImpl {
 	private:
 		std::map<std::string, PStateJournalImplVariable> m_VariableStringMap;
+		std::map<std::string, PStateJournalImplVariable> m_VariableAliasMap;
 		std::map<uint32_t, PStateJournalImplVariable> m_VariableIDMap;
 		std::vector<PStateJournalImplVariable> m_VariableList;
 
@@ -294,12 +295,15 @@ namespace AMC {
 		std::atomic<bool> m_ThreadStopFlag;
 		std::future<void> m_ThreadFuture;
 
+		PStateJournalImplVariable findVariable(const std::string& sName);
+
 	public:
 
 		CStateJournalImpl(PStateJournalStream pStream);
 		virtual ~CStateJournalImpl();
 
 		PStateJournalImplVariable generateVariable(const eStateJournalVariableType eVariableType, const std::string& sName);
+		PStateJournalImplVariable createAlias (const std::string& sName, const std::string& sSourceName);
 
 		void startRecording();
 		void finishRecording();
@@ -339,6 +343,17 @@ namespace AMC {
 		if (m_ThreadFuture.valid())
 			m_ThreadFuture.wait();
 		m_ThreadStopFlag = false;
+	}
+
+	PStateJournalImplVariable CStateJournalImpl::createAlias(const std::string& sName, const std::string& sSourceName)
+	{
+		auto iIter = m_VariableStringMap.find (sSourceName);
+		if (iIter == m_VariableStringMap.end()) 
+			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sSourceName);
+
+		auto pVariable = iIter->second;
+		m_VariableAliasMap.insert(std::make_pair(sName, pVariable));
+		return pVariable;
 	}
 
 
@@ -465,7 +480,7 @@ namespace AMC {
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (iIter->second);
 		if (pBoolVariable.get () == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + iIter->second->getName () + " is not a boolean variable");
 
 		pBoolVariable->setValue_MicroSecond (bValue, retrieveTimeStamp_MicroSecond());
 	}
@@ -480,7 +495,7 @@ namespace AMC {
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (iIter->second);
 		if (pIntegerVariable.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + iIter->second->getName() + " is not a integer variable");
 
 		pIntegerVariable->setValue_MicroSecond(nValue, retrieveTimeStamp_MicroSecond());
 
@@ -496,7 +511,7 @@ namespace AMC {
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pStringVariable = std::dynamic_pointer_cast<CStateJournalImplStringVariable> (iIter->second);
 		if (pStringVariable.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + iIter->second->getName() + " is not a string variable");
 
 		pStringVariable->setValue_MicroSecond(sValue, retrieveTimeStamp_MicroSecond());
 	}
@@ -511,9 +526,23 @@ namespace AMC {
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pDoubleVariable = std::dynamic_pointer_cast<CStateJournalImplDoubleVariable> (iIter->second);
 		if (pDoubleVariable.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + iIter->second->getName() + " is not a double variable");
 
 		pDoubleVariable->setValue_MicroSecond(dValue, retrieveTimeStamp_MicroSecond());
+
+	}
+
+	PStateJournalImplVariable CStateJournalImpl::findVariable(const std::string& sName)
+	{
+		auto iVariableIter = m_VariableStringMap.find(sName);
+		if (iVariableIter != m_VariableStringMap.end())
+			return iVariableIter->second;
+
+		auto iAliasIter = m_VariableAliasMap.find(sName);
+		if (iAliasIter != m_VariableAliasMap.end())
+			return iAliasIter->second;
+		
+		throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sName);
 
 	}
 
@@ -523,12 +552,32 @@ namespace AMC {
 		if (m_JournalMode != eStateJournalMode::sjmRecording)
 			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
 
-		auto iIter = m_VariableStringMap.find(sName);
-		auto pDoubleVariable = std::dynamic_pointer_cast<CStateJournalImplDoubleVariable> (iIter->second);
-		if (pDoubleVariable.get() == nullptr)
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDVARIABLETYPE, sName);
+		auto pVariable = findVariable(sName);
 
-		pDoubleVariable->readTimeStream(interval,  timeStream);
+		auto pDoubleVariable = std::dynamic_pointer_cast<CStateJournalImplDoubleVariable> (pVariable);
+		if (pDoubleVariable.get() != nullptr) {
+			pDoubleVariable->readTimeStream(interval, timeStream);
+			return;
+		}
+
+		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (pVariable);
+		if (pIntegerVariable.get() != nullptr) {
+			std::vector<sJournalTimeStreamInt64Entry> intTimeStream;
+			pIntegerVariable->readTimeStream(interval, intTimeStream);
+
+			timeStream.resize(intTimeStream.size ());
+			for (size_t nIndex = 0; nIndex < intTimeStream.size(); nIndex++) {
+				auto& srcEntry = intTimeStream.at(nIndex);
+				auto& targetEntry = timeStream.at(nIndex);
+				targetEntry.m_nTimeStampInMicroSeconds = srcEntry.m_nTimeStampInMicroSeconds;
+				targetEntry.m_dValue = (double) srcEntry.m_nValue;
+			}
+
+			return;
+		}
+
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + pVariable->getName() + " is not a numeric variable");
+
 
 	}
 
@@ -566,7 +615,7 @@ namespace AMC {
 		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtBoolParameter, sName);
 		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (pVariable);
 		if (pBoolVariable.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a bool variable");
 
 		pBoolVariable->setInitialValue(bInitialValue);
 
@@ -578,7 +627,7 @@ namespace AMC {
 		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtIntegerParameter, sName);		
 		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (pVariable);
 		if (pIntegerVariable.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a integer variable");
 
 		pIntegerVariable->setInitialValue(nInitialValue);
 
@@ -590,7 +639,7 @@ namespace AMC {
 		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtStringParameter, sName);	
 		auto pStringVariable = std::dynamic_pointer_cast<CStateJournalImplStringVariable> (pVariable);
 		if (pStringVariable.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a string variable");
 
 		pStringVariable->setInitialValue(sInitialValue);
 
@@ -729,6 +778,11 @@ namespace AMC {
 		
 		if (interval.m_nStartTimeInMicroSeconds >= interval.m_nEndTimeInMicroSeconds)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMPINTERVAL);
+	}
+
+	void CStateJournal::registerAlias(const std::string& sName, const std::string& sSourceName)
+	{
+		m_pImpl->createAlias(sName, sSourceName);
 	}
 
 }

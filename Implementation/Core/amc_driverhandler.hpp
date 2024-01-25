@@ -57,6 +57,9 @@ namespace AMC {
 	class CDriver;
 	typedef std::shared_ptr<CDriver> PDriver;
 
+	class CStateJournal;
+	typedef std::shared_ptr<CStateJournal> PJournal;
+
 	class CResourcePackage;
 	typedef std::shared_ptr<CResourcePackage> PResourcePackage;
 
@@ -75,6 +78,7 @@ namespace AMC {
 		PLogger m_pLogger;
 		LibMCData::PDataModel m_pDataModel;
 		AMCCommon::PChrono m_pGlobalChrono;
+		PStateJournal m_pStateJournal;
 
 		std::string m_sSystemUserID;
 
@@ -92,7 +96,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, PStateJournal pStateJournal);
 
 		virtual ~CDriverHandler();
 

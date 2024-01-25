@@ -102,6 +102,8 @@ namespace AMC {
 		
 		void retrieveRecentInterval (uint64_t nLastMilliSeconds, sStateJournalInterval& interval);
 
+		void registerAlias (const std::string& sName, const std::string& sSourceName);
+
 	};
 
 	
