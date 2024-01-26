@@ -539,6 +539,10 @@
 			<param name="Identifier" type="string" pass="return" description="Value." />	
 		</method>	
 
+		<method name="IsActive" description="Returns if the alert is actuve.">
+			<param name="Active" type="bool" pass="return" description="Returns if the alert is active." />
+		</method>
+
 		<method name="GetLevel" description="Returns the Alert Level.">
 			<param name="Level" type="enum" class="AlertLevel" pass="return" description="Value." />
 		</method>	
@@ -567,6 +571,21 @@
 			<param name="HasBeenAcknowledged" type="bool" pass="return" description="Flag if the alert has been acknowledged." />	
 		</method>			
 		
+		<method name="GetAcknowledgementInformation" description="Returns details about the acknowledgement. Fails if the alert is not acknowledged.">
+			<param name="UserUUID" type="string" pass="out" description="User who acknowledged the alert." />
+			<param name="UserComment" type="string" pass="out" description="Comment of the acknowledgement." />
+			<param name="AckTime" type="string" pass="out" description="Timestamp in ISO8601 UTC format." />
+		</method>
+
+		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+
+		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">
+			<param name="Comment" type="string" pass="in" description="Comment to store. May be empty." />
+		</method>
+		
 	</class>
 
 
@@ -590,6 +609,7 @@
 			<param name="ReadableContextInformation" type="string" pass="in" description="Readable Context Information in default language" />	
 			<param name="NeedsAcknowledgement" type="bool" pass="in" description="Flag if acknowledgement is needed" />	
 			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
+			<param name="AlertInstance" type="class" class="Alert" pass="return" description="Alert Instance" />	
 		</method>	
 		
 		<method name="HasAlert" description="Checks if an alert with a certain UUID exists.">
@@ -602,43 +622,16 @@
 			<param name="AlertInstance" type="class" class="Alert" pass="return" description="Alert Instance" />	
 		</method>	
 
-		<method name="RetrieveAllAlerts" description="Retrieves all alerts.">
+		<method name="RetrieveAlerts" description="Retrieves all or all active alerts.">
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
 		</method>	
 
-		<method name="RetrieveAllOpenAlerts" description="Retrieves all alerts which have not been acknowledged.">
+		<method name="RetrieveAlertsByType" description="Retrieves alerts of a certain type identifier.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
-		</method>	
-		
-		<method name="GetAlertInformation" description="Retrieves information of an alert. Fails if alert does not exist.">
-			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="Identifier" type="string" pass="out" description="Alert Identifier" />	
-			<param name="Level" type="enum" class="AlertLevel" pass="out" description="Alert level." />
-			<param name="Description" type="string" pass="out" description="Alert Description in default language" />	
-			<param name="DescriptionIdentifier" type="string" pass="out" description="Alert Description Identifier for internationalization. May be empty." />	
-			<param name="ReadableContextInformation" type="string" pass="out" description="Readable Context Information in default language" />	
-			<param name="NeedsAcknowledgement" type="bool" pass="out" description="Flag if acknowledgement is needed" />	
-			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
-		</method>	
-
-		<method name="AcknowledgeAlert" description="Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.">
-			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="UserUUID" type="string" pass="in" description="User UUID that acknowledged the alert." />	
-			<param name="UserComment" type="string" pass="in" description="Comment of the user." />	
-			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
-		</method>	
-
-		<method name="AlertHasBeenAcknowledged" description="Checks if an alert has been acknowledged. Fails if alert does not exist.">
-			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="HasBeenAcknowledged" type="bool" pass="return" description="Flag if the alert has been acknowledged." />	
-		</method>	
-		
-		<method name="GetAcknowledgementInformation" description="Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.">
-			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="UserUUID" type="string" pass="out" description="User UUID that acknowledged the alert." />	
-			<param name="UserComment" type="string" pass="out" description="Comment of the user." />	
-			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
-		</method>	
+		</method>				
 		
 	</class>
 

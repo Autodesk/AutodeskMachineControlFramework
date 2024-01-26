@@ -3920,6 +3920,15 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvAlert_GetUUIDPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
+* Returns if the alert is actuve.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pActive - Returns if the alert is active.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_IsActivePtr) (LibMCEnv_Alert pAlert, bool * pActive);
+
+/**
 * Returns Alert Level.
 *
 * @param[in] pAlert - Alert instance.
@@ -3966,7 +3975,7 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_NeedsAcknowledgementPtr) (LibMCEnv_Alert
 * @param[out] pValue - Flag if alert is acknowledged.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvAlert_IsAcknowledgedPtr) (LibMCEnv_Alert pAlert, bool * pValue);
+typedef LibMCEnvResult (*PLibMCEnvAlert_HasBeenAcknowledgedPtr) (LibMCEnv_Alert pAlert, bool * pValue);
 
 /**
 * Returns details about the acknowledgement. Fails if the alert is not acknowledged.
@@ -3984,6 +3993,34 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_IsAcknowledgedPtr) (LibMCEnv_Alert pAler
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementInformationPtr) (LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCEnv_uint32 nUserCommentBufferSize, LibMCEnv_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCEnv_uint32 nAckTimeBufferSize, LibMCEnv_uint32* pAckTimeNeededChars, char * pAckTimeBuffer);
+
+/**
+* Acknowledges an alert for a specific user and sets it inactive. 
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+* @param[in] pUserComment - User comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeForUserPtr) (LibMCEnv_Alert pAlert, const char * pUserUUID, const char * pUserComment);
+
+/**
+* Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] pUserComment - User comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeAlertForCurrentUserPtr) (LibMCEnv_Alert pAlert, const char * pUserComment);
+
+/**
+* Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] pComment - Comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvAlert_DeactivateAlertPtr) (LibMCEnv_Alert pAlert, const char * pComment);
 
 /*************************************************************************************************************************
  Class definition for AlertIterator
@@ -5018,15 +5055,25 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindAlertPtr) (LibMCEnv_State
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_AlertExistsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool * pValue);
 
 /**
-* Acknowledges an alert for a specific user. 
+* Retrieves all or all active alerts.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
-* @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
-* @param[in] pUserComment - User comment to store. May be empty.
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
+* @param[out] pIteratorInstance - AlertIterator Instance
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pAlertUUID, const char * pUserUUID, const char * pUserComment);
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveAlertsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
+
+/**
+* Retrieves alerts of a certain type identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
+* @param[out] pIteratorInstance - AlertIterator Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveAlertsByTypePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for UIItem
@@ -5734,25 +5781,25 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindAlertPtr) (LibMCEnv_UIEnviro
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AlertExistsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool * pValue);
 
 /**
-* Acknowledges an alert for the current user. 
+* Retrieves all or all active alerts.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] pAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
-* @param[in] pUserComment - User comment to store. May be empty.
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
+* @param[out] pIteratorInstance - AlertIterator Instance
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AcknowledgeAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pAlertUUID, const char * pUserComment);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveAlertsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /**
-* Acknowledges an alert for a specific user. 
+* Retrieves alerts of a certain type identifier.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] pAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
-* @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
-* @param[in] pUserComment - User comment to store. May be empty.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
+* @param[out] pIteratorInstance - AlertIterator Instance
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AcknowledgeAlertForUserPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pAlertUUID, const char * pUserUUID, const char * pUserComment);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveAlertsByTypePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Global functions
@@ -6167,12 +6214,16 @@ typedef struct {
 	PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr m_JournalVariable_ComputeUniformAverageSamples;
 	PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr m_JournalVariable_ReceiveRawTimeStream;
 	PLibMCEnvAlert_GetUUIDPtr m_Alert_GetUUID;
+	PLibMCEnvAlert_IsActivePtr m_Alert_IsActive;
 	PLibMCEnvAlert_GetAlertLevelPtr m_Alert_GetAlertLevel;
 	PLibMCEnvAlert_GetIdentifierPtr m_Alert_GetIdentifier;
 	PLibMCEnvAlert_GetReadableContextInformationPtr m_Alert_GetReadableContextInformation;
 	PLibMCEnvAlert_NeedsAcknowledgementPtr m_Alert_NeedsAcknowledgement;
-	PLibMCEnvAlert_IsAcknowledgedPtr m_Alert_IsAcknowledged;
+	PLibMCEnvAlert_HasBeenAcknowledgedPtr m_Alert_HasBeenAcknowledged;
 	PLibMCEnvAlert_GetAcknowledgementInformationPtr m_Alert_GetAcknowledgementInformation;
+	PLibMCEnvAlert_AcknowledgeForUserPtr m_Alert_AcknowledgeForUser;
+	PLibMCEnvAlert_AcknowledgeAlertForCurrentUserPtr m_Alert_AcknowledgeAlertForCurrentUser;
+	PLibMCEnvAlert_DeactivateAlertPtr m_Alert_DeactivateAlert;
 	PLibMCEnvAlertIterator_GetCurrentAlertPtr m_AlertIterator_GetCurrentAlert;
 	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
 	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
@@ -6263,7 +6314,8 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateAlertPtr m_StateEnvironment_CreateAlert;
 	PLibMCEnvStateEnvironment_FindAlertPtr m_StateEnvironment_FindAlert;
 	PLibMCEnvStateEnvironment_AlertExistsPtr m_StateEnvironment_AlertExists;
-	PLibMCEnvStateEnvironment_AcknowledgeAlertForUserPtr m_StateEnvironment_AcknowledgeAlertForUser;
+	PLibMCEnvStateEnvironment_RetrieveAlertsPtr m_StateEnvironment_RetrieveAlerts;
+	PLibMCEnvStateEnvironment_RetrieveAlertsByTypePtr m_StateEnvironment_RetrieveAlertsByType;
 	PLibMCEnvUIItem_GetNamePtr m_UIItem_GetName;
 	PLibMCEnvUIItem_GetPathPtr m_UIItem_GetPath;
 	PLibMCEnvUIItem_GetUUIDPtr m_UIItem_GetUUID;
@@ -6328,8 +6380,8 @@ typedef struct {
 	PLibMCEnvUIEnvironment_CreateAlertPtr m_UIEnvironment_CreateAlert;
 	PLibMCEnvUIEnvironment_FindAlertPtr m_UIEnvironment_FindAlert;
 	PLibMCEnvUIEnvironment_AlertExistsPtr m_UIEnvironment_AlertExists;
-	PLibMCEnvUIEnvironment_AcknowledgeAlertPtr m_UIEnvironment_AcknowledgeAlert;
-	PLibMCEnvUIEnvironment_AcknowledgeAlertForUserPtr m_UIEnvironment_AcknowledgeAlertForUser;
+	PLibMCEnvUIEnvironment_RetrieveAlertsPtr m_UIEnvironment_RetrieveAlerts;
+	PLibMCEnvUIEnvironment_RetrieveAlertsByTypePtr m_UIEnvironment_RetrieveAlertsByType;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

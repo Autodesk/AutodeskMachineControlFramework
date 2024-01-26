@@ -81,13 +81,16 @@ namespace AMCData {
 
 		void acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string & sTimeStampUTC);
 
-		bool alertHasBeenAcknowledged(const std::string& sUUID);
+		bool alertHasBeenAcknowledged (const std::string& sUUID);
+
+		bool alertIsActive(const std::string& sUUID);
 
 		void getAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC);
 
-		void retrieveAllAlerts(std::vector<std::string> & alertUUIDs);
-
-		void retrieveAllOpenAlerts(std::vector<std::string>& alertUUIDs);
+		void retrieveAlerts(std::vector<std::string> & alertUUIDs);
+		void retrieveActiveAlerts(std::vector<std::string>& alertUUIDs);
+		void retrieveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
+		void retrieveActiveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
 
 	};
 

@@ -43,17 +43,13 @@ using namespace LibMCEnv::Impl;
  Class definition of CAlert 
 **************************************************************************************************************************/
 
-CAlert::CAlert(const std::string& sAlertUUID, LibMCData::PDataModel pDataModel)
-	: m_sAlertUUID (AMCCommon::CUtils::normalizeUUIDString (sAlertUUID)),	
-	m_bNeedsAcknowledgement (false),
-	m_AlertLevel (LibMCEnv::eAlertLevel::CriticalError)
+CAlert::CAlert(LibMCData::PAlert pAlertData)
+	: m_pAlertData (pAlertData)
 {
-	if (pDataModel.get() == nullptr)
+	if (pAlertData.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-
-	m_pAlertSession = pDataModel->CreateAlertSession();
-
 }
+
 
 CAlert::~CAlert()
 {	
@@ -62,38 +58,94 @@ CAlert::~CAlert()
 
 std::string CAlert::GetUUID()
 {
-	return m_sAlertUUID;
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	return m_pAlertData->GetUUID ();
 }
+
+bool CAlert::IsActive()
+{
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	return m_pAlertData->IsActive();
+}
+
 
 LibMCEnv::eAlertLevel CAlert::GetAlertLevel()
 {
-	return m_AlertLevel;
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	auto alertDataLevel = m_pAlertData->GetLevel();
+	
+	switch (alertDataLevel) {
+	case LibMCData::eAlertLevel::FatalError: return LibMCEnv::eAlertLevel::FatalError;
+	case LibMCData::eAlertLevel::CriticalError: return LibMCEnv::eAlertLevel::CriticalError;
+	case LibMCData::eAlertLevel::Message: return LibMCEnv::eAlertLevel::Message;
+	case LibMCData::eAlertLevel::Warning: return LibMCEnv::eAlertLevel::Warning;
+	default:
+		return LibMCEnv::eAlertLevel::Unknown;
+	}
 }
 
 std::string CAlert::GetIdentifier()
 {
-	return m_sIdentifier;
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	return m_pAlertData->GetIdentifier();
 }
 
 std::string CAlert::GetReadableContextInformation()
 {
-	return m_sReadableContextInformation;
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	return m_pAlertData->GetReadableContextInformation();
 }
 
 bool CAlert::NeedsAcknowledgement()
 {
-	return m_bNeedsAcknowledgement;
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	return m_pAlertData->GetNeedsAcknowledgement();
 }
 
-bool CAlert::IsAcknowledged()
+bool CAlert::HasBeenAcknowledged()
 {
-	std::lock_guard<std::mutex> lockGuard(m_AlertSessionMutex);
-	return m_pAlertSession->AlertHasBeenAcknowledged(m_sAlertUUID);
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	return m_pAlertData->HasBeenAcknowledged();
 }
 
 void CAlert::GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime)
 {
-	std::lock_guard<std::mutex> lockGuard(m_AlertSessionMutex);
-	m_pAlertSession->GetAcknowledgementInformation(m_sAlertUUID, sUserUUID, sUserComment, sAckTime);
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	m_pAlertData->GetAcknowledgementInformation(sUserUUID, sUserComment, sAckTime);
 }
 
+LibMCData::PAlert CAlert::getAlertData()
+{
+	return m_pAlertData;
+}
+
+CAlert* CAlert::makeFrom(CAlert* pAlert)
+{
+	if (pAlert == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	return new CAlert(pAlert->getAlertData());
+}
+
+std::shared_ptr<CAlert> CAlert::makeSharedFrom(CAlert* pAlert)
+{
+	return std::shared_ptr<CAlert>(makeFrom(pAlert));
+}
+
+void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment)
+{
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+
+}
+
+void CAlert::AcknowledgeAlertForCurrentUser(const std::string& sUserComment)
+{
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+
+}
+
+void CAlert::DeactivateAlert(const std::string& sComment)
+{
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+
+}

@@ -98,6 +98,11 @@ std::string CAlert::GetIdentifier()
 	return m_sIdentifier;
 }
 
+bool CAlert::IsActive()
+{
+	return m_pJournal->alertIsActive(m_sAlertUUID);
+}
+
 LibMCData::eAlertLevel CAlert::GetLevel()
 {
 	refreshIfNeeded();
@@ -142,4 +147,18 @@ bool CAlert::HasBeenAcknowledged()
 AMCData::PJournal CAlert::getJournal()
 {
 	return m_pJournal;
+}
+
+void CAlert::GetAcknowledgementInformation(std::string& sUserUUID, std::string& sUserComment, std::string& sAckTime)
+{
+	m_pJournal->getAcknowledgementInformation(m_sAlertUUID, sUserUUID, sUserComment, m_sTimestampUTC);
+}
+
+void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment)
+{
+}
+
+void CAlert::DeactivateAlert(const std::string& sComment)
+{
+
 }

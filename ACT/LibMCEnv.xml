@@ -187,6 +187,7 @@
 		<option name="CriticalError" value="2"/>
 		<option name="Warning" value="3"/>
 		<option name="Message" value="4"/>
+		<option name="Unknown" value="7"/>
 	</enum>	
 
 
@@ -2245,6 +2246,10 @@
 			<param name="UUID" type="string" pass="return" description="Returns the alert uuid." />
 		</method>
 
+		<method name="IsActive" description="Returns if the alert is actuve.">
+			<param name="Active" type="bool" pass="return" description="Returns if the alert is active." />
+		</method>
+
 		<method name="GetAlertLevel" description="Returns Alert Level.">
 			<param name="Level" type="enum" class="AlertLevel" pass="return" description="Returns the alert level." />
 		</method>
@@ -2261,7 +2266,7 @@
 			<param name="Value" type="bool" pass="return" description="Flag if alert needs acknowledgement." />
 		</method>
 	
-		<method name="IsAcknowledged" description="Returns if the alert is acknowledged.">
+		<method name="HasBeenAcknowledged" description="Returns if the alert is acknowledged.">
 			<param name="Value" type="bool" pass="return" description="Flag if alert is acknowledged." />
 		</method>
 
@@ -2271,6 +2276,19 @@
 			<param name="AckTime" type="string" pass="out" description="Timestamp in ISO8601 UTC format." />
 		</method>
 
+		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+
+		<method name="AcknowledgeAlertForCurrentUser" description="Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.">
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+
+		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">
+			<param name="Comment" type="string" pass="in" description="Comment to store. May be empty." />
+		</method>
+		
 	</class>
 
 	<class name="AlertIterator" parent="Iterator">
@@ -2792,12 +2810,17 @@
 			<param name="Value" type="bool" pass="return" description="True if alert exists." />
 		</method>
 
-		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
-			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
-			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
-			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
-		</method>
-5
+		<method name="RetrieveAlerts" description="Retrieves all or all active alerts.">
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>	
+
+		<method name="RetrieveAlertsByType" description="Retrieves alerts of a certain type identifier.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>				
+
 	</class>
 
 	<class name="UIItem" parent="Base" description="Base item that represents a user interface element.">
@@ -3153,16 +3176,16 @@
 			<param name="Value" type="bool" pass="return" description="True if alert exists." />
 		</method>
 
-		<method name="AcknowledgeAlert" description="Acknowledges an alert for the current user. ">
-			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
-			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
-		</method>
-		
-		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
-			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
-			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
-			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
-		</method>
+		<method name="RetrieveAlerts" description="Retrieves all or all active alerts.">
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>	
+
+		<method name="RetrieveAlertsByType" description="Retrieves alerts of a certain type identifier.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>				
 		
 	</class>
 

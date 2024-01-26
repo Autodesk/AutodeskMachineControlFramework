@@ -3227,6 +3227,12 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
+	* IAlert::IsActive - Returns if the alert is actuve.
+	* @return Returns if the alert is active.
+	*/
+	virtual bool IsActive() = 0;
+
+	/**
 	* IAlert::GetAlertLevel - Returns Alert Level.
 	* @return Returns the alert level.
 	*/
@@ -3251,10 +3257,10 @@ public:
 	virtual bool NeedsAcknowledgement() = 0;
 
 	/**
-	* IAlert::IsAcknowledged - Returns if the alert is acknowledged.
+	* IAlert::HasBeenAcknowledged - Returns if the alert is acknowledged.
 	* @return Flag if alert is acknowledged.
 	*/
-	virtual bool IsAcknowledged() = 0;
+	virtual bool HasBeenAcknowledged() = 0;
 
 	/**
 	* IAlert::GetAcknowledgementInformation - Returns details about the acknowledgement. Fails if the alert is not acknowledged.
@@ -3263,6 +3269,25 @@ public:
 	* @param[out] sAckTime - Timestamp in ISO8601 UTC format.
 	*/
 	virtual void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) = 0;
+
+	/**
+	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment) = 0;
+
+	/**
+	* IAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	*/
+	virtual void AcknowledgeAlertForCurrentUser(const std::string & sUserComment) = 0;
+
+	/**
+	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	* @param[in] sComment - Comment to store. May be empty.
+	*/
+	virtual void DeactivateAlert(const std::string & sComment) = 0;
 
 };
 
@@ -3998,12 +4023,19 @@ public:
 	virtual bool AlertExists(const std::string & sUUID) = 0;
 
 	/**
-	* IStateEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
-	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
-	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
-	* @param[in] sUserComment - User comment to store. May be empty.
+	* IStateEnvironment::RetrieveAlerts - Retrieves all or all active alerts.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
 	*/
-	virtual void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
+	virtual IAlertIterator * RetrieveAlerts(const bool bOnlyActive) = 0;
+
+	/**
+	* IStateEnvironment::RetrieveAlertsByType - Retrieves alerts of a certain type identifier.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
+	*/
+	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
 
 };
 
@@ -4499,19 +4531,19 @@ public:
 	virtual bool AlertExists(const std::string & sUUID) = 0;
 
 	/**
-	* IUIEnvironment::AcknowledgeAlert - Acknowledges an alert for the current user. 
-	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
-	* @param[in] sUserComment - User comment to store. May be empty.
+	* IUIEnvironment::RetrieveAlerts - Retrieves all or all active alerts.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
 	*/
-	virtual void AcknowledgeAlert(const std::string & sAlertUUID, const std::string & sUserComment) = 0;
+	virtual IAlertIterator * RetrieveAlerts(const bool bOnlyActive) = 0;
 
 	/**
-	* IUIEnvironment::AcknowledgeAlertForUser - Acknowledges an alert for a specific user. 
-	* @param[in] sAlertUUID - UUID of the alert to acknowledge. Fails if alert does not exist.
-	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
-	* @param[in] sUserComment - User comment to store. May be empty.
+	* IUIEnvironment::RetrieveAlertsByType - Retrieves alerts of a certain type identifier.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
 	*/
-	virtual void AcknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment) = 0;
+	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
 
 };
 

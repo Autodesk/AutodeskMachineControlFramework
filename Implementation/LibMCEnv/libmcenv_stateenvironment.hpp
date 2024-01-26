@@ -181,7 +181,9 @@ public:
 
 	bool AlertExists(const std::string& sUUID) override;
 
-	void AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
+	IAlertIterator* RetrieveAlerts(const bool bOnlyActive) override;
+
+	IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
 
 };
 

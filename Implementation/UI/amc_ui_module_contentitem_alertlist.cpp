@@ -141,7 +141,7 @@ void CUIModule_ContentAlertList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 	CJSONWriterArray entryArray(writer);
 
 	auto pAlertSession = m_pDataModel->CreateAlertSession();
-	auto pAlertIterator = pAlertSession->RetrieveAllAlerts();
+	auto pAlertIterator = pAlertSession->RetrieveAlerts(false);
 
 	while (pAlertIterator->MoveNext ())
 	{

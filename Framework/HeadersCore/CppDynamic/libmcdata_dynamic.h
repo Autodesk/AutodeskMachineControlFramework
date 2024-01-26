@@ -222,6 +222,15 @@ typedef LibMCDataResult (*PLibMCDataAlert_GetUUIDPtr) (LibMCData_Alert pAlert, c
 typedef LibMCDataResult (*PLibMCDataAlert_GetIdentifierPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
 
 /**
+* Returns if the alert is actuve.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pActive - Returns if the alert is active.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_IsActivePtr) (LibMCData_Alert pAlert, bool * pActive);
+
+/**
 * Returns the Alert Level.
 *
 * @param[in] pAlert - Alert instance.
@@ -292,6 +301,42 @@ typedef LibMCDataResult (*PLibMCDataAlert_GetTimestampUTCPtr) (LibMCData_Alert p
 */
 typedef LibMCDataResult (*PLibMCDataAlert_HasBeenAcknowledgedPtr) (LibMCData_Alert pAlert, bool * pHasBeenAcknowledged);
 
+/**
+* Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of User who acknowledged the alert., may be NULL
+* @param[in] nUserCommentBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserCommentNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserCommentBuffer -  buffer of Comment of the acknowledgement., may be NULL
+* @param[in] nAckTimeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pAckTimeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pAckTimeBuffer -  buffer of Timestamp in ISO8601 UTC format., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetAcknowledgementInformationPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCData_uint32 nUserCommentBufferSize, LibMCData_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCData_uint32 nAckTimeBufferSize, LibMCData_uint32* pAckTimeNeededChars, char * pAckTimeBuffer);
+
+/**
+* Acknowledges an alert for a specific user and sets it inactive. 
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+* @param[in] pUserComment - User comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_AcknowledgeForUserPtr) (LibMCData_Alert pAlert, const char * pUserUUID, const char * pUserComment);
+
+/**
+* Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] pComment - Comment to store. May be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_DeactivateAlertPtr) (LibMCData_Alert pAlert, const char * pComment);
+
 /*************************************************************************************************************************
  Class definition for AlertIterator
 **************************************************************************************************************************/
@@ -321,9 +366,10 @@ typedef LibMCDataResult (*PLibMCDataAlertIterator_GetCurrentAlertPtr) (LibMCData
 * @param[in] pReadableContextInformation - Readable Context Information in default language
 * @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
 * @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
+* @param[out] pAlertInstance - Alert Instance
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataAlertSession_AddAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, LibMCData::eAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC);
+typedef LibMCDataResult (*PLibMCDataAlertSession_AddAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, LibMCData::eAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC, LibMCData_Alert * pAlertInstance);
 
 /**
 * Checks if an alert with a certain UUID exists.
@@ -346,88 +392,25 @@ typedef LibMCDataResult (*PLibMCDataAlertSession_HasAlertPtr) (LibMCData_AlertSe
 typedef LibMCDataResult (*PLibMCDataAlertSession_GetAlertByUUIDPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, LibMCData_Alert * pAlertInstance);
 
 /**
-* Retrieves all alerts.
+* Retrieves all or all active alerts.
 *
 * @param[in] pAlertSession - AlertSession instance.
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
 * @param[out] pIteratorInstance - AlertIterator Instance
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAllAlertsPtr) (LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance);
+typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAlertsPtr) (LibMCData_AlertSession pAlertSession, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
 /**
-* Retrieves all alerts which have not been acknowledged.
+* Retrieves alerts of a certain type identifier.
 *
 * @param[in] pAlertSession - AlertSession instance.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
 * @param[out] pIteratorInstance - AlertIterator Instance
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAllOpenAlertsPtr) (LibMCData_AlertSession pAlertSession, LibMCData_AlertIterator * pIteratorInstance);
-
-/**
-* Retrieves information of an alert. Fails if alert does not exist.
-*
-* @param[in] pAlertSession - AlertSession instance.
-* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pIdentifierBuffer -  buffer of Alert Identifier, may be NULL
-* @param[out] pLevel - Alert level.
-* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDescriptionBuffer -  buffer of Alert Description in default language, may be NULL
-* @param[in] nDescriptionIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDescriptionIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDescriptionIdentifierBuffer -  buffer of Alert Description Identifier for internationalization. May be empty., may be NULL
-* @param[in] nReadableContextInformationBufferSize - size of the buffer (including trailing 0)
-* @param[out] pReadableContextInformationNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pReadableContextInformationBuffer -  buffer of Readable Context Information in default language, may be NULL
-* @param[out] pNeedsAcknowledgement - Flag if acknowledgement is needed
-* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCDataResult (*PLibMCDataAlertSession_GetAlertInformationPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer, LibMCData::eAlertLevel * pLevel, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCData_uint32 nDescriptionIdentifierBufferSize, LibMCData_uint32* pDescriptionIdentifierNeededChars, char * pDescriptionIdentifierBuffer, const LibMCData_uint32 nReadableContextInformationBufferSize, LibMCData_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer, bool * pNeedsAcknowledgement, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
-
-/**
-* Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
-*
-* @param[in] pAlertSession - AlertSession instance.
-* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[in] pUserUUID - User UUID that acknowledged the alert.
-* @param[in] pUserComment - Comment of the user.
-* @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
-* @return error code or 0 (success)
-*/
-typedef LibMCDataResult (*PLibMCDataAlertSession_AcknowledgeAlertPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const char * pTimestampUTC);
-
-/**
-* Checks if an alert has been acknowledged. Fails if alert does not exist.
-*
-* @param[in] pAlertSession - AlertSession instance.
-* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[out] pHasBeenAcknowledged - Flag if the alert has been acknowledged.
-* @return error code or 0 (success)
-*/
-typedef LibMCDataResult (*PLibMCDataAlertSession_AlertHasBeenAcknowledgedPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, bool * pHasBeenAcknowledged);
-
-/**
-* Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
-*
-* @param[in] pAlertSession - AlertSession instance.
-* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserUUIDBuffer -  buffer of User UUID that acknowledged the alert., may be NULL
-* @param[in] nUserCommentBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserCommentNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserCommentBuffer -  buffer of Comment of the user., may be NULL
-* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCDataResult (*PLibMCDataAlertSession_GetAcknowledgementInformationPtr) (LibMCData_AlertSession pAlertSession, const char * pUUID, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCData_uint32 nUserCommentBufferSize, LibMCData_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAlertsByTypePtr) (LibMCData_AlertSession pAlertSession, const char * pIdentifier, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for JournalSession
@@ -1827,6 +1810,7 @@ typedef struct {
 	PLibMCDataLogSession_RetrieveLogEntriesByIDPtr m_LogSession_RetrieveLogEntriesByID;
 	PLibMCDataAlert_GetUUIDPtr m_Alert_GetUUID;
 	PLibMCDataAlert_GetIdentifierPtr m_Alert_GetIdentifier;
+	PLibMCDataAlert_IsActivePtr m_Alert_IsActive;
 	PLibMCDataAlert_GetLevelPtr m_Alert_GetLevel;
 	PLibMCDataAlert_GetDescriptionPtr m_Alert_GetDescription;
 	PLibMCDataAlert_GetDescriptionIdentifierPtr m_Alert_GetDescriptionIdentifier;
@@ -1834,16 +1818,15 @@ typedef struct {
 	PLibMCDataAlert_GetNeedsAcknowledgementPtr m_Alert_GetNeedsAcknowledgement;
 	PLibMCDataAlert_GetTimestampUTCPtr m_Alert_GetTimestampUTC;
 	PLibMCDataAlert_HasBeenAcknowledgedPtr m_Alert_HasBeenAcknowledged;
+	PLibMCDataAlert_GetAcknowledgementInformationPtr m_Alert_GetAcknowledgementInformation;
+	PLibMCDataAlert_AcknowledgeForUserPtr m_Alert_AcknowledgeForUser;
+	PLibMCDataAlert_DeactivateAlertPtr m_Alert_DeactivateAlert;
 	PLibMCDataAlertIterator_GetCurrentAlertPtr m_AlertIterator_GetCurrentAlert;
 	PLibMCDataAlertSession_AddAlertPtr m_AlertSession_AddAlert;
 	PLibMCDataAlertSession_HasAlertPtr m_AlertSession_HasAlert;
 	PLibMCDataAlertSession_GetAlertByUUIDPtr m_AlertSession_GetAlertByUUID;
-	PLibMCDataAlertSession_RetrieveAllAlertsPtr m_AlertSession_RetrieveAllAlerts;
-	PLibMCDataAlertSession_RetrieveAllOpenAlertsPtr m_AlertSession_RetrieveAllOpenAlerts;
-	PLibMCDataAlertSession_GetAlertInformationPtr m_AlertSession_GetAlertInformation;
-	PLibMCDataAlertSession_AcknowledgeAlertPtr m_AlertSession_AcknowledgeAlert;
-	PLibMCDataAlertSession_AlertHasBeenAcknowledgedPtr m_AlertSession_AlertHasBeenAcknowledged;
-	PLibMCDataAlertSession_GetAcknowledgementInformationPtr m_AlertSession_GetAcknowledgementInformation;
+	PLibMCDataAlertSession_RetrieveAlertsPtr m_AlertSession_RetrieveAlerts;
+	PLibMCDataAlertSession_RetrieveAlertsByTypePtr m_AlertSession_RetrieveAlertsByType;
 	PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr m_JournalSession_WriteJournalChunkIntegerData;
 	PLibMCDataJournalSession_GetChunkCapacityPtr m_JournalSession_GetChunkCapacity;
 	PLibMCDataJournalSession_GetFlushIntervalPtr m_JournalSession_GetFlushInterval;

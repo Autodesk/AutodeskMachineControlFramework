@@ -60,28 +60,24 @@ namespace Impl {
 class CAlert : public virtual IAlert, public virtual CBase {
 private:
 
-	std::string m_sAlertUUID;
-
 	// ATTENTION: Alert Session is not thread safe.
 	// So the Alert session needs to be private and surrounded by a mutex
-	std::mutex m_AlertSessionMutex;
-	LibMCData::PAlertSession m_pAlertSession;
-
-	LibMCEnv::eAlertLevel m_AlertLevel;
-
-	std::string m_sIdentifier;	
-
-	std::string m_sReadableContextInformation;
-
-	bool m_bNeedsAcknowledgement;
+	std::mutex m_AlertMutex;
+	LibMCData::PAlert m_pAlertData;
 
 public:
 
-	CAlert(const std::string& sAlertUUID, LibMCData::PDataModel pDataModel);
+	static CAlert* makeFrom(CAlert * pAlert);
+
+	static std::shared_ptr<CAlert> makeSharedFrom(CAlert* pAlert);
+
+	CAlert(LibMCData::PAlert pAlertData);
 
 	virtual ~CAlert();
 
 	std::string GetUUID() override;
+
+	bool IsActive() override;
 
 	LibMCEnv::eAlertLevel GetAlertLevel() override;
 
@@ -91,9 +87,17 @@ public:
 
 	bool NeedsAcknowledgement() override;
 
-	bool IsAcknowledged() override;
+	bool HasBeenAcknowledged() override;
 
 	void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) override;
+	
+	void AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment) override;
+
+	void AcknowledgeAlertForCurrentUser(const std::string& sUserComment) override;
+
+	void DeactivateAlert(const std::string& sComment) override;
+
+	LibMCData::PAlert getAlertData ();
 
 };
 

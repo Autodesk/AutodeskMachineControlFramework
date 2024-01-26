@@ -89,6 +89,8 @@ public:
 
 	std::string GetIdentifier() override;
 
+	bool IsActive() override;
+
 	LibMCData::eAlertLevel GetLevel() override;
 
 	std::string GetDescription() override;
@@ -102,6 +104,12 @@ public:
 	std::string GetTimestampUTC() override;
 
 	bool HasBeenAcknowledged() override;
+
+	void GetAcknowledgementInformation(std::string& sUserUUID, std::string& sUserComment, std::string& sAckTime) override;
+
+	void AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment) override;
+
+	void DeactivateAlert(const std::string& sComment) override;
 
 };
 

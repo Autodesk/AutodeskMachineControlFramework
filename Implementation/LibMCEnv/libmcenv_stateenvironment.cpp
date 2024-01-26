@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_alert.hpp"
+#include "libmcenv_alertiterator.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -656,9 +657,9 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pAlertSession = pDataModel->CreateAlertSession();
 
-	pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), pDefinition->getAlertLevel (), alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
+	auto pAlertData = pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), pDefinition->getAlertLevel (), alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
 
-	return new CAlert (sNewUUID, pDataModel);
+	return new CAlert (pAlertData);
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
@@ -671,7 +672,9 @@ IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 	if (!pAlertSession->HasAlert(sNormalizedUUID))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
 
-	return new CAlert(sNormalizedUUID, pDataModel);
+	auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
+
+	return new CAlert(pAlertData);
 
 }
 
@@ -686,7 +689,17 @@ bool CStateEnvironment::AlertExists(const std::string& sUUID)
 
 }
 
-void CStateEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
+IAlertIterator* CStateEnvironment::RetrieveAlerts(const bool bOnlyActive)
 {
+	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator (new CAlertIterator ());
+
+	return returnIterator.release();
+}
+
+IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
+{
+	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
+
+	return returnIterator.release();
 }
 

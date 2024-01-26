@@ -40,6 +40,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_alert.hpp"
+#include "libmcenv_alertiterator.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -639,9 +640,9 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
 
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pAlertSession = pDataModel->CreateAlertSession();
-    pAlertSession->AddAlert(sNewUUID, pDefinition->getIdentifier(), pDefinition->getAlertLevel(), alertDescription.getCustomValue(), alertDescription.getStringIdentifier(), sReadableContextInformation, pDefinition->needsAcknowledgement(), sTimeStamp);
+    auto pAlertData = pAlertSession->AddAlert(sNewUUID, pDefinition->getIdentifier(), pDefinition->getAlertLevel(), alertDescription.getCustomValue(), alertDescription.getStringIdentifier(), sReadableContextInformation, pDefinition->needsAcknowledgement(), sTimeStamp);
 
-    return new CAlert(sNewUUID, pDataModel);
+    return new CAlert(pAlertData);
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
@@ -654,7 +655,8 @@ IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
     if (!pAlertSession->HasAlert(sNormalizedUUID))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
 
-    return new CAlert(sNormalizedUUID, pDataModel);
+    auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
+    return new CAlert(pAlertData);
 
 }
 
@@ -669,34 +671,19 @@ bool CUIEnvironment::AlertExists(const std::string& sUUID)
 
 }
 
-void CUIEnvironment::AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment)
+
+IAlertIterator* CUIEnvironment::RetrieveAlerts(const bool bOnlyActive)
 {
-    std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
+    std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
 
-    auto pDataModel = m_pUISystemState->getDataModel();
-    auto pAlertSession = pDataModel->CreateAlertSession();
-
-    AMCCommon::CChrono chrono;
-
-    pAlertSession->AcknowledgeAlert(sNormalizedAlertUUID, m_pUserInformation->getUUID(), sUserComment, chrono.getStartTimeISO8601TimeUTC());
+    return returnIterator.release();
 
 }
 
-void CUIEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
+IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
 {
-    std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
-    std::string sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+    std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
 
-    auto pDataModel = m_pUISystemState->getDataModel();
-    auto pLoginHandler = pDataModel->CreateLoginHandler();
-    if (!pLoginHandler->UserUUIDExists(sNormalizedUserUUID))
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_USERDOESNOTEXIST, "user does not exist: " + sNormalizedUserUUID);
-
-    auto pAlertSession = pDataModel->CreateAlertSession();
-
-    AMCCommon::CChrono chrono;
-
-    pAlertSession->AcknowledgeAlert(sNormalizedAlertUUID, sNormalizedUserUUID, sUserComment, chrono.getStartTimeISO8601TimeUTC());
+    return returnIterator.release();
 
 }
-
