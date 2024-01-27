@@ -144,7 +144,7 @@ void CAlert::AcknowledgeAlertForCurrentUser(const std::string& sUserComment)
 
 }
 
-void CAlert::DeactivateAlert(const std::string& sComment)
+void CAlert::DeactivateAlert()
 {
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
 

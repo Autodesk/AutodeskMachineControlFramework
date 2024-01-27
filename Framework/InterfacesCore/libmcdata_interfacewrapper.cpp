@@ -1012,19 +1012,16 @@ LibMCDataResult libmcdata_alert_acknowledgeforuser(LibMCData_Alert pAlert, const
 	}
 }
 
-LibMCDataResult libmcdata_alert_deactivatealert(LibMCData_Alert pAlert, const char * pComment)
+LibMCDataResult libmcdata_alert_deactivatealert(LibMCData_Alert pAlert)
 {
 	IBase* pIBaseClass = (IBase *)pAlert;
 
 	try {
-		if (pComment == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		std::string sComment(pComment);
 		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
 		if (!pIAlert)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIAlert->DeactivateAlert(sComment);
+		pIAlert->DeactivateAlert();
 
 		return LIBMCDATA_SUCCESS;
 	}

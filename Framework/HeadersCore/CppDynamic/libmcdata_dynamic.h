@@ -332,10 +332,9 @@ typedef LibMCDataResult (*PLibMCDataAlert_AcknowledgeForUserPtr) (LibMCData_Aler
 * Sets an alert inactive. It will not be marked as acknowledged by a certain user.
 *
 * @param[in] pAlert - Alert instance.
-* @param[in] pComment - Comment to store. May be empty.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataAlert_DeactivateAlertPtr) (LibMCData_Alert pAlert, const char * pComment);
+typedef LibMCDataResult (*PLibMCDataAlert_DeactivateAlertPtr) (LibMCData_Alert pAlert);
 
 /*************************************************************************************************************************
  Class definition for AlertIterator

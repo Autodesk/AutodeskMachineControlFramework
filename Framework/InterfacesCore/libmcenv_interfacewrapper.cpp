@@ -11758,19 +11758,16 @@ LibMCEnvResult libmcenv_alert_acknowledgealertforcurrentuser(LibMCEnv_Alert pAle
 	}
 }
 
-LibMCEnvResult libmcenv_alert_deactivatealert(LibMCEnv_Alert pAlert, const char * pComment)
+LibMCEnvResult libmcenv_alert_deactivatealert(LibMCEnv_Alert pAlert)
 {
 	IBase* pIBaseClass = (IBase *)pAlert;
 
 	try {
-		if (pComment == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sComment(pComment);
 		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
 		if (!pIAlert)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIAlert->DeactivateAlert(sComment);
+		pIAlert->DeactivateAlert();
 
 		return LIBMCENV_SUCCESS;
 	}

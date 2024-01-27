@@ -502,9 +502,8 @@ public:
 
 	/**
 	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
-	* @param[in] sComment - Comment to store. May be empty.
 	*/
-	virtual void DeactivateAlert(const std::string & sComment) = 0;
+	virtual void DeactivateAlert() = 0;
 
 };
 

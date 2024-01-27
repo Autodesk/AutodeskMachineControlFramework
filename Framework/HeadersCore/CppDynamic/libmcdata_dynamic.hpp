@@ -1100,7 +1100,7 @@ public:
 	inline bool HasBeenAcknowledged();
 	inline void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime);
 	inline void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment);
-	inline void DeactivateAlert(const std::string & sComment);
+	inline void DeactivateAlert();
 };
 	
 /*************************************************************************************************************************
@@ -4169,11 +4169,10 @@ public:
 	
 	/**
 	* CAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
-	* @param[in] sComment - Comment to store. May be empty.
 	*/
-	void CAlert::DeactivateAlert(const std::string & sComment)
+	void CAlert::DeactivateAlert()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Alert_DeactivateAlert(m_pHandle, sComment.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_DeactivateAlert(m_pHandle));
 	}
 	
 	/**

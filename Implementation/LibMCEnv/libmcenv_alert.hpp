@@ -95,7 +95,7 @@ public:
 
 	void AcknowledgeAlertForCurrentUser(const std::string& sUserComment) override;
 
-	void DeactivateAlert(const std::string& sComment) override;
+	void DeactivateAlert() override;
 
 	LibMCData::PAlert getAlertData ();
 

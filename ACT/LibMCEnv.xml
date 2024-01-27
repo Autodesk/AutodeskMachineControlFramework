@@ -2286,7 +2286,6 @@
 		</method>
 
 		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">
-			<param name="Comment" type="string" pass="in" description="Comment to store. May be empty." />
 		</method>
 		
 	</class>

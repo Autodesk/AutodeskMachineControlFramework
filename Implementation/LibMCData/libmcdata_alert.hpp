@@ -109,7 +109,7 @@ public:
 
 	void AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment) override;
 
-	void DeactivateAlert(const std::string& sComment) override;
+	void DeactivateAlert() override;
 
 };
 

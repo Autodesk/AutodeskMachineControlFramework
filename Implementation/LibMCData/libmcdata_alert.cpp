@@ -158,7 +158,7 @@ void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string&
 {
 }
 
-void CAlert::DeactivateAlert(const std::string& sComment)
+void CAlert::DeactivateAlert()
 {
 
 }

@@ -653,11 +653,36 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 	auto pDefinition = m_pSystemState->alertHandler()->findDefinition(sIdentifier, true);
 	auto alertDescription = pDefinition->getDescription();
+	auto alertLevel = pDefinition->getAlertLevel();
 
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pAlertSession = pDataModel->CreateAlertSession();
 
-	auto pAlertData = pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), pDefinition->getAlertLevel (), alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
+	auto pAlertData = pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), alertLevel, alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
+
+	std::string sLogString = "Created alert " + sNewUUID + ": " + pDefinition->getIdentifier() + " / " + alertDescription.getCustomValue();
+	AMC::eLogLevel logLevel;
+	switch (alertLevel) {
+	case LibMCData::eAlertLevel::FatalError:
+		logLevel = AMC::eLogLevel::FatalError;
+		break;
+	case LibMCData::eAlertLevel::CriticalError:
+		logLevel = AMC::eLogLevel::CriticalError;
+		break;
+	case LibMCData::eAlertLevel::Message:
+		logLevel = AMC::eLogLevel::Message;
+		break;
+	case LibMCData::eAlertLevel::Warning:
+		logLevel = AMC::eLogLevel::Warning;
+		break;
+	default:
+		logLevel = AMC::eLogLevel::Unknown;
+		break;
+
+	}
+
+	auto pLogger = m_pSystemState->getLoggerInstance();
+	pLogger->logMessage(sLogString, m_sInstanceName, logLevel);
 
 	return new CAlert (pAlertData);
 }
