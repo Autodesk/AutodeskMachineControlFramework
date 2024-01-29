@@ -70,7 +70,7 @@ class CAlertIterator : public virtual IAlertIterator, public virtual CIterator {
 
         IAlert* GetCurrentAlert() override;
 
-        void AddAlert(std::shared_ptr<CAlert> pWorkingFile);
+        void AddAlert(std::shared_ptr<CAlert> pAlert);
 
 };
 

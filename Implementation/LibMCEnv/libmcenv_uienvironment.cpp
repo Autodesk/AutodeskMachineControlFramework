@@ -667,7 +667,7 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
     m_pLogger->logMessage(sLogString, m_sLogSubSystem, logLevel);
 
 
-    return new CAlert(pAlertData);
+    return new CAlert(pDataModel, pAlertData->GetUUID ());
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
@@ -681,7 +681,7 @@ IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
 
     auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
-    return new CAlert(pAlertData);
+    return new CAlert(pDataModel, pAlertData->GetUUID());
 
 }
 
@@ -701,6 +701,15 @@ IAlertIterator* CUIEnvironment::RetrieveAlerts(const bool bOnlyActive)
 {
     std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
 
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    auto pAlertIterator = pAlertSession->RetrieveAlerts(bOnlyActive);
+    while (pAlertIterator->MoveNext()) {
+        auto pAlertData = pAlertIterator->GetCurrentAlert();
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID ()));
+    }
+
     return returnIterator.release();
 
 }
@@ -708,6 +717,15 @@ IAlertIterator* CUIEnvironment::RetrieveAlerts(const bool bOnlyActive)
 IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
 {
     std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+    while (pAlertIterator->MoveNext()) {
+        auto pAlertData = pAlertIterator->GetCurrentAlert();
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID()));
+    }
 
     return returnIterator.release();
 

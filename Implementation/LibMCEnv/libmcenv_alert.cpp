@@ -43,11 +43,14 @@ using namespace LibMCEnv::Impl;
  Class definition of CAlert 
 **************************************************************************************************************************/
 
-CAlert::CAlert(LibMCData::PAlert pAlertData)
-	: m_pAlertData (pAlertData)
+CAlert::CAlert(LibMCData::PDataModel pDataModel, const std::string& sUUID)
+	: m_pDataModel(pDataModel)
 {
-	if (pAlertData.get() == nullptr)
+	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto pAlertSession = pDataModel->CreateAlertSession();
+	m_pAlertData = pAlertSession->GetAlertByUUID(sUUID);
 }
 
 
@@ -114,17 +117,12 @@ void CAlert::GetAcknowledgementInformation(std::string & sUserUUID, std::string 
 	m_pAlertData->GetAcknowledgementInformation(sUserUUID, sUserComment, sAckTime);
 }
 
-LibMCData::PAlert CAlert::getAlertData()
-{
-	return m_pAlertData;
-}
-
 CAlert* CAlert::makeFrom(CAlert* pAlert)
 {
 	if (pAlert == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	return new CAlert(pAlert->getAlertData());
+	return new CAlert(pAlert->getDataModel(), pAlert->GetUUID ());
 }
 
 std::shared_ptr<CAlert> CAlert::makeSharedFrom(CAlert* pAlert)
@@ -147,5 +145,9 @@ void CAlert::AcknowledgeAlertForCurrentUser(const std::string& sUserComment)
 void CAlert::DeactivateAlert()
 {
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+}
 
+LibMCData::PDataModel CAlert::getDataModel()
+{
+	return m_pDataModel;
 }

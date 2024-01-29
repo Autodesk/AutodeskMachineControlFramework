@@ -684,7 +684,7 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 	auto pLogger = m_pSystemState->getLoggerInstance();
 	pLogger->logMessage(sLogString, m_sInstanceName, logLevel);
 
-	return new CAlert (pAlertData);
+	return new CAlert (pDataModel, pAlertData->GetUUID ());
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
@@ -699,7 +699,7 @@ IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 
 	auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
 
-	return new CAlert(pAlertData);
+	return new CAlert(pDataModel, pAlertData->GetUUID());
 
 }
 
@@ -718,12 +718,30 @@ IAlertIterator* CStateEnvironment::RetrieveAlerts(const bool bOnlyActive)
 {
 	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator (new CAlertIterator ());
 
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+
+	auto pAlertIterator = pAlertSession->RetrieveAlerts(bOnlyActive);
+	while (pAlertIterator->MoveNext()) {
+		auto pAlertData = pAlertIterator->GetCurrentAlert();
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID ()));
+	}
+
 	return returnIterator.release();
 }
 
 IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
 {
 	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+
+	auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+	while (pAlertIterator->MoveNext()) {
+		auto pAlertData = pAlertIterator->GetCurrentAlert();
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID()));
+	}
 
 	return returnIterator.release();
 }

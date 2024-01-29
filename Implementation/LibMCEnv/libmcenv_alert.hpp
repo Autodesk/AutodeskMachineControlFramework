@@ -63,6 +63,8 @@ private:
 	// ATTENTION: Alert Session is not thread safe.
 	// So the Alert session needs to be private and surrounded by a mutex
 	std::mutex m_AlertMutex;
+
+	LibMCData::PDataModel m_pDataModel;
 	LibMCData::PAlert m_pAlertData;
 
 public:
@@ -71,7 +73,7 @@ public:
 
 	static std::shared_ptr<CAlert> makeSharedFrom(CAlert* pAlert);
 
-	CAlert(LibMCData::PAlert pAlertData);
+	CAlert(LibMCData::PDataModel pDataModel, const std::string & sUUID);
 
 	virtual ~CAlert();
 
@@ -97,7 +99,7 @@ public:
 
 	void DeactivateAlert() override;
 
-	LibMCData::PAlert getAlertData ();
+	LibMCData::PDataModel getDataModel ();
 
 };
 
