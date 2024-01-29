@@ -649,7 +649,7 @@ void CRTCContext::jumpAbsoluteEx(double dTargetXInMM, double dTargetYInMM)
 	double dTargetYInUnits = round((dTargetYInMM - m_dLaserOriginY) * m_dCorrectionFactor);
 
 	m_pScanLabSDK->n_jump_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+	//m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 }
 
@@ -688,7 +688,7 @@ void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double 
 		}
 
 		m_pScanLabSDK->n_mark_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		//m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 		
 		dOldX = dMarkToX;
 		dOldY = dMarkToY;
@@ -1826,7 +1826,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 					int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
 
 					double dSkywritingLimit = 0.0;
-					if (nSkywritingMode == 3) {
+					if ((nSkywritingMode == 3) || (nSkywritingMode == 4)) {
 						dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
 					}
 
