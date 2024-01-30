@@ -253,6 +253,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_isactive(LibMCData_Alert pAle
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getlevel(LibMCData_Alert pAlert, LibMCData::eAlertLevel * pLevel);
 
 /**
+* Returns the Alert Level string.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nLevelStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLevelStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLevelStringBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getlevelstring(LibMCData_Alert pAlert, const LibMCData_uint32 nLevelStringBufferSize, LibMCData_uint32* pLevelStringNeededChars, char * pLevelStringBuffer);
+
+/**
 * Returns the Alert Description.
 *
 * @param[in] pAlert - Alert instance.

@@ -450,6 +450,12 @@ public:
 	virtual LibMCData::eAlertLevel GetLevel() = 0;
 
 	/**
+	* IAlert::GetLevelString - Returns the Alert Level string.
+	* @return Value.
+	*/
+	virtual std::string GetLevelString() = 0;
+
+	/**
 	* IAlert::GetDescription - Returns the Alert Description.
 	* @return Value.
 	*/

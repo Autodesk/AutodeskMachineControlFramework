@@ -166,6 +166,59 @@ namespace AMCData {
 
 	}
 
+	std::string CJournal::convertAlertLevelToString(const LibMCData::eAlertLevel eLevel)
+	{
+		switch (eLevel) {
+		case LibMCData::eAlertLevel::Warning:
+			return "warning";
+			break;
+
+		case LibMCData::eAlertLevel::Message:
+			return "message";
+			break;
+
+		case LibMCData::eAlertLevel::FatalError:
+			return "fatalerror";
+			break;
+
+		case LibMCData::eAlertLevel::CriticalError:
+			return "criticalerror";
+			break;
+
+		case LibMCData::eAlertLevel::Unknown:
+			return "unknown";
+			break;
+
+		default:
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTLEVEL, "invalid alert level: " + std::to_string((int)eLevel));
+
+		}
+
+	}
+
+	LibMCData::eAlertLevel CJournal::convertStringToAlertLevel(const std::string& sValue, bool bFailIfUnknown)
+	{
+		if (sValue == "warning") {
+			return LibMCData::eAlertLevel::Warning;
+		}
+		else if (sValue == "message") {
+			return LibMCData::eAlertLevel::Message;
+		}
+		else if (sValue == "fatalerror") {
+			return LibMCData::eAlertLevel::FatalError;
+		}
+		else if (sValue == "criticalerror") {
+			return LibMCData::eAlertLevel::CriticalError;
+		}
+		else {
+			if (bFailIfUnknown)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTLEVEL, "invalid alert level: " + sValue);
+
+			return LibMCData::eAlertLevel::Unknown;
+		}
+	}
+
+
 
 	void CJournal::addAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC)
 	{
@@ -182,33 +235,8 @@ namespace AMCData {
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER, "invalid alert description identifier: " + sDescriptionIdentifier);
 		}
 
-		std::string sLevel;
+		std::string sLevel = convertAlertLevelToString (eLevel);
 
-		switch (eLevel) {
-		case LibMCData::eAlertLevel::Warning:
-			sLevel = "warning";
-			break;
-
-		case LibMCData::eAlertLevel::Message:
-			sLevel = "message";
-			break;
-
-		case LibMCData::eAlertLevel::FatalError:
-			sLevel = "fatalerror";
-			break;
-
-		case LibMCData::eAlertLevel::CriticalError:
-			sLevel = "criticalerror";
-			break;
-
-		case LibMCData::eAlertLevel::Unknown:
-			sLevel = "unknown";
-			break;
-
-		default:
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTLEVEL, "invalid alert level: " + std::to_string((int)eLevel));
-
-		}
 
 		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
 
@@ -259,21 +287,7 @@ namespace AMCData {
 			sIdentifier = pStatement->getColumnString(1);
 			std::string sAlertLevel = pStatement->getColumnString(2);
 
-			if (sAlertLevel == "warning") {
-				eLevel = LibMCData::eAlertLevel::Warning;
-			}
-			else if (sAlertLevel == "message") {
-				eLevel = LibMCData::eAlertLevel::Message;
-			}
-			else if (sAlertLevel == "fatalerror") {
-				eLevel = LibMCData::eAlertLevel::FatalError;
-			}
-			else if (sAlertLevel == "criticalerror") {
-				eLevel = LibMCData::eAlertLevel::CriticalError;
-			}
-			else {
-				eLevel = LibMCData::eAlertLevel::Unknown;
-			}
+			eLevel = convertStringToAlertLevel(sAlertLevel, false);
 
 
 			sDescription = pStatement->getColumnString(3);

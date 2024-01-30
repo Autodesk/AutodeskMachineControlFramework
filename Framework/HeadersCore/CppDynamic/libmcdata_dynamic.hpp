@@ -1092,6 +1092,7 @@ public:
 	inline std::string GetIdentifier();
 	inline bool IsActive();
 	inline eAlertLevel GetLevel();
+	inline std::string GetLevelString();
 	inline std::string GetDescription();
 	inline std::string GetDescriptionIdentifier();
 	inline std::string GetReadableContextInformation();
@@ -1578,6 +1579,7 @@ public:
 		pWrapperTable->m_Alert_GetIdentifier = nullptr;
 		pWrapperTable->m_Alert_IsActive = nullptr;
 		pWrapperTable->m_Alert_GetLevel = nullptr;
+		pWrapperTable->m_Alert_GetLevelString = nullptr;
 		pWrapperTable->m_Alert_GetDescription = nullptr;
 		pWrapperTable->m_Alert_GetDescriptionIdentifier = nullptr;
 		pWrapperTable->m_Alert_GetReadableContextInformation = nullptr;
@@ -1908,6 +1910,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Alert_GetLevel == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetLevelString = (PLibMCDataAlert_GetLevelStringPtr) GetProcAddress(hLibrary, "libmcdata_alert_getlevelstring");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetLevelString = (PLibMCDataAlert_GetLevelStringPtr) dlsym(hLibrary, "libmcdata_alert_getlevelstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetLevelString == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3232,6 +3243,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetLevel == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_alert_getlevelstring", (void**)&(pWrapperTable->m_Alert_GetLevelString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetLevelString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_alert_getdescription", (void**)&(pWrapperTable->m_Alert_GetDescription));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetDescription == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4047,6 +4062,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetLevel(m_pHandle, &resultLevel));
 		
 		return resultLevel;
+	}
+	
+	/**
+	* CAlert::GetLevelString - Returns the Alert Level string.
+	* @return Value.
+	*/
+	std::string CAlert::GetLevelString()
+	{
+		LibMCData_uint32 bytesNeededLevelString = 0;
+		LibMCData_uint32 bytesWrittenLevelString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetLevelString(m_pHandle, 0, &bytesNeededLevelString, nullptr));
+		std::vector<char> bufferLevelString(bytesNeededLevelString);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetLevelString(m_pHandle, bytesNeededLevelString, &bytesWrittenLevelString, &bufferLevelString[0]));
+		
+		return std::string(&bufferLevelString[0]);
 	}
 	
 	/**

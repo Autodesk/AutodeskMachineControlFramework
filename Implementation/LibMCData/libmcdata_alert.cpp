@@ -109,6 +109,14 @@ LibMCData::eAlertLevel CAlert::GetLevel()
 	return m_AlertLevel;
 }
 
+std::string CAlert::GetLevelString()
+{
+	refreshIfNeeded();
+	return AMCData::CJournal::convertAlertLevelToString(m_AlertLevel);
+
+}
+
+
 std::string CAlert::GetDescription()
 {
 	refreshIfNeeded();

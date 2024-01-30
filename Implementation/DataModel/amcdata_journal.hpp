@@ -58,6 +58,10 @@ namespace AMCData {
 		
 	public:
 
+		static std::string convertAlertLevelToString(const LibMCData::eAlertLevel eLevel);
+		
+		static LibMCData::eAlertLevel convertStringToAlertLevel(const std::string & sValue, bool bFailIfUnknown);
+
 		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath);
 
 		virtual ~CJournal();

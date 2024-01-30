@@ -240,6 +240,17 @@ typedef LibMCDataResult (*PLibMCDataAlert_IsActivePtr) (LibMCData_Alert pAlert, 
 typedef LibMCDataResult (*PLibMCDataAlert_GetLevelPtr) (LibMCData_Alert pAlert, LibMCData::eAlertLevel * pLevel);
 
 /**
+* Returns the Alert Level string.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nLevelStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLevelStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLevelStringBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlert_GetLevelStringPtr) (LibMCData_Alert pAlert, const LibMCData_uint32 nLevelStringBufferSize, LibMCData_uint32* pLevelStringNeededChars, char * pLevelStringBuffer);
+
+/**
 * Returns the Alert Description.
 *
 * @param[in] pAlert - Alert instance.
@@ -1811,6 +1822,7 @@ typedef struct {
 	PLibMCDataAlert_GetIdentifierPtr m_Alert_GetIdentifier;
 	PLibMCDataAlert_IsActivePtr m_Alert_IsActive;
 	PLibMCDataAlert_GetLevelPtr m_Alert_GetLevel;
+	PLibMCDataAlert_GetLevelStringPtr m_Alert_GetLevelString;
 	PLibMCDataAlert_GetDescriptionPtr m_Alert_GetDescription;
 	PLibMCDataAlert_GetDescriptionIdentifierPtr m_Alert_GetDescriptionIdentifier;
 	PLibMCDataAlert_GetReadableContextInformationPtr m_Alert_GetReadableContextInformation;

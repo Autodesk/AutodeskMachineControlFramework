@@ -147,6 +147,9 @@ void CUIModule_ContentAlertList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 	{
 		auto pAlert = pAlertIterator->GetCurrentAlert();
 
+		std::string sAlertUUID = pAlert->GetUUID();
+		std::string sAlertIdentifier = pAlert->GetIdentifier();
+
 		std::string sAlertCaption;
 		std::string sDescriptionIdentifier = pAlert->GetDescriptionIdentifier();
 		if (!sDescriptionIdentifier.empty()) {
@@ -162,11 +165,18 @@ void CUIModule_ContentAlertList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 
 		bool bNeedsAcknowledgement = pAlert->GetNeedsAcknowledgement ();
 
+		bool bAlertIsActive = pAlert->IsActive();
+
+		auto sAlertLevelString = pAlert->GetLevelString();
 
 		CJSONWriterObject entryObject(writer);
+		entryObject.addString(AMC_API_KEY_UI_ITEMALERTUUID, sAlertUUID);
+		entryObject.addString(AMC_API_KEY_UI_ITEMALERTIDENTIFIER, sAlertIdentifier);
 		entryObject.addString(AMC_API_KEY_UI_ITEMALERTTIMESTAMP, sTimeStamp);
 		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCAPTION, sAlertCaption);
 		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCONTEXT, sContextInformation);
+		entryObject.addString(AMC_API_KEY_UI_ITEMALERTLEVEL, sAlertLevelString);
+		entryObject.addBool(AMC_API_KEY_UI_ITEMALERTACTIVE, bAlertIsActive);
 		entryObject.addBool(AMC_API_KEY_UI_ITEMALERTACKNOWLEDGE, bNeedsAcknowledgement);
 
 		entryArray.addObject(entryObject);

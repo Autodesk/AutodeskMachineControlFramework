@@ -666,6 +666,54 @@ LibMCDataResult libmcdata_alert_getlevel(LibMCData_Alert pAlert, eLibMCDataAlert
 	}
 }
 
+LibMCDataResult libmcdata_alert_getlevelstring(LibMCData_Alert pAlert, const LibMCData_uint32 nLevelStringBufferSize, LibMCData_uint32* pLevelStringNeededChars, char * pLevelStringBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if ( (!pLevelStringBuffer) && !(pLevelStringNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sLevelString("");
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pLevelStringBuffer == nullptr);
+		if (isCacheCall) {
+			sLevelString = pIAlert->GetLevelString();
+
+			pIAlert->_setCache (new ParameterCache_1<std::string> (sLevelString));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAlert->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sLevelString);
+			pIAlert->_setCache (nullptr);
+		}
+		
+		if (pLevelStringNeededChars)
+			*pLevelStringNeededChars = (LibMCData_uint32) (sLevelString.size()+1);
+		if (pLevelStringBuffer) {
+			if (sLevelString.size() >= nLevelStringBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iLevelString = 0; iLevelString < sLevelString.size(); iLevelString++)
+				pLevelStringBuffer[iLevelString] = sLevelString[iLevelString];
+			pLevelStringBuffer[sLevelString.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_alert_getdescription(LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pAlert;
@@ -5692,6 +5740,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_alert_isactive;
 	if (sProcName == "libmcdata_alert_getlevel") 
 		*ppProcAddress = (void*) &libmcdata_alert_getlevel;
+	if (sProcName == "libmcdata_alert_getlevelstring") 
+		*ppProcAddress = (void*) &libmcdata_alert_getlevelstring;
 	if (sProcName == "libmcdata_alert_getdescription") 
 		*ppProcAddress = (void*) &libmcdata_alert_getdescription;
 	if (sProcName == "libmcdata_alert_getdescriptionidentifier") 

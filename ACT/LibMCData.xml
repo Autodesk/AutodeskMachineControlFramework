@@ -547,6 +547,10 @@
 			<param name="Level" type="enum" class="AlertLevel" pass="return" description="Value." />
 		</method>	
 		
+		<method name="GetLevelString" description="Returns the Alert Level string.">
+			<param name="LevelString" type="string" pass="return" description="Value." />
+		</method>	
+		
 		<method name="GetDescription" description="Returns the Alert Description.">
 			<param name="Description" type="string" pass="return" description="Value." />	
 		</method>	

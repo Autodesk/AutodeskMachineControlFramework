@@ -93,6 +93,8 @@ public:
 
 	LibMCData::eAlertLevel GetLevel() override;
 
+	std::string GetLevelString() override;
+
 	std::string GetDescription() override;
 
 	std::string GetDescriptionIdentifier() override;
