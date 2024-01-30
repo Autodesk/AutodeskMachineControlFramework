@@ -60,7 +60,7 @@ namespace AMC {
 		std::string m_sAlertNameCaption;
 		std::string m_sAlertDescriptionCaption;
 		std::string m_sAlertContextCaption;
-		std::string m_sAlertAcknowledgeCaption;
+		std::string m_sAlertActiveCaption;
 		std::string m_sSelectEvent;
 
 		std::string m_sSelectedBuildField;

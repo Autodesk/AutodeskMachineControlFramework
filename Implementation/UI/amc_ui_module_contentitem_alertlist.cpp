@@ -84,7 +84,7 @@ CUIModule_ContentAlertList::CUIModule_ContentAlertList(const std::string& sLoadi
 	m_sAlertNameCaption = "Alert Name";
 	m_sAlertDescriptionCaption = "Alert Description";
 	m_sAlertContextCaption = "Context";
-	m_sAlertAcknowledgeCaption = "Acknowledgement";
+	m_sAlertActiveCaption = "Active";
 
 	m_sSelectedBuildField = AMCCommon::CUtils::createUUID();
 
@@ -125,8 +125,8 @@ void CUIModule_ContentAlertList::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 	headersArray.addObject(headerObject4);
 
 	CJSONWriterObject headerObject5(writer);
-	headerObject5.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertAcknowledgeCaption);
-	headerObject5.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTACKNOWLEDGE);
+	headerObject5.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertActiveCaption);
+	headerObject5.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTACTIVE);
 	headersArray.addObject(headerObject5);
 
 	object.addArray(AMC_API_KEY_UI_ITEMHEADERS, headersArray);
