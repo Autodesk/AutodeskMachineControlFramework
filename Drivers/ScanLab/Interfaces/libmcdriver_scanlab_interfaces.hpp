@@ -1233,6 +1233,11 @@ public:
 	*/
 	virtual IRTCSelector * CreateRTCSelector() = 0;
 
+	/**
+	* IDriver_ScanLab::EnableJournaling - Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.
+	*/
+	virtual void EnableJournaling() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver_ScanLab> PIDriver_ScanLab;

@@ -789,6 +789,9 @@ Custom implementation
 			<param name="Instance" type="class" class="RTCSelector" pass="return" description="New Selector instance" />
 		</method>
 
+		<method name="EnableJournaling" description="Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.">
+		</method>
+
 	</class>
 
 

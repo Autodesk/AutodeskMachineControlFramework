@@ -1212,6 +1212,14 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_LoadCusto
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_RTCSelector * pInstance);
 
+/**
+* Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab);
+
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_RTC6
 **************************************************************************************************************************/
@@ -1960,6 +1968,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr m_Driver_ScanLab_LoadSDK;
 	PLibMCDriver_ScanLabDriver_ScanLab_LoadCustomSDKPtr m_Driver_ScanLab_LoadCustomSDK;
 	PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr m_Driver_ScanLab_CreateRTCSelector;
+	PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr m_Driver_ScanLab_EnableJournaling;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr m_Driver_ScanLab_RTC6_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr m_Driver_ScanLab_RTC6_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsInitializedPtr m_Driver_ScanLab_RTC6_IsInitialized;

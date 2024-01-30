@@ -3121,6 +3121,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_creatertcselector(L
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_enablejournaling(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab;
+
+	try {
+		IDriver_ScanLab* pIDriver_ScanLab = dynamic_cast<IDriver_ScanLab*>(pIBaseClass);
+		if (!pIDriver_ScanLab)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab->EnableJournaling();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_ScanLab_RTC6
@@ -4812,6 +4836,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_loadcustomsdk;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_creatertcselector") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_creatertcselector;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_enablejournaling") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_enablejournaling;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode") 

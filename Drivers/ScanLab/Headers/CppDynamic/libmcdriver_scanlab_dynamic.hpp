@@ -706,6 +706,7 @@ public:
 	inline void LoadSDK(const std::string & sResourceName);
 	inline void LoadCustomSDK(const CInputVector<LibMCDriver_ScanLab_uint8> & ScanlabDLLBuffer);
 	inline PRTCSelector CreateRTCSelector();
+	inline void EnableJournaling();
 };
 	
 /*************************************************************************************************************************
@@ -1027,6 +1028,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_LoadSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_LoadCustomSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = nullptr;
+		pWrapperTable->m_Driver_ScanLab_EnableJournaling = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_IsInitialized = nullptr;
@@ -2162,6 +2164,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_EnableJournaling = (PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_enablejournaling");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_EnableJournaling = (PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_enablejournaling");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_EnableJournaling == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode");
@@ -3153,6 +3164,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_creatertcselector", (void**)&(pWrapperTable->m_Driver_ScanLab_CreateRTCSelector));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_CreateRTCSelector == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_enablejournaling", (void**)&(pWrapperTable->m_Driver_ScanLab_EnableJournaling));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_EnableJournaling == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode));
@@ -4645,6 +4660,14 @@ public:
 			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CRTCSelector>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CDriver_ScanLab::EnableJournaling - Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.
+	*/
+	void CDriver_ScanLab::EnableJournaling()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_EnableJournaling(m_pHandle));
 	}
 	
 	/**

@@ -1225,6 +1225,14 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_creatertcselector(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_RTCSelector * pInstance);
 
+/**
+* Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_enablejournaling(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab);
+
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_RTC6
 **************************************************************************************************************************/
