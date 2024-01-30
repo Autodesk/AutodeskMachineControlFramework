@@ -185,6 +185,8 @@ public:
 
 	IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
 
+	ICryptoContext* CreateCryptoContext() override;
+
 };
 
 } // namespace Impl

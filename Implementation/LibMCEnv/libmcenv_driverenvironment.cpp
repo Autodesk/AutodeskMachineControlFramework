@@ -42,6 +42,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_cryptocontext.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -404,3 +405,9 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
     return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID);
 }
+
+ICryptoContext* CDriverEnvironment::CreateCryptoContext()
+{
+    return new CCryptoContext();
+}
+

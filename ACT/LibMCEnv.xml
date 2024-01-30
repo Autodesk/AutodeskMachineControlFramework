@@ -177,7 +177,7 @@
 		<error name="INVALIDALERTIDENTIFIER" code="10137" description="Invalid alert identifier"/>
 		<error name="ALERTNOTFOUND" code="10138" description="Alert not found."/>
 		<error name="USERDOESNOTEXIST" code="10139" description="User does not exist."/>
-		
+		<error name="EMPTYSHA256SOURCE" code="10140" description="Empty SHA256 Source."/>
 		
 
 	</errors>
@@ -327,6 +327,39 @@
 		</method>
 		
 	</class>
+	
+	<class name="CryptoContext" parent="Base">
+	
+		<method name="CalculateSHA256FromString" description="Calculates SHA256 from a string. Fails if string is empty.">
+			<param name="Value" type="string" pass="in" description="Input value."/>
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+		
+		<method name="CalculateSHA256FromBytes" description="Calculates SHA256 from a byte array. Fails if array is empty.">
+			<param name="Value" type="basicarray" class="uint8" pass="in" description="Input value."/>
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+
+		<method name="NormalizeSHA256String" description="Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.">
+			<param name="Value" type="string" pass="in" description="Input value."/>
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+
+		<method name="CreateRandomSHA256Hash" description="Generates a random SHA256 hash value with operating system APIs.">
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+
+		<method name="CreateUUID" description="Generates a random UUID with operating system APIs.">
+			<param name="UUIDValue" type="string" pass="return" description="UUID Return value."/>
+		</method>
+		
+		<method name="NormalizeUUIDString" description="Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.">
+			<param name="Value" type="string" pass="in" description="Input value."/>
+			<param name="UUIDValue" type="string" pass="return" description="UUID Return value."/>
+		</method>
+		
+	</class>	
+	
 
 	
 	<class name="PNGImageStoreOptions" parent="Base" description="Option class to parametrize saving of PNG Images.">
@@ -2014,6 +2047,10 @@
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
+		<method name="CreateCryptoContext" description="Creates a crypto context.">
+			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
+		</method>
+
 	</class>
 	
 	
@@ -2820,6 +2857,10 @@
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
 		</method>				
 
+		<method name="CreateCryptoContext" description="Creates a crypto context.">
+			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
+		</method>
+
 	</class>
 
 	<class name="UIItem" parent="Base" description="Base item that represents a user interface element.">
@@ -3185,7 +3226,11 @@
 			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
 		</method>				
-		
+
+		<method name="CreateCryptoContext" description="Creates a crypto context.">
+			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
+		</method>
+
 	</class>
 
 

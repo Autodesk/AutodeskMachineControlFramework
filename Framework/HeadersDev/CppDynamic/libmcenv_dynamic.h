@@ -112,6 +112,81 @@ typedef LibMCEnvResult (*PLibMCEnvIterator_CountPtr) (LibMCEnv_Iterator pIterato
 typedef LibMCEnvResult (*PLibMCEnvTestEnvironment_WriteTestOutputPtr) (LibMCEnv_TestEnvironment pTestEnvironment, const char * pOutputName, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer);
 
 /*************************************************************************************************************************
+ Class definition for CryptoContext
+**************************************************************************************************************************/
+
+/**
+* Calculates SHA256 from a string. Fails if string is empty.
+*
+* @param[in] pCryptoContext - CryptoContext instance.
+* @param[in] pValue - Input value.
+* @param[in] nSHA256ValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA256ValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA256ValueBuffer -  buffer of SHA256 Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvCryptoContext_CalculateSHA256FromStringPtr) (LibMCEnv_CryptoContext pCryptoContext, const char * pValue, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer);
+
+/**
+* Calculates SHA256 from a byte array. Fails if array is empty.
+*
+* @param[in] pCryptoContext - CryptoContext instance.
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[in] pValueBuffer - uint8 buffer of Input value.
+* @param[in] nSHA256ValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA256ValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA256ValueBuffer -  buffer of SHA256 Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvCryptoContext_CalculateSHA256FromBytesPtr) (LibMCEnv_CryptoContext pCryptoContext, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer);
+
+/**
+* Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.
+*
+* @param[in] pCryptoContext - CryptoContext instance.
+* @param[in] pValue - Input value.
+* @param[in] nSHA256ValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA256ValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA256ValueBuffer -  buffer of SHA256 Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvCryptoContext_NormalizeSHA256StringPtr) (LibMCEnv_CryptoContext pCryptoContext, const char * pValue, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer);
+
+/**
+* Generates a random SHA256 hash value with operating system APIs.
+*
+* @param[in] pCryptoContext - CryptoContext instance.
+* @param[in] nSHA256ValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA256ValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA256ValueBuffer -  buffer of SHA256 Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvCryptoContext_CreateRandomSHA256HashPtr) (LibMCEnv_CryptoContext pCryptoContext, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer);
+
+/**
+* Generates a random UUID with operating system APIs.
+*
+* @param[in] pCryptoContext - CryptoContext instance.
+* @param[in] nUUIDValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDValueBuffer -  buffer of UUID Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvCryptoContext_CreateUUIDPtr) (LibMCEnv_CryptoContext pCryptoContext, const LibMCEnv_uint32 nUUIDValueBufferSize, LibMCEnv_uint32* pUUIDValueNeededChars, char * pUUIDValueBuffer);
+
+/**
+* Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.
+*
+* @param[in] pCryptoContext - CryptoContext instance.
+* @param[in] pValue - Input value.
+* @param[in] nUUIDValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDValueBuffer -  buffer of UUID Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvCryptoContext_NormalizeUUIDStringPtr) (LibMCEnv_CryptoContext pCryptoContext, const char * pValue, const LibMCEnv_uint32 nUUIDValueBufferSize, LibMCEnv_uint32* pUUIDValueNeededChars, char * pUUIDValueBuffer);
+
+/*************************************************************************************************************************
  Class definition for PNGImageStoreOptions
 **************************************************************************************************************************/
 
@@ -3444,6 +3519,15 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_HasBuildJobPtr) (LibMCEnv_Dr
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_GetBuildJobPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
+/**
+* Creates a crypto context.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pContext - Cryptographic context instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateCryptoContextPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_CryptoContext * pContext);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -5074,6 +5158,15 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveAlertsPtr) (LibMCEnv_
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveAlertsByTypePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
+/**
+* Creates a crypto context.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pContext - Cryptographic context instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateCryptoContextPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_CryptoContext * pContext);
+
 /*************************************************************************************************************************
  Class definition for UIItem
 **************************************************************************************************************************/
@@ -5800,6 +5893,15 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveAlertsPtr) (LibMCEnv_UIE
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveAlertsByTypePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
+/**
+* Creates a crypto context.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pContext - Cryptographic context instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateCryptoContextPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_CryptoContext * pContext);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -5862,6 +5964,12 @@ typedef struct {
 	PLibMCEnvIterator_ClonePtr m_Iterator_Clone;
 	PLibMCEnvIterator_CountPtr m_Iterator_Count;
 	PLibMCEnvTestEnvironment_WriteTestOutputPtr m_TestEnvironment_WriteTestOutput;
+	PLibMCEnvCryptoContext_CalculateSHA256FromStringPtr m_CryptoContext_CalculateSHA256FromString;
+	PLibMCEnvCryptoContext_CalculateSHA256FromBytesPtr m_CryptoContext_CalculateSHA256FromBytes;
+	PLibMCEnvCryptoContext_NormalizeSHA256StringPtr m_CryptoContext_NormalizeSHA256String;
+	PLibMCEnvCryptoContext_CreateRandomSHA256HashPtr m_CryptoContext_CreateRandomSHA256Hash;
+	PLibMCEnvCryptoContext_CreateUUIDPtr m_CryptoContext_CreateUUID;
+	PLibMCEnvCryptoContext_NormalizeUUIDStringPtr m_CryptoContext_NormalizeUUIDString;
 	PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr m_PNGImageStoreOptions_ResetToDefaults;
 	PLibMCEnvPNGImageData_GetSizeInPixelsPtr m_PNGImageData_GetSizeInPixels;
 	PLibMCEnvPNGImageData_GetPNGDataStreamPtr m_PNGImageData_GetPNGDataStream;
@@ -6169,6 +6277,7 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr m_DriverEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvDriverEnvironment_HasBuildJobPtr m_DriverEnvironment_HasBuildJob;
 	PLibMCEnvDriverEnvironment_GetBuildJobPtr m_DriverEnvironment_GetBuildJob;
+	PLibMCEnvDriverEnvironment_CreateCryptoContextPtr m_DriverEnvironment_CreateCryptoContext;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
 	PLibMCEnvSignalTrigger_TriggerPtr m_SignalTrigger_Trigger;
 	PLibMCEnvSignalTrigger_WaitForHandlingPtr m_SignalTrigger_WaitForHandling;
@@ -6315,6 +6424,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_AlertExistsPtr m_StateEnvironment_AlertExists;
 	PLibMCEnvStateEnvironment_RetrieveAlertsPtr m_StateEnvironment_RetrieveAlerts;
 	PLibMCEnvStateEnvironment_RetrieveAlertsByTypePtr m_StateEnvironment_RetrieveAlertsByType;
+	PLibMCEnvStateEnvironment_CreateCryptoContextPtr m_StateEnvironment_CreateCryptoContext;
 	PLibMCEnvUIItem_GetNamePtr m_UIItem_GetName;
 	PLibMCEnvUIItem_GetPathPtr m_UIItem_GetPath;
 	PLibMCEnvUIItem_GetUUIDPtr m_UIItem_GetUUID;
@@ -6381,6 +6491,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_AlertExistsPtr m_UIEnvironment_AlertExists;
 	PLibMCEnvUIEnvironment_RetrieveAlertsPtr m_UIEnvironment_RetrieveAlerts;
 	PLibMCEnvUIEnvironment_RetrieveAlertsByTypePtr m_UIEnvironment_RetrieveAlertsByType;
+	PLibMCEnvUIEnvironment_CreateCryptoContextPtr m_UIEnvironment_CreateCryptoContext;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

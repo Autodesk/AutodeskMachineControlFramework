@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
+#include "libmcenv_cryptocontext.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -744,5 +745,10 @@ IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIden
 	}
 
 	return returnIterator.release();
+}
+
+ICryptoContext* CStateEnvironment::CreateCryptoContext()
+{
+	return new CCryptoContext();
 }
 

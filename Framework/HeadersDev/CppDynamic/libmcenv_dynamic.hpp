@@ -62,6 +62,7 @@ class CWrapper;
 class CBase;
 class CIterator;
 class CTestEnvironment;
+class CCryptoContext;
 class CPNGImageStoreOptions;
 class CPNGImageData;
 class CImageData;
@@ -108,6 +109,7 @@ typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
 typedef CTestEnvironment CLibMCEnvTestEnvironment;
+typedef CCryptoContext CLibMCEnvCryptoContext;
 typedef CPNGImageStoreOptions CLibMCEnvPNGImageStoreOptions;
 typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
@@ -154,6 +156,7 @@ typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CTestEnvironment> PTestEnvironment;
+typedef std::shared_ptr<CCryptoContext> PCryptoContext;
 typedef std::shared_ptr<CPNGImageStoreOptions> PPNGImageStoreOptions;
 typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
@@ -200,6 +203,7 @@ typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
 typedef PTestEnvironment PLibMCEnvTestEnvironment;
+typedef PCryptoContext PLibMCEnvCryptoContext;
 typedef PPNGImageStoreOptions PLibMCEnvPNGImageStoreOptions;
 typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
@@ -455,6 +459,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "INVALIDALERTIDENTIFIER";
 			case LIBMCENV_ERROR_ALERTNOTFOUND: return "ALERTNOTFOUND";
 			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "USERDOESNOTEXIST";
+			case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "EMPTYSHA256SOURCE";
 		}
 		return "UNKNOWN";
 	}
@@ -601,6 +606,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
 			case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
 			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
+			case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "Empty SHA256 Source.";
 		}
 		return "unknown error";
 	}
@@ -720,6 +726,7 @@ private:
 	friend class CBase;
 	friend class CIterator;
 	friend class CTestEnvironment;
+	friend class CCryptoContext;
 	friend class CPNGImageStoreOptions;
 	friend class CPNGImageData;
 	friend class CImageData;
@@ -854,6 +861,28 @@ public:
 	}
 	
 	inline void WriteTestOutput(const std::string & sOutputName, const CInputVector<LibMCEnv_uint8> & DataBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CCryptoContext 
+**************************************************************************************************************************/
+class CCryptoContext : public CBase {
+public:
+	
+	/**
+	* CCryptoContext::CCryptoContext - Constructor for CryptoContext class.
+	*/
+	CCryptoContext(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string CalculateSHA256FromString(const std::string & sValue);
+	inline std::string CalculateSHA256FromBytes(const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+	inline std::string NormalizeSHA256String(const std::string & sValue);
+	inline std::string CreateRandomSHA256Hash();
+	inline std::string CreateUUID();
+	inline std::string NormalizeUUIDString(const std::string & sValue);
 };
 	
 /*************************************************************************************************************************
@@ -1577,6 +1606,7 @@ public:
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
+	inline PCryptoContext CreateCryptoContext();
 };
 	
 /*************************************************************************************************************************
@@ -1883,6 +1913,7 @@ public:
 	inline bool AlertExists(const std::string & sUUID);
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
 	inline PAlertIterator RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive);
+	inline PCryptoContext CreateCryptoContext();
 };
 	
 /*************************************************************************************************************************
@@ -1981,6 +2012,7 @@ public:
 	inline bool AlertExists(const std::string & sUUID);
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
 	inline PAlertIterator RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive);
+	inline PCryptoContext CreateCryptoContext();
 };
 	
 	/**
@@ -2070,6 +2102,12 @@ public:
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
 		pWrapperTable->m_TestEnvironment_WriteTestOutput = nullptr;
+		pWrapperTable->m_CryptoContext_CalculateSHA256FromString = nullptr;
+		pWrapperTable->m_CryptoContext_CalculateSHA256FromBytes = nullptr;
+		pWrapperTable->m_CryptoContext_NormalizeSHA256String = nullptr;
+		pWrapperTable->m_CryptoContext_CreateRandomSHA256Hash = nullptr;
+		pWrapperTable->m_CryptoContext_CreateUUID = nullptr;
+		pWrapperTable->m_CryptoContext_NormalizeUUIDString = nullptr;
 		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = nullptr;
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_PNGImageData_GetPNGDataStream = nullptr;
@@ -2377,6 +2415,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetBuildJob = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -2523,6 +2562,7 @@ public:
 		pWrapperTable->m_StateEnvironment_AlertExists = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveAlerts = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveAlertsByType = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
 		pWrapperTable->m_UIItem_GetUUID = nullptr;
@@ -2589,6 +2629,7 @@ public:
 		pWrapperTable->m_UIEnvironment_AlertExists = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveAlerts = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveAlertsByType = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -2696,6 +2737,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_TestEnvironment_WriteTestOutput == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CryptoContext_CalculateSHA256FromString = (PLibMCEnvCryptoContext_CalculateSHA256FromStringPtr) GetProcAddress(hLibrary, "libmcenv_cryptocontext_calculatesha256fromstring");
+		#else // _WIN32
+		pWrapperTable->m_CryptoContext_CalculateSHA256FromString = (PLibMCEnvCryptoContext_CalculateSHA256FromStringPtr) dlsym(hLibrary, "libmcenv_cryptocontext_calculatesha256fromstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CryptoContext_CalculateSHA256FromString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CryptoContext_CalculateSHA256FromBytes = (PLibMCEnvCryptoContext_CalculateSHA256FromBytesPtr) GetProcAddress(hLibrary, "libmcenv_cryptocontext_calculatesha256frombytes");
+		#else // _WIN32
+		pWrapperTable->m_CryptoContext_CalculateSHA256FromBytes = (PLibMCEnvCryptoContext_CalculateSHA256FromBytesPtr) dlsym(hLibrary, "libmcenv_cryptocontext_calculatesha256frombytes");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CryptoContext_CalculateSHA256FromBytes == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CryptoContext_NormalizeSHA256String = (PLibMCEnvCryptoContext_NormalizeSHA256StringPtr) GetProcAddress(hLibrary, "libmcenv_cryptocontext_normalizesha256string");
+		#else // _WIN32
+		pWrapperTable->m_CryptoContext_NormalizeSHA256String = (PLibMCEnvCryptoContext_NormalizeSHA256StringPtr) dlsym(hLibrary, "libmcenv_cryptocontext_normalizesha256string");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CryptoContext_NormalizeSHA256String == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CryptoContext_CreateRandomSHA256Hash = (PLibMCEnvCryptoContext_CreateRandomSHA256HashPtr) GetProcAddress(hLibrary, "libmcenv_cryptocontext_createrandomsha256hash");
+		#else // _WIN32
+		pWrapperTable->m_CryptoContext_CreateRandomSHA256Hash = (PLibMCEnvCryptoContext_CreateRandomSHA256HashPtr) dlsym(hLibrary, "libmcenv_cryptocontext_createrandomsha256hash");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CryptoContext_CreateRandomSHA256Hash == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CryptoContext_CreateUUID = (PLibMCEnvCryptoContext_CreateUUIDPtr) GetProcAddress(hLibrary, "libmcenv_cryptocontext_createuuid");
+		#else // _WIN32
+		pWrapperTable->m_CryptoContext_CreateUUID = (PLibMCEnvCryptoContext_CreateUUIDPtr) dlsym(hLibrary, "libmcenv_cryptocontext_createuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CryptoContext_CreateUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CryptoContext_NormalizeUUIDString = (PLibMCEnvCryptoContext_NormalizeUUIDStringPtr) GetProcAddress(hLibrary, "libmcenv_cryptocontext_normalizeuuidstring");
+		#else // _WIN32
+		pWrapperTable->m_CryptoContext_NormalizeUUIDString = (PLibMCEnvCryptoContext_NormalizeUUIDStringPtr) dlsym(hLibrary, "libmcenv_cryptocontext_normalizeuuidstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CryptoContext_NormalizeUUIDString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5462,6 +5557,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateCryptoContext = (PLibMCEnvDriverEnvironment_CreateCryptoContextPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createcryptocontext");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateCryptoContext = (PLibMCEnvDriverEnvironment_CreateCryptoContextPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createcryptocontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateCryptoContext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) GetProcAddress(hLibrary, "libmcenv_signaltrigger_cantrigger");
 		#else // _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) dlsym(hLibrary, "libmcenv_signaltrigger_cantrigger");
@@ -6776,6 +6880,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateCryptoContext = (PLibMCEnvStateEnvironment_CreateCryptoContextPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createcryptocontext");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateCryptoContext = (PLibMCEnvStateEnvironment_CreateCryptoContextPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createcryptocontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateCryptoContext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_uiitem_getname");
 		#else // _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) dlsym(hLibrary, "libmcenv_uiitem_getname");
@@ -7370,6 +7483,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateCryptoContext = (PLibMCEnvUIEnvironment_CreateCryptoContextPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createcryptocontext");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateCryptoContext = (PLibMCEnvUIEnvironment_CreateCryptoContextPtr) dlsym(hLibrary, "libmcenv_uienvironment_createcryptocontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateCryptoContext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -7452,6 +7574,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_testenvironment_writetestoutput", (void**)&(pWrapperTable->m_TestEnvironment_WriteTestOutput));
 		if ( (eLookupError != 0) || (pWrapperTable->m_TestEnvironment_WriteTestOutput == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_cryptocontext_calculatesha256fromstring", (void**)&(pWrapperTable->m_CryptoContext_CalculateSHA256FromString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CryptoContext_CalculateSHA256FromString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_cryptocontext_calculatesha256frombytes", (void**)&(pWrapperTable->m_CryptoContext_CalculateSHA256FromBytes));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CryptoContext_CalculateSHA256FromBytes == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_cryptocontext_normalizesha256string", (void**)&(pWrapperTable->m_CryptoContext_NormalizeSHA256String));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CryptoContext_NormalizeSHA256String == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_cryptocontext_createrandomsha256hash", (void**)&(pWrapperTable->m_CryptoContext_CreateRandomSHA256Hash));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CryptoContext_CreateRandomSHA256Hash == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_cryptocontext_createuuid", (void**)&(pWrapperTable->m_CryptoContext_CreateUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CryptoContext_CreateUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_cryptocontext_normalizeuuidstring", (void**)&(pWrapperTable->m_CryptoContext_NormalizeUUIDString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CryptoContext_NormalizeUUIDString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_pngimagestoreoptions_resettodefaults", (void**)&(pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults));
@@ -8682,6 +8828,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createcryptocontext", (void**)&(pWrapperTable->m_DriverEnvironment_CreateCryptoContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateCryptoContext == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalTrigger_CanTrigger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9266,6 +9416,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveAlertsByType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createcryptocontext", (void**)&(pWrapperTable->m_StateEnvironment_CreateCryptoContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateCryptoContext == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uiitem_getname", (void**)&(pWrapperTable->m_UIItem_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIItem_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9530,6 +9684,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveAlertsByType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createcryptocontext", (void**)&(pWrapperTable->m_UIEnvironment_CreateCryptoContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateCryptoContext == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GetVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9641,6 +9799,104 @@ public:
 	void CTestEnvironment::WriteTestOutput(const std::string & sOutputName, const CInputVector<LibMCEnv_uint8> & DataBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_TestEnvironment_WriteTestOutput(m_pHandle, sOutputName.c_str(), (LibMCEnv_uint64)DataBuffer.size(), DataBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CCryptoContext
+	 */
+	
+	/**
+	* CCryptoContext::CalculateSHA256FromString - Calculates SHA256 from a string. Fails if string is empty.
+	* @param[in] sValue - Input value.
+	* @return SHA256 Return value.
+	*/
+	std::string CCryptoContext::CalculateSHA256FromString(const std::string & sValue)
+	{
+		LibMCEnv_uint32 bytesNeededSHA256Value = 0;
+		LibMCEnv_uint32 bytesWrittenSHA256Value = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CalculateSHA256FromString(m_pHandle, sValue.c_str(), 0, &bytesNeededSHA256Value, nullptr));
+		std::vector<char> bufferSHA256Value(bytesNeededSHA256Value);
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CalculateSHA256FromString(m_pHandle, sValue.c_str(), bytesNeededSHA256Value, &bytesWrittenSHA256Value, &bufferSHA256Value[0]));
+		
+		return std::string(&bufferSHA256Value[0]);
+	}
+	
+	/**
+	* CCryptoContext::CalculateSHA256FromBytes - Calculates SHA256 from a byte array. Fails if array is empty.
+	* @param[in] ValueBuffer - Input value.
+	* @return SHA256 Return value.
+	*/
+	std::string CCryptoContext::CalculateSHA256FromBytes(const CInputVector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		LibMCEnv_uint32 bytesNeededSHA256Value = 0;
+		LibMCEnv_uint32 bytesWrittenSHA256Value = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CalculateSHA256FromBytes(m_pHandle, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data(), 0, &bytesNeededSHA256Value, nullptr));
+		std::vector<char> bufferSHA256Value(bytesNeededSHA256Value);
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CalculateSHA256FromBytes(m_pHandle, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data(), bytesNeededSHA256Value, &bytesWrittenSHA256Value, &bufferSHA256Value[0]));
+		
+		return std::string(&bufferSHA256Value[0]);
+	}
+	
+	/**
+	* CCryptoContext::NormalizeSHA256String - Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.
+	* @param[in] sValue - Input value.
+	* @return SHA256 Return value.
+	*/
+	std::string CCryptoContext::NormalizeSHA256String(const std::string & sValue)
+	{
+		LibMCEnv_uint32 bytesNeededSHA256Value = 0;
+		LibMCEnv_uint32 bytesWrittenSHA256Value = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_NormalizeSHA256String(m_pHandle, sValue.c_str(), 0, &bytesNeededSHA256Value, nullptr));
+		std::vector<char> bufferSHA256Value(bytesNeededSHA256Value);
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_NormalizeSHA256String(m_pHandle, sValue.c_str(), bytesNeededSHA256Value, &bytesWrittenSHA256Value, &bufferSHA256Value[0]));
+		
+		return std::string(&bufferSHA256Value[0]);
+	}
+	
+	/**
+	* CCryptoContext::CreateRandomSHA256Hash - Generates a random SHA256 hash value with operating system APIs.
+	* @return SHA256 Return value.
+	*/
+	std::string CCryptoContext::CreateRandomSHA256Hash()
+	{
+		LibMCEnv_uint32 bytesNeededSHA256Value = 0;
+		LibMCEnv_uint32 bytesWrittenSHA256Value = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CreateRandomSHA256Hash(m_pHandle, 0, &bytesNeededSHA256Value, nullptr));
+		std::vector<char> bufferSHA256Value(bytesNeededSHA256Value);
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CreateRandomSHA256Hash(m_pHandle, bytesNeededSHA256Value, &bytesWrittenSHA256Value, &bufferSHA256Value[0]));
+		
+		return std::string(&bufferSHA256Value[0]);
+	}
+	
+	/**
+	* CCryptoContext::CreateUUID - Generates a random UUID with operating system APIs.
+	* @return UUID Return value.
+	*/
+	std::string CCryptoContext::CreateUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUIDValue = 0;
+		LibMCEnv_uint32 bytesWrittenUUIDValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CreateUUID(m_pHandle, 0, &bytesNeededUUIDValue, nullptr));
+		std::vector<char> bufferUUIDValue(bytesNeededUUIDValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_CreateUUID(m_pHandle, bytesNeededUUIDValue, &bytesWrittenUUIDValue, &bufferUUIDValue[0]));
+		
+		return std::string(&bufferUUIDValue[0]);
+	}
+	
+	/**
+	* CCryptoContext::NormalizeUUIDString - Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.
+	* @param[in] sValue - Input value.
+	* @return UUID Return value.
+	*/
+	std::string CCryptoContext::NormalizeUUIDString(const std::string & sValue)
+	{
+		LibMCEnv_uint32 bytesNeededUUIDValue = 0;
+		LibMCEnv_uint32 bytesWrittenUUIDValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_NormalizeUUIDString(m_pHandle, sValue.c_str(), 0, &bytesNeededUUIDValue, nullptr));
+		std::vector<char> bufferUUIDValue(bytesNeededUUIDValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_CryptoContext_NormalizeUUIDString(m_pHandle, sValue.c_str(), bytesNeededUUIDValue, &bytesWrittenUUIDValue, &bufferUUIDValue[0]));
+		
+		return std::string(&bufferUUIDValue[0]);
 	}
 	
 	/**
@@ -13834,6 +14090,21 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateCryptoContext - Creates a crypto context.
+	* @return Cryptographic context instance
+	*/
+	PCryptoContext CDriverEnvironment::CreateCryptoContext()
+	{
+		LibMCEnvHandle hContext = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateCryptoContext(m_pHandle, &hContext));
+		
+		if (!hContext) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CCryptoContext>(m_pWrapper, hContext);
+	}
+	
+	/**
 	 * Method definitions for class CSignalTrigger
 	 */
 	
@@ -15930,6 +16201,21 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateCryptoContext - Creates a crypto context.
+	* @return Cryptographic context instance
+	*/
+	PCryptoContext CStateEnvironment::CreateCryptoContext()
+	{
+		LibMCEnvHandle hContext = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateCryptoContext(m_pHandle, &hContext));
+		
+		if (!hContext) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CCryptoContext>(m_pWrapper, hContext);
+	}
+	
+	/**
 	 * Method definitions for class CUIItem
 	 */
 	
@@ -16879,6 +17165,21 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CreateCryptoContext - Creates a crypto context.
+	* @return Cryptographic context instance
+	*/
+	PCryptoContext CUIEnvironment::CreateCryptoContext()
+	{
+		LibMCEnvHandle hContext = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateCryptoContext(m_pHandle, &hContext));
+		
+		if (!hContext) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CCryptoContext>(m_pWrapper, hContext);
 	}
 
 } // namespace LibMCEnv

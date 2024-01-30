@@ -30,6 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <string>
+#include <vector>
+
+
+#ifdef _WIN32
+#define _WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <wincrypt.h>
+#endif
 
 #include "crossguid/guid.hpp"
 #include "PicoSHA2/picosha2.h"
@@ -59,18 +67,38 @@ namespace AMCCommon {
 	}
 
 
-
 	std::string CUtils::calculateRandomSHA256String(const uint32_t nIterations)
 	{
 		if ((nIterations == 0) || (nIterations > LIBMC_MAXRANDOMSTRINGITERATIONS))
 			throw std::runtime_error("invalid random string iterations");
 
-		std::string sRandomString;
+#ifdef _WIN32
 
+		// Check if Win32 System Crypto generated enough random data..
+		HCRYPTPROV hProv = 0;
+		if (CryptAcquireContext(&hProv, nullptr, nullptr, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+
+			std::vector<uint8_t> salt;
+			salt.resize(nIterations * 32);
+
+			if (CryptGenRandom(hProv, (uint32_t) salt.size (), salt.data())) {
+
+				CryptReleaseContext(hProv, 0);
+				return AMCCommon::CUtils::calculateSHA256FromData (salt.data (), salt.size ());
+			}
+			else {
+				CryptReleaseContext(hProv, 0);
+			}
+
+		}
+
+#endif //_WIN32
+
+
+		std::string sRandomString;
 		uint32_t nCount = nIterations + (((uint32_t)rand()) % nIterations);
 		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++)
 			sRandomString += createUUID();
-
 		return calculateSHA256FromString(sRandomString);
 	}
 

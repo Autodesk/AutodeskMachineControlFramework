@@ -252,6 +252,309 @@ LibMCEnvResult libmcenv_testenvironment_writetestoutput(LibMCEnv_TestEnvironment
 
 
 /*************************************************************************************************************************
+ Class implementation for CryptoContext
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_cryptocontext_calculatesha256fromstring(LibMCEnv_CryptoContext pCryptoContext, const char * pValue, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pCryptoContext;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pSHA256ValueBuffer) && !(pSHA256ValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sValue(pValue);
+		std::string sSHA256Value("");
+		ICryptoContext* pICryptoContext = dynamic_cast<ICryptoContext*>(pIBaseClass);
+		if (!pICryptoContext)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSHA256ValueBuffer == nullptr);
+		if (isCacheCall) {
+			sSHA256Value = pICryptoContext->CalculateSHA256FromString(sValue);
+
+			pICryptoContext->_setCache (new ParameterCache_1<std::string> (sSHA256Value));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pICryptoContext->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSHA256Value);
+			pICryptoContext->_setCache (nullptr);
+		}
+		
+		if (pSHA256ValueNeededChars)
+			*pSHA256ValueNeededChars = (LibMCEnv_uint32) (sSHA256Value.size()+1);
+		if (pSHA256ValueBuffer) {
+			if (sSHA256Value.size() >= nSHA256ValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSHA256Value = 0; iSHA256Value < sSHA256Value.size(); iSHA256Value++)
+				pSHA256ValueBuffer[iSHA256Value] = sSHA256Value[iSHA256Value];
+			pSHA256ValueBuffer[sSHA256Value.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_cryptocontext_calculatesha256frombytes(LibMCEnv_CryptoContext pCryptoContext, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pCryptoContext;
+
+	try {
+		if ( (!pValueBuffer) && (nValueBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pSHA256ValueBuffer) && !(pSHA256ValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sSHA256Value("");
+		ICryptoContext* pICryptoContext = dynamic_cast<ICryptoContext*>(pIBaseClass);
+		if (!pICryptoContext)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSHA256ValueBuffer == nullptr);
+		if (isCacheCall) {
+			sSHA256Value = pICryptoContext->CalculateSHA256FromBytes(nValueBufferSize, pValueBuffer);
+
+			pICryptoContext->_setCache (new ParameterCache_1<std::string> (sSHA256Value));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pICryptoContext->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSHA256Value);
+			pICryptoContext->_setCache (nullptr);
+		}
+		
+		if (pSHA256ValueNeededChars)
+			*pSHA256ValueNeededChars = (LibMCEnv_uint32) (sSHA256Value.size()+1);
+		if (pSHA256ValueBuffer) {
+			if (sSHA256Value.size() >= nSHA256ValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSHA256Value = 0; iSHA256Value < sSHA256Value.size(); iSHA256Value++)
+				pSHA256ValueBuffer[iSHA256Value] = sSHA256Value[iSHA256Value];
+			pSHA256ValueBuffer[sSHA256Value.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_cryptocontext_normalizesha256string(LibMCEnv_CryptoContext pCryptoContext, const char * pValue, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pCryptoContext;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pSHA256ValueBuffer) && !(pSHA256ValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sValue(pValue);
+		std::string sSHA256Value("");
+		ICryptoContext* pICryptoContext = dynamic_cast<ICryptoContext*>(pIBaseClass);
+		if (!pICryptoContext)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSHA256ValueBuffer == nullptr);
+		if (isCacheCall) {
+			sSHA256Value = pICryptoContext->NormalizeSHA256String(sValue);
+
+			pICryptoContext->_setCache (new ParameterCache_1<std::string> (sSHA256Value));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pICryptoContext->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSHA256Value);
+			pICryptoContext->_setCache (nullptr);
+		}
+		
+		if (pSHA256ValueNeededChars)
+			*pSHA256ValueNeededChars = (LibMCEnv_uint32) (sSHA256Value.size()+1);
+		if (pSHA256ValueBuffer) {
+			if (sSHA256Value.size() >= nSHA256ValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSHA256Value = 0; iSHA256Value < sSHA256Value.size(); iSHA256Value++)
+				pSHA256ValueBuffer[iSHA256Value] = sSHA256Value[iSHA256Value];
+			pSHA256ValueBuffer[sSHA256Value.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_cryptocontext_createrandomsha256hash(LibMCEnv_CryptoContext pCryptoContext, const LibMCEnv_uint32 nSHA256ValueBufferSize, LibMCEnv_uint32* pSHA256ValueNeededChars, char * pSHA256ValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pCryptoContext;
+
+	try {
+		if ( (!pSHA256ValueBuffer) && !(pSHA256ValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sSHA256Value("");
+		ICryptoContext* pICryptoContext = dynamic_cast<ICryptoContext*>(pIBaseClass);
+		if (!pICryptoContext)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSHA256ValueBuffer == nullptr);
+		if (isCacheCall) {
+			sSHA256Value = pICryptoContext->CreateRandomSHA256Hash();
+
+			pICryptoContext->_setCache (new ParameterCache_1<std::string> (sSHA256Value));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pICryptoContext->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSHA256Value);
+			pICryptoContext->_setCache (nullptr);
+		}
+		
+		if (pSHA256ValueNeededChars)
+			*pSHA256ValueNeededChars = (LibMCEnv_uint32) (sSHA256Value.size()+1);
+		if (pSHA256ValueBuffer) {
+			if (sSHA256Value.size() >= nSHA256ValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSHA256Value = 0; iSHA256Value < sSHA256Value.size(); iSHA256Value++)
+				pSHA256ValueBuffer[iSHA256Value] = sSHA256Value[iSHA256Value];
+			pSHA256ValueBuffer[sSHA256Value.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_cryptocontext_createuuid(LibMCEnv_CryptoContext pCryptoContext, const LibMCEnv_uint32 nUUIDValueBufferSize, LibMCEnv_uint32* pUUIDValueNeededChars, char * pUUIDValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pCryptoContext;
+
+	try {
+		if ( (!pUUIDValueBuffer) && !(pUUIDValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUIDValue("");
+		ICryptoContext* pICryptoContext = dynamic_cast<ICryptoContext*>(pIBaseClass);
+		if (!pICryptoContext)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDValueBuffer == nullptr);
+		if (isCacheCall) {
+			sUUIDValue = pICryptoContext->CreateUUID();
+
+			pICryptoContext->_setCache (new ParameterCache_1<std::string> (sUUIDValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pICryptoContext->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUIDValue);
+			pICryptoContext->_setCache (nullptr);
+		}
+		
+		if (pUUIDValueNeededChars)
+			*pUUIDValueNeededChars = (LibMCEnv_uint32) (sUUIDValue.size()+1);
+		if (pUUIDValueBuffer) {
+			if (sUUIDValue.size() >= nUUIDValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUIDValue = 0; iUUIDValue < sUUIDValue.size(); iUUIDValue++)
+				pUUIDValueBuffer[iUUIDValue] = sUUIDValue[iUUIDValue];
+			pUUIDValueBuffer[sUUIDValue.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_cryptocontext_normalizeuuidstring(LibMCEnv_CryptoContext pCryptoContext, const char * pValue, const LibMCEnv_uint32 nUUIDValueBufferSize, LibMCEnv_uint32* pUUIDValueNeededChars, char * pUUIDValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pCryptoContext;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pUUIDValueBuffer) && !(pUUIDValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sValue(pValue);
+		std::string sUUIDValue("");
+		ICryptoContext* pICryptoContext = dynamic_cast<ICryptoContext*>(pIBaseClass);
+		if (!pICryptoContext)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDValueBuffer == nullptr);
+		if (isCacheCall) {
+			sUUIDValue = pICryptoContext->NormalizeUUIDString(sValue);
+
+			pICryptoContext->_setCache (new ParameterCache_1<std::string> (sUUIDValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pICryptoContext->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUIDValue);
+			pICryptoContext->_setCache (nullptr);
+		}
+		
+		if (pUUIDValueNeededChars)
+			*pUUIDValueNeededChars = (LibMCEnv_uint32) (sUUIDValue.size()+1);
+		if (pUUIDValueBuffer) {
+			if (sUUIDValue.size() >= nUUIDValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUIDValue = 0; iUUIDValue < sUUIDValue.size(); iUUIDValue++)
+				pUUIDValueBuffer[iUUIDValue] = sUUIDValue[iUUIDValue];
+			pUUIDValueBuffer[sUUIDValue.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for PNGImageStoreOptions
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_pngimagestoreoptions_resettodefaults(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions)
@@ -9927,6 +10230,34 @@ LibMCEnvResult libmcenv_driverenvironment_getbuildjob(LibMCEnv_DriverEnvironment
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_createcryptocontext(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_CryptoContext * pContext)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pContext == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseContext(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseContext = pIDriverEnvironment->CreateCryptoContext();
+
+		*pContext = (IBase*)(pBaseContext);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for SignalTrigger
@@ -15137,6 +15468,34 @@ LibMCEnvResult libmcenv_stateenvironment_retrievealertsbytype(LibMCEnv_StateEnvi
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_createcryptocontext(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_CryptoContext * pContext)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pContext == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseContext(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseContext = pIStateEnvironment->CreateCryptoContext();
+
+		*pContext = (IBase*)(pBaseContext);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UIItem
@@ -17465,6 +17824,34 @@ LibMCEnvResult libmcenv_uienvironment_retrievealertsbytype(LibMCEnv_UIEnvironmen
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_createcryptocontext(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_CryptoContext * pContext)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pContext == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseContext(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseContext = pIUIEnvironment->CreateCryptoContext();
+
+		*pContext = (IBase*)(pBaseContext);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -17492,6 +17879,18 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_iterator_count;
 	if (sProcName == "libmcenv_testenvironment_writetestoutput") 
 		*ppProcAddress = (void*) &libmcenv_testenvironment_writetestoutput;
+	if (sProcName == "libmcenv_cryptocontext_calculatesha256fromstring") 
+		*ppProcAddress = (void*) &libmcenv_cryptocontext_calculatesha256fromstring;
+	if (sProcName == "libmcenv_cryptocontext_calculatesha256frombytes") 
+		*ppProcAddress = (void*) &libmcenv_cryptocontext_calculatesha256frombytes;
+	if (sProcName == "libmcenv_cryptocontext_normalizesha256string") 
+		*ppProcAddress = (void*) &libmcenv_cryptocontext_normalizesha256string;
+	if (sProcName == "libmcenv_cryptocontext_createrandomsha256hash") 
+		*ppProcAddress = (void*) &libmcenv_cryptocontext_createrandomsha256hash;
+	if (sProcName == "libmcenv_cryptocontext_createuuid") 
+		*ppProcAddress = (void*) &libmcenv_cryptocontext_createuuid;
+	if (sProcName == "libmcenv_cryptocontext_normalizeuuidstring") 
+		*ppProcAddress = (void*) &libmcenv_cryptocontext_normalizeuuidstring;
 	if (sProcName == "libmcenv_pngimagestoreoptions_resettodefaults") 
 		*ppProcAddress = (void*) &libmcenv_pngimagestoreoptions_resettodefaults;
 	if (sProcName == "libmcenv_pngimagedata_getsizeinpixels") 
@@ -18106,6 +18505,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_hasbuildjob;
 	if (sProcName == "libmcenv_driverenvironment_getbuildjob") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_getbuildjob;
+	if (sProcName == "libmcenv_driverenvironment_createcryptocontext") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createcryptocontext;
 	if (sProcName == "libmcenv_signaltrigger_cantrigger") 
 		*ppProcAddress = (void*) &libmcenv_signaltrigger_cantrigger;
 	if (sProcName == "libmcenv_signaltrigger_trigger") 
@@ -18398,6 +18799,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_retrievealerts;
 	if (sProcName == "libmcenv_stateenvironment_retrievealertsbytype") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_retrievealertsbytype;
+	if (sProcName == "libmcenv_stateenvironment_createcryptocontext") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_createcryptocontext;
 	if (sProcName == "libmcenv_uiitem_getname") 
 		*ppProcAddress = (void*) &libmcenv_uiitem_getname;
 	if (sProcName == "libmcenv_uiitem_getpath") 
@@ -18530,6 +18933,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_retrievealerts;
 	if (sProcName == "libmcenv_uienvironment_retrievealertsbytype") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_retrievealertsbytype;
+	if (sProcName == "libmcenv_uienvironment_createcryptocontext") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_createcryptocontext;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

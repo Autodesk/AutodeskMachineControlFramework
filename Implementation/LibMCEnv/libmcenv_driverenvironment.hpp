@@ -164,6 +164,8 @@ public:
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
+	ICryptoContext* CreateCryptoContext() override;
+
 };
 
 } // namespace Impl

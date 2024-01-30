@@ -57,6 +57,7 @@ namespace Impl {
 class IBase;
 class IIterator;
 class ITestEnvironment;
+class ICryptoContext;
 class IPNGImageStoreOptions;
 class IPNGImageData;
 class IImageData;
@@ -377,6 +378,58 @@ public:
 };
 
 typedef IBaseSharedPtr<ITestEnvironment> PITestEnvironment;
+
+
+/*************************************************************************************************************************
+ Class interface for CryptoContext 
+**************************************************************************************************************************/
+
+class ICryptoContext : public virtual IBase {
+public:
+	/**
+	* ICryptoContext::CalculateSHA256FromString - Calculates SHA256 from a string. Fails if string is empty.
+	* @param[in] sValue - Input value.
+	* @return SHA256 Return value.
+	*/
+	virtual std::string CalculateSHA256FromString(const std::string & sValue) = 0;
+
+	/**
+	* ICryptoContext::CalculateSHA256FromBytes - Calculates SHA256 from a byte array. Fails if array is empty.
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[in] pValueBuffer - Input value.
+	* @return SHA256 Return value.
+	*/
+	virtual std::string CalculateSHA256FromBytes(const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) = 0;
+
+	/**
+	* ICryptoContext::NormalizeSHA256String - Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.
+	* @param[in] sValue - Input value.
+	* @return SHA256 Return value.
+	*/
+	virtual std::string NormalizeSHA256String(const std::string & sValue) = 0;
+
+	/**
+	* ICryptoContext::CreateRandomSHA256Hash - Generates a random SHA256 hash value with operating system APIs.
+	* @return SHA256 Return value.
+	*/
+	virtual std::string CreateRandomSHA256Hash() = 0;
+
+	/**
+	* ICryptoContext::CreateUUID - Generates a random UUID with operating system APIs.
+	* @return UUID Return value.
+	*/
+	virtual std::string CreateUUID() = 0;
+
+	/**
+	* ICryptoContext::NormalizeUUIDString - Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.
+	* @param[in] sValue - Input value.
+	* @return UUID Return value.
+	*/
+	virtual std::string NormalizeUUIDString(const std::string & sValue) = 0;
+
+};
+
+typedef IBaseSharedPtr<ICryptoContext> PICryptoContext;
 
 
 /*************************************************************************************************************************
@@ -2874,6 +2927,12 @@ public:
 	*/
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
+	/**
+	* IDriverEnvironment::CreateCryptoContext - Creates a crypto context.
+	* @return Cryptographic context instance
+	*/
+	virtual ICryptoContext * CreateCryptoContext() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;
@@ -4036,6 +4095,12 @@ public:
 	*/
 	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
 
+	/**
+	* IStateEnvironment::CreateCryptoContext - Creates a crypto context.
+	* @return Cryptographic context instance
+	*/
+	virtual ICryptoContext * CreateCryptoContext() = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
@@ -4543,6 +4608,12 @@ public:
 	* @return AlertIterator Instance
 	*/
 	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
+
+	/**
+	* IUIEnvironment::CreateCryptoContext - Creates a crypto context.
+	* @return Cryptographic context instance
+	*/
+	virtual ICryptoContext * CreateCryptoContext() = 0;
 
 };
 

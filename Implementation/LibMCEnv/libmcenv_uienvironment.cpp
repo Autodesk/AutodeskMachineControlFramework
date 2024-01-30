@@ -41,6 +41,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
+#include "libmcenv_cryptocontext.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -729,4 +730,9 @@ IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentif
 
     return returnIterator.release();
 
+}
+
+ICryptoContext* CUIEnvironment::CreateCryptoContext()
+{
+    return new CCryptoContext ();
 }

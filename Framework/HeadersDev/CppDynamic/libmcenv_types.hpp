@@ -234,6 +234,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDALERTIDENTIFIER 10137 /** Invalid alert identifier */
 #define LIBMCENV_ERROR_ALERTNOTFOUND 10138 /** Alert not found. */
 #define LIBMCENV_ERROR_USERDOESNOTEXIST 10139 /** User does not exist. */
+#define LIBMCENV_ERROR_EMPTYSHA256SOURCE 10140 /** Empty SHA256 Source. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -380,6 +381,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
     case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
     case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
+    case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "Empty SHA256 Source.";
     default: return "unknown error";
   }
 }
@@ -391,6 +393,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
 typedef LibMCEnvHandle LibMCEnv_TestEnvironment;
+typedef LibMCEnvHandle LibMCEnv_CryptoContext;
 typedef LibMCEnvHandle LibMCEnv_PNGImageStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
