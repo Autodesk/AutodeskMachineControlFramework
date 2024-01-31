@@ -685,7 +685,9 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 	auto pLogger = m_pSystemState->getLoggerInstance();
 	pLogger->logMessage(sLogString, m_sInstanceName, logLevel);
 
-	return new CAlert (pDataModel, pAlertData->GetUUID ());
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	return new CAlert (pDataModel, pAlertData->GetUUID (), sCurrentUserUUID);
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
@@ -700,7 +702,8 @@ IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 
 	auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
 
-	return new CAlert(pDataModel, pAlertData->GetUUID());
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	return new CAlert(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID);
 
 }
 
@@ -719,13 +722,18 @@ IAlertIterator* CStateEnvironment::RetrieveAlerts(const bool bOnlyActive)
 {
 	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator (new CAlertIterator ());
 
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID ();
+
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pAlertSession = pDataModel->CreateAlertSession();
 
 	auto pAlertIterator = pAlertSession->RetrieveAlerts(bOnlyActive);
 	while (pAlertIterator->MoveNext()) {
 		auto pAlertData = pAlertIterator->GetCurrentAlert();
-		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID ()));
+
+		// State Environments have no user context...
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), sCurrentUserUUID));
 	}
 
 	return returnIterator.release();
@@ -735,13 +743,17 @@ IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIden
 {
 	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
 
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pAlertSession = pDataModel->CreateAlertSession();
 
 	auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
 	while (pAlertIterator->MoveNext()) {
 		auto pAlertData = pAlertIterator->GetCurrentAlert();
-		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID()));
+
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID));
 	}
 
 	return returnIterator.release();

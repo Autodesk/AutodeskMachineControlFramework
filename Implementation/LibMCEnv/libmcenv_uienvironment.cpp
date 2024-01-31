@@ -668,7 +668,7 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
     m_pLogger->logMessage(sLogString, m_sLogSubSystem, logLevel);
 
 
-    return new CAlert(pDataModel, pAlertData->GetUUID ());
+    return new CAlert(pDataModel, pAlertData->GetUUID (), m_pUserInformation->getUUID());
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
@@ -682,7 +682,7 @@ IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
 
     auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
-    return new CAlert(pDataModel, pAlertData->GetUUID());
+    return new CAlert(pDataModel, pAlertData->GetUUID(), m_pUserInformation->getUUID ());
 
 }
 
@@ -708,7 +708,7 @@ IAlertIterator* CUIEnvironment::RetrieveAlerts(const bool bOnlyActive)
     auto pAlertIterator = pAlertSession->RetrieveAlerts(bOnlyActive);
     while (pAlertIterator->MoveNext()) {
         auto pAlertData = pAlertIterator->GetCurrentAlert();
-        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID ()));
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), m_pUserInformation->getUUID ()));
     }
 
     return returnIterator.release();
@@ -725,7 +725,7 @@ IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentif
     auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
     while (pAlertIterator->MoveNext()) {
         auto pAlertData = pAlertIterator->GetCurrentAlert();
-        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID()));
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), m_pUserInformation->getUUID()));
     }
 
     return returnIterator.release();

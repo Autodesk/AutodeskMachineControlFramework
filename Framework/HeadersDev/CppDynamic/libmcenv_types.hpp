@@ -235,6 +235,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_ALERTNOTFOUND 10138 /** Alert not found. */
 #define LIBMCENV_ERROR_USERDOESNOTEXIST 10139 /** User does not exist. */
 #define LIBMCENV_ERROR_EMPTYSHA256SOURCE 10140 /** Empty SHA256 Source. */
+#define LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT 10141 /** Alert has no user context. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -382,6 +383,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
     case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
     case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "Empty SHA256 Source.";
+    case LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT: return "Alert has no user context.";
     default: return "unknown error";
   }
 }

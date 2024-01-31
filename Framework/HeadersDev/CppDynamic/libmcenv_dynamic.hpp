@@ -460,6 +460,7 @@ public:
 			case LIBMCENV_ERROR_ALERTNOTFOUND: return "ALERTNOTFOUND";
 			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "USERDOESNOTEXIST";
 			case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "EMPTYSHA256SOURCE";
+			case LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT: return "ALERTHASNOUSERCONTEXT";
 		}
 		return "UNKNOWN";
 	}
@@ -607,6 +608,7 @@ public:
 			case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
 			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
 			case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "Empty SHA256 Source.";
+			case LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT: return "Alert has no user context.";
 		}
 		return "unknown error";
 	}

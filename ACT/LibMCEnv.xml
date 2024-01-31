@@ -178,7 +178,8 @@
 		<error name="ALERTNOTFOUND" code="10138" description="Alert not found."/>
 		<error name="USERDOESNOTEXIST" code="10139" description="User does not exist."/>
 		<error name="EMPTYSHA256SOURCE" code="10140" description="Empty SHA256 Source."/>
-		
+		<error name="ALERTHASNOUSERCONTEXT" code="10141" description="Alert has no user context."/>
+				
 
 	</errors>
 

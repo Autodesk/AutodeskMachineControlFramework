@@ -43,11 +43,14 @@ using namespace LibMCEnv::Impl;
  Class definition of CAlert 
 **************************************************************************************************************************/
 
-CAlert::CAlert(LibMCData::PDataModel pDataModel, const std::string& sUUID)
+CAlert::CAlert(LibMCData::PDataModel pDataModel, const std::string& sUUID, const std::string& sCurrentUserUUID)
 	: m_pDataModel(pDataModel)
 {
 	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	m_sCurrentUserUUID = AMCCommon::CUtils::normalizeUUIDString(sCurrentUserUUID);
+	m_bUserContextExists = (m_sCurrentUserUUID != AMCCommon::CUtils::createEmptyUUID());
 
 	auto pAlertSession = pDataModel->CreateAlertSession();
 	m_pAlertData = pAlertSession->GetAlertByUUID(sUUID);
@@ -122,7 +125,7 @@ CAlert* CAlert::makeFrom(CAlert* pAlert)
 	if (pAlert == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	return new CAlert(pAlert->getDataModel(), pAlert->GetUUID ());
+	return new CAlert(pAlert->getDataModel(), pAlert->GetUUID (), pAlert->getCurrentUserUUID ());
 }
 
 std::shared_ptr<CAlert> CAlert::makeSharedFrom(CAlert* pAlert)
@@ -133,21 +136,33 @@ std::shared_ptr<CAlert> CAlert::makeSharedFrom(CAlert* pAlert)
 void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment)
 {
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 
+	m_pAlertData->AcknowledgeForUser(sNormalizedUUID, sUserComment);
 }
 
 void CAlert::AcknowledgeAlertForCurrentUser(const std::string& sUserComment)
 {
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	if (!m_bUserContextExists)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT, "alert has no user context: " + m_pAlertData->GetUUID ());
 
+	m_pAlertData->AcknowledgeForUser(m_sCurrentUserUUID, sUserComment);
 }
 
 void CAlert::DeactivateAlert()
 {
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+
+	m_pAlertData->DeactivateAlert();
 }
 
 LibMCData::PDataModel CAlert::getDataModel()
 {
 	return m_pDataModel;
+}
+
+std::string CAlert::getCurrentUserUUID()
+{
+	return m_sCurrentUserUUID;
 }

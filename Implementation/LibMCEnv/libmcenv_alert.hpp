@@ -66,6 +66,9 @@ private:
 
 	LibMCData::PDataModel m_pDataModel;
 	LibMCData::PAlert m_pAlertData;
+	std::string m_sCurrentUserUUID;
+	bool m_bUserContextExists;
+
 
 public:
 
@@ -73,7 +76,7 @@ public:
 
 	static std::shared_ptr<CAlert> makeSharedFrom(CAlert* pAlert);
 
-	CAlert(LibMCData::PDataModel pDataModel, const std::string & sUUID);
+	CAlert(LibMCData::PDataModel pDataModel, const std::string & sUUID, const std::string & sCurrentUserUUID);
 
 	virtual ~CAlert();
 
@@ -100,6 +103,8 @@ public:
 	void DeactivateAlert() override;
 
 	LibMCData::PDataModel getDataModel ();
+
+	std::string getCurrentUserUUID ();
 
 };
 
