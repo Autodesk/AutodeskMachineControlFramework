@@ -438,6 +438,42 @@ namespace AMCData {
 			alertUUIDs.push_back(pStatement->getColumnString(1));
 	}
 
+	void CJournal::acknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string& sTimeStampUTC)
+	{
+		auto pTransaction = m_pSQLHandler->beginTransaction();
+		auto sDeactivateQuery = "UPDATE alerts SET active=0 WHERE uuid=?";
+		auto pDeactivateStatement = pTransaction->prepareStatement(sDeactivateQuery);
+		pDeactivateStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString(sAlertUUID));
+		pDeactivateStatement->execute();
+
+		std::string sAcknowledgeUUID = AMCCommon::CUtils::createUUID();
+
+		auto sInsertAckQuery = "INSERT INTO alertacknowledgements (uuid, alertuuid, useruuid, usercomment, timestamp) VALUES (?, ?, ?, ?, ?)";
+
+		auto pInsertAckStatement = pTransaction->prepareStatement(sInsertAckQuery);
+		pInsertAckStatement->setString(1, sAcknowledgeUUID);
+		pInsertAckStatement->setString(2, AMCCommon::CUtils::normalizeUUIDString(sAlertUUID));
+		pInsertAckStatement->setString(3, AMCCommon::CUtils::normalizeUUIDString(sUserUUID));
+		pInsertAckStatement->setString(4, sUserComment);
+		pInsertAckStatement->setString(5, sTimeStampUTC);
+		pInsertAckStatement->execute();
+
+		pTransaction->commit();
+
+	}
+
+	void CJournal::deactivateAlert(const std::string& sAlertUUID)
+	{
+		auto pTransaction = m_pSQLHandler->beginTransaction();
+		auto sQuery = "UPDATE alerts SET active=0 WHERE uuid=?";
+		auto pStatement = pTransaction->prepareStatement(sQuery);
+		pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString (sAlertUUID));
+		pStatement->execute();
+
+		pTransaction->commit();
+
+	}
+
 }
 
 

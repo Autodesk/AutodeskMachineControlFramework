@@ -96,6 +96,8 @@ namespace AMCData {
 		void retrieveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
 		void retrieveActiveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
 
+		void acknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimeStampUTC);
+		void deactivateAlert(const std::string& sAlertUUID);
 	};
 
 	typedef std::shared_ptr<CJournal> PJournal;

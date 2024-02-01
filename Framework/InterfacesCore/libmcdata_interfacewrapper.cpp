@@ -1030,7 +1030,7 @@ LibMCDataResult libmcdata_alert_getacknowledgementinformation(LibMCData_Alert pA
 	}
 }
 
-LibMCDataResult libmcdata_alert_acknowledgeforuser(LibMCData_Alert pAlert, const char * pUserUUID, const char * pUserComment)
+LibMCDataResult libmcdata_alert_acknowledgeforuser(LibMCData_Alert pAlert, const char * pUserUUID, const char * pUserComment, const char * pTimestampUTC)
 {
 	IBase* pIBaseClass = (IBase *)pAlert;
 
@@ -1039,13 +1039,16 @@ LibMCDataResult libmcdata_alert_acknowledgeforuser(LibMCData_Alert pAlert, const
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserComment == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pTimestampUTC == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUserUUID(pUserUUID);
 		std::string sUserComment(pUserComment);
+		std::string sTimestampUTC(pTimestampUTC);
 		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
 		if (!pIAlert)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIAlert->AcknowledgeForUser(sUserUUID, sUserComment);
+		pIAlert->AcknowledgeForUser(sUserUUID, sUserComment, sTimestampUTC);
 
 		return LIBMCDATA_SUCCESS;
 	}

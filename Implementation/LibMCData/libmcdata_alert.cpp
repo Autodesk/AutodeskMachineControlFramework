@@ -162,11 +162,12 @@ void CAlert::GetAcknowledgementInformation(std::string& sUserUUID, std::string& 
 	m_pJournal->getAcknowledgementInformation(m_sAlertUUID, sUserUUID, sUserComment, m_sTimestampUTC);
 }
 
-void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment)
+void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment, const std::string& sTimestampUTC) 
 {
+	m_pJournal->acknowledgeAlertForUser(m_sAlertUUID, sUserUUID, sUserComment, sTimestampUTC);
 }
 
 void CAlert::DeactivateAlert()
 {
-
+	m_pJournal->deactivateAlert(m_sAlertUUID);
 }

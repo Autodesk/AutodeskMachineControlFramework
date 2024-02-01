@@ -584,6 +584,7 @@
 		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
 			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
 			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in UTC format." />
 		</method>
 
 		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">

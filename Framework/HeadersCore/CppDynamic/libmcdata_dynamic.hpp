@@ -1100,7 +1100,7 @@ public:
 	inline std::string GetTimestampUTC();
 	inline bool HasBeenAcknowledged();
 	inline void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime);
-	inline void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment);
+	inline void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC);
 	inline void DeactivateAlert();
 };
 	
@@ -4191,10 +4191,11 @@ public:
 	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
+	* @param[in] sTimestampUTC - Timestamp in UTC format.
 	*/
-	void CAlert::AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment)
+	void CAlert::AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Alert_AcknowledgeForUser(m_pHandle, sUserUUID.c_str(), sUserComment.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_AcknowledgeForUser(m_pHandle, sUserUUID.c_str(), sUserComment.c_str(), sTimestampUTC.c_str()));
 	}
 	
 	/**

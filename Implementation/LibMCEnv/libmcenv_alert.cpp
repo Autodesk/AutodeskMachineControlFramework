@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CAlert
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -138,7 +139,9 @@ void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string&
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 
-	m_pAlertData->AcknowledgeForUser(sNormalizedUUID, sUserComment);
+	AMCCommon::CChrono chrono;	
+
+	m_pAlertData->AcknowledgeForUser(sNormalizedUUID, sUserComment, chrono.getStartTimeISO8601TimeUTC());
 }
 
 void CAlert::AcknowledgeAlertForCurrentUser(const std::string& sUserComment)
@@ -147,7 +150,9 @@ void CAlert::AcknowledgeAlertForCurrentUser(const std::string& sUserComment)
 	if (!m_bUserContextExists)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT, "alert has no user context: " + m_pAlertData->GetUUID ());
 
-	m_pAlertData->AcknowledgeForUser(m_sCurrentUserUUID, sUserComment);
+	AMCCommon::CChrono chrono;
+
+	m_pAlertData->AcknowledgeForUser(m_sCurrentUserUUID, sUserComment, chrono.getStartTimeISO8601TimeUTC());
 }
 
 void CAlert::DeactivateAlert()

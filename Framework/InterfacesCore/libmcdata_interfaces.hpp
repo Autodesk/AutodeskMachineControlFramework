@@ -503,8 +503,9 @@ public:
 	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
+	* @param[in] sTimestampUTC - Timestamp in UTC format.
 	*/
-	virtual void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment) = 0;
+	virtual void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC) = 0;
 
 	/**
 	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.

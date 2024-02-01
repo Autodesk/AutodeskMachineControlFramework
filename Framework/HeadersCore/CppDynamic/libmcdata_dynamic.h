@@ -335,9 +335,10 @@ typedef LibMCDataResult (*PLibMCDataAlert_GetAcknowledgementInformationPtr) (Lib
 * @param[in] pAlert - Alert instance.
 * @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 * @param[in] pUserComment - User comment to store. May be empty.
+* @param[in] pTimestampUTC - Timestamp in UTC format.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataAlert_AcknowledgeForUserPtr) (LibMCData_Alert pAlert, const char * pUserUUID, const char * pUserComment);
+typedef LibMCDataResult (*PLibMCDataAlert_AcknowledgeForUserPtr) (LibMCData_Alert pAlert, const char * pUserUUID, const char * pUserComment, const char * pTimestampUTC);
 
 /**
 * Sets an alert inactive. It will not be marked as acknowledged by a certain user.
