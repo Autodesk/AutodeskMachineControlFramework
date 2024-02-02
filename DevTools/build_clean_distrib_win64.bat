@@ -29,12 +29,13 @@ SET /p GITHASH=<.\build\githash.txt
 
 echo "Found GIT hash %GITHASH%"
 
-".\build\Framework\create_package_xml.exe" --config ".\build\Output\%GITHASH%_config.xml" --devpackage %GITHASH% --output ".\build\Output\%GITHASH%_package.xml" --serveroutput ".\build\Output\amc_server.xml"
-
 cd build
 REM call cmake -G "MinGW Makefiles" ..
 call cmake  ..
 call cmake --build . --config Release
+
+".\Framework\create_package_xml.exe" --config ".\Output\%GITHASH%_config.xml" --devpackage %GITHASH% --output ".\Output\%GITHASH%_package.xml" --serveroutput ".\Output\amc_server.xml"
+
 
 cd Output
 
