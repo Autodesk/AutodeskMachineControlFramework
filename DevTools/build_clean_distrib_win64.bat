@@ -6,7 +6,7 @@ SET /p DEVPACKAGE=<devpackage_version.txt
 SET /p DEVPACKAGESHA=<devpackage_sha256_win64.txt
 
 echo "Verifying package %DEVPACKAGE%"
-DevTools\packageManager.exe download "DevPackages\amcf_win64_%DEVPACKAGE%.zip" "https://ssl.aleos.io/" "win64_%DEVPACKAGE%" "%DEVPACKAGESHA%"
+DevTools\packageManager.exe download "DevPackages\amcf_win64_%DEVPACKAGE%.zip" "https://ssl.aleos.io" "win64_%DEVPACKAGE%" "%DEVPACKAGESHA%"
 
 if %ERRORLEVEL% == 0 goto :verification_done
 
@@ -29,6 +29,7 @@ SET /p GITHASH=<.\build\githash.txt
 
 echo "Found GIT hash %GITHASH%"
 
+".\build\Framework\create_package_xml.exe" --config ".\build\Output\%GITHASH%_config.xml" --devpackage %GITHASH% --output ".\build\Output\%GITHASH%_package.xml" --serveroutput ".\build\Output\amc_server.xml"
 
 cd build
 REM call cmake -G "MinGW Makefiles" ..
