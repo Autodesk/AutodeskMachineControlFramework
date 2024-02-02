@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <exception>
 #include <sstream>
 #include <vector>
@@ -155,7 +156,7 @@ int main(int argc, char* argv[])
 		if (!result)
 			throw std::runtime_error("could not parse configuration file!");
 
-		std::list<std::pair<std::string, std::string>> drivers;
+		std::set<std::string> drivers;
 
 		auto mainNode = doc.child("machinedefinition");
 		auto driversNodes = mainNode.children("driver");
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
 			std::string sLibraryName(libraryAttrib.as_string());
 
 			std::cout << "   - using driver " << sName << " with library " << sLibraryName << std::endl;
-			drivers.push_back(std::make_pair (sName, sLibraryName));
+			drivers.insert (sLibraryName);
 
 			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sName))
 				throw std::runtime_error("invalid driver name: " + sName);
@@ -187,7 +188,7 @@ int main(int argc, char* argv[])
 
 		}
 
-		std::list<std::pair<std::string, std::string>> plugins;
+		std::set<std::string> plugins;
 
 		auto statemachinesNodes = mainNode.children("statemachine");
 		for (pugi::xml_node instanceNode : statemachinesNodes)
@@ -205,7 +206,7 @@ int main(int argc, char* argv[])
 				throw std::runtime_error("empty statemachine library!");
 
 			std::cout << "   - using plugin " << sName << " with library " << sLibraryName << std::endl;
-			plugins.push_back(std::make_pair(sName, sLibraryName));
+			plugins.insert (sLibraryName);
 
 			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
 				throw std::runtime_error("invalid plugin name: " + sName);
@@ -227,7 +228,7 @@ int main(int argc, char* argv[])
 		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUILibrary))
 			throw std::runtime_error("invalid user interface library: " + sUILibrary);
 
-		plugins.push_back(std::make_pair("userinterface", sUILibrary));
+		plugins.insert (sUILibrary);
 
 		std::cout << std::endl;
 		std::cout << "Creating Package XML for project..." << std::endl;
@@ -251,13 +252,11 @@ int main(int argc, char* argv[])
 		packageXMLStream << "    <library name=\"datamodel\" import=\"" << sCoreDataName << "\" />\n";
 		packageXMLStream << "    <library name=\"lib3mf\" import=\"" << sLib3MFName << "\" />\n";
 
-		for (auto iDriverIter : drivers) {
-			std::string sLibraryName = iDriverIter.second;
+		for (auto sLibraryName : drivers) {
 			packageXMLStream << "    <library name=\"" << sLibraryName << "\" import=\"" << sDevPackagePrefix << "_" << sLibraryName << "." << sExtension << "\" resources=\"" << sDevPackagePrefix << "_" << sLibraryName << ".data\" />\n";
 		}
 
-		for (auto iPluginIter : plugins) {
-			std::string sLibraryName = iPluginIter.second;
+		for (auto sLibraryName : plugins) {
 			packageXMLStream << "    <library name=\"" << sLibraryName << "\" import=\"" << sDevPackagePrefix << "_" << sLibraryName << "." << sExtension << "\"  />\n";
 		}
 
