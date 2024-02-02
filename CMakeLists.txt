@@ -692,3 +692,48 @@ set_target_properties(amc_test
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT amc_win32)
+
+
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ create_package Target
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+file(GLOB CREATE_PACKAGE_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/BuildScripts/createPackageXML.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
+)
+
+add_executable(create_package_xml ${CREATE_PACKAGE_SRC} ${LIBMC_SRC_DEP_PUGIXML})
+
+target_include_directories(create_package_xml PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(create_package_xml PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
+
+set_target_properties(create_package_xml
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	
+	OUTPUT_NAME "create_package_xml"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	    
+)
+
+
+if(WIN32)
+	target_link_libraries(create_package_xml shlwapi.lib)
+	target_link_libraries(create_package_xml ws2_32.lib)
+else()
+
+endif(WIN32)
+
+
