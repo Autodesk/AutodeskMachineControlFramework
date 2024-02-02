@@ -100,7 +100,7 @@ call cmake --build . --config Release
 
 echo "Building Package XML"
 
-"%builddir%\DevPackage\Framework\create_package_xml.exe" --config "%builddir%\Output\%GITHASH%_config.xml" --devpackage %GITHASH% --output "%builddir%\Output\%GITHASH%_package.xml"
+"%builddir%\DevPackage\Framework\create_package_xml.exe" --config "%builddir%\Output\%GITHASH%_config.xml" --devpackage %GITHASH% --output "%builddir%\Output\%GITHASH%_package.xml" --serveroutput "%builddir%\Output\amc_server.xml"
 
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
