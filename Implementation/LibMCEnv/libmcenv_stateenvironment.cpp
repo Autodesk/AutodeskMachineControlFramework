@@ -687,7 +687,7 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 	// State Environments have no user context...
 	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
-	return new CAlert (pDataModel, pAlertData->GetUUID (), sCurrentUserUUID);
+	return new CAlert (pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName);
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
@@ -703,7 +703,7 @@ IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 	auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
 
 	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
-	return new CAlert(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID);
+	return new CAlert(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName);
 
 }
 
@@ -728,12 +728,14 @@ IAlertIterator* CStateEnvironment::RetrieveAlerts(const bool bOnlyActive)
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pAlertSession = pDataModel->CreateAlertSession();
 
+	auto pLogger = m_pSystemState->getLoggerInstance();
+
 	auto pAlertIterator = pAlertSession->RetrieveAlerts(bOnlyActive);
 	while (pAlertIterator->MoveNext()) {
 		auto pAlertData = pAlertIterator->GetCurrentAlert();
 
 		// State Environments have no user context...
-		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), sCurrentUserUUID));
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, pLogger, m_sInstanceName));
 	}
 
 	return returnIterator.release();
@@ -748,12 +750,13 @@ IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIden
 
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pAlertSession = pDataModel->CreateAlertSession();
+	auto pLogger = m_pSystemState->getLoggerInstance();
 
 	auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
 	while (pAlertIterator->MoveNext()) {
 		auto pAlertData = pAlertIterator->GetCurrentAlert();
 
-		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID));
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, pLogger, m_sInstanceName));
 	}
 
 	return returnIterator.release();

@@ -58,6 +58,7 @@ namespace AMC {
 		std::string m_sLoadingText;
 		std::string m_sAlertTimeStampCaption;
 		std::string m_sAlertNameCaption;
+		std::string m_sAlertLevelCaption;
 		std::string m_sAlertDescriptionCaption;
 		std::string m_sAlertContextCaption;
 		std::string m_sAlertActiveCaption;

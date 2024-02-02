@@ -168,6 +168,8 @@ namespace AMCData {
 
 	std::string CJournal::convertAlertLevelToString(const LibMCData::eAlertLevel eLevel)
 	{
+
+
 		switch (eLevel) {
 		case LibMCData::eAlertLevel::Warning:
 			return "warning";
@@ -235,7 +237,7 @@ namespace AMCData {
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALERTDESCRIPTIONIDENTIFIER, "invalid alert description identifier: " + sDescriptionIdentifier);
 		}
 
-		std::string sLevel = convertAlertLevelToString (eLevel);
+		std::string sLevelString = convertAlertLevelToString (eLevel);
 
 
 		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
@@ -245,7 +247,7 @@ namespace AMCData {
 		pStatement->setString(1, sNormalizedUUID);
 		pStatement->setString(2, sIdentifier);
 		pStatement->setInt(3, m_AlertID);
-		pStatement->setInt(4, (int)eLevel);
+		pStatement->setString(4, sLevelString);
 		pStatement->setString(5, sDescription);
 		pStatement->setString(6, sDescriptionIdentifier);
 		pStatement->setString(7, sReadableContextInformation);

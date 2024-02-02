@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CAlert
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_languagestring.hpp"
+#include "amc_logger.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -66,6 +67,9 @@ private:
 
 	LibMCData::PDataModel m_pDataModel;
 	LibMCData::PAlert m_pAlertData;
+	AMC::PLogger m_pLogger;
+	const std::string& m_sLogInstance;
+
 	std::string m_sCurrentUserUUID;
 	bool m_bUserContextExists;
 
@@ -76,7 +80,7 @@ public:
 
 	static std::shared_ptr<CAlert> makeSharedFrom(CAlert* pAlert);
 
-	CAlert(LibMCData::PDataModel pDataModel, const std::string & sUUID, const std::string & sCurrentUserUUID);
+	CAlert(LibMCData::PDataModel pDataModel, const std::string & sUUID, const std::string & sCurrentUserUUID, AMC::PLogger pLogger, const std::string & sLogInstance);
 
 	virtual ~CAlert();
 
@@ -105,6 +109,10 @@ public:
 	LibMCData::PDataModel getDataModel ();
 
 	std::string getCurrentUserUUID ();
+
+	AMC::PLogger getLogger();
+
+	std::string getLogInstance();
 
 };
 
