@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <memory>
 #include <exception>
+#include <sstream>
 #include <vector>
 
 #include "PugiXML/pugixml.hpp"
@@ -78,6 +79,8 @@ int main(int argc, char* argv[])
 
 		std::string sDevPackagePrefix = "";
 		std::string sConfigFileName = "";
+		std::string sOutputFileName = "";
+		std::string sServerOutputFileName = "amc_server.xml";
 		for (size_t argIdx = 0; argIdx < argumentList.size(); argIdx++) {
 
 			bool bHandled = false;
@@ -101,6 +104,24 @@ int main(int argc, char* argv[])
 				bHandled = true;
 			}
 
+			if (sArgument == "--output") {
+				argIdx++;
+				if (argIdx >= argumentList.size())
+					throw std::runtime_error("missing output file name in argument");
+
+				sOutputFileName = argumentList[argIdx];
+				bHandled = true;
+			} 
+
+			if (sArgument == "--serveroutput") {
+				argIdx++;
+				if (argIdx >= argumentList.size())
+					throw std::runtime_error("missing server output file name in argument");
+
+				sServerOutputFileName = argumentList[argIdx];
+				bHandled = true;
+			} 
+
 			if (!bHandled) {
 				std::cout << "Warning! Unknown argument passed: " << sArgument << std::endl;
 			}
@@ -116,6 +137,10 @@ int main(int argc, char* argv[])
 			throw std::runtime_error("No dev package prefix given...");
 		}
 
+		if (sOutputFileName.empty()) {
+			sOutputFileName = sDevPackagePrefix + "_package.xml";
+		}
+
 		std::cout << "Importing " << sConfigFileName << "..." << std::endl;
 		std::string sConfigAsString;
 		{
@@ -125,9 +150,157 @@ int main(int argc, char* argv[])
 				throw std::runtime_error("configuration file is empty!");
 		}
 
+		pugi::xml_document doc;
+		pugi::xml_parse_result result = doc.load_string(sConfigAsString.c_str());
+		if (!result)
+			throw std::runtime_error("could not parse configuration file!");
 
+		std::list<std::pair<std::string, std::string>> drivers;
+
+		auto mainNode = doc.child("machinedefinition");
+		auto driversNodes = mainNode.children("driver");
+		for (pugi::xml_node driversNode : driversNodes)
+		{
+			auto nameAttrib = driversNode.attribute("name");
+			if (nameAttrib.empty())
+				throw std::runtime_error("missing driver name!");
+			std::string sName(nameAttrib.as_string());
+
+
+			auto typeAttrib = driversNode.attribute("type");
+			if (nameAttrib.empty())
+				throw std::runtime_error("missing driver type!");
+			std::string sType(typeAttrib.as_string());
+
+			auto libraryAttrib = driversNode.attribute("library");
+			if (libraryAttrib.empty())
+				throw std::runtime_error("missing driver library!");
+			std::string sLibraryName(libraryAttrib.as_string());
+
+			std::cout << "   - using driver " << sName << " with library " << sLibraryName << std::endl;
+			drivers.push_back(std::make_pair (sName, sLibraryName));
+
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sName))
+				throw std::runtime_error("invalid driver name: " + sName);
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sLibraryName))
+				throw std::runtime_error("invalid driver library: " + sLibraryName);
+
+		}
+
+		std::list<std::pair<std::string, std::string>> plugins;
+
+		auto statemachinesNodes = mainNode.children("statemachine");
+		for (pugi::xml_node instanceNode : statemachinesNodes)
+		{
+			auto nameAttrib = instanceNode.attribute("name");
+			if (nameAttrib.empty())
+				throw std::runtime_error("missing statemachine name!");
+			std::string sName(nameAttrib.as_string());
+
+			auto libraryAttrib = instanceNode.attribute("library");
+			if (libraryAttrib.empty())
+				throw std::runtime_error("missing statemachine library!");
+			std::string sLibraryName(libraryAttrib.as_string());
+			if (sLibraryName.length() == 0)
+				throw std::runtime_error("empty statemachine library!");
+
+			std::cout << "   - using plugin " << sName << " with library " << sLibraryName << std::endl;
+			plugins.push_back(std::make_pair(sName, sLibraryName));
+
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+				throw std::runtime_error("invalid plugin name: " + sName);
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sLibraryName))
+				throw std::runtime_error("invalid plugin library: " + sLibraryName);
+
+		}
+
+		auto userInterfaceNode = mainNode.child("userinterface");
+		if (userInterfaceNode.empty()) 
+			throw std::runtime_error("missing user interface node");
+
+		// Load user interface
+		auto uiLibraryAttrib = userInterfaceNode.attribute("library");
+		if (uiLibraryAttrib.empty())
+			throw std::runtime_error("missing user interface library");
+		std::string sUILibrary(uiLibraryAttrib.as_string ());
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUILibrary))
+			throw std::runtime_error("invalid user interface library: " + sUILibrary);
+
+		plugins.push_back(std::make_pair("userinterface", sUILibrary));
+
+		std::cout << std::endl;
 		std::cout << "Creating Package XML for project..." << std::endl;
 
+		std::string sExtension = "dll";
+		std::string sPackageName = "Build " + sDevPackagePrefix;
+		std::string sConfigName = sDevPackagePrefix + "_config.xml";
+		std::string sClientName = sDevPackagePrefix + "_core.client";
+		std::string sCoreName = sDevPackagePrefix + "_core_libmc." + sExtension;
+		std::string sCoreResourcesName = sDevPackagePrefix + "_core.data";
+		std::string sCoreDataName = sDevPackagePrefix + "_core_libmcdata." + sExtension;
+		std::string sLib3MFName = sDevPackagePrefix + "_core_lib3mf." + sExtension;
+
+		std::stringstream packageXMLStream;
+
+		packageXMLStream << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+		packageXMLStream << "<amcpackage xmlns=\"http://schemas.autodesk.com/amcpackage/2020/06\">\n";
+		packageXMLStream << "  <build name=\"" << sPackageName << "\" configuration=\"" << sConfigName << "\" coreclient=\"" << sClientName << "\">\n";
+
+		packageXMLStream << "    <library name=\"core\" import=\"" << sCoreName << "\" resources=\"" << sCoreResourcesName << "\" />\n";
+		packageXMLStream << "    <library name=\"datamodel\" import=\"" << sCoreDataName << "\" />\n";
+		packageXMLStream << "    <library name=\"lib3mf\" import=\"" << sLib3MFName << "\" />\n";
+
+		for (auto iDriverIter : drivers) {
+			std::string sLibraryName = iDriverIter.second;
+			packageXMLStream << "    <library name=\"" << sLibraryName << "\" import=\"" << sDevPackagePrefix << "_" << sLibraryName << "." << sExtension << "\" resources=\"" << sDevPackagePrefix << "_" << sLibraryName << ".data\" />\n";
+		}
+
+		for (auto iPluginIter : plugins) {
+			std::string sLibraryName = iPluginIter.second;
+			packageXMLStream << "    <library name=\"" << sLibraryName << "\" import=\"" << sDevPackagePrefix << "_" << sLibraryName << "." << sExtension << "\"  />\n";
+		}
+
+		//fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.%s\" />\n", gitHash, dllExtension);
+		//fmt.Fprintf(pkgfile, "    <library name=\"driver_rasterizer\" import=\"%s_driver_rasterizer.%s\" resources=\"%s_driver_rasterizer.data\"  />\n", gitHash, dllExtension, gitHash);
+
+		packageXMLStream << "  </build>\n";
+		packageXMLStream << "</amcpackage>\n";
+
+		std::string packageXMLString = packageXMLStream.str();
+
+		std::cout << std::endl;
+		std::cout << packageXMLString;
+		std::cout << std::endl;
+		
+		std::string sPackageSHA = AMCCommon::CUtils::calculateSHA256FromString(packageXMLString);
+		
+		std::stringstream serverXMLStream;
+		serverXMLStream << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+		serverXMLStream << "<amc xmlns=\"http://schemas.autodesk.com/amc/2020/06\">\n";
+		serverXMLStream << "  <server hostname=\"0.0.0.0\" port=\"8869\" />\n";
+		serverXMLStream << "  <data directory=\"data/\" database=\"sqlite\" sqlitedb=\"storage.db\" />\n";
+		serverXMLStream << "  <defaultpackage name=\""<< sDevPackagePrefix << "_package.xml\" githash=\"" << sDevPackagePrefix <<"\" sha256=\"" << sPackageSHA << "\" />\n";
+		serverXMLStream << "</amc>\n";
+
+		std::string serverXMLString = serverXMLStream.str();
+
+		{
+			std::cout << "Writing to " << sOutputFileName << ".." << std::endl;
+
+			AMCCommon::CExportStream_Native exportStream(sOutputFileName);
+			exportStream.writeBuffer((void*)packageXMLString.c_str(), packageXMLString.length());
+		}
+		
+		{
+			std::cout << "Writing to " << sServerOutputFileName << ".." << std::endl;
+
+			AMCCommon::CExportStream_Native exportStream(sServerOutputFileName);
+			exportStream.writeBuffer((void*)serverXMLString.c_str(), serverXMLString.length());
+		}
+
+
+		std::cout << "done.." << std::endl;
 
 	}
 	catch (std::exception& E)

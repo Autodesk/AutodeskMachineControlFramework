@@ -90,8 +90,6 @@ if "%ERRORLEVEL%" neq "0" (
 	goto ERROR
 )
 
-go run "%basepath%\BuildScripts\createPackageXML.go" "%builddir%\Output" %GITHASH% win64
-
 cd "%builddir%"
 
 echo "Building Core Modules"
@@ -99,6 +97,10 @@ call cmake ..
 REM call cmake -G "MinGW Makefiles" ..
 call cmake --build . --config Release
 
+
+echo "Building Package XML"
+
+"%builddir%\DevPackage\Framework\create_package_xml.exe" --config "%builddir%\Output\%GITHASH%_config.xml" --devpackage %GITHASH% --output "%builddir%\Output\%GITHASH%_package.xml"
 
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
@@ -111,13 +113,11 @@ if "%ERRORLEVEL%" neq "0" (
 copy ..\githash.txt Framework\Dist\disthash.txt
 copy ..\Output\amc_win32.exe Framework\Dist\
 copy ..\Output\amc_server.exe Framework\Dist\
-copy ..\Output\amc_server.xml Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmc.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_lib3mf.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmcdata.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core.client Framework\Dist\
 copy ..\Output\%GITHASH%_*.data Framework\Dist\
-copy ..\Output\%GITHASH%_package.xml Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\..\Framework\HeadersDev\CppDynamic\*.* Framework\HeadersDev\CppDynamic
 copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
