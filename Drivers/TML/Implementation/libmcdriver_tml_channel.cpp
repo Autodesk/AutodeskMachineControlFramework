@@ -68,7 +68,7 @@ std::string CChannel::GetIdentifier()
     return m_sChannelIdentifier;
 }
 
-IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer)
+IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM)
 {
     if (sIdentifier.empty())
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER);
@@ -79,7 +79,7 @@ IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML
     if ((nConfigurationBufferSize == 0) || (pConfigurationBuffer == nullptr))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER);
 
-    m_pTMLInstance->setupAxis(m_sChannelIdentifier, sIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer);
+    m_pTMLInstance->setupAxis(m_sChannelIdentifier, sIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer, nCountsPerMM);
 
     return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier);
 

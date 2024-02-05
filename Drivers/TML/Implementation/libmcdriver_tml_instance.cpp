@@ -62,8 +62,8 @@ Abstract: This is a stub class definition of CChannel
 using namespace LibMCDriver_TML::Impl;
 
 
-CTMLAxisInstance::CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID)
-    :  m_sChannelIdentifier (sChannelIdentifier), m_sAxisIdentifier(sAxisIdentifier), m_nHardwareID (nHardwareID)
+CTMLAxisInstance::CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID, uint32_t nCountsPerMM)
+    :  m_sChannelIdentifier (sChannelIdentifier), m_sAxisIdentifier(sAxisIdentifier), m_nHardwareID (nHardwareID), m_nCountsPerMM (nCountsPerMM)
 {
 
 }
@@ -86,6 +86,17 @@ std::string CTMLAxisInstance::getChannelIdentifier()
 uint8_t CTMLAxisInstance::getHardwareID()
 {
     return m_nHardwareID;
+}
+
+uint32_t CTMLAxisInstance::getCountsPerMM()
+{
+    return m_nCountsPerMM;
+}
+
+int32_t CTMLAxisInstance::convertToMM(double nInputValue, uint8_t distance_scaller, uint8_t time_scaler)
+{
+    //Time scaler has never not be found to be 1000
+    return (int32_t)(m_nCountsPerMM * pow(nInputValue, distance_scaller) * pow(1000, time_scaler));
 }
 
 
@@ -239,7 +250,8 @@ bool CTMLInstance::axisExists(const std::string& sAxisIdentifier)
 }
 
 
-void CTMLInstance::setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer)
+void CTMLInstance::setupAxis(   const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, 
+                                uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer, uint32_t nCountsPerMM)
 {
     if (!checkIdentifierString(sChannelIdentifier))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sChannelIdentifier);
@@ -265,7 +277,7 @@ void CTMLInstance::setupAxis(const std::string& sChannelIdentifier, const std::s
 
     m_pTMLSDK->checkError(m_pTMLSDK->TS_SetupAxis((uint8_t)nAxisID, nSetupID));
 
-    m_AxisMap.insert(std::make_pair(sAxisIdentifier, CTMLAxisInstance(sChannelIdentifier, sAxisIdentifier, (uint8_t)nAxisID)));
+    m_AxisMap.insert(std::make_pair(sAxisIdentifier, CTMLAxisInstance(sChannelIdentifier, sAxisIdentifier, (uint8_t)nAxisID, nCountsPerMM)));
 
     selectAxisInternal(sAxisIdentifier);
 
@@ -305,6 +317,22 @@ void CTMLInstance::ensureAxisExistsInChannel(const std::string& sChannelIdentifi
 }
 
 
+void CTMLInstance::moveAxisRelative(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nDistance, double nSpeed, double nAcceleration)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    auto nCountsDistance = iIter->second.convertToMM(nDistance, 1, 0);
+    auto nCountsSpeed = iIter->second.convertToMM(nSpeed, 1, 1);
+    auto nCountsAcceleration = iIter->second.convertToMM(nAcceleration, 1, 2);
+
+#define FROM_MEASURE 0
+#define FROM_REFERENCE 1
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_MoveRelative(nCountsDistance, nCountsSpeed, nCountsAcceleration, true, (tmlShort)1, FROM_REFERENCE));
+}
 
 void CTMLInstance::setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable)
 {

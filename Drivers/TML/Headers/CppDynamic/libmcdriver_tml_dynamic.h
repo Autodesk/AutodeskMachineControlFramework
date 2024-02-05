@@ -119,6 +119,17 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_QueryParametersExPtr) (Li
 **************************************************************************************************************************/
 
 /**
+* Moves the selected drive a relative distance.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] dDistance - Distance (mm)
+* @param[in] dSpeed - Speed (mm/s)
+* @param[in] dAcceleration - Acceleration (mm/s^2)
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_MoveRelativePtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double dDistance, LibMCDriver_TML_double dSpeed, LibMCDriver_TML_double dAcceleration);
+
+/**
 * Returns the axis identifier.
 *
 * @param[in] pAxis - Axis instance.
@@ -191,10 +202,11 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_GetIdentifierPtr) (LibMC
 * @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
 * @param[in] nConfigurationBufferSize - Number of elements in buffer
 * @param[in] pConfigurationBuffer - uint8 buffer of Configuration ZIP file for the axis.
+* @param[in] nCountsPerMM - Sets the mm per count used for all moves and accelerations.
 * @param[out] pAxisInstance - Returns the axis instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_SetupAxisPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_Axis * pAxisInstance);
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_SetupAxisPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_uint32 nCountsPerMM, LibMCDriver_TML_Axis * pAxisInstance);
 
 /**
 * Finds an existing axis of this channel.
@@ -372,6 +384,7 @@ typedef struct {
 	PLibMCDriver_TMLDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_TMLDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_TMLDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
+	PLibMCDriver_TMLAxis_MoveRelativePtr m_Axis_MoveRelative;
 	PLibMCDriver_TMLAxis_GetIdentifierPtr m_Axis_GetIdentifier;
 	PLibMCDriver_TMLAxis_GetChannelIdentifierPtr m_Axis_GetChannelIdentifier;
 	PLibMCDriver_TMLAxis_SetPowerPtr m_Axis_SetPower;

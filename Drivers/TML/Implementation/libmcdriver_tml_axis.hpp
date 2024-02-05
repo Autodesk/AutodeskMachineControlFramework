@@ -74,6 +74,7 @@ public:
     void SetPower(const bool bEnable) override;
     LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister) override;
     bool CheckPower() override;
+    void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) override;
 
     std::string GetIdentifier() override;
 

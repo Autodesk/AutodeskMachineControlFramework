@@ -60,6 +60,10 @@ CAxis::~CAxis()
 
 }
 
+void CAxis::MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration)
+{
+
+}
 
 void CAxis::SetPower(const bool bEnable)
 {

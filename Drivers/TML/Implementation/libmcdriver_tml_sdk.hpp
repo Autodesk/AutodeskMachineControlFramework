@@ -117,6 +117,7 @@ namespace LibMCDriver_TML {
 			PTS_Power TS_Power = nullptr;
 			PTS_ReadStatus TS_ReadStatus = nullptr;
 			PTS_GetLastErrorText TS_GetLastErrorText = nullptr;
+			PTS_MoveRelative TS_MoveRelative = nullptr;
 
 			CTMLSDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);			
 			virtual ~CTMLSDK();

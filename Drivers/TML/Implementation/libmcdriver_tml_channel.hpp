@@ -69,7 +69,7 @@ public:
 
     std::string GetIdentifier() override;
 
-    IAxis* SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer) override;
+    IAxis* SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM) override;
 
     IAxis* FindAxis(const std::string& sIdentifier) override;
 

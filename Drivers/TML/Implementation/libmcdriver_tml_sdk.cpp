@@ -126,7 +126,7 @@ CTMLSDK::CTMLSDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirecto
 	this->TS_Power = (PTS_Power)_loadTMLAddress(hLibrary, "TS_Power", 0);
 	this->TS_ReadStatus = (PTS_ReadStatus)_loadTMLAddress(hLibrary, "TS_ReadStatus", 0);
 	this->TS_GetLastErrorText = (PTS_GetLastErrorText)_loadTMLAddress(hLibrary, "TS_GetLastErrorText", 0);
-
+	this->TS_MoveRelative = (PTS_MoveRelative)_loadTMLAddress(hLibrary, "TS_MoveRelative", 0);
 	m_LibraryHandle = (void*) hLibrary;
 }
 

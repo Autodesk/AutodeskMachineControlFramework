@@ -146,6 +146,12 @@ Custom implementation
 -->
 
 	<class name="Axis" parent="Base" description="An axis of a TML Channel.">
+	
+		<method name="MoveRelative" description="Moves the selected drive a relative distance.">		
+			<param name="Distance" type="double" pass="in" description="Distance (mm)" />
+			<param name="Speed" type="double" pass="in" description="Speed (mm/s)" />
+			<param name="Acceleration" type="double" pass="in" description="Acceleration (mm/s^2)" />
+		</method>	
 
 		<method name="GetIdentifier" description="Returns the axis identifier.">		
 			<param name="Identifier" type="string" pass="return" description="Axis identifier." />
@@ -183,6 +189,7 @@ Custom implementation
 			<param name="Identifier" type="string" pass="in" description="Identifier for the axis. Fails if axis already exist." />
 			<param name="AxisID" type="uint32" pass="in" description="Hardware ID of the axis. MUST be unique in the channel." />
 			<param name="Configuration" type="basicarray" class="uint8" pass="in" description="Configuration ZIP file for the axis." />
+			<param name="CountsPerMM" type="uint32" pass="in" description="Sets the mm per count used for all moves and accelerations." />
 			<param name="AxisInstance" type="class" class="Axis" pass="return" description="Returns the axis instance." />
 		</method>	
 

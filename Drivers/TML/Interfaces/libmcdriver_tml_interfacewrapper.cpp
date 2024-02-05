@@ -317,6 +317,30 @@ LibMCDriver_TMLResult libmcdriver_tml_driver_queryparametersex(LibMCDriver_TML_D
 /*************************************************************************************************************************
  Class implementation for Axis
 **************************************************************************************************************************/
+LibMCDriver_TMLResult libmcdriver_tml_axis_moverelative(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double dDistance, LibMCDriver_TML_double dSpeed, LibMCDriver_TML_double dAcceleration)
+{
+	IBase* pIBaseClass = (IBase *)pAxis;
+
+	try {
+		IAxis* pIAxis = dynamic_cast<IAxis*>(pIBaseClass);
+		if (!pIAxis)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		pIAxis->MoveRelative(dDistance, dSpeed, dAcceleration);
+
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_TMLResult libmcdriver_tml_axis_getidentifier(LibMCDriver_TML_Axis pAxis, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pAxis;
@@ -541,7 +565,7 @@ LibMCDriver_TMLResult libmcdriver_tml_channel_getidentifier(LibMCDriver_TML_Chan
 	}
 }
 
-LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_Axis * pAxisInstance)
+LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_uint32 nCountsPerMM, LibMCDriver_TML_Axis * pAxisInstance)
 {
 	IBase* pIBaseClass = (IBase *)pChannel;
 
@@ -558,7 +582,7 @@ LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel 
 		if (!pIChannel)
 			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
 		
-		pBaseAxisInstance = pIChannel->SetupAxis(sIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer);
+		pBaseAxisInstance = pIChannel->SetupAxis(sIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer, nCountsPerMM);
 
 		*pAxisInstance = (IBase*)(pBaseAxisInstance);
 		return LIBMCDRIVER_TML_SUCCESS;
@@ -863,6 +887,8 @@ LibMCDriver_TMLResult LibMCDriver_TML::Impl::LibMCDriver_TML_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_queryparameters;
 	if (sProcName == "libmcdriver_tml_driver_queryparametersex") 
 		*ppProcAddress = (void*) &libmcdriver_tml_driver_queryparametersex;
+	if (sProcName == "libmcdriver_tml_axis_moverelative") 
+		*ppProcAddress = (void*) &libmcdriver_tml_axis_moverelative;
 	if (sProcName == "libmcdriver_tml_axis_getidentifier") 
 		*ppProcAddress = (void*) &libmcdriver_tml_axis_getidentifier;
 	if (sProcName == "libmcdriver_tml_axis_getchannelidentifier") 

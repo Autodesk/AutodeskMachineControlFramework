@@ -132,6 +132,17 @@ LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_driver_queryparam
 **************************************************************************************************************************/
 
 /**
+* Moves the selected drive a relative distance.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] dDistance - Distance (mm)
+* @param[in] dSpeed - Speed (mm/s)
+* @param[in] dAcceleration - Acceleration (mm/s^2)
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_moverelative(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double dDistance, LibMCDriver_TML_double dSpeed, LibMCDriver_TML_double dAcceleration);
+
+/**
 * Returns the axis identifier.
 *
 * @param[in] pAxis - Axis instance.
@@ -204,10 +215,11 @@ LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_channel_getidenti
 * @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
 * @param[in] nConfigurationBufferSize - Number of elements in buffer
 * @param[in] pConfigurationBuffer - uint8 buffer of Configuration ZIP file for the axis.
+* @param[in] nCountsPerMM - Sets the mm per count used for all moves and accelerations.
 * @param[out] pAxisInstance - Returns the axis instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_Axis * pAxisInstance);
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_channel_setupaxis(LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_uint32 nCountsPerMM, LibMCDriver_TML_Axis * pAxisInstance);
 
 /**
 * Finds an existing axis of this channel.

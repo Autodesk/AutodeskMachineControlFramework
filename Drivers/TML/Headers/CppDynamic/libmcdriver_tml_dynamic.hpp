@@ -468,6 +468,7 @@ public:
 	{
 	}
 	
+	inline void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration);
 	inline std::string GetIdentifier();
 	inline std::string GetChannelIdentifier();
 	inline void SetPower(const bool bEnable);
@@ -490,7 +491,7 @@ public:
 	}
 	
 	inline std::string GetIdentifier();
-	inline PAxis SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const CInputVector<LibMCDriver_TML_uint8> & ConfigurationBuffer);
+	inline PAxis SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const CInputVector<LibMCDriver_TML_uint8> & ConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM);
 	inline PAxis FindAxis(const std::string & sIdentifier);
 	inline bool AxisExists(const std::string & sIdentifier);
 	inline void Close();
@@ -646,6 +647,7 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
+		pWrapperTable->m_Axis_MoveRelative = nullptr;
 		pWrapperTable->m_Axis_GetIdentifier = nullptr;
 		pWrapperTable->m_Axis_GetChannelIdentifier = nullptr;
 		pWrapperTable->m_Axis_SetPower = nullptr;
@@ -771,6 +773,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParametersEx == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_MoveRelative = (PLibMCDriver_TMLAxis_MoveRelativePtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_moverelative");
+		#else // _WIN32
+		pWrapperTable->m_Axis_MoveRelative = (PLibMCDriver_TMLAxis_MoveRelativePtr) dlsym(hLibrary, "libmcdriver_tml_axis_moverelative");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_MoveRelative == nullptr)
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1020,6 +1031,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParametersEx == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_moverelative", (void**)&(pWrapperTable->m_Axis_MoveRelative));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_MoveRelative == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_tml_axis_getidentifier", (void**)&(pWrapperTable->m_Axis_GetIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetIdentifier == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1204,6 +1219,17 @@ public:
 	 */
 	
 	/**
+	* CAxis::MoveRelative - Moves the selected drive a relative distance.
+	* @param[in] dDistance - Distance (mm)
+	* @param[in] dSpeed - Speed (mm/s)
+	* @param[in] dAcceleration - Acceleration (mm/s^2)
+	*/
+	void CAxis::MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_MoveRelative(m_pHandle, dDistance, dSpeed, dAcceleration));
+	}
+	
+	/**
 	* CAxis::GetIdentifier - Returns the axis identifier.
 	* @return Axis identifier.
 	*/
@@ -1291,12 +1317,13 @@ public:
 	* @param[in] sIdentifier - Identifier for the axis. Fails if axis already exist.
 	* @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
 	* @param[in] ConfigurationBuffer - Configuration ZIP file for the axis.
+	* @param[in] nCountsPerMM - Sets the mm per count used for all moves and accelerations.
 	* @return Returns the axis instance.
 	*/
-	PAxis CChannel::SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const CInputVector<LibMCDriver_TML_uint8> & ConfigurationBuffer)
+	PAxis CChannel::SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const CInputVector<LibMCDriver_TML_uint8> & ConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM)
 	{
 		LibMCDriver_TMLHandle hAxisInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Channel_SetupAxis(m_pHandle, sIdentifier.c_str(), nAxisID, (LibMCDriver_TML_uint64)ConfigurationBuffer.size(), ConfigurationBuffer.data(), &hAxisInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Channel_SetupAxis(m_pHandle, sIdentifier.c_str(), nAxisID, (LibMCDriver_TML_uint64)ConfigurationBuffer.size(), ConfigurationBuffer.data(), nCountsPerMM, &hAxisInstance));
 		
 		if (!hAxisInstance) {
 			CheckError(LIBMCDRIVER_TML_ERROR_INVALIDPARAM);

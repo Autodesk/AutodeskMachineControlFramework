@@ -57,10 +57,12 @@ private:
     std::string m_sAxisIdentifier;
     std::string m_sChannelIdentifier;
     uint8_t m_nHardwareID;
+    uint32_t m_nCountsPerMM;
+
 
 public:
 
-    CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID);
+    CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID, uint32_t nCountsPerMM);
 
     virtual ~CTMLAxisInstance();
 
@@ -69,6 +71,10 @@ public:
     std::string getChannelIdentifier ();
 
     uint8_t getHardwareID ();
+
+    uint32_t getCountsPerMM();
+
+    int32_t convertToMM(double nInputValue, uint8_t distance_scaller = 1, uint8_t time_scaler = 0);
 
 };
 
@@ -104,11 +110,13 @@ public:
 
     bool axisExists(const std::string& sAxisIdentifier);
 
-    void setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer);
+    void setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer, uint32_t nCountsPerMM);
 
     void selectAxisInternal(const std::string& sAxisIdentifier);
 
     void setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable);
+
+    void moveAxisRelative(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nDistance, double nSpeed, double nAcceleration);
 
     tmlWord readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister);
 

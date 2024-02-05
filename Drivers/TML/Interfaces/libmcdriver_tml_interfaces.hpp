@@ -317,6 +317,14 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IAxis : public virtual IBase {
 public:
 	/**
+	* IAxis::MoveRelative - Moves the selected drive a relative distance.
+	* @param[in] dDistance - Distance (mm)
+	* @param[in] dSpeed - Speed (mm/s)
+	* @param[in] dAcceleration - Acceleration (mm/s^2)
+	*/
+	virtual void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) = 0;
+
+	/**
 	* IAxis::GetIdentifier - Returns the axis identifier.
 	* @return Axis identifier.
 	*/
@@ -370,9 +378,10 @@ public:
 	* @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
 	* @param[in] nConfigurationBufferSize - Number of elements in buffer
 	* @param[in] pConfigurationBuffer - Configuration ZIP file for the axis.
+	* @param[in] nCountsPerMM - Sets the mm per count used for all moves and accelerations.
 	* @return Returns the axis instance.
 	*/
-	virtual IAxis * SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer) = 0;
+	virtual IAxis * SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM) = 0;
 
 	/**
 	* IChannel::FindAxis - Finds an existing axis of this channel.
