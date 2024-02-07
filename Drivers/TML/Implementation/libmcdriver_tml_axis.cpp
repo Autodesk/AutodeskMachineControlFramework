@@ -62,7 +62,7 @@ CAxis::~CAxis()
 
 void CAxis::MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration)
 {
-
+    m_pTMLInstance->moveAxisRelative(m_sChannelIdentifier, m_sAxisIdentifier, dDistance, dSpeed, dAcceleration);
 }
 
 void CAxis::SetPower(const bool bEnable)
@@ -98,4 +98,34 @@ std::string CAxis::GetIdentifier()
 std::string CAxis::GetChannelIdentifier()
 {
     return m_sChannelIdentifier;
+}
+
+
+void CAxis::CallSubroutine(const std::string& sRoutine) {
+    return m_pTMLInstance->callSubroutine(m_sChannelIdentifier, m_sAxisIdentifier, sRoutine);
+}
+void CAxis::MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) {
+
+}
+LibMCDriver_TML_double CAxis::GetPosition() {
+
+    return m_pTMLInstance->readPosition(m_sChannelIdentifier, m_sAxisIdentifier);
+
+}
+LibMCDriver_TML_double CAxis::GetSpeed() {
+
+    return m_pTMLInstance->readSpeed(m_sChannelIdentifier, m_sAxisIdentifier);
+
+}
+
+LibMCDriver_TML_int32 CAxis::GetIntVariable(const std::string& sVariableName) {
+
+    return (LibMCDriver_TML_int32)m_pTMLInstance->readIntVariable(m_sChannelIdentifier, m_sAxisIdentifier, sVariableName);
+
+}
+
+bool CAxis::MotionComplete() {
+    bool bValue = false;
+    return bValue;
+
 }

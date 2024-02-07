@@ -143,6 +143,63 @@ LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_driver_queryparam
 LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_moverelative(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double dDistance, LibMCDriver_TML_double dSpeed, LibMCDriver_TML_double dAcceleration);
 
 /**
+* Moves the selected drive to an absolute location.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] dDistance - Distance (mm)
+* @param[in] dSpeed - Speed (mm/s)
+* @param[in] dAcceleration - Acceleration (mm/s^2)
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_moveabsolute(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double dDistance, LibMCDriver_TML_double dSpeed, LibMCDriver_TML_double dAcceleration);
+
+/**
+* Runs a subroutine on the selected drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] pRoutine - Label of routine
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_callsubroutine(LibMCDriver_TML_Axis pAxis, const char * pRoutine);
+
+/**
+* Retrieves the current position of the drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pPosition - Position (mm)
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_getposition(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double * pPosition);
+
+/**
+* Retrieves the current speed of the drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pSpeed - Speed (mm/s)
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_getspeed(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double * pSpeed);
+
+/**
+* Retrieves the current position of the drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] pVariableName - Variable name
+* @param[out] pValue - Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_getintvariable(LibMCDriver_TML_Axis pAxis, const char * pVariableName, LibMCDriver_TML_int32 * pValue);
+
+/**
+* Checks to see if the is currently moving.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pMotionComplete - Boolean reflecting if the drive is in currently moving.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_motioncomplete(LibMCDriver_TML_Axis pAxis, bool * pMotionComplete);
+
+/**
 * Returns the axis identifier.
 *
 * @param[in] pAxis - Axis instance.

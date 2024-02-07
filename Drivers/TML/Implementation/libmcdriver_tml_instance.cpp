@@ -93,10 +93,22 @@ uint32_t CTMLAxisInstance::getCountsPerMM()
     return m_nCountsPerMM;
 }
 
-int32_t CTMLAxisInstance::convertToMM(double nInputValue, uint8_t distance_scaller, uint8_t time_scaler)
+double CTMLAxisInstance::convertCountsToMM(double nInputValue, uint8_t distance_scaller, uint8_t time_scaler)
 {
     //Time scaler has never not be found to be 1000
-    return (int32_t)(m_nCountsPerMM * pow(nInputValue, distance_scaller) * pow(1000, time_scaler));
+    double distanceScaler = pow(m_nCountsPerMM, distance_scaller);
+    double timeScaler = pow(1000, time_scaler);
+
+    return (double)(nInputValue * timeScaler / distanceScaler);
+}
+
+double CTMLAxisInstance::convertMMToCounts(double nInputValue, uint8_t distance_scaller, uint8_t time_scaler)
+{
+    //Time scaler has never not be found to be 1000
+    double distanceScaler = pow(m_nCountsPerMM, distance_scaller);
+    double timeScaler = pow(1000, time_scaler);
+
+    return (double)(nInputValue * distanceScaler / timeScaler);
 }
 
 
@@ -324,9 +336,9 @@ void CTMLInstance::moveAxisRelative(const std::string& sChannelIdentifier, const
 
     auto iIter = m_AxisMap.find(sAxisIdentifier);
 
-    auto nCountsDistance = iIter->second.convertToMM(nDistance, 1, 0);
-    auto nCountsSpeed = iIter->second.convertToMM(nSpeed, 1, 1);
-    auto nCountsAcceleration = iIter->second.convertToMM(nAcceleration, 1, 2);
+    auto nCountsDistance = iIter->second.convertMMToCounts(nDistance, 1, 0);
+    auto nCountsSpeed = iIter->second.convertMMToCounts(nSpeed, 1, 1);
+    auto nCountsAcceleration = iIter->second.convertMMToCounts(nAcceleration, 1, 2);
 
 #define FROM_MEASURE 0
 #define FROM_REFERENCE 1
@@ -353,4 +365,80 @@ tmlWord CTMLInstance::readAxisStatus(const std::string& sChannelIdentifier, cons
     m_pTMLSDK->checkError(m_pTMLSDK->TS_ReadStatus(sReadRegister, pStatus));
 
     return pStatus;
+}
+
+
+void CTMLInstance::moveAxisAbsolute(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nLocation, double nSpeed, double nAcceleration)
+{
+
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    auto nCountsDistance = iIter->second.convertMMToCounts(nLocation, 1, 0);
+    auto nCountsSpeed = iIter->second.convertMMToCounts(nSpeed, 1, 1);
+    auto nCountsAcceleration = iIter->second.convertMMToCounts(nAcceleration, 1, 2);
+
+#define FROM_MEASURE 0
+#define FROM_REFERENCE 1
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_MoveAbsolute(nCountsDistance, nCountsSpeed, nCountsAcceleration, (tmlShort)1, FROM_REFERENCE));
+
+}
+
+tmlShort CTMLInstance::readIntVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+    tmlShort sRetInt;
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_GetIntVariable(label.c_str(), sRetInt));
+    return sRetInt;
+}
+
+tmlLong CTMLInstance::readLongVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+    tmlLong sRetInt;
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_GetLongVariable(label.c_str(), sRetInt));
+    return sRetInt;
+}
+
+tmlLong CTMLInstance::readFixedVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+    double sRetInt;
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_GetFixedVariable(label.c_str(), sRetInt));
+    return sRetInt;
+}
+
+tmlLong CTMLInstance::readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+{
+    tmlLong lPosition = readLongVariable(sChannelIdentifier, sAxisIdentifier, "APOS");
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    return iIter->second.convertCountsToMM(lPosition, 1, 0);
+
+}
+
+tmlLong CTMLInstance::readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+{
+    tmlLong lSpeed = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "TSPD");
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    return iIter->second.convertCountsToMM(lSpeed, 1, 1);
+
+}
+
+void CTMLInstance::callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sAxisIdentifier);
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_CALL_Label(label.c_str()));
+
 }

@@ -153,6 +153,36 @@ Custom implementation
 			<param name="Acceleration" type="double" pass="in" description="Acceleration (mm/s^2)" />
 		</method>	
 
+		<method name="MoveAbsolute" description="Moves the selected drive to an absolute location.">		
+			<param name="Distance" type="double" pass="in" description="Distance (mm)" />
+			<param name="Speed" type="double" pass="in" description="Speed (mm/s)" />
+			<param name="Acceleration" type="double" pass="in" description="Acceleration (mm/s^2)" />
+		</method>	
+		
+		<method name="CallSubroutine" description="Runs a subroutine on the selected drive.">		
+			<param name="Routine" type="string" pass="in" description="Label of routine" />
+		</method>	
+		
+		<method name="GetPosition" description="Retrieves the current position of the drive.">		
+			<param name="Position" type="double" pass="return" description="Position (mm)" />
+		</method>
+		
+		<method name="GetSpeed" description="Retrieves the current speed of the drive.">		
+			<param name="Speed" type="double" pass="return" description="Speed (mm/s)" />
+		</method>	
+				
+		<method name="GetIntVariable" description="Retrieves the current position of the drive.">		
+			<param name="VariableName" type="string" pass="in" description="Variable name" />
+			<param name="Value" type="int32" pass="return" description="Value" />
+		</method>	
+		
+		<method name="MotionComplete" description="Checks to see if the is currently moving.">		
+			<param name="MotionComplete" type="bool" pass="return" description="Boolean reflecting if the drive is in currently moving." />
+		</method>	
+				
+		
+		
+
 		<method name="GetIdentifier" description="Returns the axis identifier.">		
 			<param name="Identifier" type="string" pass="return" description="Axis identifier." />
 		</method>	

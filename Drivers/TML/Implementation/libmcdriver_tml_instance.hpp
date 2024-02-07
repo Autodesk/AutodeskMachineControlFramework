@@ -74,7 +74,8 @@ public:
 
     uint32_t getCountsPerMM();
 
-    int32_t convertToMM(double nInputValue, uint8_t distance_scaller = 1, uint8_t time_scaler = 0);
+    double convertMMToCounts(double nInputValue, uint8_t distance_scaller = 1, uint8_t time_scaler = 0);
+    double convertCountsToMM(double nInputValue, uint8_t distance_scaller = 1, uint8_t time_scaler = 0);
 
 };
 
@@ -117,6 +118,20 @@ public:
     void setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable);
 
     void moveAxisRelative(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nDistance, double nSpeed, double nAcceleration);
+
+    void moveAxisAbsolute(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nLocation, double nSpeed, double nAcceleration);
+
+    tmlShort readIntVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlLong readLongVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlLong readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+
+    tmlLong readFixedVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlLong readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+
+    void callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
     tmlWord readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister);
 

@@ -75,8 +75,13 @@ public:
     LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister) override;
     bool CheckPower() override;
     void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) override;
-
+    void MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) override;
     std::string GetIdentifier() override;
+    void CallSubroutine(const std::string& sRoutine) override;
+    LibMCDriver_TML_double GetPosition() override;
+    LibMCDriver_TML_double GetSpeed() override;
+    LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName) override;
+    bool MotionComplete() override;
 
     std::string GetChannelIdentifier() override;
 

@@ -469,6 +469,12 @@ public:
 	}
 	
 	inline void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration);
+	inline void MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration);
+	inline void CallSubroutine(const std::string & sRoutine);
+	inline LibMCDriver_TML_double GetPosition();
+	inline LibMCDriver_TML_double GetSpeed();
+	inline LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName);
+	inline bool MotionComplete();
 	inline std::string GetIdentifier();
 	inline std::string GetChannelIdentifier();
 	inline void SetPower(const bool bEnable);
@@ -648,6 +654,12 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_Axis_MoveRelative = nullptr;
+		pWrapperTable->m_Axis_MoveAbsolute = nullptr;
+		pWrapperTable->m_Axis_CallSubroutine = nullptr;
+		pWrapperTable->m_Axis_GetPosition = nullptr;
+		pWrapperTable->m_Axis_GetSpeed = nullptr;
+		pWrapperTable->m_Axis_GetIntVariable = nullptr;
+		pWrapperTable->m_Axis_MotionComplete = nullptr;
 		pWrapperTable->m_Axis_GetIdentifier = nullptr;
 		pWrapperTable->m_Axis_GetChannelIdentifier = nullptr;
 		pWrapperTable->m_Axis_SetPower = nullptr;
@@ -782,6 +794,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Axis_MoveRelative == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_MoveAbsolute = (PLibMCDriver_TMLAxis_MoveAbsolutePtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_moveabsolute");
+		#else // _WIN32
+		pWrapperTable->m_Axis_MoveAbsolute = (PLibMCDriver_TMLAxis_MoveAbsolutePtr) dlsym(hLibrary, "libmcdriver_tml_axis_moveabsolute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_MoveAbsolute == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_CallSubroutine = (PLibMCDriver_TMLAxis_CallSubroutinePtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_callsubroutine");
+		#else // _WIN32
+		pWrapperTable->m_Axis_CallSubroutine = (PLibMCDriver_TMLAxis_CallSubroutinePtr) dlsym(hLibrary, "libmcdriver_tml_axis_callsubroutine");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_CallSubroutine == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_GetPosition = (PLibMCDriver_TMLAxis_GetPositionPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_getposition");
+		#else // _WIN32
+		pWrapperTable->m_Axis_GetPosition = (PLibMCDriver_TMLAxis_GetPositionPtr) dlsym(hLibrary, "libmcdriver_tml_axis_getposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_GetPosition == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_GetSpeed = (PLibMCDriver_TMLAxis_GetSpeedPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_getspeed");
+		#else // _WIN32
+		pWrapperTable->m_Axis_GetSpeed = (PLibMCDriver_TMLAxis_GetSpeedPtr) dlsym(hLibrary, "libmcdriver_tml_axis_getspeed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_GetSpeed == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_GetIntVariable = (PLibMCDriver_TMLAxis_GetIntVariablePtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_getintvariable");
+		#else // _WIN32
+		pWrapperTable->m_Axis_GetIntVariable = (PLibMCDriver_TMLAxis_GetIntVariablePtr) dlsym(hLibrary, "libmcdriver_tml_axis_getintvariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_GetIntVariable == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_MotionComplete = (PLibMCDriver_TMLAxis_MotionCompletePtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_motioncomplete");
+		#else // _WIN32
+		pWrapperTable->m_Axis_MotionComplete = (PLibMCDriver_TMLAxis_MotionCompletePtr) dlsym(hLibrary, "libmcdriver_tml_axis_motioncomplete");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_MotionComplete == nullptr)
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1035,6 +1101,30 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_MoveRelative == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_moveabsolute", (void**)&(pWrapperTable->m_Axis_MoveAbsolute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_MoveAbsolute == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_callsubroutine", (void**)&(pWrapperTable->m_Axis_CallSubroutine));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_CallSubroutine == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_getposition", (void**)&(pWrapperTable->m_Axis_GetPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetPosition == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_getspeed", (void**)&(pWrapperTable->m_Axis_GetSpeed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetSpeed == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_getintvariable", (void**)&(pWrapperTable->m_Axis_GetIntVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetIntVariable == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_motioncomplete", (void**)&(pWrapperTable->m_Axis_MotionComplete));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_MotionComplete == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_tml_axis_getidentifier", (void**)&(pWrapperTable->m_Axis_GetIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetIdentifier == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1227,6 +1317,75 @@ public:
 	void CAxis::MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Axis_MoveRelative(m_pHandle, dDistance, dSpeed, dAcceleration));
+	}
+	
+	/**
+	* CAxis::MoveAbsolute - Moves the selected drive to an absolute location.
+	* @param[in] dDistance - Distance (mm)
+	* @param[in] dSpeed - Speed (mm/s)
+	* @param[in] dAcceleration - Acceleration (mm/s^2)
+	*/
+	void CAxis::MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_MoveAbsolute(m_pHandle, dDistance, dSpeed, dAcceleration));
+	}
+	
+	/**
+	* CAxis::CallSubroutine - Runs a subroutine on the selected drive.
+	* @param[in] sRoutine - Label of routine
+	*/
+	void CAxis::CallSubroutine(const std::string & sRoutine)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_CallSubroutine(m_pHandle, sRoutine.c_str()));
+	}
+	
+	/**
+	* CAxis::GetPosition - Retrieves the current position of the drive.
+	* @return Position (mm)
+	*/
+	LibMCDriver_TML_double CAxis::GetPosition()
+	{
+		LibMCDriver_TML_double resultPosition = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetPosition(m_pHandle, &resultPosition));
+		
+		return resultPosition;
+	}
+	
+	/**
+	* CAxis::GetSpeed - Retrieves the current speed of the drive.
+	* @return Speed (mm/s)
+	*/
+	LibMCDriver_TML_double CAxis::GetSpeed()
+	{
+		LibMCDriver_TML_double resultSpeed = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetSpeed(m_pHandle, &resultSpeed));
+		
+		return resultSpeed;
+	}
+	
+	/**
+	* CAxis::GetIntVariable - Retrieves the current position of the drive.
+	* @param[in] sVariableName - Variable name
+	* @return Value
+	*/
+	LibMCDriver_TML_int32 CAxis::GetIntVariable(const std::string & sVariableName)
+	{
+		LibMCDriver_TML_int32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetIntVariable(m_pHandle, sVariableName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CAxis::MotionComplete - Checks to see if the is currently moving.
+	* @return Boolean reflecting if the drive is in currently moving.
+	*/
+	bool CAxis::MotionComplete()
+	{
+		bool resultMotionComplete = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_MotionComplete(m_pHandle, &resultMotionComplete));
+		
+		return resultMotionComplete;
 	}
 	
 	/**

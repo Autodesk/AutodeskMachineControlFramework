@@ -325,6 +325,45 @@ public:
 	virtual void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) = 0;
 
 	/**
+	* IAxis::MoveAbsolute - Moves the selected drive to an absolute location.
+	* @param[in] dDistance - Distance (mm)
+	* @param[in] dSpeed - Speed (mm/s)
+	* @param[in] dAcceleration - Acceleration (mm/s^2)
+	*/
+	virtual void MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) = 0;
+
+	/**
+	* IAxis::CallSubroutine - Runs a subroutine on the selected drive.
+	* @param[in] sRoutine - Label of routine
+	*/
+	virtual void CallSubroutine(const std::string & sRoutine) = 0;
+
+	/**
+	* IAxis::GetPosition - Retrieves the current position of the drive.
+	* @return Position (mm)
+	*/
+	virtual LibMCDriver_TML_double GetPosition() = 0;
+
+	/**
+	* IAxis::GetSpeed - Retrieves the current speed of the drive.
+	* @return Speed (mm/s)
+	*/
+	virtual LibMCDriver_TML_double GetSpeed() = 0;
+
+	/**
+	* IAxis::GetIntVariable - Retrieves the current position of the drive.
+	* @param[in] sVariableName - Variable name
+	* @return Value
+	*/
+	virtual LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName) = 0;
+
+	/**
+	* IAxis::MotionComplete - Checks to see if the is currently moving.
+	* @return Boolean reflecting if the drive is in currently moving.
+	*/
+	virtual bool MotionComplete() = 0;
+
+	/**
 	* IAxis::GetIdentifier - Returns the axis identifier.
 	* @return Axis identifier.
 	*/

@@ -74,6 +74,11 @@ namespace LibMCDriver_TML {
 		typedef bool(TML_CALLINGCONVENTION* PTS_MoveAbsolute) (tmlLong nAbsPosition, double dSpeed, double dAcceleration, tmlShort nMoveMoment, tmlShort nReferenceBase);
 		typedef bool(TML_CALLINGCONVENTION* PTS_MoveRelative) (tmlLong nRelativePosition, double dSpeed, double dAcceleration, tmlBool isAdditive, tmlShort nMoveMoment, tmlShort nReferenceBase);
 		typedef bool(TML_CALLINGCONVENTION* PTS_MoveVelocity) (double dSpeed, double dAcceleration, tmlShort nMoveMoment, tmlShort nReferenceBase);
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetIntVariable) (const char* sVariableName, tmlShort& variable);
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetLongVariable) (const char* sVariableName, tmlLong& variable);
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetFixedVariable) (const char* sVariableName, double& variable);
+		typedef bool(TML_CALLINGCONVENTION* PTS_CALL_Label) (const char* pszRoutine);
+
 		typedef bool(TML_CALLINGCONVENTION* PTS_Stop) ();
 		typedef bool(TML_CALLINGCONVENTION* PTS_SetPosition) (tmlLong nPositionValue);
 		typedef bool(TML_CALLINGCONVENTION* PTS_SetTargetPositionToActual) ();
@@ -118,6 +123,11 @@ namespace LibMCDriver_TML {
 			PTS_ReadStatus TS_ReadStatus = nullptr;
 			PTS_GetLastErrorText TS_GetLastErrorText = nullptr;
 			PTS_MoveRelative TS_MoveRelative = nullptr;
+			PTS_MoveAbsolute TS_MoveAbsolute = nullptr;
+			PTS_GetIntVariable TS_GetIntVariable = nullptr;
+			PTS_GetLongVariable TS_GetLongVariable = nullptr;
+			PTS_CALL_Label TS_CALL_Label = nullptr;
+			PTS_GetFixedVariable TS_GetFixedVariable = nullptr;
 
 			CTMLSDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);			
 			virtual ~CTMLSDK();
