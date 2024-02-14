@@ -198,6 +198,14 @@ namespace LibMCDriver_TML {
     CHANNEL_ESD_CAN = 1005 /** CHANNEL_ESD_CAN Canbus Channel */
   };
   
+  enum class eReferenceType : LibMCDriver_TML_int32 {
+    Unknown = 0, /** Unknown Reference */
+    Target = 1000, /** Use the target reference (no feedback). */
+    Actual_Motor = 1001, /** Use the motor reference. */
+    Actual_Load = 1002, /** Use the load reference. */
+    Error = 1003 /** Get the error. */
+  };
+  
   enum class eProtocolType : LibMCDriver_TML_int32 {
     Unknown = 0, /** Unknown Protocol */
     TMLCAN = 1, /** TMLCAN Protocol */
@@ -208,6 +216,7 @@ namespace LibMCDriver_TML {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_TML::eChannelType eLibMCDriver_TMLChannelType;
+typedef LibMCDriver_TML::eReferenceType eLibMCDriver_TMLReferenceType;
 typedef LibMCDriver_TML::eProtocolType eLibMCDriver_TMLProtocolType;
 
 #endif // __LIBMCDRIVER_TML_TYPES_HEADER_CPP

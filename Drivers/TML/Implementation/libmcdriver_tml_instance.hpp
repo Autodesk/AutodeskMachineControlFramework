@@ -125,11 +125,11 @@ public:
 
     tmlLong readLongVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
-    tmlLong readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+    tmlLong readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
     tmlLong readFixedVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
-    tmlLong readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+    tmlLong readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
     void callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 

@@ -153,19 +153,21 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_CallSubroutinePtr) (LibMCDr
 * Retrieves the current position of the drive.
 *
 * @param[in] pAxis - Axis instance.
+* @param[in] eReference - Reference type to use for the position.
 * @param[out] pPosition - Position (mm)
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetPositionPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double * pPosition);
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetPositionPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML::eReferenceType eReference, LibMCDriver_TML_double * pPosition);
 
 /**
 * Retrieves the current speed of the drive.
 *
 * @param[in] pAxis - Axis instance.
+* @param[in] eReference - Reference type to use for the speed.
 * @param[out] pSpeed - Speed (mm/s)
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetSpeedPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double * pSpeed);
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetSpeedPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML::eReferenceType eReference, LibMCDriver_TML_double * pSpeed);
 
 /**
 * Retrieves the current position of the drive.

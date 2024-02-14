@@ -392,7 +392,7 @@ LibMCDriver_TMLResult libmcdriver_tml_axis_callsubroutine(LibMCDriver_TML_Axis p
 	}
 }
 
-LibMCDriver_TMLResult libmcdriver_tml_axis_getposition(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double * pPosition)
+LibMCDriver_TMLResult libmcdriver_tml_axis_getposition(LibMCDriver_TML_Axis pAxis, eLibMCDriver_TMLReferenceType eReference, LibMCDriver_TML_double * pPosition)
 {
 	IBase* pIBaseClass = (IBase *)pAxis;
 
@@ -403,7 +403,7 @@ LibMCDriver_TMLResult libmcdriver_tml_axis_getposition(LibMCDriver_TML_Axis pAxi
 		if (!pIAxis)
 			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
 		
-		*pPosition = pIAxis->GetPosition();
+		*pPosition = pIAxis->GetPosition(eReference);
 
 		return LIBMCDRIVER_TML_SUCCESS;
 	}
@@ -418,7 +418,7 @@ LibMCDriver_TMLResult libmcdriver_tml_axis_getposition(LibMCDriver_TML_Axis pAxi
 	}
 }
 
-LibMCDriver_TMLResult libmcdriver_tml_axis_getspeed(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double * pSpeed)
+LibMCDriver_TMLResult libmcdriver_tml_axis_getspeed(LibMCDriver_TML_Axis pAxis, eLibMCDriver_TMLReferenceType eReference, LibMCDriver_TML_double * pSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pAxis;
 
@@ -429,7 +429,7 @@ LibMCDriver_TMLResult libmcdriver_tml_axis_getspeed(LibMCDriver_TML_Axis pAxis, 
 		if (!pIAxis)
 			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
 		
-		*pSpeed = pIAxis->GetSpeed();
+		*pSpeed = pIAxis->GetSpeed(eReference);
 
 		return LIBMCDRIVER_TML_SUCCESS;
 	}

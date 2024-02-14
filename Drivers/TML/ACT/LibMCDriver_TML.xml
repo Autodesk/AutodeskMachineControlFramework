@@ -85,6 +85,14 @@
 		<option name="PEAK_SYS_PCAN_PCI" value="1004" description="PEAK_SYS_PCAN_PCI Canbus Channel"/>
 		<option name="CHANNEL_ESD_CAN" value="1005" description="CHANNEL_ESD_CAN Canbus Channel"/>
 	</enum>
+	
+	<enum name="ReferenceType">
+		<option name="Unknown" value="0" description="Unknown Reference"/>
+		<option name="Target" value="1000" description="Use the target reference (no feedback)."/>
+		<option name="Actual_Motor" value="1001" description="Use the motor reference."/>
+		<option name="Actual_Load" value="1002" description="Use the load reference."/>
+		<option name="Error" value="1003" description="Get the error."/>
+	</enum>
 
 	<enum name="ProtocolType">
 		<option name="Unknown" value="0" description="Unknown Protocol"/>
@@ -164,10 +172,12 @@ Custom implementation
 		</method>	
 		
 		<method name="GetPosition" description="Retrieves the current position of the drive.">		
+			<param name="Reference" type="enum" class="ReferenceType" pass="in" description="Reference type to use for the position." />	
 			<param name="Position" type="double" pass="return" description="Position (mm)" />
 		</method>
 		
 		<method name="GetSpeed" description="Retrieves the current speed of the drive.">		
+			<param name="Reference" type="enum" class="ReferenceType" pass="in" description="Reference type to use for the speed." />	
 			<param name="Speed" type="double" pass="return" description="Speed (mm/s)" />
 		</method>	
 				

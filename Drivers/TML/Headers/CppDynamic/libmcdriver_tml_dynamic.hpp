@@ -471,8 +471,8 @@ public:
 	inline void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration);
 	inline void MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration);
 	inline void CallSubroutine(const std::string & sRoutine);
-	inline LibMCDriver_TML_double GetPosition();
-	inline LibMCDriver_TML_double GetSpeed();
+	inline LibMCDriver_TML_double GetPosition(const eReferenceType eReference);
+	inline LibMCDriver_TML_double GetSpeed(const eReferenceType eReference);
 	inline LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName);
 	inline bool MotionComplete();
 	inline std::string GetIdentifier();
@@ -1341,24 +1341,26 @@ public:
 	
 	/**
 	* CAxis::GetPosition - Retrieves the current position of the drive.
+	* @param[in] eReference - Reference type to use for the position.
 	* @return Position (mm)
 	*/
-	LibMCDriver_TML_double CAxis::GetPosition()
+	LibMCDriver_TML_double CAxis::GetPosition(const eReferenceType eReference)
 	{
 		LibMCDriver_TML_double resultPosition = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetPosition(m_pHandle, &resultPosition));
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetPosition(m_pHandle, eReference, &resultPosition));
 		
 		return resultPosition;
 	}
 	
 	/**
 	* CAxis::GetSpeed - Retrieves the current speed of the drive.
+	* @param[in] eReference - Reference type to use for the speed.
 	* @return Speed (mm/s)
 	*/
-	LibMCDriver_TML_double CAxis::GetSpeed()
+	LibMCDriver_TML_double CAxis::GetSpeed(const eReferenceType eReference)
 	{
 		LibMCDriver_TML_double resultSpeed = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetSpeed(m_pHandle, &resultSpeed));
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_GetSpeed(m_pHandle, eReference, &resultSpeed));
 		
 		return resultSpeed;
 	}

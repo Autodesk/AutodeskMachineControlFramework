@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2024 Autodesk Inc.
+Copyright (C) 2024 ASL Inc.
 
 All rights reserved.
 
@@ -27,19 +27,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CAxis
+Abstract: This is the class declaration of CDriver
 
 */
 
 
-#ifndef __LIBMCDRIVER_TML_AXIS
-#define __LIBMCDRIVER_TML_AXIS
+#ifndef __LIBMCDRIVER_ASL_DRIVER
+#define __LIBMCDRIVER_ASL_DRIVER
 
-#include "libmcdriver_tml_interfaces.hpp"
-#include "libmcdriver_tml_instance.hpp"
+#include "libmcdriver_asl_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriver_tml_base.hpp"
+#include "libmcdriver_asl_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -48,49 +47,45 @@ Abstract: This is the class declaration of CAxis
 // Include custom headers here.
 
 
-namespace LibMCDriver_TML {
+namespace LibMCDriver_ASL {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CAxis 
+ Class declaration of CDriver 
 **************************************************************************************************************************/
 
-class CAxis : public virtual IAxis, public virtual CBase {
+class CDriver : public virtual IDriver, public virtual CBase {
 private:
 
-    PTMLInstance m_pTMLInstance;
-    std::string m_sChannelIdentifier;
-    std::string m_sAxisIdentifier;
+	/**
+	* Put private members here.
+	*/
 
 protected:
 
+	/**
+	* Put protected members here.
+	*/
+
 public:
 
-    CAxis(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, const std::string & sAxisIdentifier);
+	/**
+	* Put additional public members here. They will not be visible in the external API.
+	*/
 
-    virtual ~CAxis();
 
-    void SetPower(const bool bEnable) override;
-    LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister) override;
-    bool CheckPower() override;
-    void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) override;
-    void MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) override;
-    std::string GetIdentifier() override;
-    void CallSubroutine(const std::string& sRoutine) override;
-    LibMCDriver_TML_double GetPosition(const LibMCDriver_TML::eReferenceType eReference) override;
-    LibMCDriver_TML_double GetSpeed(const LibMCDriver_TML::eReferenceType eReference) override;
-    LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName) override;
-    bool MotionComplete() override;
+	/**
+	* Public member functions to implement.
+	*/
 
-    std::string GetChannelIdentifier() override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCDriver_TML
+} // namespace LibMCDriver_ASL
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_TML_AXIS
+#endif // __LIBMCDRIVER_ASL_DRIVER

@@ -414,8 +414,9 @@ tmlLong CTMLInstance::readFixedVariable(const std::string& sChannelIdentifier, c
     return sRetInt;
 }
 
-tmlLong CTMLInstance::readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+tmlLong CTMLInstance::readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
 {
+    //APOS_LD APOS_MT TPOS POSERR
     tmlLong lPosition = readLongVariable(sChannelIdentifier, sAxisIdentifier, "APOS");
 
     auto iIter = m_AxisMap.find(sAxisIdentifier);
@@ -424,9 +425,10 @@ tmlLong CTMLInstance::readPosition(const std::string& sChannelIdentifier, const 
 
 }
 
-tmlLong CTMLInstance::readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+tmlLong CTMLInstance::readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
 {
-    tmlLong lSpeed = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "TSPD");
+    //ASPD_LD ASPD_MT TSPD SPDERR
+    tmlLong lSpeed = readFixedVariable(sChannelIdentifier, sAxisIdentifier, label);
 
     auto iIter = m_AxisMap.find(sAxisIdentifier);
 

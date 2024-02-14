@@ -107,14 +107,34 @@ void CAxis::CallSubroutine(const std::string& sRoutine) {
 void CAxis::MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) {
 
 }
-LibMCDriver_TML_double CAxis::GetPosition() {
+LibMCDriver_TML_double CAxis::GetPosition(const LibMCDriver_TML::eReferenceType eReference) {
 
-    return m_pTMLInstance->readPosition(m_sChannelIdentifier, m_sAxisIdentifier);
+    if (eReference == LibMCDriver_TML::eReferenceType::Actual_Load)
+        return m_pTMLInstance->readPosition(m_sChannelIdentifier, m_sAxisIdentifier, "APOS_LD");
+
+    if (eReference == LibMCDriver_TML::eReferenceType::Actual_Motor)
+        return m_pTMLInstance->readPosition(m_sChannelIdentifier, m_sAxisIdentifier, "APOS_MT");
+
+    if (eReference == LibMCDriver_TML::eReferenceType::Error)
+        return m_pTMLInstance->readPosition(m_sChannelIdentifier, m_sAxisIdentifier, "POSERR");
+
+    //Default case being target
+    return m_pTMLInstance->readPosition(m_sChannelIdentifier, m_sAxisIdentifier, "TPOS");
 
 }
-LibMCDriver_TML_double CAxis::GetSpeed() {
+LibMCDriver_TML_double CAxis::GetSpeed(const LibMCDriver_TML::eReferenceType eReference) {
 
-    return m_pTMLInstance->readSpeed(m_sChannelIdentifier, m_sAxisIdentifier);
+    if (eReference == LibMCDriver_TML::eReferenceType::Actual_Load)
+        return m_pTMLInstance->readSpeed(m_sChannelIdentifier, m_sAxisIdentifier, "ASPD_LD");
+
+    if (eReference == LibMCDriver_TML::eReferenceType::Actual_Motor)
+        return m_pTMLInstance->readSpeed(m_sChannelIdentifier, m_sAxisIdentifier, "ASPD_MT");
+
+    if (eReference == LibMCDriver_TML::eReferenceType::Error)
+        return m_pTMLInstance->readSpeed(m_sChannelIdentifier, m_sAxisIdentifier, "SPDERR");
+
+    //Default case being target
+    return m_pTMLInstance->readSpeed(m_sChannelIdentifier, m_sAxisIdentifier, "TSPD");
 
 }
 
