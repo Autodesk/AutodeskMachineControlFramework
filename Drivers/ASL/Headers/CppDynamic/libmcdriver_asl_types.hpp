@@ -135,8 +135,20 @@ typedef LibMCDriver_ASLHandle LibMCDriver_ASL_Driver_ASL;
 
 namespace LibMCDriver_ASL {
 
+  /*************************************************************************************************************************
+   Declaration of enums
+  **************************************************************************************************************************/
+  
+  enum class eBoardMode : LibMCDriver_ASL_int32 {
+    DW_INT = 1000,
+    DW_EXT = 1001,
+    IMG_ENC = 1002,
+    IMG_PD = 1003
+  };
+  
 } // namespace LibMCDriver_ASL;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCDriver_ASL::eBoardMode eLibMCDriver_ASLBoardMode;
 
 #endif // __LIBMCDRIVER_ASL_TYPES_HEADER_CPP

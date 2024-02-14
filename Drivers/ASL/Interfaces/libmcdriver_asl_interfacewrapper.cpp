@@ -365,6 +365,126 @@ LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getserialnumber(LibMCDriver_
 	}
 }
 
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setpower(LibMCDriver_ASL_DriverContext pDriverContext, bool bPower)
+{
+	IBase* pIBaseClass = (IBase *)pDriverContext;
+
+	try {
+		IDriverContext* pIDriverContext = dynamic_cast<IDriverContext*>(pIBaseClass);
+		if (!pIDriverContext)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		pIDriverContext->SetPower(bPower);
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setprintheadmode(LibMCDriver_ASL_DriverContext pDriverContext, eLibMCDriver_ASLBoardMode eMode)
+{
+	IBase* pIBaseClass = (IBase *)pDriverContext;
+
+	try {
+		IDriverContext* pIDriverContext = dynamic_cast<IDriverContext*>(pIBaseClass);
+		if (!pIDriverContext)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		pIDriverContext->SetPrintheadMode(eMode);
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setfrequency(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nFrequency)
+{
+	IBase* pIBaseClass = (IBase *)pDriverContext;
+
+	try {
+		IDriverContext* pIDriverContext = dynamic_cast<IDriverContext*>(pIBaseClass);
+		if (!pIDriverContext)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		pIDriverContext->SetFrequency(nFrequency);
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_settemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double dTemperature)
+{
+	IBase* pIBaseClass = (IBase *)pDriverContext;
+
+	try {
+		IDriverContext* pIDriverContext = dynamic_cast<IDriverContext*>(pIBaseClass);
+		if (!pIDriverContext)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		pIDriverContext->SetTemperature(nIndex, dTemperature);
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setprintstart(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nStartLocation)
+{
+	IBase* pIBaseClass = (IBase *)pDriverContext;
+
+	try {
+		IDriverContext* pIDriverContext = dynamic_cast<IDriverContext*>(pIBaseClass);
+		if (!pIDriverContext)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		pIDriverContext->SetPrintStart(nStartLocation);
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_ASL
@@ -542,6 +662,16 @@ LibMCDriver_ASLResult LibMCDriver_ASL::Impl::LibMCDriver_ASL_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_asl_driver_queryparametersex;
 	if (sProcName == "libmcdriver_asl_drivercontext_getserialnumber") 
 		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_getserialnumber;
+	if (sProcName == "libmcdriver_asl_drivercontext_setpower") 
+		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_setpower;
+	if (sProcName == "libmcdriver_asl_drivercontext_setprintheadmode") 
+		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_setprintheadmode;
+	if (sProcName == "libmcdriver_asl_drivercontext_setfrequency") 
+		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_setfrequency;
+	if (sProcName == "libmcdriver_asl_drivercontext_settemperature") 
+		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_settemperature;
+	if (sProcName == "libmcdriver_asl_drivercontext_setprintstart") 
+		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_setprintstart;
 	if (sProcName == "libmcdriver_asl_driver_asl_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_asl_driver_asl_settosimulationmode;
 	if (sProcName == "libmcdriver_asl_driver_asl_issimulationmode") 

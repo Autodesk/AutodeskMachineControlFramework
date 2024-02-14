@@ -129,6 +129,52 @@ typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriver_QueryParametersExPtr) (Li
 */
 typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetSerialNumberPtr) (LibMCDriver_ASL_DriverContext pDriverContext, const LibMCDriver_ASL_uint32 nTypeBufferSize, LibMCDriver_ASL_uint32* pTypeNeededChars, char * pTypeBuffer);
 
+/**
+* Set the board power.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] bPower - Power on/off.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetPowerPtr) (LibMCDriver_ASL_DriverContext pDriverContext, bool bPower);
+
+/**
+* set the mode of the board for printing
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] eMode - Type of the driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetPrintheadModePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL::eBoardMode eMode);
+
+/**
+* Set the frequency of the board (only supported in certain modes).
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nFrequency - Frequency in Hz
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetFrequencyPtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nFrequency);
+
+/**
+* Set the temperature of a specific head.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[in] dTemperature - Temperature to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetTemperaturePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double dTemperature);
+
+/**
+* Set the print start location.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nStartLocation - The start location of the print.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetPrintStartPtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nStartLocation);
+
 /*************************************************************************************************************************
  Class definition for Driver_ASL
 **************************************************************************************************************************/
@@ -264,6 +310,11 @@ typedef struct {
 	PLibMCDriver_ASLDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_ASLDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_ASLDriverContext_GetSerialNumberPtr m_DriverContext_GetSerialNumber;
+	PLibMCDriver_ASLDriverContext_SetPowerPtr m_DriverContext_SetPower;
+	PLibMCDriver_ASLDriverContext_SetPrintheadModePtr m_DriverContext_SetPrintheadMode;
+	PLibMCDriver_ASLDriverContext_SetFrequencyPtr m_DriverContext_SetFrequency;
+	PLibMCDriver_ASLDriverContext_SetTemperaturePtr m_DriverContext_SetTemperature;
+	PLibMCDriver_ASLDriverContext_SetPrintStartPtr m_DriverContext_SetPrintStart;
 	PLibMCDriver_ASLDriver_ASL_SetToSimulationModePtr m_Driver_ASL_SetToSimulationMode;
 	PLibMCDriver_ASLDriver_ASL_IsSimulationModePtr m_Driver_ASL_IsSimulationMode;
 	PLibMCDriver_ASLDriver_ASL_ConnectPtr m_Driver_ASL_Connect;

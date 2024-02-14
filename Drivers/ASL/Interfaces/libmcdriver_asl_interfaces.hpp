@@ -321,6 +321,37 @@ public:
 	*/
 	virtual std::string GetSerialNumber() = 0;
 
+	/**
+	* IDriverContext::SetPower - Set the board power.
+	* @param[in] bPower - Power on/off.
+	*/
+	virtual void SetPower(const bool bPower) = 0;
+
+	/**
+	* IDriverContext::SetPrintheadMode - set the mode of the board for printing
+	* @param[in] eMode - Type of the driver.
+	*/
+	virtual void SetPrintheadMode(const LibMCDriver_ASL::eBoardMode eMode) = 0;
+
+	/**
+	* IDriverContext::SetFrequency - Set the frequency of the board (only supported in certain modes).
+	* @param[in] nFrequency - Frequency in Hz
+	*/
+	virtual void SetFrequency(const LibMCDriver_ASL_uint32 nFrequency) = 0;
+
+	/**
+	* IDriverContext::SetTemperature - Set the temperature of a specific head.
+	* @param[in] nIndex - Head index
+	* @param[in] dTemperature - Temperature to set
+	*/
+	virtual void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature) = 0;
+
+	/**
+	* IDriverContext::SetPrintStart - Set the print start location.
+	* @param[in] nStartLocation - The start location of the print.
+	*/
+	virtual void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverContext> PIDriverContext;

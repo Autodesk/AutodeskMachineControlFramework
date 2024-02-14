@@ -142,6 +142,52 @@ LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_driver_queryparam
 */
 LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getserialnumber(LibMCDriver_ASL_DriverContext pDriverContext, const LibMCDriver_ASL_uint32 nTypeBufferSize, LibMCDriver_ASL_uint32* pTypeNeededChars, char * pTypeBuffer);
 
+/**
+* Set the board power.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] bPower - Power on/off.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setpower(LibMCDriver_ASL_DriverContext pDriverContext, bool bPower);
+
+/**
+* set the mode of the board for printing
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] eMode - Type of the driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setprintheadmode(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL::eBoardMode eMode);
+
+/**
+* Set the frequency of the board (only supported in certain modes).
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nFrequency - Frequency in Hz
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setfrequency(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nFrequency);
+
+/**
+* Set the temperature of a specific head.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[in] dTemperature - Temperature to set
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_settemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double dTemperature);
+
+/**
+* Set the print start location.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nStartLocation - The start location of the print.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setprintstart(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nStartLocation);
+
 /*************************************************************************************************************************
  Class definition for Driver_ASL
 **************************************************************************************************************************/

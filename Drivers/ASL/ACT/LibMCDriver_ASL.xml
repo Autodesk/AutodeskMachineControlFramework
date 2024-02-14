@@ -56,6 +56,13 @@
 This base Driver interface MUST be in Sync with LibMCDriver.xml
 
 -->
+
+	<enum name="BoardMode">
+	   <option name="DW_INT" value="1000" />
+	   <option name="DW_EXT" value="1001" />
+	   <option name="IMG_ENC" value="1002" />
+	   <option name="IMG_PD" value="1003" />	   
+	</enum>
 	
 	<class name="Base">
 	</class>
@@ -108,9 +115,36 @@ Custom implementation
 
 
 	<class name="DriverContext" parent="Base" description="An abstract Machine Control Driver">
+	
 		<method name="GetSerialNumber" description = "Returns the serial number of board">
 			<param name="Type" type="string" pass="return" description="Type of the driver." />
 		</method>
+	
+		<method name="SetPower" description = "Set the board power.">
+			<param name="Power" type="bool" pass="in" description="Power on/off." />
+		</method>
+	
+		<method name="SetPrintheadMode" description = "set the mode of the board for printing">
+			<param name="Mode" type="enum" class="BoardMode" pass="in" description="Type of the driver." />
+		</method>
+
+		<method name="SetFrequency" description = "Set the frequency of the board (only supported in certain modes).">
+			<param name="Frequency" type="uint32" pass="in" description="Frequency in Hz" />
+		</method>
+	
+		<method name="SetTemperature" description = "Set the temperature of a specific head.">
+			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Temperature" type="double" pass="in" description="Temperature to set" />
+		</method>
+		
+		<method name="SetPrintStart" description = "Set the print start location.">
+			<param name="StartLocation" type="uint32" pass="in" description="The start location of the print." />
+		</method>
+	
+	
+	
+	
+	
 	</class>
 	
 

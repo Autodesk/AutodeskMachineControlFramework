@@ -416,6 +416,11 @@ public:
 	}
 	
 	inline std::string GetSerialNumber();
+	inline void SetPower(const bool bPower);
+	inline void SetPrintheadMode(const eBoardMode eMode);
+	inline void SetFrequency(const LibMCDriver_ASL_uint32 nFrequency);
+	inline void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature);
+	inline void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation);
 };
 	
 /*************************************************************************************************************************
@@ -568,6 +573,11 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_DriverContext_GetSerialNumber = nullptr;
+		pWrapperTable->m_DriverContext_SetPower = nullptr;
+		pWrapperTable->m_DriverContext_SetPrintheadMode = nullptr;
+		pWrapperTable->m_DriverContext_SetFrequency = nullptr;
+		pWrapperTable->m_DriverContext_SetTemperature = nullptr;
+		pWrapperTable->m_DriverContext_SetPrintStart = nullptr;
 		pWrapperTable->m_Driver_ASL_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ASL_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ASL_Connect = nullptr;
@@ -691,6 +701,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverContext_GetSerialNumber == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_SetPower = (PLibMCDriver_ASLDriverContext_SetPowerPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_setpower");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_SetPower = (PLibMCDriver_ASLDriverContext_SetPowerPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_setpower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_SetPower == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_SetPrintheadMode = (PLibMCDriver_ASLDriverContext_SetPrintheadModePtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_setprintheadmode");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_SetPrintheadMode = (PLibMCDriver_ASLDriverContext_SetPrintheadModePtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_setprintheadmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_SetPrintheadMode == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_SetFrequency = (PLibMCDriver_ASLDriverContext_SetFrequencyPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_setfrequency");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_SetFrequency = (PLibMCDriver_ASLDriverContext_SetFrequencyPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_setfrequency");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_SetFrequency == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_SetTemperature = (PLibMCDriver_ASLDriverContext_SetTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_settemperature");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_SetTemperature = (PLibMCDriver_ASLDriverContext_SetTemperaturePtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_settemperature");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_SetTemperature == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_SetPrintStart = (PLibMCDriver_ASLDriverContext_SetPrintStartPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_setprintstart");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_SetPrintStart = (PLibMCDriver_ASLDriverContext_SetPrintStartPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_setprintstart");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_SetPrintStart == nullptr)
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -845,6 +900,26 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetSerialNumber == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_setpower", (void**)&(pWrapperTable->m_DriverContext_SetPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetPower == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_setprintheadmode", (void**)&(pWrapperTable->m_DriverContext_SetPrintheadMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetPrintheadMode == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_setfrequency", (void**)&(pWrapperTable->m_DriverContext_SetFrequency));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetFrequency == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_settemperature", (void**)&(pWrapperTable->m_DriverContext_SetTemperature));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetTemperature == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_setprintstart", (void**)&(pWrapperTable->m_DriverContext_SetPrintStart));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetPrintStart == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_asl_driver_asl_settosimulationmode", (void**)&(pWrapperTable->m_Driver_ASL_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ASL_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -997,6 +1072,52 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetSerialNumber(m_pHandle, bytesNeededType, &bytesWrittenType, &bufferType[0]));
 		
 		return std::string(&bufferType[0]);
+	}
+	
+	/**
+	* CDriverContext::SetPower - Set the board power.
+	* @param[in] bPower - Power on/off.
+	*/
+	void CDriverContext::SetPower(const bool bPower)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SetPower(m_pHandle, bPower));
+	}
+	
+	/**
+	* CDriverContext::SetPrintheadMode - set the mode of the board for printing
+	* @param[in] eMode - Type of the driver.
+	*/
+	void CDriverContext::SetPrintheadMode(const eBoardMode eMode)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SetPrintheadMode(m_pHandle, eMode));
+	}
+	
+	/**
+	* CDriverContext::SetFrequency - Set the frequency of the board (only supported in certain modes).
+	* @param[in] nFrequency - Frequency in Hz
+	*/
+	void CDriverContext::SetFrequency(const LibMCDriver_ASL_uint32 nFrequency)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SetFrequency(m_pHandle, nFrequency));
+	}
+	
+	/**
+	* CDriverContext::SetTemperature - Set the temperature of a specific head.
+	* @param[in] nIndex - Head index
+	* @param[in] dTemperature - Temperature to set
+	*/
+	void CDriverContext::SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SetTemperature(m_pHandle, nIndex, dTemperature));
+	}
+	
+	/**
+	* CDriverContext::SetPrintStart - Set the print start location.
+	* @param[in] nStartLocation - The start location of the print.
+	*/
+	void CDriverContext::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SetPrintStart(m_pHandle, nStartLocation));
 	}
 	
 	/**
