@@ -36,12 +36,15 @@ Abstract: This is a stub class definition of CDriverContext
 
 // Include custom headers here.
 
-
 using namespace LibMCDriver_ASL::Impl;
 
 /*************************************************************************************************************************
  Class definition of CDriverContext 
 **************************************************************************************************************************/
+
+CDriverContext::CDriverContext(const std::string& sIdentifier, const std::string& sCOMPort, serial::Serial* pConnection, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+    : m_pConnection(pConnection), m_pDriverEnvironment(pDriverEnvironment), m_sIdentifier(sIdentifier), m_sCOMPort(sCOMPort) {}
+
 
 std::string CDriverContext::GetSerialNumber()
 {

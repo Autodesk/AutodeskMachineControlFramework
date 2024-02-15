@@ -48,9 +48,6 @@ Abstract: This is the class declaration of CDriver_ASL
 
 #include <string>
 
-namespace serial {
-	class Serial;
-}
 
 namespace LibMCDriver_ASL {
 namespace Impl {
@@ -71,7 +68,6 @@ private:
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 	bool m_bSimulationMode;
 
-	std::unique_ptr<serial::Serial> m_pConnection;
 
 protected:
 

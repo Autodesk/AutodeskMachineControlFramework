@@ -36,6 +36,8 @@ Abstract: This is the class declaration of CDriverContext
 #define __LIBMCDRIVER_ASL_DRIVERCONTEXT
 
 #include "libmcdriver_asl_interfaces.hpp"
+#include "serial/serial.h"
+
 
 // Parent classes
 #include "libmcdriver_asl_base.hpp"
@@ -61,7 +63,10 @@ private:
 	/**
 	* Put private members here.
 	*/
-
+	std::unique_ptr<serial::Serial> m_pConnection;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+	const std::string& m_sIdentifier;
+	const std::string& m_sCOMPort;
 protected:
 
 	/**
@@ -70,14 +75,9 @@ protected:
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CDriverContext(const std::string& sIdentifier, const std::string& sCOMPort, serial::Serial* pConnection, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	virtual ~CDriverContext();
 
-
-	/**
-	* Public member functions to implement.
-	*/
 
 	std::string GetSerialNumber() override;
 

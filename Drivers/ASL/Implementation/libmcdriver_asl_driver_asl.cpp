@@ -33,11 +33,9 @@ Abstract: This is a stub class definition of CDriver_ASL
 
 #include "libmcdriver_asl_driver_asl.hpp"
 #include "libmcdriver_asl_interfaceexception.hpp"
+#include "libmcdriver_asl_drivercontext.hpp"
 
 // Include custom headers here.
-
-#include "serial/serial.h"
-
 using namespace LibMCDriver_ASL::Impl;
 
 /*************************************************************************************************************************
@@ -69,17 +67,16 @@ bool CDriver_ASL::IsSimulationMode()
 
 IDriverContext * CDriver_ASL::Connect(const std::string & sIdentifier, const std::string & sCOMPort)
 {
+	std::unique_ptr<serial::Serial> pConnection;
 
-	m_pConnection.reset();
+	pConnection.reset(new serial::Serial(sCOMPort, 1000000));
 
-	m_pConnection.reset(new serial::Serial(sCOMPort));
-
-	if (!m_pConnection->isOpen()) {
-		m_pConnection.reset();
+	if (!pConnection->isOpen()) {
+		pConnection.reset();
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_BUFFERTOOSMALL);
 	}
-	IDriverContext* idc;
-	return idc;
+
+	return new CDriverContext(sIdentifier, sCOMPort, pConnection.release(), m_pDriverEnvironment);
 }
 
 bool CDriver_ASL::ContextExists(const std::string & sIdentifier)
