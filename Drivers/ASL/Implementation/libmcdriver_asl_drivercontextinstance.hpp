@@ -27,84 +27,78 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver_ASL
+Abstract: This is the class declaration of CDriverContext
 
 */
 
 
-#ifndef __LIBMCDRIVER_ASL_DRIVER_ASL
-#define __LIBMCDRIVER_ASL_DRIVER_ASL
+#ifndef __LIBMCDRIVER_ASL_DRIVERCONTEXTINSTANCE
+#define __LIBMCDRIVER_ASL_DRIVERCONTEXTINSTANCE
 
 #include "libmcdriver_asl_interfaces.hpp"
 
-// Parent classes
-#include "libmcdriver_asl_driver.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "serial/serial.h"
 
-// Include custom headers here.
-#include "libmcdriver_asl_drivercontextinstance.hpp"
-
-#include <string>
-#include <map>
+#include <memory>
 
 namespace LibMCDriver_ASL {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver_ASL 
+ Class declaration of CDriverContextInstance
 **************************************************************************************************************************/
 
-class CDriver_ASL : public virtual IDriver_ASL, public virtual CDriver {
+class CDriverContextInstance {
 private:
 
-	std::string m_sName;
+	std::string m_sIdentifier;
+	
+	std::string m_sCOMPort;
+	
+	std::unique_ptr<serial::Serial> m_pConnection;
+	
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
-	bool m_bSimulationMode;
-
-	std::map<std::string, std::shared_ptr<CDriverContextInstance>> m_InstanceMap;
-
+		
 public:
 
-	CDriver_ASL(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CDriverContextInstance (const std::string & sIdentifier, const std::string & sCOMPort, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	
+	virtual ~CDriverContextInstance ();
 
-	virtual ~CDriver_ASL();
+	std::string GetSerialNumber();
 
+	void SetPower(const bool bPower);
 
-	void SetToSimulationMode() override;
+	void SetPrintheadMode(const LibMCDriver_ASL::eBoardMode eMode);
 
-	bool IsSimulationMode() override;
+	void SetFrequency(const LibMCDriver_ASL_uint32 nFrequency);
 
-	IDriverContext * Connect(const std::string & sIdentifier, const std::string & sCOMPort) override;
+	void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature);
 
-	bool ContextExists(const std::string & sIdentifier) override;
+	void HomeLocation();
 
-	IDriverContext * FindContext(const std::string & sIdentifier) override;
+	void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation);
 
-	void Configure(const std::string& sConfigurationString) override;
+	void SendImage(LibMCEnv::PImageData pImageObject);
 
-	std::string GetName() override;
+	void Poll();
 
-	static std::string getTypeStatic();
+	LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex);
 
-	std::string GetType() override;
+	LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex);
 
-	void GetVersion(LibMCDriver_ASL_uint32& nMajor, LibMCDriver_ASL_uint32& nMinor, LibMCDriver_ASL_uint32& nMicro, std::string& sBuild) override;
+	LibMCDriver_ASL_double GetImageLength(const LibMCDriver_ASL_uint8 nIndex);
 
-	void QueryParameters() override;
+	LibMCDriver_ASL_double GetHeadState(const LibMCDriver_ASL_uint8 nIndex);
 
-	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+	bool IsHeating(const LibMCDriver_ASL_uint8 nIndex);
 
+	bool GetPower();
 
 };
 
 } // namespace Impl
 } // namespace LibMCDriver_ASL
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_ASL_DRIVER_ASL
+#endif // __LIBMCDRIVER_ASL_DRIVERCONTEXTINSTANCE

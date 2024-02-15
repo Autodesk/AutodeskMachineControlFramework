@@ -36,8 +36,6 @@ Abstract: This is the class declaration of CDriverContext
 #define __LIBMCDRIVER_ASL_DRIVERCONTEXT
 
 #include "libmcdriver_asl_interfaces.hpp"
-#include "serial/serial.h"
-
 
 // Parent classes
 #include "libmcdriver_asl_base.hpp"
@@ -47,7 +45,7 @@ Abstract: This is the class declaration of CDriverContext
 #endif
 
 // Include custom headers here.
-
+#include "libmcdriver_asl_drivercontextinstance.hpp"
 
 namespace LibMCDriver_ASL {
 namespace Impl {
@@ -60,26 +58,43 @@ namespace Impl {
 class CDriverContext : public virtual IDriverContext, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-	std::unique_ptr<serial::Serial> m_pConnection;
-	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
-	const std::string& m_sIdentifier;
-	const std::string& m_sCOMPort;
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	std::shared_ptr<CDriverContextInstance> m_pInstance;
 
 public:
 
-	CDriverContext(const std::string& sIdentifier, const std::string& sCOMPort, serial::Serial* pConnection, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CDriverContext(std::shared_ptr<CDriverContextInstance> pInstance);
+
 	virtual ~CDriverContext();
-
-
+	
 	std::string GetSerialNumber() override;
+
+	void SetPower(const bool bPower) override;
+
+	void SetPrintheadMode(const LibMCDriver_ASL::eBoardMode eMode) override;
+
+	void SetFrequency(const LibMCDriver_ASL_uint32 nFrequency) override;
+
+	void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature) override;
+
+	void HomeLocation() override;
+
+	void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation) override;
+
+	void SendImage(LibMCEnv::PImageData pImageObject) override;
+
+	void Poll() override;
+
+	LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	LibMCDriver_ASL_double GetImageLength(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	LibMCDriver_ASL_double GetHeadState(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	bool IsHeating(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	bool GetPower() override;
 
 };
 

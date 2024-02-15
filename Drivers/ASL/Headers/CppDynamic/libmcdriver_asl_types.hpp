@@ -104,6 +104,13 @@ typedef void * LibMCDriver_ASL_pvoid;
 #define LIBMCDRIVER_ASL_ERROR_COULDNOTLOADLIBRARY 6 /** the library could not be loaded */
 #define LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT 7 /** a required exported symbol could not be found in the library */
 #define LIBMCDRIVER_ASL_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
+#define LIBMCDRIVER_ASL_ERROR_DRIVERTYPENOTFOUND 9 /** Driver type not found. */
+#define LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTIDENTIFIER 10 /** Empty driver context identifier. */
+#define LIBMCDRIVER_ASL_ERROR_DUPLICATEDRIVERCONTEXTIDENTIFIER 11 /** Duplicate driver context identifier. */
+#define LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTIDENTIFIER 12 /** Invalid driver context identifier. */
+#define LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT 13 /** Could not connect to COM Port. */
+#define LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTCOMPORT 14 /** Invalid driver context COM port. */
+#define LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT 15 /** Empty driver context COM port. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ASL
@@ -120,6 +127,13 @@ inline const char * LIBMCDRIVER_ASL_GETERRORSTRING (LibMCDriver_ASLResult nError
     case LIBMCDRIVER_ASL_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
     case LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBMCDRIVER_ASL_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
+    case LIBMCDRIVER_ASL_ERROR_DRIVERTYPENOTFOUND: return "Driver type not found.";
+    case LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTIDENTIFIER: return "Empty driver context identifier.";
+    case LIBMCDRIVER_ASL_ERROR_DUPLICATEDRIVERCONTEXTIDENTIFIER: return "Duplicate driver context identifier.";
+    case LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTIDENTIFIER: return "Invalid driver context identifier.";
+    case LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT: return "Could not connect to COM Port.";
+    case LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTCOMPORT: return "Invalid driver context COM port.";
+    case LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT: return "Empty driver context COM port.";
     default: return "unknown error";
   }
 }

@@ -31,7 +31,7 @@ Abstract: This is a stub class definition of CDriverContext
 
 */
 
-#include "libmcdriver_asl_drivercontext.hpp"
+#include "libmcdriver_asl_drivercontextinstance.hpp"
 #include "libmcdriver_asl_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -43,89 +43,111 @@ using namespace LibMCDriver_ASL::Impl;
  Class definition of CDriverContext 
 **************************************************************************************************************************/
 
-CDriverContext::CDriverContext(std::shared_ptr<CDriverContextInstance> pInstance)
-	: m_pInstance (pInstance)
+CDriverContextInstance::CDriverContextInstance(const std::string& sIdentifier, const std::string& sCOMPort, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_sIdentifier (sIdentifier), m_sCOMPort (sCOMPort), m_pDriverEnvironment (pDriverEnvironment)
 {
-	if (pInstance.get () == nullptr)
+	if (pDriverEnvironment.get() == nullptr)
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDPARAM);
+
+	if (sCOMPort.empty())
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT);
+
+	for (auto ch : sCOMPort)
+		if (!isalnum (ch))
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTCOMPORT, "invalid driver context COM Port: " + sCOMPort);
+
+	if (sIdentifier.empty())
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTIDENTIFIER);
+
+	for (auto ch : sIdentifier)
+		if (!isalnum(ch))
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTIDENTIFIER, "invalid driver context COM Port: " + sCOMPort);
+
+	m_pConnection.reset(new serial::Serial(sCOMPort, 1000000));
+
+	if (!m_pConnection->isOpen()) {
+		m_pConnection.reset();
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "could not connect to COM Port: " + sCOMPort);
+	}
+
 }
 
-CDriverContext::~CDriverContext()
+CDriverContextInstance::~CDriverContextInstance()
 {
 
 }
 
-std::string CDriverContext::GetSerialNumber()
-{
-	return m_pInstance->GetSerialNumber();
-}
-
-void CDriverContext::SetPower(const bool bPower)
-{
-	m_pInstance->SetPower(bPower);
-}
-
-void CDriverContext::SetPrintheadMode(const LibMCDriver_ASL::eBoardMode eMode)
-{
-	m_pInstance->SetPrintheadMode(eMode);
-}
-
-void CDriverContext::SetFrequency(const LibMCDriver_ASL_uint32 nFrequency)
-{
-	m_pInstance->SetFrequency(nFrequency);
-}
-
-void CDriverContext::SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature)
-{
-	m_pInstance->SetTemperature(nIndex, dTemperature);
-}
-
-void CDriverContext::HomeLocation()
+std::string CDriverContextInstance::GetSerialNumber()
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-void CDriverContext::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
+void CDriverContextInstance::SetPower(const bool bPower)
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-void CDriverContext::SendImage(LibMCEnv::PImageData pImageObject)
+void CDriverContextInstance::SetPrintheadMode(const LibMCDriver_ASL::eBoardMode eMode)
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-void CDriverContext::Poll()
+void CDriverContextInstance::SetFrequency(const LibMCDriver_ASL_uint32 nFrequency)
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-LibMCDriver_ASL_double CDriverContext::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
+void CDriverContextInstance::SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature)
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-LibMCDriver_ASL_double CDriverContext::GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)
+void CDriverContextInstance::HomeLocation()
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-LibMCDriver_ASL_double CDriverContext::GetImageLength(const LibMCDriver_ASL_uint8 nIndex)
+void CDriverContextInstance::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-LibMCDriver_ASL_double CDriverContext::GetHeadState(const LibMCDriver_ASL_uint8 nIndex)
+void CDriverContextInstance::SendImage(LibMCEnv::PImageData pImageObject)
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-bool CDriverContext::IsHeating(const LibMCDriver_ASL_uint8 nIndex)
+void CDriverContextInstance::Poll()
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
-bool CDriverContext::GetPower()
+LibMCDriver_ASL_double CDriverContextInstance::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
+{
+	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+}
+
+LibMCDriver_ASL_double CDriverContextInstance::GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)
+{
+	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+}
+
+LibMCDriver_ASL_double CDriverContextInstance::GetImageLength(const LibMCDriver_ASL_uint8 nIndex)
+{
+	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+}
+
+LibMCDriver_ASL_double CDriverContextInstance::GetHeadState(const LibMCDriver_ASL_uint8 nIndex)
+{
+	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+}
+
+bool CDriverContextInstance::IsHeating(const LibMCDriver_ASL_uint8 nIndex)
+{
+	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+}
+
+bool CDriverContextInstance::GetPower()
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }

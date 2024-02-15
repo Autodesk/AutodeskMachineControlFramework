@@ -57,31 +57,33 @@ CDriver_ASL::~CDriver_ASL()
 
 void CDriver_ASL::SetToSimulationMode()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	m_bSimulationMode = true;
 }
 
 bool CDriver_ASL::IsSimulationMode()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_bSimulationMode;
 }
 
 IDriverContext * CDriver_ASL::Connect(const std::string & sIdentifier, const std::string & sCOMPort)
 {
-	std::unique_ptr<serial::Serial> pConnection;
+	if (sIdentifier.empty ())
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTIDENTIFIER);
+	if (ContextExists (sIdentifier))
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_DUPLICATEDRIVERCONTEXTIDENTIFIER, "Duplicate driver context identifier: " + sIdentifier);
 
-	pConnection.reset(new serial::Serial(sCOMPort, 1000000));
 
-	if (!pConnection->isOpen()) {
-		pConnection.reset();
-		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_BUFFERTOOSMALL);
-	}
+	auto pDriverContextInstance = std::make_shared<CDriverContextInstance> (sIdentifier, sCOMPort, m_pDriverEnvironment);
 
-	return new CDriverContext(sIdentifier, sCOMPort, pConnection.release(), m_pDriverEnvironment);
+	m_InstanceMap.insert(std::make_pair (sIdentifier, pDriverContextInstance));
+
+	return new CDriverContext(pDriverContextInstance);
 }
 
 bool CDriver_ASL::ContextExists(const std::string & sIdentifier)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	auto iIter = m_InstanceMap.find(sIdentifier);
+	return (iIter != m_InstanceMap.end());
 }
 
 IDriverContext * CDriver_ASL::FindContext(const std::string & sIdentifier)
@@ -92,17 +94,22 @@ IDriverContext * CDriver_ASL::FindContext(const std::string & sIdentifier)
 
 void CDriver_ASL::Configure(const std::string& sConfigurationString)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+
 }
 
 std::string CDriver_ASL::GetName()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_sName;
+}
+
+std::string CDriver_ASL::getTypeStatic()
+{
+	return "x128-serial-1.0";
 }
 
 std::string CDriver_ASL::GetType()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return getTypeStatic ();
 }
 
 void CDriver_ASL::GetVersion(LibMCDriver_ASL_uint32& nMajor, LibMCDriver_ASL_uint32& nMinor, LibMCDriver_ASL_uint32& nMicro, std::string& sBuild)
@@ -112,11 +119,9 @@ void CDriver_ASL::GetVersion(LibMCDriver_ASL_uint32& nMajor, LibMCDriver_ASL_uin
 
 void CDriver_ASL::QueryParameters()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
 void CDriver_ASL::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 

@@ -48,6 +48,18 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		<error name="DRIVERTYPENOTFOUND" code="9" description="Driver type not found." />
+		<error name="EMPTYDRIVERCONTEXTIDENTIFIER" code="10" description="Empty driver context identifier." />
+		<error name="DUPLICATEDRIVERCONTEXTIDENTIFIER" code="11" description="Duplicate driver context identifier." />
+		<error name="INVALIDDRIVERCONTEXTIDENTIFIER" code="12" description="Invalid driver context identifier." />
+		<error name="COULDNOTCONNECTTOCOMPORT" code="13" description="Could not connect to COM Port." />
+		<error name="INVALIDDRIVERCONTEXTCOMPORT" code="14" description="Invalid driver context COM port." />
+		<error name="EMPTYDRIVERCONTEXTCOMPORT" code="15" description="Empty driver context COM port." />
+		
+		
+		
+	
+		
 
 	</errors>
 

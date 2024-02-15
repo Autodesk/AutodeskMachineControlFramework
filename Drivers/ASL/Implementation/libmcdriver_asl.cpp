@@ -75,10 +75,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (sType == "x128-serial-1.0")
+	if (sType == CDriver_ASL::getTypeStatic ())
 		return new CDriver_ASL(sName, pDriverEnvironment);
 
-	//add some limitation to this function-- pass naem to driver -- disguished by type if you liek
+	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_DRIVERTYPENOTFOUND);
 }
 
 
