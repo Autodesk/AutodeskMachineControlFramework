@@ -338,9 +338,13 @@ public:
 	virtual bool IsSimulationMode() = 0;
 
 	/**
-	* IDriver_GRPC::Connect - Connects to a GRPC end point.
+	* IDriver_GRPC::ConnectUnsecure - Connects to a GRPC end point.
+	* @param[in] sIdentifier - Connection Identifier.
+	* @param[in] sNetworkCredentials - Network Credentials.
+	* @param[in] sProtobufDefinition - Protobuf definition file.
+	* @return Connection instance in case of success.
 	*/
-	virtual void Connect() = 0;
+	virtual IGRPCConnection * ConnectUnsecure(const std::string & sIdentifier, const std::string & sNetworkCredentials, const std::string & sProtobufDefinition) = 0;
 
 	/**
 	* IDriver_GRPC::FindConnection - Finds a connection with a certain name.

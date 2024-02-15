@@ -37,3 +37,6 @@
 [submodule "submodules/cpp-httplib"]
 	path = submodules/cpp-httplib
 	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "submodules/libgrpc"]
+	path = submodules/libgrpc
+	url = https://github.com/alexanderoster/libgrpc.git

@@ -156,9 +156,13 @@ LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_is
 * Connects to a GRPC end point.
 *
 * @param[in] pDriver_GRPC - Driver_GRPC instance.
+* @param[in] pIdentifier - Connection Identifier.
+* @param[in] pNetworkCredentials - Network Credentials.
+* @param[in] pProtobufDefinition - Protobuf definition file.
+* @param[out] pConnectionInstance - Connection instance in case of success.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connect(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC);
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connectunsecure(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC, const char * pIdentifier, const char * pNetworkCredentials, const char * pProtobufDefinition, LibMCDriver_GRPC_GRPCConnection * pConnectionInstance);
 
 /**
 * Finds a connection with a certain name.

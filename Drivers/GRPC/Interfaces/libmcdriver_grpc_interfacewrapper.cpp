@@ -371,17 +371,30 @@ LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_issimulationmode(LibMCDriver
 	}
 }
 
-LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connect(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC)
+LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connectunsecure(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC, const char * pIdentifier, const char * pNetworkCredentials, const char * pProtobufDefinition, LibMCDriver_GRPC_GRPCConnection * pConnectionInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_GRPC;
 
 	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pNetworkCredentials == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pProtobufDefinition == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pConnectionInstance == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		std::string sNetworkCredentials(pNetworkCredentials);
+		std::string sProtobufDefinition(pProtobufDefinition);
+		IBase* pBaseConnectionInstance(nullptr);
 		IDriver_GRPC* pIDriver_GRPC = dynamic_cast<IDriver_GRPC*>(pIBaseClass);
 		if (!pIDriver_GRPC)
 			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
 		
-		pIDriver_GRPC->Connect();
+		pBaseConnectionInstance = pIDriver_GRPC->ConnectUnsecure(sIdentifier, sNetworkCredentials, sProtobufDefinition);
 
+		*pConnectionInstance = (IBase*)(pBaseConnectionInstance);
 		return LIBMCDRIVER_GRPC_SUCCESS;
 	}
 	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
@@ -450,8 +463,8 @@ LibMCDriver_GRPCResult LibMCDriver_GRPC::Impl::LibMCDriver_GRPC_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_settosimulationmode;
 	if (sProcName == "libmcdriver_grpc_driver_grpc_issimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_issimulationmode;
-	if (sProcName == "libmcdriver_grpc_driver_grpc_connect") 
-		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_connect;
+	if (sProcName == "libmcdriver_grpc_driver_grpc_connectunsecure") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_connectunsecure;
 	if (sProcName == "libmcdriver_grpc_driver_grpc_findconnection") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_findconnection;
 	if (sProcName == "libmcdriver_grpc_getversion") 

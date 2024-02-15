@@ -181,71 +181,8 @@ public:
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERERROR: return "DRIVERERROR";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTINITIALISED: return "DRIVERNOTINITIALISED";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED: return "DRIVERNOTCONNECTED";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDDRIVERPROTOCOL: return "INVALIDDRIVERPROTOCOL";
-			case LIBMCDRIVER_GRPC_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "COULDNOTPARSEDRIVERPROTOCOL";
-			case LIBMCDRIVER_GRPC_ERROR_NOWORKINGDIRECTORY: return "NOWORKINGDIRECTORY";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDTASKID: return "INVALIDTASKID";
-			case LIBMCDRIVER_GRPC_ERROR_VERSIONMISMATCH: return "VERSIONMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_FEATURELOCKED: return "FEATURELOCKED";
-			case LIBMCDRIVER_GRPC_ERROR_UNSUPPORTEDHARDWARE: return "UNSUPPORTEDHARDWARE";
-			case LIBMCDRIVER_GRPC_ERROR_RESETTIMEOUT: return "RESETTIMEOUT";
-			case LIBMCDRIVER_GRPC_ERROR_ALLOCATIONFAILED: return "ALLOCATIONFAILED";
-			case LIBMCDRIVER_GRPC_ERROR_NOTCONNECTED: return "NOTCONNECTED";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDAXISINDEX: return "INVALIDAXISINDEX";
-			case LIBMCDRIVER_GRPC_ERROR_TOOLTABLEERROR: return "TOOLTABLEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDLOST: return "DRIVECOMMANDLOST";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDRESPONSE: return "DRIVECOMMANDRESPONSE";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREISONCHRONOUSERROR: return "FIREWIREISONCHRONOUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREASYNCHRONOUSERROR: return "FIREWIREASYNCHRONOUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_PCMODBUSERROR: return "PCMODBUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_COMMUNICATIONLOST: return "COMMUNICATIONLOST";
-			case LIBMCDRIVER_GRPC_ERROR_ETHERNETCOMMUNICATIONLOST: return "ETHERNETCOMMUNICATIONLOST";
-			case LIBMCDRIVER_GRPC_ERROR_SERVICECOMMUNICATIONLOST: return "SERVICECOMMUNICATIONLOST";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECARDCONFIGURATION: return "FIREWIRECARDCONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_PCICARDERROR: return "PCICARDERROR";
-			case LIBMCDRIVER_GRPC_ERROR_AXISMISMATCH: return "AXISMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_TASKMISMATCH: return "TASKMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDCOMMANDLINE: return "INVALIDCOMMANDLINE";
-			case LIBMCDRIVER_GRPC_ERROR_MACHINECONFIGURATION: return "MACHINECONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECONFIGURATION: return "FIREWIRECONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYCONFIGURATION: return "GANTRYCONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKTIMEOUT: return "CALLBACKTIMEOUT";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKERROR: return "CALLBACKERROR";
-			case LIBMCDRIVER_GRPC_ERROR_TOOMANYSTATUSITEMS: return "TOOMANYSTATUSITEMS";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMERROR: return "PROGRAMERROR";
-			case LIBMCDRIVER_GRPC_ERROR_STRINGOVERFLOW: return "STRINGOVERFLOW";
-			case LIBMCDRIVER_GRPC_ERROR_DIVIDEBYZERO: return "DIVIDEBYZERO";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMTIMEOUT: return "PROGRAMTIMEOUT";
-			case LIBMCDRIVER_GRPC_ERROR_PROFILEQUEUEERROR: return "PROFILEQUEUEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDARGUMENT: return "INVALIDARGUMENT";
-			case LIBMCDRIVER_GRPC_ERROR_PARAMETERNOTPASSED: return "PARAMETERNOTPASSED";
-			case LIBMCDRIVER_GRPC_ERROR_QUEUEBUFFERFULL: return "QUEUEBUFFERFULL";
-			case LIBMCDRIVER_GRPC_ERROR_NULLPROGRAMLINE: return "NULLPROGRAMLINE";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMNUMBEROUTOFBOUNDS: return "PROGRAMNUMBEROUTOFBOUNDS";
-			case LIBMCDRIVER_GRPC_ERROR_CANNEDFUNCTIONERROR: return "CANNEDFUNCTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_ZEROSPEED: return "ZEROSPEED";
-			case LIBMCDRIVER_GRPC_ERROR_STACKERROR: return "STACKERROR";
-			case LIBMCDRIVER_GRPC_ERROR_SLICEERROR: return "SLICEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_LOOKAHEADERROR: return "LOOKAHEADERROR";
-			case LIBMCDRIVER_GRPC_ERROR_RETRACEERROR: return "RETRACEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_AXISINFAULT: return "AXISINFAULT";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTENABLED: return "AXISNOTENABLED";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONERROR: return "MOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYMOTIONERROR: return "GANTRYMOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CUTTERCOMPENSATIONERROR: return "CUTTERCOMPENSATIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARMOTIONERROR: return "CIRCULARMOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARRADIUSERROR: return "CIRCULARRADIUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_NORMALCYERROR: return "NORMALCYERROR";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONTYPEMISMATCH: return "MOTIONTYPEMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_SPINDLENUMBERNOTASSIGNED: return "SPINDLENUMBERNOTASSIGNED";
-			case LIBMCDRIVER_GRPC_ERROR_ELLIPTICALMOTIONERROR: return "ELLIPTICALMOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONACTIVE: return "MOTIONACTIVE";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDEPENDENT: return "AXISNOTDEPENDENT";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDOMINANT: return "AXISNOTDOMINANT";
-			case LIBMCDRIVER_GRPC_ERROR_NOJOYSTICKGROUPS: return "NOJOYSTICKGROUPS";
-			case LIBMCDRIVER_GRPC_ERROR_TRANSFORMATIONERROR: return "TRANSFORMATIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CALIBRATIONTABLEERROR: return "CALIBRATIONTABLEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CAMTABLEERROR: return "CAMTABLEERROR";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER: return "COULDNOTLOADGRPCWRAPPER";
+			case LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED: return "DRIVERTYPENOTSUPPORTED";
 		}
 		return "UNKNOWN";
 	}
@@ -265,71 +202,8 @@ public:
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERERROR: return "a driver error occured";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
-			case LIBMCDRIVER_GRPC_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
-			case LIBMCDRIVER_GRPC_ERROR_NOWORKINGDIRECTORY: return "No working directory";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDTASKID: return "Invalid task ID";
-			case LIBMCDRIVER_GRPC_ERROR_VERSIONMISMATCH: return "An incompatible version was detected";
-			case LIBMCDRIVER_GRPC_ERROR_FEATURELOCKED: return "A license error occurred";
-			case LIBMCDRIVER_GRPC_ERROR_UNSUPPORTEDHARDWARE: return "A connected hardware type is no longer supported";
-			case LIBMCDRIVER_GRPC_ERROR_RESETTIMEOUT: return "A timeout occurred while waiting for the controller reset to finish.";
-			case LIBMCDRIVER_GRPC_ERROR_ALLOCATIONFAILED: return "An attempt to allocate memory on the SMC failed";
-			case LIBMCDRIVER_GRPC_ERROR_NOTCONNECTED: return "The specified controller handle is invalid";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDAXISINDEX: return "The specified axis index is invalid.";
-			case LIBMCDRIVER_GRPC_ERROR_TOOLTABLEERROR: return "A problem occurred with a tool table";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDLOST: return "A drive command was overwritten and lost.";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDRESPONSE: return "A timeout occurred while waiting for a drive response";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREISONCHRONOUSERROR: return "An error occurred with isochronous communication";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREASYNCHRONOUSERROR: return "An error occurred during an asynchronous communication";
-			case LIBMCDRIVER_GRPC_ERROR_PCMODBUSERROR: return "An error occurred with PC Modbus communication";
-			case LIBMCDRIVER_GRPC_ERROR_COMMUNICATIONLOST: return "FireWire communications were interrupted.";
-			case LIBMCDRIVER_GRPC_ERROR_ETHERNETCOMMUNICATIONLOST: return "Ethernet communications were interrupted.";
-			case LIBMCDRIVER_GRPC_ERROR_SERVICECOMMUNICATIONLOST: return "Communication Service communications were interrupted.";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECARDCONFIGURATION: return "The FireWire card configuration is invalid.";
-			case LIBMCDRIVER_GRPC_ERROR_PCICARDERROR: return "A problem exists with PCI card configuration.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISMISMATCH: return "An incorrect number of axes are attached.";
-			case LIBMCDRIVER_GRPC_ERROR_TASKMISMATCH: return "An insufficient number of tasks are enabled.";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDCOMMANDLINE: return "An invalid SMC command line argument was specified.";
-			case LIBMCDRIVER_GRPC_ERROR_MACHINECONFIGURATION: return "An error occurred while accessing the machine configuration.";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECONFIGURATION: return "An error was detected in the FireWire configuration.";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYCONFIGURATION: return "An error gantry configuration was detected.";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKTIMEOUT: return "A timeout occurred while responding to a callback.";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKERROR: return "A timeout occurred while responding to a callback.";
-			case LIBMCDRIVER_GRPC_ERROR_TOOMANYSTATUSITEMS: return "The maximum number of status items was exceeded.";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMERROR: return "An error occurred in program execution.";
-			case LIBMCDRIVER_GRPC_ERROR_STRINGOVERFLOW: return "The maximum string length was exceeded.";
-			case LIBMCDRIVER_GRPC_ERROR_DIVIDEBYZERO: return "A divide-by-zero was detected.";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMTIMEOUT: return "A program timeout occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_PROFILEQUEUEERROR: return "An error occurred in the execution queue";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDARGUMENT: return "An invalid argument was specified.";
-			case LIBMCDRIVER_GRPC_ERROR_PARAMETERNOTPASSED: return "A callstack argument was not passed to a subroutine.";
-			case LIBMCDRIVER_GRPC_ERROR_QUEUEBUFFERFULL: return "The buffered program queue is full.";
-			case LIBMCDRIVER_GRPC_ERROR_NULLPROGRAMLINE: return "A NULL code line pointer was specified.";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMNUMBEROUTOFBOUNDS: return "The specified program number is outside of the valid range of values.";
-			case LIBMCDRIVER_GRPC_ERROR_CANNEDFUNCTIONERROR: return "An error occurred with a canned function.";
-			case LIBMCDRIVER_GRPC_ERROR_ZEROSPEED: return "The move speed is zero.";
-			case LIBMCDRIVER_GRPC_ERROR_STACKERROR: return "A stack error occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_SLICEERROR: return "An error occurred while executing the SLICE command.";
-			case LIBMCDRIVER_GRPC_ERROR_LOOKAHEADERROR: return "A error occurred while performing lookahead.";
-			case LIBMCDRIVER_GRPC_ERROR_RETRACEERROR: return "An error occurred while doing retrace.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISINFAULT: return "An axis fault occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTENABLED: return "The axis is not enabled.";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONERROR: return "An error occurred with a motion command.";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYMOTIONERROR: return "An error occurred while performing gantry motion.";
-			case LIBMCDRIVER_GRPC_ERROR_CUTTERCOMPENSATIONERROR: return "An error occurred while peforming cutter compensation.";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARMOTIONERROR: return "An error occurred while performing circular motion.";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARRADIUSERROR: return "A circular radius error occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_NORMALCYERROR: return "An error occurred while performing normalcy.";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONTYPEMISMATCH: return "A LINEAR move is required to execute this command.";
-			case LIBMCDRIVER_GRPC_ERROR_SPINDLENUMBERNOTASSIGNED: return "The specified spindle is not assigned to an axis.";
-			case LIBMCDRIVER_GRPC_ERROR_ELLIPTICALMOTIONERROR: return "An error occurred while performing elliptical motion.";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONACTIVE: return "Motion is already active.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDEPENDENT: return "This feature is only available on dependent axes.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDOMINANT: return "This feature is only available on dominant axes.";
-			case LIBMCDRIVER_GRPC_ERROR_NOJOYSTICKGROUPS: return "No joystick groups have been specified.";
-			case LIBMCDRIVER_GRPC_ERROR_TRANSFORMATIONERROR: return "An error occurred performing a transformation.";
-			case LIBMCDRIVER_GRPC_ERROR_CALIBRATIONTABLEERROR: return "An error occurred with a calibration table.";
-			case LIBMCDRIVER_GRPC_ERROR_CAMTABLEERROR: return "An error occurred with a cam table command.";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER: return "Could not load grpc wrapper";
+			case LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED: return "the driver type is not supported";
 		}
 		return "unknown error";
 	}
@@ -569,7 +443,7 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
-	inline void Connect();
+	inline PGRPCConnection ConnectUnsecure(const std::string & sIdentifier, const std::string & sNetworkCredentials, const std::string & sProtobufDefinition);
 	inline void FindConnection();
 };
 	
@@ -703,7 +577,7 @@ public:
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_Driver_GRPC_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_GRPC_IsSimulationMode = nullptr;
-		pWrapperTable->m_Driver_GRPC_Connect = nullptr;
+		pWrapperTable->m_Driver_GRPC_ConnectUnsecure = nullptr;
 		pWrapperTable->m_Driver_GRPC_FindConnection = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -835,12 +709,12 @@ public:
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_GRPC_Connect = (PLibMCDriver_GRPCDriver_GRPC_ConnectPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_driver_grpc_connect");
+		pWrapperTable->m_Driver_GRPC_ConnectUnsecure = (PLibMCDriver_GRPCDriver_GRPC_ConnectUnsecurePtr) GetProcAddress(hLibrary, "libmcdriver_grpc_driver_grpc_connectunsecure");
 		#else // _WIN32
-		pWrapperTable->m_Driver_GRPC_Connect = (PLibMCDriver_GRPCDriver_GRPC_ConnectPtr) dlsym(hLibrary, "libmcdriver_grpc_driver_grpc_connect");
+		pWrapperTable->m_Driver_GRPC_ConnectUnsecure = (PLibMCDriver_GRPCDriver_GRPC_ConnectUnsecurePtr) dlsym(hLibrary, "libmcdriver_grpc_driver_grpc_connectunsecure");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_GRPC_Connect == nullptr)
+		if (pWrapperTable->m_Driver_GRPC_ConnectUnsecure == nullptr)
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -963,8 +837,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GRPC_IsSimulationMode == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_grpc_driver_grpc_connect", (void**)&(pWrapperTable->m_Driver_GRPC_Connect));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GRPC_Connect == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_grpc_driver_grpc_connectunsecure", (void**)&(pWrapperTable->m_Driver_GRPC_ConnectUnsecure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GRPC_ConnectUnsecure == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_grpc_driver_grpc_findconnection", (void**)&(pWrapperTable->m_Driver_GRPC_FindConnection));
@@ -1115,11 +989,21 @@ public:
 	}
 	
 	/**
-	* CDriver_GRPC::Connect - Connects to a GRPC end point.
+	* CDriver_GRPC::ConnectUnsecure - Connects to a GRPC end point.
+	* @param[in] sIdentifier - Connection Identifier.
+	* @param[in] sNetworkCredentials - Network Credentials.
+	* @param[in] sProtobufDefinition - Protobuf definition file.
+	* @return Connection instance in case of success.
 	*/
-	void CDriver_GRPC::Connect()
+	PGRPCConnection CDriver_GRPC::ConnectUnsecure(const std::string & sIdentifier, const std::string & sNetworkCredentials, const std::string & sProtobufDefinition)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GRPC_Connect(m_pHandle));
+		LibMCDriver_GRPCHandle hConnectionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GRPC_ConnectUnsecure(m_pHandle, sIdentifier.c_str(), sNetworkCredentials.c_str(), sProtobufDefinition.c_str(), &hConnectionInstance));
+		
+		if (!hConnectionInstance) {
+			CheckError(LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CGRPCConnection>(m_pWrapper, hConnectionInstance);
 	}
 	
 	/**

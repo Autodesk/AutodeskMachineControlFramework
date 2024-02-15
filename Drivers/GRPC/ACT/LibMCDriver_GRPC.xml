@@ -51,6 +51,9 @@
 		<error name="DRIVERERROR" code="1009" description="a driver error occured" />
 		<error name="DRIVERNOTINITIALISED" code="1010" description="the driver is not initialised" />
 		<error name="DRIVERNOTCONNECTED" code="1011" description="the driver is not connected" />
+		<error name="COULDNOTLOADGRPCWRAPPER" code="1012" description="Could not load grpc wrapper" />
+		<error name="DRIVERTYPENOTSUPPORTED" code="1013" description="the driver type is not supported" />
+		
 
 	</errors>
 
@@ -122,7 +125,11 @@ Custom implementation
 			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
 		</method>	
 		
-		<method name="Connect" description= "Connects to a GRPC end point.">
+		<method name="ConnectUnsecure" description= "Connects to a GRPC end point.">
+			<param name="Identifier" type="string" pass="in" description="Connection Identifier." />
+			<param name="NetworkCredentials" type="string" pass="in" description="Network Credentials." />
+			<param name="ProtobufDefinition" type="string" pass="in" description="Protobuf definition file." />
+			<param name="ConnectionInstance" type="class" class="GRPCConnection" pass="return" description="Connection instance in case of success." />
 		</method>
 
 		<method name="FindConnection" description= "Finds a connection with a certain name.">

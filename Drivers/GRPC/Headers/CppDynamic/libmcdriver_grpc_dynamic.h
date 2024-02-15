@@ -143,9 +143,13 @@ typedef LibMCDriver_GRPCResult (*PLibMCDriver_GRPCDriver_GRPC_IsSimulationModePt
 * Connects to a GRPC end point.
 *
 * @param[in] pDriver_GRPC - Driver_GRPC instance.
+* @param[in] pIdentifier - Connection Identifier.
+* @param[in] pNetworkCredentials - Network Credentials.
+* @param[in] pProtobufDefinition - Protobuf definition file.
+* @param[out] pConnectionInstance - Connection instance in case of success.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_GRPCResult (*PLibMCDriver_GRPCDriver_GRPC_ConnectPtr) (LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC);
+typedef LibMCDriver_GRPCResult (*PLibMCDriver_GRPCDriver_GRPC_ConnectUnsecurePtr) (LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC, const char * pIdentifier, const char * pNetworkCredentials, const char * pProtobufDefinition, LibMCDriver_GRPC_GRPCConnection * pConnectionInstance);
 
 /**
 * Finds a connection with a certain name.
@@ -239,7 +243,7 @@ typedef struct {
 	PLibMCDriver_GRPCDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_GRPCDriver_GRPC_SetToSimulationModePtr m_Driver_GRPC_SetToSimulationMode;
 	PLibMCDriver_GRPCDriver_GRPC_IsSimulationModePtr m_Driver_GRPC_IsSimulationMode;
-	PLibMCDriver_GRPCDriver_GRPC_ConnectPtr m_Driver_GRPC_Connect;
+	PLibMCDriver_GRPCDriver_GRPC_ConnectUnsecurePtr m_Driver_GRPC_ConnectUnsecure;
 	PLibMCDriver_GRPCDriver_GRPC_FindConnectionPtr m_Driver_GRPC_FindConnection;
 	PLibMCDriver_GRPCGetVersionPtr m_GetVersion;
 	PLibMCDriver_GRPCGetLastErrorPtr m_GetLastError;

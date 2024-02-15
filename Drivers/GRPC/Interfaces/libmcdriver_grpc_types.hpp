@@ -107,71 +107,8 @@ typedef void * LibMCDriver_GRPC_pvoid;
 #define LIBMCDRIVER_GRPC_ERROR_DRIVERERROR 1009 /** a driver error occured */
 #define LIBMCDRIVER_GRPC_ERROR_DRIVERNOTINITIALISED 1010 /** the driver is not initialised */
 #define LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED 1011 /** the driver is not connected */
-#define LIBMCDRIVER_GRPC_ERROR_INVALIDDRIVERPROTOCOL 1012 /** invalid driver protocol definition */
-#define LIBMCDRIVER_GRPC_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1013 /** could not parse driver protocol */
-#define LIBMCDRIVER_GRPC_ERROR_NOWORKINGDIRECTORY 1015 /** No working directory */
-#define LIBMCDRIVER_GRPC_ERROR_INVALIDTASKID 1016 /** Invalid task ID */
-#define LIBMCDRIVER_GRPC_ERROR_VERSIONMISMATCH 1 /** An incompatible version was detected */
-#define LIBMCDRIVER_GRPC_ERROR_FEATURELOCKED 2 /** A license error occurred */
-#define LIBMCDRIVER_GRPC_ERROR_UNSUPPORTEDHARDWARE 3 /** A connected hardware type is no longer supported */
-#define LIBMCDRIVER_GRPC_ERROR_RESETTIMEOUT 6 /** A timeout occurred while waiting for the controller reset to finish. */
-#define LIBMCDRIVER_GRPC_ERROR_ALLOCATIONFAILED 8 /** An attempt to allocate memory on the SMC failed */
-#define LIBMCDRIVER_GRPC_ERROR_NOTCONNECTED 9 /** The specified controller handle is invalid */
-#define LIBMCDRIVER_GRPC_ERROR_INVALIDAXISINDEX 10 /** The specified axis index is invalid. */
-#define LIBMCDRIVER_GRPC_ERROR_TOOLTABLEERROR 11 /** A problem occurred with a tool table */
-#define LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDLOST 12 /** A drive command was overwritten and lost. */
-#define LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDRESPONSE 13 /** A timeout occurred while waiting for a drive response */
-#define LIBMCDRIVER_GRPC_ERROR_FIREWIREISONCHRONOUSERROR 14 /** An error occurred with isochronous communication */
-#define LIBMCDRIVER_GRPC_ERROR_FIREWIREASYNCHRONOUSERROR 15 /** An error occurred during an asynchronous communication */
-#define LIBMCDRIVER_GRPC_ERROR_PCMODBUSERROR 16 /** An error occurred with PC Modbus communication */
-#define LIBMCDRIVER_GRPC_ERROR_COMMUNICATIONLOST 17 /** FireWire communications were interrupted. */
-#define LIBMCDRIVER_GRPC_ERROR_ETHERNETCOMMUNICATIONLOST 18 /** Ethernet communications were interrupted. */
-#define LIBMCDRIVER_GRPC_ERROR_SERVICECOMMUNICATIONLOST 19 /** Communication Service communications were interrupted. */
-#define LIBMCDRIVER_GRPC_ERROR_FIREWIRECARDCONFIGURATION 20 /** The FireWire card configuration is invalid. */
-#define LIBMCDRIVER_GRPC_ERROR_PCICARDERROR 21 /** A problem exists with PCI card configuration. */
-#define LIBMCDRIVER_GRPC_ERROR_AXISMISMATCH 22 /** An incorrect number of axes are attached. */
-#define LIBMCDRIVER_GRPC_ERROR_TASKMISMATCH 23 /** An insufficient number of tasks are enabled. */
-#define LIBMCDRIVER_GRPC_ERROR_INVALIDCOMMANDLINE 24 /** An invalid SMC command line argument was specified. */
-#define LIBMCDRIVER_GRPC_ERROR_MACHINECONFIGURATION 25 /** An error occurred while accessing the machine configuration. */
-#define LIBMCDRIVER_GRPC_ERROR_FIREWIRECONFIGURATION 28 /** An error was detected in the FireWire configuration. */
-#define LIBMCDRIVER_GRPC_ERROR_GANTRYCONFIGURATION 29 /** An error gantry configuration was detected. */
-#define LIBMCDRIVER_GRPC_ERROR_CALLBACKTIMEOUT 31 /** A timeout occurred while responding to a callback. */
-#define LIBMCDRIVER_GRPC_ERROR_CALLBACKERROR 32 /** A timeout occurred while responding to a callback. */
-#define LIBMCDRIVER_GRPC_ERROR_TOOMANYSTATUSITEMS 33 /** The maximum number of status items was exceeded. */
-#define LIBMCDRIVER_GRPC_ERROR_PROGRAMERROR 34 /** An error occurred in program execution. */
-#define LIBMCDRIVER_GRPC_ERROR_STRINGOVERFLOW 35 /** The maximum string length was exceeded. */
-#define LIBMCDRIVER_GRPC_ERROR_DIVIDEBYZERO 36 /** A divide-by-zero was detected. */
-#define LIBMCDRIVER_GRPC_ERROR_PROGRAMTIMEOUT 37 /** A program timeout occurred. */
-#define LIBMCDRIVER_GRPC_ERROR_PROFILEQUEUEERROR 38 /** An error occurred in the execution queue */
-#define LIBMCDRIVER_GRPC_ERROR_INVALIDARGUMENT 39 /** An invalid argument was specified. */
-#define LIBMCDRIVER_GRPC_ERROR_PARAMETERNOTPASSED 40 /** A callstack argument was not passed to a subroutine. */
-#define LIBMCDRIVER_GRPC_ERROR_QUEUEBUFFERFULL 41 /** The buffered program queue is full. */
-#define LIBMCDRIVER_GRPC_ERROR_NULLPROGRAMLINE 42 /** A NULL code line pointer was specified. */
-#define LIBMCDRIVER_GRPC_ERROR_PROGRAMNUMBEROUTOFBOUNDS 43 /** The specified program number is outside of the valid range of values. */
-#define LIBMCDRIVER_GRPC_ERROR_CANNEDFUNCTIONERROR 44 /** An error occurred with a canned function. */
-#define LIBMCDRIVER_GRPC_ERROR_ZEROSPEED 46 /** The move speed is zero. */
-#define LIBMCDRIVER_GRPC_ERROR_STACKERROR 47 /** A stack error occurred. */
-#define LIBMCDRIVER_GRPC_ERROR_SLICEERROR 48 /** An error occurred while executing the SLICE command. */
-#define LIBMCDRIVER_GRPC_ERROR_LOOKAHEADERROR 49 /** A error occurred while performing lookahead. */
-#define LIBMCDRIVER_GRPC_ERROR_RETRACEERROR 50 /** An error occurred while doing retrace. */
-#define LIBMCDRIVER_GRPC_ERROR_AXISINFAULT 51 /** An axis fault occurred. */
-#define LIBMCDRIVER_GRPC_ERROR_AXISNOTENABLED 52 /** The axis is not enabled. */
-#define LIBMCDRIVER_GRPC_ERROR_MOTIONERROR 53 /** An error occurred with a motion command. */
-#define LIBMCDRIVER_GRPC_ERROR_GANTRYMOTIONERROR 54 /** An error occurred while performing gantry motion. */
-#define LIBMCDRIVER_GRPC_ERROR_CUTTERCOMPENSATIONERROR 55 /** An error occurred while peforming cutter compensation. */
-#define LIBMCDRIVER_GRPC_ERROR_CIRCULARMOTIONERROR 56 /** An error occurred while performing circular motion. */
-#define LIBMCDRIVER_GRPC_ERROR_CIRCULARRADIUSERROR 57 /** A circular radius error occurred. */
-#define LIBMCDRIVER_GRPC_ERROR_NORMALCYERROR 58 /** An error occurred while performing normalcy. */
-#define LIBMCDRIVER_GRPC_ERROR_MOTIONTYPEMISMATCH 59 /** A LINEAR move is required to execute this command. */
-#define LIBMCDRIVER_GRPC_ERROR_SPINDLENUMBERNOTASSIGNED 60 /** The specified spindle is not assigned to an axis. */
-#define LIBMCDRIVER_GRPC_ERROR_ELLIPTICALMOTIONERROR 61 /** An error occurred while performing elliptical motion. */
-#define LIBMCDRIVER_GRPC_ERROR_MOTIONACTIVE 62 /** Motion is already active. */
-#define LIBMCDRIVER_GRPC_ERROR_AXISNOTDEPENDENT 63 /** This feature is only available on dependent axes. */
-#define LIBMCDRIVER_GRPC_ERROR_AXISNOTDOMINANT 64 /** This feature is only available on dominant axes. */
-#define LIBMCDRIVER_GRPC_ERROR_NOJOYSTICKGROUPS 65 /** No joystick groups have been specified. */
-#define LIBMCDRIVER_GRPC_ERROR_TRANSFORMATIONERROR 66 /** An error occurred performing a transformation. */
-#define LIBMCDRIVER_GRPC_ERROR_CALIBRATIONTABLEERROR 67 /** An error occurred with a calibration table. */
-#define LIBMCDRIVER_GRPC_ERROR_CAMTABLEERROR 68 /** An error occurred with a cam table command. */
+#define LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER 1012 /** Could not load grpc wrapper */
+#define LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED 1013 /** the driver type is not supported */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_GRPC
@@ -191,71 +128,8 @@ inline const char * LIBMCDRIVER_GRPC_GETERRORSTRING (LibMCDriver_GRPCResult nErr
     case LIBMCDRIVER_GRPC_ERROR_DRIVERERROR: return "a driver error occured";
     case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
     case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
-    case LIBMCDRIVER_GRPC_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
-    case LIBMCDRIVER_GRPC_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
-    case LIBMCDRIVER_GRPC_ERROR_NOWORKINGDIRECTORY: return "No working directory";
-    case LIBMCDRIVER_GRPC_ERROR_INVALIDTASKID: return "Invalid task ID";
-    case LIBMCDRIVER_GRPC_ERROR_VERSIONMISMATCH: return "An incompatible version was detected";
-    case LIBMCDRIVER_GRPC_ERROR_FEATURELOCKED: return "A license error occurred";
-    case LIBMCDRIVER_GRPC_ERROR_UNSUPPORTEDHARDWARE: return "A connected hardware type is no longer supported";
-    case LIBMCDRIVER_GRPC_ERROR_RESETTIMEOUT: return "A timeout occurred while waiting for the controller reset to finish.";
-    case LIBMCDRIVER_GRPC_ERROR_ALLOCATIONFAILED: return "An attempt to allocate memory on the SMC failed";
-    case LIBMCDRIVER_GRPC_ERROR_NOTCONNECTED: return "The specified controller handle is invalid";
-    case LIBMCDRIVER_GRPC_ERROR_INVALIDAXISINDEX: return "The specified axis index is invalid.";
-    case LIBMCDRIVER_GRPC_ERROR_TOOLTABLEERROR: return "A problem occurred with a tool table";
-    case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDLOST: return "A drive command was overwritten and lost.";
-    case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDRESPONSE: return "A timeout occurred while waiting for a drive response";
-    case LIBMCDRIVER_GRPC_ERROR_FIREWIREISONCHRONOUSERROR: return "An error occurred with isochronous communication";
-    case LIBMCDRIVER_GRPC_ERROR_FIREWIREASYNCHRONOUSERROR: return "An error occurred during an asynchronous communication";
-    case LIBMCDRIVER_GRPC_ERROR_PCMODBUSERROR: return "An error occurred with PC Modbus communication";
-    case LIBMCDRIVER_GRPC_ERROR_COMMUNICATIONLOST: return "FireWire communications were interrupted.";
-    case LIBMCDRIVER_GRPC_ERROR_ETHERNETCOMMUNICATIONLOST: return "Ethernet communications were interrupted.";
-    case LIBMCDRIVER_GRPC_ERROR_SERVICECOMMUNICATIONLOST: return "Communication Service communications were interrupted.";
-    case LIBMCDRIVER_GRPC_ERROR_FIREWIRECARDCONFIGURATION: return "The FireWire card configuration is invalid.";
-    case LIBMCDRIVER_GRPC_ERROR_PCICARDERROR: return "A problem exists with PCI card configuration.";
-    case LIBMCDRIVER_GRPC_ERROR_AXISMISMATCH: return "An incorrect number of axes are attached.";
-    case LIBMCDRIVER_GRPC_ERROR_TASKMISMATCH: return "An insufficient number of tasks are enabled.";
-    case LIBMCDRIVER_GRPC_ERROR_INVALIDCOMMANDLINE: return "An invalid SMC command line argument was specified.";
-    case LIBMCDRIVER_GRPC_ERROR_MACHINECONFIGURATION: return "An error occurred while accessing the machine configuration.";
-    case LIBMCDRIVER_GRPC_ERROR_FIREWIRECONFIGURATION: return "An error was detected in the FireWire configuration.";
-    case LIBMCDRIVER_GRPC_ERROR_GANTRYCONFIGURATION: return "An error gantry configuration was detected.";
-    case LIBMCDRIVER_GRPC_ERROR_CALLBACKTIMEOUT: return "A timeout occurred while responding to a callback.";
-    case LIBMCDRIVER_GRPC_ERROR_CALLBACKERROR: return "A timeout occurred while responding to a callback.";
-    case LIBMCDRIVER_GRPC_ERROR_TOOMANYSTATUSITEMS: return "The maximum number of status items was exceeded.";
-    case LIBMCDRIVER_GRPC_ERROR_PROGRAMERROR: return "An error occurred in program execution.";
-    case LIBMCDRIVER_GRPC_ERROR_STRINGOVERFLOW: return "The maximum string length was exceeded.";
-    case LIBMCDRIVER_GRPC_ERROR_DIVIDEBYZERO: return "A divide-by-zero was detected.";
-    case LIBMCDRIVER_GRPC_ERROR_PROGRAMTIMEOUT: return "A program timeout occurred.";
-    case LIBMCDRIVER_GRPC_ERROR_PROFILEQUEUEERROR: return "An error occurred in the execution queue";
-    case LIBMCDRIVER_GRPC_ERROR_INVALIDARGUMENT: return "An invalid argument was specified.";
-    case LIBMCDRIVER_GRPC_ERROR_PARAMETERNOTPASSED: return "A callstack argument was not passed to a subroutine.";
-    case LIBMCDRIVER_GRPC_ERROR_QUEUEBUFFERFULL: return "The buffered program queue is full.";
-    case LIBMCDRIVER_GRPC_ERROR_NULLPROGRAMLINE: return "A NULL code line pointer was specified.";
-    case LIBMCDRIVER_GRPC_ERROR_PROGRAMNUMBEROUTOFBOUNDS: return "The specified program number is outside of the valid range of values.";
-    case LIBMCDRIVER_GRPC_ERROR_CANNEDFUNCTIONERROR: return "An error occurred with a canned function.";
-    case LIBMCDRIVER_GRPC_ERROR_ZEROSPEED: return "The move speed is zero.";
-    case LIBMCDRIVER_GRPC_ERROR_STACKERROR: return "A stack error occurred.";
-    case LIBMCDRIVER_GRPC_ERROR_SLICEERROR: return "An error occurred while executing the SLICE command.";
-    case LIBMCDRIVER_GRPC_ERROR_LOOKAHEADERROR: return "A error occurred while performing lookahead.";
-    case LIBMCDRIVER_GRPC_ERROR_RETRACEERROR: return "An error occurred while doing retrace.";
-    case LIBMCDRIVER_GRPC_ERROR_AXISINFAULT: return "An axis fault occurred.";
-    case LIBMCDRIVER_GRPC_ERROR_AXISNOTENABLED: return "The axis is not enabled.";
-    case LIBMCDRIVER_GRPC_ERROR_MOTIONERROR: return "An error occurred with a motion command.";
-    case LIBMCDRIVER_GRPC_ERROR_GANTRYMOTIONERROR: return "An error occurred while performing gantry motion.";
-    case LIBMCDRIVER_GRPC_ERROR_CUTTERCOMPENSATIONERROR: return "An error occurred while peforming cutter compensation.";
-    case LIBMCDRIVER_GRPC_ERROR_CIRCULARMOTIONERROR: return "An error occurred while performing circular motion.";
-    case LIBMCDRIVER_GRPC_ERROR_CIRCULARRADIUSERROR: return "A circular radius error occurred.";
-    case LIBMCDRIVER_GRPC_ERROR_NORMALCYERROR: return "An error occurred while performing normalcy.";
-    case LIBMCDRIVER_GRPC_ERROR_MOTIONTYPEMISMATCH: return "A LINEAR move is required to execute this command.";
-    case LIBMCDRIVER_GRPC_ERROR_SPINDLENUMBERNOTASSIGNED: return "The specified spindle is not assigned to an axis.";
-    case LIBMCDRIVER_GRPC_ERROR_ELLIPTICALMOTIONERROR: return "An error occurred while performing elliptical motion.";
-    case LIBMCDRIVER_GRPC_ERROR_MOTIONACTIVE: return "Motion is already active.";
-    case LIBMCDRIVER_GRPC_ERROR_AXISNOTDEPENDENT: return "This feature is only available on dependent axes.";
-    case LIBMCDRIVER_GRPC_ERROR_AXISNOTDOMINANT: return "This feature is only available on dominant axes.";
-    case LIBMCDRIVER_GRPC_ERROR_NOJOYSTICKGROUPS: return "No joystick groups have been specified.";
-    case LIBMCDRIVER_GRPC_ERROR_TRANSFORMATIONERROR: return "An error occurred performing a transformation.";
-    case LIBMCDRIVER_GRPC_ERROR_CALIBRATIONTABLEERROR: return "An error occurred with a calibration table.";
-    case LIBMCDRIVER_GRPC_ERROR_CAMTABLEERROR: return "An error occurred with a cam table command.";
+    case LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER: return "Could not load grpc wrapper";
+    case LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED: return "the driver type is not supported";
     default: return "unknown error";
   }
 }
