@@ -33,7 +33,7 @@ Abstract: This is a stub class definition of CDriverContext
 
 #include "libmcdriver_asl_drivercontextinstance.hpp"
 #include "libmcdriver_asl_interfaceexception.hpp"
-
+#include "thread"
 // Include custom headers here.
 
 
@@ -63,7 +63,9 @@ CDriverContextInstance::CDriverContextInstance(const std::string& sIdentifier, c
 		if (!isalnum(ch))
 			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTIDENTIFIER, "invalid driver context COM Port: " + sCOMPort);
 
-	m_pConnection.reset(new serial::Serial(sCOMPort, 1000000));
+	auto tOut = serial::Timeout(5, 5, 5, 5, 5);
+
+	m_pConnection.reset(new serial::Serial(sCOMPort, 1000000, tOut));
 
 	if (!m_pConnection->isOpen()) {
 		m_pConnection.reset();
@@ -84,22 +86,50 @@ std::string CDriverContextInstance::GetSerialNumber()
 
 void CDriverContextInstance::SetPower(const bool bPower)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if (!m_pConnection->isOpen()) {
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "port was not opened before call.");
+	}
+
+	m_pConnection->write("O");
+
 }
+
 
 void CDriverContextInstance::SetPrintheadMode(const LibMCDriver_ASL::eBoardMode eMode)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if (!m_pConnection->isOpen()) {
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "port was not opened before call.");
+	}
+
+	if (eMode == LibMCDriver_ASL::eBoardMode::DW_INT)
+		m_pConnection->write("M 1\n");
+	if (eMode == LibMCDriver_ASL::eBoardMode::DW_EXT)
+		m_pConnection->write("M 2\n");
+	if (eMode == LibMCDriver_ASL::eBoardMode::IMG_ENC)
+		m_pConnection->write("M 4\n");
+	if (eMode == LibMCDriver_ASL::eBoardMode::IMG_PD)
+		m_pConnection->write("M 5\n");
+
 }
 
 void CDriverContextInstance::SetFrequency(const LibMCDriver_ASL_uint32 nFrequency)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if (!m_pConnection->isOpen()) {
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "port was not opened before call.");
+	}
+
+	m_pConnection->write("p" + std::to_string(nFrequency) + '\n');
+
 }
 
 void CDriverContextInstance::SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if (!m_pConnection->isOpen()) {
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "port was not opened before call.");
+	}
+
+	m_pConnection->write("T" + std::to_string(nIndex) + " " + std::to_string(dTemperature) + '\n');
+
 }
 
 void CDriverContextInstance::HomeLocation()
@@ -109,7 +139,11 @@ void CDriverContextInstance::HomeLocation()
 
 void CDriverContextInstance::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if (!m_pConnection->isOpen()) {
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "port was not opened before call.");
+	}
+
+	m_pConnection->write("," + std::to_string(nStartLocation) + '\n');
 }
 
 void CDriverContextInstance::SendImage(LibMCEnv::PImageData pImageObject)
@@ -119,12 +153,79 @@ void CDriverContextInstance::SendImage(LibMCEnv::PImageData pImageObject)
 
 void CDriverContextInstance::Poll()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+
+	if (!m_pConnection->isOpen()) {
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "port was not opened before call.");
+	}
+	//flush buffer
+
+	m_pConnection->flushInput();
+
+	auto toRead = m_pConnection->available(); 
+	m_pConnection->read(toRead);
+
+	m_pConnection->write("b");
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+	//m_pConnection->waitReadable();
+	toRead = m_pConnection->available();
+	//bad code
+	while (toRead != m_pConnection->available())
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		toRead = m_pConnection->available();
+	}
+
+	auto msg = m_pConnection->read(toRead);
+
+	/*
+	double m_dSetTemperatures[4];
+	double m_dCurrentTemperatures[4];
+	double m_dPrintCounts[4];
+	double m_dImageLength[4];
+	double m_dStates[4];
+	*/
+
+	for (int idx = 0; idx < 4; idx++) {
+
+		auto nHeadStartPosition = msg.find("\"head\": " + std::to_string(idx + 1));
+		auto nHeadStopPosition = msg.find("\"head\": " + std::to_string(idx + 2)); //wont find 5, but that should be OK
+
+		auto sHeadString = msg.substr(nHeadStartPosition, nHeadStopPosition - nHeadStartPosition);
+
+		auto nHeadStatus = sHeadString.find("status");
+		auto nHeadCurrentTemp = sHeadString.find("curTemperature");
+		auto nHeadSetTemp = sHeadString.find("setTemperature");
+		auto nHeadPrintCounts = sHeadString.find("printCounts");
+
+
+		auto nHeadStatusEnd = sHeadString.find(',', nHeadStatus);
+		auto nHeadCurrentTempEnd = sHeadString.find(',', nHeadCurrentTemp);
+		auto nHeadSetTempEnd = sHeadString.find(',', nHeadSetTemp);
+		auto nHeadPrintCountsEnd = sHeadString.find(',', nHeadPrintCounts);
+
+
+		auto sHeadStatus = sHeadString.substr(nHeadStatus+8, nHeadStatusEnd - (nHeadStatus+8));
+		auto sHeadCurrentTemp = sHeadString.substr(nHeadCurrentTemp+16, nHeadCurrentTempEnd - (nHeadCurrentTemp+16));
+		auto sHeadSetTemp = sHeadString.substr(nHeadSetTemp + 16, nHeadSetTempEnd - (nHeadSetTemp+16));
+		auto sHeadPrintCounts = sHeadString.substr(nHeadPrintCounts+13, nHeadPrintCountsEnd - (nHeadPrintCounts+13));
+
+		m_dStates[idx] = std::stod(sHeadStatus);
+		m_dCurrentTemperatures[idx] = std::stod(sHeadCurrentTemp);
+		m_dSetTemperatures[idx] = std::stod(sHeadSetTemp);
+		m_dPrintCounts[idx] = std::stod(sHeadPrintCounts);
+
+	}
 }
 
 LibMCDriver_ASL_double CDriverContextInstance::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if(true)
+		CDriverContextInstance::Poll();
+
+	return m_dSetTemperatures[nIndex-1];
+
 }
 
 LibMCDriver_ASL_double CDriverContextInstance::GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)

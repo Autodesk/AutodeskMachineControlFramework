@@ -59,6 +59,13 @@ private:
 	std::unique_ptr<serial::Serial> m_pConnection;
 	
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
+	double m_dSetTemperatures[4];
+	double m_dCurrentTemperatures[4];
+	double m_dPrintCounts[4];
+	double m_dImageLength[4];
+	double m_dStates[4];
+
 		
 public:
 

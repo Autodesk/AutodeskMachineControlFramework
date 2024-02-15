@@ -69,9 +69,9 @@ IDriverContext * CDriver_ASL::Connect(const std::string & sIdentifier, const std
 {
 	if (sIdentifier.empty ())
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTIDENTIFIER);
+
 	if (ContextExists (sIdentifier))
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_DUPLICATEDRIVERCONTEXTIDENTIFIER, "Duplicate driver context identifier: " + sIdentifier);
-
 
 	auto pDriverContextInstance = std::make_shared<CDriverContextInstance> (sIdentifier, sCOMPort, m_pDriverEnvironment);
 

@@ -87,7 +87,7 @@ void CDriverContext::HomeLocation()
 
 void CDriverContext::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	m_pInstance->SetPrintStart(nStartLocation);
 }
 
 void CDriverContext::SendImage(LibMCEnv::PImageData pImageObject)
@@ -97,12 +97,12 @@ void CDriverContext::SendImage(LibMCEnv::PImageData pImageObject)
 
 void CDriverContext::Poll()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	m_pInstance->Poll();
 }
 
 LibMCDriver_ASL_double CDriverContext::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_pInstance->GetTemperature(nIndex);
 }
 
 LibMCDriver_ASL_double CDriverContext::GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)
