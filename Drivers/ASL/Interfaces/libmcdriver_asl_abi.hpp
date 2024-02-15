@@ -180,6 +180,14 @@ LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_set
 LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_settemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double dTemperature);
 
 /**
+* Zeroes the encoder counts on the driver board.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_homelocation(LibMCDriver_ASL_DriverContext pDriverContext);
+
+/**
 * Set the print start location.
 *
 * @param[in] pDriverContext - DriverContext instance.
@@ -187,6 +195,82 @@ LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_set
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setprintstart(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nStartLocation);
+
+/**
+* Send the image data.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] pImageObject - Image to print
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_sendimage(LibMCDriver_ASL_DriverContext pDriverContext, LibMCEnv_ImageData pImageObject);
+
+/**
+* Force update driver data.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_poll(LibMCDriver_ASL_DriverContext pDriverContext);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_gettemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getprintcounts(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getimagelength(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getheadstate(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_isheating(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, bool * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getpower(LibMCDriver_ASL_DriverContext pDriverContext, bool * pData);
 
 /*************************************************************************************************************************
  Class definition for Driver_ASL

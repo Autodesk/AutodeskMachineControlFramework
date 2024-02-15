@@ -43,6 +43,19 @@ using namespace LibMCDriver_ASL::Impl;
  Class definition of CDriver_ASL 
 **************************************************************************************************************************/
 
+CDriver_ASL::CDriver_ASL(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_sName(sName), m_pDriverEnvironment(pDriverEnvironment), m_bSimulationMode(false)
+{
+	if (pDriverEnvironment.get() == nullptr)
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDPARAM);
+
+}
+
+CDriver_ASL::~CDriver_ASL()
+{
+
+}
+
 void CDriver_ASL::SetToSimulationMode()
 {
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);

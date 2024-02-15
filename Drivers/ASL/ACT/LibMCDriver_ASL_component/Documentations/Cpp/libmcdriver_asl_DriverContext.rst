@@ -46,11 +46,77 @@ CDriverContext
 		:param dTemperature: Temperature to set 
 
 
+	.. cpp:function:: void HomeLocation()
+
+		Zeroes the encoder counts on the driver board.
+
+
+
 	.. cpp:function:: void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
 
 		Set the print start location.
 
 		:param nStartLocation: The start location of the print. 
+
+
+	.. cpp:function:: void SendImage(classParam<LibMCEnv::CImageData> pImageObject)
+
+		Send the image data.
+
+		:param pImageObject: Image to print 
+
+
+	.. cpp:function:: void Poll()
+
+		Force update driver data.
+
+
+
+	.. cpp:function:: LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
+
+		Get the data from the driver.
+
+		:param nIndex: Head index 
+		:returns: Requested data
+
+
+	.. cpp:function:: LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)
+
+		Get the data from the driver.
+
+		:param nIndex: Head index 
+		:returns: Requested data
+
+
+	.. cpp:function:: LibMCDriver_ASL_double GetImageLength(const LibMCDriver_ASL_uint8 nIndex)
+
+		Get the data from the driver.
+
+		:param nIndex: Head index 
+		:returns: Requested data
+
+
+	.. cpp:function:: LibMCDriver_ASL_double GetHeadState(const LibMCDriver_ASL_uint8 nIndex)
+
+		Get the data from the driver.
+
+		:param nIndex: Head index 
+		:returns: Requested data
+
+
+	.. cpp:function:: bool IsHeating(const LibMCDriver_ASL_uint8 nIndex)
+
+		Get the data from the driver.
+
+		:param nIndex: Head index 
+		:returns: Requested data
+
+
+	.. cpp:function:: bool GetPower()
+
+		Get the data from the driver.
+
+		:returns: Requested data
 
 
 .. cpp:type:: std::shared_ptr<CDriverContext> LibMCDriver_ASL::PDriverContext

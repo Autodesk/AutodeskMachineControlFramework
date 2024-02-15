@@ -62,6 +62,11 @@ private:
 	* Put private members here.
 	*/
 
+	std::string m_sName;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+	bool m_bSimulationMode;
+
+
 protected:
 
 	/**
@@ -70,6 +75,9 @@ protected:
 
 public:
 
+	CDriver_ASL(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	virtual ~CDriver_ASL();
 	/**
 	* Put additional public members here. They will not be visible in the external API.
 	*/

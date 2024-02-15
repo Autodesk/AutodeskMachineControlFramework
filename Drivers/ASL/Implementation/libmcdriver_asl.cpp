@@ -39,6 +39,7 @@ Interface version: 2.0.0
 #include "libmcdriver_asl_abi.hpp"
 #include "libmcdriver_asl_interfaces.hpp"
 #include "libmcdriver_asl_interfaceexception.hpp"
+#include "libmcdriver_asl_driver_asl.hpp"
 
 using namespace LibMCDriver_ASL;
 using namespace LibMCDriver_ASL::Impl;
@@ -74,7 +75,9 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if (sType == "x128-serial-1.0")
+		return new CDriver_ASL(sName, pDriverEnvironment);
+
 	//add some limitation to this function-- pass naem to driver -- disguished by type if you liek
 }
 

@@ -167,6 +167,14 @@ typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetFrequencyPtr) (
 typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetTemperaturePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double dTemperature);
 
 /**
+* Zeroes the encoder counts on the driver board.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_HomeLocationPtr) (LibMCDriver_ASL_DriverContext pDriverContext);
+
+/**
 * Set the print start location.
 *
 * @param[in] pDriverContext - DriverContext instance.
@@ -174,6 +182,82 @@ typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetTemperaturePtr)
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetPrintStartPtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 nStartLocation);
+
+/**
+* Send the image data.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] pImageObject - Image to print
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SendImagePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCEnv_ImageData pImageObject);
+
+/**
+* Force update driver data.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_PollPtr) (LibMCDriver_ASL_DriverContext pDriverContext);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetTemperaturePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetPrintCountsPtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetImageLengthPtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetHeadStatePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_IsHeatingPtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, bool * pData);
+
+/**
+* Get the data from the driver.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[out] pData - Requested data
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetPowerPtr) (LibMCDriver_ASL_DriverContext pDriverContext, bool * pData);
 
 /*************************************************************************************************************************
  Class definition for Driver_ASL
@@ -314,7 +398,16 @@ typedef struct {
 	PLibMCDriver_ASLDriverContext_SetPrintheadModePtr m_DriverContext_SetPrintheadMode;
 	PLibMCDriver_ASLDriverContext_SetFrequencyPtr m_DriverContext_SetFrequency;
 	PLibMCDriver_ASLDriverContext_SetTemperaturePtr m_DriverContext_SetTemperature;
+	PLibMCDriver_ASLDriverContext_HomeLocationPtr m_DriverContext_HomeLocation;
 	PLibMCDriver_ASLDriverContext_SetPrintStartPtr m_DriverContext_SetPrintStart;
+	PLibMCDriver_ASLDriverContext_SendImagePtr m_DriverContext_SendImage;
+	PLibMCDriver_ASLDriverContext_PollPtr m_DriverContext_Poll;
+	PLibMCDriver_ASLDriverContext_GetTemperaturePtr m_DriverContext_GetTemperature;
+	PLibMCDriver_ASLDriverContext_GetPrintCountsPtr m_DriverContext_GetPrintCounts;
+	PLibMCDriver_ASLDriverContext_GetImageLengthPtr m_DriverContext_GetImageLength;
+	PLibMCDriver_ASLDriverContext_GetHeadStatePtr m_DriverContext_GetHeadState;
+	PLibMCDriver_ASLDriverContext_IsHeatingPtr m_DriverContext_IsHeating;
+	PLibMCDriver_ASLDriverContext_GetPowerPtr m_DriverContext_GetPower;
 	PLibMCDriver_ASLDriver_ASL_SetToSimulationModePtr m_Driver_ASL_SetToSimulationMode;
 	PLibMCDriver_ASLDriver_ASL_IsSimulationModePtr m_Driver_ASL_IsSimulationMode;
 	PLibMCDriver_ASLDriver_ASL_ConnectPtr m_Driver_ASL_Connect;

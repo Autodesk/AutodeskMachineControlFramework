@@ -137,11 +137,49 @@ Custom implementation
 			<param name="Temperature" type="double" pass="in" description="Temperature to set" />
 		</method>
 		
+		<method name="HomeLocation" description = "Zeroes the encoder counts on the driver board.">
+		</method>
+		
 		<method name="SetPrintStart" description = "Set the print start location.">
 			<param name="StartLocation" type="uint32" pass="in" description="The start location of the print." />
 		</method>
+		
+		<method name="SendImage" description = "Send the image data.">
+			<param name="ImageObject" type="class" class="LibMCEnv:ImageData" pass="in" description="Image to print" />
+		</method>
 	
+		<method name="Poll" description = "Force update driver data.">
+		</method>
+		
+		<method name="GetTemperature" description = "Get the data from the driver.">
+			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Data" type="double" pass="return" description="Requested data" />
+		</method>
 	
+		<method name="GetPrintCounts" description = "Get the data from the driver.">
+			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Data" type="double" pass="return" description="Requested data" />
+		</method>
+	
+		<method name="GetImageLength" description = "Get the data from the driver.">
+			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Data" type="double" pass="return" description="Requested data" />
+		</method>
+		
+		<method name="GetHeadState" description = "Get the data from the driver.">
+			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Data" type="double" pass="return" description="Requested data" />
+		</method>
+	
+		<method name="IsHeating" description = "Get the data from the driver.">
+			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Data" type="bool" pass="return" description="Requested data" />
+		</method>
+	
+		<method name="GetPower" description = "Get the data from the driver.">
+			<param name="Data" type="bool" pass="return" description="Requested data" />
+		</method>
+		
 	
 	
 	

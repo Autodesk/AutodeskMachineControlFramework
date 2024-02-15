@@ -420,7 +420,16 @@ public:
 	inline void SetPrintheadMode(const eBoardMode eMode);
 	inline void SetFrequency(const LibMCDriver_ASL_uint32 nFrequency);
 	inline void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature);
+	inline void HomeLocation();
 	inline void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation);
+	inline void SendImage(classParam<LibMCEnv::CImageData> pImageObject);
+	inline void Poll();
+	inline LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex);
+	inline LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex);
+	inline LibMCDriver_ASL_double GetImageLength(const LibMCDriver_ASL_uint8 nIndex);
+	inline LibMCDriver_ASL_double GetHeadState(const LibMCDriver_ASL_uint8 nIndex);
+	inline bool IsHeating(const LibMCDriver_ASL_uint8 nIndex);
+	inline bool GetPower();
 };
 	
 /*************************************************************************************************************************
@@ -577,7 +586,16 @@ public:
 		pWrapperTable->m_DriverContext_SetPrintheadMode = nullptr;
 		pWrapperTable->m_DriverContext_SetFrequency = nullptr;
 		pWrapperTable->m_DriverContext_SetTemperature = nullptr;
+		pWrapperTable->m_DriverContext_HomeLocation = nullptr;
 		pWrapperTable->m_DriverContext_SetPrintStart = nullptr;
+		pWrapperTable->m_DriverContext_SendImage = nullptr;
+		pWrapperTable->m_DriverContext_Poll = nullptr;
+		pWrapperTable->m_DriverContext_GetTemperature = nullptr;
+		pWrapperTable->m_DriverContext_GetPrintCounts = nullptr;
+		pWrapperTable->m_DriverContext_GetImageLength = nullptr;
+		pWrapperTable->m_DriverContext_GetHeadState = nullptr;
+		pWrapperTable->m_DriverContext_IsHeating = nullptr;
+		pWrapperTable->m_DriverContext_GetPower = nullptr;
 		pWrapperTable->m_Driver_ASL_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ASL_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ASL_Connect = nullptr;
@@ -740,12 +758,93 @@ public:
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_HomeLocation = (PLibMCDriver_ASLDriverContext_HomeLocationPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_homelocation");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_HomeLocation = (PLibMCDriver_ASLDriverContext_HomeLocationPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_homelocation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_HomeLocation == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverContext_SetPrintStart = (PLibMCDriver_ASLDriverContext_SetPrintStartPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_setprintstart");
 		#else // _WIN32
 		pWrapperTable->m_DriverContext_SetPrintStart = (PLibMCDriver_ASLDriverContext_SetPrintStartPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_setprintstart");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverContext_SetPrintStart == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_SendImage = (PLibMCDriver_ASLDriverContext_SendImagePtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_sendimage");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_SendImage = (PLibMCDriver_ASLDriverContext_SendImagePtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_sendimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_SendImage == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_Poll = (PLibMCDriver_ASLDriverContext_PollPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_poll");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_Poll = (PLibMCDriver_ASLDriverContext_PollPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_poll");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_Poll == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_GetTemperature = (PLibMCDriver_ASLDriverContext_GetTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_gettemperature");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_GetTemperature = (PLibMCDriver_ASLDriverContext_GetTemperaturePtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_gettemperature");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_GetTemperature == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_GetPrintCounts = (PLibMCDriver_ASLDriverContext_GetPrintCountsPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_getprintcounts");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_GetPrintCounts = (PLibMCDriver_ASLDriverContext_GetPrintCountsPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_getprintcounts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_GetPrintCounts == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_GetImageLength = (PLibMCDriver_ASLDriverContext_GetImageLengthPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_getimagelength");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_GetImageLength = (PLibMCDriver_ASLDriverContext_GetImageLengthPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_getimagelength");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_GetImageLength == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_GetHeadState = (PLibMCDriver_ASLDriverContext_GetHeadStatePtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_getheadstate");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_GetHeadState = (PLibMCDriver_ASLDriverContext_GetHeadStatePtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_getheadstate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_GetHeadState == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_IsHeating = (PLibMCDriver_ASLDriverContext_IsHeatingPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_isheating");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_IsHeating = (PLibMCDriver_ASLDriverContext_IsHeatingPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_isheating");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_IsHeating == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_GetPower = (PLibMCDriver_ASLDriverContext_GetPowerPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_getpower");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_GetPower = (PLibMCDriver_ASLDriverContext_GetPowerPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_getpower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_GetPower == nullptr)
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -916,8 +1015,44 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetTemperature == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_homelocation", (void**)&(pWrapperTable->m_DriverContext_HomeLocation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_HomeLocation == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_setprintstart", (void**)&(pWrapperTable->m_DriverContext_SetPrintStart));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetPrintStart == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_sendimage", (void**)&(pWrapperTable->m_DriverContext_SendImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SendImage == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_poll", (void**)&(pWrapperTable->m_DriverContext_Poll));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_Poll == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_gettemperature", (void**)&(pWrapperTable->m_DriverContext_GetTemperature));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetTemperature == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_getprintcounts", (void**)&(pWrapperTable->m_DriverContext_GetPrintCounts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetPrintCounts == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_getimagelength", (void**)&(pWrapperTable->m_DriverContext_GetImageLength));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetImageLength == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_getheadstate", (void**)&(pWrapperTable->m_DriverContext_GetHeadState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetHeadState == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_isheating", (void**)&(pWrapperTable->m_DriverContext_IsHeating));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_IsHeating == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_getpower", (void**)&(pWrapperTable->m_DriverContext_GetPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetPower == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_asl_driver_asl_settosimulationmode", (void**)&(pWrapperTable->m_Driver_ASL_SetToSimulationMode));
@@ -1112,12 +1247,115 @@ public:
 	}
 	
 	/**
+	* CDriverContext::HomeLocation - Zeroes the encoder counts on the driver board.
+	*/
+	void CDriverContext::HomeLocation()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_HomeLocation(m_pHandle));
+	}
+	
+	/**
 	* CDriverContext::SetPrintStart - Set the print start location.
 	* @param[in] nStartLocation - The start location of the print.
 	*/
 	void CDriverContext::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SetPrintStart(m_pHandle, nStartLocation));
+	}
+	
+	/**
+	* CDriverContext::SendImage - Send the image data.
+	* @param[in] pImageObject - Image to print
+	*/
+	void CDriverContext::SendImage(classParam<LibMCEnv::CImageData> pImageObject)
+	{
+		LibMCEnvHandle hImageObject = pImageObject.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SendImage(m_pHandle, hImageObject));
+	}
+	
+	/**
+	* CDriverContext::Poll - Force update driver data.
+	*/
+	void CDriverContext::Poll()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_Poll(m_pHandle));
+	}
+	
+	/**
+	* CDriverContext::GetTemperature - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	LibMCDriver_ASL_double CDriverContext::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
+	{
+		LibMCDriver_ASL_double resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetTemperature(m_pHandle, nIndex, &resultData));
+		
+		return resultData;
+	}
+	
+	/**
+	* CDriverContext::GetPrintCounts - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	LibMCDriver_ASL_double CDriverContext::GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)
+	{
+		LibMCDriver_ASL_double resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetPrintCounts(m_pHandle, nIndex, &resultData));
+		
+		return resultData;
+	}
+	
+	/**
+	* CDriverContext::GetImageLength - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	LibMCDriver_ASL_double CDriverContext::GetImageLength(const LibMCDriver_ASL_uint8 nIndex)
+	{
+		LibMCDriver_ASL_double resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetImageLength(m_pHandle, nIndex, &resultData));
+		
+		return resultData;
+	}
+	
+	/**
+	* CDriverContext::GetHeadState - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	LibMCDriver_ASL_double CDriverContext::GetHeadState(const LibMCDriver_ASL_uint8 nIndex)
+	{
+		LibMCDriver_ASL_double resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetHeadState(m_pHandle, nIndex, &resultData));
+		
+		return resultData;
+	}
+	
+	/**
+	* CDriverContext::IsHeating - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	bool CDriverContext::IsHeating(const LibMCDriver_ASL_uint8 nIndex)
+	{
+		bool resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_IsHeating(m_pHandle, nIndex, &resultData));
+		
+		return resultData;
+	}
+	
+	/**
+	* CDriverContext::GetPower - Get the data from the driver.
+	* @return Requested data
+	*/
+	bool CDriverContext::GetPower()
+	{
+		bool resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetPower(m_pHandle, &resultData));
+		
+		return resultData;
 	}
 	
 	/**

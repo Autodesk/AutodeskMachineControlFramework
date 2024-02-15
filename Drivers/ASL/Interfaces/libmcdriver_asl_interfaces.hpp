@@ -347,10 +347,67 @@ public:
 	virtual void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature) = 0;
 
 	/**
+	* IDriverContext::HomeLocation - Zeroes the encoder counts on the driver board.
+	*/
+	virtual void HomeLocation() = 0;
+
+	/**
 	* IDriverContext::SetPrintStart - Set the print start location.
 	* @param[in] nStartLocation - The start location of the print.
 	*/
 	virtual void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation) = 0;
+
+	/**
+	* IDriverContext::SendImage - Send the image data.
+	* @param[in] pImageObject - Image to print
+	*/
+	virtual void SendImage(LibMCEnv::PImageData pImageObject) = 0;
+
+	/**
+	* IDriverContext::Poll - Force update driver data.
+	*/
+	virtual void Poll() = 0;
+
+	/**
+	* IDriverContext::GetTemperature - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	virtual LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex) = 0;
+
+	/**
+	* IDriverContext::GetPrintCounts - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	virtual LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex) = 0;
+
+	/**
+	* IDriverContext::GetImageLength - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	virtual LibMCDriver_ASL_double GetImageLength(const LibMCDriver_ASL_uint8 nIndex) = 0;
+
+	/**
+	* IDriverContext::GetHeadState - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	virtual LibMCDriver_ASL_double GetHeadState(const LibMCDriver_ASL_uint8 nIndex) = 0;
+
+	/**
+	* IDriverContext::IsHeating - Get the data from the driver.
+	* @param[in] nIndex - Head index
+	* @return Requested data
+	*/
+	virtual bool IsHeating(const LibMCDriver_ASL_uint8 nIndex) = 0;
+
+	/**
+	* IDriverContext::GetPower - Get the data from the driver.
+	* @return Requested data
+	*/
+	virtual bool GetPower() = 0;
 
 };
 
