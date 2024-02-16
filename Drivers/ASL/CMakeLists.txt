@@ -43,5 +43,11 @@ include (../CMakeDriverCommon.txt)
 ### Add custom code below
 ##########################################################################################
 
+IF(WIN32)
+	target_link_libraries(${DRIVERNAME} ws2_32.lib)
+ENDIF(WIN32)
 
+IF(WIN32)
+	target_link_libraries(${DRIVERNAME} setupapi.lib)
+ENDIF(WIN32)
 
