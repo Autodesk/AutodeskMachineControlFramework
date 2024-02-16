@@ -365,6 +365,32 @@ LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getserialnumber(LibMCDriver_
 	}
 }
 
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getheadtimeon(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 * pType)
+{
+	IBase* pIBaseClass = (IBase *)pDriverContext;
+
+	try {
+		if (pType == nullptr)
+			throw ELibMCDriver_ASLInterfaceException (LIBMCDRIVER_ASL_ERROR_INVALIDPARAM);
+		IDriverContext* pIDriverContext = dynamic_cast<IDriverContext*>(pIBaseClass);
+		if (!pIDriverContext)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		*pType = pIDriverContext->GetHeadTimeOn();
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setpower(LibMCDriver_ASL_DriverContext pDriverContext, bool bPower)
 {
 	IBase* pIBaseClass = (IBase *)pDriverContext;
@@ -509,7 +535,7 @@ LibMCDriver_ASLResult libmcdriver_asl_drivercontext_setprintstart(LibMCDriver_AS
 	}
 }
 
-LibMCDriver_ASLResult libmcdriver_asl_drivercontext_sendimage(LibMCDriver_ASL_DriverContext pDriverContext, LibMCEnv_ImageData pImageObject)
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_sendimage(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_uint32 nPadding, LibMCEnv_ImageData pImageObject)
 {
 	IBase* pIBaseClass = (IBase *)pDriverContext;
 
@@ -523,7 +549,33 @@ LibMCDriver_ASLResult libmcdriver_asl_drivercontext_sendimage(LibMCDriver_ASL_Dr
 		if (!pIDriverContext)
 			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
 		
-		pIDriverContext->SendImage(pIImageObject);
+		pIDriverContext->SendImage(nIndex, nPadding, pIImageObject);
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_verifyimages(LibMCDriver_ASL_DriverContext pDriverContext, bool * pVerified)
+{
+	IBase* pIBaseClass = (IBase *)pDriverContext;
+
+	try {
+		if (pVerified == nullptr)
+			throw ELibMCDriver_ASLInterfaceException (LIBMCDRIVER_ASL_ERROR_INVALIDPARAM);
+		IDriverContext* pIDriverContext = dynamic_cast<IDriverContext*>(pIBaseClass);
+		if (!pIDriverContext)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		*pVerified = pIDriverContext->VerifyImages();
 
 		return LIBMCDRIVER_ASL_SUCCESS;
 	}
@@ -562,7 +614,7 @@ LibMCDriver_ASLResult libmcdriver_asl_drivercontext_poll(LibMCDriver_ASL_DriverC
 	}
 }
 
-LibMCDriver_ASLResult libmcdriver_asl_drivercontext_gettemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData)
+LibMCDriver_ASLResult libmcdriver_asl_drivercontext_gettemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, bool bSet, LibMCDriver_ASL_double * pData)
 {
 	IBase* pIBaseClass = (IBase *)pDriverContext;
 
@@ -573,7 +625,7 @@ LibMCDriver_ASLResult libmcdriver_asl_drivercontext_gettemperature(LibMCDriver_A
 		if (!pIDriverContext)
 			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
 		
-		*pData = pIDriverContext->GetTemperature(nIndex);
+		*pData = pIDriverContext->GetTemperature(nIndex, bSet);
 
 		return LIBMCDRIVER_ASL_SUCCESS;
 	}
@@ -866,6 +918,30 @@ LibMCDriver_ASLResult libmcdriver_asl_driver_asl_findcontext(LibMCDriver_ASL_Dri
 	}
 }
 
+LibMCDriver_ASLResult libmcdriver_asl_driver_asl_clearcontexts(LibMCDriver_ASL_Driver_ASL pDriver_ASL)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ASL;
+
+	try {
+		IDriver_ASL* pIDriver_ASL = dynamic_cast<IDriver_ASL*>(pIBaseClass);
+		if (!pIDriver_ASL)
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INVALIDCAST);
+		
+		pIDriver_ASL->ClearContexts();
+
+		return LIBMCDRIVER_ASL_SUCCESS;
+	}
+	catch (ELibMCDriver_ASLInterfaceException & Exception) {
+		return handleLibMCDriver_ASLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -895,6 +971,8 @@ LibMCDriver_ASLResult LibMCDriver_ASL::Impl::LibMCDriver_ASL_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_asl_driver_queryparametersex;
 	if (sProcName == "libmcdriver_asl_drivercontext_getserialnumber") 
 		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_getserialnumber;
+	if (sProcName == "libmcdriver_asl_drivercontext_getheadtimeon") 
+		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_getheadtimeon;
 	if (sProcName == "libmcdriver_asl_drivercontext_setpower") 
 		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_setpower;
 	if (sProcName == "libmcdriver_asl_drivercontext_setprintheadmode") 
@@ -909,6 +987,8 @@ LibMCDriver_ASLResult LibMCDriver_ASL::Impl::LibMCDriver_ASL_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_setprintstart;
 	if (sProcName == "libmcdriver_asl_drivercontext_sendimage") 
 		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_sendimage;
+	if (sProcName == "libmcdriver_asl_drivercontext_verifyimages") 
+		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_verifyimages;
 	if (sProcName == "libmcdriver_asl_drivercontext_poll") 
 		*ppProcAddress = (void*) &libmcdriver_asl_drivercontext_poll;
 	if (sProcName == "libmcdriver_asl_drivercontext_gettemperature") 
@@ -933,6 +1013,8 @@ LibMCDriver_ASLResult LibMCDriver_ASL::Impl::LibMCDriver_ASL_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_asl_driver_asl_contextexists;
 	if (sProcName == "libmcdriver_asl_driver_asl_findcontext") 
 		*ppProcAddress = (void*) &libmcdriver_asl_driver_asl_findcontext;
+	if (sProcName == "libmcdriver_asl_driver_asl_clearcontexts") 
+		*ppProcAddress = (void*) &libmcdriver_asl_driver_asl_clearcontexts;
 	if (sProcName == "libmcdriver_asl_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_asl_getversion;
 	if (sProcName == "libmcdriver_asl_getlasterror") 

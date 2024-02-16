@@ -130,6 +130,15 @@ typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriver_QueryParametersExPtr) (Li
 typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetSerialNumberPtr) (LibMCDriver_ASL_DriverContext pDriverContext, const LibMCDriver_ASL_uint32 nTypeBufferSize, LibMCDriver_ASL_uint32* pTypeNeededChars, char * pTypeBuffer);
 
 /**
+* Returns the time the board has been running
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[out] pType - Time on.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetHeadTimeOnPtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 * pType);
+
+/**
 * Set the board power.
 *
 * @param[in] pDriverContext - DriverContext instance.
@@ -187,10 +196,21 @@ typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SetPrintStartPtr) 
 * Send the image data.
 *
 * @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[in] nPadding - White space padding to add
 * @param[in] pImageObject - Image to print
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SendImagePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCEnv_ImageData pImageObject);
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_SendImagePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_uint32 nPadding, LibMCEnv_ImageData pImageObject);
+
+/**
+* Verifies images that have been sent.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[out] pVerified - Images are verfied or not
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_VerifyImagesPtr) (LibMCDriver_ASL_DriverContext pDriverContext, bool * pVerified);
 
 /**
 * Force update driver data.
@@ -205,10 +225,11 @@ typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_PollPtr) (LibMCDri
 *
 * @param[in] pDriverContext - DriverContext instance.
 * @param[in] nIndex - Head index
+* @param[in] bSet - Request set or actual temperature
 * @param[out] pData - Requested data
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetTemperaturePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriverContext_GetTemperaturePtr) (LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, bool bSet, LibMCDriver_ASL_double * pData);
 
 /**
 * Get the data from the driver.
@@ -311,6 +332,14 @@ typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriver_ASL_ContextExistsPtr) (Li
 */
 typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriver_ASL_FindContextPtr) (LibMCDriver_ASL_Driver_ASL pDriver_ASL, const char * pIdentifier, LibMCDriver_ASL_DriverContext * pChannelInstance);
 
+/**
+* Clears any contexts to release objects.
+*
+* @param[in] pDriver_ASL - Driver_ASL instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ASLResult (*PLibMCDriver_ASLDriver_ASL_ClearContextsPtr) (LibMCDriver_ASL_Driver_ASL pDriver_ASL);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -394,6 +423,7 @@ typedef struct {
 	PLibMCDriver_ASLDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_ASLDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_ASLDriverContext_GetSerialNumberPtr m_DriverContext_GetSerialNumber;
+	PLibMCDriver_ASLDriverContext_GetHeadTimeOnPtr m_DriverContext_GetHeadTimeOn;
 	PLibMCDriver_ASLDriverContext_SetPowerPtr m_DriverContext_SetPower;
 	PLibMCDriver_ASLDriverContext_SetPrintheadModePtr m_DriverContext_SetPrintheadMode;
 	PLibMCDriver_ASLDriverContext_SetFrequencyPtr m_DriverContext_SetFrequency;
@@ -401,6 +431,7 @@ typedef struct {
 	PLibMCDriver_ASLDriverContext_HomeLocationPtr m_DriverContext_HomeLocation;
 	PLibMCDriver_ASLDriverContext_SetPrintStartPtr m_DriverContext_SetPrintStart;
 	PLibMCDriver_ASLDriverContext_SendImagePtr m_DriverContext_SendImage;
+	PLibMCDriver_ASLDriverContext_VerifyImagesPtr m_DriverContext_VerifyImages;
 	PLibMCDriver_ASLDriverContext_PollPtr m_DriverContext_Poll;
 	PLibMCDriver_ASLDriverContext_GetTemperaturePtr m_DriverContext_GetTemperature;
 	PLibMCDriver_ASLDriverContext_GetPrintCountsPtr m_DriverContext_GetPrintCounts;
@@ -413,6 +444,7 @@ typedef struct {
 	PLibMCDriver_ASLDriver_ASL_ConnectPtr m_Driver_ASL_Connect;
 	PLibMCDriver_ASLDriver_ASL_ContextExistsPtr m_Driver_ASL_ContextExists;
 	PLibMCDriver_ASLDriver_ASL_FindContextPtr m_Driver_ASL_FindContext;
+	PLibMCDriver_ASLDriver_ASL_ClearContextsPtr m_Driver_ASL_ClearContexts;
 	PLibMCDriver_ASLGetVersionPtr m_GetVersion;
 	PLibMCDriver_ASLGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ASLReleaseInstancePtr m_ReleaseInstance;

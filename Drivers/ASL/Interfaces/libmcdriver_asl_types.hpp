@@ -111,6 +111,9 @@ typedef void * LibMCDriver_ASL_pvoid;
 #define LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT 13 /** Could not connect to COM Port. */
 #define LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTCOMPORT 14 /** Invalid driver context COM port. */
 #define LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT 15 /** Empty driver context COM port. */
+#define LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT 16 /** The image width was not 128 pixels. */
+#define LIBMCDRIVER_ASL_ERROR_INCORRECTHEADINDEX 17 /** Head indexes are 1-4 for valid. */
+#define LIBMCDRIVER_ASL_ERROR_BOARDPOLLFAILED 18 /** Head indexes are 1-4 for valid. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ASL
@@ -134,6 +137,9 @@ inline const char * LIBMCDRIVER_ASL_GETERRORSTRING (LibMCDriver_ASLResult nError
     case LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT: return "Could not connect to COM Port.";
     case LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTCOMPORT: return "Invalid driver context COM port.";
     case LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT: return "Empty driver context COM port.";
+    case LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT: return "The image width was not 128 pixels.";
+    case LIBMCDRIVER_ASL_ERROR_INCORRECTHEADINDEX: return "Head indexes are 1-4 for valid.";
+    case LIBMCDRIVER_ASL_ERROR_BOARDPOLLFAILED: return "Head indexes are 1-4 for valid.";
     default: return "unknown error";
   }
 }

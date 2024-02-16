@@ -55,11 +55,9 @@
 		<error name="COULDNOTCONNECTTOCOMPORT" code="13" description="Could not connect to COM Port." />
 		<error name="INVALIDDRIVERCONTEXTCOMPORT" code="14" description="Invalid driver context COM port." />
 		<error name="EMPTYDRIVERCONTEXTCOMPORT" code="15" description="Empty driver context COM port." />
-		
-		
-		
-	
-		
+		<error name="IMAGEWIDTHINCORRECT" code="16" description="The image width was not 128 pixels." />
+		<error name="INCORRECTHEADINDEX" code="17" description="Head indexes are 1-4 for valid." />
+		<error name="BOARDPOLLFAILED" code="18" description="Polling head paramters timedout." />
 
 	</errors>
 
@@ -131,6 +129,10 @@ Custom implementation
 		<method name="GetSerialNumber" description = "Returns the serial number of board">
 			<param name="Type" type="string" pass="return" description="Type of the driver." />
 		</method>
+		
+		<method name="GetHeadTimeOn" description = "Returns the time the board has been running">
+			<param name="Type" type="uint32" pass="return" description="Time on." />
+		</method>
 	
 		<method name="SetPower" description = "Set the board power.">
 			<param name="Power" type="bool" pass="in" description="Power on/off." />
@@ -157,7 +159,13 @@ Custom implementation
 		</method>
 		
 		<method name="SendImage" description = "Send the image data.">
+			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Padding" type="uint32" pass="in" description="White space padding to add" />
 			<param name="ImageObject" type="class" class="LibMCEnv:ImageData" pass="in" description="Image to print" />
+		</method>
+		
+		<method name="VerifyImages" description = "Verifies images that have been sent.">
+			<param name="Verified" type="bool" pass="return" description="Images are verfied or not" />
 		</method>
 	
 		<method name="Poll" description = "Force update driver data.">
@@ -165,9 +173,10 @@ Custom implementation
 		
 		<method name="GetTemperature" description = "Get the data from the driver.">
 			<param name="Index" type="uint8" pass="in" description="Head index" />
+			<param name="Set" type="bool" pass="in" description="Request set or actual temperature" />
 			<param name="Data" type="double" pass="return" description="Requested data" />
 		</method>
-	
+			
 		<method name="GetPrintCounts" description = "Get the data from the driver.">
 			<param name="Index" type="uint8" pass="in" description="Head index" />
 			<param name="Data" type="double" pass="return" description="Requested data" />
@@ -221,6 +230,10 @@ Custom implementation
 		<method name="FindContext" description= "Find a communication channel by integer. Fails if the channel does not exist.">
 			<param name="Identifier" type="string" pass="in" description="Identifier of the device." />
 			<param name="ChannelInstance" type="class" class="DriverContext" pass="return" description="Returns the channel instance." />
+		</method>
+		
+
+		<method name="ClearContexts" description= "Clears any contexts to release objects.">
 		</method>
 		
 	</class>

@@ -185,6 +185,9 @@ public:
 			case LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT: return "COULDNOTCONNECTTOCOMPORT";
 			case LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTCOMPORT: return "INVALIDDRIVERCONTEXTCOMPORT";
 			case LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT: return "EMPTYDRIVERCONTEXTCOMPORT";
+			case LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT: return "IMAGEWIDTHINCORRECT";
+			case LIBMCDRIVER_ASL_ERROR_INCORRECTHEADINDEX: return "INCORRECTHEADINDEX";
+			case LIBMCDRIVER_ASL_ERROR_BOARDPOLLFAILED: return "BOARDPOLLFAILED";
 		}
 		return "UNKNOWN";
 	}
@@ -208,6 +211,9 @@ public:
 			case LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT: return "Could not connect to COM Port.";
 			case LIBMCDRIVER_ASL_ERROR_INVALIDDRIVERCONTEXTCOMPORT: return "Invalid driver context COM port.";
 			case LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT: return "Empty driver context COM port.";
+			case LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT: return "The image width was not 128 pixels.";
+			case LIBMCDRIVER_ASL_ERROR_INCORRECTHEADINDEX: return "Head indexes are 1-4 for valid.";
+			case LIBMCDRIVER_ASL_ERROR_BOARDPOLLFAILED: return "Head indexes are 1-4 for valid.";
 		}
 		return "unknown error";
 	}
@@ -430,15 +436,17 @@ public:
 	}
 	
 	inline std::string GetSerialNumber();
+	inline LibMCDriver_ASL_uint32 GetHeadTimeOn();
 	inline void SetPower(const bool bPower);
 	inline void SetPrintheadMode(const eBoardMode eMode);
 	inline void SetFrequency(const LibMCDriver_ASL_uint32 nFrequency);
 	inline void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature);
 	inline void HomeLocation();
 	inline void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation);
-	inline void SendImage(classParam<LibMCEnv::CImageData> pImageObject);
+	inline void SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, classParam<LibMCEnv::CImageData> pImageObject);
+	inline bool VerifyImages();
 	inline void Poll();
-	inline LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex);
+	inline LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet);
 	inline LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex);
 	inline LibMCDriver_ASL_double GetImageLength(const LibMCDriver_ASL_uint8 nIndex);
 	inline LibMCDriver_ASL_double GetHeadState(const LibMCDriver_ASL_uint8 nIndex);
@@ -465,6 +473,7 @@ public:
 	inline PDriverContext Connect(const std::string & sIdentifier, const std::string & sCOMPort);
 	inline bool ContextExists(const std::string & sIdentifier);
 	inline PDriverContext FindContext(const std::string & sIdentifier);
+	inline void ClearContexts();
 };
 	
 	/**
@@ -596,6 +605,7 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_DriverContext_GetSerialNumber = nullptr;
+		pWrapperTable->m_DriverContext_GetHeadTimeOn = nullptr;
 		pWrapperTable->m_DriverContext_SetPower = nullptr;
 		pWrapperTable->m_DriverContext_SetPrintheadMode = nullptr;
 		pWrapperTable->m_DriverContext_SetFrequency = nullptr;
@@ -603,6 +613,7 @@ public:
 		pWrapperTable->m_DriverContext_HomeLocation = nullptr;
 		pWrapperTable->m_DriverContext_SetPrintStart = nullptr;
 		pWrapperTable->m_DriverContext_SendImage = nullptr;
+		pWrapperTable->m_DriverContext_VerifyImages = nullptr;
 		pWrapperTable->m_DriverContext_Poll = nullptr;
 		pWrapperTable->m_DriverContext_GetTemperature = nullptr;
 		pWrapperTable->m_DriverContext_GetPrintCounts = nullptr;
@@ -615,6 +626,7 @@ public:
 		pWrapperTable->m_Driver_ASL_Connect = nullptr;
 		pWrapperTable->m_Driver_ASL_ContextExists = nullptr;
 		pWrapperTable->m_Driver_ASL_FindContext = nullptr;
+		pWrapperTable->m_Driver_ASL_ClearContexts = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -736,6 +748,15 @@ public:
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_GetHeadTimeOn = (PLibMCDriver_ASLDriverContext_GetHeadTimeOnPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_getheadtimeon");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_GetHeadTimeOn = (PLibMCDriver_ASLDriverContext_GetHeadTimeOnPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_getheadtimeon");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_GetHeadTimeOn == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverContext_SetPower = (PLibMCDriver_ASLDriverContext_SetPowerPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_setpower");
 		#else // _WIN32
 		pWrapperTable->m_DriverContext_SetPower = (PLibMCDriver_ASLDriverContext_SetPowerPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_setpower");
@@ -796,6 +817,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverContext_SendImage == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverContext_VerifyImages = (PLibMCDriver_ASLDriverContext_VerifyImagesPtr) GetProcAddress(hLibrary, "libmcdriver_asl_drivercontext_verifyimages");
+		#else // _WIN32
+		pWrapperTable->m_DriverContext_VerifyImages = (PLibMCDriver_ASLDriverContext_VerifyImagesPtr) dlsym(hLibrary, "libmcdriver_asl_drivercontext_verifyimages");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverContext_VerifyImages == nullptr)
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -907,6 +937,15 @@ public:
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ASL_ClearContexts = (PLibMCDriver_ASLDriver_ASL_ClearContextsPtr) GetProcAddress(hLibrary, "libmcdriver_asl_driver_asl_clearcontexts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ASL_ClearContexts = (PLibMCDriver_ASLDriver_ASL_ClearContextsPtr) dlsym(hLibrary, "libmcdriver_asl_driver_asl_clearcontexts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ASL_ClearContexts == nullptr)
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_ASLGetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_asl_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_ASLGetVersionPtr) dlsym(hLibrary, "libmcdriver_asl_getversion");
@@ -1013,6 +1052,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetSerialNumber == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_getheadtimeon", (void**)&(pWrapperTable->m_DriverContext_GetHeadTimeOn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_GetHeadTimeOn == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_setpower", (void**)&(pWrapperTable->m_DriverContext_SetPower));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SetPower == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1039,6 +1082,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_sendimage", (void**)&(pWrapperTable->m_DriverContext_SendImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_SendImage == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_verifyimages", (void**)&(pWrapperTable->m_DriverContext_VerifyImages));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverContext_VerifyImages == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_asl_drivercontext_poll", (void**)&(pWrapperTable->m_DriverContext_Poll));
@@ -1087,6 +1134,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_asl_driver_asl_findcontext", (void**)&(pWrapperTable->m_Driver_ASL_FindContext));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ASL_FindContext == nullptr) )
+			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_asl_driver_asl_clearcontexts", (void**)&(pWrapperTable->m_Driver_ASL_ClearContexts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ASL_ClearContexts == nullptr) )
 			return LIBMCDRIVER_ASL_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_asl_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1224,6 +1275,18 @@ public:
 	}
 	
 	/**
+	* CDriverContext::GetHeadTimeOn - Returns the time the board has been running
+	* @return Time on.
+	*/
+	LibMCDriver_ASL_uint32 CDriverContext::GetHeadTimeOn()
+	{
+		LibMCDriver_ASL_uint32 resultType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetHeadTimeOn(m_pHandle, &resultType));
+		
+		return resultType;
+	}
+	
+	/**
 	* CDriverContext::SetPower - Set the board power.
 	* @param[in] bPower - Power on/off.
 	*/
@@ -1279,12 +1342,26 @@ public:
 	
 	/**
 	* CDriverContext::SendImage - Send the image data.
+	* @param[in] nIndex - Head index
+	* @param[in] nPadding - White space padding to add
 	* @param[in] pImageObject - Image to print
 	*/
-	void CDriverContext::SendImage(classParam<LibMCEnv::CImageData> pImageObject)
+	void CDriverContext::SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, classParam<LibMCEnv::CImageData> pImageObject)
 	{
 		LibMCEnvHandle hImageObject = pImageObject.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SendImage(m_pHandle, hImageObject));
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_SendImage(m_pHandle, nIndex, nPadding, hImageObject));
+	}
+	
+	/**
+	* CDriverContext::VerifyImages - Verifies images that have been sent.
+	* @return Images are verfied or not
+	*/
+	bool CDriverContext::VerifyImages()
+	{
+		bool resultVerified = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_VerifyImages(m_pHandle, &resultVerified));
+		
+		return resultVerified;
 	}
 	
 	/**
@@ -1298,12 +1375,13 @@ public:
 	/**
 	* CDriverContext::GetTemperature - Get the data from the driver.
 	* @param[in] nIndex - Head index
+	* @param[in] bSet - Request set or actual temperature
 	* @return Requested data
 	*/
-	LibMCDriver_ASL_double CDriverContext::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
+	LibMCDriver_ASL_double CDriverContext::GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet)
 	{
 		LibMCDriver_ASL_double resultData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetTemperature(m_pHandle, nIndex, &resultData));
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverContext_GetTemperature(m_pHandle, nIndex, bSet, &resultData));
 		
 		return resultData;
 	}
@@ -1440,6 +1518,14 @@ public:
 			CheckError(LIBMCDRIVER_ASL_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDriverContext>(m_pWrapper, hChannelInstance);
+	}
+	
+	/**
+	* CDriver_ASL::ClearContexts - Clears any contexts to release objects.
+	*/
+	void CDriver_ASL::ClearContexts()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ASL_ClearContexts(m_pHandle));
 	}
 
 } // namespace LibMCDriver_ASL

@@ -80,11 +80,11 @@ public:
 
 	void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation) override;
 
-	void SendImage(LibMCEnv::PImageData pImageObject) override;
+	void SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, LibMCEnv::PImageData pImageObject) override;
 
 	void Poll() override;
 
-	LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex) override;
+	LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet) override;
 
 	LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex) override;
 
@@ -95,6 +95,10 @@ public:
 	bool IsHeating(const LibMCDriver_ASL_uint8 nIndex) override;
 
 	bool GetPower() override;
+
+	LibMCDriver_ASL_uint32 GetHeadTimeOn() override;
+
+	bool VerifyImages() override;
 
 };
 

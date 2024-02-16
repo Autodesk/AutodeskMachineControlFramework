@@ -86,9 +86,18 @@ bool CDriver_ASL::ContextExists(const std::string & sIdentifier)
 	return (iIter != m_InstanceMap.end());
 }
 
+void CDriver_ASL::ClearContexts() 
+{
+	m_InstanceMap.clear();
+}
+
+
 IDriverContext * CDriver_ASL::FindContext(const std::string & sIdentifier)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	if (!CDriver_ASL::ContextExists(sIdentifier))
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTIDENTIFIER);
+		
+	return new CDriverContext(m_InstanceMap.find(sIdentifier)->second);
 }
 
 

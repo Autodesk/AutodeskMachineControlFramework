@@ -81,6 +81,7 @@ public:
 	IDriverContext * Connect(const std::string & sIdentifier, const std::string & sCOMPort) override;
 
 	bool ContextExists(const std::string & sIdentifier) override;
+	void ClearContexts() override;
 
 	IDriverContext * FindContext(const std::string & sIdentifier) override;
 

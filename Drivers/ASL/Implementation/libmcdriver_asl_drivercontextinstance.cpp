@@ -34,8 +34,10 @@ Abstract: This is a stub class definition of CDriverContext
 #include "libmcdriver_asl_drivercontextinstance.hpp"
 #include "libmcdriver_asl_interfaceexception.hpp"
 #include "thread"
+#include <chrono>
 // Include custom headers here.
 
+#define MAX_TIME_POLL 500
 
 using namespace LibMCDriver_ASL::Impl;
 
@@ -70,6 +72,12 @@ CDriverContextInstance::CDriverContextInstance(const std::string& sIdentifier, c
 	if (!m_pConnection->isOpen()) {
 		m_pConnection.reset();
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "could not connect to COM Port: " + sCOMPort);
+	}
+
+	for (uint8_t idx = 0; idx < 4; idx++) {
+		m_nImageVerifyDL_INT[idx] = 0;
+		m_nImageVerifyRC_INT[idx] = 0;
+		m_nImageVerifyLV_INT[idx] = 0;
 	}
 
 }
@@ -124,6 +132,8 @@ void CDriverContextInstance::SetFrequency(const LibMCDriver_ASL_uint32 nFrequenc
 
 void CDriverContextInstance::SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature)
 {
+
+	CDriverContextInstance::VerifyIndex(nIndex);
 	if (!m_pConnection->isOpen()) {
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "port was not opened before call.");
 	}
@@ -146,9 +156,67 @@ void CDriverContextInstance::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLo
 	m_pConnection->write("," + std::to_string(nStartLocation) + '\n');
 }
 
-void CDriverContextInstance::SendImage(LibMCEnv::PImageData pImageObject)
+void CDriverContextInstance::SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, LibMCEnv::PImageData pImageObject)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+
+	CDriverContextInstance::VerifyIndex(nIndex);
+	uint32_t imageHeight, imageWidth;
+	pImageObject->GetSizeInPixels(imageWidth, imageHeight);
+
+	if(imageWidth != 128)
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT, "incorrect image size sent.");
+
+	if(imageHeight == 0)
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT, "no length image height.");
+
+	//auto pFormat = pImageObject->GetPixelFormat();
+	//LibMCEnv::eImagePixelFormat::Unknown;
+
+	std::vector<uint8_t> imageData;
+	imageData.push_back(87); // 87 = W
+	imageData.push_back(100 + nIndex); // head index 1-4 so 101 - 104
+
+	uint64_t sumofval = 0;
+	int count = 0;
+	uint8_t curByte = 0;
+	// Pre image white space
+	for (int i = 0; i < nPadding; ++i) {
+		for (int byt = 0; byt < 16; ++byt) {
+			imageData.push_back(0);
+			sumofval += 0; // last value is 0 in this case
+			count++;
+		}
+	}
+
+	// Convert image data to binary string, note reversal inside the byte
+	for (int i = 0; i < 128; ++i) {
+		for (int byt = 0; byt < 16; ++byt) {
+			curByte = 0;
+			for (int bit = 0; bit < 8; ++bit) {
+				int j = byt * 8 + bit;
+				if (j < imageHeight && pImageObject->GetPixel(j, i) > 0) {
+					curByte |= 1 << (7 - bit);
+				}
+			}
+			imageData.push_back(curByte);
+			sumofval += curByte;
+			count++;
+		}
+	}
+
+	auto nBytesWritten = m_pConnection->write(imageData);
+	if(nBytesWritten != imageData.size())
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "incorrect data length sent.");
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+	m_nImageVerifyDL_INT[nIndex - 1] = count;
+	m_nImageVerifyLV_INT[nIndex - 1] = curByte;
+	m_nImageVerifyRC_INT[nIndex - 1] = sumofval;
+
+	auto toRead = m_pConnection->available();
+	auto msg = m_pConnection->read(toRead);
+
 }
 
 void CDriverContextInstance::Poll()
@@ -159,97 +227,158 @@ void CDriverContextInstance::Poll()
 	}
 	//flush buffer
 
-	m_pConnection->flushInput();
+	//m_pConnection->flushInput();
 
-	auto toRead = m_pConnection->available(); 
-	m_pConnection->read(toRead);
+	auto toClear = m_pConnection->available(); 
+	m_pConnection->read(toClear);
 
 	m_pConnection->write("b");
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 	//m_pConnection->waitReadable();
-	toRead = m_pConnection->available();
-	//bad code
-	while (toRead != m_pConnection->available())
+
+	int nTimeMillisToWait = 500;
+
+	auto toRead = m_pConnection->available();
+	while (toRead < 1300) //json should be over 1300
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		toRead = m_pConnection->available();
+		if (nTimeMillisToWait > 0) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			nTimeMillisToWait--;
+			toRead = m_pConnection->available();
+		}
+		else {
+			throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_BOARDPOLLFAILED, "max retries reached for polling.");
+		}
 	}
+
+
 
 	auto msg = m_pConnection->read(toRead);
 
-	/*
-	double m_dSetTemperatures[4];
-	double m_dCurrentTemperatures[4];
-	double m_dPrintCounts[4];
-	double m_dImageLength[4];
-	double m_dStates[4];
-	*/
+
+	m_cLastPollTime = std::chrono::system_clock::now();
+
+	m_nTimeOn = std::stod(CDriverContextInstance::FindAndExtract(msg, "timeOn", ","));
+	m_nTimeOn = nTimeMillisToWait;
 
 	for (int idx = 0; idx < 4; idx++) {
 
-		auto nHeadStartPosition = msg.find("\"head\": " + std::to_string(idx + 1));
-		auto nHeadStopPosition = msg.find("\"head\": " + std::to_string(idx + 2)); //wont find 5, but that should be OK
+		auto sHeadString = CDriverContextInstance::FindAndExtract(msg, "\"head\": " + std::to_string(idx + 1), "\"head\": " + std::to_string(idx + 2));
 
-		auto sHeadString = msg.substr(nHeadStartPosition, nHeadStopPosition - nHeadStartPosition);
+		m_dStates[idx] = std::stod(CDriverContextInstance::FindAndExtract(sHeadString, "status", ","));
+		m_dCurrentTemperatures[idx] = std::stod(CDriverContextInstance::FindAndExtract(sHeadString, "curTemperature", ","));
+		m_dSetTemperatures[idx] = std::stod(CDriverContextInstance::FindAndExtract(sHeadString, "setTemperature", ","));
+		m_dPrintCounts[idx] = std::stod(CDriverContextInstance::FindAndExtract(sHeadString, "printCounts", ","));
 
-		auto nHeadStatus = sHeadString.find("status");
-		auto nHeadCurrentTemp = sHeadString.find("curTemperature");
-		auto nHeadSetTemp = sHeadString.find("setTemperature");
-		auto nHeadPrintCounts = sHeadString.find("printCounts");
+		auto sImageString = CDriverContextInstance::FindAndExtract(msg, "\"image\": " + std::to_string(idx + 1), "\"image\": " + std::to_string(idx + 2));
 
-
-		auto nHeadStatusEnd = sHeadString.find(',', nHeadStatus);
-		auto nHeadCurrentTempEnd = sHeadString.find(',', nHeadCurrentTemp);
-		auto nHeadSetTempEnd = sHeadString.find(',', nHeadSetTemp);
-		auto nHeadPrintCountsEnd = sHeadString.find(',', nHeadPrintCounts);
-
-
-		auto sHeadStatus = sHeadString.substr(nHeadStatus+8, nHeadStatusEnd - (nHeadStatus+8));
-		auto sHeadCurrentTemp = sHeadString.substr(nHeadCurrentTemp+16, nHeadCurrentTempEnd - (nHeadCurrentTemp+16));
-		auto sHeadSetTemp = sHeadString.substr(nHeadSetTemp + 16, nHeadSetTempEnd - (nHeadSetTemp+16));
-		auto sHeadPrintCounts = sHeadString.substr(nHeadPrintCounts+13, nHeadPrintCountsEnd - (nHeadPrintCounts+13));
-
-		m_dStates[idx] = std::stod(sHeadStatus);
-		m_dCurrentTemperatures[idx] = std::stod(sHeadCurrentTemp);
-		m_dSetTemperatures[idx] = std::stod(sHeadSetTemp);
-		m_dPrintCounts[idx] = std::stod(sHeadPrintCounts);
+		m_dImageLength[idx] = std::stod(CDriverContextInstance::FindAndExtract(sImageString, "length", ","));
+		m_bHasData[idx] = std::stod(CDriverContextInstance::FindAndExtract(sImageString, "hasData", ",")) == 1;
+		m_dProgress[idx] = std::stod(CDriverContextInstance::FindAndExtract(sImageString, "progress", ","));
+		m_nImageVerifyLV[idx] = std::stod(CDriverContextInstance::FindAndExtract(sImageString, "image_stored_lv", ","));
+		m_nImageVerifyDL[idx] = std::stod(CDriverContextInstance::FindAndExtract(sImageString, "image_stored_dl", ","));
+		m_nImageVerifyRC[idx] = std::stod(CDriverContextInstance::FindAndExtract(sImageString, "image_stored_rc", ","));
 
 	}
+
 }
 
-LibMCDriver_ASL_double CDriverContextInstance::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
-{
-	if(true)
+std::string CDriverContextInstance::FindAndExtract(std::string sTotalMessage, std::string sRangeStart, std::string sRangeEnd) {
+
+	auto nStart = sTotalMessage.find(sRangeStart);
+	auto nEnd = sTotalMessage.find(sRangeEnd, nStart);
+
+	nStart += sRangeStart.length() + 2;
+
+	return sTotalMessage.substr(nStart, nEnd - nStart);
+}
+
+void CDriverContextInstance::SoftPoll() {
+
+	auto now = std::chrono::system_clock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - m_cLastPollTime);
+	if(elapsed > std::chrono::milliseconds(MAX_TIME_POLL))
 		CDriverContextInstance::Poll();
+}
 
-	return m_dSetTemperatures[nIndex-1];
+void CDriverContextInstance::VerifyIndex(const LibMCDriver_ASL_uint8 nIndex) {
 
+	if (nIndex > 4 | nIndex < 1)
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_INCORRECTHEADINDEX);
+
+}
+
+LibMCDriver_ASL_double CDriverContextInstance::GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet)
+{
+
+	CDriverContextInstance::SoftPoll();
+	
+	CDriverContextInstance::VerifyIndex(nIndex);
+
+	if(bSet)
+		return m_dSetTemperatures[nIndex-1];
+	else
+		return m_dCurrentTemperatures[nIndex - 1];
 }
 
 LibMCDriver_ASL_double CDriverContextInstance::GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)
 {
+	CDriverContextInstance::SoftPoll();
+
+	CDriverContextInstance::VerifyIndex(nIndex);
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
 LibMCDriver_ASL_double CDriverContextInstance::GetImageLength(const LibMCDriver_ASL_uint8 nIndex)
 {
+	CDriverContextInstance::SoftPoll();
+
+	CDriverContextInstance::VerifyIndex(nIndex);
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
 LibMCDriver_ASL_double CDriverContextInstance::GetHeadState(const LibMCDriver_ASL_uint8 nIndex)
 {
+	CDriverContextInstance::SoftPoll();
+
+	CDriverContextInstance::VerifyIndex(nIndex);
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
 bool CDriverContextInstance::IsHeating(const LibMCDriver_ASL_uint8 nIndex)
 {
+	CDriverContextInstance::SoftPoll();
+
+	CDriverContextInstance::VerifyIndex(nIndex);
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
 bool CDriverContextInstance::GetPower()
 {
+	CDriverContextInstance::SoftPoll();
 	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
 }
 
+LibMCDriver_ASL_uint32 CDriverContextInstance::GetHeadTimeOn()
+{
+	CDriverContextInstance::SoftPoll();
+	return m_nTimeOn;
+}
+
+bool CDriverContextInstance::VerifyImages()
+{
+	CDriverContextInstance::Poll();
+
+	for (uint8_t idx = 0; idx < 4; idx++) {
+
+		if (m_nImageVerifyLV[idx] != m_nImageVerifyLV_INT[idx])
+			return false;
+		if (m_nImageVerifyRC[idx] != m_nImageVerifyRC_INT[idx])
+			return false;
+		if (m_nImageVerifyDL[idx] != m_nImageVerifyDL_INT[idx])
+			return false;
+	}
+
+	return true;
+}

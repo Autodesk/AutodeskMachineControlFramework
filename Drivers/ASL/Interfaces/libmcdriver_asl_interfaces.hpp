@@ -322,6 +322,12 @@ public:
 	virtual std::string GetSerialNumber() = 0;
 
 	/**
+	* IDriverContext::GetHeadTimeOn - Returns the time the board has been running
+	* @return Time on.
+	*/
+	virtual LibMCDriver_ASL_uint32 GetHeadTimeOn() = 0;
+
+	/**
 	* IDriverContext::SetPower - Set the board power.
 	* @param[in] bPower - Power on/off.
 	*/
@@ -359,9 +365,17 @@ public:
 
 	/**
 	* IDriverContext::SendImage - Send the image data.
+	* @param[in] nIndex - Head index
+	* @param[in] nPadding - White space padding to add
 	* @param[in] pImageObject - Image to print
 	*/
-	virtual void SendImage(LibMCEnv::PImageData pImageObject) = 0;
+	virtual void SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, LibMCEnv::PImageData pImageObject) = 0;
+
+	/**
+	* IDriverContext::VerifyImages - Verifies images that have been sent.
+	* @return Images are verfied or not
+	*/
+	virtual bool VerifyImages() = 0;
 
 	/**
 	* IDriverContext::Poll - Force update driver data.
@@ -371,9 +385,10 @@ public:
 	/**
 	* IDriverContext::GetTemperature - Get the data from the driver.
 	* @param[in] nIndex - Head index
+	* @param[in] bSet - Request set or actual temperature
 	* @return Requested data
 	*/
-	virtual LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex) = 0;
+	virtual LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet) = 0;
 
 	/**
 	* IDriverContext::GetPrintCounts - Get the data from the driver.
@@ -452,6 +467,11 @@ public:
 	* @return Returns the channel instance.
 	*/
 	virtual IDriverContext * FindContext(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDriver_ASL::ClearContexts - Clears any contexts to release objects.
+	*/
+	virtual void ClearContexts() = 0;
 
 };
 

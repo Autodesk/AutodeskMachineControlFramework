@@ -90,9 +90,9 @@ void CDriverContext::SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation)
 	m_pInstance->SetPrintStart(nStartLocation);
 }
 
-void CDriverContext::SendImage(LibMCEnv::PImageData pImageObject)
+void CDriverContext::SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, LibMCEnv::PImageData pImageObject)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	m_pInstance->SendImage(nIndex, nPadding, pImageObject);
 }
 
 void CDriverContext::Poll()
@@ -100,33 +100,42 @@ void CDriverContext::Poll()
 	m_pInstance->Poll();
 }
 
-LibMCDriver_ASL_double CDriverContext::GetTemperature(const LibMCDriver_ASL_uint8 nIndex)
+LibMCDriver_ASL_double CDriverContext::GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet)
 {
-	return m_pInstance->GetTemperature(nIndex);
+	return m_pInstance->GetTemperature(nIndex, bSet);
 }
 
 LibMCDriver_ASL_double CDriverContext::GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_pInstance->GetPrintCounts(nIndex);
 }
 
 LibMCDriver_ASL_double CDriverContext::GetImageLength(const LibMCDriver_ASL_uint8 nIndex)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_pInstance->GetImageLength(nIndex);
 }
 
 LibMCDriver_ASL_double CDriverContext::GetHeadState(const LibMCDriver_ASL_uint8 nIndex)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_pInstance->GetHeadState(nIndex);
 }
 
 bool CDriverContext::IsHeating(const LibMCDriver_ASL_uint8 nIndex)
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_pInstance->IsHeating(nIndex);
 }
 
 bool CDriverContext::GetPower()
 {
-	throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_NOTIMPLEMENTED);
+	return m_pInstance->GetPower();
 }
 
+LibMCDriver_ASL_uint32 CDriverContext::GetHeadTimeOn()
+{
+	return m_pInstance->GetHeadTimeOn();
+}
+
+bool CDriverContext::VerifyImages()
+{
+	return m_pInstance->VerifyImages();
+}

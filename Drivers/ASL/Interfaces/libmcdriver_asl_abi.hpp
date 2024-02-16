@@ -143,6 +143,15 @@ LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_driver_queryparam
 LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getserialnumber(LibMCDriver_ASL_DriverContext pDriverContext, const LibMCDriver_ASL_uint32 nTypeBufferSize, LibMCDriver_ASL_uint32* pTypeNeededChars, char * pTypeBuffer);
 
 /**
+* Returns the time the board has been running
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[out] pType - Time on.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_getheadtimeon(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint32 * pType);
+
+/**
 * Set the board power.
 *
 * @param[in] pDriverContext - DriverContext instance.
@@ -200,10 +209,21 @@ LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_set
 * Send the image data.
 *
 * @param[in] pDriverContext - DriverContext instance.
+* @param[in] nIndex - Head index
+* @param[in] nPadding - White space padding to add
 * @param[in] pImageObject - Image to print
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_sendimage(LibMCDriver_ASL_DriverContext pDriverContext, LibMCEnv_ImageData pImageObject);
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_sendimage(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_uint32 nPadding, LibMCEnv_ImageData pImageObject);
+
+/**
+* Verifies images that have been sent.
+*
+* @param[in] pDriverContext - DriverContext instance.
+* @param[out] pVerified - Images are verfied or not
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_verifyimages(LibMCDriver_ASL_DriverContext pDriverContext, bool * pVerified);
 
 /**
 * Force update driver data.
@@ -218,10 +238,11 @@ LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_pol
 *
 * @param[in] pDriverContext - DriverContext instance.
 * @param[in] nIndex - Head index
+* @param[in] bSet - Request set or actual temperature
 * @param[out] pData - Requested data
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_gettemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, LibMCDriver_ASL_double * pData);
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_drivercontext_gettemperature(LibMCDriver_ASL_DriverContext pDriverContext, LibMCDriver_ASL_uint8 nIndex, bool bSet, LibMCDriver_ASL_double * pData);
 
 /**
 * Get the data from the driver.
@@ -323,6 +344,14 @@ LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_driver_asl_contex
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_driver_asl_findcontext(LibMCDriver_ASL_Driver_ASL pDriver_ASL, const char * pIdentifier, LibMCDriver_ASL_DriverContext * pChannelInstance);
+
+/**
+* Clears any contexts to release objects.
+*
+* @param[in] pDriver_ASL - Driver_ASL instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ASL_DECLSPEC LibMCDriver_ASLResult libmcdriver_asl_driver_asl_clearcontexts(LibMCDriver_ASL_Driver_ASL pDriver_ASL);
 
 /*************************************************************************************************************************
  Global functions

@@ -38,6 +38,7 @@ Abstract: This is the class declaration of CDriverContext
 #include "libmcdriver_asl_interfaces.hpp"
 
 #include "serial/serial.h"
+#include <chrono>
 
 #include <memory>
 
@@ -60,12 +61,25 @@ private:
 	
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
+	//External JSON variables
 	double m_dSetTemperatures[4];
 	double m_dCurrentTemperatures[4];
 	double m_dPrintCounts[4];
 	double m_dImageLength[4];
+	bool   m_bHasData[4];
+	double m_dProgress[4];
 	double m_dStates[4];
+	uint32_t m_nImageVerifyRC[4];
+	uint32_t m_nImageVerifyLV[4];
+	uint32_t m_nImageVerifyDL[4];
+	uint32_t m_nTimeOn;
 
+	//Internal set variables
+	uint32_t m_nImageVerifyRC_INT[4];
+	uint32_t m_nImageVerifyLV_INT[4];
+	uint32_t m_nImageVerifyDL_INT[4];
+
+	std::chrono::system_clock::time_point m_cLastPollTime;
 		
 public:
 
@@ -87,11 +101,15 @@ public:
 
 	void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation);
 
-	void SendImage(LibMCEnv::PImageData pImageObject);
+	void SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, LibMCEnv::PImageData pImageObject);
 
 	void Poll();
 
-	LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex);
+	void SoftPoll();
+
+	void VerifyIndex(const LibMCDriver_ASL_uint8 nIndex);
+
+	LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet);
 
 	LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex);
 
@@ -102,6 +120,12 @@ public:
 	bool IsHeating(const LibMCDriver_ASL_uint8 nIndex);
 
 	bool GetPower();
+
+	LibMCDriver_ASL_uint32 GetHeadTimeOn();
+
+	bool VerifyImages();
+
+	std::string CDriverContextInstance::FindAndExtract(std::string sTotalMessage, std::string sRangeStart, std::string sRangeEnd);
 
 };
 
