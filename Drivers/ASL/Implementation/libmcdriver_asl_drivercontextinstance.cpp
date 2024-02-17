@@ -260,7 +260,6 @@ void CDriverContextInstance::Poll()
 	m_cLastPollTime = std::chrono::system_clock::now();
 
 	m_nTimeOn = std::stod(CDriverContextInstance::FindAndExtract(msg, "timeOn", ","));
-	m_nTimeOn = nTimeMillisToWait;
 
 	for (int idx = 0; idx < 4; idx++) {
 
