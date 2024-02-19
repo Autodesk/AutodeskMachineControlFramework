@@ -55,13 +55,15 @@ CAlert::CAlert(LibMCData::PDataModel pDataModel, const std::string& sUUID, const
 	m_sCurrentUserUUID = AMCCommon::CUtils::normalizeUUIDString(sCurrentUserUUID);
 	m_bUserContextExists = (m_sCurrentUserUUID != AMCCommon::CUtils::createEmptyUUID());
 
-	auto pAlertSession = pDataModel->CreateAlertSession();
-	m_pAlertData = pAlertSession->GetAlertByUUID(sUUID);
+	m_pAlertSession = pDataModel->CreateAlertSession();
+	m_pAlertData = m_pAlertSession->GetAlertByUUID(sUUID);
 }
 
 
 CAlert::~CAlert()
 {	
+	m_pAlertData = nullptr;
+	m_pAlertSession = nullptr;
 }
 
 

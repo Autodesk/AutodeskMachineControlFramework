@@ -66,9 +66,10 @@ private:
 	std::mutex m_AlertMutex;
 
 	LibMCData::PDataModel m_pDataModel;
+	LibMCData::PAlertSession m_pAlertSession;
 	LibMCData::PAlert m_pAlertData;
 	AMC::PLogger m_pLogger;
-	const std::string& m_sLogInstance;
+	std::string m_sLogInstance;
 
 	std::string m_sCurrentUserUUID;
 	bool m_bUserContextExists;
