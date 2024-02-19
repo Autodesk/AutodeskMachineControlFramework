@@ -103,6 +103,25 @@ IDriverContext * CDriver_ASL::FindContext(const std::string & sIdentifier)
 
 void CDriver_ASL::Configure(const std::string& sConfigurationString)
 {
+	m_pDriverEnvironment->RegisterDoubleParameter("headsettempone", "Set temperature of head one", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headsettemptwo", "Set temperature of head two", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headsettempthr", "Set temperature of head three", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headsettempfor", "Set temperature of head four", 0.0);
+
+	m_pDriverEnvironment->RegisterDoubleParameter("headcurtempone", "Actual temperature of head one", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headcurtemptwo", "Actual temperature of head two", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headcurtempthr", "Actual temperature of head three", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headcurtempfor", "Actual temperature of head four", 0.0);
+
+	m_pDriverEnvironment->RegisterDoubleParameter("headprintcountsone", "Print counts of head one", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headprintcountstwo", "Print counts of head two", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headprintcountsthr", "Print counts of head three", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headprintcountsfor", "Print counts of head four", 0.0);
+	
+	m_pDriverEnvironment->RegisterDoubleParameter("headstateone",   "State of head one", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headstatetwo",   "State of head two", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headstatethr", "State of head three", 0.0);
+	m_pDriverEnvironment->RegisterDoubleParameter("headstatefor",  "State of head four", 0.0);
 
 }
 
@@ -128,9 +147,30 @@ void CDriver_ASL::GetVersion(LibMCDriver_ASL_uint32& nMajor, LibMCDriver_ASL_uin
 
 void CDriver_ASL::QueryParameters()
 {
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
 }
 
 void CDriver_ASL::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
+	pDriverUpdateInstance->SetDoubleParameter("headsettempone", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headsettemptwo", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headsettempthr", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headsettempfor", 0.0);
+
+	pDriverUpdateInstance->SetDoubleParameter("headcurtempone", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headcurtemptwo", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headcurtempthr", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headcurtempfor", 0.0);
+
+	pDriverUpdateInstance->SetDoubleParameter("headprintcountsone", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headprintcountstwo", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headprintcountsthr", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headprintcountsfor", 0.0);
+
+	pDriverUpdateInstance->SetDoubleParameter("headstateone", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headstatetwo", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headstatethr", 0.0);
+	pDriverUpdateInstance->SetDoubleParameter("headstatefor", 0.0);
+
 }
 

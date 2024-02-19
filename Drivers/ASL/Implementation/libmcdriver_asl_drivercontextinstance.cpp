@@ -281,6 +281,30 @@ void CDriverContextInstance::Poll()
 
 	}
 
+
+	m_pDriverEnvironment->SetDoubleParameter("headsettempone", m_dSetTemperatures[0]);
+	m_pDriverEnvironment->SetDoubleParameter("headsettemptwo", m_dSetTemperatures[1]);
+	m_pDriverEnvironment->SetDoubleParameter("headsettempthr", m_dSetTemperatures[2]);
+	m_pDriverEnvironment->SetDoubleParameter("headsettempfor", m_dSetTemperatures[3]);
+
+	m_pDriverEnvironment->SetDoubleParameter("headcurtempone", m_dCurrentTemperatures[0]);
+	m_pDriverEnvironment->SetDoubleParameter("headcurtemptwo", m_dCurrentTemperatures[1]);
+	m_pDriverEnvironment->SetDoubleParameter("headcurtempthr", m_dCurrentTemperatures[2]);
+	m_pDriverEnvironment->SetDoubleParameter("headcurtempfor", m_dCurrentTemperatures[3]);
+
+	m_pDriverEnvironment->SetDoubleParameter("headprintcountsone", m_dPrintCounts[0]);
+	m_pDriverEnvironment->SetDoubleParameter("headprintcountstwo", m_dPrintCounts[1]);
+	m_pDriverEnvironment->SetDoubleParameter("headprintcountsthr", m_dPrintCounts[2]);
+	m_pDriverEnvironment->SetDoubleParameter("headprintcountsfor", m_dPrintCounts[3]);
+
+	m_pDriverEnvironment->SetDoubleParameter("headstateone", m_dStates[0]);
+	m_pDriverEnvironment->SetDoubleParameter("headstatetwo", m_dStates[1]);
+	m_pDriverEnvironment->SetDoubleParameter("headstatethr", m_dStates[2]);
+	m_pDriverEnvironment->SetDoubleParameter("headstatefor", m_dStates[3]);
+
+
+	//m_pDriverEnvironment->LogMessage("We polled!");
+
 }
 
 std::string CDriverContextInstance::FindAndExtract(std::string sTotalMessage, std::string sRangeStart, std::string sRangeEnd) {
