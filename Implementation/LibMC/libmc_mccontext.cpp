@@ -635,12 +635,12 @@ void CMCContext::loadAlertDefinitions(const pugi::xml_node& xmlNode)
 
     auto alertNodes = xmlNode.children("alert");
     for (auto alertNode : alertNodes) {
-        std::string sName = alertNode.attribute("name").as_string();
+        std::string sIdentifier = alertNode.attribute("identifier").as_string();
         std::string sLevel = alertNode.attribute("level").as_string();
         std::string sAcknowledgePermission = alertNode.attribute("acknowledgepermission").as_string();
 
-        if (sName.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGALERTNAME);
+        if (sIdentifier.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGALERTIDENTIFIER);
         if (sLevel.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGALERTLEVEL);
 
@@ -650,7 +650,7 @@ void CMCContext::loadAlertDefinitions(const pugi::xml_node& xmlNode)
 
         AMC::CLanguageString description(alertNode, "description");
 
-        auto pDefinition = alertHandler->addDefinition(sName, alertLevel, description, bNeedsAcknowledgement);
+        auto pDefinition = alertHandler->addDefinition(sIdentifier, alertLevel, description, bNeedsAcknowledgement);
         if (bNeedsAcknowledgement) {
             auto accessControl = m_pSystemState->accessControl();
             auto pNeededPermission = accessControl->findPermission(sAcknowledgePermission, true);

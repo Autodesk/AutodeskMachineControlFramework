@@ -598,7 +598,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDLANGUAGEIDENTIFIER 581 /** Invalid language identifier */
 #define LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER 582 /** Invalid language string identifier */
 #define LIBMC_ERROR_INVALIDLANGUAGEDEFINITION 583 /** Invalid language definition */
-#define LIBMC_ERROR_MISSINGALERTNAME 584 /** Missing alert name */
+#define LIBMC_ERROR_MISSINGALERTIDENTIFIER 584 /** Missing alert identifier */
 #define LIBMC_ERROR_MISSINGALERTLEVEL 585 /** Missing alert level */
 #define LIBMC_ERROR_INVALIDALERTLEVEL 586 /** Invalid alert level */
 #define LIBMC_ERROR_ALERTLISTNAMEMISSING 587 /** Alert list name missing */
@@ -1112,7 +1112,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDLANGUAGEIDENTIFIER: return "Invalid language identifier";
     case LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER: return "Invalid language string identifier";
     case LIBMC_ERROR_INVALIDLANGUAGEDEFINITION: return "Invalid language definition";
-    case LIBMC_ERROR_MISSINGALERTNAME: return "Missing alert name";
+    case LIBMC_ERROR_MISSINGALERTIDENTIFIER: return "Missing alert identifier";
     case LIBMC_ERROR_MISSINGALERTLEVEL: return "Missing alert level";
     case LIBMC_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
     case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "Alert list name missing";
