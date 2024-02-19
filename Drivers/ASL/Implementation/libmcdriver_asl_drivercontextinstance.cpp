@@ -163,11 +163,11 @@ void CDriverContextInstance::SendImage(const LibMCDriver_ASL_uint8 nIndex, const
 	uint32_t imageHeight, imageWidth;
 	pImageObject->GetSizeInPixels(imageWidth, imageHeight);
 
-	if(imageWidth != 128)
-		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT, "incorrect image size sent.");
-
 	if(imageHeight == 0)
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT, "no length image height.");
+
+	if (imageWidth != 128)
+		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT, "incorrect image size sent.");
 
 	//auto pFormat = pImageObject->GetPixelFormat();
 	//LibMCEnv::eImagePixelFormat::Unknown;
@@ -208,14 +208,9 @@ void CDriverContextInstance::SendImage(const LibMCDriver_ASL_uint8 nIndex, const
 	if(nBytesWritten != imageData.size())
 		throw ELibMCDriver_ASLInterfaceException(LIBMCDRIVER_ASL_ERROR_COULDNOTCONNECTTOCOMPORT, "incorrect data length sent.");
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
 	m_nImageVerifyDL_INT[nIndex - 1] = count;
 	m_nImageVerifyLV_INT[nIndex - 1] = curByte;
 	m_nImageVerifyRC_INT[nIndex - 1] = sumofval;
-
-	auto toRead = m_pConnection->available();
-	auto msg = m_pConnection->read(toRead);
 
 }
 
