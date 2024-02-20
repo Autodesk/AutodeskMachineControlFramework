@@ -92,6 +92,7 @@ protected:
 
 	bool m_bEnableOIEPIDControl;
 	uint32_t m_nCurrentFreeVariable0;
+	bool m_bMeasurementTagging;
 
 	double m_dLaserOriginX;
 	double m_dLaserOriginY;

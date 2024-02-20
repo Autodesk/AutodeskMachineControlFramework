@@ -117,6 +117,8 @@
 		<error name="INVALIDMODULATIONCALLBACK" code="1065" description="Invalid modulation callback." />		
 		<error name="INVALIDSUBDIVISIONTHRESHOLD" code="1066" description="Invalid subdivision threshold." />		
 		<error name="MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID" code="1067" description="Multiple laser ports are not compatible with PID control." />		
+		<error name="INVALIDOIEMEASUREMENTTAG" code="1068" description="Invalid OIE measurement tag." />		
+		
 		
 		
 					

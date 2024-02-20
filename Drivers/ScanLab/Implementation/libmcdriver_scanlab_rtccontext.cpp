@@ -141,6 +141,7 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_pModulationCallback (nullptr),
 	m_pModulationCallbackUserData (nullptr),
 	m_bEnableLineSubdivision (false),
+	m_bMeasurementTagging (false),
 	m_dLineSubdivisionThreshold (RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD)
 
 {
@@ -892,7 +893,7 @@ void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_Scan
 
 		// Make sure List is strictly ascending in Power!
 		int64_t nOldDiscretePower = -1;
-		for (auto point : m_LaserPowerCalibrationList) {
+		for (auto & point : m_LaserPowerCalibrationList) {
 			int64_t nDiscreteLaserPower = (int64_t) round (point.m_PowerSetPointInPercent / m_dLaserPowerCalibrationUnits);
 			if (nDiscreteLaserPower <= nOldDiscretePower)
 				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT);
@@ -1169,13 +1170,15 @@ void CRTCContext::sendFreeVariable0(uint32_t nValue)
 
 void CRTCContext::sendOIEMeasurementTag(uint32_t nCurrentVectorID)
 {
-	m_CurrentMeasurementTagInfo.m_nCurrentVectorID = nCurrentVectorID;
-	m_MeasurementTags.push_back(m_CurrentMeasurementTagInfo);
+	if (m_bMeasurementTagging) {
+		m_CurrentMeasurementTagInfo.m_nCurrentVectorID = nCurrentVectorID;
+		m_MeasurementTags.push_back(m_CurrentMeasurementTagInfo);
 
-	uint32_t nMeasurementTag = (uint32_t) m_MeasurementTags.size () & ((1UL << 22) - 1);
+		uint32_t nMeasurementTag = (uint32_t)m_MeasurementTags.size() & ((1UL << 22) - 1);
 
-	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, nMeasurementTag);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, nMeasurementTag);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	}
 
 }
 
@@ -1280,17 +1283,17 @@ void CRTCContext::SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex)
 
 void CRTCContext::ClearOIEMeasurementTags()
 {
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	m_MeasurementTags.clear();
 }
 
 void CRTCContext::EnableOIEMeasurementTagging()
 {
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	m_bMeasurementTagging = true;
 }
 
 void CRTCContext::DisableOIEMeasurementTagging()
 {
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	m_bMeasurementTagging = false;
 }
 
 void CRTCContext::MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32& nPartID, LibMCDriver_ScanLab_uint32& nProfileID, LibMCDriver_ScanLab_uint32& nSegmentID, LibMCDriver_ScanLab_uint32& nVectorID)
@@ -1303,7 +1306,7 @@ void CRTCContext::MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasure
 		nVectorID = record.m_nCurrentVectorID;
 
 	} else
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIEMEASUREMENTTAG, "Invalid OIE Measurement Tag" + std::to_string (nMeasurementTag));
 }
 
 
@@ -1839,7 +1842,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 
 		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = nSegmentIndex + 1;
-		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "profileid", 0);
+		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "measurementid", 0);
 
 		LibMCEnv::eToolpathSegmentType eSegmentType;
 		uint32_t nPointCount;
