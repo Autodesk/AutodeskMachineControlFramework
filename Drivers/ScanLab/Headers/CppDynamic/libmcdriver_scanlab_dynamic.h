@@ -806,6 +806,43 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPIDC
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
+* Clears all stored OIE Measurement tags of the context. New Tag Indices will start from 0 again.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables OIE Measurement tagging.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables OIE Measurement tagging.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Maps an OIE Measurement tag back to the original scan parameters.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nMeasurementTag - Measurement Tag that has been sent to the OIE.
+* @param[out] pPartID - ID of the part.
+* @param[out] pProfileID - ID of the profile.
+* @param[out] pSegmentID - ID of the segment.
+* @param[out] pVectorID - ID of the vector.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 * pPartID, LibMCDriver_ScanLab_uint32 * pProfileID, LibMCDriver_ScanLab_uint32 * pSegmentID, LibMCDriver_ScanLab_uint32 * pVectorID);
+
+/**
 * Disable skywriting.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1927,6 +1964,10 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetOIEPIDModePtr m_RTCContext_SetOIEPIDMode;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr m_RTCContext_EnableOIEPIDControl;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr m_RTCContext_DisableOIEPIDControl;
+	PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr m_RTCContext_ClearOIEMeasurementTags;
+	PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr m_RTCContext_EnableOIEMeasurementTagging;
+	PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr m_RTCContext_DisableOIEMeasurementTagging;
+	PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr m_RTCContext_MapOIEMeasurementTag;
 	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr m_RTCContext_EnableSkyWritingMode2;

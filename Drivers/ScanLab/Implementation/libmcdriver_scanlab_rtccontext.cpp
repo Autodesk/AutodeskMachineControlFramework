@@ -157,6 +157,11 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 
 	m_pScanLabSDK->n_reset_error(m_CardNo, 0xffffffff);
 
+	m_CurrentMeasurementTagInfo.m_nCurrentPartID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentProfileID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentVectorID = 0;
+
 }
 
 CRTCContext::~CRTCContext()
@@ -375,6 +380,8 @@ void CRTCContext::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, cons
 {
 	m_pScanLabSDK->n_set_start_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+	m_MeasurementTags.clear();
 }
 
 void CRTCContext::SetEndOfList()
@@ -728,6 +735,8 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
 
+		sendOIEMeasurementTag((uint32_t)index);
+
 		markAbsoluteEx(pPrevPoint->m_X, pPrevPoint->m_Y, pPoint->m_X, pPoint->m_Y, fPower, bOIEControlFlag);
 		pPrevPoint = pPoint;
 		pPoint++;		
@@ -759,6 +768,9 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 
 	for (uint64_t index = 0; index < nHatchesBufferSize; index++) {
 		jumpAbsoluteEx(pHatch->m_X1, pHatch->m_Y1);
+
+		sendOIEMeasurementTag((uint32_t)index);
+
 		markAbsoluteEx(pHatch->m_X1, pHatch->m_Y1, pHatch->m_X2, pHatch->m_Y2, fPower, bOIEControlFlag);
 
 		pHatch++;
@@ -1155,6 +1167,19 @@ void CRTCContext::sendFreeVariable0(uint32_t nValue)
 	m_nCurrentFreeVariable0 = nValue;
 }
 
+void CRTCContext::sendOIEMeasurementTag(uint32_t nCurrentVectorID)
+{
+	m_CurrentMeasurementTagInfo.m_nCurrentVectorID = nCurrentVectorID;
+	m_MeasurementTags.push_back(m_CurrentMeasurementTagInfo);
+
+	uint32_t nMeasurementTag = (uint32_t) m_MeasurementTags.size () & ((1UL << 22) - 1);
+
+	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, nMeasurementTag);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+
 void CRTCContext::EnableOIE()
 {
 	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
@@ -1252,6 +1277,35 @@ void CRTCContext::SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex)
 
 
 }
+
+void CRTCContext::ClearOIEMeasurementTags()
+{
+	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+}
+
+void CRTCContext::EnableOIEMeasurementTagging()
+{
+	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+}
+
+void CRTCContext::DisableOIEMeasurementTagging()
+{
+	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+}
+
+void CRTCContext::MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32& nPartID, LibMCDriver_ScanLab_uint32& nProfileID, LibMCDriver_ScanLab_uint32& nSegmentID, LibMCDriver_ScanLab_uint32& nVectorID)
+{
+	if ((nMeasurementTag >= 1) && (nMeasurementTag < m_MeasurementTags.size())) {
+		auto & record = m_MeasurementTags.at (nMeasurementTag - 1);
+		nPartID = record.m_nCurrentPartID;
+		nSegmentID = record.m_nCurrentSegmentID;
+		nProfileID = record.m_nCurrentProfileID;
+		nVectorID = record.m_nCurrentVectorID;
+
+	} else
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+}
+
 
 void CRTCContext::DisableSkyWriting()
 {
@@ -1784,10 +1838,13 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	uint32_t nSegmentCount = pLayer->GetSegmentCount();
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 
+		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = nSegmentIndex + 1;
+		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "profileid", 0);
+
 		LibMCEnv::eToolpathSegmentType eSegmentType;
 		uint32_t nPointCount;
 		pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
-
+		
 		bool bDrawSegment = true;
 		if (nAttributeFilterID != 0) {
 			int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nAttributeFilterID);

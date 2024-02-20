@@ -75,6 +75,8 @@ public:
 
 	void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY) override;
 
+	LibMCDriver_ScanLabOIE_uint32 GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex) override;
+
 	void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nRTCSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pRTCSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pRTCSignalsBuffer) override;
 
 	void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nSensorSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSensorSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSensorSignalsBuffer) override;
@@ -84,6 +86,8 @@ public:
 	void GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pXArrayNeededCount, LibMCDriver_ScanLabOIE_double * pXArrayBuffer, LibMCDriver_ScanLabOIE_uint64 nYArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pYArrayNeededCount, LibMCDriver_ScanLabOIE_double * pYArrayBuffer) override;
 
 	void GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer) override;
+
+	void GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32* pMeasurementTagsBuffer) override;
 
 	void GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) override;
 

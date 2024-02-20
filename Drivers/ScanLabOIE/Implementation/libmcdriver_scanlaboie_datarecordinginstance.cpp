@@ -109,7 +109,7 @@ CDataRecordingInstance::~CDataRecordingInstance()
 
 }
 
-void CDataRecordingInstance::startRecord(uint32_t nPacketNumber, double dX, double dY)
+void CDataRecordingInstance::startRecord (uint32_t nPacketNumber, uint32_t nMeasurementTag, double dX, double dY)
 {
     if (m_pCurrentBuffer.get() == nullptr) {
         m_pCurrentBuffer = std::make_shared<CDataRecordingBuffer>(m_nValueCountPerBuffer);
@@ -119,6 +119,7 @@ void CDataRecordingInstance::startRecord(uint32_t nPacketNumber, double dX, doub
     m_CurrentEntry.m_dX = dX;
     m_CurrentEntry.m_dY = dY;
     m_CurrentEntry.m_nPacketNumber = nPacketNumber;
+    m_CurrentEntry.m_nMeasurementTag = nMeasurementTag;
     m_CurrentEntry.m_pData = m_pCurrentBuffer->allocData (m_nValuesPerRecord);
     m_nCurrentEntryDataIndex = 0;
 
@@ -329,6 +330,27 @@ void CDataRecordingInstance::copyYCoordinates(double* pCoordinateBuffer, size_t 
     for (size_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
         auto pRecord = m_Entries.getData(nIndex);
         *pTarget = pRecord->m_dY;
+        pTarget++;
+    }
+
+}
+
+void CDataRecordingInstance::copyMeasurementTags(uint32_t* pMeasurementTagBuffer, size_t nMeasurementTagBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (pMeasurementTagBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nMeasurementTagBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    uint32_t* pTarget = pMeasurementTagBuffer;
+    for (size_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+        auto pRecord = m_Entries.getData(nIndex);
+        *pTarget = pRecord->m_nMeasurementTag;
         pTarget++;
     }
 

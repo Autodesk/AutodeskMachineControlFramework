@@ -84,6 +84,14 @@ void CDataRecording::GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nI
 	dY = pRecord->m_dY;
 }
 
+LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex)
+{
+	auto pRecord = m_pDataRecordingInstance->getRecord(nIndex);
+	return pRecord->m_nMeasurementTag;
+
+}
+
+
 void CDataRecording::GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nRTCSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pRTCSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pRTCSignalsBuffer)
 {
 	if (nIndex >= m_pDataRecordingInstance->getRecordCount())
@@ -166,6 +174,17 @@ void CDataRecording::GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNu
 
 	if (pPacketNumersBuffer != nullptr)
 		m_pDataRecordingInstance->copyPacketNumbers(pPacketNumersBuffer, nPacketNumersBufferSize);
+}
+
+void CDataRecording::GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32* pMeasurementTagsBuffer)
+{
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (pMeasurementTagsNeededCount != nullptr)
+		*pMeasurementTagsNeededCount = nRecordCount;
+
+	if (pMeasurementTagsBuffer != nullptr)
+		m_pDataRecordingInstance->copyMeasurementTags(pMeasurementTagsBuffer, nMeasurementTagsBufferSize);
+
 }
 
 void CDataRecording::GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer)

@@ -936,6 +936,31 @@ public:
 	virtual void DisableOIEPIDControl() = 0;
 
 	/**
+	* IRTCContext::ClearOIEMeasurementTags - Clears all stored OIE Measurement tags of the context. New Tag Indices will start from 0 again.
+	*/
+	virtual void ClearOIEMeasurementTags() = 0;
+
+	/**
+	* IRTCContext::EnableOIEMeasurementTagging - Enables OIE Measurement tagging.
+	*/
+	virtual void EnableOIEMeasurementTagging() = 0;
+
+	/**
+	* IRTCContext::DisableOIEMeasurementTagging - Disables OIE Measurement tagging.
+	*/
+	virtual void DisableOIEMeasurementTagging() = 0;
+
+	/**
+	* IRTCContext::MapOIEMeasurementTag - Maps an OIE Measurement tag back to the original scan parameters.
+	* @param[in] nMeasurementTag - Measurement Tag that has been sent to the OIE.
+	* @param[out] nPartID - ID of the part.
+	* @param[out] nProfileID - ID of the profile.
+	* @param[out] nSegmentID - ID of the segment.
+	* @param[out] nVectorID - ID of the vector.
+	*/
+	virtual void MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 & nPartID, LibMCDriver_ScanLab_uint32 & nProfileID, LibMCDriver_ScanLab_uint32 & nSegmentID, LibMCDriver_ScanLab_uint32 & nVectorID) = 0;
+
+	/**
 	* IRTCContext::DisableSkyWriting - Disable skywriting.
 	*/
 	virtual void DisableSkyWriting() = 0;

@@ -586,6 +586,23 @@ Custom implementation
 		<method name="DisableOIEPIDControl" description="Disables OIE PID Control.">
 		</method>
 
+		<method name="ClearOIEMeasurementTags" description="Clears all stored OIE Measurement tags of the context. New Tag Indices will start from 0 again.">
+		</method>
+
+		<method name="EnableOIEMeasurementTagging" description="Enables OIE Measurement tagging.">
+		</method>
+
+		<method name="DisableOIEMeasurementTagging" description="Disables OIE Measurement tagging.">
+		</method>
+
+		<method name="MapOIEMeasurementTag" description="Maps an OIE Measurement tag back to the original scan parameters.">
+			<param name="MeasurementTag" type="uint32" pass="in" description="Measurement Tag that has been sent to the OIE." />
+			<param name="PartID" type="uint32" pass="out" description="ID of the part." />
+			<param name="ProfileID" type="uint32" pass="out" description="ID of the profile." />
+			<param name="SegmentID" type="uint32" pass="out" description="ID of the segment." />
+			<param name="VectorID" type="uint32" pass="out" description="ID of the vector." />
+		</method>
+
 		<method name="DisableSkyWriting" description="Disable skywriting.">
 		</method>
 

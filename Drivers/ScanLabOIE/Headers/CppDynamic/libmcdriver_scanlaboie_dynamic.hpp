@@ -563,11 +563,13 @@ public:
 	inline LibMCDriver_ScanLabOIE_uint32 GetAdditionalSignalCount();
 	inline LibMCDriver_ScanLabOIE_uint64 GetRecordCount();
 	inline void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY);
+	inline LibMCDriver_ScanLabOIE_uint32 GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex);
 	inline void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & RTCSignalsBuffer);
 	inline void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SensorSignalsBuffer);
 	inline void GetAdditionalSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & AdditionalSignalsBuffer);
 	inline void GetAllCoordinates(std::vector<LibMCDriver_ScanLabOIE_double> & XArrayBuffer, std::vector<LibMCDriver_ScanLabOIE_double> & YArrayBuffer);
 	inline void GetAllPacketNumbers(std::vector<LibMCDriver_ScanLabOIE_uint32> & PacketNumersBuffer);
+	inline void GetAllMeasurementTags(std::vector<LibMCDriver_ScanLabOIE_uint32> & MeasurementTagsBuffer);
 	inline void GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
 	inline void GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
 	inline void GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
@@ -788,11 +790,13 @@ public:
 		pWrapperTable->m_DataRecording_GetAdditionalSignalCount = nullptr;
 		pWrapperTable->m_DataRecording_GetRecordCount = nullptr;
 		pWrapperTable->m_DataRecording_GetRecordInformation = nullptr;
+		pWrapperTable->m_DataRecording_GetMeasurementTag = nullptr;
 		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetAllCoordinates = nullptr;
 		pWrapperTable->m_DataRecording_GetAllPacketNumbers = nullptr;
+		pWrapperTable->m_DataRecording_GetAllMeasurementTags = nullptr;
 		pWrapperTable->m_DataRecording_GetAllRTCSignals = nullptr;
 		pWrapperTable->m_DataRecording_GetAllSensorSignals = nullptr;
 		pWrapperTable->m_DataRecording_GetAllAdditionalSignals = nullptr;
@@ -1075,6 +1079,15 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetMeasurementTag = (PLibMCDriver_ScanLabOIEDataRecording_GetMeasurementTagPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getmeasurementtag");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetMeasurementTag = (PLibMCDriver_ScanLabOIEDataRecording_GetMeasurementTagPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getmeasurementtag");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetMeasurementTag == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalsOfRecordPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord");
 		#else // _WIN32
 		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalsOfRecordPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord");
@@ -1117,6 +1130,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataRecording_GetAllPacketNumbers == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAllMeasurementTags = (PLibMCDriver_ScanLabOIEDataRecording_GetAllMeasurementTagsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallmeasurementtags");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAllMeasurementTags = (PLibMCDriver_ScanLabOIEDataRecording_GetAllMeasurementTagsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallmeasurementtags");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAllMeasurementTags == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1674,6 +1696,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRecordInformation == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getmeasurementtag", (void**)&(pWrapperTable->m_DataRecording_GetMeasurementTag));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetMeasurementTag == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord", (void**)&(pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1692,6 +1718,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallpacketnumbers", (void**)&(pWrapperTable->m_DataRecording_GetAllPacketNumbers));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllPacketNumbers == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallmeasurementtags", (void**)&(pWrapperTable->m_DataRecording_GetAllMeasurementTags));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllMeasurementTags == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallrtcsignals", (void**)&(pWrapperTable->m_DataRecording_GetAllRTCSignals));
@@ -2172,6 +2202,19 @@ public:
 	}
 	
 	/**
+	* CDataRecording::GetMeasurementTag - Returns the measurement tag of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @return Measurement Tag of the record.
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex)
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultMeasurementTag = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetMeasurementTag(m_pHandle, nIndex, &resultMeasurementTag));
+		
+		return resultMeasurementTag;
+	}
+	
+	/**
 	* CDataRecording::GetRTCSignalsOfRecord - Returns the RTC signals of a specific record.
 	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
 	* @param[out] RTCSignalsBuffer - Recorded RTC Signals
@@ -2241,6 +2284,19 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllPacketNumbers(m_pHandle, 0, &elementsNeededPacketNumers, nullptr));
 		PacketNumersBuffer.resize((size_t) elementsNeededPacketNumers);
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllPacketNumbers(m_pHandle, elementsNeededPacketNumers, &elementsWrittenPacketNumers, PacketNumersBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetAllMeasurementTags - Returns an array of all measurement tags.
+	* @param[out] MeasurementTagsBuffer - Array of Measurement Tags of all records.
+	*/
+	void CDataRecording::GetAllMeasurementTags(std::vector<LibMCDriver_ScanLabOIE_uint32> & MeasurementTagsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededMeasurementTags = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenMeasurementTags = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllMeasurementTags(m_pHandle, 0, &elementsNeededMeasurementTags, nullptr));
+		MeasurementTagsBuffer.resize((size_t) elementsNeededMeasurementTags);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllMeasurementTags(m_pHandle, elementsNeededMeasurementTags, &elementsWrittenMeasurementTags, MeasurementTagsBuffer.data()));
 	}
 	
 	/**

@@ -735,6 +735,32 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getrecordinfor
 	}
 }
 
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getmeasurementtag(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTag)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pMeasurementTag == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		*pMeasurementTag = pIDataRecording->GetMeasurementTag(nIndex);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, const LibMCDriver_ScanLabOIE_uint64 nRTCSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pRTCSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pRTCSignalsBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDataRecording;
@@ -853,6 +879,32 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getallpacketnu
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
 		pIDataRecording->GetAllPacketNumbers(nPacketNumersBufferSize, pPacketNumersNeededCount, pPacketNumersBuffer);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getallmeasurementtags(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTagsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if ((!pMeasurementTagsBuffer) && !(pMeasurementTagsNeededCount))
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->GetAllMeasurementTags(nMeasurementTagsBufferSize, pMeasurementTagsNeededCount, pMeasurementTagsBuffer);
 
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
 	}
@@ -2286,6 +2338,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getrecordcount;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getrecordinformation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getrecordinformation;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_getmeasurementtag") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getmeasurementtag;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getsensorsignalsofrecord") 
@@ -2296,6 +2350,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getallcoordinates;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getallpacketnumbers") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getallpacketnumbers;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_getallmeasurementtags") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getallmeasurementtags;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getallrtcsignals") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getallrtcsignals;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getallsensorsignals") 

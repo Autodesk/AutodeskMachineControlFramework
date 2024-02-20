@@ -29,10 +29,16 @@ namespace LibMCDriver_ScanLab {
 namespace Impl {
 
 
+typedef struct _sMeasurementTagInfo {
+	uint32_t m_nCurrentPartID;
+	uint32_t m_nCurrentProfileID;
+	uint32_t m_nCurrentSegmentID;
+	uint32_t m_nCurrentVectorID;
+} sMeasurementTagInfo;
+
 /*************************************************************************************************************************
  Class declaration of CRTCContext 
 **************************************************************************************************************************/
-
 class CRTCContextOwnerData {
 private:
 	PScanLabSDK m_pScanlabSDK;
@@ -81,6 +87,9 @@ protected:
 	std::string m_sNetmask;
 	uint32_t m_nLaserIndex;
 
+	sMeasurementTagInfo m_CurrentMeasurementTagInfo;
+	std::vector<sMeasurementTagInfo> m_MeasurementTags;
+
 	bool m_bEnableOIEPIDControl;
 	uint32_t m_nCurrentFreeVariable0;
 
@@ -117,6 +126,8 @@ protected:
 	uint32_t getCurrentFreeVariable0 ();
 
 	void sendFreeVariable0 (uint32_t nValue);
+
+	void sendOIEMeasurementTag (uint32_t nCurrentVectorID);
 
 	uint32_t saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY);
 
@@ -238,6 +249,14 @@ public:
 	void StopOIEMeasurement() override;
 
 	void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) override;
+
+	void ClearOIEMeasurementTags() override;
+
+	void EnableOIEMeasurementTagging() override;
+
+	void DisableOIEMeasurementTagging() override;
+
+	void MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32& nPartID, LibMCDriver_ScanLab_uint32& nProfileID, LibMCDriver_ScanLab_uint32& nSegmentID, LibMCDriver_ScanLab_uint32& nVectorID) override;
 
 	void EnableOIEPIDControl() override;
 

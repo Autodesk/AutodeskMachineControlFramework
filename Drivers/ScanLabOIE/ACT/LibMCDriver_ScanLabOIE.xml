@@ -249,6 +249,11 @@ Custom implementation
 			<param name="Y" type="double" pass="out" description="Y Coordinate of the record." />
 		</method>	
 
+		<method name="GetMeasurementTag" description="Returns the measurement tag of a specific record.">
+			<param name="Index" type="uint32" pass="in" description="Index of the record. 0-based. MUST be smaller than RecordCount." />
+			<param name="MeasurementTag" type="uint32" pass="return" description="Measurement Tag of the record." />
+		</method>	
+
 		<method name="GetRTCSignalsOfRecord" description="Returns the RTC signals of a specific record.">
 			<param name="Index" type="uint32" pass="in" description="Index of the record. 0-based. MUST be smaller than RecordCount." />
 			<param name="RTCSignals" type="basicarray" class="int32" pass="out" description="Recorded RTC Signals" />
@@ -271,6 +276,10 @@ Custom implementation
 		
 		<method name="GetAllPacketNumbers" description="Returns an array of all packet numbers.">
 			<param name="PacketNumers" type="basicarray" class="uint32" pass="out" description="Array of Packet Numbers of all records." />
+		</method>	
+
+		<method name="GetAllMeasurementTags" description="Returns an array of all measurement tags.">
+			<param name="MeasurementTags" type="basicarray" class="uint32" pass="out" description="Array of Measurement Tags of all records." />
 		</method>	
 
 		<method name="GetAllRTCSignals" description="Returns an array of all RTC signals of a specific index.">

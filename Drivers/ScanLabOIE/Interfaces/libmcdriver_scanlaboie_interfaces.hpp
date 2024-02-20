@@ -424,6 +424,13 @@ public:
 	virtual void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY) = 0;
 
 	/**
+	* IDataRecording::GetMeasurementTag - Returns the measurement tag of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @return Measurement Tag of the record.
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex) = 0;
+
+	/**
 	* IDataRecording::GetRTCSignalsOfRecord - Returns the RTC signals of a specific record.
 	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
 	* @param[in] nRTCSignalsBufferSize - Number of elements in buffer
@@ -468,6 +475,14 @@ public:
 	* @param[out] pPacketNumersBuffer - uint32 buffer of Array of Packet Numbers of all records.
 	*/
 	virtual void GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer) = 0;
+
+	/**
+	* IDataRecording::GetAllMeasurementTags - Returns an array of all measurement tags.
+	* @param[in] nMeasurementTagsBufferSize - Number of elements in buffer
+	* @param[out] pMeasurementTagsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pMeasurementTagsBuffer - uint32 buffer of Array of Measurement Tags of all records.
+	*/
+	virtual void GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTagsBuffer) = 0;
 
 	/**
 	* IDataRecording::GetAllRTCSignals - Returns an array of all RTC signals of a specific index.

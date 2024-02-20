@@ -819,6 +819,43 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableoiepidcontrol(LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
+* Clears all stored OIE Measurement tags of the context. New Tag Indices will start from 0 again.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_clearoiemeasurementtags(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables OIE Measurement tagging.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableoiemeasurementtagging(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables OIE Measurement tagging.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Maps an OIE Measurement tag back to the original scan parameters.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nMeasurementTag - Measurement Tag that has been sent to the OIE.
+* @param[out] pPartID - ID of the part.
+* @param[out] pProfileID - ID of the profile.
+* @param[out] pSegmentID - ID of the segment.
+* @param[out] pVectorID - ID of the vector.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mapoiemeasurementtag(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 * pPartID, LibMCDriver_ScanLab_uint32 * pProfileID, LibMCDriver_ScanLab_uint32 * pSegmentID, LibMCDriver_ScanLab_uint32 * pVectorID);
+
+/**
 * Disable skywriting.
 *
 * @param[in] pRTCContext - RTCContext instance.

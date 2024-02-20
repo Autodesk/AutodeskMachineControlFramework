@@ -264,6 +264,16 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetR
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetRecordInformationPtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pPacketNumber, LibMCDriver_ScanLabOIE_double * pX, LibMCDriver_ScanLabOIE_double * pY);
 
 /**
+* Returns the measurement tag of a specific record.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+* @param[out] pMeasurementTag - Measurement Tag of the record.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetMeasurementTagPtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTag);
+
+/**
 * Returns the RTC signals of a specific record.
 *
 * @param[in] pDataRecording - DataRecording instance.
@@ -323,6 +333,17 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetA
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetAllPacketNumbersPtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer);
+
+/**
+* Returns an array of all measurement tags.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nMeasurementTagsBufferSize - Number of elements in buffer
+* @param[out] pMeasurementTagsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pMeasurementTagsBuffer - uint32  buffer of Array of Measurement Tags of all records.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_GetAllMeasurementTagsPtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTagsBuffer);
 
 /**
 * Returns an array of all RTC signals of a specific index.
@@ -879,11 +900,13 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEDataRecording_GetAdditionalSignalCountPtr m_DataRecording_GetAdditionalSignalCount;
 	PLibMCDriver_ScanLabOIEDataRecording_GetRecordCountPtr m_DataRecording_GetRecordCount;
 	PLibMCDriver_ScanLabOIEDataRecording_GetRecordInformationPtr m_DataRecording_GetRecordInformation;
+	PLibMCDriver_ScanLabOIEDataRecording_GetMeasurementTagPtr m_DataRecording_GetMeasurementTag;
 	PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalsOfRecordPtr m_DataRecording_GetRTCSignalsOfRecord;
 	PLibMCDriver_ScanLabOIEDataRecording_GetSensorSignalsOfRecordPtr m_DataRecording_GetSensorSignalsOfRecord;
 	PLibMCDriver_ScanLabOIEDataRecording_GetAdditionalSignalsOfRecordPtr m_DataRecording_GetAdditionalSignalsOfRecord;
 	PLibMCDriver_ScanLabOIEDataRecording_GetAllCoordinatesPtr m_DataRecording_GetAllCoordinates;
 	PLibMCDriver_ScanLabOIEDataRecording_GetAllPacketNumbersPtr m_DataRecording_GetAllPacketNumbers;
+	PLibMCDriver_ScanLabOIEDataRecording_GetAllMeasurementTagsPtr m_DataRecording_GetAllMeasurementTags;
 	PLibMCDriver_ScanLabOIEDataRecording_GetAllRTCSignalsPtr m_DataRecording_GetAllRTCSignals;
 	PLibMCDriver_ScanLabOIEDataRecording_GetAllSensorSignalsPtr m_DataRecording_GetAllSensorSignals;
 	PLibMCDriver_ScanLabOIEDataRecording_GetAllAdditionalSignalsPtr m_DataRecording_GetAllAdditionalSignals;

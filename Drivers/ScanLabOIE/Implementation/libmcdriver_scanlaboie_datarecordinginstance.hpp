@@ -81,6 +81,7 @@ typedef std::shared_ptr<CDataRecordingBuffer> PDataRecordingBuffer;
 typedef struct _sDataRecordingEntry
 {
     uint32_t m_nPacketNumber;
+    uint32_t m_nMeasurementTag;
     double m_dX;
     double m_dY;
     int32_t* m_pData;
@@ -126,7 +127,7 @@ public:
 
     virtual ~CDataRecordingInstance();
 
-    void startRecord(uint32_t nPacketNumber, double dX, double dY);
+    void startRecord(uint32_t nPacketNumber, uint32_t nMeasurementTag, double dX, double dY);
 
     void recordValue (int32_t nValue);
 
@@ -153,6 +154,8 @@ public:
     void copyYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize);
 
     void copyPacketNumbers(uint32_t* pPacketNumberBuffer, size_t nPacketNumberBufferSize);
+
+    void copyMeasurementTags(uint32_t* pMeasurementTagBuffer, size_t nMeasurementTagBufferSize);
 
     void copyAllRTCSignalsByIndex(uint32_t nRTCIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize);
 

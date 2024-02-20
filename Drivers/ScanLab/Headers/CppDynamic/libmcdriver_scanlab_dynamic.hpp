@@ -633,6 +633,10 @@ public:
 	inline void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex);
 	inline void EnableOIEPIDControl();
 	inline void DisableOIEPIDControl();
+	inline void ClearOIEMeasurementTags();
+	inline void EnableOIEMeasurementTagging();
+	inline void DisableOIEMeasurementTagging();
+	inline void MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 & nPartID, LibMCDriver_ScanLab_uint32 & nProfileID, LibMCDriver_ScanLab_uint32 & nSegmentID, LibMCDriver_ScanLab_uint32 & nVectorID);
 	inline void DisableSkyWriting();
 	inline void EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
 	inline void EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
@@ -987,6 +991,10 @@ public:
 		pWrapperTable->m_RTCContext_SetOIEPIDMode = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIEPIDControl = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIEPIDControl = nullptr;
+		pWrapperTable->m_RTCContext_ClearOIEMeasurementTags = nullptr;
+		pWrapperTable->m_RTCContext_EnableOIEMeasurementTagging = nullptr;
+		pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging = nullptr;
+		pWrapperTable->m_RTCContext_MapOIEMeasurementTag = nullptr;
 		pWrapperTable->m_RTCContext_DisableSkyWriting = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode2 = nullptr;
@@ -1792,6 +1800,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_DisableOIEPIDControl == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ClearOIEMeasurementTags = (PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_clearoiemeasurementtags");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ClearOIEMeasurementTags = (PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_clearoiemeasurementtags");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ClearOIEMeasurementTags == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableOIEMeasurementTagging = (PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableoiemeasurementtagging");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableOIEMeasurementTagging = (PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableoiemeasurementtagging");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableOIEMeasurementTagging == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging = (PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging = (PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_MapOIEMeasurementTag = (PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_mapoiemeasurementtag");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_MapOIEMeasurementTag = (PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_mapoiemeasurementtag");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_MapOIEMeasurementTag == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3002,6 +3046,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableOIEPIDControl == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_clearoiemeasurementtags", (void**)&(pWrapperTable->m_RTCContext_ClearOIEMeasurementTags));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ClearOIEMeasurementTags == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoiemeasurementtagging", (void**)&(pWrapperTable->m_RTCContext_EnableOIEMeasurementTagging));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableOIEMeasurementTagging == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging", (void**)&(pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_mapoiemeasurementtag", (void**)&(pWrapperTable->m_RTCContext_MapOIEMeasurementTag));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_MapOIEMeasurementTag == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableskywriting", (void**)&(pWrapperTable->m_RTCContext_DisableSkyWriting));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableSkyWriting == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4199,6 +4259,43 @@ public:
 	void CRTCContext::DisableOIEPIDControl()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableOIEPIDControl(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::ClearOIEMeasurementTags - Clears all stored OIE Measurement tags of the context. New Tag Indices will start from 0 again.
+	*/
+	void CRTCContext::ClearOIEMeasurementTags()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ClearOIEMeasurementTags(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::EnableOIEMeasurementTagging - Enables OIE Measurement tagging.
+	*/
+	void CRTCContext::EnableOIEMeasurementTagging()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableOIEMeasurementTagging(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DisableOIEMeasurementTagging - Disables OIE Measurement tagging.
+	*/
+	void CRTCContext::DisableOIEMeasurementTagging()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableOIEMeasurementTagging(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::MapOIEMeasurementTag - Maps an OIE Measurement tag back to the original scan parameters.
+	* @param[in] nMeasurementTag - Measurement Tag that has been sent to the OIE.
+	* @param[out] nPartID - ID of the part.
+	* @param[out] nProfileID - ID of the profile.
+	* @param[out] nSegmentID - ID of the segment.
+	* @param[out] nVectorID - ID of the vector.
+	*/
+	void CRTCContext::MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 & nPartID, LibMCDriver_ScanLab_uint32 & nProfileID, LibMCDriver_ScanLab_uint32 & nSegmentID, LibMCDriver_ScanLab_uint32 & nVectorID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_MapOIEMeasurementTag(m_pHandle, nMeasurementTag, &nPartID, &nProfileID, &nSegmentID, &nVectorID));
 	}
 	
 	/**

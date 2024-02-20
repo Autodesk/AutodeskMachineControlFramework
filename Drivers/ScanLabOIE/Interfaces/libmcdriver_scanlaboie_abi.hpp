@@ -277,6 +277,16 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getrecordinformation(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pPacketNumber, LibMCDriver_ScanLabOIE_double * pX, LibMCDriver_ScanLabOIE_double * pY);
 
 /**
+* Returns the measurement tag of a specific record.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+* @param[out] pMeasurementTag - Measurement Tag of the record.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getmeasurementtag(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTag);
+
+/**
 * Returns the RTC signals of a specific record.
 *
 * @param[in] pDataRecording - DataRecording instance.
@@ -336,6 +346,17 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getallpacketnumbers(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer);
+
+/**
+* Returns an array of all measurement tags.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nMeasurementTagsBufferSize - Number of elements in buffer
+* @param[out] pMeasurementTagsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pMeasurementTagsBuffer - uint32  buffer of Array of Measurement Tags of all records.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getallmeasurementtags(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTagsBuffer);
 
 /**
 * Returns an array of all RTC signals of a specific index.
