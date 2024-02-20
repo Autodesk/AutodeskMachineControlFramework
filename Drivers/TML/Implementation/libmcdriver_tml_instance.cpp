@@ -474,3 +474,15 @@ void CTMLInstance::callSubroutine(const std::string& sChannelIdentifier, const s
     m_pTMLSDK->checkError(m_pTMLSDK->TS_CALL_Label(label.c_str()));
 
 }
+
+void CTMLInstance::resetAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const bool bForceFull = false) 
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+
+    if(bForceFull)
+        m_pTMLSDK->checkError(m_pTMLSDK->TS_Reset());
+    else
+        m_pTMLSDK->checkError(m_pTMLSDK->TS_ResetFault());
+
+}

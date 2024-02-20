@@ -475,11 +475,14 @@ public:
 	inline LibMCDriver_TML_double GetSpeed(const eReferenceType eReference);
 	inline LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName);
 	inline bool MotionComplete();
+	inline bool TargetReached();
 	inline std::string GetIdentifier();
 	inline std::string GetChannelIdentifier();
 	inline void SetPower(const bool bEnable);
 	inline LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister);
 	inline bool CheckPower();
+	inline bool CheckAxisError(LibMCDriver_TML_uint16 & nErrorRegister);
+	inline void ResetAxis(const bool bForceFull);
 };
 	
 /*************************************************************************************************************************
@@ -660,11 +663,14 @@ public:
 		pWrapperTable->m_Axis_GetSpeed = nullptr;
 		pWrapperTable->m_Axis_GetIntVariable = nullptr;
 		pWrapperTable->m_Axis_MotionComplete = nullptr;
+		pWrapperTable->m_Axis_TargetReached = nullptr;
 		pWrapperTable->m_Axis_GetIdentifier = nullptr;
 		pWrapperTable->m_Axis_GetChannelIdentifier = nullptr;
 		pWrapperTable->m_Axis_SetPower = nullptr;
 		pWrapperTable->m_Axis_ReadRegister = nullptr;
 		pWrapperTable->m_Axis_CheckPower = nullptr;
+		pWrapperTable->m_Axis_CheckAxisError = nullptr;
+		pWrapperTable->m_Axis_ResetAxis = nullptr;
 		pWrapperTable->m_Channel_GetIdentifier = nullptr;
 		pWrapperTable->m_Channel_SetupAxis = nullptr;
 		pWrapperTable->m_Channel_FindAxis = nullptr;
@@ -851,6 +857,15 @@ public:
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Axis_TargetReached = (PLibMCDriver_TMLAxis_TargetReachedPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_targetreached");
+		#else // _WIN32
+		pWrapperTable->m_Axis_TargetReached = (PLibMCDriver_TMLAxis_TargetReachedPtr) dlsym(hLibrary, "libmcdriver_tml_axis_targetreached");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_TargetReached == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Axis_GetIdentifier = (PLibMCDriver_TMLAxis_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_getidentifier");
 		#else // _WIN32
 		pWrapperTable->m_Axis_GetIdentifier = (PLibMCDriver_TMLAxis_GetIdentifierPtr) dlsym(hLibrary, "libmcdriver_tml_axis_getidentifier");
@@ -893,6 +908,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Axis_CheckPower == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_CheckAxisError = (PLibMCDriver_TMLAxis_CheckAxisErrorPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_checkaxiserror");
+		#else // _WIN32
+		pWrapperTable->m_Axis_CheckAxisError = (PLibMCDriver_TMLAxis_CheckAxisErrorPtr) dlsym(hLibrary, "libmcdriver_tml_axis_checkaxiserror");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_CheckAxisError == nullptr)
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Axis_ResetAxis = (PLibMCDriver_TMLAxis_ResetAxisPtr) GetProcAddress(hLibrary, "libmcdriver_tml_axis_resetaxis");
+		#else // _WIN32
+		pWrapperTable->m_Axis_ResetAxis = (PLibMCDriver_TMLAxis_ResetAxisPtr) dlsym(hLibrary, "libmcdriver_tml_axis_resetaxis");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Axis_ResetAxis == nullptr)
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1125,6 +1158,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_MotionComplete == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_targetreached", (void**)&(pWrapperTable->m_Axis_TargetReached));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_TargetReached == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_tml_axis_getidentifier", (void**)&(pWrapperTable->m_Axis_GetIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_GetIdentifier == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1143,6 +1180,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_tml_axis_checkpower", (void**)&(pWrapperTable->m_Axis_CheckPower));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_CheckPower == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_checkaxiserror", (void**)&(pWrapperTable->m_Axis_CheckAxisError));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_CheckAxisError == nullptr) )
+			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tml_axis_resetaxis", (void**)&(pWrapperTable->m_Axis_ResetAxis));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Axis_ResetAxis == nullptr) )
 			return LIBMCDRIVER_TML_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_tml_channel_getidentifier", (void**)&(pWrapperTable->m_Channel_GetIdentifier));
@@ -1379,7 +1424,7 @@ public:
 	}
 	
 	/**
-	* CAxis::MotionComplete - Checks to see if the is currently moving.
+	* CAxis::MotionComplete - Checks to see if the  is currently moving.
 	* @return Boolean reflecting if the drive is in currently moving.
 	*/
 	bool CAxis::MotionComplete()
@@ -1388,6 +1433,18 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Axis_MotionComplete(m_pHandle, &resultMotionComplete));
 		
 		return resultMotionComplete;
+	}
+	
+	/**
+	* CAxis::TargetReached - Checks to see if the drive is in position.
+	* @return Boolean reflecting if the drive is in position.
+	*/
+	bool CAxis::TargetReached()
+	{
+		bool resultTargetReached = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_TargetReached(m_pHandle, &resultTargetReached));
+		
+		return resultTargetReached;
 	}
 	
 	/**
@@ -1452,6 +1509,28 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Axis_CheckPower(m_pHandle, &resultData));
 		
 		return resultData;
+	}
+	
+	/**
+	* CAxis::CheckAxisError - Checks for any errors on the selected axis, ignores limits.
+	* @param[out] nErrorRegister - Error register.
+	* @return True for error.
+	*/
+	bool CAxis::CheckAxisError(LibMCDriver_TML_uint16 & nErrorRegister)
+	{
+		bool resultData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_CheckAxisError(m_pHandle, &nErrorRegister, &resultData));
+		
+		return resultData;
+	}
+	
+	/**
+	* CAxis::ResetAxis - Resets the selected axis, homing will be required.
+	* @param[in] bForceFull - To set if a full or just fault reset is run (false=faultreset, true=fullreset).
+	*/
+	void CAxis::ResetAxis(const bool bForceFull)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Axis_ResetAxis(m_pHandle, bForceFull));
 	}
 	
 	/**

@@ -40,8 +40,15 @@ Abstract: This is the class declaration of CChannel
 
 #include <map>
 
+#define TML_REG_MCR 0UL
+#define TML_REG_MSR 1UL
+#define TML_REG_ISR 2UL
 #define TML_REG_SRL 3UL
+#define TML_REG_SRH 4UL
+#define TML_REG_MER 5UL
 #define TML_REG_SRL_POWERBIT (1UL<<15)
+#define TML_REG_SRL_MOTIONCOMPLETE (1UL<<10)
+#define TML_REG_SRH_TARGETREACHED (1UL<<9)
 
 namespace LibMCDriver_TML {
 namespace Impl {
@@ -138,6 +145,8 @@ public:
     void callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
     tmlWord readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister);
+
+    void CTMLInstance::resetAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const bool bForceFull);
 
 };
 

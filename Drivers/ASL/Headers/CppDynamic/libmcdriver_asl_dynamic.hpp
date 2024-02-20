@@ -213,7 +213,7 @@ public:
 			case LIBMCDRIVER_ASL_ERROR_EMPTYDRIVERCONTEXTCOMPORT: return "Empty driver context COM port.";
 			case LIBMCDRIVER_ASL_ERROR_IMAGEWIDTHINCORRECT: return "The image width was not 128 pixels.";
 			case LIBMCDRIVER_ASL_ERROR_INCORRECTHEADINDEX: return "Head indexes are 1-4 for valid.";
-			case LIBMCDRIVER_ASL_ERROR_BOARDPOLLFAILED: return "Head indexes are 1-4 for valid.";
+			case LIBMCDRIVER_ASL_ERROR_BOARDPOLLFAILED: return "Polling head paramters timedout.";
 		}
 		return "unknown error";
 	}

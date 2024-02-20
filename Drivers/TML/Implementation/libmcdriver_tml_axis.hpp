@@ -83,6 +83,9 @@ public:
     LibMCDriver_TML_double GetSpeed(const LibMCDriver_TML::eReferenceType eReference) override;
     LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName) override;
     bool MotionComplete() override;
+    bool TargetReached() override;
+    bool CheckAxisError(LibMCDriver_TML_uint16& nErrorRegister) override;
+    void ResetAxis(const bool bForceFull) override;
 
     std::string GetChannelIdentifier() override;
 

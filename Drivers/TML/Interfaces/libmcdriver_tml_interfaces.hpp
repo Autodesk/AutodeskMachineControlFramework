@@ -360,10 +360,16 @@ public:
 	virtual LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName) = 0;
 
 	/**
-	* IAxis::MotionComplete - Checks to see if the is currently moving.
+	* IAxis::MotionComplete - Checks to see if the  is currently moving.
 	* @return Boolean reflecting if the drive is in currently moving.
 	*/
 	virtual bool MotionComplete() = 0;
+
+	/**
+	* IAxis::TargetReached - Checks to see if the drive is in position.
+	* @return Boolean reflecting if the drive is in position.
+	*/
+	virtual bool TargetReached() = 0;
 
 	/**
 	* IAxis::GetIdentifier - Returns the axis identifier.
@@ -395,6 +401,19 @@ public:
 	* @return True for power on.
 	*/
 	virtual bool CheckPower() = 0;
+
+	/**
+	* IAxis::CheckAxisError - Checks for any errors on the selected axis, ignores limits.
+	* @param[out] nErrorRegister - Error register.
+	* @return True for error.
+	*/
+	virtual bool CheckAxisError(LibMCDriver_TML_uint16 & nErrorRegister) = 0;
+
+	/**
+	* IAxis::ResetAxis - Resets the selected axis, homing will be required.
+	* @param[in] bForceFull - To set if a full or just fault reset is run (false=faultreset, true=fullreset).
+	*/
+	virtual void ResetAxis(const bool bForceFull) = 0;
 
 };
 

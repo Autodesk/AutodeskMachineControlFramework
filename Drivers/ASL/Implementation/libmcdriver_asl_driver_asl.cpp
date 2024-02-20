@@ -152,25 +152,6 @@ void CDriver_ASL::QueryParameters()
 
 void CDriver_ASL::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
-	pDriverUpdateInstance->SetDoubleParameter("headsettempone", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headsettemptwo", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headsettempthr", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headsettempfor", 0.0);
-
-	pDriverUpdateInstance->SetDoubleParameter("headcurtempone", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headcurtemptwo", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headcurtempthr", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headcurtempfor", 0.0);
-
-	pDriverUpdateInstance->SetDoubleParameter("headprintcountsone", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headprintcountstwo", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headprintcountsthr", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headprintcountsfor", 0.0);
-
-	pDriverUpdateInstance->SetDoubleParameter("headstateone", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headstatetwo", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headstatethr", 0.0);
-	pDriverUpdateInstance->SetDoubleParameter("headstatefor", 0.0);
 
 }
 

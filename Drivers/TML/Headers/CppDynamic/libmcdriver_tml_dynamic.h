@@ -180,13 +180,22 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetSpeedPtr) (LibMCDriver_T
 typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetIntVariablePtr) (LibMCDriver_TML_Axis pAxis, const char * pVariableName, LibMCDriver_TML_int32 * pValue);
 
 /**
-* Checks to see if the is currently moving.
+* Checks to see if the  is currently moving.
 *
 * @param[in] pAxis - Axis instance.
 * @param[out] pMotionComplete - Boolean reflecting if the drive is in currently moving.
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_MotionCompletePtr) (LibMCDriver_TML_Axis pAxis, bool * pMotionComplete);
+
+/**
+* Checks to see if the drive is in position.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pTargetReached - Boolean reflecting if the drive is in position.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_TargetReachedPtr) (LibMCDriver_TML_Axis pAxis, bool * pTargetReached);
 
 /**
 * Returns the axis identifier.
@@ -237,6 +246,25 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_ReadRegisterPtr) (LibMCDriv
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_CheckPowerPtr) (LibMCDriver_TML_Axis pAxis, bool * pData);
+
+/**
+* Checks for any errors on the selected axis, ignores limits.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pErrorRegister - Error register.
+* @param[out] pData - True for error.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_CheckAxisErrorPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_uint16 * pErrorRegister, bool * pData);
+
+/**
+* Resets the selected axis, homing will be required.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] bForceFull - To set if a full or just fault reset is run (false=faultreset, true=fullreset).
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_ResetAxisPtr) (LibMCDriver_TML_Axis pAxis, bool bForceFull);
 
 /*************************************************************************************************************************
  Class definition for Channel
@@ -450,11 +478,14 @@ typedef struct {
 	PLibMCDriver_TMLAxis_GetSpeedPtr m_Axis_GetSpeed;
 	PLibMCDriver_TMLAxis_GetIntVariablePtr m_Axis_GetIntVariable;
 	PLibMCDriver_TMLAxis_MotionCompletePtr m_Axis_MotionComplete;
+	PLibMCDriver_TMLAxis_TargetReachedPtr m_Axis_TargetReached;
 	PLibMCDriver_TMLAxis_GetIdentifierPtr m_Axis_GetIdentifier;
 	PLibMCDriver_TMLAxis_GetChannelIdentifierPtr m_Axis_GetChannelIdentifier;
 	PLibMCDriver_TMLAxis_SetPowerPtr m_Axis_SetPower;
 	PLibMCDriver_TMLAxis_ReadRegisterPtr m_Axis_ReadRegister;
 	PLibMCDriver_TMLAxis_CheckPowerPtr m_Axis_CheckPower;
+	PLibMCDriver_TMLAxis_CheckAxisErrorPtr m_Axis_CheckAxisError;
+	PLibMCDriver_TMLAxis_ResetAxisPtr m_Axis_ResetAxis;
 	PLibMCDriver_TMLChannel_GetIdentifierPtr m_Channel_GetIdentifier;
 	PLibMCDriver_TMLChannel_SetupAxisPtr m_Channel_SetupAxis;
 	PLibMCDriver_TMLChannel_FindAxisPtr m_Channel_FindAxis;

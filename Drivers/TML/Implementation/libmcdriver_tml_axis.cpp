@@ -145,7 +145,40 @@ LibMCDriver_TML_int32 CAxis::GetIntVariable(const std::string& sVariableName) {
 }
 
 bool CAxis::MotionComplete() {
-    bool bValue = false;
-    return bValue;
 
+
+    auto registerContent = m_pTMLInstance->readAxisStatus(m_sChannelIdentifier, m_sAxisIdentifier, TML_REG_SRL);
+    if (registerContent & TML_REG_SRL_MOTIONCOMPLETE)
+        return true;
+
+    return false;
+
+}
+
+bool CAxis::TargetReached() {
+
+    auto registerContent = m_pTMLInstance->readAxisStatus(m_sChannelIdentifier, m_sAxisIdentifier, TML_REG_SRH);
+    if (registerContent & TML_REG_SRH_TARGETREACHED)
+        return true;
+
+    return false;
+
+}
+
+
+bool CAxis::CheckAxisError(LibMCDriver_TML_uint16& nErrorRegister) {
+
+    nErrorRegister = m_pTMLInstance->readAxisStatus(m_sChannelIdentifier, m_sAxisIdentifier, TML_REG_MER);
+
+    uint16_t nMaskRegister = (1 << (int)LibMCDriver_TML::eMERType::LSNST) + (1 << (int)LibMCDriver_TML::eMERType::LSPST);
+    uint16_t nNoLimitError =  nErrorRegister & ~nMaskRegister; //ignore the limit switches in any checks
+
+    if (nNoLimitError > 0)
+        return true;
+
+    return false;
+}
+
+void CAxis::ResetAxis(const bool bForceFull) {
+    return m_pTMLInstance->resetAxis(m_sChannelIdentifier, m_sAxisIdentifier, bForceFull);
 }

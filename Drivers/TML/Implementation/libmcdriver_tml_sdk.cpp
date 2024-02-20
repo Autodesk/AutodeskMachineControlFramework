@@ -123,6 +123,7 @@ CTMLSDK::CTMLSDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirecto
 	this->TS_SelectAxis = (PTS_SelectAxis)_loadTMLAddress(hLibrary, "TS_SelectAxis", 0);
 	this->TS_LoadSetup = (PTS_LoadSetup)_loadTMLAddress(hLibrary, "TS_LoadSetup", 0);
 	this->TS_ResetFault = (PTS_ResetFault)_loadTMLAddress(hLibrary, "TS_ResetFault", 0);
+	this->TS_Reset = (PTS_ResetFault)_loadTMLAddress(hLibrary, "TS_Reset", 0);
 	this->TS_Power = (PTS_Power)_loadTMLAddress(hLibrary, "TS_Power", 0);
 	this->TS_ReadStatus = (PTS_ReadStatus)_loadTMLAddress(hLibrary, "TS_ReadStatus", 0);
 	this->TS_GetLastErrorText = (PTS_GetLastErrorText)_loadTMLAddress(hLibrary, "TS_GetLastErrorText", 0);
@@ -184,6 +185,7 @@ void CTMLSDK::resetFunctionPtrs()
 	TS_SetupAxis = nullptr;
 	TS_SelectAxis = nullptr;
 	TS_ResetFault = nullptr;
+	TS_Reset = nullptr;
 	TS_Power = nullptr;
 	TS_ReadStatus = nullptr;
 	TS_GetLastErrorText = nullptr;

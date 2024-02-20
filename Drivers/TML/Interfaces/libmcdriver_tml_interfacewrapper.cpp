@@ -499,6 +499,32 @@ LibMCDriver_TMLResult libmcdriver_tml_axis_motioncomplete(LibMCDriver_TML_Axis p
 	}
 }
 
+LibMCDriver_TMLResult libmcdriver_tml_axis_targetreached(LibMCDriver_TML_Axis pAxis, bool * pTargetReached)
+{
+	IBase* pIBaseClass = (IBase *)pAxis;
+
+	try {
+		if (pTargetReached == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		IAxis* pIAxis = dynamic_cast<IAxis*>(pIBaseClass);
+		if (!pIAxis)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		*pTargetReached = pIAxis->TargetReached();
+
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_TMLResult libmcdriver_tml_axis_getidentifier(LibMCDriver_TML_Axis pAxis, const LibMCDriver_TML_uint32 nIdentifierBufferSize, LibMCDriver_TML_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pAxis;
@@ -657,6 +683,58 @@ LibMCDriver_TMLResult libmcdriver_tml_axis_checkpower(LibMCDriver_TML_Axis pAxis
 			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
 		
 		*pData = pIAxis->CheckPower();
+
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TMLResult libmcdriver_tml_axis_checkaxiserror(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_uint16 * pErrorRegister, bool * pData)
+{
+	IBase* pIBaseClass = (IBase *)pAxis;
+
+	try {
+		if (!pErrorRegister)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		if (pData == nullptr)
+			throw ELibMCDriver_TMLInterfaceException (LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
+		IAxis* pIAxis = dynamic_cast<IAxis*>(pIBaseClass);
+		if (!pIAxis)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		*pData = pIAxis->CheckAxisError(*pErrorRegister);
+
+		return LIBMCDRIVER_TML_SUCCESS;
+	}
+	catch (ELibMCDriver_TMLInterfaceException & Exception) {
+		return handleLibMCDriver_TMLException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TMLResult libmcdriver_tml_axis_resetaxis(LibMCDriver_TML_Axis pAxis, bool bForceFull)
+{
+	IBase* pIBaseClass = (IBase *)pAxis;
+
+	try {
+		IAxis* pIAxis = dynamic_cast<IAxis*>(pIBaseClass);
+		if (!pIAxis)
+			throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCAST);
+		
+		pIAxis->ResetAxis(bForceFull);
 
 		return LIBMCDRIVER_TML_SUCCESS;
 	}
@@ -1059,6 +1137,8 @@ LibMCDriver_TMLResult LibMCDriver_TML::Impl::LibMCDriver_TML_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_tml_axis_getintvariable;
 	if (sProcName == "libmcdriver_tml_axis_motioncomplete") 
 		*ppProcAddress = (void*) &libmcdriver_tml_axis_motioncomplete;
+	if (sProcName == "libmcdriver_tml_axis_targetreached") 
+		*ppProcAddress = (void*) &libmcdriver_tml_axis_targetreached;
 	if (sProcName == "libmcdriver_tml_axis_getidentifier") 
 		*ppProcAddress = (void*) &libmcdriver_tml_axis_getidentifier;
 	if (sProcName == "libmcdriver_tml_axis_getchannelidentifier") 
@@ -1069,6 +1149,10 @@ LibMCDriver_TMLResult LibMCDriver_TML::Impl::LibMCDriver_TML_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_tml_axis_readregister;
 	if (sProcName == "libmcdriver_tml_axis_checkpower") 
 		*ppProcAddress = (void*) &libmcdriver_tml_axis_checkpower;
+	if (sProcName == "libmcdriver_tml_axis_checkaxiserror") 
+		*ppProcAddress = (void*) &libmcdriver_tml_axis_checkaxiserror;
+	if (sProcName == "libmcdriver_tml_axis_resetaxis") 
+		*ppProcAddress = (void*) &libmcdriver_tml_axis_resetaxis;
 	if (sProcName == "libmcdriver_tml_channel_getidentifier") 
 		*ppProcAddress = (void*) &libmcdriver_tml_channel_getidentifier;
 	if (sProcName == "libmcdriver_tml_channel_setupaxis") 

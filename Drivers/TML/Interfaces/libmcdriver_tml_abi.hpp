@@ -193,13 +193,22 @@ LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_getspeed(Lib
 LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_getintvariable(LibMCDriver_TML_Axis pAxis, const char * pVariableName, LibMCDriver_TML_int32 * pValue);
 
 /**
-* Checks to see if the is currently moving.
+* Checks to see if the  is currently moving.
 *
 * @param[in] pAxis - Axis instance.
 * @param[out] pMotionComplete - Boolean reflecting if the drive is in currently moving.
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_motioncomplete(LibMCDriver_TML_Axis pAxis, bool * pMotionComplete);
+
+/**
+* Checks to see if the drive is in position.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pTargetReached - Boolean reflecting if the drive is in position.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_targetreached(LibMCDriver_TML_Axis pAxis, bool * pTargetReached);
 
 /**
 * Returns the axis identifier.
@@ -250,6 +259,25 @@ LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_readregister
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_checkpower(LibMCDriver_TML_Axis pAxis, bool * pData);
+
+/**
+* Checks for any errors on the selected axis, ignores limits.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pErrorRegister - Error register.
+* @param[out] pData - True for error.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_checkaxiserror(LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_uint16 * pErrorRegister, bool * pData);
+
+/**
+* Resets the selected axis, homing will be required.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] bForceFull - To set if a full or just fault reset is run (false=faultreset, true=fullreset).
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TML_DECLSPEC LibMCDriver_TMLResult libmcdriver_tml_axis_resetaxis(LibMCDriver_TML_Axis pAxis, bool bForceFull);
 
 /*************************************************************************************************************************
  Class definition for Channel

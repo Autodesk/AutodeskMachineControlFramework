@@ -100,6 +100,25 @@
 		<option name="TechnoCAN" value="2" description="TechnoCAN Protocol"/>
  	</enum>
 	
+	<enum name="MERType">
+		<option name="CANBER" value="0" description="CANBus"/>
+		<option name="SCER" value="1" description="short-circuit protection"/>
+		<option name="STPLTBL" value="2" description="setup table"/>
+		<option name="CTRER" value="3" description="control"/>
+		<option name="SCIER" value="4" description="communication"/>
+		<option name="WRPSER" value="5" description="feedback"/>
+		<option name="LSPST" value="6" description="positive limit"/>
+		<option name="LSNST" value="7" description="negative limit"/>
+		<option name="OCER" value="8" description="over-current"/>
+		<option name="I2TER" value="9" description="I2T protection"/>
+		<option name="OTERM" value="10" description="motor temperature"/>
+		<option name="OTERD" value="11" description="drive temperature"/>
+		<option name="OVER" value="12" description="over voltage"/>
+		<option name="UVER" value="13" description="under voltage"/>
+		<option name="CMDER" value="14" description="command"/>
+		<option name="ENST" value="15" description="enable status"/>
+ 	</enum>
+	
 <!--
 
 This base Driver interface MUST be in Sync with LibMCDriver.xml
@@ -186,12 +205,13 @@ Custom implementation
 			<param name="Value" type="int32" pass="return" description="Value" />
 		</method>	
 		
-		<method name="MotionComplete" description="Checks to see if the is currently moving.">		
+		<method name="MotionComplete" description="Checks to see if the  is currently moving.">		
 			<param name="MotionComplete" type="bool" pass="return" description="Boolean reflecting if the drive is in currently moving." />
-		</method>	
-				
+		</method>		
 		
-		
+		<method name="TargetReached" description="Checks to see if the drive is in position.">		
+			<param name="TargetReached" type="bool" pass="return" description="Boolean reflecting if the drive is in position." />
+		</method>			
 
 		<method name="GetIdentifier" description="Returns the axis identifier.">		
 			<param name="Identifier" type="string" pass="return" description="Axis identifier." />
@@ -212,6 +232,15 @@ Custom implementation
 
 		<method name="CheckPower" description="Checks the power of the selected axis.">		
 			<param name="Data" type="bool" pass="return" description="True for power on." />
+		</method>	
+
+		<method name="CheckAxisError" description="Checks for any errors on the selected axis, ignores limits.">		
+			<param name="ErrorRegister" type="uint16" pass="out" description="Error register." />
+			<param name="Data" type="bool" pass="return" description="True for error." />
+		</method>	
+		
+		<method name="ResetAxis" description="Resets the selected axis, homing will be required.">		
+			<param name="ForceFull" type="bool" pass="in" description="To set if a full or just fault reset is run (false=faultreset, true=fullreset)." />
 		</method>	
 
 

@@ -66,6 +66,7 @@ namespace LibMCDriver_TML {
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_SetupAxis) (tmlByte nAxisID, tmlInt nSetupID);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_SelectAxis) (tmlByte nAxisID);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_ResetFault) ();
+		typedef tmlBool(TML_CALLINGCONVENTION* PTS_Reset) ();
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_Power) (tmlBool bEnable);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_ReadStatus) (tmlShort nSelectionIndex, tmlWord & nStatus);
 		typedef tmlLPCSTR(TML_CALLINGCONVENTION* PTS_GetLastErrorText) ();
@@ -119,6 +120,7 @@ namespace LibMCDriver_TML {
 			PTS_SetupAxis TS_SetupAxis = nullptr;
 			PTS_SelectAxis TS_SelectAxis = nullptr;
 			PTS_ResetFault TS_ResetFault = nullptr;
+			PTS_Reset TS_Reset = nullptr;
 			PTS_Power TS_Power = nullptr;
 			PTS_ReadStatus TS_ReadStatus = nullptr;
 			PTS_GetLastErrorText TS_GetLastErrorText = nullptr;
