@@ -62,12 +62,13 @@ private:
     PTMLInstance m_pTMLInstance;
     std::string m_sChannelIdentifier;
     std::string m_sAxisIdentifier;
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 protected:
 
 public:
 
-    CAxis(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, const std::string & sAxisIdentifier);
+    CAxis(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, const std::string & sAxisIdentifier, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     virtual ~CAxis();
 

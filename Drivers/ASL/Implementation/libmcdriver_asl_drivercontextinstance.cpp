@@ -212,6 +212,7 @@ void CDriverContextInstance::SendImage(const LibMCDriver_ASL_uint8 nIndex, const
 	m_nImageVerifyLV_INT[nIndex - 1] = curByte;
 	m_nImageVerifyRC_INT[nIndex - 1] = sumofval;
 
+
 }
 
 void CDriverContextInstance::Poll()

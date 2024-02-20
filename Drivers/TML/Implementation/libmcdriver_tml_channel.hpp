@@ -59,11 +59,12 @@ class CChannel : public virtual IChannel, public virtual CBase {
 private:
 
     PTMLInstance m_pTMLInstance;
-    std::string m_sChannelIdentifier;
+    std::string m_sChannelIdentifier; 
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 public:
 
-    CChannel(PTMLInstance pTMLInstance, const std::string & sChannelIdentifier);
+    CChannel(PTMLInstance pTMLInstance, const std::string & sChannelIdentifier, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     virtual ~CChannel();
 

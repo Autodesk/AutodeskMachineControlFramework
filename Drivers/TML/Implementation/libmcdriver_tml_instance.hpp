@@ -85,6 +85,8 @@ private:
 
     LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
     std::map<std::string, int32_t> m_ChannelFileDescriptorMap;
 
     std::map<std::string, CTMLAxisInstance> m_AxisMap;
@@ -93,7 +95,7 @@ private:
 
 public:
 
-    CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory);
+    CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     virtual ~CTMLInstance();
 
@@ -113,7 +115,7 @@ public:
 
     void setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer, uint32_t nCountsPerMM);
 
-    void selectAxisInternal(const std::string& sAxisIdentifier);
+    void selectAxisInternal(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
 
     void setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable);
 
@@ -130,6 +132,8 @@ public:
     tmlLong readFixedVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
     tmlLong readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    void pollDrive(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
 
     void callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
 
