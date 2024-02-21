@@ -130,7 +130,6 @@ fi
 cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
 
 cd "$builddir"
-go run "$basepath/BuildScripts/createPackageXML.go" ./Output $GITHASH $PLATFORMNAME
 
 
 echo "Building Core Modules"
@@ -173,6 +172,10 @@ cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 rm Framework/Dist/${GITHASH}_core.data
 
 cd $builddir
+echo "Building Package XML"
+
+"$builddir/DevPackage/Framework/create_package_xml" --config "$builddir/Output/${GITHASH}_config.xml" --devpackage ${GITHASH} --output "$builddir/Output/${GITHASH}_package.xml" --serveroutput "$builddir/Output/amc_server.xml"
+
 go run "$basepath/BuildScripts/createDevPackage.go" ./DevPackage/Framework ./DevPackage ${LONGGITHASH} $PLATFORMNAME
 
 cp "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "$builddir/Artifacts/devpackage_${PLATFORMNAME}.zip"
