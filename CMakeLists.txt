@@ -732,8 +732,13 @@ set_target_properties(create_package_xml
 if(WIN32)
 	target_link_libraries(create_package_xml shlwapi.lib)
 	target_link_libraries(create_package_xml ws2_32.lib)
-else()
-
 endif(WIN32)
+
+if(UNIX)
+	if(NOT LIBUUID_PATH)
+		message(FATAL_ERROR "libuuid not found")
+	endif()
+	target_link_libraries(create_package_xml ${LIBUUID_PATH})
+endif()
 
 
