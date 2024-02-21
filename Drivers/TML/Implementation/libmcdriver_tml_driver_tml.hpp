@@ -97,6 +97,8 @@ public:
 
     bool ChannelExists(const std::string& sIdentifier) override;
 
+    void Configure(const std::string& sConfigurationString) override;
+
 };
 
 } // namespace Impl

@@ -98,6 +98,8 @@ private:
 
     std::map<std::string, CTMLAxisInstance> m_AxisMap;
 
+    uint8_t m_nActiveDrive;
+
     void ensureAxisExistsInChannel(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
 
 public:

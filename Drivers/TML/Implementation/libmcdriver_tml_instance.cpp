@@ -295,13 +295,6 @@ void CTMLInstance::setupAxis(   const std::string& sChannelIdentifier, const std
 
     m_pTMLSDK->checkError(m_pTMLSDK->TS_DriveInitialisation());
 
-    m_pDriverEnvironment->RegisterDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualpositionload", "Actual position of the axis load " + sAxisIdentifier, -1.0);
-    m_pDriverEnvironment->RegisterDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualpositionmotor", "Actual position of the axis motor " + sAxisIdentifier, -1.0);
-    m_pDriverEnvironment->RegisterDoubleParameter(sChannelIdentifier + sAxisIdentifier + "targetposition", "Target position of the axis " + sAxisIdentifier, -1.0);
-    m_pDriverEnvironment->RegisterDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualspeedload", "Actual speed of the axis load " + sAxisIdentifier, -1.0);
-    m_pDriverEnvironment->RegisterDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualspeedmotor", "Actual speed of the axis motor " + sAxisIdentifier, -1.0);
-    m_pDriverEnvironment->RegisterDoubleParameter(sChannelIdentifier + sAxisIdentifier + "targetspeed", "Target speed of the axis " + sAxisIdentifier, -1.0);
-
 }
 
 void CTMLInstance::selectAxisInternal(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
@@ -314,8 +307,12 @@ void CTMLInstance::selectAxisInternal(const std::string& sChannelIdentifier, con
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISNOTFOUND, "axis not found: " + sAxisIdentifier);
 
     m_pTMLSDK->checkError(m_pTMLSDK->TS_SelectAxis(iIter->second.getHardwareID ()));
-
-    CTMLInstance::pollDrive(sChannelIdentifier, sAxisIdentifier);
+    if (m_nActiveDrive != iIter->second.getHardwareID())
+    {
+        m_nActiveDrive = iIter->second.getHardwareID();
+        CTMLInstance::pollDrive(sChannelIdentifier, sAxisIdentifier);
+    }
+    
 }
 
 void CTMLInstance::ensureAxisExistsInChannel(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
@@ -451,18 +448,18 @@ void CTMLInstance::pollDrive(const std::string& sChannelIdentifier, const std::s
     //APOS_LD APOS_MT TPOS POSERR
     //ASPD_LD ASPD_MT TSPD SPDERR
     tmlLong lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "APOS_MT");
-    m_pDriverEnvironment->SetDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualpositionmotor", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionmotor", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
     lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "APOS_LD");
-    m_pDriverEnvironment->SetDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualpositionload", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionload", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
     lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "TPOS");
-    m_pDriverEnvironment->SetDoubleParameter(sChannelIdentifier + sAxisIdentifier + "targetposition", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetposition", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
 
     lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "ASPD_LD");
-    m_pDriverEnvironment->SetDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualspeedload", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedload", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
     lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "ASPD_MT");
-    m_pDriverEnvironment->SetDoubleParameter(sChannelIdentifier + sAxisIdentifier + "actualspeedmotor", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedmotor", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
     lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "TSPD");
-    m_pDriverEnvironment->SetDoubleParameter(sChannelIdentifier + sAxisIdentifier + "targetspeed", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetspeed", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
      
 }
 

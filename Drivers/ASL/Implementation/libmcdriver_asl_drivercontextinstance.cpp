@@ -306,6 +306,11 @@ void CDriverContextInstance::Poll()
 std::string CDriverContextInstance::FindAndExtract(std::string sTotalMessage, std::string sRangeStart, std::string sRangeEnd) {
 
 	auto nStart = sTotalMessage.find(sRangeStart);
+
+	if (nStart > (sTotalMessage.length()+2)) {
+		return "-1";
+	}
+
 	auto nEnd = sTotalMessage.find(sRangeEnd, nStart);
 
 	nStart += sRangeStart.length() + 2;
