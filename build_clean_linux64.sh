@@ -145,6 +145,12 @@ cmake --build . --config Release
 echo "Building Core Resources"
 go run ../BuildScripts/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
 
+cd $builddir
+echo "Building Package XML"
+
+"$builddir/DevPackage/Framework/create_package_xml" --config "$builddir/Output/${GITHASH}_config.xml" --devpackage ${GITHASH} --output "$builddir/Output/${GITHASH}_package.xml" --serveroutput "$builddir/Output/amc_server.xml"
+
+
 echo "Building Developer Package"
 cd "$builddir/DevPackage"
 cp ../githash.txt Framework/Dist/disthash.txt
@@ -158,7 +164,6 @@ cp ../Output/amc_server Framework/Dist/
 DLLEXT=so
 fi
 
-cp ../Output/amc_server.xml Framework/Dist/
 cp ../Output/${GITHASH}_core_libmc.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_core_lib3mf.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_core_libmcdata.${DLLEXT} Framework/Dist/
@@ -170,11 +175,6 @@ cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 rm Framework/Dist/${GITHASH}_core.data
-
-cd $builddir
-echo "Building Package XML"
-
-"$builddir/DevPackage/Framework/create_package_xml" --config "$builddir/Output/${GITHASH}_config.xml" --devpackage ${GITHASH} --output "$builddir/Output/${GITHASH}_package.xml" --serveroutput "$builddir/Output/amc_server.xml"
 
 go run "$basepath/BuildScripts/createDevPackage.go" ./DevPackage/Framework ./DevPackage ${LONGGITHASH} $PLATFORMNAME
 
