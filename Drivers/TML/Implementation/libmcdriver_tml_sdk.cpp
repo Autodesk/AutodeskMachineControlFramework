@@ -128,6 +128,7 @@ CTMLSDK::CTMLSDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirecto
 	this->TS_ReadStatus = (PTS_ReadStatus)_loadTMLAddress(hLibrary, "TS_ReadStatus", 0);
 	this->TS_GetLastErrorText = (PTS_GetLastErrorText)_loadTMLAddress(hLibrary, "TS_GetLastErrorText", 0);
 	this->TS_MoveRelative = (PTS_MoveRelative)_loadTMLAddress(hLibrary, "TS_MoveRelative", 0);
+	this->TS_MoveAbsolute = (PTS_MoveAbsolute)_loadTMLAddress(hLibrary, "TS_MoveAbsolute", 0);
 	this->TS_GetIntVariable =   (PTS_GetIntVariable)_loadTMLAddress(hLibrary, "TS_GetIntVariable", 0);
 	this->TS_GetLongVariable =  (PTS_GetLongVariable)_loadTMLAddress(hLibrary, "TS_GetLongVariable", 0);
 	this->TS_GetFixedVariable = (PTS_GetFixedVariable)_loadTMLAddress(hLibrary, "TS_GetFixedVariable", 0);

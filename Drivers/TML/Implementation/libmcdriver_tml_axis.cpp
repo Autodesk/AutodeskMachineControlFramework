@@ -104,9 +104,11 @@ std::string CAxis::GetChannelIdentifier()
 void CAxis::CallSubroutine(const std::string& sRoutine) {
     return m_pTMLInstance->callSubroutine(m_sChannelIdentifier, m_sAxisIdentifier, sRoutine);
 }
-void CAxis::MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) {
 
+void CAxis::MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) {
+    m_pTMLInstance->moveAxisAbsolute(m_sChannelIdentifier, m_sAxisIdentifier, dDistance, dSpeed, dAcceleration);
 }
+
 LibMCDriver_TML_double CAxis::GetPosition(const LibMCDriver_TML::eReferenceType eReference) {
 
     if (eReference == LibMCDriver_TML::eReferenceType::Actual_Load)

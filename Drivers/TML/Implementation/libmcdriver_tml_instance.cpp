@@ -351,6 +351,26 @@ void CTMLInstance::moveAxisRelative(const std::string& sChannelIdentifier, const
     m_pTMLSDK->checkError(m_pTMLSDK->TS_MoveRelative(nCountsDistance, nCountsSpeed, nCountsAcceleration, true, (tmlShort)1, FROM_REFERENCE));
 }
 
+
+void CTMLInstance::moveAxisAbsolute(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nLocation, double nSpeed, double nAcceleration)
+{
+
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    auto nCountsDistance = iIter->second.convertMMToCounts(nLocation, 1, 0);
+    auto nCountsSpeed = iIter->second.convertMMToCounts(nSpeed, 1, 1);
+    auto nCountsAcceleration = iIter->second.convertMMToCounts(nAcceleration, 1, 2);
+
+#define FROM_MEASURE 0
+#define FROM_REFERENCE 1
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_MoveAbsolute(nCountsDistance, nCountsSpeed, nCountsAcceleration, (tmlShort)1, FROM_REFERENCE));
+
+}
+
 void CTMLInstance::setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable)
 {
     ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
@@ -370,26 +390,6 @@ tmlWord CTMLInstance::readAxisStatus(const std::string& sChannelIdentifier, cons
     m_pTMLSDK->checkError(m_pTMLSDK->TS_ReadStatus(sReadRegister, pStatus));
 
     return pStatus;
-}
-
-
-void CTMLInstance::moveAxisAbsolute(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nLocation, double nSpeed, double nAcceleration)
-{
-
-    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
-    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
-
-    auto iIter = m_AxisMap.find(sAxisIdentifier);
-
-    auto nCountsDistance = iIter->second.convertMMToCounts(nLocation, 1, 0);
-    auto nCountsSpeed = iIter->second.convertMMToCounts(nSpeed, 1, 1);
-    auto nCountsAcceleration = iIter->second.convertMMToCounts(nAcceleration, 1, 2);
-
-#define FROM_MEASURE 0
-#define FROM_REFERENCE 1
-
-    m_pTMLSDK->checkError(m_pTMLSDK->TS_MoveAbsolute(nCountsDistance, nCountsSpeed, nCountsAcceleration, (tmlShort)1, FROM_REFERENCE));
-
 }
 
 tmlShort CTMLInstance::readIntVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
