@@ -443,24 +443,16 @@ tmlLong CTMLInstance::readSpeed(const std::string& sChannelIdentifier, const std
 
 void CTMLInstance::pollDrive(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
 {
-    auto iIter = m_AxisMap.find(sAxisIdentifier);
-
     //APOS_LD APOS_MT TPOS POSERR
     //ASPD_LD ASPD_MT TSPD SPDERR
-    tmlLong lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "APOS_MT");
-    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionmotor", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
-    lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "APOS_LD");
-    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionload", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
-    lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "TPOS");
-    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetposition", iIter->second.convertCountsToMM(lReturnValue, 1, 0));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionmotor", readPosition(sChannelIdentifier, sAxisIdentifier, "APOS_MT"));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionload", readPosition(sChannelIdentifier, sAxisIdentifier, "APOS_LD"));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetposition", readPosition(sChannelIdentifier, sAxisIdentifier, "TPOS"));
 
-    lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "ASPD_LD");
-    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedload", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
-    lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "ASPD_MT");
-    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedmotor", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
-    lReturnValue = readFixedVariable(sChannelIdentifier, sAxisIdentifier, "TSPD");
-    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetspeed", iIter->second.convertCountsToMM(lReturnValue, 1, 1));
-     
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedload", readSpeed(sChannelIdentifier, sAxisIdentifier, "ASPD_LD"));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedmotor", readSpeed(sChannelIdentifier, sAxisIdentifier, "ASPD_MT"));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetspeed", readSpeed(sChannelIdentifier, sAxisIdentifier, "TSPD"));
+
 }
 
 void CTMLInstance::callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
