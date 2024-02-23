@@ -306,9 +306,9 @@ void CTMLInstance::selectAxisInternal(const std::string& sChannelIdentifier, con
     if (iIter == m_AxisMap.end())
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISNOTFOUND, "axis not found: " + sAxisIdentifier);
 
-    m_pTMLSDK->checkError(m_pTMLSDK->TS_SelectAxis(iIter->second.getHardwareID ()));
     if (m_nActiveDrive != iIter->second.getHardwareID())
     {
+        m_pTMLSDK->checkError(m_pTMLSDK->TS_SelectAxis(iIter->second.getHardwareID ()));
         m_nActiveDrive = iIter->second.getHardwareID();
         CTMLInstance::pollDrive(sChannelIdentifier, sAxisIdentifier);
     }
@@ -445,12 +445,14 @@ void CTMLInstance::pollDrive(const std::string& sChannelIdentifier, const std::s
 {
     //APOS_LD APOS_MT TPOS POSERR
     //ASPD_LD ASPD_MT TSPD SPDERR
+    /*
     m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionmotor", readPosition(sChannelIdentifier, sAxisIdentifier, "APOS_MT"));
     m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionload", readPosition(sChannelIdentifier, sAxisIdentifier, "APOS_LD"));
-    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetposition", readPosition(sChannelIdentifier, sAxisIdentifier, "TPOS"));
 
     m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedload", readSpeed(sChannelIdentifier, sAxisIdentifier, "ASPD_LD"));
     m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedmotor", readSpeed(sChannelIdentifier, sAxisIdentifier, "ASPD_MT"));
+    */
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetposition", readPosition(sChannelIdentifier, sAxisIdentifier, "TPOS"));
     m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetspeed", readSpeed(sChannelIdentifier, sAxisIdentifier, "TSPD"));
 
 }
