@@ -453,9 +453,9 @@ void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
 	if (nYMin >= m_nPixelCountY)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
-	if (nXMax > m_nPixelCountX)
+	if (nXMax >= m_nPixelCountX)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
-	if (nYMax > m_nPixelCountY)
+	if (nYMax >= m_nPixelCountY)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
 	if (nXMin > nXMax)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATERANGE);
