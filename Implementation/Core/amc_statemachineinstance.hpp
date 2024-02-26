@@ -75,6 +75,9 @@ namespace AMC {
 		std::promise<void> m_TerminateSignal;
 		std::future<void> m_TerminateFuture;
 
+		uint64_t m_nEndTimeOfPreviousStateInMicroseconds;
+		std::string m_sPreviousState;
+
 		// Externally accessible members		
 		// Machine Name (only set in the constructor)
 		std::string m_sName;

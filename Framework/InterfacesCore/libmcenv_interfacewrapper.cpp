@@ -13741,6 +13741,54 @@ LibMCEnvResult libmcenv_stateenvironment_getmachinestate(LibMCEnv_StateEnvironme
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_getpreviousstate(LibMCEnv_StateEnvironment pStateEnvironment, const LibMCEnv_uint32 nStateNameBufferSize, LibMCEnv_uint32* pStateNameNeededChars, char * pStateNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if ( (!pStateNameBuffer) && !(pStateNameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sStateName("");
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pStateNameBuffer == nullptr);
+		if (isCacheCall) {
+			sStateName = pIStateEnvironment->GetPreviousState();
+
+			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sStateName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sStateName);
+			pIStateEnvironment->_setCache (nullptr);
+		}
+		
+		if (pStateNameNeededChars)
+			*pStateNameNeededChars = (LibMCEnv_uint32) (sStateName.size()+1);
+		if (pStateNameBuffer) {
+			if (sStateName.size() >= nStateNameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iStateName = 0; iStateName < sStateName.size(); iStateName++)
+				pStateNameBuffer[iStateName] = sStateName[iStateName];
+			pStateNameBuffer[sStateName.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_preparesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -14895,6 +14943,162 @@ LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmicroseconds(LibMCEnv_S
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_getstarttimeofstateinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIStateEnvironment->GetStartTimeOfStateInMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_getstarttimeofstateinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIStateEnvironment->GetStartTimeOfStateInMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_getendtimeofpreviousstateinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIStateEnvironment->GetEndTimeOfPreviousStateInMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_getendtimeofpreviousstateinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIStateEnvironment->GetEndTimeOfPreviousStateInMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_getelapsedtimeinstateinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIStateEnvironment->GetElapsedTimeInStateInMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_getelapsedtimeinstateinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIStateEnvironment->GetElapsedTimeInStateInMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_gettestenvironment(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -15315,7 +15519,7 @@ LibMCEnvResult libmcenv_stateenvironment_releasedataseries(LibMCEnv_StateEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_stateenvironment_createalert(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert)
+LibMCEnvResult libmcenv_stateenvironment_createalert(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, const char * pReadableContextInformation, bool bAutomaticLogEntry, LibMCEnv_Alert * pAlert)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
 
@@ -15333,7 +15537,7 @@ LibMCEnvResult libmcenv_stateenvironment_createalert(LibMCEnv_StateEnvironment p
 		if (!pIStateEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseAlert = pIStateEnvironment->CreateAlert(sIdentifier, sReadableContextInformation);
+		pBaseAlert = pIStateEnvironment->CreateAlert(sIdentifier, sReadableContextInformation, bAutomaticLogEntry);
 
 		*pAlert = (IBase*)(pBaseAlert);
 		return LIBMCENV_SUCCESS;
@@ -17671,7 +17875,7 @@ LibMCEnvResult libmcenv_uienvironment_releasedataseries(LibMCEnv_UIEnvironment p
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_createalert(LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert)
+LibMCEnvResult libmcenv_uienvironment_createalert(LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, const char * pReadableContextInformation, bool bAutomaticLogEntry, LibMCEnv_Alert * pAlert)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -17689,7 +17893,7 @@ LibMCEnvResult libmcenv_uienvironment_createalert(LibMCEnv_UIEnvironment pUIEnvi
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseAlert = pIUIEnvironment->CreateAlert(sIdentifier, sReadableContextInformation);
+		pBaseAlert = pIUIEnvironment->CreateAlert(sIdentifier, sReadableContextInformation, bAutomaticLogEntry);
 
 		*pAlert = (IBase*)(pBaseAlert);
 		return LIBMCENV_SUCCESS;
@@ -18689,6 +18893,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_usermanagementhandler_getactiveusers;
 	if (sProcName == "libmcenv_stateenvironment_getmachinestate") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getmachinestate;
+	if (sProcName == "libmcenv_stateenvironment_getpreviousstate") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getpreviousstate;
 	if (sProcName == "libmcenv_stateenvironment_preparesignal") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_preparesignal;
 	if (sProcName == "libmcenv_stateenvironment_waitforsignal") 
@@ -18761,6 +18967,18 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getglobaltimerinmilliseconds;
 	if (sProcName == "libmcenv_stateenvironment_getglobaltimerinmicroseconds") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getglobaltimerinmicroseconds;
+	if (sProcName == "libmcenv_stateenvironment_getstarttimeofstateinmilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getstarttimeofstateinmilliseconds;
+	if (sProcName == "libmcenv_stateenvironment_getstarttimeofstateinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getstarttimeofstateinmicroseconds;
+	if (sProcName == "libmcenv_stateenvironment_getendtimeofpreviousstateinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getendtimeofpreviousstateinmicroseconds;
+	if (sProcName == "libmcenv_stateenvironment_getendtimeofpreviousstateinmilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getendtimeofpreviousstateinmilliseconds;
+	if (sProcName == "libmcenv_stateenvironment_getelapsedtimeinstateinmilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getelapsedtimeinstateinmilliseconds;
+	if (sProcName == "libmcenv_stateenvironment_getelapsedtimeinstateinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getelapsedtimeinstateinmicroseconds;
 	if (sProcName == "libmcenv_stateenvironment_gettestenvironment") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_gettestenvironment;
 	if (sProcName == "libmcenv_stateenvironment_createxmldocument") 

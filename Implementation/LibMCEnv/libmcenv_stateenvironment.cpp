@@ -72,20 +72,27 @@ using namespace LibMCEnv::Impl;
  Class definition of CStateEnvironment 
 **************************************************************************************************************************/
 
-CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName)
-	: m_pSystemState (pSystemState), m_pParameterHandler (pParameterHandler), m_sInstanceName(sInstanceName)
+CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName)
+	: m_pSystemState (pSystemState), m_pParameterHandler (pParameterHandler), m_sInstanceName(sInstanceName),
+	  m_nEndTimeOfPreviousStateInMicroseconds (nEndTimeOfPreviousStateInMicroseconds), m_sPreviousStateName (sPreviousStateName)
 {
 	if (pSystemState.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pParameterHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+	m_nStartTimeOfStateInMicroseconds = pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
 }
 
 
 std::string CStateEnvironment::GetMachineState(const std::string& sMachineInstance)
 {
 	return m_pSystemState->stateMachineData()->getInstanceStateName(sMachineInstance);
+}
+
+std::string CStateEnvironment::GetPreviousState()
+{
+	return m_sPreviousStateName;
 }
 
 
@@ -457,6 +464,40 @@ LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMicroseconds()
 	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
 }
 
+LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMilliseconds()
+{
+	return m_nStartTimeOfStateInMicroseconds / 1000;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMicroseconds()
+{
+	return m_nStartTimeOfStateInMicroseconds;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds()
+{
+	return m_nEndTimeOfPreviousStateInMicroseconds / 1000;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds()
+{
+	return m_nEndTimeOfPreviousStateInMicroseconds;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMilliseconds()
+{
+	uint64_t nElapsedTimeInMicroseconds = GetGlobalTimerInMicroseconds() - m_nStartTimeOfStateInMicroseconds;
+	return nElapsedTimeInMicroseconds / 1000;
+}
+
+
+LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMicroseconds()
+{
+	uint64_t nElapsedTimeInMicroseconds = GetGlobalTimerInMicroseconds() - m_nStartTimeOfStateInMicroseconds;
+	return nElapsedTimeInMicroseconds;
+}
+
+
 ITestEnvironment* CStateEnvironment::GetTestEnvironment()
 {
 	return new CTestEnvironment(m_pSystemState->getTestEnvironmentPath ());
@@ -639,7 +680,7 @@ void CStateEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 }
 
 
-IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation, const bool bAutomaticLogEntry) 
 {
 	if (sIdentifier.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
@@ -661,29 +702,31 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 	auto pAlertData = pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), alertLevel, alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
 
-	std::string sLogString = "Created alert " + sNewUUID + ": " + pDefinition->getIdentifier() + " / " + alertDescription.getCustomValue();
-	AMC::eLogLevel logLevel;
-	switch (alertLevel) {
-	case LibMCData::eAlertLevel::FatalError:
-		logLevel = AMC::eLogLevel::FatalError;
-		break;
-	case LibMCData::eAlertLevel::CriticalError:
-		logLevel = AMC::eLogLevel::CriticalError;
-		break;
-	case LibMCData::eAlertLevel::Message:
-		logLevel = AMC::eLogLevel::Message;
-		break;
-	case LibMCData::eAlertLevel::Warning:
-		logLevel = AMC::eLogLevel::Warning;
-		break;
-	default:
-		logLevel = AMC::eLogLevel::Unknown;
-		break;
+	if (bAutomaticLogEntry) {
+		std::string sLogString = "Created alert " + sNewUUID + ": " + pDefinition->getIdentifier() + " / " + alertDescription.getCustomValue();
+		AMC::eLogLevel logLevel;
+		switch (alertLevel) {
+		case LibMCData::eAlertLevel::FatalError:
+			logLevel = AMC::eLogLevel::FatalError;
+			break;
+		case LibMCData::eAlertLevel::CriticalError:
+			logLevel = AMC::eLogLevel::CriticalError;
+			break;
+		case LibMCData::eAlertLevel::Message:
+			logLevel = AMC::eLogLevel::Message;
+			break;
+		case LibMCData::eAlertLevel::Warning:
+			logLevel = AMC::eLogLevel::Warning;
+			break;
+		default:
+			logLevel = AMC::eLogLevel::Unknown;
+			break;
 
+		}
+
+		auto pLogger = m_pSystemState->getLoggerInstance();
+		pLogger->logMessage(sLogString, m_sInstanceName, logLevel);
 	}
-
-	auto pLogger = m_pSystemState->getLoggerInstance();
-	pLogger->logMessage(sLogString, m_sInstanceName, logLevel);
 
 	// State Environments have no user context...
 	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();

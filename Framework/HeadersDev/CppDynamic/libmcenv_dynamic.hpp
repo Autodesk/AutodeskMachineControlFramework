@@ -1860,6 +1860,7 @@ public:
 	}
 	
 	inline std::string GetMachineState(const std::string & sMachineInstance);
+	inline std::string GetPreviousState();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
 	inline PSignalHandler GetUnhandledSignal(const std::string & sSignalTypeName);
@@ -1896,6 +1897,12 @@ public:
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
+	inline LibMCEnv_uint64 GetStartTimeOfStateInMilliseconds();
+	inline LibMCEnv_uint64 GetStartTimeOfStateInMicroseconds();
+	inline LibMCEnv_uint64 GetEndTimeOfPreviousStateInMicroseconds();
+	inline LibMCEnv_uint64 GetEndTimeOfPreviousStateInMilliseconds();
+	inline LibMCEnv_uint64 GetElapsedTimeInStateInMilliseconds();
+	inline LibMCEnv_uint64 GetElapsedTimeInStateInMicroseconds();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
@@ -1910,7 +1917,7 @@ public:
 	inline bool HasDataSeries(const std::string & sDataSeriesUUID);
 	inline PDataSeries FindDataSeries(const std::string & sDataSeriesUUID);
 	inline void ReleaseDataSeries(const std::string & sDataSeriesUUID);
-	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation);
+	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation, const bool bAutomaticLogEntry);
 	inline PAlert FindAlert(const std::string & sUUID);
 	inline bool AlertExists(const std::string & sUUID);
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
@@ -2009,7 +2016,7 @@ public:
 	inline bool HasDataSeries(const std::string & sDataSeriesUUID);
 	inline PDataSeries FindDataSeries(const std::string & sDataSeriesUUID);
 	inline void ReleaseDataSeries(const std::string & sDataSeriesUUID);
-	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation);
+	inline PAlert CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation, const bool bAutomaticLogEntry);
 	inline PAlert FindAlert(const std::string & sUUID);
 	inline bool AlertExists(const std::string & sUUID);
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
@@ -2509,6 +2516,7 @@ public:
 		pWrapperTable->m_UserManagementHandler_SetUserPasswordByUUID = nullptr;
 		pWrapperTable->m_UserManagementHandler_GetActiveUsers = nullptr;
 		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
+		pWrapperTable->m_StateEnvironment_GetPreviousState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = nullptr;
@@ -2545,6 +2553,12 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMilliseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMicroseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMilliseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
@@ -6387,6 +6401,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetPreviousState = (PLibMCEnvStateEnvironment_GetPreviousStatePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getpreviousstate");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetPreviousState = (PLibMCEnvStateEnvironment_GetPreviousStatePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getpreviousstate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetPreviousState == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_PrepareSignal = (PLibMCEnvStateEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_PrepareSignal = (PLibMCEnvStateEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_preparesignal");
@@ -6708,6 +6731,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMilliseconds = (PLibMCEnvStateEnvironment_GetStartTimeOfStateInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getstarttimeofstateinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMilliseconds = (PLibMCEnvStateEnvironment_GetStartTimeOfStateInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getstarttimeofstateinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMicroseconds = (PLibMCEnvStateEnvironment_GetStartTimeOfStateInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getstarttimeofstateinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMicroseconds = (PLibMCEnvStateEnvironment_GetStartTimeOfStateInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getstarttimeofstateinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds = (PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getendtimeofpreviousstateinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds = (PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getendtimeofpreviousstateinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds = (PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getendtimeofpreviousstateinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds = (PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getendtimeofpreviousstateinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMilliseconds = (PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getelapsedtimeinstateinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMilliseconds = (PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getelapsedtimeinstateinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds = (PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getelapsedtimeinstateinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds = (PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getelapsedtimeinstateinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9198,6 +9275,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetMachineState == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getpreviousstate", (void**)&(pWrapperTable->m_StateEnvironment_GetPreviousState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetPreviousState == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_preparesignal", (void**)&(pWrapperTable->m_StateEnvironment_PrepareSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_PrepareSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9340,6 +9421,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getglobaltimerinmicroseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getstarttimeofstateinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getstarttimeofstateinmicroseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetStartTimeOfStateInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getendtimeofpreviousstateinmicroseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getendtimeofpreviousstateinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getelapsedtimeinstateinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getelapsedtimeinstateinmicroseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_gettestenvironment", (void**)&(pWrapperTable->m_StateEnvironment_GetTestEnvironment));
@@ -10105,7 +10210,7 @@ public:
 	}
 	
 	/**
-	* CImageData::GetPixelRange - Returns a subset of an image or the whole image data.
+	* CImageData::GetPixelRange - Returns a subset of an image or the whole image data. DEPRECIATED.
 	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
 	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
 	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
@@ -10122,7 +10227,7 @@ public:
 	}
 	
 	/**
-	* CImageData::SetPixelRange - Exchanges a subset of an image or the whole image data.
+	* CImageData::SetPixelRange - Exchanges a subset of an image or the whole image data. DEPRECIATED.
 	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
 	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
 	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
@@ -15421,6 +15526,21 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::GetPreviousState - Retrieves the previous state before this execution. Returns the init state name, if called during the first state during runtime.
+	* @return Name of previous state
+	*/
+	std::string CStateEnvironment::GetPreviousState()
+	{
+		LibMCEnv_uint32 bytesNeededStateName = 0;
+		LibMCEnv_uint32 bytesWrittenStateName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetPreviousState(m_pHandle, 0, &bytesNeededStateName, nullptr));
+		std::vector<char> bufferStateName(bytesNeededStateName);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetPreviousState(m_pHandle, bytesNeededStateName, &bytesWrittenStateName, &bufferStateName[0]));
+		
+		return std::string(&bufferStateName[0]);
+	}
+	
+	/**
 	* CStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
@@ -15917,6 +16037,78 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::GetStartTimeOfStateInMilliseconds - Returns the global start time of the current state in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetStartTimeOfStateInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
+	* CStateEnvironment::GetStartTimeOfStateInMicroseconds - Returns the global start time of the current state in microseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetStartTimeOfStateInMicroseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
+	* CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
+	* CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
+	* CStateEnvironment::GetElapsedTimeInStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetElapsedTimeInStateInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
+	* CStateEnvironment::GetElapsedTimeInStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetElapsedTimeInStateInMicroseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
 	* CStateEnvironment::GetTestEnvironment - Returns a test environment instance.
 	* @return Test Environment Instance
 	*/
@@ -16127,12 +16319,13 @@ public:
 	* CStateEnvironment::CreateAlert - creates a new alert
 	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
 	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @param[in] bAutomaticLogEntry - If this flag is set to true, an automatic message will be posted to the system log.
 	* @return Alert instance.
 	*/
-	PAlert CStateEnvironment::CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation)
+	PAlert CStateEnvironment::CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation, const bool bAutomaticLogEntry)
 	{
 		LibMCEnvHandle hAlert = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateAlert(m_pHandle, sIdentifier.c_str(), sReadableContextInformation.c_str(), &hAlert));
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateAlert(m_pHandle, sIdentifier.c_str(), sReadableContextInformation.c_str(), bAutomaticLogEntry, &hAlert));
 		
 		if (!hAlert) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -17094,12 +17287,13 @@ public:
 	* CUIEnvironment::CreateAlert - creates a new alert
 	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
 	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @param[in] bAutomaticLogEntry - If this flag is set to true, an automatic message will be posted to the system log.
 	* @return Alert instance.
 	*/
-	PAlert CUIEnvironment::CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation)
+	PAlert CUIEnvironment::CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation, const bool bAutomaticLogEntry)
 	{
 		LibMCEnvHandle hAlert = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateAlert(m_pHandle, sIdentifier.c_str(), sReadableContextInformation.c_str(), &hAlert));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateAlert(m_pHandle, sIdentifier.c_str(), sReadableContextInformation.c_str(), bAutomaticLogEntry, &hAlert));
 		
 		if (!hAlert) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

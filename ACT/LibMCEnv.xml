@@ -454,7 +454,7 @@
 			<param name="Value" type="uint32" pass="in" description="New Pixel value at this position" />
 		</method>		
 
-		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data.">
+		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data. DEPRECIATED.">
 			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
 			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
 			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
@@ -462,7 +462,7 @@
 			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
 		</method>		
 
-		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
+		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data. DEPRECIATED.">
 			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
 			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
 			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
@@ -2555,6 +2555,9 @@
 			<param name="StateName" type="string" pass="return" description="Name of current state" />
 		</method>
 
+		<method name="GetPreviousState" description="Retrieves the previous state before this execution. Returns the init state name, if called during the first state during runtime.">
+			<param name="StateName" type="string" pass="return" description="Name of previous state" />
+		</method>
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
@@ -2762,6 +2765,31 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
 		</method>
 
+		<method name="GetStartTimeOfStateInMilliseconds" description="Returns the global start time of the current state in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetStartTimeOfStateInMicroseconds" description="Returns the global start time of the current state in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetEndTimeOfPreviousStateInMicroseconds" description="Returns the global finish time of the previous state in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
+		<method name="GetEndTimeOfPreviousStateInMilliseconds" description="Returns the global finish time of the previous state in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetElapsedTimeInStateInMilliseconds" description="Returns the global finish time of the previous state in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetElapsedTimeInStateInMicroseconds" description="Returns the global finish time of the previous state in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
+
 		<method name="GetTestEnvironment" description="Returns a test environment instance.">
 			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
 		</method>
@@ -2834,6 +2862,7 @@
 		<method name="CreateAlert" description="creates a new alert">
 			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
 			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="AutomaticLogEntry" type="bool" pass="in" description="If this flag is set to true, an automatic message will be posted to the system log." />
 			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 
@@ -3204,6 +3233,7 @@
 		<method name="CreateAlert" description="creates a new alert">
 			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
 			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="AutomaticLogEntry" type="bool" pass="in" description="If this flag is set to true, an automatic message will be posted to the system log." />
 			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 

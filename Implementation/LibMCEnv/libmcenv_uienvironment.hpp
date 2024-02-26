@@ -211,7 +211,7 @@ public:
 
 	void ReleaseDataSeries(const std::string& sDataSeriesUUID) override;
 
-	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation) override;
+	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation, const bool bAutomaticLogEntry) override;
 
 	IAlert* FindAlert(const std::string& sUUID) override;
 

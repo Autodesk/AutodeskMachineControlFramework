@@ -123,13 +123,13 @@ namespace AMC {
 		return pExternalInstance;
 	}
 
-	void CStateMachineState::execute(std::string& sNextState, PSystemState pSystemState, PParameterHandler pParameterHandler)
+	void CStateMachineState::execute(std::string& sNextState, PSystemState pSystemState, PParameterHandler pParameterHandler, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName)
 	{
 		LibMCAssertNotNull(pSystemState.get());
 		LibMCAssertNotNull(pParameterHandler.get());
 		LibMCAssertNotNull(m_pPluginState.get());
 
-		auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CStateEnvironment>(pSystemState, pParameterHandler, m_sInstanceName);
+		auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CStateEnvironment>(pSystemState, pParameterHandler, m_sInstanceName, nEndTimeOfPreviousStateInMicroseconds, sPreviousStateName);
 		auto pExternalEnvironment = mapInternalStateEnvInstance<LibMCEnv::CStateEnvironment>  (pInternalEnvironment, m_pEnvironmentWrapper);
 					
 		sNextState = "";

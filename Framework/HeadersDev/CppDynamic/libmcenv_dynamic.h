@@ -374,7 +374,7 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelPtr) (LibMCEnv_ImageData pIm
 typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_uint32 nValue);
 
 /**
-* Returns a subset of an image or the whole image data.
+* Returns a subset of an image or the whole image data. DEPRECIATED.
 *
 * @param[in] pImageData - ImageData instance.
 * @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
@@ -389,7 +389,7 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelPtr) (LibMCEnv_ImageData pIm
 typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelRangePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer);
 
 /**
-* Exchanges a subset of an image or the whole image data.
+* Exchanges a subset of an image or the whole image data. DEPRECIATED.
 *
 * @param[in] pImageData - ImageData instance.
 * @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
@@ -4576,6 +4576,17 @@ typedef LibMCEnvResult (*PLibMCEnvUserManagementHandler_GetActiveUsersPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetMachineStatePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const LibMCEnv_uint32 nStateNameBufferSize, LibMCEnv_uint32* pStateNameNeededChars, char * pStateNameBuffer);
 
 /**
+* Retrieves the previous state before this execution. Returns the init state name, if called during the first state during runtime.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStateNameBuffer -  buffer of Name of previous state, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetPreviousStatePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const LibMCEnv_uint32 nStateNameBufferSize, LibMCEnv_uint32* pStateNameNeededChars, char * pStateNameBuffer);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -4968,6 +4979,60 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsP
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetGlobalTimerInMicrosecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
+* Returns the global start time of the current state in milliseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetStartTimeOfStateInMillisecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns the global start time of the current state in microseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetStartTimeOfStateInMicrosecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns the global finish time of the previous state in microseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Microseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMicrosecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns the global finish time of the previous state in milliseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMillisecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns the global finish time of the previous state in milliseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMillisecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns the global finish time of the previous state in microseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Microseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMicrosecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
 * Returns a test environment instance.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -5112,10 +5177,11 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ReleaseDataSeriesPtr) (LibMCE
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pIdentifier - Alert type identifier. Call fails if identifier is not registered.
 * @param[in] pReadableContextInformation - Context information string that can be displayed to the user.
+* @param[in] bAutomaticLogEntry - If this flag is set to true, an automatic message will be posted to the system log.
 * @param[out] pAlert - Alert instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateAlertPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateAlertPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, const char * pReadableContextInformation, bool bAutomaticLogEntry, LibMCEnv_Alert * pAlert);
 
 /**
 * finds an alert by UUID. Fails if alert does not exist.
@@ -5847,10 +5913,11 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ReleaseDataSeriesPtr) (LibMCEnv_
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pIdentifier - Alert type identifier. Call fails if identifier is not registered.
 * @param[in] pReadableContextInformation - Context information string that can be displayed to the user.
+* @param[in] bAutomaticLogEntry - If this flag is set to true, an automatic message will be posted to the system log.
 * @param[out] pAlert - Alert instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, const char * pReadableContextInformation, LibMCEnv_Alert * pAlert);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateAlertPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, const char * pReadableContextInformation, bool bAutomaticLogEntry, LibMCEnv_Alert * pAlert);
 
 /**
 * finds an alert by UUID. Fails if alert does not exist.
@@ -6369,6 +6436,7 @@ typedef struct {
 	PLibMCEnvUserManagementHandler_SetUserPasswordByUUIDPtr m_UserManagementHandler_SetUserPasswordByUUID;
 	PLibMCEnvUserManagementHandler_GetActiveUsersPtr m_UserManagementHandler_GetActiveUsers;
 	PLibMCEnvStateEnvironment_GetMachineStatePtr m_StateEnvironment_GetMachineState;
+	PLibMCEnvStateEnvironment_GetPreviousStatePtr m_StateEnvironment_GetPreviousState;
 	PLibMCEnvStateEnvironment_PrepareSignalPtr m_StateEnvironment_PrepareSignal;
 	PLibMCEnvStateEnvironment_WaitForSignalPtr m_StateEnvironment_WaitForSignal;
 	PLibMCEnvStateEnvironment_GetUnhandledSignalPtr m_StateEnvironment_GetUnhandledSignal;
@@ -6405,6 +6473,12 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr m_StateEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr m_StateEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvStateEnvironment_GetGlobalTimerInMicrosecondsPtr m_StateEnvironment_GetGlobalTimerInMicroseconds;
+	PLibMCEnvStateEnvironment_GetStartTimeOfStateInMillisecondsPtr m_StateEnvironment_GetStartTimeOfStateInMilliseconds;
+	PLibMCEnvStateEnvironment_GetStartTimeOfStateInMicrosecondsPtr m_StateEnvironment_GetStartTimeOfStateInMicroseconds;
+	PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMicrosecondsPtr m_StateEnvironment_GetEndTimeOfPreviousStateInMicroseconds;
+	PLibMCEnvStateEnvironment_GetEndTimeOfPreviousStateInMillisecondsPtr m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds;
+	PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMillisecondsPtr m_StateEnvironment_GetElapsedTimeInStateInMilliseconds;
+	PLibMCEnvStateEnvironment_GetElapsedTimeInStateInMicrosecondsPtr m_StateEnvironment_GetElapsedTimeInStateInMicroseconds;
 	PLibMCEnvStateEnvironment_GetTestEnvironmentPtr m_StateEnvironment_GetTestEnvironment;
 	PLibMCEnvStateEnvironment_CreateXMLDocumentPtr m_StateEnvironment_CreateXMLDocument;
 	PLibMCEnvStateEnvironment_ParseXMLStringPtr m_StateEnvironment_ParseXMLString;

@@ -582,7 +582,7 @@ public:
 	virtual void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue) = 0;
 
 	/**
-	* IImageData::GetPixelRange - Returns a subset of an image or the whole image data.
+	* IImageData::GetPixelRange - Returns a subset of an image or the whole image data. DEPRECIATED.
 	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
 	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
 	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
@@ -594,7 +594,7 @@ public:
 	virtual void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer) = 0;
 
 	/**
-	* IImageData::SetPixelRange - Exchanges a subset of an image or the whole image data.
+	* IImageData::SetPixelRange - Exchanges a subset of an image or the whole image data. DEPRECIATED.
 	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
 	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
 	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
@@ -3686,6 +3686,12 @@ public:
 	virtual std::string GetMachineState(const std::string & sMachineInstance) = 0;
 
 	/**
+	* IStateEnvironment::GetPreviousState - Retrieves the previous state before this execution. Returns the init state name, if called during the first state during runtime.
+	* @return Name of previous state
+	*/
+	virtual std::string GetPreviousState() = 0;
+
+	/**
 	* IStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
@@ -3962,6 +3968,42 @@ public:
 	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
 
 	/**
+	* IStateEnvironment::GetStartTimeOfStateInMilliseconds - Returns the global start time of the current state in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeOfStateInMilliseconds() = 0;
+
+	/**
+	* IStateEnvironment::GetStartTimeOfStateInMicroseconds - Returns the global start time of the current state in microseconds.
+	* @return Timer value in Milliseconds
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeOfStateInMicroseconds() = 0;
+
+	/**
+	* IStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeOfPreviousStateInMicroseconds() = 0;
+
+	/**
+	* IStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeOfPreviousStateInMilliseconds() = 0;
+
+	/**
+	* IStateEnvironment::GetElapsedTimeInStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	virtual LibMCEnv_uint64 GetElapsedTimeInStateInMilliseconds() = 0;
+
+	/**
+	* IStateEnvironment::GetElapsedTimeInStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* @return Timer value in Microseconds
+	*/
+	virtual LibMCEnv_uint64 GetElapsedTimeInStateInMicroseconds() = 0;
+
+	/**
 	* IStateEnvironment::GetTestEnvironment - Returns a test environment instance.
 	* @return Test Environment Instance
 	*/
@@ -4062,9 +4104,10 @@ public:
 	* IStateEnvironment::CreateAlert - creates a new alert
 	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
 	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @param[in] bAutomaticLogEntry - If this flag is set to true, an automatic message will be posted to the system log.
 	* @return Alert instance.
 	*/
-	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
+	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation, const bool bAutomaticLogEntry) = 0;
 
 	/**
 	* IStateEnvironment::FindAlert - finds an alert by UUID. Fails if alert does not exist.
@@ -4576,9 +4619,10 @@ public:
 	* IUIEnvironment::CreateAlert - creates a new alert
 	* @param[in] sIdentifier - Alert type identifier. Call fails if identifier is not registered.
 	* @param[in] sReadableContextInformation - Context information string that can be displayed to the user.
+	* @param[in] bAutomaticLogEntry - If this flag is set to true, an automatic message will be posted to the system log.
 	* @return Alert instance.
 	*/
-	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation) = 0;
+	virtual IAlert * CreateAlert(const std::string & sIdentifier, const std::string & sReadableContextInformation, const bool bAutomaticLogEntry) = 0;
 
 	/**
 	* IUIEnvironment::FindAlert - finds an alert by UUID. Fails if alert does not exist.

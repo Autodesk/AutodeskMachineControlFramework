@@ -623,7 +623,7 @@ void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 
 }
 
-IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation, const bool bAutomaticLogEntry)
 {
     if (sIdentifier.empty())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
@@ -644,10 +644,12 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
     auto pAlertSession = pDataModel->CreateAlertSession();
     auto pAlertData = pAlertSession->AddAlert(sNewUUID, pDefinition->getIdentifier(), alertLevel, alertDescription.getCustomValue(), alertDescription.getStringIdentifier(), sReadableContextInformation, pDefinition->needsAcknowledgement(), sTimeStamp);
 
-    std::string sLogString = "Created alert " + sNewUUID + ": " + pDefinition->getIdentifier() + " / " + alertDescription.getCustomValue();
-    AMC::eLogLevel logLevel;
-    switch (alertLevel) {
-        case LibMCData::eAlertLevel::FatalError: 
+    if (bAutomaticLogEntry) {
+
+        std::string sLogString = "Created alert " + sNewUUID + ": " + pDefinition->getIdentifier() + " / " + alertDescription.getCustomValue();
+        AMC::eLogLevel logLevel;
+        switch (alertLevel) {
+        case LibMCData::eAlertLevel::FatalError:
             logLevel = AMC::eLogLevel::FatalError;
             break;
         case LibMCData::eAlertLevel::CriticalError:
@@ -663,9 +665,10 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
             logLevel = AMC::eLogLevel::Unknown;
             break;
 
-    }
+        }
 
-    m_pLogger->logMessage(sLogString, m_sLogSubSystem, logLevel);
+        m_pLogger->logMessage(sLogString, m_sLogSubSystem, logLevel);
+    }
 
 
     return new CAlert(pDataModel, pAlertData->GetUUID (), m_pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem);
