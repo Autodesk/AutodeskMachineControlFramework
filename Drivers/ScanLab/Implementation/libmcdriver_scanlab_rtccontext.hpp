@@ -360,6 +360,8 @@ public:
 
 	void DisableLineSubdivision() override;
 
+	LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) override;
+
 };
 
 

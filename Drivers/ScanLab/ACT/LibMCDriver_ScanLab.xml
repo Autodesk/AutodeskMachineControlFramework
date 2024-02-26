@@ -741,6 +741,11 @@ Custom implementation
 		<method name="DisableLineSubdivision" description="Disables the subdivision of mark lines.">
 		</method>
 		
+		<method name="ReadMultiMCBSP" description="Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.">
+			<param name="RegisterNo" type="uint32" pass="in" description="Number of the register to read." />
+			<param name="RegisterContent" type="int32" pass="return" description="Value of the register." />
+		</method>
+		
 	</class>
 
 	

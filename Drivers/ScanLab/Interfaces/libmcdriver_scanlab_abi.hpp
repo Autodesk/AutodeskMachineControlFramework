@@ -1144,6 +1144,16 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablelinesubdivision(LibMCDriver_ScanLab_RTCContext pRTCContext);
 
+/**
+* Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nRegisterNo - Number of the register to read.
+* @param[out] pRegisterContent - Value of the register.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readmultimcbsp(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nRegisterNo, LibMCDriver_ScanLab_int32 * pRegisterContent);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/

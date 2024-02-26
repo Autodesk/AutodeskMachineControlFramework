@@ -2083,3 +2083,12 @@ LibMCDriver_ScanLab_uint32 CRTCContext::CheckOnTheFlyError(const bool bFailIfErr
 	else
 		return 0;
 }
+
+LibMCDriver_ScanLab_int32 CRTCContext::ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	int32_t nRegisterContent = m_pScanLabSDK->n_read_multi_mcbsp(m_CardNo, nRegisterNo);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	return nRegisterContent;
+}

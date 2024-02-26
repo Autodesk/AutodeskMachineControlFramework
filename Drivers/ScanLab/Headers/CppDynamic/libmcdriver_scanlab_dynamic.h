@@ -1131,6 +1131,16 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableLineSub
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
+/**
+* Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nRegisterNo - Number of the register to read.
+* @param[out] pRegisterContent - Value of the register.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nRegisterNo, LibMCDriver_ScanLab_int32 * pRegisterContent);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -1998,6 +2008,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr m_RTCContext_DisablePowerModulation;
 	PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr m_RTCContext_EnableLineSubdivision;
 	PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr m_RTCContext_DisableLineSubdivision;
+	PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr m_RTCContext_ReadMultiMCBSP;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;

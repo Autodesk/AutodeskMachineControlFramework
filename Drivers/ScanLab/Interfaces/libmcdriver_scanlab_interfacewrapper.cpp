@@ -2908,6 +2908,32 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablelinesubdivision(
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readmultimcbsp(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nRegisterNo, LibMCDriver_ScanLab_int32 * pRegisterContent)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pRegisterContent == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pRegisterContent = pIRTCContext->ReadMultiMCBSP(nRegisterNo);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for RTCSelector
@@ -4926,6 +4952,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enablelinesubdivision;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disablelinesubdivision") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disablelinesubdivision;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_readmultimcbsp") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_readmultimcbsp;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcards") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_searchcards;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcardsbyrange") 

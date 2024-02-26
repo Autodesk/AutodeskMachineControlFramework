@@ -1159,6 +1159,13 @@ public:
 	*/
 	virtual void DisableLineSubdivision() = 0;
 
+	/**
+	* IRTCContext::ReadMultiMCBSP - Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.
+	* @param[in] nRegisterNo - Number of the register to read.
+	* @return Value of the register.
+	*/
+	virtual LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;

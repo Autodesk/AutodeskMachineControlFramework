@@ -310,6 +310,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_range_checking = (PScanLabPtr_n_range_checking)_loadScanLabAddress(hLibrary, "n_range_checking");
 	this->ptr_n_stop_execution = (PScanLabPtr_n_stop_execution)_loadScanLabAddress(hLibrary, "n_stop_execution");
 	this->ptr_n_timed_mark_abs = (PScanLabPtr_n_timed_mark_abs)_loadScanLabAddress(hLibrary, "n_timed_mark_abs");
+	this->ptr_n_read_multi_mcbsp = (PScanLabPtr_n_read_multi_mcbsp)_loadScanLabAddress(hLibrary, "n_read_multi_mcbsp");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -503,6 +504,7 @@ void CScanLabSDK::resetFunctionPtrs()
 
 	ptr_n_stop_execution = nullptr;
 	ptr_n_timed_mark_abs = nullptr;
+	ptr_n_read_multi_mcbsp = nullptr;
 
 }
 
@@ -1554,6 +1556,15 @@ void CScanLabSDK::n_timed_mark_abs(uint32_t nCardNo, int32_t nX, int32_t nY, dou
 		m_pLogJournal->logCall("n_timed_mark_abs", std::to_string(nCardNo) + ", " + std::to_string(nX) + ", " + std::to_string(nY) + ", " + std::to_string(dTime));
 
 	ptr_n_timed_mark_abs(nCardNo, nX, nY, dTime);
+}
+
+int32_t CScanLabSDK::n_read_multi_mcbsp(uint32_t nCardNo, uint32_t nRegisterNo)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_read_multi_mcbsp", std::to_string(nCardNo) + ", " + std::to_string(nRegisterNo));
+
+	return ptr_n_read_multi_mcbsp(nCardNo, nRegisterNo);
+
 }
 
 

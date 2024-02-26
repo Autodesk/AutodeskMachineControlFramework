@@ -669,6 +669,7 @@ public:
 	inline void DisablePowerModulation();
 	inline void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold);
 	inline void DisableLineSubdivision();
+	inline LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo);
 };
 	
 /*************************************************************************************************************************
@@ -1027,6 +1028,7 @@ public:
 		pWrapperTable->m_RTCContext_DisablePowerModulation = nullptr;
 		pWrapperTable->m_RTCContext_EnableLineSubdivision = nullptr;
 		pWrapperTable->m_RTCContext_DisableLineSubdivision = nullptr;
+		pWrapperTable->m_RTCContext_ReadMultiMCBSP = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -2111,6 +2113,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ReadMultiMCBSP = (PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_readmultimcbsp");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ReadMultiMCBSP = (PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_readmultimcbsp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ReadMultiMCBSP == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
 		#else // _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
@@ -3182,6 +3193,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablelinesubdivision", (void**)&(pWrapperTable->m_RTCContext_DisableLineSubdivision));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableLineSubdivision == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_readmultimcbsp", (void**)&(pWrapperTable->m_RTCContext_ReadMultiMCBSP));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ReadMultiMCBSP == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -4600,6 +4615,19 @@ public:
 	void CRTCContext::DisableLineSubdivision()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableLineSubdivision(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::ReadMultiMCBSP - Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.
+	* @param[in] nRegisterNo - Number of the register to read.
+	* @return Value of the register.
+	*/
+	LibMCDriver_ScanLab_int32 CRTCContext::ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo)
+	{
+		LibMCDriver_ScanLab_int32 resultRegisterContent = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ReadMultiMCBSP(m_pHandle, nRegisterNo, &resultRegisterContent));
+		
+		return resultRegisterContent;
 	}
 	
 	/**
