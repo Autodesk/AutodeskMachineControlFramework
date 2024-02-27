@@ -179,6 +179,9 @@
 		<error name="USERDOESNOTEXIST" code="10139" description="User does not exist."/>
 		<error name="EMPTYSHA256SOURCE" code="10140" description="Empty SHA256 Source."/>
 		<error name="ALERTHASNOUSERCONTEXT" code="10141" description="Alert has no user context."/>
+		<error name="EMPTYJOURNALSTREAMNAME" code="10142" description="Empty journal stream name."/>
+		<error name="EMPTYJOURNALSTREAMMIMETYPE" code="10143" description="Empty journal stream mime type."/>
+		
 				
 
 	</errors>
@@ -2207,6 +2210,91 @@
 	</class>
 
 
+	<class name="TempStreamWriter" parent="Base" description="A writer that allows to create a temporary storage stream.">
+	
+		<method name="GetUUID" description="Returns the UUID of the stream.">
+			<param name="UUID" type="string" pass="return" description="Returns stream uuid." />
+		</method>
+		
+		<method name="GetName" description="Returns the name of the stream.">
+			<param name="Name" type="string" pass="return" description="Returns stream name." />
+		</method>
+		
+		<method name="GetMIMEType" description="Returns the MIME type of the stream.">
+			<param name="MIMEType" type="string" pass="return" description="Returns stream MIME Type." />
+		</method>		
+		
+		<method name="GetSize" description="Returns the current size of the stream.">
+			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
+		</method>
+		
+		<method name="GetWritePosition" description="Returns the current write position of the stream.">
+			<param name="WritePosition" type="uint64" pass="return" description="Current write position of the stream." />
+		</method>		
+
+		<method name="Seek" description="Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.">
+			<param name="WritePosition" type="uint64" pass="in" description="New write position of the stream." />
+		</method>		
+
+		<method name="IsFinished" description="Returns if the stream writing has been finished.">
+			<param name="WritingIsFinished" type="bool" pass="return" description="Returns true if writing is finished." />
+		</method>
+		
+		<method name="WriteData" description="Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data array to write into the stream" />
+		</method>
+		
+		<method name="WriteString" description="Writes a string into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
+			<param name="Data" type="string" pass="in" description="String to write into the stream" />
+		</method>
+		
+		<method name="WriteLine" description="Writes a string into the stream and adds a newline character. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
+			<param name="Line" type="string" pass="in" description="String to write into the stream" />
+		</method>
+
+		<method name="Finish" description="Finishes the stream writing. Fails if stream has been finished already.">
+		</method>
+		
+	</class>
+	
+	
+	<class name="StreamReader" parent="Base" description="A reader class that allows to access a storage stream.">
+	
+		<method name="GetUUID" description="Returns the UUID of the stream.">
+			<param name="UUID" type="string" pass="return" description="Returns stream uuid." />
+		</method>
+
+		<method name="GetName" description="Returns the name of the stream.">
+			<param name="Name" type="string" pass="return" description="Returns stream name." />
+		</method>
+		
+		<method name="GetMIMEType" description="Returns the MIME type of the stream.">
+			<param name="MIMEType" type="string" pass="return" description="Returns stream MIME Type." />
+		</method>
+
+		<method name="GetSize" description="Returns the current size of the stream.">
+			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
+		</method>
+		
+		<method name="GetReadPosition" description="Returns the current read position of the stream.">
+			<param name="ReadPosition" type="uint64" pass="return" description="Current read position of the stream." />
+		</method>		
+
+		<method name="Seek" description="Moves the current read position to a certain address. New position MUST be smaller or equal the stream size.">
+			<param name="ReadPosition" type="uint64" pass="in" description="New read position of the stream." />
+		</method>		
+		
+		<method name="ReadData" description="Reads a data array from the stream from the current read position. Fails if reading outside of the stream data.">
+			<param name="SizeToRead" type="uint64" pass="in" description="Bytes to read. MUST be larger than 0." />
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Return data array. In case of success, will have SizeToRead elements." />
+		</method>
+
+		<method name="ReadAllData" description="Seeks to the beginning of the stream and returns all the stream data.">
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Return data array. In case of success, will have stream size elements." />
+		</method>
+		
+	</class>	
+
 	<class name="UniformJournalSampling" parent="Base" description="Result class for Journal Sampling">
 
 		<method name="GetVariableName" description="returns the name of the recorded variable.">
@@ -2890,6 +2978,18 @@
 		<method name="CreateCryptoContext" description="Creates a crypto context.">
 			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
 		</method>
+		
+		<method name="CreateTemporaryStream" description="Creates a new writer to store temporary data. This data will be attached to the current journal.">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
+		</method>
+		
+		<method name="FindStream" description="Finds a stream in the storage system.">
+			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
+			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
+			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
+		</method>
 
 	</class>
 
@@ -2939,6 +3039,10 @@
 		</method>
 
 		<method name="HideHint" description="Hides hint if any is displayed.">
+		</method>
+
+		<method name="StartStreamDownload" description="Starts a stream download on the client. Fails if stream does not exist.">
+			<param name="UUID" type="string" pass="in" description="Stream UUID." />
 		</method>
 
 		<method name="ShowMessageDlg" description="Shows a message dialog in the user interface.">
@@ -3260,6 +3364,18 @@
 
 		<method name="CreateCryptoContext" description="Creates a crypto context.">
 			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
+		</method>
+
+		<method name="CreateTemporaryStream" description="Creates a new writer to store temporary data. This data will be attached to the current journal.">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
+		</method>
+
+		<method name="FindStream" description="Finds a stream in the storage system.">
+			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
+			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
+			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
 		</method>
 
 	</class>
