@@ -22,18 +22,17 @@ TODO
 
 
 ## Dependencies / Prerequisites / Compilation (on Windows)
-* Get and install cmake https://cmake.org/download/
-* Visual Studio C/C++ 2019 or 2022 (the Community Edition is sufficient technically)
+* Visual Studio C/C++ (the Community Edition is sufficient technically) TODO
 * Get and install go https://golang.org/doc/install
-* Git needs to be reachable in the PATH
+* A 64-MinGW compiler for cgo (we recommend TDM-GCC: https://jmeubank.github.io/tdm-gcc/)
+* Get and install cmake https://cmake.org/download/
+* Get and install nodejs: https://nodejs.org/en/download/ with optional chocolatey install (will install Phython as well)
 * build_clean_win64.bat should build the binaries and dev packages on Windows. The results are located in "build/Output".
 
-## For core development on the HMI client code:
-* Get and install nodejs: https://nodejs.org/en/download/ 
-* Artifacts/build_client_clean.bat should build the client artifacts.
 
 ## Dependencies / Prerequisites / Compilation (on x64-Linux)
 * Get and install go binaries from https://golang.org/doc/install
+* Get and install node binaries from https://nodejs.org/en/download/ 
 * On x64 Debian, the following packages should be sufficient: 
     - build-essential
 	- cmake
