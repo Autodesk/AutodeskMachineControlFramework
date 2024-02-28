@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_streamreader.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
