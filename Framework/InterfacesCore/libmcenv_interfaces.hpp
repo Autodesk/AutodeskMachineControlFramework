@@ -4282,6 +4282,14 @@ public:
 	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
 
 	/**
+	* IStateEnvironment::HasAlertOfType - Checks, if an alert of a certain type identifier exists.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+	* @return Flag, if the alert exists.
+	*/
+	virtual bool HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
+
+	/**
 	* IStateEnvironment::CreateCryptoContext - Creates a crypto context.
 	* @return Cryptographic context instance
 	*/
@@ -4817,6 +4825,14 @@ public:
 	* @return AlertIterator Instance
 	*/
 	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
+
+	/**
+	* IUIEnvironment::HasAlertOfType - Checks, if an alert of a certain type identifier exists.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+	* @return Flag, if the alert exists.
+	*/
+	virtual bool HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
 
 	/**
 	* IUIEnvironment::CreateCryptoContext - Creates a crypto context.

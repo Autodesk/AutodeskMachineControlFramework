@@ -5421,6 +5421,17 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveAlertsPtr) (LibMCEnv_
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveAlertsByTypePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /**
+* Checks, if an alert of a certain type identifier exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+* @param[out] pHasAlert - Flag, if the alert exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasAlertOfTypePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool bOnlyActive, bool * pHasAlert);
+
+/**
 * Creates a crypto context.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -6188,6 +6199,17 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveAlertsPtr) (LibMCEnv_UIE
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveAlertsByTypePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /**
+* Checks, if an alert of a certain type identifier exists.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+* @param[out] pHasAlert - Flag, if the alert exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasAlertOfTypePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool bOnlyActive, bool * pHasAlert);
+
+/**
 * Creates a crypto context.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -6766,6 +6788,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_AlertExistsPtr m_StateEnvironment_AlertExists;
 	PLibMCEnvStateEnvironment_RetrieveAlertsPtr m_StateEnvironment_RetrieveAlerts;
 	PLibMCEnvStateEnvironment_RetrieveAlertsByTypePtr m_StateEnvironment_RetrieveAlertsByType;
+	PLibMCEnvStateEnvironment_HasAlertOfTypePtr m_StateEnvironment_HasAlertOfType;
 	PLibMCEnvStateEnvironment_CreateCryptoContextPtr m_StateEnvironment_CreateCryptoContext;
 	PLibMCEnvStateEnvironment_CreateTemporaryStreamPtr m_StateEnvironment_CreateTemporaryStream;
 	PLibMCEnvStateEnvironment_FindStreamPtr m_StateEnvironment_FindStream;
@@ -6836,6 +6859,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_AlertExistsPtr m_UIEnvironment_AlertExists;
 	PLibMCEnvUIEnvironment_RetrieveAlertsPtr m_UIEnvironment_RetrieveAlerts;
 	PLibMCEnvUIEnvironment_RetrieveAlertsByTypePtr m_UIEnvironment_RetrieveAlertsByType;
+	PLibMCEnvUIEnvironment_HasAlertOfTypePtr m_UIEnvironment_HasAlertOfType;
 	PLibMCEnvUIEnvironment_CreateCryptoContextPtr m_UIEnvironment_CreateCryptoContext;
 	PLibMCEnvUIEnvironment_CreateTemporaryStreamPtr m_UIEnvironment_CreateTemporaryStream;
 	PLibMCEnvUIEnvironment_FindStreamPtr m_UIEnvironment_FindStream;

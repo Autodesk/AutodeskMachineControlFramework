@@ -16302,6 +16302,35 @@ LibMCEnvResult libmcenv_stateenvironment_retrievealertsbytype(LibMCEnv_StateEnvi
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_hasalertoftype(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool bOnlyActive, bool * pHasAlert)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHasAlert == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasAlert = pIStateEnvironment->HasAlertOfType(sIdentifier, bOnlyActive);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_createcryptocontext(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_CryptoContext * pContext)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -18750,6 +18779,35 @@ LibMCEnvResult libmcenv_uienvironment_retrievealertsbytype(LibMCEnv_UIEnvironmen
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_hasalertoftype(LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool bOnlyActive, bool * pHasAlert)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHasAlert == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasAlert = pIUIEnvironment->HasAlertOfType(sIdentifier, bOnlyActive);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_createcryptocontext(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_CryptoContext * pContext)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -19842,6 +19900,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_retrievealerts;
 	if (sProcName == "libmcenv_stateenvironment_retrievealertsbytype") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_retrievealertsbytype;
+	if (sProcName == "libmcenv_stateenvironment_hasalertoftype") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_hasalertoftype;
 	if (sProcName == "libmcenv_stateenvironment_createcryptocontext") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createcryptocontext;
 	if (sProcName == "libmcenv_stateenvironment_createtemporarystream") 
@@ -19982,6 +20042,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_retrievealerts;
 	if (sProcName == "libmcenv_uienvironment_retrievealertsbytype") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_retrievealertsbytype;
+	if (sProcName == "libmcenv_uienvironment_hasalertoftype") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_hasalertoftype;
 	if (sProcName == "libmcenv_uienvironment_createcryptocontext") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createcryptocontext;
 	if (sProcName == "libmcenv_uienvironment_createtemporarystream") 

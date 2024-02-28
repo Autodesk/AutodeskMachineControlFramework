@@ -203,6 +203,8 @@ public:
 
 	IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
 
+	bool HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive) override;
+
 	ICryptoContext* CreateCryptoContext() override;
 
 	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;

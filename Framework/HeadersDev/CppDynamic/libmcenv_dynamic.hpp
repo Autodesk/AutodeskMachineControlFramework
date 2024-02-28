@@ -2001,6 +2001,7 @@ public:
 	inline bool AlertExists(const std::string & sUUID);
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
 	inline PAlertIterator RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive);
+	inline bool HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive);
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
 	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
@@ -2103,6 +2104,7 @@ public:
 	inline bool AlertExists(const std::string & sUUID);
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
 	inline PAlertIterator RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive);
+	inline bool HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive);
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
 	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
@@ -2681,6 +2683,7 @@ public:
 		pWrapperTable->m_StateEnvironment_AlertExists = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveAlerts = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveAlertsByType = nullptr;
+		pWrapperTable->m_StateEnvironment_HasAlertOfType = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateTemporaryStream = nullptr;
 		pWrapperTable->m_StateEnvironment_FindStream = nullptr;
@@ -2751,6 +2754,7 @@ public:
 		pWrapperTable->m_UIEnvironment_AlertExists = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveAlerts = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveAlertsByType = nullptr;
+		pWrapperTable->m_UIEnvironment_HasAlertOfType = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = nullptr;
 		pWrapperTable->m_UIEnvironment_FindStream = nullptr;
@@ -7238,6 +7242,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasAlertOfType = (PLibMCEnvStateEnvironment_HasAlertOfTypePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasalertoftype");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasAlertOfType = (PLibMCEnvStateEnvironment_HasAlertOfTypePtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasalertoftype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasAlertOfType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_CreateCryptoContext = (PLibMCEnvStateEnvironment_CreateCryptoContextPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createcryptocontext");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_CreateCryptoContext = (PLibMCEnvStateEnvironment_CreateCryptoContextPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createcryptocontext");
@@ -7865,6 +7878,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_RetrieveAlertsByType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasAlertOfType = (PLibMCEnvUIEnvironment_HasAlertOfTypePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasalertoftype");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasAlertOfType = (PLibMCEnvUIEnvironment_HasAlertOfTypePtr) dlsym(hLibrary, "libmcenv_uienvironment_hasalertoftype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasAlertOfType == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9923,6 +9945,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveAlertsByType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasalertoftype", (void**)&(pWrapperTable->m_StateEnvironment_HasAlertOfType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasAlertOfType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createcryptocontext", (void**)&(pWrapperTable->m_StateEnvironment_CreateCryptoContext));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateCryptoContext == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10201,6 +10227,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_retrievealertsbytype", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveAlertsByType));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveAlertsByType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasalertoftype", (void**)&(pWrapperTable->m_UIEnvironment_HasAlertOfType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasAlertOfType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_createcryptocontext", (void**)&(pWrapperTable->m_UIEnvironment_CreateCryptoContext));
@@ -17054,6 +17084,20 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::HasAlertOfType - Checks, if an alert of a certain type identifier exists.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+	* @return Flag, if the alert exists.
+	*/
+	bool CStateEnvironment::HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive)
+	{
+		bool resultHasAlert = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasAlertOfType(m_pHandle, sIdentifier.c_str(), bOnlyActive, &resultHasAlert));
+		
+		return resultHasAlert;
+	}
+	
+	/**
 	* CStateEnvironment::CreateCryptoContext - Creates a crypto context.
 	* @return Cryptographic context instance
 	*/
@@ -18063,6 +18107,20 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CUIEnvironment::HasAlertOfType - Checks, if an alert of a certain type identifier exists.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+	* @return Flag, if the alert exists.
+	*/
+	bool CUIEnvironment::HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive)
+	{
+		bool resultHasAlert = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasAlertOfType(m_pHandle, sIdentifier.c_str(), bOnlyActive, &resultHasAlert));
+		
+		return resultHasAlert;
 	}
 	
 	/**

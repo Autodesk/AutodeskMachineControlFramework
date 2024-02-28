@@ -5434,6 +5434,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievealerts(LibMCE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievealertsbytype(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /**
+* Checks, if an alert of a certain type identifier exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+* @param[out] pHasAlert - Flag, if the alert exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasalertoftype(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool bOnlyActive, bool * pHasAlert);
+
+/**
 * Creates a crypto context.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -6199,6 +6210,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrievealerts(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrievealertsbytype(LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool bOnlyActive, LibMCEnv_AlertIterator * pIteratorInstance);
+
+/**
+* Checks, if an alert of a certain type identifier exists.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be taken into account.
+* @param[out] pHasAlert - Flag, if the alert exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasalertoftype(LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool bOnlyActive, bool * pHasAlert);
 
 /**
 * Creates a crypto context.

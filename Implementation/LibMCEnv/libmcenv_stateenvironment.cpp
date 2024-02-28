@@ -807,6 +807,20 @@ IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIden
 	return returnIterator.release();
 }
 
+
+bool CStateEnvironment::HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive)
+{
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+	auto pLogger = m_pSystemState->getLoggerInstance();
+
+	auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+	return (pAlertIterator->MoveNext());
+}
+
 ICryptoContext* CStateEnvironment::CreateCryptoContext()
 {
 	return new CCryptoContext();

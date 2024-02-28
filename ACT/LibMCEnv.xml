@@ -2982,6 +2982,12 @@
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
 		</method>				
 
+		<method name="HasAlertOfType" description="Checks, if an alert of a certain type identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be taken into account." />	
+			<param name="HasAlert" type="bool" pass="return" description="Flag, if the alert exists." />	
+		</method>				
+
 		<method name="CreateCryptoContext" description="Creates a crypto context.">
 			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
 		</method>
@@ -3367,6 +3373,12 @@
 			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
 			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>				
+
+		<method name="HasAlertOfType" description="Checks, if an alert of a certain type identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be taken into account." />	
+			<param name="HasAlert" type="bool" pass="return" description="Flag, if the alert exists." />	
 		</method>				
 
 		<method name="CreateCryptoContext" description="Creates a crypto context.">
