@@ -180,7 +180,14 @@
 		<error name="EMPTYSHA256SOURCE" code="10140" description="Empty SHA256 Source."/>
 		<error name="ALERTHASNOUSERCONTEXT" code="10141" description="Alert has no user context."/>
 		<error name="EMPTYJOURNALSTREAMNAME" code="10142" description="Empty journal stream name."/>
-		<error name="EMPTYJOURNALSTREAMMIMETYPE" code="10143" description="Empty journal stream mime type."/>
+		<error name="EMPTYJOURNALSTREAMMIMETYPE" code="10143" description="Empty journal stream mime type."/>		
+		<error name="INVALIDSTREAMREADCALLBACK" code="10144" description="Invalid stream read callback." />		
+		<error name="INVALIDSTREAMSEEKCALLBACK" code="10145" description="Invalid stream seek callback." />		
+		<error name="INVALIDSTREAMCALLBACKUSERDATA" code="10146" description="Invalid stream callback user data." />		
+		<error name="STREAMREADEXCEEDSSTREAMSIZE" code="10147" description="Stream read exceeds stream size." />		
+		<error name="INVALIDSTREAMREADSIZE" code="10148" description="Invalid stream read size." />		
+		<error name="INVALIDSTREAMSEEKPOSITION" code="10149" description="Invalid stream seek position." />		
+		<error name="STORAGESTREAMNOTFOUND" code="10150" description="Storage Stream not found." />		
 		
 				
 

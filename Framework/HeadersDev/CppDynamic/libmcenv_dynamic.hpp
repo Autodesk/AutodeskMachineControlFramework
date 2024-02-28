@@ -91,6 +91,8 @@ class CDriverStatusUpdateSession;
 class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
+class CTempStreamWriter;
+class CStreamReader;
 class CUniformJournalSampling;
 class CJournalVariable;
 class CAlert;
@@ -138,6 +140,8 @@ typedef CDriverStatusUpdateSession CLibMCEnvDriverStatusUpdateSession;
 typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
+typedef CTempStreamWriter CLibMCEnvTempStreamWriter;
+typedef CStreamReader CLibMCEnvStreamReader;
 typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
 typedef CJournalVariable CLibMCEnvJournalVariable;
 typedef CAlert CLibMCEnvAlert;
@@ -185,6 +189,8 @@ typedef std::shared_ptr<CDriverStatusUpdateSession> PDriverStatusUpdateSession;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
+typedef std::shared_ptr<CTempStreamWriter> PTempStreamWriter;
+typedef std::shared_ptr<CStreamReader> PStreamReader;
 typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
 typedef std::shared_ptr<CJournalVariable> PJournalVariable;
 typedef std::shared_ptr<CAlert> PAlert;
@@ -232,6 +238,8 @@ typedef PDriverStatusUpdateSession PLibMCEnvDriverStatusUpdateSession;
 typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
+typedef PTempStreamWriter PLibMCEnvTempStreamWriter;
+typedef PStreamReader PLibMCEnvStreamReader;
 typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
 typedef PJournalVariable PLibMCEnvJournalVariable;
 typedef PAlert PLibMCEnvAlert;
@@ -461,6 +469,15 @@ public:
 			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "USERDOESNOTEXIST";
 			case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "EMPTYSHA256SOURCE";
 			case LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT: return "ALERTHASNOUSERCONTEXT";
+			case LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME: return "EMPTYJOURNALSTREAMNAME";
+			case LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE: return "EMPTYJOURNALSTREAMMIMETYPE";
+			case LIBMCENV_ERROR_INVALIDSTREAMREADCALLBACK: return "INVALIDSTREAMREADCALLBACK";
+			case LIBMCENV_ERROR_INVALIDSTREAMSEEKCALLBACK: return "INVALIDSTREAMSEEKCALLBACK";
+			case LIBMCENV_ERROR_INVALIDSTREAMCALLBACKUSERDATA: return "INVALIDSTREAMCALLBACKUSERDATA";
+			case LIBMCENV_ERROR_STREAMREADEXCEEDSSTREAMSIZE: return "STREAMREADEXCEEDSSTREAMSIZE";
+			case LIBMCENV_ERROR_INVALIDSTREAMREADSIZE: return "INVALIDSTREAMREADSIZE";
+			case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "INVALIDSTREAMSEEKPOSITION";
+			case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "STORAGESTREAMNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -609,6 +626,15 @@ public:
 			case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
 			case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "Empty SHA256 Source.";
 			case LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT: return "Alert has no user context.";
+			case LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME: return "Empty journal stream name.";
+			case LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE: return "Empty journal stream mime type.";
+			case LIBMCENV_ERROR_INVALIDSTREAMREADCALLBACK: return "Invalid stream read callback.";
+			case LIBMCENV_ERROR_INVALIDSTREAMSEEKCALLBACK: return "Invalid stream seek callback.";
+			case LIBMCENV_ERROR_INVALIDSTREAMCALLBACKUSERDATA: return "Invalid stream callback user data.";
+			case LIBMCENV_ERROR_STREAMREADEXCEEDSSTREAMSIZE: return "Stream read exceeds stream size.";
+			case LIBMCENV_ERROR_INVALIDSTREAMREADSIZE: return "Invalid stream read size.";
+			case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "Invalid stream seek position.";
+			case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found.";
 		}
 		return "unknown error";
 	}
@@ -757,6 +783,8 @@ private:
 	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
+	friend class CTempStreamWriter;
+	friend class CStreamReader;
 	friend class CUniformJournalSampling;
 	friend class CJournalVariable;
 	friend class CAlert;
@@ -1674,6 +1702,57 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CTempStreamWriter 
+**************************************************************************************************************************/
+class CTempStreamWriter : public CBase {
+public:
+	
+	/**
+	* CTempStreamWriter::CTempStreamWriter - Constructor for TempStreamWriter class.
+	*/
+	CTempStreamWriter(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline std::string GetName();
+	inline std::string GetMIMEType();
+	inline LibMCEnv_uint64 GetSize();
+	inline LibMCEnv_uint64 GetWritePosition();
+	inline void Seek(const LibMCEnv_uint64 nWritePosition);
+	inline bool IsFinished();
+	inline void WriteData(const CInputVector<LibMCEnv_uint8> & DataBuffer);
+	inline void WriteString(const std::string & sData);
+	inline void WriteLine(const std::string & sLine);
+	inline void Finish();
+};
+	
+/*************************************************************************************************************************
+ Class CStreamReader 
+**************************************************************************************************************************/
+class CStreamReader : public CBase {
+public:
+	
+	/**
+	* CStreamReader::CStreamReader - Constructor for StreamReader class.
+	*/
+	CStreamReader(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline std::string GetName();
+	inline std::string GetMIMEType();
+	inline LibMCEnv_uint64 GetSize();
+	inline LibMCEnv_uint64 GetReadPosition();
+	inline void Seek(const LibMCEnv_uint64 nReadPosition);
+	inline void ReadData(const LibMCEnv_uint64 nSizeToRead, std::vector<LibMCEnv_uint8> & DataBuffer);
+	inline void ReadAllData(std::vector<LibMCEnv_uint8> & DataBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CUniformJournalSampling 
 **************************************************************************************************************************/
 class CUniformJournalSampling : public CBase {
@@ -1923,6 +2002,8 @@ public:
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
 	inline PAlertIterator RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive);
 	inline PCryptoContext CreateCryptoContext();
+	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
+	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
 };
 	
 /*************************************************************************************************************************
@@ -1965,6 +2046,7 @@ public:
 	inline void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS);
 	inline void ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const sColorRGB & Color, const sColorRGB & FontColor);
 	inline void HideHint();
+	inline void StartStreamDownload(const std::string & sUUID);
 	inline std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent);
 	inline std::string RetrieveEventSender();
 	inline std::string RetrieveEventSenderPage();
@@ -2022,6 +2104,8 @@ public:
 	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
 	inline PAlertIterator RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive);
 	inline PCryptoContext CreateCryptoContext();
+	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
+	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
 };
 	
 	/**
@@ -2455,6 +2539,25 @@ public:
 		pWrapperTable->m_SignalHandler_SetDoubleResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetIntegerResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetBoolResult = nullptr;
+		pWrapperTable->m_TempStreamWriter_GetUUID = nullptr;
+		pWrapperTable->m_TempStreamWriter_GetName = nullptr;
+		pWrapperTable->m_TempStreamWriter_GetMIMEType = nullptr;
+		pWrapperTable->m_TempStreamWriter_GetSize = nullptr;
+		pWrapperTable->m_TempStreamWriter_GetWritePosition = nullptr;
+		pWrapperTable->m_TempStreamWriter_Seek = nullptr;
+		pWrapperTable->m_TempStreamWriter_IsFinished = nullptr;
+		pWrapperTable->m_TempStreamWriter_WriteData = nullptr;
+		pWrapperTable->m_TempStreamWriter_WriteString = nullptr;
+		pWrapperTable->m_TempStreamWriter_WriteLine = nullptr;
+		pWrapperTable->m_TempStreamWriter_Finish = nullptr;
+		pWrapperTable->m_StreamReader_GetUUID = nullptr;
+		pWrapperTable->m_StreamReader_GetName = nullptr;
+		pWrapperTable->m_StreamReader_GetMIMEType = nullptr;
+		pWrapperTable->m_StreamReader_GetSize = nullptr;
+		pWrapperTable->m_StreamReader_GetReadPosition = nullptr;
+		pWrapperTable->m_StreamReader_Seek = nullptr;
+		pWrapperTable->m_StreamReader_ReadData = nullptr;
+		pWrapperTable->m_StreamReader_ReadAllData = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetVariableName = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetNumberOfSamples = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetStartTimeStamp = nullptr;
@@ -2579,6 +2682,8 @@ public:
 		pWrapperTable->m_StateEnvironment_RetrieveAlerts = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveAlertsByType = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateCryptoContext = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateTemporaryStream = nullptr;
+		pWrapperTable->m_StateEnvironment_FindStream = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
 		pWrapperTable->m_UIItem_GetUUID = nullptr;
@@ -2589,6 +2694,7 @@ public:
 		pWrapperTable->m_UIEnvironment_ShowHint = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowHintColored = nullptr;
 		pWrapperTable->m_UIEnvironment_HideHint = nullptr;
+		pWrapperTable->m_UIEnvironment_StartStreamDownload = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowMessageDlg = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = nullptr;
@@ -2646,6 +2752,8 @@ public:
 		pWrapperTable->m_UIEnvironment_RetrieveAlerts = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveAlertsByType = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateCryptoContext = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = nullptr;
+		pWrapperTable->m_UIEnvironment_FindStream = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -5852,6 +5960,177 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_GetUUID = (PLibMCEnvTempStreamWriter_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_GetUUID = (PLibMCEnvTempStreamWriter_GetUUIDPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_GetName = (PLibMCEnvTempStreamWriter_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getname");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_GetName = (PLibMCEnvTempStreamWriter_GetNamePtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_GetMIMEType = (PLibMCEnvTempStreamWriter_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getmimetype");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_GetMIMEType = (PLibMCEnvTempStreamWriter_GetMIMETypePtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getmimetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_GetMIMEType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_GetSize = (PLibMCEnvTempStreamWriter_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getsize");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_GetSize = (PLibMCEnvTempStreamWriter_GetSizePtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_GetSize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_GetWritePosition = (PLibMCEnvTempStreamWriter_GetWritePositionPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getwriteposition");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_GetWritePosition = (PLibMCEnvTempStreamWriter_GetWritePositionPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getwriteposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_GetWritePosition == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_Seek = (PLibMCEnvTempStreamWriter_SeekPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_seek");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_Seek = (PLibMCEnvTempStreamWriter_SeekPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_seek");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_Seek == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_IsFinished = (PLibMCEnvTempStreamWriter_IsFinishedPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_isfinished");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_IsFinished = (PLibMCEnvTempStreamWriter_IsFinishedPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_isfinished");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_IsFinished == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_WriteData = (PLibMCEnvTempStreamWriter_WriteDataPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_writedata");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_WriteData = (PLibMCEnvTempStreamWriter_WriteDataPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_writedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_WriteData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_WriteString = (PLibMCEnvTempStreamWriter_WriteStringPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_writestring");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_WriteString = (PLibMCEnvTempStreamWriter_WriteStringPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_writestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_WriteString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_WriteLine = (PLibMCEnvTempStreamWriter_WriteLinePtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_writeline");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_WriteLine = (PLibMCEnvTempStreamWriter_WriteLinePtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_writeline");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_WriteLine == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_Finish = (PLibMCEnvTempStreamWriter_FinishPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_finish");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_Finish = (PLibMCEnvTempStreamWriter_FinishPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_finish");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_Finish == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_GetUUID = (PLibMCEnvStreamReader_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_streamreader_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_GetUUID = (PLibMCEnvStreamReader_GetUUIDPtr) dlsym(hLibrary, "libmcenv_streamreader_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_GetName = (PLibMCEnvStreamReader_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_streamreader_getname");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_GetName = (PLibMCEnvStreamReader_GetNamePtr) dlsym(hLibrary, "libmcenv_streamreader_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_GetMIMEType = (PLibMCEnvStreamReader_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcenv_streamreader_getmimetype");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_GetMIMEType = (PLibMCEnvStreamReader_GetMIMETypePtr) dlsym(hLibrary, "libmcenv_streamreader_getmimetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_GetMIMEType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_GetSize = (PLibMCEnvStreamReader_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_streamreader_getsize");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_GetSize = (PLibMCEnvStreamReader_GetSizePtr) dlsym(hLibrary, "libmcenv_streamreader_getsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_GetSize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_GetReadPosition = (PLibMCEnvStreamReader_GetReadPositionPtr) GetProcAddress(hLibrary, "libmcenv_streamreader_getreadposition");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_GetReadPosition = (PLibMCEnvStreamReader_GetReadPositionPtr) dlsym(hLibrary, "libmcenv_streamreader_getreadposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_GetReadPosition == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_Seek = (PLibMCEnvStreamReader_SeekPtr) GetProcAddress(hLibrary, "libmcenv_streamreader_seek");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_Seek = (PLibMCEnvStreamReader_SeekPtr) dlsym(hLibrary, "libmcenv_streamreader_seek");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_Seek == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_ReadData = (PLibMCEnvStreamReader_ReadDataPtr) GetProcAddress(hLibrary, "libmcenv_streamreader_readdata");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_ReadData = (PLibMCEnvStreamReader_ReadDataPtr) dlsym(hLibrary, "libmcenv_streamreader_readdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_ReadData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamReader_ReadAllData = (PLibMCEnvStreamReader_ReadAllDataPtr) GetProcAddress(hLibrary, "libmcenv_streamreader_readalldata");
+		#else // _WIN32
+		pWrapperTable->m_StreamReader_ReadAllData = (PLibMCEnvStreamReader_ReadAllDataPtr) dlsym(hLibrary, "libmcenv_streamreader_readalldata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamReader_ReadAllData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UniformJournalSampling_GetVariableName = (PLibMCEnvUniformJournalSampling_GetVariableNamePtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getvariablename");
 		#else // _WIN32
 		pWrapperTable->m_UniformJournalSampling_GetVariableName = (PLibMCEnvUniformJournalSampling_GetVariableNamePtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getvariablename");
@@ -6968,6 +7247,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateTemporaryStream = (PLibMCEnvStateEnvironment_CreateTemporaryStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createtemporarystream");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateTemporaryStream = (PLibMCEnvStateEnvironment_CreateTemporaryStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createtemporarystream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateTemporaryStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findstream");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_uiitem_getname");
 		#else // _WIN32
 		pWrapperTable->m_UIItem_GetName = (PLibMCEnvUIItem_GetNamePtr) dlsym(hLibrary, "libmcenv_uiitem_getname");
@@ -7055,6 +7352,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_HideHint == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_StartStreamDownload = (PLibMCEnvUIEnvironment_StartStreamDownloadPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_startstreamdownload");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_StartStreamDownload = (PLibMCEnvUIEnvironment_StartStreamDownloadPtr) dlsym(hLibrary, "libmcenv_uienvironment_startstreamdownload");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_StartStreamDownload == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7568,6 +7874,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_CreateCryptoContext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = (PLibMCEnvUIEnvironment_CreateTemporaryStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createtemporarystream");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = (PLibMCEnvUIEnvironment_CreateTemporaryStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_createtemporarystream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateTemporaryStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findstream");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_findstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_FindStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9031,6 +9355,82 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_SetBoolResult == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getuuid", (void**)&(pWrapperTable->m_TempStreamWriter_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getname", (void**)&(pWrapperTable->m_TempStreamWriter_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getmimetype", (void**)&(pWrapperTable->m_TempStreamWriter_GetMIMEType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetMIMEType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getsize", (void**)&(pWrapperTable->m_TempStreamWriter_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetSize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getwriteposition", (void**)&(pWrapperTable->m_TempStreamWriter_GetWritePosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetWritePosition == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_seek", (void**)&(pWrapperTable->m_TempStreamWriter_Seek));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_Seek == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_isfinished", (void**)&(pWrapperTable->m_TempStreamWriter_IsFinished));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_IsFinished == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_writedata", (void**)&(pWrapperTable->m_TempStreamWriter_WriteData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_WriteData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_writestring", (void**)&(pWrapperTable->m_TempStreamWriter_WriteString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_WriteString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_writeline", (void**)&(pWrapperTable->m_TempStreamWriter_WriteLine));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_WriteLine == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_finish", (void**)&(pWrapperTable->m_TempStreamWriter_Finish));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_Finish == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_getuuid", (void**)&(pWrapperTable->m_StreamReader_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_getname", (void**)&(pWrapperTable->m_StreamReader_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_getmimetype", (void**)&(pWrapperTable->m_StreamReader_GetMIMEType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_GetMIMEType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_getsize", (void**)&(pWrapperTable->m_StreamReader_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_GetSize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_getreadposition", (void**)&(pWrapperTable->m_StreamReader_GetReadPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_GetReadPosition == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_seek", (void**)&(pWrapperTable->m_StreamReader_Seek));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_Seek == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_readdata", (void**)&(pWrapperTable->m_StreamReader_ReadData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_ReadData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_streamreader_readalldata", (void**)&(pWrapperTable->m_StreamReader_ReadAllData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_ReadAllData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getvariablename", (void**)&(pWrapperTable->m_UniformJournalSampling_GetVariableName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetVariableName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9527,6 +9927,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateCryptoContext == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createtemporarystream", (void**)&(pWrapperTable->m_StateEnvironment_CreateTemporaryStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateTemporaryStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_findstream", (void**)&(pWrapperTable->m_StateEnvironment_FindStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uiitem_getname", (void**)&(pWrapperTable->m_UIItem_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIItem_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9565,6 +9973,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_hidehint", (void**)&(pWrapperTable->m_UIEnvironment_HideHint));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HideHint == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_startstreamdownload", (void**)&(pWrapperTable->m_UIEnvironment_StartStreamDownload));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_StartStreamDownload == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_showmessagedlg", (void**)&(pWrapperTable->m_UIEnvironment_ShowMessageDlg));
@@ -9793,6 +10205,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_createcryptocontext", (void**)&(pWrapperTable->m_UIEnvironment_CreateCryptoContext));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateCryptoContext == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createtemporarystream", (void**)&(pWrapperTable->m_UIEnvironment_CreateTemporaryStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateTemporaryStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_findstream", (void**)&(pWrapperTable->m_UIEnvironment_FindStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -14593,6 +15013,244 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CTempStreamWriter
+	 */
+	
+	/**
+	* CTempStreamWriter::GetUUID - Returns the UUID of the stream.
+	* @return Returns stream uuid.
+	*/
+	std::string CTempStreamWriter::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CTempStreamWriter::GetName - Returns the name of the stream.
+	* @return Returns stream name.
+	*/
+	std::string CTempStreamWriter::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CTempStreamWriter::GetMIMEType - Returns the MIME type of the stream.
+	* @return Returns stream MIME Type.
+	*/
+	std::string CTempStreamWriter::GetMIMEType()
+	{
+		LibMCEnv_uint32 bytesNeededMIMEType = 0;
+		LibMCEnv_uint32 bytesWrittenMIMEType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetMIMEType(m_pHandle, 0, &bytesNeededMIMEType, nullptr));
+		std::vector<char> bufferMIMEType(bytesNeededMIMEType);
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetMIMEType(m_pHandle, bytesNeededMIMEType, &bytesWrittenMIMEType, &bufferMIMEType[0]));
+		
+		return std::string(&bufferMIMEType[0]);
+	}
+	
+	/**
+	* CTempStreamWriter::GetSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	LibMCEnv_uint64 CTempStreamWriter::GetSize()
+	{
+		LibMCEnv_uint64 resultSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetSize(m_pHandle, &resultSize));
+		
+		return resultSize;
+	}
+	
+	/**
+	* CTempStreamWriter::GetWritePosition - Returns the current write position of the stream.
+	* @return Current write position of the stream.
+	*/
+	LibMCEnv_uint64 CTempStreamWriter::GetWritePosition()
+	{
+		LibMCEnv_uint64 resultWritePosition = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetWritePosition(m_pHandle, &resultWritePosition));
+		
+		return resultWritePosition;
+	}
+	
+	/**
+	* CTempStreamWriter::Seek - Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.
+	* @param[in] nWritePosition - New write position of the stream.
+	*/
+	void CTempStreamWriter::Seek(const LibMCEnv_uint64 nWritePosition)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_Seek(m_pHandle, nWritePosition));
+	}
+	
+	/**
+	* CTempStreamWriter::IsFinished - Returns if the stream writing has been finished.
+	* @return Returns true if writing is finished.
+	*/
+	bool CTempStreamWriter::IsFinished()
+	{
+		bool resultWritingIsFinished = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_IsFinished(m_pHandle, &resultWritingIsFinished));
+		
+		return resultWritingIsFinished;
+	}
+	
+	/**
+	* CTempStreamWriter::WriteData - Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+	* @param[in] DataBuffer - Data array to write into the stream
+	*/
+	void CTempStreamWriter::WriteData(const CInputVector<LibMCEnv_uint8> & DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_WriteData(m_pHandle, (LibMCEnv_uint64)DataBuffer.size(), DataBuffer.data()));
+	}
+	
+	/**
+	* CTempStreamWriter::WriteString - Writes a string into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+	* @param[in] sData - String to write into the stream
+	*/
+	void CTempStreamWriter::WriteString(const std::string & sData)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_WriteString(m_pHandle, sData.c_str()));
+	}
+	
+	/**
+	* CTempStreamWriter::WriteLine - Writes a string into the stream and adds a newline character. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+	* @param[in] sLine - String to write into the stream
+	*/
+	void CTempStreamWriter::WriteLine(const std::string & sLine)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_WriteLine(m_pHandle, sLine.c_str()));
+	}
+	
+	/**
+	* CTempStreamWriter::Finish - Finishes the stream writing. Fails if stream has been finished already.
+	*/
+	void CTempStreamWriter::Finish()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_Finish(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CStreamReader
+	 */
+	
+	/**
+	* CStreamReader::GetUUID - Returns the UUID of the stream.
+	* @return Returns stream uuid.
+	*/
+	std::string CStreamReader::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CStreamReader::GetName - Returns the name of the stream.
+	* @return Returns stream name.
+	*/
+	std::string CStreamReader::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CStreamReader::GetMIMEType - Returns the MIME type of the stream.
+	* @return Returns stream MIME Type.
+	*/
+	std::string CStreamReader::GetMIMEType()
+	{
+		LibMCEnv_uint32 bytesNeededMIMEType = 0;
+		LibMCEnv_uint32 bytesWrittenMIMEType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetMIMEType(m_pHandle, 0, &bytesNeededMIMEType, nullptr));
+		std::vector<char> bufferMIMEType(bytesNeededMIMEType);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetMIMEType(m_pHandle, bytesNeededMIMEType, &bytesWrittenMIMEType, &bufferMIMEType[0]));
+		
+		return std::string(&bufferMIMEType[0]);
+	}
+	
+	/**
+	* CStreamReader::GetSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	LibMCEnv_uint64 CStreamReader::GetSize()
+	{
+		LibMCEnv_uint64 resultSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetSize(m_pHandle, &resultSize));
+		
+		return resultSize;
+	}
+	
+	/**
+	* CStreamReader::GetReadPosition - Returns the current read position of the stream.
+	* @return Current read position of the stream.
+	*/
+	LibMCEnv_uint64 CStreamReader::GetReadPosition()
+	{
+		LibMCEnv_uint64 resultReadPosition = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_GetReadPosition(m_pHandle, &resultReadPosition));
+		
+		return resultReadPosition;
+	}
+	
+	/**
+	* CStreamReader::Seek - Moves the current read position to a certain address. New position MUST be smaller or equal the stream size.
+	* @param[in] nReadPosition - New read position of the stream.
+	*/
+	void CStreamReader::Seek(const LibMCEnv_uint64 nReadPosition)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_Seek(m_pHandle, nReadPosition));
+	}
+	
+	/**
+	* CStreamReader::ReadData - Reads a data array from the stream from the current read position. Fails if reading outside of the stream data.
+	* @param[in] nSizeToRead - Bytes to read. MUST be larger than 0.
+	* @param[out] DataBuffer - Return data array. In case of success, will have SizeToRead elements.
+	*/
+	void CStreamReader::ReadData(const LibMCEnv_uint64 nSizeToRead, std::vector<LibMCEnv_uint8> & DataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededData = 0;
+		LibMCEnv_uint64 elementsWrittenData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_ReadData(m_pHandle, nSizeToRead, 0, &elementsNeededData, nullptr));
+		DataBuffer.resize((size_t) elementsNeededData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_ReadData(m_pHandle, nSizeToRead, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
+	}
+	
+	/**
+	* CStreamReader::ReadAllData - Seeks to the beginning of the stream and returns all the stream data.
+	* @param[out] DataBuffer - Return data array. In case of success, will have stream size elements.
+	*/
+	void CStreamReader::ReadAllData(std::vector<LibMCEnv_uint8> & DataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededData = 0;
+		LibMCEnv_uint64 elementsWrittenData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_ReadAllData(m_pHandle, 0, &elementsNeededData, nullptr));
+		DataBuffer.resize((size_t) elementsNeededData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamReader_ReadAllData(m_pHandle, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CUniformJournalSampling
 	 */
 	
@@ -16411,6 +17069,41 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateTemporaryStream - Creates a new writer to store temporary data. This data will be attached to the current journal.
+	* @param[in] sName - Name of the storage stream.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @return Temp stream writer instance
+	*/
+	PTempStreamWriter CStateEnvironment::CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType)
+	{
+		LibMCEnvHandle hTempStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateTemporaryStream(m_pHandle, sName.c_str(), sMIMEType.c_str(), &hTempStreamInstance));
+		
+		if (!hTempStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTempStreamWriter>(m_pWrapper, hTempStreamInstance);
+	}
+	
+	/**
+	* CStateEnvironment::FindStream - Finds a stream in the storage system.
+	* @param[in] sUUID - UUID of the storage stream.
+	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
+	* @return Stream Instance. Will return null if not found and MustExists is false.
+	*/
+	PStreamReader CStateEnvironment::FindStream(const std::string & sUUID, const bool bMustExist)
+	{
+		LibMCEnvHandle hStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
+		
+		if (hStreamInstance) {
+			return std::make_shared<CStreamReader>(m_pWrapper, hStreamInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
 	 * Method definitions for class CUIItem
 	 */
 	
@@ -16525,6 +17218,15 @@ public:
 	void CUIEnvironment::HideHint()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HideHint(m_pHandle));
+	}
+	
+	/**
+	* CUIEnvironment::StartStreamDownload - Starts a stream download on the client. Fails if stream does not exist.
+	* @param[in] sUUID - Stream UUID.
+	*/
+	void CUIEnvironment::StartStreamDownload(const std::string & sUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_StartStreamDownload(m_pHandle, sUUID.c_str()));
 	}
 	
 	/**
@@ -17376,6 +18078,41 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CCryptoContext>(m_pWrapper, hContext);
+	}
+	
+	/**
+	* CUIEnvironment::CreateTemporaryStream - Creates a new writer to store temporary data. This data will be attached to the current journal.
+	* @param[in] sName - Name of the storage stream.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @return Temp stream writer instance
+	*/
+	PTempStreamWriter CUIEnvironment::CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType)
+	{
+		LibMCEnvHandle hTempStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateTemporaryStream(m_pHandle, sName.c_str(), sMIMEType.c_str(), &hTempStreamInstance));
+		
+		if (!hTempStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTempStreamWriter>(m_pWrapper, hTempStreamInstance);
+	}
+	
+	/**
+	* CUIEnvironment::FindStream - Finds a stream in the storage system.
+	* @param[in] sUUID - UUID of the storage stream.
+	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
+	* @return Stream Instance. Will return null if not found and MustExists is false.
+	*/
+	PStreamReader CUIEnvironment::FindStream(const std::string & sUUID, const bool bMustExist)
+	{
+		LibMCEnvHandle hStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
+		
+		if (hStreamInstance) {
+			return std::make_shared<CStreamReader>(m_pWrapper, hStreamInstance);
+		} else {
+			return nullptr;
+		}
 	}
 
 } // namespace LibMCEnv

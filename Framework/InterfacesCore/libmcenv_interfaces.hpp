@@ -86,6 +86,8 @@ class IDriverStatusUpdateSession;
 class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
+class ITempStreamWriter;
+class IStreamReader;
 class IUniformJournalSampling;
 class IJournalVariable;
 class IAlert;
@@ -3160,6 +3162,147 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for TempStreamWriter 
+**************************************************************************************************************************/
+
+class ITempStreamWriter : public virtual IBase {
+public:
+	/**
+	* ITempStreamWriter::GetUUID - Returns the UUID of the stream.
+	* @return Returns stream uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* ITempStreamWriter::GetName - Returns the name of the stream.
+	* @return Returns stream name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* ITempStreamWriter::GetMIMEType - Returns the MIME type of the stream.
+	* @return Returns stream MIME Type.
+	*/
+	virtual std::string GetMIMEType() = 0;
+
+	/**
+	* ITempStreamWriter::GetSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	virtual LibMCEnv_uint64 GetSize() = 0;
+
+	/**
+	* ITempStreamWriter::GetWritePosition - Returns the current write position of the stream.
+	* @return Current write position of the stream.
+	*/
+	virtual LibMCEnv_uint64 GetWritePosition() = 0;
+
+	/**
+	* ITempStreamWriter::Seek - Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.
+	* @param[in] nWritePosition - New write position of the stream.
+	*/
+	virtual void Seek(const LibMCEnv_uint64 nWritePosition) = 0;
+
+	/**
+	* ITempStreamWriter::IsFinished - Returns if the stream writing has been finished.
+	* @return Returns true if writing is finished.
+	*/
+	virtual bool IsFinished() = 0;
+
+	/**
+	* ITempStreamWriter::WriteData - Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[in] pDataBuffer - Data array to write into the stream
+	*/
+	virtual void WriteData(const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer) = 0;
+
+	/**
+	* ITempStreamWriter::WriteString - Writes a string into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+	* @param[in] sData - String to write into the stream
+	*/
+	virtual void WriteString(const std::string & sData) = 0;
+
+	/**
+	* ITempStreamWriter::WriteLine - Writes a string into the stream and adds a newline character. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+	* @param[in] sLine - String to write into the stream
+	*/
+	virtual void WriteLine(const std::string & sLine) = 0;
+
+	/**
+	* ITempStreamWriter::Finish - Finishes the stream writing. Fails if stream has been finished already.
+	*/
+	virtual void Finish() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITempStreamWriter> PITempStreamWriter;
+
+
+/*************************************************************************************************************************
+ Class interface for StreamReader 
+**************************************************************************************************************************/
+
+class IStreamReader : public virtual IBase {
+public:
+	/**
+	* IStreamReader::GetUUID - Returns the UUID of the stream.
+	* @return Returns stream uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IStreamReader::GetName - Returns the name of the stream.
+	* @return Returns stream name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IStreamReader::GetMIMEType - Returns the MIME type of the stream.
+	* @return Returns stream MIME Type.
+	*/
+	virtual std::string GetMIMEType() = 0;
+
+	/**
+	* IStreamReader::GetSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	virtual LibMCEnv_uint64 GetSize() = 0;
+
+	/**
+	* IStreamReader::GetReadPosition - Returns the current read position of the stream.
+	* @return Current read position of the stream.
+	*/
+	virtual LibMCEnv_uint64 GetReadPosition() = 0;
+
+	/**
+	* IStreamReader::Seek - Moves the current read position to a certain address. New position MUST be smaller or equal the stream size.
+	* @param[in] nReadPosition - New read position of the stream.
+	*/
+	virtual void Seek(const LibMCEnv_uint64 nReadPosition) = 0;
+
+	/**
+	* IStreamReader::ReadData - Reads a data array from the stream from the current read position. Fails if reading outside of the stream data.
+	* @param[in] nSizeToRead - Bytes to read. MUST be larger than 0.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBuffer - uint8 buffer of Return data array. In case of success, will have SizeToRead elements.
+	*/
+	virtual void ReadData(const LibMCEnv_uint64 nSizeToRead, LibMCEnv_uint64 nDataBufferSize, LibMCEnv_uint64* pDataNeededCount, LibMCEnv_uint8 * pDataBuffer) = 0;
+
+	/**
+	* IStreamReader::ReadAllData - Seeks to the beginning of the stream and returns all the stream data.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBuffer - uint8 buffer of Return data array. In case of success, will have stream size elements.
+	*/
+	virtual void ReadAllData(LibMCEnv_uint64 nDataBufferSize, LibMCEnv_uint64* pDataNeededCount, LibMCEnv_uint8 * pDataBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IStreamReader> PIStreamReader;
+
+
+/*************************************************************************************************************************
  Class interface for UniformJournalSampling 
 **************************************************************************************************************************/
 
@@ -4144,6 +4287,22 @@ public:
 	*/
 	virtual ICryptoContext * CreateCryptoContext() = 0;
 
+	/**
+	* IStateEnvironment::CreateTemporaryStream - Creates a new writer to store temporary data. This data will be attached to the current journal.
+	* @param[in] sName - Name of the storage stream.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @return Temp stream writer instance
+	*/
+	virtual ITempStreamWriter * CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType) = 0;
+
+	/**
+	* IStateEnvironment::FindStream - Finds a stream in the storage system.
+	* @param[in] sUUID - UUID of the storage stream.
+	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
+	* @return Stream Instance. Will return null if not found and MustExists is false.
+	*/
+	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
@@ -4226,6 +4385,12 @@ public:
 	* IUIEnvironment::HideHint - Hides hint if any is displayed.
 	*/
 	virtual void HideHint() = 0;
+
+	/**
+	* IUIEnvironment::StartStreamDownload - Starts a stream download on the client. Fails if stream does not exist.
+	* @param[in] sUUID - Stream UUID.
+	*/
+	virtual void StartStreamDownload(const std::string & sUUID) = 0;
 
 	/**
 	* IUIEnvironment::ShowMessageDlg - Shows a message dialog in the user interface.
@@ -4658,6 +4823,22 @@ public:
 	* @return Cryptographic context instance
 	*/
 	virtual ICryptoContext * CreateCryptoContext() = 0;
+
+	/**
+	* IUIEnvironment::CreateTemporaryStream - Creates a new writer to store temporary data. This data will be attached to the current journal.
+	* @param[in] sName - Name of the storage stream.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @return Temp stream writer instance
+	*/
+	virtual ITempStreamWriter * CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType) = 0;
+
+	/**
+	* IUIEnvironment::FindStream - Finds a stream in the storage system.
+	* @param[in] sUUID - UUID of the storage stream.
+	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
+	* @return Stream Instance. Will return null if not found and MustExists is false.
+	*/
+	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
 
 };
 

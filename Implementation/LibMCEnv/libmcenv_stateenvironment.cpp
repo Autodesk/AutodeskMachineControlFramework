@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
+#include "libmcenv_tempstreamwriter.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -810,3 +811,33 @@ ICryptoContext* CStateEnvironment::CreateCryptoContext()
 	return new CCryptoContext();
 }
 
+
+ITempStreamWriter* CStateEnvironment::CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType)
+{
+	if (sName.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+	if (sMIMEType.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);
+
+	return new CTempStreamWriter(m_pSystemState->getDataModelInstance(), sName, sMIMEType);
+}
+
+
+IStreamReader* CStateEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+{
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
+
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	if (pStorage->StreamIsReady(sNormalizedUUID)) {
+
+		auto pStorageStream = pStorage->RetrieveStream(sNormalizedUUID);
+		return new CStreamReader(pStorage, pStorageStream);
+
+	}
+	else {
+		if (bMustExist)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_STORAGESTREAMNOTFOUND, "Storage Stream not found: " + sUUID);
+	}
+}

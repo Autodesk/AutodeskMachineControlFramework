@@ -205,6 +205,10 @@ public:
 
 	ICryptoContext* CreateCryptoContext() override;
 
+	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;
+
+	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
+
 };
 
 } // namespace Impl

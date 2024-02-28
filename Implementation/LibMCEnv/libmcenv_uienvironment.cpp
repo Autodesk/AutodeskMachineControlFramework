@@ -42,6 +42,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
+#include "libmcenv_tempstreamwriter.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -53,6 +54,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_journalvariable.hpp"
+#include "libmcenv_streamreader.hpp"
 
 #include "amc_toolpathhandler.hpp"
 #include "amc_logger.hpp"
@@ -142,6 +144,13 @@ void CUIEnvironment::ActivatePage(const std::string& sPageName)
 {
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ActivatePage>(sPageName));
 }
+
+void CUIEnvironment::StartStreamDownload(const std::string& sUUID)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+
 
 std::string CUIEnvironment::RetrieveEventSender()
 {
@@ -738,4 +747,34 @@ IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentif
 ICryptoContext* CUIEnvironment::CreateCryptoContext()
 {
     return new CCryptoContext ();
+}
+
+
+ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType)
+{
+    if (sName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+    if (sMIMEType.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);
+    
+    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType);
+}
+
+IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+{
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pStorage = pDataModel->CreateStorage();
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    if (pStorage->StreamIsReady(sNormalizedUUID)) {
+
+        auto pStorageStream = pStorage->RetrieveStream(sNormalizedUUID);
+        return new CStreamReader (pStorage, pStorageStream);
+
+    }
+    else {
+        if (bMustExist)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_STORAGESTREAMNOTFOUND, "Storage Stream not found: " + sUUID);
+    }
 }

@@ -236,6 +236,15 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_USERDOESNOTEXIST 10139 /** User does not exist. */
 #define LIBMCENV_ERROR_EMPTYSHA256SOURCE 10140 /** Empty SHA256 Source. */
 #define LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT 10141 /** Alert has no user context. */
+#define LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME 10142 /** Empty journal stream name. */
+#define LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE 10143 /** Empty journal stream mime type. */
+#define LIBMCENV_ERROR_INVALIDSTREAMREADCALLBACK 10144 /** Invalid stream read callback. */
+#define LIBMCENV_ERROR_INVALIDSTREAMSEEKCALLBACK 10145 /** Invalid stream seek callback. */
+#define LIBMCENV_ERROR_INVALIDSTREAMCALLBACKUSERDATA 10146 /** Invalid stream callback user data. */
+#define LIBMCENV_ERROR_STREAMREADEXCEEDSSTREAMSIZE 10147 /** Stream read exceeds stream size. */
+#define LIBMCENV_ERROR_INVALIDSTREAMREADSIZE 10148 /** Invalid stream read size. */
+#define LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION 10149 /** Invalid stream seek position. */
+#define LIBMCENV_ERROR_STORAGESTREAMNOTFOUND 10150 /** Storage Stream not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -384,6 +393,15 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
     case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "Empty SHA256 Source.";
     case LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT: return "Alert has no user context.";
+    case LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME: return "Empty journal stream name.";
+    case LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE: return "Empty journal stream mime type.";
+    case LIBMCENV_ERROR_INVALIDSTREAMREADCALLBACK: return "Invalid stream read callback.";
+    case LIBMCENV_ERROR_INVALIDSTREAMSEEKCALLBACK: return "Invalid stream seek callback.";
+    case LIBMCENV_ERROR_INVALIDSTREAMCALLBACKUSERDATA: return "Invalid stream callback user data.";
+    case LIBMCENV_ERROR_STREAMREADEXCEEDSSTREAMSIZE: return "Stream read exceeds stream size.";
+    case LIBMCENV_ERROR_INVALIDSTREAMREADSIZE: return "Invalid stream read size.";
+    case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "Invalid stream seek position.";
+    case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found.";
     default: return "unknown error";
   }
 }
@@ -424,6 +442,8 @@ typedef LibMCEnvHandle LibMCEnv_DriverStatusUpdateSession;
 typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
+typedef LibMCEnvHandle LibMCEnv_TempStreamWriter;
+typedef LibMCEnvHandle LibMCEnv_StreamReader;
 typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;
 typedef LibMCEnvHandle LibMCEnv_Alert;

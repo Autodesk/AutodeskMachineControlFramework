@@ -98,6 +98,8 @@ public:
 
 	void ActivatePage(const std::string& sPageName) override;
 
+	void StartStreamDownload(const std::string& sUUID) override;
+
 	std::string RetrieveEventSender() override;
 
 	std::string RetrieveEventSenderPage() override;
@@ -222,6 +224,10 @@ public:
 	IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
 
 	ICryptoContext* CreateCryptoContext() override;
+
+	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;
+
+	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
 
 };
 

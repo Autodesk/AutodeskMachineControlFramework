@@ -3859,6 +3859,202 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setintegerresult(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setboolresult(LibMCEnv_SignalHandler pSignalHandler, const char * pName, bool bValue);
 
 /*************************************************************************************************************************
+ Class definition for TempStreamWriter
+**************************************************************************************************************************/
+
+/**
+* Returns the UUID of the stream.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns stream uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getuuid(LibMCEnv_TempStreamWriter pTempStreamWriter, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the name of the stream.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns stream name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getname(LibMCEnv_TempStreamWriter pTempStreamWriter, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the MIME type of the stream.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] nMIMETypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMIMETypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMIMETypeBuffer -  buffer of Returns stream MIME Type., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getmimetype(LibMCEnv_TempStreamWriter pTempStreamWriter, const LibMCEnv_uint32 nMIMETypeBufferSize, LibMCEnv_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
+
+/**
+* Returns the current size of the stream.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[out] pSize - Current size of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getsize(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_uint64 * pSize);
+
+/**
+* Returns the current write position of the stream.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[out] pWritePosition - Current write position of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getwriteposition(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_uint64 * pWritePosition);
+
+/**
+* Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] nWritePosition - New write position of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_seek(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_uint64 nWritePosition);
+
+/**
+* Returns if the stream writing has been finished.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[out] pWritingIsFinished - Returns true if writing is finished.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_isfinished(LibMCEnv_TempStreamWriter pTempStreamWriter, bool * pWritingIsFinished);
+
+/**
+* Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[in] pDataBuffer - uint8 buffer of Data array to write into the stream
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_writedata(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer);
+
+/**
+* Writes a string into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] pData - String to write into the stream
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_writestring(LibMCEnv_TempStreamWriter pTempStreamWriter, const char * pData);
+
+/**
+* Writes a string into the stream and adds a newline character. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] pLine - String to write into the stream
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_writeline(LibMCEnv_TempStreamWriter pTempStreamWriter, const char * pLine);
+
+/**
+* Finishes the stream writing. Fails if stream has been finished already.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_finish(LibMCEnv_TempStreamWriter pTempStreamWriter);
+
+/*************************************************************************************************************************
+ Class definition for StreamReader
+**************************************************************************************************************************/
+
+/**
+* Returns the UUID of the stream.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns stream uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_getuuid(LibMCEnv_StreamReader pStreamReader, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the name of the stream.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns stream name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_getname(LibMCEnv_StreamReader pStreamReader, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the MIME type of the stream.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[in] nMIMETypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMIMETypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMIMETypeBuffer -  buffer of Returns stream MIME Type., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_getmimetype(LibMCEnv_StreamReader pStreamReader, const LibMCEnv_uint32 nMIMETypeBufferSize, LibMCEnv_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
+
+/**
+* Returns the current size of the stream.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[out] pSize - Current size of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_getsize(LibMCEnv_StreamReader pStreamReader, LibMCEnv_uint64 * pSize);
+
+/**
+* Returns the current read position of the stream.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[out] pReadPosition - Current read position of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_getreadposition(LibMCEnv_StreamReader pStreamReader, LibMCEnv_uint64 * pReadPosition);
+
+/**
+* Moves the current read position to a certain address. New position MUST be smaller or equal the stream size.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[in] nReadPosition - New read position of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_seek(LibMCEnv_StreamReader pStreamReader, LibMCEnv_uint64 nReadPosition);
+
+/**
+* Reads a data array from the stream from the current read position. Fails if reading outside of the stream data.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[in] nSizeToRead - Bytes to read. MUST be larger than 0.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Return data array. In case of success, will have SizeToRead elements.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_readdata(LibMCEnv_StreamReader pStreamReader, LibMCEnv_uint64 nSizeToRead, const LibMCEnv_uint64 nDataBufferSize, LibMCEnv_uint64* pDataNeededCount, LibMCEnv_uint8 * pDataBuffer);
+
+/**
+* Seeks to the beginning of the stream and returns all the stream data.
+*
+* @param[in] pStreamReader - StreamReader instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Return data array. In case of success, will have stream size elements.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_streamreader_readalldata(LibMCEnv_StreamReader pStreamReader, const LibMCEnv_uint64 nDataBufferSize, LibMCEnv_uint64* pDataNeededCount, LibMCEnv_uint8 * pDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for UniformJournalSampling
 **************************************************************************************************************************/
 
@@ -5246,6 +5442,28 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievealertsbytype(
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createcryptocontext(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_CryptoContext * pContext);
 
+/**
+* Creates a new writer to store temporary data. This data will be attached to the current journal.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name of the storage stream.
+* @param[in] pMIMEType - Mime type of the data.
+* @param[out] pTempStreamInstance - Temp stream writer instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createtemporarystream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pMIMEType, LibMCEnv_TempStreamWriter * pTempStreamInstance);
+
+/**
+* Finds a stream in the storage system.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pUUID - UUID of the storage stream.
+* @param[in] bMustExist - If true, the call fails if the stream does not exist.
+* @param[out] pStreamInstance - Stream Instance. Will return null if not found and MustExists is false.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findstream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
+
 /*************************************************************************************************************************
  Class definition for UIItem
 **************************************************************************************************************************/
@@ -5350,6 +5568,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_showhintcolored(LibMCEnv
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hidehint(LibMCEnv_UIEnvironment pUIEnvironment);
+
+/**
+* Starts a stream download on the client. Fails if stream does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pUUID - Stream UUID.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_startstreamdownload(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID);
 
 /**
 * Shows a message dialog in the user interface.
@@ -5981,6 +6208,28 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrievealertsbytype(Lib
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createcryptocontext(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_CryptoContext * pContext);
+
+/**
+* Creates a new writer to store temporary data. This data will be attached to the current journal.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pName - Name of the storage stream.
+* @param[in] pMIMEType - Mime type of the data.
+* @param[out] pTempStreamInstance - Temp stream writer instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createtemporarystream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pName, const char * pMIMEType, LibMCEnv_TempStreamWriter * pTempStreamInstance);
+
+/**
+* Finds a stream in the storage system.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pUUID - UUID of the storage stream.
+* @param[in] bMustExist - If true, the call fails if the stream does not exist.
+* @param[out] pStreamInstance - Stream Instance. Will return null if not found and MustExists is false.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
 
 /*************************************************************************************************************************
  Global functions
