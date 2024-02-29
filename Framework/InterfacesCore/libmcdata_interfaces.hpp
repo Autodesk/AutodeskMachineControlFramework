@@ -761,6 +761,39 @@ public:
 	virtual void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2) = 0;
 
 	/**
+	* IStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
+	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
+	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+	* @param[in] sName - Name of the stream.
+	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
+	* @param[in] sUserID - Currently authenticated user
+	*/
+	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID) = 0;
+
+	/**
+	* IStorage::StoreRandomWriteStream - stores data in a stream with random write access. Writing may be in arbitrary order.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @param[in] nOffset - Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size.
+	* @param[in] nContentBufferSize - Number of elements in buffer
+	* @param[in] pContentBuffer - Data block to store in stream.
+	*/
+	virtual void StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) = 0;
+
+	/**
+	* IStorage::GetRandomWriteStreamSize - Returns the size random write stream .
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @return Current size in bytes.
+	*/
+	virtual LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID) = 0;
+
+	/**
+	* IStorage::FinishRandomWriteStream - Finishes storing a random write stream.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	*/
+	virtual void FinishRandomWriteStream(const std::string & sUUID) = 0;
+
+	/**
 	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
 	* @return Maximum Stream Size in Bytes.
 	*/

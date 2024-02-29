@@ -662,6 +662,51 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstream(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstreamblockwisesha256(LibMCData_Storage pStorage, const char * pUUID, const char * pBlockwiseSHA2);
 
 /**
+* starts storing a stream with random write access. Checksums are not required.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
+* @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+* @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+* @param[in] pName - Name of the stream.
+* @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
+* @param[in] pUserID - Currently authenticated user
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID);
+
+/**
+* stores data in a stream with random write access. Writing may be in arbitrary order.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+* @param[in] nOffset - Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size.
+* @param[in] nContentBufferSize - Number of elements in buffer
+* @param[in] pContentBuffer - uint8 buffer of Data block to store in stream.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storerandomwritestream(LibMCData_Storage pStorage, const char * pUUID, LibMCData_uint64 nOffset, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer);
+
+/**
+* Returns the size random write stream .
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+* @param[out] pCurrentSize - Current size in bytes.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_getrandomwritestreamsize(LibMCData_Storage pStorage, const char * pUUID, LibMCData_uint64 * pCurrentSize);
+
+/**
+* Finishes storing a random write stream.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishrandomwritestream(LibMCData_Storage pStorage, const char * pUUID);
+
+/**
 * Returns the maximum stream size that the data model allows.
 *
 * @param[in] pStorage - Storage instance.

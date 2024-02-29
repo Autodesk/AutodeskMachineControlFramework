@@ -1985,6 +1985,133 @@ LibMCDataResult libmcdata_storage_finishpartialstreamblockwisesha256(LibMCData_S
 	}
 }
 
+LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pContextUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pContextIdentifier == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pMimeType == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUserID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sContextUUID(pContextUUID);
+		std::string sContextIdentifier(pContextIdentifier);
+		std::string sName(pName);
+		std::string sMimeType(pMimeType);
+		std::string sUserID(pUserID);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorage->BeginRandomWriteStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, sUserID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storage_storerandomwritestream(LibMCData_Storage pStorage, const char * pUUID, LibMCData_uint64 nOffset, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pContentBuffer) && (nContentBufferSize>0))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorage->StoreRandomWriteStream(sUUID, nOffset, nContentBufferSize, pContentBuffer);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storage_getrandomwritestreamsize(LibMCData_Storage pStorage, const char * pUUID, LibMCData_uint64 * pCurrentSize)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pCurrentSize == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCurrentSize = pIStorage->GetRandomWriteStreamSize(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storage_finishrandomwritestream(LibMCData_Storage pStorage, const char * pUUID)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorage->FinishRandomWriteStream(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_storage_getmaxstreamsize(LibMCData_Storage pStorage, LibMCData_uint64 * pMaxStreamSize)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
@@ -5813,6 +5940,14 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storage_finishpartialstream;
 	if (sProcName == "libmcdata_storage_finishpartialstreamblockwisesha256") 
 		*ppProcAddress = (void*) &libmcdata_storage_finishpartialstreamblockwisesha256;
+	if (sProcName == "libmcdata_storage_beginrandomwritestream") 
+		*ppProcAddress = (void*) &libmcdata_storage_beginrandomwritestream;
+	if (sProcName == "libmcdata_storage_storerandomwritestream") 
+		*ppProcAddress = (void*) &libmcdata_storage_storerandomwritestream;
+	if (sProcName == "libmcdata_storage_getrandomwritestreamsize") 
+		*ppProcAddress = (void*) &libmcdata_storage_getrandomwritestreamsize;
+	if (sProcName == "libmcdata_storage_finishrandomwritestream") 
+		*ppProcAddress = (void*) &libmcdata_storage_finishrandomwritestream;
 	if (sProcName == "libmcdata_storage_getmaxstreamsize") 
 		*ppProcAddress = (void*) &libmcdata_storage_getmaxstreamsize;
 	if (sProcName == "libmcdata_storage_contenttypeisaccepted") 

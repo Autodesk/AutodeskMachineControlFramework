@@ -152,7 +152,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
     std::string sCalculatedSHA256, sCalculatedBlockSHA256;
 
     // Store data asynchroniously on disk and finalize when writing has finished
-    auto pWriter = std::make_shared<AMCData::CStorageWriter>(sUUID, m_pStorageState->getStreamPath (sUUID), nContentBufferSize);
+    auto pWriter = std::make_shared<AMCData::CStorageWriter_Partial>(sUUID, m_pStorageState->getStreamPath (sUUID), nContentBufferSize);
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, 0);
     pWriter->finalize(sSHA256, "", sCalculatedSHA256, sCalculatedBlockSHA256);
  
@@ -174,7 +174,7 @@ void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& s
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
         insertDBEntry(sParsedUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, "", sUserID);
 
-        auto pWriter = std::make_shared<AMCData::CStorageWriter>(sParsedUUID, m_pStorageState->getStreamPath(sUUID), nSize);
+        auto pWriter = std::make_shared<AMCData::CStorageWriter_Partial>(sParsedUUID, m_pStorageState->getStreamPath(sUUID), nSize);
         m_pStorageState->addPartialWriter(pWriter);
     }
     
@@ -192,6 +192,10 @@ void CStorage::StorePartialStream(const std::string & sUUID, const LibMCData_uin
     auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, false);
     if (pWriter == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD, "invalid partial upload: " + sParsedUUID);
+
+    auto pPartialWriter = dynamic_cast<AMCData::CStorageWriter_Partial*> (pWriter.get());
+    if (pPartialWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL, "storage stream not partial: " + sParsedUUID);
 
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
 }
@@ -221,11 +225,15 @@ void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string
         sNormalizedBlockwiseSHA2 = AMCCommon::CUtils::normalizeSHA256String(sBlockwiseSHA2);
 
     auto pWriter = m_pStorageState->findPartialWriter (sParsedUUID, true);
+    auto pPartialWriter = dynamic_cast<AMCData::CStorageWriter_Partial*> (pWriter.get());
+    if (pPartialWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL, "storage stream not partial: " + sParsedUUID);
+
     m_pStorageState->deletePartialWriter (sParsedUUID);
 
     // Write data and calculate checksums
     std::string sCalculatedSHA256, sCalculatedBlockSHA256;
-    pWriter->finalize (sNormalizedSHA2, sNormalizedBlockwiseSHA2, sCalculatedSHA256, sCalculatedBlockSHA256);
+    pPartialWriter->finalize (sNormalizedSHA2, sNormalizedBlockwiseSHA2, sCalculatedSHA256, sCalculatedBlockSHA256);
 
     std::string sUpdateQuery = "UPDATE storage_streams SET status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
     auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
@@ -237,6 +245,90 @@ void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string
     pUpdateStatement->execute();
 
 }
+
+void CStorage::BeginRandomWriteStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const std::string& sUserID)
+{
+    if (sName.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+    if (sMimeType.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+    if (sUserID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    {
+        std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+        insertDBEntry(sParsedUUID, sContextUUID, sContextIdentifier, sName, sMimeType, 0, "", sUserID);
+
+        auto pWriter = std::make_shared<AMCData::CStorageWriter_RandomAccess>(sParsedUUID, m_pStorageState->getStreamPath(sUUID));
+        m_pStorageState->addPartialWriter(pWriter);
+    }
+
+}
+
+void CStorage::StoreRandomWriteStream(const std::string& sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer)
+{
+    if (nContentBufferSize == 0)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUFFERSIZE);
+    if (pContentBuffer == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, false);
+    if (pWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD, "invalid partial upload: " + sParsedUUID);
+
+    auto pRandomAccessWriter = dynamic_cast<AMCData::CStorageWriter_RandomAccess*> (pWriter.get());
+    if (pRandomAccessWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS, "storage stream is not random access: " + sParsedUUID);
+
+    pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
+
+}
+
+LibMCData_uint64 CStorage::GetRandomWriteStreamSize(const std::string& sUUID)
+{
+    std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, false);
+    if (pWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD, "invalid partial upload: " + sParsedUUID);
+
+    auto pRandomAccessWriter = dynamic_cast<AMCData::CStorageWriter_RandomAccess*> (pWriter.get());
+    if (pRandomAccessWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS, "storage stream is not random access: " + sParsedUUID);
+
+    return pRandomAccessWriter->getCurrentSize();
+
+}
+
+void CStorage::FinishRandomWriteStream(const std::string& sUUID)
+{
+    std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, true);
+    auto pRandomAccessWriter = dynamic_cast<AMCData::CStorageWriter_RandomAccess*> (pWriter.get());
+    if (pRandomAccessWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS, "storage stream is not random access: " + sParsedUUID);
+
+    m_pStorageState->deletePartialWriter(sParsedUUID);
+
+    // Write data and calculate checksums
+    std::string sCalculatedSHA256, sCalculatedBlockSHA256;
+    uint64_t nSize = pRandomAccessWriter->getCurrentSize();
+
+    pRandomAccessWriter->finalize(sCalculatedSHA256, sCalculatedBlockSHA256);
+
+    std::string sUpdateQuery = "UPDATE storage_streams SET size=?, status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
+    auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
+    pUpdateStatement->setString(1, std::to_string (nSize));
+    pUpdateStatement->setString(2, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
+    pUpdateStatement->setString(3, sCalculatedSHA256);
+    pUpdateStatement->setString(4, sCalculatedBlockSHA256);
+    pUpdateStatement->setString(5, sUUID);
+    pUpdateStatement->setString(6, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
+    pUpdateStatement->execute();
+
+}
+
 
 
 LibMCData_uint64 CStorage::GetMaxStreamSize()

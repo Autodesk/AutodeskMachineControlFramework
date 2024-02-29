@@ -384,6 +384,8 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDSTORAGESTATE 357 /** Invalid storage state. */
 #define LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS 358 /** Storage writer already exists. */
 #define LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST 359 /** Storage writer does not exist. */
+#define LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL 360 /** Storage stream is not partial. */
+#define LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS 361 /** Storage stream is not random access. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -680,6 +682,8 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDSTORAGESTATE: return "Invalid storage state.";
     case LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS: return "Storage writer already exists.";
     case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "Storage writer does not exist.";
+    case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "Storage stream is not partial.";
+    case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "Storage stream is not random access.";
     default: return "unknown error";
   }
 }

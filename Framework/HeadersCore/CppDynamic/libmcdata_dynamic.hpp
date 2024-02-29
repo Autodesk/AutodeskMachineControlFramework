@@ -521,6 +521,8 @@ public:
 			case LIBMCDATA_ERROR_INVALIDSTORAGESTATE: return "INVALIDSTORAGESTATE";
 			case LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS: return "STORAGEWRITERALREADYEXISTS";
 			case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "STORAGEWRITERDOESNOTEXIST";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "STORAGESTREAMNOTPARTIAL";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "STORAGESTREAMNOTRANDOMACCESS";
 		}
 		return "UNKNOWN";
 	}
@@ -817,6 +819,8 @@ public:
 			case LIBMCDATA_ERROR_INVALIDSTORAGESTATE: return "Invalid storage state.";
 			case LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS: return "Storage writer already exists.";
 			case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "Storage writer does not exist.";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "Storage stream is not partial.";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "Storage stream is not random access.";
 		}
 		return "unknown error";
 	}
@@ -1207,6 +1211,10 @@ public:
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
 	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
+	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID);
+	inline void StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
+	inline LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID);
+	inline void FinishRandomWriteStream(const std::string & sUUID);
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
@@ -1614,6 +1622,10 @@ public:
 		pWrapperTable->m_Storage_StorePartialStream = nullptr;
 		pWrapperTable->m_Storage_FinishPartialStream = nullptr;
 		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = nullptr;
+		pWrapperTable->m_Storage_BeginRandomWriteStream = nullptr;
+		pWrapperTable->m_Storage_StoreRandomWriteStream = nullptr;
+		pWrapperTable->m_Storage_GetRandomWriteStreamSize = nullptr;
+		pWrapperTable->m_Storage_FinishRandomWriteStream = nullptr;
 		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
 		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
 		pWrapperTable->m_Storage_StreamIsImage = nullptr;
@@ -2225,6 +2237,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_BeginRandomWriteStream = (PLibMCDataStorage_BeginRandomWriteStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_beginrandomwritestream");
+		#else // _WIN32
+		pWrapperTable->m_Storage_BeginRandomWriteStream = (PLibMCDataStorage_BeginRandomWriteStreamPtr) dlsym(hLibrary, "libmcdata_storage_beginrandomwritestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_BeginRandomWriteStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_StoreRandomWriteStream = (PLibMCDataStorage_StoreRandomWriteStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_storerandomwritestream");
+		#else // _WIN32
+		pWrapperTable->m_Storage_StoreRandomWriteStream = (PLibMCDataStorage_StoreRandomWriteStreamPtr) dlsym(hLibrary, "libmcdata_storage_storerandomwritestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_StoreRandomWriteStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_GetRandomWriteStreamSize = (PLibMCDataStorage_GetRandomWriteStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_storage_getrandomwritestreamsize");
+		#else // _WIN32
+		pWrapperTable->m_Storage_GetRandomWriteStreamSize = (PLibMCDataStorage_GetRandomWriteStreamSizePtr) dlsym(hLibrary, "libmcdata_storage_getrandomwritestreamsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_GetRandomWriteStreamSize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_FinishRandomWriteStream = (PLibMCDataStorage_FinishRandomWriteStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_finishrandomwritestream");
+		#else // _WIN32
+		pWrapperTable->m_Storage_FinishRandomWriteStream = (PLibMCDataStorage_FinishRandomWriteStreamPtr) dlsym(hLibrary, "libmcdata_storage_finishrandomwritestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_FinishRandomWriteStream == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3381,6 +3429,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_storage_finishpartialstreamblockwisesha256", (void**)&(pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_beginrandomwritestream", (void**)&(pWrapperTable->m_Storage_BeginRandomWriteStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_BeginRandomWriteStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_storerandomwritestream", (void**)&(pWrapperTable->m_Storage_StoreRandomWriteStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_StoreRandomWriteStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_getrandomwritestreamsize", (void**)&(pWrapperTable->m_Storage_GetRandomWriteStreamSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_GetRandomWriteStreamSize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_finishrandomwritestream", (void**)&(pWrapperTable->m_Storage_FinishRandomWriteStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishRandomWriteStream == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storage_getmaxstreamsize", (void**)&(pWrapperTable->m_Storage_GetMaxStreamSize));
@@ -4577,6 +4641,53 @@ public:
 	void CStorage::FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStreamBlockwiseSHA256(m_pHandle, sUUID.c_str(), sBlockwiseSHA2.c_str()));
+	}
+	
+	/**
+	* CStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
+	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
+	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+	* @param[in] sName - Name of the stream.
+	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
+	* @param[in] sUserID - Currently authenticated user
+	*/
+	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), sUserID.c_str()));
+	}
+	
+	/**
+	* CStorage::StoreRandomWriteStream - stores data in a stream with random write access. Writing may be in arbitrary order.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @param[in] nOffset - Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size.
+	* @param[in] ContentBuffer - Data block to store in stream.
+	*/
+	void CStorage::StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreRandomWriteStream(m_pHandle, sUUID.c_str(), nOffset, (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data()));
+	}
+	
+	/**
+	* CStorage::GetRandomWriteStreamSize - Returns the size random write stream .
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @return Current size in bytes.
+	*/
+	LibMCData_uint64 CStorage::GetRandomWriteStreamSize(const std::string & sUUID)
+	{
+		LibMCData_uint64 resultCurrentSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_GetRandomWriteStreamSize(m_pHandle, sUUID.c_str(), &resultCurrentSize));
+		
+		return resultCurrentSize;
+	}
+	
+	/**
+	* CStorage::FinishRandomWriteStream - Finishes storing a random write stream.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	*/
+	void CStorage::FinishRandomWriteStream(const std::string & sUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishRandomWriteStream(m_pHandle, sUUID.c_str()));
 	}
 	
 	/**

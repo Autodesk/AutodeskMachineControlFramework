@@ -92,6 +92,14 @@ public:
 
     void FinishPartialStreamBlockwiseSHA256(const std::string& sUUID, const std::string& sBlockwiseSHA2) override;
 
+	void BeginRandomWriteStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const std::string& sUserID) override;
+
+	void StoreRandomWriteStream(const std::string& sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer) override;
+
+    LibMCData_uint64 GetRandomWriteStreamSize(const std::string& sUUID) override;
+
+	void FinishRandomWriteStream(const std::string& sUUID) override;
+
     LibMCData_uint64 GetMaxStreamSize() override;
 
     bool ContentTypeIsAccepted(const std::string& sContentType) override;

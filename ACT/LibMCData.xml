@@ -357,6 +357,9 @@
 		<error name="INVALIDSTORAGESTATE" code="357" description="Invalid storage state." />		
 		<error name="STORAGEWRITERALREADYEXISTS" code="358" description="Storage writer already exists." />		
 		<error name="STORAGEWRITERDOESNOTEXIST" code="359" description="Storage writer does not exist." />		
+		<error name="STORAGESTREAMNOTPARTIAL" code="360" description="Storage stream is not partial." />		
+		<error name="STORAGESTREAMNOTRANDOMACCESS" code="361" description="Storage stream is not random access." />		
+		
 		
 										
 	</errors>
@@ -754,6 +757,30 @@
 			<param name="BlockwiseSHA2" type="string" pass="in" description="64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical." />
 		</method>	
 		
+		<method name="BeginRandomWriteStream" description="starts storing a stream with random write access. Checksums are not required.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
+			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
+			<param name="Name" type="string" pass="in" description="Name of the stream." />	
+			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
+			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+		</method>	
+
+		<method name="StoreRandomWriteStream" description="stores data in a stream with random write access. Writing may be in arbitrary order.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginRandomWriteStream first." />	
+			<param name="Offset" type="uint64" pass="in" description="Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size." />	
+			<param name="Content" type="basicarray" class="uint8" pass="in" description="Data block to store in stream." />	
+		</method>	
+		
+		<method name="GetRandomWriteStreamSize" description="Returns the size random write stream .">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginRandomWriteStream first." />	
+			<param name="CurrentSize" type="uint64" pass="return" description="Current size in bytes." />	
+		</method>	
+
+		<method name="FinishRandomWriteStream" description="Finishes storing a random write stream.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
+		</method>	
+
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
 			<param name="MaxStreamSize" type="uint64" pass="return" description="Maximum Stream Size in Bytes." />	
 		</method>	

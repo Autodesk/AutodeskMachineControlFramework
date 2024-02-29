@@ -744,6 +744,16 @@ IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentif
 
 }
 
+bool CUIEnvironment::HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive)
+{
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+    return (pAlertIterator->MoveNext());
+
+}
+
 ICryptoContext* CUIEnvironment::CreateCryptoContext()
 {
     return new CCryptoContext ();
