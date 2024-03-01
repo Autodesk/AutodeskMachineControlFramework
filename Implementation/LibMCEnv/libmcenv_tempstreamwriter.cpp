@@ -43,15 +43,16 @@ using namespace LibMCEnv::Impl;
  Class definition of CTempStreamWriter 
 **************************************************************************************************************************/
 
-CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType)
-    : m_pDataModel(pDataModel), m_sName(sName), m_sMIMEType(sMIMEType)
+CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType, const std::string& sJournalUUID, const std::string& sCurrentUserUUID)
+    : m_pDataModel(pDataModel), m_sName(sName), m_sMIMEType(sMIMEType), m_nWritePosition (0), m_bIsFinished (false)
 {
     if (pDataModel.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-    m_pStorage = m_pDataModel->CreateStorage();
-
     m_sUUID = AMCCommon::CUtils::createUUID();
+
+    m_pStorage = m_pDataModel->CreateStorage();
+    m_pStorage->BeginRandomWriteStream(m_sUUID, AMCCommon::CUtils::normalizeUUIDString(sJournalUUID), "journal", sName, sMIMEType, sCurrentUserUUID);
 }
 
 
@@ -79,41 +80,48 @@ std::string CTempStreamWriter::GetMIMEType()
 
 LibMCEnv_uint64 CTempStreamWriter::GetSize()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_pStorage->GetRandomWriteStreamSize(m_sUUID);
 }
 
 LibMCEnv_uint64 CTempStreamWriter::GetWritePosition()
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_nWritePosition;
 }
 
 void CTempStreamWriter::Seek(const LibMCEnv_uint64 nWritePosition)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    m_nWritePosition = nWritePosition;
 }
 
 bool CTempStreamWriter::IsFinished()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_bIsFinished;
 }
 
 void CTempStreamWriter::WriteData(const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    if (nDataBufferSize > 0) {
+        m_pStorage->StoreRandomWriteStream(m_sUUID, m_nWritePosition, LibMCData::CInputVector<uint8_t>(pDataBuffer, nDataBufferSize));
+        m_nWritePosition += nDataBufferSize;
+    }
 }
 
 void CTempStreamWriter::WriteString(const std::string & sData)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    if (!sData.empty()) {
+        WriteData(sData.length(), (const uint8_t*)sData.c_str());
+    }
 }
 
 void CTempStreamWriter::WriteLine(const std::string & sLine)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    std::string sData = sLine + "\n";
+    WriteString(sData);
 }
 
 void CTempStreamWriter::Finish()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    m_pStorage->FinishRandomWriteStream(m_sUUID);
+    m_bIsFinished = true;
 }
 

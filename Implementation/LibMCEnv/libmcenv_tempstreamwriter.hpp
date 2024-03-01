@@ -65,12 +65,15 @@ private:
 	LibMCData::PStorage m_pStorage;
 	std::mutex m_StorageMutex;
 
+	uint64_t m_nWritePosition;
+
 	std::string m_sName;
 	std::string m_sMIMEType;
+	bool m_bIsFinished;
 
 public:
 
-	CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string & sName, const std::string & sMIMEType);
+	CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string & sName, const std::string & sMIMEType, const std::string & sJournalUUID, const std::string & sCurrentUserID);
 
 	virtual ~CTempStreamWriter();
 

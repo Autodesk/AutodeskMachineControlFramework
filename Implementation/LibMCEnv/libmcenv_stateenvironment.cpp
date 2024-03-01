@@ -834,7 +834,10 @@ ITempStreamWriter* CStateEnvironment::CreateTemporaryStream(const std::string& s
 	if (sMIMEType.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);
 
-	return new CTempStreamWriter(m_pSystemState->getDataModelInstance(), sName, sMIMEType);
+	std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	std::string sJournalUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	return new CTempStreamWriter(m_pSystemState->getDataModelInstance(), sName, sMIMEType, sJournalUUID, sUserUUID);
 }
 
 
