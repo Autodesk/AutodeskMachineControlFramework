@@ -226,8 +226,11 @@ namespace AMC {
 		try {
 
 			std::string sCurrentState = m_pCurrentState->getName();
+			std::string sPreviousState = m_sPreviousState;
+			m_sPreviousState = sCurrentState;
+
 			std::string sNextState;
-			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler, m_nEndTimeOfPreviousStateInMicroseconds, m_sPreviousState);
+			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler, m_nEndTimeOfPreviousStateInMicroseconds, sPreviousState);
 
 			if (sNextState.empty())
 				throw ELibMCCustomException(LIBMC_ERROR_NOOUTSTATEGIVEN, m_sName + ": " + sCurrentState);
