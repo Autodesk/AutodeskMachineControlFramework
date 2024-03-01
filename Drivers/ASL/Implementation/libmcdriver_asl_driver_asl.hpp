@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2024 Autodesk Inc.
+Copyright (C) 2024 ASL Inc.
 
 All rights reserved.
 
@@ -27,84 +27,85 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver_TML
+Abstract: This is the class declaration of CDriver_ASL
 
 */
 
 
-#ifndef __LIBMCDRIVER_TML_DRIVER_TML
-#define __LIBMCDRIVER_TML_DRIVER_TML
+#ifndef __LIBMCDRIVER_ASL_DRIVER_ASL
+#define __LIBMCDRIVER_ASL_DRIVER_ASL
 
-#include "libmcdriver_tml_interfaces.hpp"
-#include "libmcdriver_tml_instance.hpp"
+#include "libmcdriver_asl_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriver_tml_driver.hpp"
+#include "libmcdriver_asl_driver.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "libmcdriver_tml_sdk.hpp"
-#include <vector>
+#include "libmcdriver_asl_drivercontextinstance.hpp"
 
-namespace LibMCDriver_TML {
+#include <string>
+#include <map>
+
+namespace LibMCDriver_ASL {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver_TML 
+ Class declaration of CDriver_ASL 
 **************************************************************************************************************************/
 
-class CDriver_TML : public virtual IDriver_TML, public virtual CDriver {
+class CDriver_ASL : public virtual IDriver_ASL, public virtual CDriver {
 private:
-    
-    std::string m_sName;
-    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
-    bool m_bSimulationMode;
-     
-    PTMLSDK m_pTMLSDK;
-    PTMLInstance m_pTMLInstance;
+	std::string m_sName;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+	bool m_bSimulationMode;
 
-    std::vector<uint8_t> m_SDKLibDLLBuffer;
-    std::vector<uint8_t> m_SDKCommsDLLBuffer;
-
-    LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
-    LibMCEnv::PWorkingFile m_pTMLLibDLLLibrary;
-    LibMCEnv::PWorkingFile m_pTMLCommsDLLLibrary;
-
-    bool sdkIsLoaded();
-
-    void ensureSDKIsLoaded();
+	std::map<std::string, std::shared_ptr<CDriverContextInstance>> m_InstanceMap;
 
 public:
 
-    CDriver_TML(const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CDriver_ASL(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-    virtual ~CDriver_TML();
+	virtual ~CDriver_ASL();
+
 
 	void SetToSimulationMode() override;
 
 	bool IsSimulationMode() override;
 
-	void SetCustomSDKResource(const std::string& sLibResourceName, const std::string& sCommsResourceName) override;
+	IDriverContext * Connect(const std::string & sIdentifier, const std::string & sCOMPort) override;
 
-	IChannel * OpenChannel(const std::string & sIdentifier, const std::string & sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate) override;
+	bool ContextExists(const std::string & sIdentifier) override;
+	void ClearContexts() override;
 
-	IChannel * FindChannel(const std::string & sIdentifier) override;
+	IDriverContext * FindContext(const std::string & sIdentifier) override;
 
-    bool ChannelExists(const std::string& sIdentifier) override;
+	void Configure(const std::string& sConfigurationString) override;
 
-    void Configure(const std::string& sConfigurationString) override;
+	std::string GetName() override;
+
+	static std::string getTypeStatic();
+
+	std::string GetType() override;
+
+	void GetVersion(LibMCDriver_ASL_uint32& nMajor, LibMCDriver_ASL_uint32& nMinor, LibMCDriver_ASL_uint32& nMicro, std::string& sBuild) override;
+
+	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+
 
 };
 
 } // namespace Impl
-} // namespace LibMCDriver_TML
+} // namespace LibMCDriver_ASL
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_TML_DRIVER_TML
+#endif // __LIBMCDRIVER_ASL_DRIVER_ASL

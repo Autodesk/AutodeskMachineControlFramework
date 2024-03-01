@@ -62,20 +62,30 @@ private:
     PTMLInstance m_pTMLInstance;
     std::string m_sChannelIdentifier;
     std::string m_sAxisIdentifier;
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 protected:
 
 public:
 
-    CAxis(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, const std::string & sAxisIdentifier);
+    CAxis(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, const std::string & sAxisIdentifier, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     virtual ~CAxis();
 
     void SetPower(const bool bEnable) override;
     LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister) override;
     bool CheckPower() override;
-
+    void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) override;
+    void MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) override;
     std::string GetIdentifier() override;
+    void CallSubroutine(const std::string& sRoutine) override;
+    LibMCDriver_TML_double GetPosition(const LibMCDriver_TML::eReferenceType eReference) override;
+    LibMCDriver_TML_double GetSpeed(const LibMCDriver_TML::eReferenceType eReference) override;
+    LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName) override;
+    bool MotionComplete() override;
+    bool TargetReached() override;
+    bool CheckAxisError(LibMCDriver_TML_uint16& nErrorRegister) override;
+    void ResetAxis(const bool bForceFull) override;
 
     std::string GetChannelIdentifier() override;
 

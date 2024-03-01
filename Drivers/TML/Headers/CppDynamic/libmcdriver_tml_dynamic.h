@@ -119,6 +119,85 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLDriver_QueryParametersExPtr) (Li
 **************************************************************************************************************************/
 
 /**
+* Moves the selected drive a relative distance.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] dDistance - Distance (mm)
+* @param[in] dSpeed - Speed (mm/s)
+* @param[in] dAcceleration - Acceleration (mm/s^2)
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_MoveRelativePtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double dDistance, LibMCDriver_TML_double dSpeed, LibMCDriver_TML_double dAcceleration);
+
+/**
+* Moves the selected drive to an absolute location.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] dDistance - Distance (mm)
+* @param[in] dSpeed - Speed (mm/s)
+* @param[in] dAcceleration - Acceleration (mm/s^2)
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_MoveAbsolutePtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_double dDistance, LibMCDriver_TML_double dSpeed, LibMCDriver_TML_double dAcceleration);
+
+/**
+* Runs a subroutine on the selected drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] pRoutine - Label of routine
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_CallSubroutinePtr) (LibMCDriver_TML_Axis pAxis, const char * pRoutine);
+
+/**
+* Retrieves the current position of the drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] eReference - Reference type to use for the position.
+* @param[out] pPosition - Position (mm)
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetPositionPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML::eReferenceType eReference, LibMCDriver_TML_double * pPosition);
+
+/**
+* Retrieves the current speed of the drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] eReference - Reference type to use for the speed.
+* @param[out] pSpeed - Speed (mm/s)
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetSpeedPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML::eReferenceType eReference, LibMCDriver_TML_double * pSpeed);
+
+/**
+* Retrieves the current position of the drive.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] pVariableName - Variable name
+* @param[out] pValue - Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_GetIntVariablePtr) (LibMCDriver_TML_Axis pAxis, const char * pVariableName, LibMCDriver_TML_int32 * pValue);
+
+/**
+* Checks to see if the  is currently moving.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pMotionComplete - Boolean reflecting if the drive is in currently moving.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_MotionCompletePtr) (LibMCDriver_TML_Axis pAxis, bool * pMotionComplete);
+
+/**
+* Checks to see if the drive is in position.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pTargetReached - Boolean reflecting if the drive is in position.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_TargetReachedPtr) (LibMCDriver_TML_Axis pAxis, bool * pTargetReached);
+
+/**
 * Returns the axis identifier.
 *
 * @param[in] pAxis - Axis instance.
@@ -168,6 +247,25 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_ReadRegisterPtr) (LibMCDriv
 */
 typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_CheckPowerPtr) (LibMCDriver_TML_Axis pAxis, bool * pData);
 
+/**
+* Checks for any errors on the selected axis, ignores limits.
+*
+* @param[in] pAxis - Axis instance.
+* @param[out] pErrorRegister - Error register.
+* @param[out] pData - True for error.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_CheckAxisErrorPtr) (LibMCDriver_TML_Axis pAxis, LibMCDriver_TML_uint16 * pErrorRegister, bool * pData);
+
+/**
+* Resets the selected axis, homing will be required.
+*
+* @param[in] pAxis - Axis instance.
+* @param[in] bForceFull - To set if a full or just fault reset is run (false=faultreset, true=fullreset).
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLAxis_ResetAxisPtr) (LibMCDriver_TML_Axis pAxis, bool bForceFull);
+
 /*************************************************************************************************************************
  Class definition for Channel
 **************************************************************************************************************************/
@@ -191,10 +289,11 @@ typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_GetIdentifierPtr) (LibMC
 * @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
 * @param[in] nConfigurationBufferSize - Number of elements in buffer
 * @param[in] pConfigurationBuffer - uint8 buffer of Configuration ZIP file for the axis.
+* @param[in] nCountsPerMM - Sets the mm per count used for all moves and accelerations.
 * @param[out] pAxisInstance - Returns the axis instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_SetupAxisPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_Axis * pAxisInstance);
+typedef LibMCDriver_TMLResult (*PLibMCDriver_TMLChannel_SetupAxisPtr) (LibMCDriver_TML_Channel pChannel, const char * pIdentifier, LibMCDriver_TML_uint32 nAxisID, LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, LibMCDriver_TML_uint32 nCountsPerMM, LibMCDriver_TML_Axis * pAxisInstance);
 
 /**
 * Finds an existing axis of this channel.
@@ -372,11 +471,21 @@ typedef struct {
 	PLibMCDriver_TMLDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_TMLDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_TMLDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
+	PLibMCDriver_TMLAxis_MoveRelativePtr m_Axis_MoveRelative;
+	PLibMCDriver_TMLAxis_MoveAbsolutePtr m_Axis_MoveAbsolute;
+	PLibMCDriver_TMLAxis_CallSubroutinePtr m_Axis_CallSubroutine;
+	PLibMCDriver_TMLAxis_GetPositionPtr m_Axis_GetPosition;
+	PLibMCDriver_TMLAxis_GetSpeedPtr m_Axis_GetSpeed;
+	PLibMCDriver_TMLAxis_GetIntVariablePtr m_Axis_GetIntVariable;
+	PLibMCDriver_TMLAxis_MotionCompletePtr m_Axis_MotionComplete;
+	PLibMCDriver_TMLAxis_TargetReachedPtr m_Axis_TargetReached;
 	PLibMCDriver_TMLAxis_GetIdentifierPtr m_Axis_GetIdentifier;
 	PLibMCDriver_TMLAxis_GetChannelIdentifierPtr m_Axis_GetChannelIdentifier;
 	PLibMCDriver_TMLAxis_SetPowerPtr m_Axis_SetPower;
 	PLibMCDriver_TMLAxis_ReadRegisterPtr m_Axis_ReadRegister;
 	PLibMCDriver_TMLAxis_CheckPowerPtr m_Axis_CheckPower;
+	PLibMCDriver_TMLAxis_CheckAxisErrorPtr m_Axis_CheckAxisError;
+	PLibMCDriver_TMLAxis_ResetAxisPtr m_Axis_ResetAxis;
 	PLibMCDriver_TMLChannel_GetIdentifierPtr m_Channel_GetIdentifier;
 	PLibMCDriver_TMLChannel_SetupAxisPtr m_Channel_SetupAxis;
 	PLibMCDriver_TMLChannel_FindAxisPtr m_Channel_FindAxis;

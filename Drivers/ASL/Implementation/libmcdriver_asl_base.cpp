@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2024 Autodesk Inc.
+Copyright (C) 2024 ASL Inc.
 
 All rights reserved.
 
@@ -27,63 +27,58 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CChannel
+Abstract: This is a stub class definition of CBase
 
 */
 
-
-#ifndef __LIBMCDRIVER_TML_CHANNEL
-#define __LIBMCDRIVER_TML_CHANNEL
-
-#include "libmcdriver_tml_interfaces.hpp"
-
-// Parent classes
-#include "libmcdriver_tml_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcdriver_asl_base.hpp"
+#include "libmcdriver_asl_interfaceexception.hpp"
 
 // Include custom headers here.
-#include "libmcdriver_tml_instance.hpp"
 
-namespace LibMCDriver_TML {
-namespace Impl {
 
+using namespace LibMCDriver_ASL::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CChannel 
+ Class definition of CBase 
 **************************************************************************************************************************/
 
-class CChannel : public virtual IChannel, public virtual CBase {
-private:
+bool CBase::GetLastErrorMessage(std::string & sErrorMessage)
+{
+	if (m_pLastError.get() != nullptr) {
+		sErrorMessage = *m_pLastError;
+		return true;
+	} else {
+		sErrorMessage = "";
+		return false;
+	}
+}
 
-    PTMLInstance m_pTMLInstance;
-    std::string m_sChannelIdentifier; 
-    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+void CBase::ClearErrorMessages()
+{
+	m_pLastError.reset();
+}
 
-public:
+void CBase::RegisterErrorMessage(const std::string & sErrorMessage)
+{
+	if (m_pLastError.get() == nullptr) {
+		m_pLastError.reset(new std::string());
+	}
+	*m_pLastError = sErrorMessage;
+}
 
-    CChannel(PTMLInstance pTMLInstance, const std::string & sChannelIdentifier, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+void CBase::IncRefCount()
+{
+	++m_nReferenceCount;
+}
 
-    virtual ~CChannel();
+bool CBase::DecRefCount()
+{
+	m_nReferenceCount--;
+	if (!m_nReferenceCount) {
+		delete this;
+		return true;
+	}
+	return false;
+}
 
-    std::string GetIdentifier() override;
-
-    IAxis* SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM) override;
-
-    IAxis* FindAxis(const std::string& sIdentifier) override;
-
-    bool AxisExists(const std::string& sIdentifier) override;
-
-	void Close() override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCDriver_TML
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_TML_CHANNEL

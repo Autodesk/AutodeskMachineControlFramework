@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2024 Autodesk Inc.
+Copyright (C) 2024 ASL Inc.
 
 All rights reserved.
 
@@ -27,84 +27,65 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver_TML
+Abstract: This is the class declaration of CDriver
 
 */
 
 
-#ifndef __LIBMCDRIVER_TML_DRIVER_TML
-#define __LIBMCDRIVER_TML_DRIVER_TML
+#ifndef __LIBMCDRIVER_ASL_DRIVER
+#define __LIBMCDRIVER_ASL_DRIVER
 
-#include "libmcdriver_tml_interfaces.hpp"
-#include "libmcdriver_tml_instance.hpp"
+#include "libmcdriver_asl_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriver_tml_driver.hpp"
+#include "libmcdriver_asl_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "libmcdriver_tml_sdk.hpp"
-#include <vector>
 
-namespace LibMCDriver_TML {
+
+namespace LibMCDriver_ASL {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver_TML 
+ Class declaration of CDriver 
 **************************************************************************************************************************/
 
-class CDriver_TML : public virtual IDriver_TML, public virtual CDriver {
+class CDriver : public virtual IDriver, public virtual CBase {
 private:
-    
-    std::string m_sName;
-    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
-    bool m_bSimulationMode;
-     
-    PTMLSDK m_pTMLSDK;
-    PTMLInstance m_pTMLInstance;
+	/**
+	* Put private members here.
+	*/
 
-    std::vector<uint8_t> m_SDKLibDLLBuffer;
-    std::vector<uint8_t> m_SDKCommsDLLBuffer;
+protected:
 
-    LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
-    LibMCEnv::PWorkingFile m_pTMLLibDLLLibrary;
-    LibMCEnv::PWorkingFile m_pTMLCommsDLLLibrary;
-
-    bool sdkIsLoaded();
-
-    void ensureSDKIsLoaded();
+	/**
+	* Put protected members here.
+	*/
 
 public:
 
-    CDriver_TML(const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	/**
+	* Put additional public members here. They will not be visible in the external API.
+	*/
 
-    virtual ~CDriver_TML();
 
-	void SetToSimulationMode() override;
+	/**
+	* Public member functions to implement.
+	*/
 
-	bool IsSimulationMode() override;
-
-	void SetCustomSDKResource(const std::string& sLibResourceName, const std::string& sCommsResourceName) override;
-
-	IChannel * OpenChannel(const std::string & sIdentifier, const std::string & sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate) override;
-
-	IChannel * FindChannel(const std::string & sIdentifier) override;
-
-    bool ChannelExists(const std::string& sIdentifier) override;
-
-    void Configure(const std::string& sConfigurationString) override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCDriver_TML
+} // namespace LibMCDriver_ASL
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_TML_DRIVER_TML
+#endif // __LIBMCDRIVER_ASL_DRIVER

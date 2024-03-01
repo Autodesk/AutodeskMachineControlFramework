@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2024 Autodesk Inc.
+Copyright (C) 2024 ASL Inc.
 
 All rights reserved.
 
@@ -27,84 +27,85 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver_TML
+Abstract: This is the class declaration of CDriverContext
 
 */
 
 
-#ifndef __LIBMCDRIVER_TML_DRIVER_TML
-#define __LIBMCDRIVER_TML_DRIVER_TML
+#ifndef __LIBMCDRIVER_ASL_DRIVERCONTEXT
+#define __LIBMCDRIVER_ASL_DRIVERCONTEXT
 
-#include "libmcdriver_tml_interfaces.hpp"
-#include "libmcdriver_tml_instance.hpp"
+#include "libmcdriver_asl_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriver_tml_driver.hpp"
+#include "libmcdriver_asl_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "libmcdriver_tml_sdk.hpp"
-#include <vector>
+#include "libmcdriver_asl_drivercontextinstance.hpp"
 
-namespace LibMCDriver_TML {
+namespace LibMCDriver_ASL {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver_TML 
+ Class declaration of CDriverContext 
 **************************************************************************************************************************/
 
-class CDriver_TML : public virtual IDriver_TML, public virtual CDriver {
+class CDriverContext : public virtual IDriverContext, public virtual CBase {
 private:
-    
-    std::string m_sName;
-    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
-    bool m_bSimulationMode;
-     
-    PTMLSDK m_pTMLSDK;
-    PTMLInstance m_pTMLInstance;
-
-    std::vector<uint8_t> m_SDKLibDLLBuffer;
-    std::vector<uint8_t> m_SDKCommsDLLBuffer;
-
-    LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
-    LibMCEnv::PWorkingFile m_pTMLLibDLLLibrary;
-    LibMCEnv::PWorkingFile m_pTMLCommsDLLLibrary;
-
-    bool sdkIsLoaded();
-
-    void ensureSDKIsLoaded();
+	std::shared_ptr<CDriverContextInstance> m_pInstance;
 
 public:
 
-    CDriver_TML(const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CDriverContext(std::shared_ptr<CDriverContextInstance> pInstance);
 
-    virtual ~CDriver_TML();
+	virtual ~CDriverContext();
+	
+	std::string GetSerialNumber() override;
 
-	void SetToSimulationMode() override;
+	void SetPower(const bool bPower) override;
 
-	bool IsSimulationMode() override;
+	void SetPrintheadMode(const LibMCDriver_ASL::eBoardMode eMode) override;
 
-	void SetCustomSDKResource(const std::string& sLibResourceName, const std::string& sCommsResourceName) override;
+	void SetFrequency(const LibMCDriver_ASL_uint32 nFrequency) override;
 
-	IChannel * OpenChannel(const std::string & sIdentifier, const std::string & sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate) override;
+	void SetTemperature(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_double dTemperature) override;
 
-	IChannel * FindChannel(const std::string & sIdentifier) override;
+	void HomeLocation() override;
 
-    bool ChannelExists(const std::string& sIdentifier) override;
+	void SetPrintStart(const LibMCDriver_ASL_uint32 nStartLocation) override;
 
-    void Configure(const std::string& sConfigurationString) override;
+	void SendImage(const LibMCDriver_ASL_uint8 nIndex, const LibMCDriver_ASL_uint32 nPadding, LibMCEnv::PImageData pImageObject) override;
+
+	void Poll() override;
+
+	LibMCDriver_ASL_double GetTemperature(const LibMCDriver_ASL_uint8 nIndex, const bool bSet) override;
+
+	LibMCDriver_ASL_double GetPrintCounts(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	LibMCDriver_ASL_double GetImageLength(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	LibMCDriver_ASL_double GetHeadState(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	bool IsHeating(const LibMCDriver_ASL_uint8 nIndex) override;
+
+	bool GetPower() override;
+
+	LibMCDriver_ASL_uint32 GetHeadTimeOn() override;
+
+	bool VerifyImages() override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCDriver_TML
+} // namespace LibMCDriver_ASL
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_TML_DRIVER_TML
+#endif // __LIBMCDRIVER_ASL_DRIVERCONTEXT

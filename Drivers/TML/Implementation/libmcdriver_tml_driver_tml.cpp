@@ -110,7 +110,7 @@ void CDriver_TML::ensureSDKIsLoaded()
 
         m_pTMLSDK = std::make_shared<CTMLSDK> (m_pTMLLibDLLLibrary->GetAbsoluteFileName(), m_pWorkingDirectory->GetAbsoluteFilePath ());
 
-        m_pTMLInstance = std::make_shared<CTMLInstance>(m_pTMLSDK, m_pWorkingDirectory);
+        m_pTMLInstance = std::make_shared<CTMLInstance>(m_pTMLSDK, m_pWorkingDirectory, m_pDriverEnvironment);
 
     }
 
@@ -124,7 +124,7 @@ IChannel * CDriver_TML::OpenChannel(const std::string & sIdentifier, const std::
 
     m_pTMLInstance->openChannel (sIdentifier, sDeviceName, eChannelTypeToUse, eProtocolTypeToUse, nHostID, nBaudrate);
 
-    return new CChannel(m_pTMLInstance, sIdentifier);
+    return new CChannel(m_pTMLInstance, sIdentifier, m_pDriverEnvironment);
 
 }
 
@@ -138,7 +138,7 @@ IChannel * CDriver_TML::FindChannel(const std::string & sIdentifier)
     if (!m_pTMLInstance->channelExists (sIdentifier))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_CHANNELDOESNOTEXIST);
 
-    return new CChannel(m_pTMLInstance, sIdentifier);
+    return new CChannel(m_pTMLInstance, sIdentifier, m_pDriverEnvironment);
 }
 
 bool CDriver_TML::ChannelExists(const std::string& sIdentifier)
@@ -146,5 +146,22 @@ bool CDriver_TML::ChannelExists(const std::string& sIdentifier)
     ensureSDKIsLoaded();
 
     return m_pTMLInstance->channelExists(sIdentifier);
+
+}
+
+void CDriver_TML::Configure(const std::string& sConfigurationString)
+{
+
+    for (char c : "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+        std::string sAxisIdentifier(1, c);
+        //m_pDriverEnvironment->RegisterDoubleParameter(sAxisIdentifier + "actualpositionload", "Actual position of the axis load " + sAxisIdentifier, -1.0);
+        //m_pDriverEnvironment->RegisterDoubleParameter(sAxisIdentifier + "actualpositionmotor", "Actual position of the axis motor " + sAxisIdentifier, -1.0);
+        m_pDriverEnvironment->RegisterDoubleParameter(sAxisIdentifier + "targetposition", "Target position of the axis " + sAxisIdentifier, -1.0);
+        //m_pDriverEnvironment->RegisterDoubleParameter(sAxisIdentifier + "actualspeedload", "Actual speed of the axis load " + sAxisIdentifier, -1.0);
+        //m_pDriverEnvironment->RegisterDoubleParameter(sAxisIdentifier + "actualspeedmotor", "Actual speed of the axis motor " + sAxisIdentifier, -1.0);
+        m_pDriverEnvironment->RegisterDoubleParameter(sAxisIdentifier + "targetspeed", "Target speed of the axis " + sAxisIdentifier, -1.0);
+        if (c == '\0') break; // Stop before the null terminator
+    }
+
 
 }
