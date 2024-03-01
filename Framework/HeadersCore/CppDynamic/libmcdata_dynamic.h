@@ -163,6 +163,17 @@ typedef LibMCDataResult (*PLibMCDataLogEntryList_HasEntryPtr) (LibMCData_LogEntr
 **************************************************************************************************************************/
 
 /**
+* retrieves the session UUID.
+*
+* @param[in] pLogSession - LogSession instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLogSession_GetSessionUUIDPtr) (LibMCData_LogSession pLogSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
+
+/**
 * adds a new log entry.
 *
 * @param[in] pLogSession - LogSession instance.
@@ -426,6 +437,17 @@ typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAlertsByTypePtr) (LibMC
 /*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/
+
+/**
+* retrieves the session UUID.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalSession_GetSessionUUIDPtr) (LibMCData_JournalSession pJournalSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
 
 /**
 * writes detailed journal state data to disk.
@@ -1861,6 +1883,7 @@ typedef struct {
 	PLibMCDataLogEntryList_GetEntryByIndexPtr m_LogEntryList_GetEntryByIndex;
 	PLibMCDataLogEntryList_GetEntryByIDPtr m_LogEntryList_GetEntryByID;
 	PLibMCDataLogEntryList_HasEntryPtr m_LogEntryList_HasEntry;
+	PLibMCDataLogSession_GetSessionUUIDPtr m_LogSession_GetSessionUUID;
 	PLibMCDataLogSession_AddEntryPtr m_LogSession_AddEntry;
 	PLibMCDataLogSession_GetMaxLogEntryIDPtr m_LogSession_GetMaxLogEntryID;
 	PLibMCDataLogSession_RetrieveLogEntriesByIDPtr m_LogSession_RetrieveLogEntriesByID;
@@ -1884,6 +1907,7 @@ typedef struct {
 	PLibMCDataAlertSession_GetAlertByUUIDPtr m_AlertSession_GetAlertByUUID;
 	PLibMCDataAlertSession_RetrieveAlertsPtr m_AlertSession_RetrieveAlerts;
 	PLibMCDataAlertSession_RetrieveAlertsByTypePtr m_AlertSession_RetrieveAlertsByType;
+	PLibMCDataJournalSession_GetSessionUUIDPtr m_JournalSession_GetSessionUUID;
 	PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr m_JournalSession_WriteJournalChunkIntegerData;
 	PLibMCDataJournalSession_GetChunkCapacityPtr m_JournalSession_GetChunkCapacity;
 	PLibMCDataJournalSession_GetFlushIntervalPtr m_JournalSession_GetFlushInterval;

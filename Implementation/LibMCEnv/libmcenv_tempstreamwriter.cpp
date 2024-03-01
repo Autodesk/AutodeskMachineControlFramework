@@ -43,13 +43,17 @@ using namespace LibMCEnv::Impl;
  Class definition of CTempStreamWriter 
 **************************************************************************************************************************/
 
-CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType, const std::string& sJournalUUID, const std::string& sCurrentUserUUID)
+CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType, const std::string& sCurrentUserUUID)
     : m_pDataModel(pDataModel), m_sName(sName), m_sMIMEType(sMIMEType), m_nWritePosition (0), m_bIsFinished (false)
 {
     if (pDataModel.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
     m_sUUID = AMCCommon::CUtils::createUUID();
+
+    auto pJournalSession = pDataModel->CreateJournalSession();
+
+    std::string sJournalUUID = pJournalSession->GetSessionUUID();
 
     m_pStorage = m_pDataModel->CreateStorage();
     m_pStorage->BeginRandomWriteStream(m_sUUID, AMCCommon::CUtils::normalizeUUIDString(sJournalUUID), "journal", sName, sMIMEType, sCurrentUserUUID);

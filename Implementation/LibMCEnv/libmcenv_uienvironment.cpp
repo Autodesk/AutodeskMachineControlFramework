@@ -768,9 +768,8 @@ ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sNam
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);
 
     std::string sUserUUID = m_pUserInformation->getUUID();
-    std::string sJournalUUID = AMCCommon::CUtils::createEmptyUUID();
     
-    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sJournalUUID, sUserUUID);
+    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sUserUUID);
 }
 
 IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
@@ -790,4 +789,6 @@ IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool b
         if (bMustExist)
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_STORAGESTREAMNOTFOUND, "Storage Stream not found: " + sUUID);
     }
+
+    return nullptr;
 }

@@ -53,6 +53,7 @@ namespace AMCData {
 		std::mutex m_JournalMutex;
 		std::atomic<uint32_t> m_LogID;
 		std::atomic<uint32_t> m_AlertID;		
+		std::string m_sSessionUUID;
 
 		AMCCommon::PExportStream_Native m_pJournalStream;
 		
@@ -62,9 +63,11 @@ namespace AMCData {
 		
 		static LibMCData::eAlertLevel convertStringToAlertLevel(const std::string & sValue, bool bFailIfUnknown);
 
-		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath);
+		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string & sSessionUUID);
 
 		virtual ~CJournal();
+
+		std::string getSessionUUID();
 
 		uint32_t getSchemaVersion();
 

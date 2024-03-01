@@ -1073,6 +1073,7 @@ public:
 	{
 	}
 	
+	inline std::string GetSessionUUID();
 	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestampUTC);
 	inline LibMCData_uint32 GetMaxLogEntryID();
 	inline PLogEntryList RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const eLogLevel eMinLogLevel);
@@ -1160,6 +1161,7 @@ public:
 	{
 	}
 	
+	inline std::string GetSessionUUID();
 	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<sJournalChunkIntegerEntry> & EntryDataBuffer);
 	inline LibMCData_uint32 GetChunkCapacity();
 	inline LibMCData_uint32 GetFlushInterval();
@@ -1580,6 +1582,7 @@ public:
 		pWrapperTable->m_LogEntryList_GetEntryByIndex = nullptr;
 		pWrapperTable->m_LogEntryList_GetEntryByID = nullptr;
 		pWrapperTable->m_LogEntryList_HasEntry = nullptr;
+		pWrapperTable->m_LogSession_GetSessionUUID = nullptr;
 		pWrapperTable->m_LogSession_AddEntry = nullptr;
 		pWrapperTable->m_LogSession_GetMaxLogEntryID = nullptr;
 		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = nullptr;
@@ -1603,6 +1606,7 @@ public:
 		pWrapperTable->m_AlertSession_GetAlertByUUID = nullptr;
 		pWrapperTable->m_AlertSession_RetrieveAlerts = nullptr;
 		pWrapperTable->m_AlertSession_RetrieveAlertsByType = nullptr;
+		pWrapperTable->m_JournalSession_GetSessionUUID = nullptr;
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkCapacity = nullptr;
 		pWrapperTable->m_JournalSession_GetFlushInterval = nullptr;
@@ -1862,6 +1866,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LogSession_GetSessionUUID = (PLibMCDataLogSession_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_logsession_getsessionuuid");
+		#else // _WIN32
+		pWrapperTable->m_LogSession_GetSessionUUID = (PLibMCDataLogSession_GetSessionUUIDPtr) dlsym(hLibrary, "libmcdata_logsession_getsessionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogSession_GetSessionUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_LogSession_AddEntry = (PLibMCDataLogSession_AddEntryPtr) GetProcAddress(hLibrary, "libmcdata_logsession_addentry");
 		#else // _WIN32
 		pWrapperTable->m_LogSession_AddEntry = (PLibMCDataLogSession_AddEntryPtr) dlsym(hLibrary, "libmcdata_logsession_addentry");
@@ -2066,6 +2079,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_AlertSession_RetrieveAlertsByType == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_GetSessionUUID = (PLibMCDataJournalSession_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getsessionuuid");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_GetSessionUUID = (PLibMCDataJournalSession_GetSessionUUIDPtr) dlsym(hLibrary, "libmcdata_journalsession_getsessionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_GetSessionUUID == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3263,6 +3285,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_HasEntry == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_logsession_getsessionuuid", (void**)&(pWrapperTable->m_LogSession_GetSessionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_GetSessionUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_logsession_addentry", (void**)&(pWrapperTable->m_LogSession_AddEntry));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_AddEntry == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3353,6 +3379,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_alertsession_retrievealertsbytype", (void**)&(pWrapperTable->m_AlertSession_RetrieveAlertsByType));
 		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_RetrieveAlertsByType == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalsession_getsessionuuid", (void**)&(pWrapperTable->m_JournalSession_GetSessionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetSessionUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkintegerdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData));
@@ -4029,6 +4059,21 @@ public:
 	 */
 	
 	/**
+	* CLogSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	std::string CLogSession::GetSessionUUID()
+	{
+		LibMCData_uint32 bytesNeededSessionUUID = 0;
+		LibMCData_uint32 bytesWrittenSessionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_GetSessionUUID(m_pHandle, 0, &bytesNeededSessionUUID, nullptr));
+		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_GetSessionUUID(m_pHandle, bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0]));
+		
+		return std::string(&bufferSessionUUID[0]);
+	}
+	
+	/**
 	* CLogSession::AddEntry - adds a new log entry.
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
@@ -4381,6 +4426,21 @@ public:
 	/**
 	 * Method definitions for class CJournalSession
 	 */
+	
+	/**
+	* CJournalSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	std::string CJournalSession::GetSessionUUID()
+	{
+		LibMCData_uint32 bytesNeededSessionUUID = 0;
+		LibMCData_uint32 bytesWrittenSessionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetSessionUUID(m_pHandle, 0, &bytesNeededSessionUUID, nullptr));
+		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetSessionUUID(m_pHandle, bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0]));
+		
+		return std::string(&bufferSessionUUID[0]);
+	}
 	
 	/**
 	* CJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.

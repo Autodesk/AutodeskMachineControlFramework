@@ -391,6 +391,12 @@ typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 class ILogSession : public virtual IBase {
 public:
 	/**
+	* ILogSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
+	/**
 	* ILogSession::AddEntry - adds a new log entry.
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
@@ -594,6 +600,12 @@ typedef IBaseSharedPtr<IAlertSession> PIAlertSession;
 
 class IJournalSession : public virtual IBase {
 public:
+	/**
+	* IJournalSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
 	/**
 	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
 	* @param[in] nChunkIndex - Index of the Chunk to write

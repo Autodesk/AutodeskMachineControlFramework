@@ -176,6 +176,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logentrylist_hasentry(LibMCData_Log
 **************************************************************************************************************************/
 
 /**
+* retrieves the session UUID.
+*
+* @param[in] pLogSession - LogSession instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_getsessionuuid(LibMCData_LogSession pLogSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
+
+/**
 * adds a new log entry.
 *
 * @param[in] pLogSession - LogSession instance.
@@ -439,6 +450,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrievealertsbytype(L
 /*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/
+
+/**
+* retrieves the session UUID.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMCData_JournalSession pJournalSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
 
 /**
 * writes detailed journal state data to disk.

@@ -73,7 +73,7 @@ private:
 
 public:
 
-	CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string & sName, const std::string & sMIMEType, const std::string & sJournalUUID, const std::string & sCurrentUserID);
+	CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string & sName, const std::string & sMIMEType, const std::string & sCurrentUserID);
 
 	virtual ~CTempStreamWriter();
 

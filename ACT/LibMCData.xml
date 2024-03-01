@@ -508,7 +508,11 @@
 
     <!-- The LogSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="LogSession" parent="Base" description="Logging Instance">
-	
+
+		<method name="GetSessionUUID" description="retrieves the session UUID.">
+			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
+		</method>	
+
 		<method name="AddEntry" description="adds a new log entry.">
 			<param name="Message" type="string" pass="in" description="Log Message" />	
 			<param name="SubSystem" type="string" pass="in" description="Sub System identifier" />	
@@ -526,8 +530,7 @@
 			<param name="MinLogLevel" type="enum" class="LogLevel" pass="in" description="Minimum Log Level to return." />	
 			<param name="LogEntryList" type="class" class="LogEntryList" pass="return" description="Log Entry List." />
 		</method>	
-				
-		
+						
 	</class>
 
 
@@ -645,6 +648,10 @@
 
     <!-- The JournalSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
+
+		<method name="GetSessionUUID" description="retrieves the session UUID.">
+			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
+		</method>	
 
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	

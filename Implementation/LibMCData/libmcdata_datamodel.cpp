@@ -113,7 +113,7 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     auto sJournalName = m_pStorageState->getJournalFileName(m_sTimeFileName);
     auto sJournalDataName = m_pStorageState->getJournalDataFileName(m_sTimeFileName);
 
-    m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath);
+    m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath, m_sSessionUUID);
 
     auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion) VALUES (?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);

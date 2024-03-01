@@ -91,3 +91,8 @@ ILogEntryList* CLogSession::RetrieveLogEntriesByID(const LibMCData_uint32 nMinLo
 
 	return pLogEntryList.release();
 }
+
+std::string CLogSession::GetSessionUUID()
+{
+	return m_pJournal->getSessionUUID();
+}

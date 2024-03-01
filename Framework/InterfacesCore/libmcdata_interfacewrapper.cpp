@@ -427,6 +427,54 @@ LibMCDataResult libmcdata_logentrylist_hasentry(LibMCData_LogEntryList pLogEntry
 /*************************************************************************************************************************
  Class implementation for LogSession
 **************************************************************************************************************************/
+LibMCDataResult libmcdata_logsession_getsessionuuid(LibMCData_LogSession pLogSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pLogSession;
+
+	try {
+		if ( (!pSessionUUIDBuffer) && !(pSessionUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID("");
+		ILogSession* pILogSession = dynamic_cast<ILogSession*>(pIBaseClass);
+		if (!pILogSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSessionUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sSessionUUID = pILogSession->GetSessionUUID();
+
+			pILogSession->_setCache (new ParameterCache_1<std::string> (sSessionUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pILogSession->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sSessionUUID);
+			pILogSession->_setCache (nullptr);
+		}
+		
+		if (pSessionUUIDNeededChars)
+			*pSessionUUIDNeededChars = (LibMCData_uint32) (sSessionUUID.size()+1);
+		if (pSessionUUIDBuffer) {
+			if (sSessionUUID.size() >= nSessionUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSessionUUID = 0; iSessionUUID < sSessionUUID.size(); iSessionUUID++)
+				pSessionUUIDBuffer[iSessionUUID] = sSessionUUID[iSessionUUID];
+			pSessionUUIDBuffer[sSessionUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_logsession_addentry(LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, eLibMCDataLogLevel eLogLevel, const char * pTimestampUTC)
 {
 	IBase* pIBaseClass = (IBase *)pLogSession;
@@ -1292,6 +1340,54 @@ LibMCDataResult libmcdata_alertsession_retrievealertsbytype(LibMCData_AlertSessi
 /*************************************************************************************************************************
  Class implementation for JournalSession
 **************************************************************************************************************************/
+LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMCData_JournalSession pJournalSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pJournalSession;
+
+	try {
+		if ( (!pSessionUUIDBuffer) && !(pSessionUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID("");
+		IJournalSession* pIJournalSession = dynamic_cast<IJournalSession*>(pIBaseClass);
+		if (!pIJournalSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSessionUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sSessionUUID = pIJournalSession->GetSessionUUID();
+
+			pIJournalSession->_setCache (new ParameterCache_1<std::string> (sSessionUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIJournalSession->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sSessionUUID);
+			pIJournalSession->_setCache (nullptr);
+		}
+		
+		if (pSessionUUIDNeededChars)
+			*pSessionUUIDNeededChars = (LibMCData_uint32) (sSessionUUID.size()+1);
+		if (pSessionUUIDBuffer) {
+			if (sSessionUUID.size() >= nSessionUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSessionUUID = 0; iSessionUUID < sSessionUUID.size(); iSessionUUID++)
+				pSessionUUIDBuffer[iSessionUUID] = sSessionUUID[iSessionUUID];
+			pSessionUUIDBuffer[sSessionUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_journalsession_writejournalchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const sLibMCDataJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nEntryDataBufferSize, const sLibMCDataJournalChunkIntegerEntry * pEntryDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pJournalSession;
@@ -5856,6 +5952,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_logentrylist_getentrybyid;
 	if (sProcName == "libmcdata_logentrylist_hasentry") 
 		*ppProcAddress = (void*) &libmcdata_logentrylist_hasentry;
+	if (sProcName == "libmcdata_logsession_getsessionuuid") 
+		*ppProcAddress = (void*) &libmcdata_logsession_getsessionuuid;
 	if (sProcName == "libmcdata_logsession_addentry") 
 		*ppProcAddress = (void*) &libmcdata_logsession_addentry;
 	if (sProcName == "libmcdata_logsession_getmaxlogentryid") 
@@ -5902,6 +6000,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_alertsession_retrievealerts;
 	if (sProcName == "libmcdata_alertsession_retrievealertsbytype") 
 		*ppProcAddress = (void*) &libmcdata_alertsession_retrievealertsbytype;
+	if (sProcName == "libmcdata_journalsession_getsessionuuid") 
+		*ppProcAddress = (void*) &libmcdata_journalsession_getsessionuuid;
 	if (sProcName == "libmcdata_journalsession_writejournalchunkintegerdata") 
 		*ppProcAddress = (void*) &libmcdata_journalsession_writejournalchunkintegerdata;
 	if (sProcName == "libmcdata_journalsession_getchunkcapacity") 

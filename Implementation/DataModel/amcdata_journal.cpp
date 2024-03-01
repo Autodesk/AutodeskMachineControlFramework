@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCData {
 		
-	CJournal::CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath)
-		: m_LogID(1), m_AlertID (1)
+	CJournal::CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string& sSessionUUID)
+		: m_LogID(1), m_AlertID (1), m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
 	{
 
 		m_pJournalStream = std::make_shared<AMCCommon::CExportStream_Native>(sJournalDataPath);
@@ -97,6 +97,11 @@ namespace AMCData {
 	CJournal::~CJournal()
 	{
 
+	}
+
+	std::string CJournal::getSessionUUID()
+	{
+		return m_sSessionUUID;
 	}
 
 	uint32_t CJournal::getSchemaVersion()
