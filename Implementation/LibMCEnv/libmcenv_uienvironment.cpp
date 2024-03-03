@@ -161,7 +161,7 @@ void CUIEnvironment::StartStreamDownload(const std::string& sFilename, const std
 
     std::string sDownloadUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
 
-    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sDownloadUUID));
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sDownloadUUID, sFilename));
 }
 
 

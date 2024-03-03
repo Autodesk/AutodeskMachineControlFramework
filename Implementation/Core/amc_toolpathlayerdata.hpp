@@ -162,7 +162,7 @@ namespace AMC {
 		bool hasUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 
-		void calculateExtents(int32_t nMinX, int32_t nMinY, int32_t nMaxX, int32_t nMaxY);
+		void calculateExtents(int32_t & nMinX, int32_t & nMinY, int32_t & nMaxX, int32_t & nMaxY);
 	};
 
 

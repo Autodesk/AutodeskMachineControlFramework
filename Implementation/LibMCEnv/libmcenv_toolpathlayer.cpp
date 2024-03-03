@@ -442,7 +442,11 @@ void CToolpathLayer::CalculateExtents(LibMCEnv_int32& nMinX, LibMCEnv_int32& nMi
 
 void CToolpathLayer::CalculateExtentsInMM(LibMCEnv_double& dMinX, LibMCEnv_double& dMinY, LibMCEnv_double& dMaxX, LibMCEnv_double& dMaxY)
 {
-	int32_t nMinX, nMinY, nMaxX, nMaxY;
+	int32_t nMinX = 0;
+	int32_t nMinY = 0;
+	int32_t nMaxX = 0;
+	int32_t nMaxY = 0;
+
 	m_pToolpathLayerData->calculateExtents(nMinX, nMinY, nMaxX, nMaxY);
 	double dUnits = m_pToolpathLayerData->getUnits();
 	dMinX = nMinX * dUnits;

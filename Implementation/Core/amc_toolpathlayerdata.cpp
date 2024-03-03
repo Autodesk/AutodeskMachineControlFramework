@@ -554,7 +554,7 @@ namespace AMC {
 
 	}
 
-	void CToolpathLayerData::calculateExtents(int32_t nMinX, int32_t nMinY, int32_t nMaxX, int32_t nMaxY)
+	void CToolpathLayerData::calculateExtents(int32_t & nMinX, int32_t & nMinY, int32_t & nMaxX, int32_t & nMaxY)
 	{
 		nMinX = 0;
 		nMinY = 0;
