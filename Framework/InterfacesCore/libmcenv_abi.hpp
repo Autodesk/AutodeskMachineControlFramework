@@ -921,6 +921,36 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentinfo(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmenttype(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType);
 
 /**
+* Returns if segment is a loop.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pIsLoop - Flag if segment is a loop.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_segmentisloop(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsLoop);
+
+/**
+* Returns if segment is a polyline.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pIsPolyline - Flag if segment is a polyline.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_segmentispolyline(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsPolyline);
+
+/**
+* Returns if segment is a hatch segment.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pIsHatchSegment - Flag if segment is a hatch segment.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_segmentishatchsegment(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsHatchSegment);
+
+/**
 * Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
@@ -1300,6 +1330,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_hasuniquemetadata(LibMCE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_finduniquemetadata(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
+
+/**
+* Calculates the layers extents in units
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pMinX - Minimal X value of the layer in units.
+* @param[out] pMinY - Minimal Y value of the layer in units.
+* @param[out] pMaxX - Maximal X value of the layer in units.
+* @param[out] pMaxY - Maximal Y value of the layer in units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_calculateextents(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_int32 * pMinX, LibMCEnv_int32 * pMinY, LibMCEnv_int32 * pMaxX, LibMCEnv_int32 * pMaxY);
+
+/**
+* Calculates the layers extents in millimeters
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pMinX - Minimal X value of the layer in mm.
+* @param[out] pMinY - Minimal Y value of the layer in mm.
+* @param[out] pMaxX - Maximal X value of the layer in mm.
+* @param[out] pMaxY - Maximal Y value of the layer in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_calculateextentsinmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pMinX, LibMCEnv_double * pMinY, LibMCEnv_double * pMaxX, LibMCEnv_double * pMaxY);
 
 /*************************************************************************************************************************
  Class definition for ToolpathAccessor

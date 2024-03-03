@@ -2487,6 +2487,84 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmenttype(LibMCEnv_ToolpathLayer pToo
 	}
 }
 
+LibMCEnvResult libmcenv_toolpathlayer_segmentisloop(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsLoop)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pIsLoop == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsLoop = pIToolpathLayer->SegmentIsLoop(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_segmentispolyline(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsPolyline)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pIsPolyline == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsPolyline = pIToolpathLayer->SegmentIsPolyline(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_segmentishatchsegment(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsHatchSegment)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pIsHatchSegment == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsHatchSegment = pIToolpathLayer->SegmentIsHatchSegment(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_toolpathlayer_getsegmentintegerattribute(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 nAttributeID, LibMCEnv_int64 * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
@@ -3553,6 +3631,70 @@ LibMCEnvResult libmcenv_toolpathlayer_finduniquemetadata(LibMCEnv_ToolpathLayer 
 		pBaseXMLNode = pIToolpathLayer->FindUniqueMetaData(sNamespace, sName);
 
 		*pXMLNode = (IBase*)(pBaseXMLNode);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_calculateextents(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_int32 * pMinX, LibMCEnv_int32 * pMinY, LibMCEnv_int32 * pMaxX, LibMCEnv_int32 * pMaxY)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (!pMinX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMinY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMaxX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMaxY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIToolpathLayer->CalculateExtents(*pMinX, *pMinY, *pMaxX, *pMaxY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_calculateextentsinmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pMinX, LibMCEnv_double * pMinY, LibMCEnv_double * pMaxX, LibMCEnv_double * pMaxY)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (!pMinX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMinY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMaxX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMaxY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIToolpathLayer->CalculateExtentsInMM(*pMinX, *pMinY, *pMaxX, *pMaxY);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -19072,6 +19214,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentinfo;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmenttype") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmenttype;
+	if (sProcName == "libmcenv_toolpathlayer_segmentisloop") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_segmentisloop;
+	if (sProcName == "libmcenv_toolpathlayer_segmentispolyline") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_segmentispolyline;
+	if (sProcName == "libmcenv_toolpathlayer_segmentishatchsegment") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_segmentishatchsegment;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentintegerattribute") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentintegerattribute;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentdoubleattribute") 
@@ -19138,6 +19286,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_hasuniquemetadata;
 	if (sProcName == "libmcenv_toolpathlayer_finduniquemetadata") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_finduniquemetadata;
+	if (sProcName == "libmcenv_toolpathlayer_calculateextents") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_calculateextents;
+	if (sProcName == "libmcenv_toolpathlayer_calculateextentsinmm") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_calculateextentsinmm;
 	if (sProcName == "libmcenv_toolpathaccessor_getstorageuuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getstorageuuid;
 	if (sProcName == "libmcenv_toolpathaccessor_getbuilduuid") 

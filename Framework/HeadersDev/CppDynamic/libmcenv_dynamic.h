@@ -908,6 +908,36 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentInfoPtr) (LibMCEnv_Too
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentTypePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType);
 
 /**
+* Returns if segment is a loop.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pIsLoop - Flag if segment is a loop.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentIsLoopPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsLoop);
+
+/**
+* Returns if segment is a polyline.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pIsPolyline - Flag if segment is a polyline.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentIsPolylinePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsPolyline);
+
+/**
+* Returns if segment is a hatch segment.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pIsHatchSegment - Flag if segment is a hatch segment.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentIsHatchSegmentPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, bool * pIsHatchSegment);
+
+/**
 * Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
@@ -1287,6 +1317,30 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_HasUniqueMetaDataPtr) (LibMCEnv_
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
+
+/**
+* Calculates the layers extents in units
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pMinX - Minimal X value of the layer in units.
+* @param[out] pMinY - Minimal Y value of the layer in units.
+* @param[out] pMaxX - Maximal X value of the layer in units.
+* @param[out] pMaxY - Maximal Y value of the layer in units.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_CalculateExtentsPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_int32 * pMinX, LibMCEnv_int32 * pMinY, LibMCEnv_int32 * pMaxX, LibMCEnv_int32 * pMaxY);
+
+/**
+* Calculates the layers extents in millimeters
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pMinX - Minimal X value of the layer in mm.
+* @param[out] pMinY - Minimal Y value of the layer in mm.
+* @param[out] pMaxX - Maximal X value of the layer in mm.
+* @param[out] pMaxY - Maximal Y value of the layer in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_CalculateExtentsInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pMinX, LibMCEnv_double * pMinY, LibMCEnv_double * pMaxX, LibMCEnv_double * pMaxY);
 
 /*************************************************************************************************************************
  Class definition for ToolpathAccessor
@@ -6374,6 +6428,9 @@ typedef struct {
 	PLibMCEnvToolpathLayer_GetSegmentCountPtr m_ToolpathLayer_GetSegmentCount;
 	PLibMCEnvToolpathLayer_GetSegmentInfoPtr m_ToolpathLayer_GetSegmentInfo;
 	PLibMCEnvToolpathLayer_GetSegmentTypePtr m_ToolpathLayer_GetSegmentType;
+	PLibMCEnvToolpathLayer_SegmentIsLoopPtr m_ToolpathLayer_SegmentIsLoop;
+	PLibMCEnvToolpathLayer_SegmentIsPolylinePtr m_ToolpathLayer_SegmentIsPolyline;
+	PLibMCEnvToolpathLayer_SegmentIsHatchSegmentPtr m_ToolpathLayer_SegmentIsHatchSegment;
 	PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr m_ToolpathLayer_GetSegmentIntegerAttribute;
 	PLibMCEnvToolpathLayer_GetSegmentDoubleAttributePtr m_ToolpathLayer_GetSegmentDoubleAttribute;
 	PLibMCEnvToolpathLayer_HasCustomSegmentAttributePtr m_ToolpathLayer_HasCustomSegmentAttribute;
@@ -6407,6 +6464,8 @@ typedef struct {
 	PLibMCEnvToolpathLayer_GetMetaDataContentPtr m_ToolpathLayer_GetMetaDataContent;
 	PLibMCEnvToolpathLayer_HasUniqueMetaDataPtr m_ToolpathLayer_HasUniqueMetaData;
 	PLibMCEnvToolpathLayer_FindUniqueMetaDataPtr m_ToolpathLayer_FindUniqueMetaData;
+	PLibMCEnvToolpathLayer_CalculateExtentsPtr m_ToolpathLayer_CalculateExtents;
+	PLibMCEnvToolpathLayer_CalculateExtentsInMMPtr m_ToolpathLayer_CalculateExtentsInMM;
 	PLibMCEnvToolpathAccessor_GetStorageUUIDPtr m_ToolpathAccessor_GetStorageUUID;
 	PLibMCEnvToolpathAccessor_GetBuildUUIDPtr m_ToolpathAccessor_GetBuildUUID;
 	PLibMCEnvToolpathAccessor_GetLayerCountPtr m_ToolpathAccessor_GetLayerCount;

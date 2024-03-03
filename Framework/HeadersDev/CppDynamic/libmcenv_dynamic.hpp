@@ -478,6 +478,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDSTREAMREADSIZE: return "INVALIDSTREAMREADSIZE";
 			case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "INVALIDSTREAMSEEKPOSITION";
 			case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "STORAGESTREAMNOTFOUND";
+			case LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST: return "DOWNLOADSTREAMDOESNOTEXIST";
 		}
 		return "UNKNOWN";
 	}
@@ -635,6 +636,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDSTREAMREADSIZE: return "Invalid stream read size.";
 			case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "Invalid stream seek position.";
 			case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found.";
+			case LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST: return "Download stream does not exist.";
 		}
 		return "unknown error";
 	}
@@ -1123,6 +1125,9 @@ public:
 	inline LibMCEnv_uint32 GetSegmentCount();
 	inline void GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount);
 	inline eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex);
+	inline bool SegmentIsLoop(const LibMCEnv_uint32 nIndex);
+	inline bool SegmentIsPolyline(const LibMCEnv_uint32 nIndex);
+	inline bool SegmentIsHatchSegment(const LibMCEnv_uint32 nIndex);
 	inline LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
 	inline LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID);
 	inline bool HasCustomSegmentAttribute(const std::string & sNamespace, const std::string & sAttributeName);
@@ -1156,6 +1161,8 @@ public:
 	inline PXMLDocumentNode GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex);
 	inline bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName);
 	inline PXMLDocumentNode FindUniqueMetaData(const std::string & sNamespace, const std::string & sName);
+	inline void CalculateExtents(LibMCEnv_int32 & nMinX, LibMCEnv_int32 & nMinY, LibMCEnv_int32 & nMaxX, LibMCEnv_int32 & nMaxY);
+	inline void CalculateExtentsInMM(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY);
 };
 	
 /*************************************************************************************************************************
@@ -2269,6 +2276,9 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentType = nullptr;
+		pWrapperTable->m_ToolpathLayer_SegmentIsLoop = nullptr;
+		pWrapperTable->m_ToolpathLayer_SegmentIsPolyline = nullptr;
+		pWrapperTable->m_ToolpathLayer_SegmentIsHatchSegment = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentDoubleAttribute = nullptr;
 		pWrapperTable->m_ToolpathLayer_HasCustomSegmentAttribute = nullptr;
@@ -2302,6 +2312,8 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetMetaDataContent = nullptr;
 		pWrapperTable->m_ToolpathLayer_HasUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathLayer_FindUniqueMetaData = nullptr;
+		pWrapperTable->m_ToolpathLayer_CalculateExtents = nullptr;
+		pWrapperTable->m_ToolpathLayer_CalculateExtentsInMM = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetBuildUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
@@ -3516,6 +3528,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentIsLoop = (PLibMCEnvToolpathLayer_SegmentIsLoopPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_segmentisloop");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentIsLoop = (PLibMCEnvToolpathLayer_SegmentIsLoopPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_segmentisloop");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_SegmentIsLoop == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentIsPolyline = (PLibMCEnvToolpathLayer_SegmentIsPolylinePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_segmentispolyline");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentIsPolyline = (PLibMCEnvToolpathLayer_SegmentIsPolylinePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_segmentispolyline");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_SegmentIsPolyline == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentIsHatchSegment = (PLibMCEnvToolpathLayer_SegmentIsHatchSegmentPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_segmentishatchsegment");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentIsHatchSegment = (PLibMCEnvToolpathLayer_SegmentIsHatchSegmentPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_segmentishatchsegment");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_SegmentIsHatchSegment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = (PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentintegerattribute");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute = (PLibMCEnvToolpathLayer_GetSegmentIntegerAttributePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentintegerattribute");
@@ -3810,6 +3849,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_FindUniqueMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_CalculateExtents = (PLibMCEnvToolpathLayer_CalculateExtentsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_calculateextents");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_CalculateExtents = (PLibMCEnvToolpathLayer_CalculateExtentsPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_calculateextents");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_CalculateExtents == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_CalculateExtentsInMM = (PLibMCEnvToolpathLayer_CalculateExtentsInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_calculateextentsinmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_CalculateExtentsInMM = (PLibMCEnvToolpathLayer_CalculateExtentsInMMPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_calculateextentsinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_CalculateExtentsInMM == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8289,6 +8346,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_segmentisloop", (void**)&(pWrapperTable->m_ToolpathLayer_SegmentIsLoop));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_SegmentIsLoop == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_segmentispolyline", (void**)&(pWrapperTable->m_ToolpathLayer_SegmentIsPolyline));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_SegmentIsPolyline == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_segmentishatchsegment", (void**)&(pWrapperTable->m_ToolpathLayer_SegmentIsHatchSegment));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_SegmentIsHatchSegment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentintegerattribute", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentIntegerAttribute == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8419,6 +8488,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_finduniquemetadata", (void**)&(pWrapperTable->m_ToolpathLayer_FindUniqueMetaData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_FindUniqueMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_calculateextents", (void**)&(pWrapperTable->m_ToolpathLayer_CalculateExtents));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_CalculateExtents == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_calculateextentsinmm", (void**)&(pWrapperTable->m_ToolpathLayer_CalculateExtentsInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_CalculateExtentsInMM == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getstorageuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetStorageUUID));
@@ -11281,6 +11358,45 @@ public:
 	}
 	
 	/**
+	* CToolpathLayer::SegmentIsLoop - Returns if segment is a loop.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Flag if segment is a loop.
+	*/
+	bool CToolpathLayer::SegmentIsLoop(const LibMCEnv_uint32 nIndex)
+	{
+		bool resultIsLoop = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentIsLoop(m_pHandle, nIndex, &resultIsLoop));
+		
+		return resultIsLoop;
+	}
+	
+	/**
+	* CToolpathLayer::SegmentIsPolyline - Returns if segment is a polyline.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Flag if segment is a polyline.
+	*/
+	bool CToolpathLayer::SegmentIsPolyline(const LibMCEnv_uint32 nIndex)
+	{
+		bool resultIsPolyline = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentIsPolyline(m_pHandle, nIndex, &resultIsPolyline));
+		
+		return resultIsPolyline;
+	}
+	
+	/**
+	* CToolpathLayer::SegmentIsHatchSegment - Returns if segment is a hatch segment.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Flag if segment is a hatch segment.
+	*/
+	bool CToolpathLayer::SegmentIsHatchSegment(const LibMCEnv_uint32 nIndex)
+	{
+		bool resultIsHatchSegment = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentIsHatchSegment(m_pHandle, nIndex, &resultIsHatchSegment));
+		
+		return resultIsHatchSegment;
+	}
+	
+	/**
 	* CToolpathLayer::GetSegmentIntegerAttribute - Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
 	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
 	* @param[in] nAttributeID - ID of the attribute.
@@ -11763,6 +11879,30 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
+	}
+	
+	/**
+	* CToolpathLayer::CalculateExtents - Calculates the layers extents in units
+	* @param[out] nMinX - Minimal X value of the layer in units.
+	* @param[out] nMinY - Minimal Y value of the layer in units.
+	* @param[out] nMaxX - Maximal X value of the layer in units.
+	* @param[out] nMaxY - Maximal Y value of the layer in units.
+	*/
+	void CToolpathLayer::CalculateExtents(LibMCEnv_int32 & nMinX, LibMCEnv_int32 & nMinY, LibMCEnv_int32 & nMaxX, LibMCEnv_int32 & nMaxY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_CalculateExtents(m_pHandle, &nMinX, &nMinY, &nMaxX, &nMaxY));
+	}
+	
+	/**
+	* CToolpathLayer::CalculateExtentsInMM - Calculates the layers extents in millimeters
+	* @param[out] dMinX - Minimal X value of the layer in mm.
+	* @param[out] dMinY - Minimal Y value of the layer in mm.
+	* @param[out] dMaxX - Maximal X value of the layer in mm.
+	* @param[out] dMaxY - Maximal Y value of the layer in mm.
+	*/
+	void CToolpathLayer::CalculateExtentsInMM(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_CalculateExtentsInMM(m_pHandle, &dMinX, &dMinY, &dMaxX, &dMaxY));
 	}
 	
 	/**

@@ -369,7 +369,7 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	
 	auto pUIHandler = m_pSystemState->uiHandler();
 
-	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth->getClientVariableHandler (), pAuth->getUserInformation ());
+	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth);
 
 	CJSONWriterArray contentUpdateNode(writer);
 

@@ -64,6 +64,17 @@ namespace AMC {
 		virtual void writeToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 	};
 			
+	class CUIClientAction_StreamDownload : public CUIClientAction {
+	private:
+		std::string m_sDownloadTicketUUID;
+	public:
+		CUIClientAction_StreamDownload(const std::string& sDownloadTicketUUID);
+		virtual ~CUIClientAction_StreamDownload();
+
+		std::string getDownloadTicketUUID();
+
+		virtual void writeToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+	};
 
 	class CUIClientAction_ActivatePage : public CUIClientAction {
 	private:

@@ -1000,6 +1000,27 @@ public:
 	virtual LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
+	* IToolpathLayer::SegmentIsLoop - Returns if segment is a loop.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Flag if segment is a loop.
+	*/
+	virtual bool SegmentIsLoop(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::SegmentIsPolyline - Returns if segment is a polyline.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Flag if segment is a polyline.
+	*/
+	virtual bool SegmentIsPolyline(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::SegmentIsHatchSegment - Returns if segment is a hatch segment.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Flag if segment is a hatch segment.
+	*/
+	virtual bool SegmentIsHatchSegment(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
 	* IToolpathLayer::GetSegmentIntegerAttribute - Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.
 	* @param[in] nIndex - Segment Index. Must be between 0 and Count - 1.
 	* @param[in] nAttributeID - ID of the attribute.
@@ -1268,6 +1289,24 @@ public:
 	* @return XML Metadata Object
 	*/
 	virtual IXMLDocumentNode * FindUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathLayer::CalculateExtents - Calculates the layers extents in units
+	* @param[out] nMinX - Minimal X value of the layer in units.
+	* @param[out] nMinY - Minimal Y value of the layer in units.
+	* @param[out] nMaxX - Maximal X value of the layer in units.
+	* @param[out] nMaxY - Maximal Y value of the layer in units.
+	*/
+	virtual void CalculateExtents(LibMCEnv_int32 & nMinX, LibMCEnv_int32 & nMinY, LibMCEnv_int32 & nMaxX, LibMCEnv_int32 & nMaxY) = 0;
+
+	/**
+	* IToolpathLayer::CalculateExtentsInMM - Calculates the layers extents in millimeters
+	* @param[out] dMinX - Minimal X value of the layer in mm.
+	* @param[out] dMinY - Minimal Y value of the layer in mm.
+	* @param[out] dMaxX - Maximal X value of the layer in mm.
+	* @param[out] dMaxY - Maximal Y value of the layer in mm.
+	*/
+	virtual void CalculateExtentsInMM(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY) = 0;
 
 };
 

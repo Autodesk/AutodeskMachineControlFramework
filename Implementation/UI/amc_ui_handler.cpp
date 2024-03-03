@@ -709,10 +709,13 @@ template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<L
 void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 {
     std::string sSenderUUID = AMCCommon::CUtils::createUUID();
+    std::string sDummySessionUUID = AMCCommon::CUtils::createUUID();
+    std::string sDummySessionKey = AMCCommon::CUtils::calculateRandomSHA256String(1);
 
     auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
+    auto pDummyAPIAuth = std::make_shared<CAPIAuth>(sDummySessionUUID, sDummySessionKey, CUserInformation::makeEmpty (), false, pDummyClientVariableHandler);
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, "", pDummyClientVariableHandler, m_pUISystemState->getTestOutputPath (), CUserInformation::makeEmpty ());
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, "", pDummyAPIAuth, m_pUISystemState->getTestOutputPath ());
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -746,7 +749,7 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
 }
 
 
-CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler, PUserInformation pUserInformation)
+CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PAPIAuth pAPIAuth)
 {
     auto pLogger = m_pUISystemState->getLogger();
 
@@ -781,11 +784,12 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         }
 
-        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, sSenderPath, pClientVariableHandler, m_pUISystemState->getTestOutputPath (), pUserInformation);
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, sSenderPath, pAPIAuth, m_pUISystemState->getTestOutputPath ());
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
+        auto pClientVariableHandler = pAPIAuth->getClientVariableHandler();
         if ((pClientVariableHandler.get() != nullptr) && (!sEventPayloadJSON.empty())) {
 
             rapidjson::Document document;

@@ -554,6 +554,56 @@ namespace AMC {
 
 	}
 
+	void CToolpathLayerData::calculateExtents(int32_t nMinX, int32_t nMinY, int32_t nMaxX, int32_t nMaxY)
+	{
+		nMinX = 0;
+		nMinY = 0;
+		nMaxX = 0;
+		nMaxY = 0;
+		bool bIsFirst = true;
+
+		for (auto& segment : m_Segments) {
+			switch (segment.m_Type) {
+			case LibMCEnv::eToolpathSegmentType::Loop:
+			case LibMCEnv::eToolpathSegmentType::Polyline:
+			case LibMCEnv::eToolpathSegmentType::Hatch:
+
+				if (segment.m_PointCount > 0) {
+					auto pSrcPoint = &m_Points.at(segment.m_PointStartIndex);
+					for (uint32_t nPointIndex = 0; nPointIndex < segment.m_PointCount; nPointIndex++) {
+						int32_t nX = pSrcPoint->m_Coordinates[0];
+						int32_t nY = pSrcPoint->m_Coordinates[1];
+
+						if (bIsFirst) {
+							nMinX = nX;
+							nMinY = nY;
+							nMaxX = nX;
+							nMaxY = nY;
+
+							bIsFirst = false;
+						}
+						else {
+							if (nMinX > nX)
+								nMinX = nX;
+							if (nMaxX < nX)
+								nMaxX = nX;
+							if (nMinY > nY)
+								nMinY = nY;
+							if (nMaxY < nY)
+								nMaxY = nY;
+
+						}
+
+						pSrcPoint++;
+					}
+				}
+
+				break;
+			}
+		}
+	}
+
+
 }
 
 

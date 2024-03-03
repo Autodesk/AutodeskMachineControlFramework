@@ -188,6 +188,7 @@
 		<error name="INVALIDSTREAMREADSIZE" code="10148" description="Invalid stream read size." />		
 		<error name="INVALIDSTREAMSEEKPOSITION" code="10149" description="Invalid stream seek position." />		
 		<error name="STORAGESTREAMNOTFOUND" code="10150" description="Storage Stream not found." />		
+		<error name="DOWNLOADSTREAMDOESNOTEXIST" code="10151" description="Download stream does not exist." />		
 		
 				
 
@@ -736,6 +737,21 @@
 			<param name="Type" type="enum" class="ToolpathSegmentType" pass="return" description="Segment Type" />
 		</method>
 
+		<method name="SegmentIsLoop" description="Returns if segment is a loop.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="IsLoop" type="bool" pass="return" description="Flag if segment is a loop." />
+		</method>
+
+		<method name="SegmentIsPolyline" description="Returns if segment is a polyline.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="IsPolyline" type="bool" pass="return" description="Flag if segment is a polyline." />
+		</method>
+
+		<method name="SegmentIsHatchSegment" description="Returns if segment is a hatch segment.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="IsHatchSegment" type="bool" pass="return" description="Flag if segment is a hatch segment." />
+		</method>
+		
 		<method name="GetSegmentIntegerAttribute" description="Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
 			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
 			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
@@ -933,6 +949,20 @@
 			<param name="Name" type="string" pass="in" description="Name of the metadata" />
 			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
 		</method>		
+
+		<method name="CalculateExtents" description="Calculates the layers extents in units">
+			<param name="MinX" type="int32" pass="out" description="Minimal X value of the layer in units." />
+			<param name="MinY" type="int32" pass="out" description="Minimal Y value of the layer in units." />
+			<param name="MaxX" type="int32" pass="out" description="Maximal X value of the layer in units." />
+			<param name="MaxY" type="int32" pass="out" description="Maximal Y value of the layer in units." />
+		</method>
+		
+		<method name="CalculateExtentsInMM" description="Calculates the layers extents in millimeters">
+			<param name="MinX" type="double" pass="out" description="Minimal X value of the layer in mm." />
+			<param name="MinY" type="double" pass="out" description="Minimal Y value of the layer in mm." />
+			<param name="MaxX" type="double" pass="out" description="Maximal X value of the layer in mm." />
+			<param name="MaxY" type="double" pass="out" description="Maximal Y value of the layer in mm." />
+		</method>
 		
 	</class>
 

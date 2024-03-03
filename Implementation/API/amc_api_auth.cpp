@@ -99,3 +99,13 @@ PParameterHandler CAPIAuth::getClientVariableHandler()
 {
 	return m_pClientVariableHandler;
 }
+
+std::string CAPIAuth::createStreamDownloadTicket(const std::string& sStreamUUID)
+{
+	std::string sTicketUUID = AMCCommon::CUtils::createUUID();
+	std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+
+	m_DownloadTickets.insert(std::make_pair (sTicketUUID, sNormalizedStreamUUID));
+
+	return sTicketUUID;
+}

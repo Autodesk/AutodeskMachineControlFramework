@@ -43,6 +43,7 @@ Abstract: This is the class declaration of CUIEnvironment
 #include "amc_systemstate.hpp"
 #include "amc_userinformation.hpp"
 #include "amc_ui_systemstate.hpp"
+#include "amc_api_auth.hpp"
 
 #include <vector>
 
@@ -79,8 +80,7 @@ private:
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
 
-	AMC::PUserInformation m_pUserInformation;
-	AMC::PParameterHandler m_pClientVariableHandler;
+	AMC::PAPIAuth m_pAPIAuth;
 
 	std::vector<AMC::PUIClientAction> m_ClientActions;
 
@@ -88,7 +88,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandle, const std::string & sTestEnvironmentPath, AMC::PUserInformation pUserInformation);
+	CUIEnvironment(AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PAPIAuth pAPIAuth, const std::string & sTestEnvironmentPath);
 
 	virtual ~CUIEnvironment();
 

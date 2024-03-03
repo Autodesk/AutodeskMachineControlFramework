@@ -74,6 +74,13 @@ public:
 
 	LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) override;
 
+	bool SegmentIsLoop(const LibMCEnv_uint32 nIndex) override;
+
+	bool SegmentIsPolyline(const LibMCEnv_uint32 nIndex) override;
+
+	bool SegmentIsHatchSegment(const LibMCEnv_uint32 nIndex) override;
+
+
 	LibMCEnv_int64 GetSegmentIntegerAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) override;
 
 	LibMCEnv_double GetSegmentDoubleAttribute(const LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nAttributeID) override;
@@ -139,6 +146,10 @@ public:
 	bool HasUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
 
 	IXMLDocumentNode* FindUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
+
+	void CalculateExtents(LibMCEnv_int32& nMinX, LibMCEnv_int32& nMinY, LibMCEnv_int32& nMaxX, LibMCEnv_int32& nMaxY) override;
+
+	void CalculateExtentsInMM(LibMCEnv_double& dMinX, LibMCEnv_double& dMinY, LibMCEnv_double& dMaxX, LibMCEnv_double& dMaxY) override;
 
 };
 
