@@ -189,9 +189,9 @@
 		<error name="INVALIDSTREAMSEEKPOSITION" code="10149" description="Invalid stream seek position." />		
 		<error name="STORAGESTREAMNOTFOUND" code="10150" description="Storage Stream not found." />		
 		<error name="DOWNLOADSTREAMDOESNOTEXIST" code="10151" description="Download stream does not exist." />		
+		<error name="EMPTYDOWNLOADSTREAMFILENAME" code="10152" description="Empty download stream filename." />		
+		<error name="INVALIDDOWNLOADSTREAMFILENAME" code="10153" description="Invalid download stream filename." />		
 		
-				
-
 	</errors>
 
 	<enum name="AlertLevel">
@@ -3085,6 +3085,7 @@
 		</method>
 
 		<method name="StartStreamDownload" description="Starts a stream download on the client. Fails if stream does not exist.">
+			<param name="Filename" type="string" pass="in" description="Filename on disk. Fails if empty string." />
 			<param name="UUID" type="string" pass="in" description="Stream UUID." />
 		</method>
 

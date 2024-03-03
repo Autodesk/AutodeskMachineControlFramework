@@ -479,6 +479,8 @@ public:
 			case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "INVALIDSTREAMSEEKPOSITION";
 			case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "STORAGESTREAMNOTFOUND";
 			case LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST: return "DOWNLOADSTREAMDOESNOTEXIST";
+			case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "EMPTYDOWNLOADSTREAMFILENAME";
+			case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "INVALIDDOWNLOADSTREAMFILENAME";
 		}
 		return "UNKNOWN";
 	}
@@ -637,6 +639,8 @@ public:
 			case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "Invalid stream seek position.";
 			case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found.";
 			case LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST: return "Download stream does not exist.";
+			case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "Empty download stream filename.";
+			case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "Invalid download stream filename.";
 		}
 		return "unknown error";
 	}
@@ -2054,7 +2058,7 @@ public:
 	inline void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS);
 	inline void ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const sColorRGB & Color, const sColorRGB & FontColor);
 	inline void HideHint();
-	inline void StartStreamDownload(const std::string & sUUID);
+	inline void StartStreamDownload(const std::string & sFilename, const std::string & sUUID);
 	inline std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent);
 	inline std::string RetrieveEventSender();
 	inline std::string RetrieveEventSenderPage();
@@ -17406,11 +17410,12 @@ public:
 	
 	/**
 	* CUIEnvironment::StartStreamDownload - Starts a stream download on the client. Fails if stream does not exist.
+	* @param[in] sFilename - Filename on disk. Fails if empty string.
 	* @param[in] sUUID - Stream UUID.
 	*/
-	void CUIEnvironment::StartStreamDownload(const std::string & sUUID)
+	void CUIEnvironment::StartStreamDownload(const std::string & sFilename, const std::string & sUUID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_StartStreamDownload(m_pHandle, sUUID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_StartStreamDownload(m_pHandle, sFilename.c_str(), sUUID.c_str()));
 	}
 	
 	/**

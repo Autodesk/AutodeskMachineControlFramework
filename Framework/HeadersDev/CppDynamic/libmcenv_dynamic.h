@@ -5625,10 +5625,11 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HideHintPtr) (LibMCEnv_UIEnviron
 * Starts a stream download on the client. Fails if stream does not exist.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFilename - Filename on disk. Fails if empty string.
 * @param[in] pUUID - Stream UUID.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_StartStreamDownloadPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_StartStreamDownloadPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pFilename, const char * pUUID);
 
 /**
 * Shows a message dialog in the user interface.

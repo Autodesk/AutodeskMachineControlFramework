@@ -91,8 +91,8 @@ void CUIClientAction_ActivatePage::writeToJSON(CJSONWriter& writer, CJSONWriterO
 
 }
 
-CUIClientAction_StreamDownload::CUIClientAction_StreamDownload(const std::string& sDownloadTicketUUID)
-	: m_sDownloadTicketUUID (AMCCommon::CUtils::normalizeUUIDString (sDownloadTicketUUID))
+CUIClientAction_StreamDownload::CUIClientAction_StreamDownload(const std::string& sDownloadFileName, const std::string& sDownloadTicketUUID)
+	: m_sDownloadTicketUUID (AMCCommon::CUtils::normalizeUUIDString (sDownloadTicketUUID)), m_sDownloadFileName (sDownloadFileName)
 {
 
 }
@@ -108,6 +108,8 @@ std::string CUIClientAction_StreamDownload::getDownloadTicketUUID()
 
 void CUIClientAction_StreamDownload::writeToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
+	object.addString("action", "streamdownload");
+	object.addString("downloadfilename", m_sDownloadFileName);
 	object.addString("downloadticket", m_sDownloadTicketUUID);
 
 }

@@ -16898,19 +16898,22 @@ LibMCEnvResult libmcenv_uienvironment_hidehint(LibMCEnv_UIEnvironment pUIEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_startstreamdownload(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID)
+LibMCEnvResult libmcenv_uienvironment_startstreamdownload(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFilename, const char * pUUID)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
+		if (pFilename == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sFilename(pFilename);
 		std::string sUUID(pUUID);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUIEnvironment->StartStreamDownload(sUUID);
+		pIUIEnvironment->StartStreamDownload(sFilename, sUUID);
 
 		return LIBMCENV_SUCCESS;
 	}

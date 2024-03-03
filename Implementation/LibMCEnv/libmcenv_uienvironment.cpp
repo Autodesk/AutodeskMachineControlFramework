@@ -67,6 +67,8 @@ Abstract: This is a stub class definition of CUIEnvironment
 
 #include <cmath>
 
+#define DOWNLOADFILENAME_MAXLENGTH 256
+
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
@@ -142,7 +144,7 @@ void CUIEnvironment::ActivatePage(const std::string& sPageName)
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ActivatePage>(sPageName));
 }
 
-void CUIEnvironment::StartStreamDownload(const std::string& sUUID)
+void CUIEnvironment::StartStreamDownload(const std::string& sFilename, const std::string& sUUID)
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
     auto pDataModel = m_pUISystemState->getDataModel ();
@@ -151,7 +153,13 @@ void CUIEnvironment::StartStreamDownload(const std::string& sUUID)
     if (!pStorage->StreamIsReady(sNormalizedUUID))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST, "Download stream does not exist: " + sNormalizedUUID);
 
-    std::string sDownloadUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID);
+    if (sFilename.empty ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME);
+
+    if (sFilename.size () > DOWNLOADFILENAME_MAXLENGTH)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME);
+
+    std::string sDownloadUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
 
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sDownloadUUID));
 }

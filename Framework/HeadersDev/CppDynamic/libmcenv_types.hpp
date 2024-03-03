@@ -246,6 +246,8 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION 10149 /** Invalid stream seek position. */
 #define LIBMCENV_ERROR_STORAGESTREAMNOTFOUND 10150 /** Storage Stream not found. */
 #define LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST 10151 /** Download stream does not exist. */
+#define LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME 10152 /** Empty download stream filename. */
+#define LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME 10153 /** Invalid download stream filename. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -404,6 +406,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "Invalid stream seek position.";
     case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found.";
     case LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST: return "Download stream does not exist.";
+    case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "Empty download stream filename.";
+    case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "Invalid download stream filename.";
     default: return "unknown error";
   }
 }

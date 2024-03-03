@@ -66,9 +66,10 @@ namespace AMC {
 			
 	class CUIClientAction_StreamDownload : public CUIClientAction {
 	private:
+		std::string m_sDownloadFileName;
 		std::string m_sDownloadTicketUUID;
 	public:
-		CUIClientAction_StreamDownload(const std::string& sDownloadTicketUUID);
+		CUIClientAction_StreamDownload(const std::string & sDownloadFileName, const std::string& sDownloadTicketUUID);
 		virtual ~CUIClientAction_StreamDownload();
 
 		std::string getDownloadTicketUUID();

@@ -98,7 +98,7 @@ public:
 
 	void ActivatePage(const std::string& sPageName) override;
 
-	void StartStreamDownload(const std::string& sUUID) override;
+	void StartStreamDownload(const std::string& sFilename, const std::string& sUUID) override;
 
 	std::string RetrieveEventSender() override;
 

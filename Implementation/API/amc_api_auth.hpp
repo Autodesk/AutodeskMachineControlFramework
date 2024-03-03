@@ -58,7 +58,7 @@ namespace AMC {
 		PUserInformation m_pUserInformation;
 		PParameterHandler m_pClientVariableHandler;
 
-		std::map<std::string, std::string> m_DownloadTickets;
+		std::map<std::string, std::pair<std::string, std::string>> m_DownloadTickets;
 
 
 	protected:
@@ -83,7 +83,7 @@ namespace AMC {
 
 		PParameterHandler getClientVariableHandler ();
 
-		std::string createStreamDownloadTicket(const std::string & sStreamUUID);
+		std::string createStreamDownloadTicket(const std::string & sStreamUUID, const std::string & sDownloadFileName);
 								
 	};
 
