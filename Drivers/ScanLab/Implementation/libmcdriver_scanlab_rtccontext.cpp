@@ -382,7 +382,10 @@ void CRTCContext::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, cons
 	m_pScanLabSDK->n_set_start_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
-	m_MeasurementTags.clear();
+	m_CurrentMeasurementTagInfo.m_nCurrentPartID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentProfileID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentVectorID = 0;
 }
 
 void CRTCContext::SetEndOfList()
@@ -1192,6 +1195,9 @@ void CRTCContext::EnableOIE()
 
 	sendFreeVariable0(1);
 
+	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
 	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 20, 21, 1, 2);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
@@ -1208,6 +1214,9 @@ void CRTCContext::DisableOIE()
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	sendFreeVariable0(0);
+
+	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
 
@@ -1298,7 +1307,7 @@ void CRTCContext::DisableOIEMeasurementTagging()
 
 void CRTCContext::MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32& nPartID, LibMCDriver_ScanLab_uint32& nProfileID, LibMCDriver_ScanLab_uint32& nSegmentID, LibMCDriver_ScanLab_uint32& nVectorID)
 {
-	if ((nMeasurementTag >= 1) && (nMeasurementTag < m_MeasurementTags.size())) {
+	if ((nMeasurementTag >= 1) && (nMeasurementTag <= m_MeasurementTags.size())) {
 		auto & record = m_MeasurementTags.at (nMeasurementTag - 1);
 		nPartID = record.m_nCurrentPartID;
 		nSegmentID = record.m_nCurrentSegmentID;
@@ -1485,7 +1494,7 @@ uint32_t CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t Data
 	uint32_t Error = 0;
 	uint32_t nDataLength = DataEnd - DataStart;
 
-	std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
+	//std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
 
 	if (nDataLength > 0) {
 
@@ -1529,7 +1538,7 @@ std::string return_current_time_and_date()
 
 void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
 {
-	std::cout << "Executing list position" << std::endl;
+	//std::cout << "Executing list position" << std::endl;
 
 	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
