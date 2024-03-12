@@ -2058,7 +2058,7 @@ public:
 	inline void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS);
 	inline void ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const sColorRGB & Color, const sColorRGB & FontColor);
 	inline void HideHint();
-	inline void StartStreamDownload(const std::string & sFilename, const std::string & sUUID);
+	inline void StartStreamDownload(const std::string & sUUID, const std::string & sFilename);
 	inline std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent);
 	inline std::string RetrieveEventSender();
 	inline std::string RetrieveEventSenderPage();
@@ -17410,12 +17410,12 @@ public:
 	
 	/**
 	* CUIEnvironment::StartStreamDownload - Starts a stream download on the client. Fails if stream does not exist.
-	* @param[in] sFilename - Filename on disk. Fails if empty string.
 	* @param[in] sUUID - Stream UUID.
+	* @param[in] sFilename - Filename on disk. Fails if empty string.
 	*/
-	void CUIEnvironment::StartStreamDownload(const std::string & sFilename, const std::string & sUUID)
+	void CUIEnvironment::StartStreamDownload(const std::string & sUUID, const std::string & sFilename)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_StartStreamDownload(m_pHandle, sFilename.c_str(), sUUID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_StartStreamDownload(m_pHandle, sUUID.c_str(), sFilename.c_str()));
 	}
 	
 	/**

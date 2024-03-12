@@ -5638,11 +5638,11 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hidehint(LibMCEnv_UIEnvi
 * Starts a stream download on the client. Fails if stream does not exist.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] pFilename - Filename on disk. Fails if empty string.
 * @param[in] pUUID - Stream UUID.
+* @param[in] pFilename - Filename on disk. Fails if empty string.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_startstreamdownload(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFilename, const char * pUUID);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_startstreamdownload(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, const char * pFilename);
 
 /**
 * Shows a message dialog in the user interface.

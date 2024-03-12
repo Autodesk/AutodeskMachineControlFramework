@@ -164,3 +164,13 @@ void CAPIRequestHandler::GetResultData(LibMC_uint64 nDataBufferSize, LibMC_uint6
 
 }
 
+
+std::string CAPIRequestHandler::GetContentDispositionName()
+{
+    if (m_pResponse.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_APIREQUESTNOTHANDLED);
+
+    return m_pResponse->getContentDispositionName();
+
+}
+

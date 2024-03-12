@@ -169,6 +169,13 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			}
 		}
 
+		if (sParameterString.length() == 46) {
+			if (sParameterString.substr(0, 10) == "/download/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(10, 36));
+				return APIHandler_UIType::utDownload;
+			}
+		}
+
 		if (sParameterString.length() == 43) {
 			if (sParameterString.substr(0, 7) == "/chart/") {
 				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(7, 36));
@@ -225,8 +232,10 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 	uint32_t nParameterStateID = 0;
 	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
 
-	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage)) {
-
+	// The Configuration needs to be available pre-login
+	// Downloads do not need to be authorized, as they generate download ticket ids that are unique to the session user...
+	// Images are dynamically checked in the download, if they are authenticated..
+	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage) || (uiType == APIHandler_UIType::utDownload)) {
 		bNeedsToBeAuthorized = false;
 		bCreateNewSession = false;
 
@@ -298,6 +307,28 @@ PAPIResponse CAPIHandler_UI::handleImageRequest(const std::string& sParameterUUI
 
 	// if not found, return 404
 	return nullptr;
+
+}
+
+
+PAPIResponse CAPIHandler_UI::handleDownloadRequest(const std::string& sParameterUUID, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto apiResponse = std::make_shared<CAPIFixedBufferResponse>("application/csv");	
+	apiResponse->setContentDispositionName("test.csv");
+
+	auto & buffer = apiResponse->getBuffer();
+	buffer.push_back('T');
+	buffer.push_back('E');
+	buffer.push_back('S');
+	buffer.push_back('T');
+	return apiResponse;
+
+
+	// if not found, return 404
+	//return nullptr;
 
 }
 
@@ -424,6 +455,9 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 
 	case APIHandler_UIType::utImage:
 		return handleImageRequest(sParameterUUID, pAuth);
+
+	case APIHandler_UIType::utDownload:
+		return handleDownloadRequest(sParameterUUID, pAuth);
 
 	case APIHandler_UIType::utMeshGeometry: {
 		auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();

@@ -523,6 +523,7 @@ public:
 			case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "STORAGEWRITERDOESNOTEXIST";
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "STORAGESTREAMNOTPARTIAL";
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "STORAGESTREAMNOTRANDOMACCESS";
+			case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "DOWNLOADTICKETNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -821,6 +822,7 @@ public:
 			case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "Storage writer does not exist.";
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "Storage stream is not partial.";
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "Storage stream is not random access.";
+			case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "Download ticket not found.";
 		}
 		return "unknown error";
 	}
@@ -1220,6 +1222,8 @@ public:
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
+	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sSessionUUID, const std::string & sUserUUID);
+	inline void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sSessionUUID, std::string & sUserUUID);
 };
 	
 /*************************************************************************************************************************
@@ -1633,6 +1637,8 @@ public:
 		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
 		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
 		pWrapperTable->m_Storage_StreamIsImage = nullptr;
+		pWrapperTable->m_Storage_CreateDownloadTicket = nullptr;
+		pWrapperTable->m_Storage_RequestDownloadTicket = nullptr;
 		pWrapperTable->m_BuildJobData_GetDataUUID = nullptr;
 		pWrapperTable->m_BuildJobData_GetJobUUID = nullptr;
 		pWrapperTable->m_BuildJobData_GetName = nullptr;
@@ -2322,6 +2328,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Storage_StreamIsImage == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_CreateDownloadTicket = (PLibMCDataStorage_CreateDownloadTicketPtr) GetProcAddress(hLibrary, "libmcdata_storage_createdownloadticket");
+		#else // _WIN32
+		pWrapperTable->m_Storage_CreateDownloadTicket = (PLibMCDataStorage_CreateDownloadTicketPtr) dlsym(hLibrary, "libmcdata_storage_createdownloadticket");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_CreateDownloadTicket == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_RequestDownloadTicket = (PLibMCDataStorage_RequestDownloadTicketPtr) GetProcAddress(hLibrary, "libmcdata_storage_requestdownloadticket");
+		#else // _WIN32
+		pWrapperTable->m_Storage_RequestDownloadTicket = (PLibMCDataStorage_RequestDownloadTicketPtr) dlsym(hLibrary, "libmcdata_storage_requestdownloadticket");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_RequestDownloadTicket == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3487,6 +3511,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_storage_streamisimage", (void**)&(pWrapperTable->m_Storage_StreamIsImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_StreamIsImage == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_createdownloadticket", (void**)&(pWrapperTable->m_Storage_CreateDownloadTicket));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_CreateDownloadTicket == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_requestdownloadticket", (void**)&(pWrapperTable->m_Storage_RequestDownloadTicket));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_RequestDownloadTicket == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobdata_getdatauuid", (void**)&(pWrapperTable->m_BuildJobData_GetDataUUID));
@@ -4786,6 +4818,44 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StreamIsImage(m_pHandle, sUUID.c_str(), &resultIsImage));
 		
 		return resultIsImage;
+	}
+	
+	/**
+	* CStorage::CreateDownloadTicket - Creates a new download ticket for a stream and a user.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sStreamUUID - UUID of storage stream.
+	* @param[in] sSessionUUID - UUID of user session.
+	* @param[in] sUserUUID - UUID of user that created the ticket.
+	*/
+	void CStorage::CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sSessionUUID, const std::string & sUserUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_CreateDownloadTicket(m_pHandle, sTicketUUID.c_str(), sStreamUUID.c_str(), sSessionUUID.c_str(), sUserUUID.c_str()));
+	}
+	
+	/**
+	* CStorage::RequestDownloadTicket - Returns the details of a download ticket and creates an entry in an access log with time stamp.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sIPAddress - IP Address where the request came from.
+	* @param[out] sStreamUUID - UUID of storage stream.
+	* @param[out] sSessionUUID - UUID of user session.
+	* @param[out] sUserUUID - UUID of user that created the ticket.
+	*/
+	void CStorage::RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sSessionUUID, std::string & sUserUUID)
+	{
+		LibMCData_uint32 bytesNeededStreamUUID = 0;
+		LibMCData_uint32 bytesWrittenStreamUUID = 0;
+		LibMCData_uint32 bytesNeededSessionUUID = 0;
+		LibMCData_uint32 bytesWrittenSessionUUID = 0;
+		LibMCData_uint32 bytesNeededUserUUID = 0;
+		LibMCData_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), 0, &bytesNeededStreamUUID, nullptr, 0, &bytesNeededSessionUUID, nullptr, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferStreamUUID(bytesNeededStreamUUID);
+		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0], bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0], bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		sStreamUUID = std::string(&bufferStreamUUID[0]);
+		sSessionUUID = std::string(&bufferSessionUUID[0]);
+		sUserUUID = std::string(&bufferUserUUID[0]);
 	}
 	
 	/**

@@ -678,7 +678,10 @@
 			<param name="Data" type="basicarray" class="uint8" pass="out" description="Binary stream data" />	
 		</method>
 		
-
+		<method name="GetContentDispositionName" description="returns the cached stream content disposition string of the resulting data. Call only after Handle().">
+			<param name="ContentDispositionName" type="string" pass="return" description="Returns non-empty string if content disposition header should be added." />	
+		</method>
+		
 	</class>
 
 

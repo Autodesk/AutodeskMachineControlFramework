@@ -3085,8 +3085,8 @@
 		</method>
 
 		<method name="StartStreamDownload" description="Starts a stream download on the client. Fails if stream does not exist.">
-			<param name="Filename" type="string" pass="in" description="Filename on disk. Fails if empty string." />
 			<param name="UUID" type="string" pass="in" description="Stream UUID." />
+			<param name="Filename" type="string" pass="in" description="Filename on disk. Fails if empty string." />
 		</method>
 
 		<method name="ShowMessageDlg" description="Shows a message dialog in the user interface.">

@@ -131,6 +131,17 @@ typedef LibMCResult (*PLibMCAPIRequestHandler_HandlePtr) (LibMC_APIRequestHandle
 */
 typedef LibMCResult (*PLibMCAPIRequestHandler_GetResultDataPtr) (LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer);
 
+/**
+* returns the cached stream content disposition string of the resulting data. Call only after Handle().
+*
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[in] nContentDispositionNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pContentDispositionNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pContentDispositionNameBuffer -  buffer of Returns non-empty string if content disposition header should be added., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCAPIRequestHandler_GetContentDispositionNamePtr) (LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint32 nContentDispositionNameBufferSize, LibMC_uint32* pContentDispositionNameNeededChars, char * pContentDispositionNameBuffer);
+
 /*************************************************************************************************************************
  Class definition for MCContext
 **************************************************************************************************************************/
@@ -335,6 +346,7 @@ typedef struct {
 	PLibMCAPIRequestHandler_SetFormStringFieldPtr m_APIRequestHandler_SetFormStringField;
 	PLibMCAPIRequestHandler_HandlePtr m_APIRequestHandler_Handle;
 	PLibMCAPIRequestHandler_GetResultDataPtr m_APIRequestHandler_GetResultData;
+	PLibMCAPIRequestHandler_GetContentDispositionNamePtr m_APIRequestHandler_GetContentDispositionName;
 	PLibMCMCContext_RegisterLibraryPathPtr m_MCContext_RegisterLibraryPath;
 	PLibMCMCContext_SetTempBasePathPtr m_MCContext_SetTempBasePath;
 	PLibMCMCContext_ParseConfigurationPtr m_MCContext_ParseConfiguration;

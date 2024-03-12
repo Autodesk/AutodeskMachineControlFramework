@@ -1390,6 +1390,7 @@ public:
 	inline void SetFormStringField(const std::string & sName, const std::string & sString);
 	inline void Handle(const CInputVector<LibMC_uint8> & RawBodyBuffer, std::string & sContentType, LibMC_uint32 & nHTTPCode);
 	inline void GetResultData(std::vector<LibMC_uint8> & DataBuffer);
+	inline std::string GetContentDispositionName();
 };
 	
 /*************************************************************************************************************************
@@ -1535,6 +1536,7 @@ public:
 		pWrapperTable->m_APIRequestHandler_SetFormStringField = nullptr;
 		pWrapperTable->m_APIRequestHandler_Handle = nullptr;
 		pWrapperTable->m_APIRequestHandler_GetResultData = nullptr;
+		pWrapperTable->m_APIRequestHandler_GetContentDispositionName = nullptr;
 		pWrapperTable->m_MCContext_RegisterLibraryPath = nullptr;
 		pWrapperTable->m_MCContext_SetTempBasePath = nullptr;
 		pWrapperTable->m_MCContext_ParseConfiguration = nullptr;
@@ -1665,6 +1667,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_APIRequestHandler_GetResultData == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_APIRequestHandler_GetContentDispositionName = (PLibMCAPIRequestHandler_GetContentDispositionNamePtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_getcontentdispositionname");
+		#else // _WIN32
+		pWrapperTable->m_APIRequestHandler_GetContentDispositionName = (PLibMCAPIRequestHandler_GetContentDispositionNamePtr) dlsym(hLibrary, "libmc_apirequesthandler_getcontentdispositionname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_APIRequestHandler_GetContentDispositionName == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1882,6 +1893,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_GetResultData == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmc_apirequesthandler_getcontentdispositionname", (void**)&(pWrapperTable->m_APIRequestHandler_GetContentDispositionName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_GetContentDispositionName == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmc_mccontext_registerlibrarypath", (void**)&(pWrapperTable->m_MCContext_RegisterLibraryPath));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_RegisterLibraryPath == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2060,6 +2075,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetResultData(m_pHandle, 0, &elementsNeededData, nullptr));
 		DataBuffer.resize((size_t) elementsNeededData);
 		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetResultData(m_pHandle, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
+	}
+	
+	/**
+	* CAPIRequestHandler::GetContentDispositionName - returns the cached stream content disposition string of the resulting data. Call only after Handle().
+	* @return Returns non-empty string if content disposition header should be added.
+	*/
+	std::string CAPIRequestHandler::GetContentDispositionName()
+	{
+		LibMC_uint32 bytesNeededContentDispositionName = 0;
+		LibMC_uint32 bytesWrittenContentDispositionName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetContentDispositionName(m_pHandle, 0, &bytesNeededContentDispositionName, nullptr));
+		std::vector<char> bufferContentDispositionName(bytesNeededContentDispositionName);
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetContentDispositionName(m_pHandle, bytesNeededContentDispositionName, &bytesWrittenContentDispositionName, &bufferContentDispositionName[0]));
+		
+		return std::string(&bufferContentDispositionName[0]);
 	}
 	
 	/**

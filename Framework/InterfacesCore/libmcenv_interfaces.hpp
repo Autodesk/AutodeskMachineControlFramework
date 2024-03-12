@@ -4435,10 +4435,10 @@ public:
 
 	/**
 	* IUIEnvironment::StartStreamDownload - Starts a stream download on the client. Fails if stream does not exist.
-	* @param[in] sFilename - Filename on disk. Fails if empty string.
 	* @param[in] sUUID - Stream UUID.
+	* @param[in] sFilename - Filename on disk. Fails if empty string.
 	*/
-	virtual void StartStreamDownload(const std::string & sFilename, const std::string & sUUID) = 0;
+	virtual void StartStreamDownload(const std::string & sUUID, const std::string & sFilename) = 0;
 
 	/**
 	* IUIEnvironment::ShowMessageDlg - Shows a message dialog in the user interface.

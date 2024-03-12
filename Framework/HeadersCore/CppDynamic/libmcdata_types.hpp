@@ -386,6 +386,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST 359 /** Storage writer does not exist. */
 #define LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL 360 /** Storage stream is not partial. */
 #define LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS 361 /** Storage stream is not random access. */
+#define LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND 362 /** Download ticket not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -684,6 +685,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "Storage writer does not exist.";
     case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "Storage stream is not partial.";
     case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "Storage stream is not random access.";
+    case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "Download ticket not found.";
     default: return "unknown error";
   }
 }

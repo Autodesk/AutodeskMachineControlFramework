@@ -82,6 +82,25 @@ namespace AMCData {
 				break;
 			}
 
+
+			case 8: {
+				std::string sTicketsQuery = "CREATE TABLE `storage_downloadtickets` (";
+				sTicketsQuery += "`ticketuuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+				sTicketsQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`sessionuuid`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`useruuid`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+				pTransaction->executeStatement(sTicketsQuery);
+
+				std::string sDownloadsQuery = "CREATE TABLE `storage_downloads` (";
+				sDownloadsQuery += "`downloaduuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+				sDownloadsQuery += "`ticketuuid`  varchar ( 64 ) NOT NULL,";
+				sDownloadsQuery += "`ipaddress`  varchar ( 128 ) NOT NULL,";
+				sDownloadsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+				pTransaction->executeStatement(sDownloadsQuery);
+
+				break;
+			}
 		}
 	}
 

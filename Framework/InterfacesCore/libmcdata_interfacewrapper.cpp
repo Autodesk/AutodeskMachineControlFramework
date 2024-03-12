@@ -2292,6 +2292,120 @@ LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Storage pStorage, cons
 	}
 }
 
+LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pSessionUUID, const char * pUserUUID)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pTicketUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pStreamUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pSessionUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTicketUUID(pTicketUUID);
+		std::string sStreamUUID(pStreamUUID);
+		std::string sSessionUUID(pSessionUUID);
+		std::string sUserUUID(pUserUUID);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorage->CreateDownloadTicket(sTicketUUID, sStreamUUID, sSessionUUID, sUserUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pTicketUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pIPAddress == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pStreamUUIDBuffer) && !(pStreamUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pSessionUUIDBuffer) && !(pSessionUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pUserUUIDBuffer) && !(pUserUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTicketUUID(pTicketUUID);
+		std::string sIPAddress(pIPAddress);
+		std::string sStreamUUID("");
+		std::string sSessionUUID("");
+		std::string sUserUUID("");
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pStreamUUIDBuffer == nullptr) || (pSessionUUIDBuffer == nullptr) || (pUserUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			pIStorage->RequestDownloadTicket(sTicketUUID, sIPAddress, sStreamUUID, sSessionUUID, sUserUUID);
+
+			pIStorage->_setCache (new ParameterCache_3<std::string, std::string, std::string> (sStreamUUID, sSessionUUID, sUserUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_3<std::string, std::string, std::string>*> (pIStorage->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sStreamUUID, sSessionUUID, sUserUUID);
+			pIStorage->_setCache (nullptr);
+		}
+		
+		if (pStreamUUIDNeededChars)
+			*pStreamUUIDNeededChars = (LibMCData_uint32) (sStreamUUID.size()+1);
+		if (pStreamUUIDBuffer) {
+			if (sStreamUUID.size() >= nStreamUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iStreamUUID = 0; iStreamUUID < sStreamUUID.size(); iStreamUUID++)
+				pStreamUUIDBuffer[iStreamUUID] = sStreamUUID[iStreamUUID];
+			pStreamUUIDBuffer[sStreamUUID.size()] = 0;
+		}
+		if (pSessionUUIDNeededChars)
+			*pSessionUUIDNeededChars = (LibMCData_uint32) (sSessionUUID.size()+1);
+		if (pSessionUUIDBuffer) {
+			if (sSessionUUID.size() >= nSessionUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSessionUUID = 0; iSessionUUID < sSessionUUID.size(); iSessionUUID++)
+				pSessionUUIDBuffer[iSessionUUID] = sSessionUUID[iSessionUUID];
+			pSessionUUIDBuffer[sSessionUUID.size()] = 0;
+		}
+		if (pUserUUIDNeededChars)
+			*pUserUUIDNeededChars = (LibMCData_uint32) (sUserUUID.size()+1);
+		if (pUserUUIDBuffer) {
+			if (sUserUUID.size() >= nUserUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iUserUUID = 0; iUserUUID < sUserUUID.size(); iUserUUID++)
+				pUserUUIDBuffer[iUserUUID] = sUserUUID[iUserUUID];
+			pUserUUIDBuffer[sUserUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for BuildJobData
@@ -6054,6 +6168,10 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storage_contenttypeisaccepted;
 	if (sProcName == "libmcdata_storage_streamisimage") 
 		*ppProcAddress = (void*) &libmcdata_storage_streamisimage;
+	if (sProcName == "libmcdata_storage_createdownloadticket") 
+		*ppProcAddress = (void*) &libmcdata_storage_createdownloadticket;
+	if (sProcName == "libmcdata_storage_requestdownloadticket") 
+		*ppProcAddress = (void*) &libmcdata_storage_requestdownloadticket;
 	if (sProcName == "libmcdata_buildjobdata_getdatauuid") 
 		*ppProcAddress = (void*) &libmcdata_buildjobdata_getdatauuid;
 	if (sProcName == "libmcdata_buildjobdata_getjobuuid") 

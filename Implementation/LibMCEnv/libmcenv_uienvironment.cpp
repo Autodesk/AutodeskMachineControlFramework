@@ -144,7 +144,7 @@ void CUIEnvironment::ActivatePage(const std::string& sPageName)
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ActivatePage>(sPageName));
 }
 
-void CUIEnvironment::StartStreamDownload(const std::string& sFilename, const std::string& sUUID)
+void CUIEnvironment::StartStreamDownload(const std::string& sUUID, const std::string& sFilename)
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
     auto pDataModel = m_pUISystemState->getDataModel ();

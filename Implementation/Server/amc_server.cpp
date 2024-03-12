@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Libraries/cpp-httplib/httplib.h"
 
 #include "amc_server.hpp"
+#include "common_utils.hpp"
 #include <iostream>
 
 using namespace AMC;
@@ -320,6 +321,25 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 					pHandler->Handle(Buffer, sContentType, nHttpCode);
 
 					pHandler->GetResultData(ResultBuffer);
+					std::string sContentDispositionName = pHandler->GetContentDispositionName();
+
+					if (!sContentDispositionName.empty()) {
+						bool bIsAscii = true;
+						for (auto ch : sContentDispositionName) {
+							if (!(isalnum(ch) || (ch == '.') || (ch == '.') || (ch == '_') || (ch == '-') || (ch == '~') || (ch == ' '))) {
+								bIsAscii = false;
+							}
+						}
+
+						if (bIsAscii) {
+							res.set_header("Content-Disposition", "attachment; filename=\"" + sContentDispositionName + "\"");
+						}
+						else {
+							// TODO: Encode in RFC 5987 Encoding
+							//res.set_header("Content-Disposition", "attachment; filename*=UTF-8''" + sContentDispositionName);
+							throw std::runtime_error("Content disposition filename contains invalid characters...");
+						}
+					}
 
 					if (!ResultBuffer.empty()) {
 						std::string sResult(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());

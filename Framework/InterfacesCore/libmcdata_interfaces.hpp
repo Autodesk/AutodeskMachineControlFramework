@@ -825,6 +825,25 @@ public:
 	*/
 	virtual bool StreamIsImage(const std::string & sUUID) = 0;
 
+	/**
+	* IStorage::CreateDownloadTicket - Creates a new download ticket for a stream and a user.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sStreamUUID - UUID of storage stream.
+	* @param[in] sSessionUUID - UUID of user session.
+	* @param[in] sUserUUID - UUID of user that created the ticket.
+	*/
+	virtual void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sSessionUUID, const std::string & sUserUUID) = 0;
+
+	/**
+	* IStorage::RequestDownloadTicket - Returns the details of a download ticket and creates an entry in an access log with time stamp.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sIPAddress - IP Address where the request came from.
+	* @param[out] sStreamUUID - UUID of storage stream.
+	* @param[out] sSessionUUID - UUID of user session.
+	* @param[out] sUserUUID - UUID of user that created the ticket.
+	*/
+	virtual void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sSessionUUID, std::string & sUserUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStorage> PIStorage;

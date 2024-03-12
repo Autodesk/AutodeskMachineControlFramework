@@ -66,6 +66,15 @@ uint32_t CAPIResponse::getHTTPCode() const
 	return m_nHTTPCode;
 }
 
+std::string CAPIResponse::getContentDispositionName() const
+{
+	return m_sContentDispositionName;
+}
+
+void CAPIResponse::setContentDispositionName(const std::string& sContentDispositionName)
+{
+	m_sContentDispositionName = sContentDispositionName;
+}
 
 
 

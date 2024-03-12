@@ -144,6 +144,17 @@ LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_handle(LibMC_APIRequestHandle
 */
 LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_getresultdata(LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer);
 
+/**
+* returns the cached stream content disposition string of the resulting data. Call only after Handle().
+*
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[in] nContentDispositionNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pContentDispositionNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pContentDispositionNameBuffer -  buffer of Returns non-empty string if content disposition header should be added., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_getcontentdispositionname(LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint32 nContentDispositionNameBufferSize, LibMC_uint32* pContentDispositionNameNeededChars, char * pContentDispositionNameBuffer);
+
 /*************************************************************************************************************************
  Class definition for MCContext
 **************************************************************************************************************************/
