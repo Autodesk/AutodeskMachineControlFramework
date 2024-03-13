@@ -360,6 +360,8 @@
 		<error name="STORAGESTREAMNOTPARTIAL" code="360" description="Storage stream is not partial." />		
 		<error name="STORAGESTREAMNOTRANDOMACCESS" code="361" description="Storage stream is not random access." />				
 		<error name="DOWNLOADTICKETNOTFOUND" code="362" description="Download ticket not found." />		
+		<error name="EMPTYCLIENTFILENAME" code="363" description="Empty client file name." />		
+		<error name="INVALIDCLIENTFILENAME" code="364" description="Invalid client file name." />		
 										
 	</errors>
 	
@@ -804,6 +806,7 @@
 		<method name="CreateDownloadTicket" description="Creates a new download ticket for a stream and a user.">
 			<param name="TicketUUID" type="string" pass="in" description="UUID of download ticket." />	
 			<param name="StreamUUID" type="string" pass="in" description="UUID of storage stream." />	
+			<param name="ClientFileName" type="string" pass="in" description="ClientFileName of the ticket. MUST NOT be empty." />	
 			<param name="SessionUUID" type="string" pass="in" description="UUID of user session." />	
 			<param name="UserUUID" type="string" pass="in" description="UUID of user that created the ticket." />	
 		</method>	
@@ -812,6 +815,7 @@
 			<param name="TicketUUID" type="string" pass="in" description="UUID of download ticket." />	
 			<param name="IPAddress" type="string" pass="in" description="IP Address where the request came from." />	
 			<param name="StreamUUID" type="string" pass="out" description="UUID of storage stream." />	
+			<param name="ClientFileName" type="string" pass="out" description="ClientFileName of the ticket." />	
 			<param name="SessionUUID" type="string" pass="out" description="UUID of user session." />	
 			<param name="UserUUID" type="string" pass="out" description="UUID of user that created the ticket." />	
 		</method>	

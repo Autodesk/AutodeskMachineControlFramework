@@ -191,6 +191,8 @@
 		<error name="DOWNLOADSTREAMDOESNOTEXIST" code="10151" description="Download stream does not exist." />		
 		<error name="EMPTYDOWNLOADSTREAMFILENAME" code="10152" description="Empty download stream filename." />		
 		<error name="INVALIDDOWNLOADSTREAMFILENAME" code="10153" description="Invalid download stream filename." />		
+		<error name="USERISNOTAUTHORIZED" code="10154" description="User is not authorized." />		
+		
 		
 	</errors>
 

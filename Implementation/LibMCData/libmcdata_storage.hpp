@@ -106,9 +106,10 @@ public:
 
     bool StreamIsImage(const std::string& sUUID) override;
 
-    void CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sSessionUUID, const std::string& sUserUUID);
 
-    void RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sSessionUUID, std::string& sUserUUID);
+    void CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sClientFileName, const std::string& sSessionUUID, const std::string& sUserUUID) override;
+
+    void RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID) override;
 
 };
 

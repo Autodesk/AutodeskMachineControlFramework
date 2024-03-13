@@ -316,19 +316,26 @@ PAPIResponse CAPIHandler_UI::handleDownloadRequest(const std::string& sParameter
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto apiResponse = std::make_shared<CAPIFixedBufferResponse>("application/csv");	
-	apiResponse->setContentDispositionName("test.csv");
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
 
-	auto & buffer = apiResponse->getBuffer();
-	buffer.push_back('T');
-	buffer.push_back('E');
-	buffer.push_back('S');
-	buffer.push_back('T');
+	std::string sIPAddress;
+
+	std::string sStreamUUID;
+	std::string sSessionUUID;
+	std::string sUserUUID;
+	std::string sDownloadFileName;
+
+	pStorage->RequestDownloadTicket(sParameterUUID, sIPAddress, sStreamUUID, sDownloadFileName, sSessionUUID, sUserUUID);
+
+	auto pStream = pStorage->RetrieveStream(sStreamUUID);
+	auto sContentType = pStream->GetMIMEType();
+
+	auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(sContentType);
+	apiResponse->setContentDispositionName(sDownloadFileName);
+	pStream->GetContent(apiResponse->getBuffer());
+
 	return apiResponse;
-
-
-	// if not found, return 404
-	//return nullptr;
 
 }
 

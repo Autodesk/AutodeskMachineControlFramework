@@ -763,11 +763,12 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Sto
 * @param[in] pStorage - Storage instance.
 * @param[in] pTicketUUID - UUID of download ticket.
 * @param[in] pStreamUUID - UUID of storage stream.
+* @param[in] pClientFileName - ClientFileName of the ticket. MUST NOT be empty.
 * @param[in] pSessionUUID - UUID of user session.
 * @param[in] pUserUUID - UUID of user that created the ticket.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pSessionUUID, const char * pUserUUID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pClientFileName, const char * pSessionUUID, const char * pUserUUID);
 
 /**
 * Returns the details of a download ticket and creates an entry in an access log with time stamp.
@@ -778,6 +779,9 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCD
 * @param[in] nStreamUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pStreamUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pStreamUUIDBuffer -  buffer of UUID of storage stream., may be NULL
+* @param[in] nClientFileNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pClientFileNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pClientFileNameBuffer -  buffer of ClientFileName of the ticket., may be NULL
 * @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pSessionUUIDBuffer -  buffer of UUID of user session., may be NULL
@@ -786,7 +790,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCD
 * @param[out] pUserUUIDBuffer -  buffer of UUID of user that created the ticket., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
 
 /*************************************************************************************************************************
  Class definition for BuildJobData

@@ -87,6 +87,7 @@ namespace AMCData {
 				std::string sTicketsQuery = "CREATE TABLE `storage_downloadtickets` (";
 				sTicketsQuery += "`ticketuuid`  varchar ( 64 ) UNIQUE NOT NULL,";
 				sTicketsQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`clientfilename`  varchar ( 64 ) NOT NULL,";
 				sTicketsQuery += "`sessionuuid`  varchar ( 64 ) NOT NULL,";
 				sTicketsQuery += "`useruuid`  varchar ( 64 ) NOT NULL,";
 				sTicketsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";

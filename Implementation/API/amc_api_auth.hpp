@@ -73,6 +73,8 @@ namespace AMC {
 
 		std::string getUserName();
 
+		std::string getUserUUID();
+
 		std::string getSessionUUID();
 
 		std::string getSessionKey();

@@ -159,9 +159,15 @@ void CUIEnvironment::StartStreamDownload(const std::string& sUUID, const std::st
     if (sFilename.size () > DOWNLOADFILENAME_MAXLENGTH)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME);
 
-    std::string sDownloadUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
+    if (!m_pAPIAuth->userIsAuthorized ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_USERISNOTAUTHORIZED);
 
-    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sDownloadUUID, sFilename));
+    std::string sUserUUID = m_pAPIAuth->getUserUUID();
+
+    std::string sTicketUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
+    pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID);
+
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sTicketUUID, sFilename));
 }
 
 

@@ -361,12 +361,17 @@ bool CStorage::StreamIsImage(const std::string& sUUID)
 }
 
 
-void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sSessionUUID, const std::string& sUserUUID)
+void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sClientFileName, const std::string& sSessionUUID, const std::string& sUserUUID) 
 {
     std::string sNormalizedTicketUUID = AMCCommon::CUtils::normalizeUUIDString(sTicketUUID);
     std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
     std::string sNormalizedSessionUUID = AMCCommon::CUtils::normalizeUUIDString(sSessionUUID);
     std::string sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+    if (sClientFileName.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYCLIENTFILENAME);
+
+    // TODO: Check invalid file name?
 
     auto pTransaction = m_pSQLHandler->beginTransaction();
 
@@ -388,13 +393,14 @@ void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::s
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND, "user not found for download: " + sNormalizedUserUUID);
     pUserStatement = nullptr;
 
-    std::string sTicketQuery = "INSERT INTO storage_downloadtickets (ticketuuid, streamuuid, sessionuuid, useruuid, timestamp) VALUES (?, ?, ?, ?, ?)";
+    std::string sTicketQuery = "INSERT INTO storage_downloadtickets (ticketuuid, streamuuid, clientfilename, sessionuuid, useruuid, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
     auto pTicketStatement = pTransaction->prepareStatement(sTicketQuery);
     pTicketStatement->setString(1, sNormalizedTicketUUID);
     pTicketStatement->setString(2, sNormalizedStreamUUID);
-    pTicketStatement->setString(3, sNormalizedSessionUUID);
-    pTicketStatement->setString(4, sNormalizedUserUUID);
-    pTicketStatement->setString(5, sTimestamp);
+    pTicketStatement->setString(3, sClientFileName);
+    pTicketStatement->setString(4, sNormalizedSessionUUID);
+    pTicketStatement->setString(5, sNormalizedUserUUID);
+    pTicketStatement->setString(6, sTimestamp);
     pTicketStatement->execute();
     pTicketStatement = nullptr;
 
@@ -403,7 +409,8 @@ void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::s
 
 }
 
-void CStorage::RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sSessionUUID, std::string& sUserUUID)
+
+void CStorage::RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID) 
 {
     std::string sNormalizedTicketUUID = AMCCommon::CUtils::normalizeUUIDString(sTicketUUID);
 
@@ -411,15 +418,16 @@ void CStorage::RequestDownloadTicket(const std::string& sTicketUUID, const std::
     AMCCommon::CChrono chrono;
     std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC();
 
-    std::string sTicketQuery = "SELECT streamuuid, sessionuuid, useruuid FROM storage_downloadtickets WHERE ticketuuid=?";
+    std::string sTicketQuery = "SELECT streamuuid, clientfilename, sessionuuid, useruuid FROM storage_downloadtickets WHERE ticketuuid=?";
     auto pTicketStatement = pTransaction->prepareStatement(sTicketQuery);
     pTicketStatement->setString(1, sNormalizedTicketUUID);
     if (!pTicketStatement->nextRow())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND, "download ticket not found: " + sNormalizedTicketUUID);
 
     sStreamUUID = pTicketStatement->getColumnString(1);
-    sSessionUUID = pTicketStatement->getColumnString(2);
-    sUserUUID = pTicketStatement->getColumnString(3);
+    sClientFileName = pTicketStatement->getColumnString(2);
+    sSessionUUID = pTicketStatement->getColumnString(3);
+    sUserUUID = pTicketStatement->getColumnString(4);
 
     pTicketStatement = nullptr;
 

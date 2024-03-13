@@ -524,6 +524,8 @@ public:
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "STORAGESTREAMNOTPARTIAL";
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "STORAGESTREAMNOTRANDOMACCESS";
 			case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "DOWNLOADTICKETNOTFOUND";
+			case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "EMPTYCLIENTFILENAME";
+			case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "INVALIDCLIENTFILENAME";
 		}
 		return "UNKNOWN";
 	}
@@ -823,6 +825,8 @@ public:
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "Storage stream is not partial.";
 			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "Storage stream is not random access.";
 			case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "Download ticket not found.";
+			case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "Empty client file name.";
+			case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "Invalid client file name.";
 		}
 		return "unknown error";
 	}
@@ -1222,8 +1226,8 @@ public:
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
-	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sSessionUUID, const std::string & sUserUUID);
-	inline void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sSessionUUID, std::string & sUserUUID);
+	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID);
+	inline void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID);
 };
 	
 /*************************************************************************************************************************
@@ -4824,12 +4828,13 @@ public:
 	* CStorage::CreateDownloadTicket - Creates a new download ticket for a stream and a user.
 	* @param[in] sTicketUUID - UUID of download ticket.
 	* @param[in] sStreamUUID - UUID of storage stream.
+	* @param[in] sClientFileName - ClientFileName of the ticket. MUST NOT be empty.
 	* @param[in] sSessionUUID - UUID of user session.
 	* @param[in] sUserUUID - UUID of user that created the ticket.
 	*/
-	void CStorage::CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sSessionUUID, const std::string & sUserUUID)
+	void CStorage::CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_CreateDownloadTicket(m_pHandle, sTicketUUID.c_str(), sStreamUUID.c_str(), sSessionUUID.c_str(), sUserUUID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_CreateDownloadTicket(m_pHandle, sTicketUUID.c_str(), sStreamUUID.c_str(), sClientFileName.c_str(), sSessionUUID.c_str(), sUserUUID.c_str()));
 	}
 	
 	/**
@@ -4837,23 +4842,28 @@ public:
 	* @param[in] sTicketUUID - UUID of download ticket.
 	* @param[in] sIPAddress - IP Address where the request came from.
 	* @param[out] sStreamUUID - UUID of storage stream.
+	* @param[out] sClientFileName - ClientFileName of the ticket.
 	* @param[out] sSessionUUID - UUID of user session.
 	* @param[out] sUserUUID - UUID of user that created the ticket.
 	*/
-	void CStorage::RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sSessionUUID, std::string & sUserUUID)
+	void CStorage::RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID)
 	{
 		LibMCData_uint32 bytesNeededStreamUUID = 0;
 		LibMCData_uint32 bytesWrittenStreamUUID = 0;
+		LibMCData_uint32 bytesNeededClientFileName = 0;
+		LibMCData_uint32 bytesWrittenClientFileName = 0;
 		LibMCData_uint32 bytesNeededSessionUUID = 0;
 		LibMCData_uint32 bytesWrittenSessionUUID = 0;
 		LibMCData_uint32 bytesNeededUserUUID = 0;
 		LibMCData_uint32 bytesWrittenUserUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), 0, &bytesNeededStreamUUID, nullptr, 0, &bytesNeededSessionUUID, nullptr, 0, &bytesNeededUserUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), 0, &bytesNeededStreamUUID, nullptr, 0, &bytesNeededClientFileName, nullptr, 0, &bytesNeededSessionUUID, nullptr, 0, &bytesNeededUserUUID, nullptr));
 		std::vector<char> bufferStreamUUID(bytesNeededStreamUUID);
+		std::vector<char> bufferClientFileName(bytesNeededClientFileName);
 		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
 		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0], bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0], bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0], bytesNeededClientFileName, &bytesWrittenClientFileName, &bufferClientFileName[0], bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0], bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
 		sStreamUUID = std::string(&bufferStreamUUID[0]);
+		sClientFileName = std::string(&bufferClientFileName[0]);
 		sSessionUUID = std::string(&bufferSessionUUID[0]);
 		sUserUUID = std::string(&bufferUserUUID[0]);
 	}

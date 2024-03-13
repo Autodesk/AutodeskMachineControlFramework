@@ -2292,7 +2292,7 @@ LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Storage pStorage, cons
 	}
 }
 
-LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pSessionUUID, const char * pUserUUID)
+LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pClientFileName, const char * pSessionUUID, const char * pUserUUID)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -2301,19 +2301,22 @@ LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorag
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pStreamUUID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pClientFileName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pSessionUUID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserUUID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sTicketUUID(pTicketUUID);
 		std::string sStreamUUID(pStreamUUID);
+		std::string sClientFileName(pClientFileName);
 		std::string sSessionUUID(pSessionUUID);
 		std::string sUserUUID(pUserUUID);
 		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->CreateDownloadTicket(sTicketUUID, sStreamUUID, sSessionUUID, sUserUUID);
+		pIStorage->CreateDownloadTicket(sTicketUUID, sStreamUUID, sClientFileName, sSessionUUID, sUserUUID);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -2328,7 +2331,7 @@ LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorag
 	}
 }
 
-LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer)
+LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -2339,6 +2342,8 @@ LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStora
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if ( (!pStreamUUIDBuffer) && !(pStreamUUIDNeededChars) )
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pClientFileNameBuffer) && !(pClientFileNameNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if ( (!pSessionUUIDBuffer) && !(pSessionUUIDNeededChars) )
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if ( (!pUserUUIDBuffer) && !(pUserUUIDNeededChars) )
@@ -2346,23 +2351,24 @@ LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStora
 		std::string sTicketUUID(pTicketUUID);
 		std::string sIPAddress(pIPAddress);
 		std::string sStreamUUID("");
+		std::string sClientFileName("");
 		std::string sSessionUUID("");
 		std::string sUserUUID("");
 		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pStreamUUIDBuffer == nullptr) || (pSessionUUIDBuffer == nullptr) || (pUserUUIDBuffer == nullptr);
+		bool isCacheCall = (pStreamUUIDBuffer == nullptr) || (pClientFileNameBuffer == nullptr) || (pSessionUUIDBuffer == nullptr) || (pUserUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			pIStorage->RequestDownloadTicket(sTicketUUID, sIPAddress, sStreamUUID, sSessionUUID, sUserUUID);
+			pIStorage->RequestDownloadTicket(sTicketUUID, sIPAddress, sStreamUUID, sClientFileName, sSessionUUID, sUserUUID);
 
-			pIStorage->_setCache (new ParameterCache_3<std::string, std::string, std::string> (sStreamUUID, sSessionUUID, sUserUUID));
+			pIStorage->_setCache (new ParameterCache_4<std::string, std::string, std::string, std::string> (sStreamUUID, sClientFileName, sSessionUUID, sUserUUID));
 		}
 		else {
-			auto cache = dynamic_cast<ParameterCache_3<std::string, std::string, std::string>*> (pIStorage->_getCache ());
+			auto cache = dynamic_cast<ParameterCache_4<std::string, std::string, std::string, std::string>*> (pIStorage->_getCache ());
 			if (cache == nullptr)
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-			cache->retrieveData (sStreamUUID, sSessionUUID, sUserUUID);
+			cache->retrieveData (sStreamUUID, sClientFileName, sSessionUUID, sUserUUID);
 			pIStorage->_setCache (nullptr);
 		}
 		
@@ -2374,6 +2380,15 @@ LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStora
 			for (size_t iStreamUUID = 0; iStreamUUID < sStreamUUID.size(); iStreamUUID++)
 				pStreamUUIDBuffer[iStreamUUID] = sStreamUUID[iStreamUUID];
 			pStreamUUIDBuffer[sStreamUUID.size()] = 0;
+		}
+		if (pClientFileNameNeededChars)
+			*pClientFileNameNeededChars = (LibMCData_uint32) (sClientFileName.size()+1);
+		if (pClientFileNameBuffer) {
+			if (sClientFileName.size() >= nClientFileNameBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iClientFileName = 0; iClientFileName < sClientFileName.size(); iClientFileName++)
+				pClientFileNameBuffer[iClientFileName] = sClientFileName[iClientFileName];
+			pClientFileNameBuffer[sClientFileName.size()] = 0;
 		}
 		if (pSessionUUIDNeededChars)
 			*pSessionUUIDNeededChars = (LibMCData_uint32) (sSessionUUID.size()+1);

@@ -92,8 +92,13 @@ PUserInformation CAPIAuth::getUserInformation()
 std::string CAPIAuth::getUserName() 
 {
 	return m_pUserInformation->getLogin();
-
 }
+
+std::string CAPIAuth::getUserUUID()
+{
+	return m_pUserInformation->getUUID();
+}
+
 
 PParameterHandler CAPIAuth::getClientVariableHandler()
 {

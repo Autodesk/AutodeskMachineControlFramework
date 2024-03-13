@@ -248,6 +248,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST 10151 /** Download stream does not exist. */
 #define LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME 10152 /** Empty download stream filename. */
 #define LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME 10153 /** Invalid download stream filename. */
+#define LIBMCENV_ERROR_USERISNOTAUTHORIZED 10154 /** User is not authorized. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -408,6 +409,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST: return "Download stream does not exist.";
     case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "Empty download stream filename.";
     case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "Invalid download stream filename.";
+    case LIBMCENV_ERROR_USERISNOTAUTHORIZED: return "User is not authorized.";
     default: return "unknown error";
   }
 }
