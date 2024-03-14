@@ -205,7 +205,7 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler
         uint32_t nGreen = (color.second >> 8) & 0xff;
         uint32_t nBlue = (color.second >> 16) & 0xff;
 
-        sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << nGreen << nBlue;
+        sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << std::setfill('0') << std::setw(2) << std::hex << nGreen << std::setfill('0') << std::setw(2) << std::hex << nBlue;
 
         colorsObject.addString(color.first, sColorStream.str());
     }
