@@ -18,6 +18,7 @@
       <permission identifier="permission_start_build" displayname="Start Build" description="Can start a new build on machine." />
       <permission identifier="permission_user_management" displayname="User Management" description="Can create/edit local users." />
       <permission identifier="permission_that_nobody_has" displayname="Permission that nobody has" description="." />
+      <permission identifier="permission_acknowledgealerts" displayname="Acknowledge Alerts" description="Can acknowledge alerts." />
     </permissions>
 
 
@@ -46,25 +47,58 @@
   </accesscontrol>
 
   <alerts>
-    <alert name="testalert"	level="warning"	description="Test alert on PLC" acknowledgepermission="permission_acknowledgealerts" />
-    <alert name="dooropen"	level="criticalerror"	description="Door is open" acknowledgepermission="permission_acknowledgealerts" />
-    <alert name="halfemptysomething"	level="message"	description="Something reached 50% fill level" />
-    <alert name="recoatercrashed"	level="fatalerror"	description="Recoater crashed" acknowledgepermission="permission_acknowledgealerts" />
+    <alert identifier="testalert"	level="warning"	description="Test alert description" acknowledgepermission="permission_acknowledgealerts" />
+    <alert identifier="dooropen"	level="criticalerror"	description="Door is open" acknowledgepermission="permission_acknowledgealerts" />
+    <alert identifier="halfemptysomething"	level="message"	description="Something reached 50% fill level" />
+    <alert identifier="recoatercrashed"	level="fatalerror"	description="Recoater crashed" acknowledgepermission="permission_acknowledgealerts" />
   </alerts>
   
-	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol"/>
-	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
+  <driver name="bur" library="driver_bur" type="bur-1.0" configurationschema="http://schemas.autodesk.com/amc/burprotocol/2023/06">
+    <version major="2" minor="0" patch="0"/>
+
+    <protocol packetsignature="171"/>
+
+    <queue size="2048"/>
+
+    <machinestatus>
+      <dint name="journalindex" address="0" description="Journal Index"/>
+      <dint name="cyclecounter" address="4" description="Cycle Counter"/>
+    </machinestatus>
+
+
+    <commands>
+
+      <command name="home" id="1025">
+      </command>
+
+      <command name="testmove" id="1034">
+        <dint name="target" address="0" description="Target Position in micron"/>
+        <dint name="speed" address="4" description="Speed in micron per second"/>
+        <dint name="acceleration" address="8" description="Acceleration in micron per second squared"/>
+      </command>
+
+      <command name="triggersingleaxismovement" id="2000">
+        <int name="axis" address="0" description="ID of the axis to move (1 = Recoater, 2 = ....)"/>
+        <int name="absoluterelative" address="2" description="Is movement absolute (1) or relative (2)."/>
+        <dint name="target" address="4" description="Target Position in micron"/>
+        <dint name="speed" address="8" description="Speed in micron per second"/>
+        <dint name="acceleration" address="12" description="Acceleration in micron per second squared"/>
+      </command>
+
+
+    </commands>
+  </driver>
+  
+  
+  <driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
 	<driver name="raylase" library="driver_raylase" type="raylase"/>
   <driver name="scanlabsmc" library="driver_scanlabsmc" type="scanlab-smc-0.6">
-
     <preset name="smc_laser_1">
 			<general DynamicViolationReaction="WarningOnly" />
     </preset>
-
-
-
   </driver>
-    
+
+  <driver name="grpc" library="driver_grpc" type="libgrpc-1.0"/>
 
   <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
@@ -91,8 +125,8 @@
     </parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
-			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
-			<parameter name="simulateplc" description="Simulate PLC behaviour" default="1" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9"/>
+			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a" />
+			<parameter name="simulateplc" description="Simulate PLC behaviour" default="1" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9" />
 		</parametergroup>
 
 		<signaldefinition name="signal_initjob">
@@ -228,8 +262,8 @@
 	<statemachine name="plc" description="PLC System" initstate="init" failedstate="fatalerror" library="plugin_plc">
 
 		<parametergroup name="plcconfig" description="PLC Config">
-			<parameter name="ipaddress" description="PLC Ethernet Address" default="192.168.2.2" type="string"/>
-			<parameter name="port" description="PLC Port" default="12000" type="int"/>
+			<parameter name="ipaddress" description="PLC Ethernet Address" default="127.0.0.1" type="string"/>
+			<parameter name="port" description="PLC Port" default="12200" type="int"/>
 			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
 			<derivedparameter name="simulateplc" statemachine="main" group="configuration" parameter="simulateplc"/>
 		</parametergroup>
@@ -332,7 +366,7 @@
           <chart name="chart1">
             
           </chart>
-					
+
 
           <form name="machinestateinforform">
 						<edit name="mainstatename" caption="Main System" readonly="1" sync:value="main.$state"/>
@@ -545,19 +579,36 @@
 		</page>
 
 		<page name="systemstatus">
+      <grid name="previewgrid">
+        <column width="3" unit="free"/>
+        <column width="3" unit="free"/>
 
-			<content name="currentbuild" title="Current System Status">
-				<parameterlist loadingtext="Loading parameters">
-					<entry statemachine="main" group="jobinfo"/>
-					<entry statemachine="main" group="ui"/>
-					<entry statemachine="plc" group="plcconfig"/>
-					<entry statemachine="plc" group="plcstate"/>
+        <row height="1" unit="free"/>
 
-					<entry statemachine="laser" group="sdkstate"/>
+        <content name="currentbuild" title="Current System Status" columnstart="1" rowstart="1" columnend="1" rowend="1"  scrollbars="1">
+          <parameterlist loadingtext="Loading parameters">
+            <entry statemachine="main" group="jobinfo"/>
+            <entry statemachine="main" group="ui"/>
+            <entry statemachine="plc" group="plcconfig"/>
+            <entry statemachine="plc" group="plcstate"/>
 
-				</parameterlist>
+            <entry statemachine="laser" group="sdkstate"/>
 
-			</content>
+          </parameterlist>
+
+        </content>
+
+        <content name="alertpage" title="Alerts" columnstart="2" rowstart="1" columnend="2" rowend="1">
+
+          <alertlist name="alerts" loadingtext="Loading alerts" entriesperpage="20" />
+
+				<buttongroup name="buttongroup" distribution="equal">
+					<button name="button1" caption="Button 1" event="createalert"/>
+					<button name="button2" caption="Button 2" event="createalert"/>
+				</buttongroup>
+      
+				</content>
+				</grid>
 
 		</page>
 
