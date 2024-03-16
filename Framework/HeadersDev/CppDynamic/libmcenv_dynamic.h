@@ -1531,6 +1531,340 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_HasUniqueMetaDataPtr) (LibMCE
 typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_FindUniqueMetaDataPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
 
 /*************************************************************************************************************************
+ Class definition for BuildExecution
+**************************************************************************************************************************/
+
+/**
+* Returns uuid of the build execution.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nExecutionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pExecutionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pExecutionUUIDBuffer -  buffer of UUID of the build execution., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nExecutionUUIDBufferSize, LibMCEnv_uint32* pExecutionUUIDNeededChars, char * pExecutionUUIDBuffer);
+
+/**
+* Returns uuid of the build.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of UUID of the build., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetBuildUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
+* Returns the instance of the build.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pBuildInstance - Instance of the build.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetBuildPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_Build * pBuildInstance);
+
+/**
+* Returns the status of the execution.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pExecutionStatus - Status of the build.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetExecutionStatusPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv::eBuildExecutionStatus * pExecutionStatus);
+
+/**
+* Convenience function for checking the execution status.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pIsInProcess - Returns true if the status is InProcess.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_IsInProcessPtr) (LibMCEnv_BuildExecution pBuildExecution, bool * pIsInProcess);
+
+/**
+* Convenience function for checking the execution status.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pIsInProcess - Returns true if the status is Finished.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_IsFinishedPtr) (LibMCEnv_BuildExecution pBuildExecution, bool * pIsInProcess);
+
+/**
+* Convenience function for checking the execution status.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pIsInProcess - Returns true if the status is Failed.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_IsFailedPtr) (LibMCEnv_BuildExecution pBuildExecution, bool * pIsInProcess);
+
+/**
+* Sets build execution status to finished. Fails if Build status is not InProcess 
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_SetStatusToFinishedPtr) (LibMCEnv_BuildExecution pBuildExecution);
+
+/**
+* Sets build execution status to failed. Fails if Build status is not InProcess 
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_SetStatusToFailedPtr) (LibMCEnv_BuildExecution pBuildExecution);
+
+/**
+* Returns a human readable description of the build execution for display in the User Interface.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetDescriptionPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Sets a human readable description of the build execution for display in the User Interface. Should not be empty.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pDescription - Description.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_SetDescriptionPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pDescription);
+
+/**
+* Returns the machine journal UUID that this job in executing in.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nJournalUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pJournalUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pJournalUUIDBuffer -  buffer of Journal UUID of build execution., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetJournalUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nJournalUUIDBufferSize, LibMCEnv_uint32* pJournalUUIDNeededChars, char * pJournalUUIDBuffer);
+
+/**
+* Returns if a user is attached to the execution.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pUserIsAttached - Flag if a user is attached to the execution.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_HasAttachedUserPtr) (LibMCEnv_BuildExecution pBuildExecution, bool * pUserIsAttached);
+
+/**
+* Returns the user that started this job. Fails if no user is attached to the execution.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of User who started the job., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetUserUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+
+/**
+* Returns the start time of the build in ISO8601 UTC format.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nStartTimeInUTCBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStartTimeInUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStartTimeInUTCBuffer -  buffer of Start time of the build., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetStartTimeInUTCPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nStartTimeInUTCBufferSize, LibMCEnv_uint32* pStartTimeInUTCNeededChars, char * pStartTimeInUTCBuffer);
+
+/**
+* Returns the start time stamp of the build execution in the current machine journal.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pTimeStampInMilliseconds - TimeStamp when the build started in Milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetStartTimeStampInMillisecondsPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMilliseconds);
+
+/**
+* Returns the start time stamp of the build execution in the current machine journal.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pTimeStampInMicroseconds - TimeStamp when the build started in Microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetStartTimeStampInMicrosecondsPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMicroseconds);
+
+/**
+* Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pTimeStampInMilliseconds - TimeStamp when the build ended in Milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetEndTimeStampInMillisecondsPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMilliseconds);
+
+/**
+* Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pTimeStampInMicroseconds - TimeStamp when the build ended in Microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetEndTimeStampInMicrosecondsPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMicroseconds);
+
+/**
+* Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pTimeStampInMilliseconds - Elapsed time in Milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMilliseconds);
+
+/**
+* Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pTimeStampInMicroseconds - Elapsed time in Microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMicroseconds);
+
+/**
+* Adds binary data to store with the build.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+* @param[in] pName - Name of the attache data
+* @param[in] pMIMEType - Mime type of the data.
+* @param[in] nContentBufferSize - Number of elements in buffer
+* @param[in] pContentBuffer - uint8 buffer of Stream content to store
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_AddBinaryDataPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pFieldDataInstance - Loaded field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pFieldDataInstance - Loaded field instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadDiscreteField2DByUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+
+/**
+* Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pFieldDataInstance - Field instance to store.
+* @param[in] pStoreOptions - Field Data Store Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StoreDiscreteField2DPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pImageDataInstance - Image data instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pImageDataInstance - Image data instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadPNGImageByUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* Stores a discrete field in the build job. MIME Type will be image/png
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pImageDataInstance - Image data instance.
+* @param[in] pStoreOptions - PNG Store Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StorePNGImagePtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+* @param[in] pValue - Value to store.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_AddMetaDataStringPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const char * pValue);
+
+/**
+* Checks if a metadata string exists.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[out] pMetaDataStringExists - Returns if metadata string exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_HasMetaDataStringPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pKey, bool * pMetaDataStringExists);
+
+/**
+* Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetMetaDataStringPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/*************************************************************************************************************************
+ Class definition for BuildExecutionIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the execution the iterator points at.
+*
+* @param[in] pBuildExecutionIterator - BuildExecutionIterator instance.
+* @param[out] pBuildExecutionInstance - returns the BuildExecution instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecutionIterator_GetCurrentExecutionPtr) (LibMCEnv_BuildExecutionIterator pBuildExecutionIterator, LibMCEnv_BuildExecution * pBuildExecutionInstance);
+
+/*************************************************************************************************************************
  Class definition for Build
 **************************************************************************************************************************/
 
@@ -1557,7 +1891,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_GetNamePtr) (LibMCEnv_Build pBuild, cons
 typedef LibMCEnvResult (*PLibMCEnvBuild_GetBuildUUIDPtr) (LibMCEnv_Build pBuild, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
 
 /**
-* Returns storage uuid of the build.
+* Returns storage uuid of the build stream.
 *
 * @param[in] pBuild - Build instance.
 * @param[in] nStorageUUIDBufferSize - size of the buffer (including trailing 0)
@@ -1715,7 +2049,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_LoadPNGImageByUUIDPtr) (LibMCEnv_Build p
 * Stores a discrete field in the build job. MIME Type will be image/png
 *
 * @param[in] pBuild - Build instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
 * @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 * @param[in] pImageDataInstance - Image data instance.
 * @param[in] pStoreOptions - PNG Store Options.
@@ -1725,6 +2059,90 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_LoadPNGImageByUUIDPtr) (LibMCEnv_Build p
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvBuild_StorePNGImagePtr) (LibMCEnv_Build pBuild, const char * pContextIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Starts a build execution. This function does not work in a UIEnvironment context!
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDescription - A human readable description of the build execution for display in the User Interface. Should not be empty.
+* @param[in] pUserUUID - User who started the execution. MUST exist. If empty, no user is attached.
+* @param[out] pBuildExecutionInstance - Build execution instance. Will be newly created and has the status InProcess.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_StartExecutionPtr) (LibMCEnv_Build pBuild, const char * pDescription, const char * pUserUUID, LibMCEnv_BuildExecution * pBuildExecutionInstance);
+
+/**
+* Checks if a build execution exists for this build.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pExecutionUUID - The UUID of the exceution.
+* @param[out] pExecutionExist - Returns true if the execution exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_HasExecutionPtr) (LibMCEnv_Build pBuild, const char * pExecutionUUID, bool * pExecutionExist);
+
+/**
+* Finds a build execution. Fails if execution does not exist.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pExecutionUUID - The UUID of the exceution.
+* @param[out] pBuildExecutionInstance - Build execution instance. Will be newly created and has the status InProcess.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_FindExecutionPtr) (LibMCEnv_Build pBuild, const char * pExecutionUUID, LibMCEnv_BuildExecution * pBuildExecutionInstance);
+
+/**
+* Lists all Executions of the build.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+* @param[out] pIteratorInstance - Iterator instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_ListExecutionsPtr) (LibMCEnv_Build pBuild, bool bOnlyCurrentJournalSession, LibMCEnv_BuildExecutionIterator * pIteratorInstance);
+
+/**
+* Lists all Executions of the build by status.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] eExecutionStatus - Status of the build.
+* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+* @param[out] pIteratorInstance - Iterator instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_ListExecutionsByStatusPtr) (LibMCEnv_Build pBuild, LibMCEnv::eBuildExecutionStatus eExecutionStatus, bool bOnlyCurrentJournalSession, LibMCEnv_BuildExecutionIterator * pIteratorInstance);
+
+/**
+* Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+* @param[in] pValue - Value to store.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_AddMetaDataStringPtr) (LibMCEnv_Build pBuild, const char * pKey, const char * pValue);
+
+/**
+* Checks if a metadata string exists.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[out] pMetaDataStringExists - Returns if metadata string exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_HasMetaDataStringPtr) (LibMCEnv_Build pBuild, const char * pKey, bool * pMetaDataStringExists);
+
+/**
+* Gets a metadata string of a build. Fails if Meta Data does not exist.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Return value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_GetMetaDataStringPtr) (LibMCEnv_Build pBuild, const char * pKey, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /*************************************************************************************************************************
  Class definition for WorkingFileExecution
@@ -6485,6 +6903,38 @@ typedef struct {
 	PLibMCEnvToolpathAccessor_GetMetaDataContentPtr m_ToolpathAccessor_GetMetaDataContent;
 	PLibMCEnvToolpathAccessor_HasUniqueMetaDataPtr m_ToolpathAccessor_HasUniqueMetaData;
 	PLibMCEnvToolpathAccessor_FindUniqueMetaDataPtr m_ToolpathAccessor_FindUniqueMetaData;
+	PLibMCEnvBuildExecution_GetUUIDPtr m_BuildExecution_GetUUID;
+	PLibMCEnvBuildExecution_GetBuildUUIDPtr m_BuildExecution_GetBuildUUID;
+	PLibMCEnvBuildExecution_GetBuildPtr m_BuildExecution_GetBuild;
+	PLibMCEnvBuildExecution_GetExecutionStatusPtr m_BuildExecution_GetExecutionStatus;
+	PLibMCEnvBuildExecution_IsInProcessPtr m_BuildExecution_IsInProcess;
+	PLibMCEnvBuildExecution_IsFinishedPtr m_BuildExecution_IsFinished;
+	PLibMCEnvBuildExecution_IsFailedPtr m_BuildExecution_IsFailed;
+	PLibMCEnvBuildExecution_SetStatusToFinishedPtr m_BuildExecution_SetStatusToFinished;
+	PLibMCEnvBuildExecution_SetStatusToFailedPtr m_BuildExecution_SetStatusToFailed;
+	PLibMCEnvBuildExecution_GetDescriptionPtr m_BuildExecution_GetDescription;
+	PLibMCEnvBuildExecution_SetDescriptionPtr m_BuildExecution_SetDescription;
+	PLibMCEnvBuildExecution_GetJournalUUIDPtr m_BuildExecution_GetJournalUUID;
+	PLibMCEnvBuildExecution_HasAttachedUserPtr m_BuildExecution_HasAttachedUser;
+	PLibMCEnvBuildExecution_GetUserUUIDPtr m_BuildExecution_GetUserUUID;
+	PLibMCEnvBuildExecution_GetStartTimeInUTCPtr m_BuildExecution_GetStartTimeInUTC;
+	PLibMCEnvBuildExecution_GetStartTimeStampInMillisecondsPtr m_BuildExecution_GetStartTimeStampInMilliseconds;
+	PLibMCEnvBuildExecution_GetStartTimeStampInMicrosecondsPtr m_BuildExecution_GetStartTimeStampInMicroseconds;
+	PLibMCEnvBuildExecution_GetEndTimeStampInMillisecondsPtr m_BuildExecution_GetEndTimeStampInMilliseconds;
+	PLibMCEnvBuildExecution_GetEndTimeStampInMicrosecondsPtr m_BuildExecution_GetEndTimeStampInMicroseconds;
+	PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr m_BuildExecution_GetElapsedTimeInMilliseconds;
+	PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr m_BuildExecution_GetElapsedTimeInMicroseconds;
+	PLibMCEnvBuildExecution_AddBinaryDataPtr m_BuildExecution_AddBinaryData;
+	PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr m_BuildExecution_LoadDiscreteField2DByIdentifier;
+	PLibMCEnvBuildExecution_LoadDiscreteField2DByUUIDPtr m_BuildExecution_LoadDiscreteField2DByUUID;
+	PLibMCEnvBuildExecution_StoreDiscreteField2DPtr m_BuildExecution_StoreDiscreteField2D;
+	PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr m_BuildExecution_LoadPNGImageByIdentifier;
+	PLibMCEnvBuildExecution_LoadPNGImageByUUIDPtr m_BuildExecution_LoadPNGImageByUUID;
+	PLibMCEnvBuildExecution_StorePNGImagePtr m_BuildExecution_StorePNGImage;
+	PLibMCEnvBuildExecution_AddMetaDataStringPtr m_BuildExecution_AddMetaDataString;
+	PLibMCEnvBuildExecution_HasMetaDataStringPtr m_BuildExecution_HasMetaDataString;
+	PLibMCEnvBuildExecution_GetMetaDataStringPtr m_BuildExecution_GetMetaDataString;
+	PLibMCEnvBuildExecutionIterator_GetCurrentExecutionPtr m_BuildExecutionIterator_GetCurrentExecution;
 	PLibMCEnvBuild_GetNamePtr m_Build_GetName;
 	PLibMCEnvBuild_GetBuildUUIDPtr m_Build_GetBuildUUID;
 	PLibMCEnvBuild_GetStorageUUIDPtr m_Build_GetStorageUUID;
@@ -6503,6 +6953,14 @@ typedef struct {
 	PLibMCEnvBuild_LoadPNGImageByIdentifierPtr m_Build_LoadPNGImageByIdentifier;
 	PLibMCEnvBuild_LoadPNGImageByUUIDPtr m_Build_LoadPNGImageByUUID;
 	PLibMCEnvBuild_StorePNGImagePtr m_Build_StorePNGImage;
+	PLibMCEnvBuild_StartExecutionPtr m_Build_StartExecution;
+	PLibMCEnvBuild_HasExecutionPtr m_Build_HasExecution;
+	PLibMCEnvBuild_FindExecutionPtr m_Build_FindExecution;
+	PLibMCEnvBuild_ListExecutionsPtr m_Build_ListExecutions;
+	PLibMCEnvBuild_ListExecutionsByStatusPtr m_Build_ListExecutionsByStatus;
+	PLibMCEnvBuild_AddMetaDataStringPtr m_Build_AddMetaDataString;
+	PLibMCEnvBuild_HasMetaDataStringPtr m_Build_HasMetaDataString;
+	PLibMCEnvBuild_GetMetaDataStringPtr m_Build_GetMetaDataString;
 	PLibMCEnvWorkingFileExecution_GetStatusPtr m_WorkingFileExecution_GetStatus;
 	PLibMCEnvWorkingFileExecution_ReturnStdOutPtr m_WorkingFileExecution_ReturnStdOut;
 	PLibMCEnvWorkingFile_GetAbsoluteFileNamePtr m_WorkingFile_GetAbsoluteFileName;

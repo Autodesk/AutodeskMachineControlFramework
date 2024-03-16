@@ -727,7 +727,7 @@ public:
 	/**
 	* IStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -740,7 +740,7 @@ public:
 	/**
 	* IStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -775,7 +775,7 @@ public:
 	/**
 	* IStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -845,6 +845,13 @@ public:
 	* @param[out] sUserUUID - UUID of user that created the ticket.
 	*/
 	virtual void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID) = 0;
+
+	/**
+	* IStorage::AttachStreamToJournal - Attaches a stream to a journal as temporary stream.
+	* @param[in] sStreamUUID - UUID of stream. Call fails if stream does not exist.
+	* @param[in] sJournalUUID - UUID of journal. Call fails if journal does not exist.
+	*/
+	virtual void AttachStreamToJournal(const std::string & sStreamUUID, const std::string & sJournalUUID) = 0;
 
 };
 

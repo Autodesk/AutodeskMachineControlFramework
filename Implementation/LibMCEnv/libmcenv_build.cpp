@@ -295,3 +295,52 @@ std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const s
 
 }
 
+
+IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const std::string& sUserUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+bool CBuild::HasExecution(const std::string& sExecutionUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+bool CBuild::HasMetaDataString(const std::string& sKey)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+std::string CBuild::GetMetaDataString(const std::string& sKey)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+

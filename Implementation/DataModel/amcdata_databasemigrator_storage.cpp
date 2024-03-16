@@ -53,17 +53,6 @@ namespace AMCData {
 				sStreamsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 				pTransaction->executeStatement(sStreamsQuery);
 
-				std::string sContextQuery = "CREATE TABLE `storage_context` (";
-				sContextQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
-				sContextQuery += "`contextuuid`  varchar ( 64 ) NOT NULL)";
-				pTransaction->executeStatement(sContextQuery);
-
-				std::string sAccessQuery = "CREATE TABLE `storage_access` (";
-				sAccessQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
-				sAccessQuery += "`userid`  varchar ( 64 ) NOT NULL,";
-				sAccessQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
-				pTransaction->executeStatement(sAccessQuery);
-
 				break;
 			}
 
@@ -102,6 +91,17 @@ namespace AMCData {
 
 				break;
 			}
+
+			case 9: {
+				std::string sDropAccessQuery = "DROP TABLE IF EXISTS `storage_access`";
+				pTransaction->executeStatement(sDropAccessQuery);
+
+				std::string sDropContextQuery = "DROP TABLE IF EXISTS `storage_context`";
+				pTransaction->executeStatement(sDropContextQuery);
+
+				break;
+			}
+
 		}
 	}
 

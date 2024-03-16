@@ -259,6 +259,13 @@
 		<option name="DialogYesNoCancel" value="4" />
 	</enum>
 	
+	<enum name="BuildExecutionStatus">
+		<option name="Unknown" value="0" />
+		<option name="InProcess" value="1" />
+		<option name="Finished" value="2" />
+		<option name="Failed" value="3" />
+	</enum>
+		
 	
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
@@ -1061,6 +1068,159 @@
 	</class>
 
 
+	<class name="BuildExecution" parent="Base" description="A build execution is a physical run of a build.">
+
+		<method name="GetUUID" description="Returns uuid of the build execution.">
+			<param name="ExecutionUUID" type="string" pass="return" description="UUID of the build execution." />
+		</method>
+
+		<method name="GetBuildUUID" description="Returns uuid of the build.">
+			<param name="BuildUUID" type="string" pass="return" description="UUID of the build." />
+		</method>
+
+		<method name="GetBuild" description="Returns the instance of the build.">
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Instance of the build." />
+		</method>
+
+		<method name="GetExecutionStatus" description="Returns the status of the execution.">
+			<param name="ExecutionStatus" type="enum" class="BuildExecutionStatus" pass="return" description="Status of the build." />
+		</method>
+		
+		<method name="IsInProcess" description="Convenience function for checking the execution status.">
+			<param name="IsInProcess" type="bool" pass="return" description="Returns true if the status is InProcess." />
+		</method>		
+
+		<method name="IsFinished" description="Convenience function for checking the execution status.">
+			<param name="IsInProcess" type="bool" pass="return" description="Returns true if the status is Finished." />
+		</method>		
+
+		<method name="IsFailed" description="Convenience function for checking the execution status.">
+			<param name="IsInProcess" type="bool" pass="return" description="Returns true if the status is Failed." />
+		</method>		
+		
+		<method name="SetStatusToFinished" description="Sets build execution status to finished. Fails if Build status is not InProcess ">
+		</method>
+		
+		<method name="SetStatusToFailed" description="Sets build execution status to failed. Fails if Build status is not InProcess ">
+		</method>
+		
+		<method name="GetDescription" description="Returns a human readable description of the build execution for display in the User Interface.">
+			<param name="Description" type="string" pass="return" description="Description." />
+		</method>
+		
+		<method name="SetDescription" description="Sets a human readable description of the build execution for display in the User Interface. Should not be empty.">
+			<param name="Description" type="string" pass="in" description="Description." />
+		</method>
+		
+		<method name="GetJournalUUID" description="Returns the machine journal UUID that this job in executing in.">
+			<param name="JournalUUID" type="string" pass="return" description="Journal UUID of build execution." />
+		</method>
+
+		<method name="HasAttachedUser" description="Returns if a user is attached to the execution.">
+			<param name="UserIsAttached" type="bool" pass="return" description="Flag if a user is attached to the execution." />
+		</method>
+
+		<method name="GetUserUUID" description="Returns the user that started this job. Fails if no user is attached to the execution.">
+			<param name="UserUUID" type="string" pass="return" description="User who started the job." />
+		</method>
+
+		<method name="GetStartTimeInUTC" description="Returns the start time of the build in ISO8601 UTC format.">
+			<param name="StartTimeInUTC" type="string" pass="return" description="Start time of the build." />
+		</method>
+
+		<method name="GetStartTimeStampInMilliseconds" description="Returns the start time stamp of the build execution in the current machine journal.">
+			<param name="TimeStampInMilliseconds" type="uint64" pass="return" description="TimeStamp when the build started in Milliseconds." />
+		</method>
+
+		<method name="GetStartTimeStampInMicroseconds" description="Returns the start time stamp of the build execution in the current machine journal.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build started in Microseconds." />
+		</method>
+		
+		<method name="GetEndTimeStampInMilliseconds" description="Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
+			<param name="TimeStampInMilliseconds" type="uint64" pass="return" description="TimeStamp when the build ended in Milliseconds." />
+		</method>
+
+		<method name="GetEndTimeStampInMicroseconds" description="Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build ended in Microseconds." />
+		</method>
+		
+		<method name="GetElapsedTimeInMilliseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
+			<param name="TimeStampInMilliseconds" type="uint64" pass="return" description="Elapsed time in Milliseconds." />
+		</method>
+
+		<method name="GetElapsedTimeInMicroseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
+		</method>
+		
+		<method name="AddBinaryData" description="Adds binary data to store with the build.">
+			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
+			<param name="Name" type="string" pass="in" description="Name of the attache data" />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>
+		
+		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+		
+		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+
+		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
+			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
+
+		<method name="LoadPNGImageByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+		
+		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+
+		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
+			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>			
+
+		<method name="AddMetaDataString" description="Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+		
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
+		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build execution. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+
+	</class>
+	
+	
+	<class name="BuildExecutionIterator" parent="Iterator">
+		<method name="GetCurrentExecution" description="Returns the execution the iterator points at.">
+			<param name="BuildExecutionInstance" type="handle" class="BuildExecution" pass="return" description="returns the BuildExecution instance."/>
+		</method>
+	</class>
+
+
 	<class name="Build" parent="Base" description="Build instance to access build files">
 
 		<method name="GetName" description="Returns name of the build.">
@@ -1071,7 +1231,7 @@
 			<param name="BuildUUID" type="string" pass="return" description="UUID of the build." />
 		</method>
 
-		<method name="GetStorageUUID" description="Returns storage uuid of the build.">
+		<method name="GetStorageUUID" description="Returns storage uuid of the build stream.">
 			<param name="StorageUUID" type="string" pass="return" description="Storage UUID of the build." />
 		</method>
 
@@ -1143,14 +1303,55 @@
 		</method>	
 
 		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does already exist or has invalid Mime type." />
 			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
 			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
+		<method name="StartExecution" description="Starts a build execution. This function does not work in a UIEnvironment context!">
+			<param name="Description" type="string" pass="in" description="A human readable description of the build execution for display in the User Interface. Should not be empty." />
+			<param name="UserUUID" type="string" pass="in" description="User who started the execution. MUST exist. If empty, no user is attached." />
+			<param name="BuildExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance. Will be newly created and has the status InProcess." />
+		</method>
+
+		<method name="HasExecution" description="Checks if a build execution exists for this build.">
+			<param name="ExecutionUUID" type="string" pass="in" description="The UUID of the exceution." />
+			<param name="ExecutionExist" type="bool" pass="return" description="Returns true if the execution exists." />
+		</method>
 				
+		<method name="FindExecution" description="Finds a build execution. Fails if execution does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="The UUID of the exceution." />
+			<param name="BuildExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance. Will be newly created and has the status InProcess." />
+		</method>
+
+		<method name="ListExecutions" description="Lists all Executions of the build.">
+			<param name="OnlyCurrentJournalSession" type="bool" pass="in" description="If true, only the builds that have been created in the current machine session." />
+			<param name="IteratorInstance" type="class" class="BuildExecutionIterator" pass="return" description="Iterator instance." />
+		</method>
+
+		<method name="ListExecutionsByStatus" description="Lists all Executions of the build by status.">
+			<param name="ExecutionStatus" type="enum" class="BuildExecutionStatus" pass="in" description="Status of the build." />
+			<param name="OnlyCurrentJournalSession" type="bool" pass="in" description="If true, only the builds that have been created in the current machine session." />
+			<param name="IteratorInstance" type="class" class="BuildExecutionIterator" pass="return" description="Iterator instance." />
+		</method>
+		
+		<method name="AddMetaDataString" description="Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+		
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
+		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+		
 	</class>
 	
 	

@@ -68,7 +68,7 @@ private:
     AMCData::PStorageState m_pStorageState;
     AMCData::PSQLHandler m_pSQLHandler;
 
-    void insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID);
+    void insertDBEntry(const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID);
 
 protected:
 
@@ -111,6 +111,7 @@ public:
 
     void RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID) override;
 
+    void AttachStreamToJournal(const std::string& sStreamUUID, const std::string& sJournalUUID) override;
 };
 
 } // namespace Impl

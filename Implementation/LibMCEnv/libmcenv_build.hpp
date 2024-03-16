@@ -107,6 +107,22 @@ public:
 
 	std::string StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
 
+	IBuildExecution* StartExecution(const std::string& sDescription, const std::string& sUserUUID) override;
+
+	bool HasExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecution* FindExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecutionIterator* ListExecutions(const bool bOnlyCurrentJournalSession) override;
+
+	IBuildExecutionIterator* ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession) override;
+
+	void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
+
+	bool HasMetaDataString(const std::string& sKey) override;
+
+	std::string GetMetaDataString(const std::string& sKey) override;
+
 };
 
 } // namespace Impl

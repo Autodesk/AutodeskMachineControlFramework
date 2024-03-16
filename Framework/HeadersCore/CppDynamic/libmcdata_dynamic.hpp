@@ -1228,6 +1228,7 @@ public:
 	inline bool StreamIsImage(const std::string & sUUID);
 	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID);
 	inline void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID);
+	inline void AttachStreamToJournal(const std::string & sStreamUUID, const std::string & sJournalUUID);
 };
 	
 /*************************************************************************************************************************
@@ -1643,6 +1644,7 @@ public:
 		pWrapperTable->m_Storage_StreamIsImage = nullptr;
 		pWrapperTable->m_Storage_CreateDownloadTicket = nullptr;
 		pWrapperTable->m_Storage_RequestDownloadTicket = nullptr;
+		pWrapperTable->m_Storage_AttachStreamToJournal = nullptr;
 		pWrapperTable->m_BuildJobData_GetDataUUID = nullptr;
 		pWrapperTable->m_BuildJobData_GetJobUUID = nullptr;
 		pWrapperTable->m_BuildJobData_GetName = nullptr;
@@ -2350,6 +2352,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Storage_RequestDownloadTicket == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_AttachStreamToJournal = (PLibMCDataStorage_AttachStreamToJournalPtr) GetProcAddress(hLibrary, "libmcdata_storage_attachstreamtojournal");
+		#else // _WIN32
+		pWrapperTable->m_Storage_AttachStreamToJournal = (PLibMCDataStorage_AttachStreamToJournalPtr) dlsym(hLibrary, "libmcdata_storage_attachstreamtojournal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_AttachStreamToJournal == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3525,6 +3536,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_RequestDownloadTicket == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_storage_attachstreamtojournal", (void**)&(pWrapperTable->m_Storage_AttachStreamToJournal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_AttachStreamToJournal == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjobdata_getdatauuid", (void**)&(pWrapperTable->m_BuildJobData_GetDataUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetDataUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4681,7 +4696,7 @@ public:
 	/**
 	* CStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -4696,7 +4711,7 @@ public:
 	/**
 	* CStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -4742,7 +4757,7 @@ public:
 	/**
 	* CStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -4866,6 +4881,16 @@ public:
 		sClientFileName = std::string(&bufferClientFileName[0]);
 		sSessionUUID = std::string(&bufferSessionUUID[0]);
 		sUserUUID = std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CStorage::AttachStreamToJournal - Attaches a stream to a journal as temporary stream.
+	* @param[in] sStreamUUID - UUID of stream. Call fails if stream does not exist.
+	* @param[in] sJournalUUID - UUID of journal. Call fails if journal does not exist.
+	*/
+	void CStorage::AttachStreamToJournal(const std::string & sStreamUUID, const std::string & sJournalUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_AttachStreamToJournal(m_pHandle, sStreamUUID.c_str(), sJournalUUID.c_str()));
 	}
 	
 	/**

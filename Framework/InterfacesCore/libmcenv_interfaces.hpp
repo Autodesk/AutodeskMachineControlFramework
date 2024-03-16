@@ -68,6 +68,8 @@ class IMeshObject;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
+class IBuildExecution;
+class IBuildExecutionIterator;
 class IBuild;
 class IWorkingFileExecution;
 class IWorkingFile;
@@ -1447,6 +1449,238 @@ typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
 
 
 /*************************************************************************************************************************
+ Class interface for BuildExecution 
+**************************************************************************************************************************/
+
+class IBuildExecution : public virtual IBase {
+public:
+	/**
+	* IBuildExecution::GetUUID - Returns uuid of the build execution.
+	* @return UUID of the build execution.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IBuildExecution::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	virtual std::string GetBuildUUID() = 0;
+
+	/**
+	* IBuildExecution::GetBuild - Returns the instance of the build.
+	* @return Instance of the build.
+	*/
+	virtual IBuild * GetBuild() = 0;
+
+	/**
+	* IBuildExecution::GetExecutionStatus - Returns the status of the execution.
+	* @return Status of the build.
+	*/
+	virtual LibMCEnv::eBuildExecutionStatus GetExecutionStatus() = 0;
+
+	/**
+	* IBuildExecution::IsInProcess - Convenience function for checking the execution status.
+	* @return Returns true if the status is InProcess.
+	*/
+	virtual bool IsInProcess() = 0;
+
+	/**
+	* IBuildExecution::IsFinished - Convenience function for checking the execution status.
+	* @return Returns true if the status is Finished.
+	*/
+	virtual bool IsFinished() = 0;
+
+	/**
+	* IBuildExecution::IsFailed - Convenience function for checking the execution status.
+	* @return Returns true if the status is Failed.
+	*/
+	virtual bool IsFailed() = 0;
+
+	/**
+	* IBuildExecution::SetStatusToFinished - Sets build execution status to finished. Fails if Build status is not InProcess 
+	*/
+	virtual void SetStatusToFinished() = 0;
+
+	/**
+	* IBuildExecution::SetStatusToFailed - Sets build execution status to failed. Fails if Build status is not InProcess 
+	*/
+	virtual void SetStatusToFailed() = 0;
+
+	/**
+	* IBuildExecution::GetDescription - Returns a human readable description of the build execution for display in the User Interface.
+	* @return Description.
+	*/
+	virtual std::string GetDescription() = 0;
+
+	/**
+	* IBuildExecution::SetDescription - Sets a human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sDescription - Description.
+	*/
+	virtual void SetDescription(const std::string & sDescription) = 0;
+
+	/**
+	* IBuildExecution::GetJournalUUID - Returns the machine journal UUID that this job in executing in.
+	* @return Journal UUID of build execution.
+	*/
+	virtual std::string GetJournalUUID() = 0;
+
+	/**
+	* IBuildExecution::HasAttachedUser - Returns if a user is attached to the execution.
+	* @return Flag if a user is attached to the execution.
+	*/
+	virtual bool HasAttachedUser() = 0;
+
+	/**
+	* IBuildExecution::GetUserUUID - Returns the user that started this job. Fails if no user is attached to the execution.
+	* @return User who started the job.
+	*/
+	virtual std::string GetUserUUID() = 0;
+
+	/**
+	* IBuildExecution::GetStartTimeInUTC - Returns the start time of the build in ISO8601 UTC format.
+	* @return Start time of the build.
+	*/
+	virtual std::string GetStartTimeInUTC() = 0;
+
+	/**
+	* IBuildExecution::GetStartTimeStampInMilliseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStampInMilliseconds() = 0;
+
+	/**
+	* IBuildExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildExecution::GetEndTimeStampInMilliseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStampInMilliseconds() = 0;
+
+	/**
+	* IBuildExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildExecution::GetElapsedTimeInMilliseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetElapsedTimeInMilliseconds() = 0;
+
+	/**
+	* IBuildExecution::GetElapsedTimeInMicroseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetElapsedTimeInMicroseconds() = 0;
+
+	/**
+	* IBuildExecution::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] nContentBufferSize - Number of elements in buffer
+	* @param[in] pContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+
+	/**
+	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) = 0;
+
+	/**
+	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
+
+	/**
+	* IBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuildExecution::AddMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuildExecution::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildExecution::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildExecution> PIBuildExecution;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildExecutionIterator 
+**************************************************************************************************************************/
+
+class IBuildExecutionIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildExecutionIterator::GetCurrentExecution - Returns the execution the iterator points at.
+	* @return returns the BuildExecution instance.
+	*/
+	virtual IBuildExecution * GetCurrentExecution() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildExecutionIterator> PIBuildExecutionIterator;
+
+
+/*************************************************************************************************************************
  Class interface for Build 
 **************************************************************************************************************************/
 
@@ -1465,7 +1699,7 @@ public:
 	virtual std::string GetBuildUUID() = 0;
 
 	/**
-	* IBuild::GetStorageUUID - Returns storage uuid of the build.
+	* IBuild::GetStorageUUID - Returns storage uuid of the build stream.
 	* @return Storage UUID of the build.
 	*/
 	virtual std::string GetStorageUUID() = 0;
@@ -1568,13 +1802,71 @@ public:
 
 	/**
 	* IBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
 	* @return Data UUID of the attachment.
 	*/
 	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuild::StartExecution - Starts a build execution. This function does not work in a UIEnvironment context!
+	* @param[in] sDescription - A human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sUserUUID - User who started the execution. MUST exist. If empty, no user is attached.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	virtual IBuildExecution * StartExecution(const std::string & sDescription, const std::string & sUserUUID) = 0;
+
+	/**
+	* IBuild::HasExecution - Checks if a build execution exists for this build.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Returns true if the execution exists.
+	*/
+	virtual bool HasExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IBuild::FindExecution - Finds a build execution. Fails if execution does not exist.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	virtual IBuildExecution * FindExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IBuild::ListExecutions - Lists all Executions of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	virtual IBuildExecutionIterator * ListExecutions(const bool bOnlyCurrentJournalSession) = 0;
+
+	/**
+	* IBuild::ListExecutionsByStatus - Lists all Executions of the build by status.
+	* @param[in] eExecutionStatus - Status of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	virtual IBuildExecutionIterator * ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession) = 0;
+
+	/**
+	* IBuild::AddMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuild::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuild::GetMetaDataString - Gets a metadata string of a build. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
 
 };
 

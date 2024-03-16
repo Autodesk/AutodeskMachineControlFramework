@@ -432,6 +432,8 @@ typedef LibMCEnvHandle LibMCEnv_MeshObject;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
+typedef LibMCEnvHandle LibMCEnv_BuildExecution;
+typedef LibMCEnvHandle LibMCEnv_BuildExecutionIterator;
 typedef LibMCEnvHandle LibMCEnv_Build;
 typedef LibMCEnvHandle LibMCEnv_WorkingFileExecution;
 typedef LibMCEnvHandle LibMCEnv_WorkingFile;
@@ -530,6 +532,13 @@ namespace LibMCEnv {
     DialogYesNoCancel = 4
   };
   
+  enum class eBuildExecutionStatus : LibMCEnv_int32 {
+    Unknown = 0,
+    InProcess = 1,
+    Finished = 2,
+    Failed = 3
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -596,6 +605,7 @@ typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
+typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;

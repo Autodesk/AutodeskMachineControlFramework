@@ -59,13 +59,12 @@ CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pSto
 }
 
 
-void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID)
+void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID)
 {
 
     auto pTransaction = m_pSQLHandler->beginTransaction();
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-    std::string sParsedContextUUID = AMCCommon::CUtils::normalizeUUIDString(sContextUUID);
 
     AMCCommon::CChrono chrono;
     std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC ();
@@ -90,13 +89,6 @@ void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sConte
     pInsertStatement->setString(9, AMCData::CStorageState::storageStreamStatusToString (AMCData::eStorageStreamStatus::sssNew));
     pInsertStatement->execute();
     pInsertStatement = nullptr;
-
-    std::string sContextQuery = "INSERT INTO storage_context (streamuuid, contextuuid) VALUES (?, ?)";
-    auto pContextStatement = pTransaction->prepareStatement(sContextQuery);
-    pContextStatement->setString(1, sParsedUUID);
-    pContextStatement->setString(2, sParsedContextUUID);
-    pContextStatement->execute();
-    pContextStatement = nullptr;
 
     pTransaction->commit();
 }
@@ -131,6 +123,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
     if (sUserID.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
+    // sContextUUID is depreciated and not used anymore!
 
     // Calculate SHA Hash (not under mutex lock)
     auto beginIter = static_cast<const unsigned char*>(pContentBuffer);
@@ -146,7 +139,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
 	
     // From here, we lock storage database write access
     {       
-        insertDBEntry(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, sSHA256, sUserID);        
+        insertDBEntry(sUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, sSHA256, sUserID);        
     }
 
     std::string sCalculatedSHA256, sCalculatedBlockSHA256;
@@ -170,9 +163,11 @@ void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& s
     if (sUserID.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
+    // sContextUUID is depreciated and not used anymore!
+
     {
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-        insertDBEntry(sParsedUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, "", sUserID);
+        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, nSize, "", sUserID);
 
         auto pWriter = std::make_shared<AMCData::CStorageWriter_Partial>(sParsedUUID, m_pStorageState->getStreamPath(sUUID), nSize);
         m_pStorageState->addPartialWriter(pWriter);
@@ -255,9 +250,11 @@ void CStorage::BeginRandomWriteStream(const std::string& sUUID, const std::strin
     if (sUserID.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
+    // sContextUUID is depreciated and not used anymore!
+
     {
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-        insertDBEntry(sParsedUUID, sContextUUID, sContextIdentifier, sName, sMimeType, 0, "", sUserID);
+        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, 0, "", sUserID);
 
         auto pWriter = std::make_shared<AMCData::CStorageWriter_RandomAccess>(sParsedUUID, m_pStorageState->getStreamPath(sUUID));
         m_pStorageState->addPartialWriter(pWriter);
@@ -444,5 +441,50 @@ void CStorage::RequestDownloadTicket(const std::string& sTicketUUID, const std::
 
     pTransaction->commit();
 
+}
+
+
+void CStorage::AttachStreamToJournal(const std::string& sStreamUUID, const std::string& sJournalUUID)
+{
+    std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+    std::string sNormalizedJournalUUID = AMCCommon::CUtils::normalizeUUIDString(sJournalUUID);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sStreamQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
+    auto pStreamStatement = pTransaction->prepareStatement(sStreamQuery);
+    pStreamStatement->setString(1, sNormalizedStreamUUID);
+    if (!pStreamStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "storage stream not found for journal attachment: " + sNormalizedStreamUUID);
+    pStreamStatement = nullptr;
+
+
+    std::string sJournalQuery = "SELECT uuid FROM journals WHERE uuid=?";
+    auto pJournalStatement = pTransaction->prepareStatement(sJournalQuery);
+    pJournalStatement->setString(1, sNormalizedJournalUUID);
+    if (!pJournalStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "journal not found for journal attachment: " + sNormalizedStreamUUID);
+    pJournalStatement = nullptr;
+
+
+    std::string sLinkQuery = "SELECT uuid FROM journal_tempstreams WHERE journaluuid=? AND streamuuid=?";
+    auto pLinkStatement = pTransaction->prepareStatement(sLinkQuery);
+    pLinkStatement->setString(1, sNormalizedJournalUUID);
+    pLinkStatement->setString(2, sNormalizedStreamUUID);
+    bool bLinkExists = pLinkStatement->nextRow();
+    pLinkStatement = nullptr;
+
+    if (!bLinkExists) {
+        std::string sInsertQuery = "INSERT INTO journal_tempstreams (uuid, journaluuid, streamuuid) VALUES (?, ?, ?)";
+        auto pInsertStatement = pTransaction->prepareStatement(sInsertQuery);
+        pInsertStatement->setString(1, AMCCommon::CUtils::createUUID ());
+        pInsertStatement->setString(2, sNormalizedJournalUUID);
+        pInsertStatement->setString(3, sNormalizedStreamUUID);
+        pInsertStatement->execute();
+        pInsertStatement = nullptr;
+
+    }
+
+    pTransaction->commit();
 }
 

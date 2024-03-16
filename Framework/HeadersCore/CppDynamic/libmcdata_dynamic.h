@@ -612,7 +612,7 @@ typedef LibMCDataResult (*PLibMCDataStorage_RetrieveStreamPtr) (LibMCData_Storag
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. Must be unique and newly generated.
-* @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 * @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name Description of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
@@ -628,7 +628,7 @@ typedef LibMCDataResult (*PLibMCDataStorage_StoreNewStreamPtr) (LibMCData_Storag
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
-* @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 * @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
@@ -675,7 +675,7 @@ typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Pt
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
-* @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 * @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
@@ -778,6 +778,16 @@ typedef LibMCDataResult (*PLibMCDataStorage_CreateDownloadTicketPtr) (LibMCData_
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataStorage_RequestDownloadTicketPtr) (LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+
+/**
+* Attaches a stream to a journal as temporary stream.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pStreamUUID - UUID of stream. Call fails if stream does not exist.
+* @param[in] pJournalUUID - UUID of journal. Call fails if journal does not exist.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorage_AttachStreamToJournalPtr) (LibMCData_Storage pStorage, const char * pStreamUUID, const char * pJournalUUID);
 
 /*************************************************************************************************************************
  Class definition for BuildJobData
@@ -1971,6 +1981,7 @@ typedef struct {
 	PLibMCDataStorage_StreamIsImagePtr m_Storage_StreamIsImage;
 	PLibMCDataStorage_CreateDownloadTicketPtr m_Storage_CreateDownloadTicket;
 	PLibMCDataStorage_RequestDownloadTicketPtr m_Storage_RequestDownloadTicket;
+	PLibMCDataStorage_AttachStreamToJournalPtr m_Storage_AttachStreamToJournal;
 	PLibMCDataBuildJobData_GetDataUUIDPtr m_BuildJobData_GetDataUUID;
 	PLibMCDataBuildJobData_GetJobUUIDPtr m_BuildJobData_GetJobUUID;
 	PLibMCDataBuildJobData_GetNamePtr m_BuildJobData_GetName;

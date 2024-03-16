@@ -56,7 +56,8 @@ CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std
     std::string sJournalUUID = pJournalSession->GetSessionUUID();
 
     m_pStorage = m_pDataModel->CreateStorage();
-    m_pStorage->BeginRandomWriteStream(m_sUUID, AMCCommon::CUtils::normalizeUUIDString(sJournalUUID), "journal", sName, sMIMEType, sCurrentUserUUID);
+    m_pStorage->BeginRandomWriteStream(m_sUUID, sJournalUUID, "journal", sName, sMIMEType, sCurrentUserUUID);
+    m_pStorage->AttachStreamToJournal(m_sUUID, sJournalUUID);
 }
 
 

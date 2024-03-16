@@ -41,7 +41,7 @@ namespace AMCData {
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
 		switch (nCurrentVersionIndex) {
-		case 6: {
+			case 6: {
 				std::string sCreateQuery = "CREATE TABLE `journals` (";
 				sCreateQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
 				sCreateQuery += "`starttime`  varchar ( 256 ) NOT NULL,";
@@ -58,6 +58,15 @@ namespace AMCData {
 
 				std::string sSchemaVersionAddQuery = "ALTER TABLE `journals` ADD `schemaversion` INTEGER DEFAULT 0";
 				pTransaction->executeStatement(sSchemaVersionAddQuery);
+
+				break;
+			}
+			case 9: {
+				std::string sTempStreamQuery = "CREATE TABLE `journal_tempstreams` (";				
+				sTempStreamQuery += "`uuid`  varchar ( 64 ) NOT NULL,";
+				sTempStreamQuery += "`journaluuid`  varchar ( 64 ) NOT NULL,";
+				sTempStreamQuery += "`streamuuid`  varchar ( 64 ) NOT NULL)";
+				pTransaction->executeStatement(sTempStreamQuery);
 
 				break;
 			}

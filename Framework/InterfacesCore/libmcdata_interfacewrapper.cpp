@@ -2421,6 +2421,36 @@ LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStora
 	}
 }
 
+LibMCDataResult libmcdata_storage_attachstreamtojournal(LibMCData_Storage pStorage, const char * pStreamUUID, const char * pJournalUUID)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pJournalUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		std::string sJournalUUID(pJournalUUID);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorage->AttachStreamToJournal(sStreamUUID, sJournalUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for BuildJobData
@@ -6187,6 +6217,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storage_createdownloadticket;
 	if (sProcName == "libmcdata_storage_requestdownloadticket") 
 		*ppProcAddress = (void*) &libmcdata_storage_requestdownloadticket;
+	if (sProcName == "libmcdata_storage_attachstreamtojournal") 
+		*ppProcAddress = (void*) &libmcdata_storage_attachstreamtojournal;
 	if (sProcName == "libmcdata_buildjobdata_getdatauuid") 
 		*ppProcAddress = (void*) &libmcdata_buildjobdata_getdatauuid;
 	if (sProcName == "libmcdata_buildjobdata_getjobuuid") 

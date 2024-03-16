@@ -73,6 +73,8 @@ class CMeshObject;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
+class CBuildExecution;
+class CBuildExecutionIterator;
 class CBuild;
 class CWorkingFileExecution;
 class CWorkingFile;
@@ -122,6 +124,8 @@ typedef CMeshObject CLibMCEnvMeshObject;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
+typedef CBuildExecution CLibMCEnvBuildExecution;
+typedef CBuildExecutionIterator CLibMCEnvBuildExecutionIterator;
 typedef CBuild CLibMCEnvBuild;
 typedef CWorkingFileExecution CLibMCEnvWorkingFileExecution;
 typedef CWorkingFile CLibMCEnvWorkingFile;
@@ -171,6 +175,8 @@ typedef std::shared_ptr<CMeshObject> PMeshObject;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
+typedef std::shared_ptr<CBuildExecution> PBuildExecution;
+typedef std::shared_ptr<CBuildExecutionIterator> PBuildExecutionIterator;
 typedef std::shared_ptr<CBuild> PBuild;
 typedef std::shared_ptr<CWorkingFileExecution> PWorkingFileExecution;
 typedef std::shared_ptr<CWorkingFile> PWorkingFile;
@@ -220,6 +226,8 @@ typedef PMeshObject PLibMCEnvMeshObject;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
+typedef PBuildExecution PLibMCEnvBuildExecution;
+typedef PBuildExecutionIterator PLibMCEnvBuildExecutionIterator;
 typedef PBuild PLibMCEnvBuild;
 typedef PWorkingFileExecution PLibMCEnvWorkingFileExecution;
 typedef PWorkingFile PLibMCEnvWorkingFile;
@@ -773,6 +781,8 @@ private:
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
+	friend class CBuildExecution;
+	friend class CBuildExecutionIterator;
 	friend class CBuild;
 	friend class CWorkingFileExecution;
 	friend class CWorkingFile;
@@ -1206,6 +1216,70 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CBuildExecution 
+**************************************************************************************************************************/
+class CBuildExecution : public CBase {
+public:
+	
+	/**
+	* CBuildExecution::CBuildExecution - Constructor for BuildExecution class.
+	*/
+	CBuildExecution(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline std::string GetBuildUUID();
+	inline PBuild GetBuild();
+	inline eBuildExecutionStatus GetExecutionStatus();
+	inline bool IsInProcess();
+	inline bool IsFinished();
+	inline bool IsFailed();
+	inline void SetStatusToFinished();
+	inline void SetStatusToFailed();
+	inline std::string GetDescription();
+	inline void SetDescription(const std::string & sDescription);
+	inline std::string GetJournalUUID();
+	inline bool HasAttachedUser();
+	inline std::string GetUserUUID();
+	inline std::string GetStartTimeInUTC();
+	inline LibMCEnv_uint64 GetStartTimeStampInMilliseconds();
+	inline LibMCEnv_uint64 GetStartTimeStampInMicroseconds();
+	inline LibMCEnv_uint64 GetEndTimeStampInMilliseconds();
+	inline LibMCEnv_uint64 GetEndTimeStampInMicroseconds();
+	inline LibMCEnv_uint64 GetElapsedTimeInMilliseconds();
+	inline LibMCEnv_uint64 GetElapsedTimeInMicroseconds();
+	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
+	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
+	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
+	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline bool HasMetaDataString(const std::string & sKey);
+	inline std::string GetMetaDataString(const std::string & sKey);
+};
+	
+/*************************************************************************************************************************
+ Class CBuildExecutionIterator 
+**************************************************************************************************************************/
+class CBuildExecutionIterator : public CIterator {
+public:
+	
+	/**
+	* CBuildExecutionIterator::CBuildExecutionIterator - Constructor for BuildExecutionIterator class.
+	*/
+	CBuildExecutionIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PBuildExecution GetCurrentExecution();
+};
+	
+/*************************************************************************************************************************
  Class CBuild 
 **************************************************************************************************************************/
 class CBuild : public CBase {
@@ -1237,6 +1311,14 @@ public:
 	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
 	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline PBuildExecution StartExecution(const std::string & sDescription, const std::string & sUserUUID);
+	inline bool HasExecution(const std::string & sExecutionUUID);
+	inline PBuildExecution FindExecution(const std::string & sExecutionUUID);
+	inline PBuildExecutionIterator ListExecutions(const bool bOnlyCurrentJournalSession);
+	inline PBuildExecutionIterator ListExecutionsByStatus(const eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline bool HasMetaDataString(const std::string & sKey);
+	inline std::string GetMetaDataString(const std::string & sKey);
 };
 	
 /*************************************************************************************************************************
@@ -2338,6 +2420,38 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetMetaDataContent = nullptr;
 		pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData = nullptr;
+		pWrapperTable->m_BuildExecution_GetUUID = nullptr;
+		pWrapperTable->m_BuildExecution_GetBuildUUID = nullptr;
+		pWrapperTable->m_BuildExecution_GetBuild = nullptr;
+		pWrapperTable->m_BuildExecution_GetExecutionStatus = nullptr;
+		pWrapperTable->m_BuildExecution_IsInProcess = nullptr;
+		pWrapperTable->m_BuildExecution_IsFinished = nullptr;
+		pWrapperTable->m_BuildExecution_IsFailed = nullptr;
+		pWrapperTable->m_BuildExecution_SetStatusToFinished = nullptr;
+		pWrapperTable->m_BuildExecution_SetStatusToFailed = nullptr;
+		pWrapperTable->m_BuildExecution_GetDescription = nullptr;
+		pWrapperTable->m_BuildExecution_SetDescription = nullptr;
+		pWrapperTable->m_BuildExecution_GetJournalUUID = nullptr;
+		pWrapperTable->m_BuildExecution_HasAttachedUser = nullptr;
+		pWrapperTable->m_BuildExecution_GetUserUUID = nullptr;
+		pWrapperTable->m_BuildExecution_GetStartTimeInUTC = nullptr;
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_AddBinaryData = nullptr;
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = nullptr;
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID = nullptr;
+		pWrapperTable->m_BuildExecution_StoreDiscreteField2D = nullptr;
+		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = nullptr;
+		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = nullptr;
+		pWrapperTable->m_BuildExecution_StorePNGImage = nullptr;
+		pWrapperTable->m_BuildExecution_AddMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecution_HasMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecution_GetMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
@@ -2356,6 +2470,14 @@ public:
 		pWrapperTable->m_Build_LoadPNGImageByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadPNGImageByUUID = nullptr;
 		pWrapperTable->m_Build_StorePNGImage = nullptr;
+		pWrapperTable->m_Build_StartExecution = nullptr;
+		pWrapperTable->m_Build_HasExecution = nullptr;
+		pWrapperTable->m_Build_FindExecution = nullptr;
+		pWrapperTable->m_Build_ListExecutions = nullptr;
+		pWrapperTable->m_Build_ListExecutionsByStatus = nullptr;
+		pWrapperTable->m_Build_AddMetaDataString = nullptr;
+		pWrapperTable->m_Build_HasMetaDataString = nullptr;
+		pWrapperTable->m_Build_GetMetaDataString = nullptr;
 		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
 		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = nullptr;
 		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = nullptr;
@@ -4038,6 +4160,294 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetUUID = (PLibMCEnvBuildExecution_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetUUID = (PLibMCEnvBuildExecution_GetUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetBuildUUID = (PLibMCEnvBuildExecution_GetBuildUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getbuilduuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetBuildUUID = (PLibMCEnvBuildExecution_GetBuildUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getbuilduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetBuildUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetBuild = (PLibMCEnvBuildExecution_GetBuildPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getbuild");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetBuild = (PLibMCEnvBuildExecution_GetBuildPtr) dlsym(hLibrary, "libmcenv_buildexecution_getbuild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetBuild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetExecutionStatus = (PLibMCEnvBuildExecution_GetExecutionStatusPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getexecutionstatus");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetExecutionStatus = (PLibMCEnvBuildExecution_GetExecutionStatusPtr) dlsym(hLibrary, "libmcenv_buildexecution_getexecutionstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetExecutionStatus == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_IsInProcess = (PLibMCEnvBuildExecution_IsInProcessPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_isinprocess");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_IsInProcess = (PLibMCEnvBuildExecution_IsInProcessPtr) dlsym(hLibrary, "libmcenv_buildexecution_isinprocess");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_IsInProcess == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_IsFinished = (PLibMCEnvBuildExecution_IsFinishedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_isfinished");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_IsFinished = (PLibMCEnvBuildExecution_IsFinishedPtr) dlsym(hLibrary, "libmcenv_buildexecution_isfinished");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_IsFinished == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_IsFailed = (PLibMCEnvBuildExecution_IsFailedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_isfailed");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_IsFailed = (PLibMCEnvBuildExecution_IsFailedPtr) dlsym(hLibrary, "libmcenv_buildexecution_isfailed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_IsFailed == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFinished = (PLibMCEnvBuildExecution_SetStatusToFinishedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_setstatustofinished");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFinished = (PLibMCEnvBuildExecution_SetStatusToFinishedPtr) dlsym(hLibrary, "libmcenv_buildexecution_setstatustofinished");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_SetStatusToFinished == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFailed = (PLibMCEnvBuildExecution_SetStatusToFailedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_setstatustofailed");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFailed = (PLibMCEnvBuildExecution_SetStatusToFailedPtr) dlsym(hLibrary, "libmcenv_buildexecution_setstatustofailed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_SetStatusToFailed == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetDescription = (PLibMCEnvBuildExecution_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getdescription");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetDescription = (PLibMCEnvBuildExecution_GetDescriptionPtr) dlsym(hLibrary, "libmcenv_buildexecution_getdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_SetDescription = (PLibMCEnvBuildExecution_SetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_setdescription");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_SetDescription = (PLibMCEnvBuildExecution_SetDescriptionPtr) dlsym(hLibrary, "libmcenv_buildexecution_setdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_SetDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetJournalUUID = (PLibMCEnvBuildExecution_GetJournalUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getjournaluuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetJournalUUID = (PLibMCEnvBuildExecution_GetJournalUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getjournaluuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetJournalUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachedUser = (PLibMCEnvBuildExecution_HasAttachedUserPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasattacheduser");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachedUser = (PLibMCEnvBuildExecution_HasAttachedUserPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasattacheduser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasAttachedUser == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetUserUUID = (PLibMCEnvBuildExecution_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetUserUUID = (PLibMCEnvBuildExecution_GetUserUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetUserUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeInUTC = (PLibMCEnvBuildExecution_GetStartTimeInUTCPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getstarttimeinutc");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeInUTC = (PLibMCEnvBuildExecution_GetStartTimeInUTCPtr) dlsym(hLibrary, "libmcenv_buildexecution_getstarttimeinutc");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetStartTimeInUTC == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getstarttimestampinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMillisecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getstarttimestampinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getstarttimestampinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getstarttimestampinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getendtimestampinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMillisecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getendtimestampinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getendtimestampinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getendtimestampinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_addbinarydata");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) dlsym(hLibrary, "libmcenv_buildexecution_addbinarydata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_AddBinaryData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID = (PLibMCEnvBuildExecution_LoadDiscreteField2DByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID = (PLibMCEnvBuildExecution_LoadDiscreteField2DByUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_StoreDiscreteField2D = (PLibMCEnvBuildExecution_StoreDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_storediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_StoreDiscreteField2D = (PLibMCEnvBuildExecution_StoreDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_buildexecution_storediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_StoreDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = (PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loadpngimagebyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = (PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_loadpngimagebyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = (PLibMCEnvBuildExecution_LoadPNGImageByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loadpngimagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = (PLibMCEnvBuildExecution_LoadPNGImageByUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_loadpngimagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadPNGImageByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_StorePNGImage = (PLibMCEnvBuildExecution_StorePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_storepngimage");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_StorePNGImage = (PLibMCEnvBuildExecution_StorePNGImagePtr) dlsym(hLibrary, "libmcenv_buildexecution_storepngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_StorePNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_AddMetaDataString = (PLibMCEnvBuildExecution_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_addmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_AddMetaDataString = (PLibMCEnvBuildExecution_AddMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_addmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_AddMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasMetaDataString = (PLibMCEnvBuildExecution_HasMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasMetaDataString = (PLibMCEnvBuildExecution_HasMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetMetaDataString = (PLibMCEnvBuildExecution_GetMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetMetaDataString = (PLibMCEnvBuildExecution_GetMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_getmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = (PLibMCEnvBuildExecutionIterator_GetCurrentExecutionPtr) GetProcAddress(hLibrary, "libmcenv_buildexecutioniterator_getcurrentexecution");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = (PLibMCEnvBuildExecutionIterator_GetCurrentExecutionPtr) dlsym(hLibrary, "libmcenv_buildexecutioniterator_getcurrentexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_build_getname");
 		#else // _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) dlsym(hLibrary, "libmcenv_build_getname");
@@ -4197,6 +4607,78 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_StorePNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_StartExecution = (PLibMCEnvBuild_StartExecutionPtr) GetProcAddress(hLibrary, "libmcenv_build_startexecution");
+		#else // _WIN32
+		pWrapperTable->m_Build_StartExecution = (PLibMCEnvBuild_StartExecutionPtr) dlsym(hLibrary, "libmcenv_build_startexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_StartExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasExecution = (PLibMCEnvBuild_HasExecutionPtr) GetProcAddress(hLibrary, "libmcenv_build_hasexecution");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasExecution = (PLibMCEnvBuild_HasExecutionPtr) dlsym(hLibrary, "libmcenv_build_hasexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_FindExecution = (PLibMCEnvBuild_FindExecutionPtr) GetProcAddress(hLibrary, "libmcenv_build_findexecution");
+		#else // _WIN32
+		pWrapperTable->m_Build_FindExecution = (PLibMCEnvBuild_FindExecutionPtr) dlsym(hLibrary, "libmcenv_build_findexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_FindExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_ListExecutions = (PLibMCEnvBuild_ListExecutionsPtr) GetProcAddress(hLibrary, "libmcenv_build_listexecutions");
+		#else // _WIN32
+		pWrapperTable->m_Build_ListExecutions = (PLibMCEnvBuild_ListExecutionsPtr) dlsym(hLibrary, "libmcenv_build_listexecutions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_ListExecutions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_ListExecutionsByStatus = (PLibMCEnvBuild_ListExecutionsByStatusPtr) GetProcAddress(hLibrary, "libmcenv_build_listexecutionsbystatus");
+		#else // _WIN32
+		pWrapperTable->m_Build_ListExecutionsByStatus = (PLibMCEnvBuild_ListExecutionsByStatusPtr) dlsym(hLibrary, "libmcenv_build_listexecutionsbystatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_ListExecutionsByStatus == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_AddMetaDataString = (PLibMCEnvBuild_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_addmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_Build_AddMetaDataString = (PLibMCEnvBuild_AddMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_addmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_AddMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasMetaDataString = (PLibMCEnvBuild_HasMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_hasmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasMetaDataString = (PLibMCEnvBuild_HasMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_hasmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetMetaDataString = (PLibMCEnvBuild_GetMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_getmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetMetaDataString = (PLibMCEnvBuild_GetMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_getmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetMetaDataString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8576,6 +9058,134 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getuuid", (void**)&(pWrapperTable->m_BuildExecution_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getbuilduuid", (void**)&(pWrapperTable->m_BuildExecution_GetBuildUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetBuildUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getbuild", (void**)&(pWrapperTable->m_BuildExecution_GetBuild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetBuild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getexecutionstatus", (void**)&(pWrapperTable->m_BuildExecution_GetExecutionStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetExecutionStatus == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_isinprocess", (void**)&(pWrapperTable->m_BuildExecution_IsInProcess));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_IsInProcess == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_isfinished", (void**)&(pWrapperTable->m_BuildExecution_IsFinished));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_IsFinished == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_isfailed", (void**)&(pWrapperTable->m_BuildExecution_IsFailed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_IsFailed == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_setstatustofinished", (void**)&(pWrapperTable->m_BuildExecution_SetStatusToFinished));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_SetStatusToFinished == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_setstatustofailed", (void**)&(pWrapperTable->m_BuildExecution_SetStatusToFailed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_SetStatusToFailed == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getdescription", (void**)&(pWrapperTable->m_BuildExecution_GetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_setdescription", (void**)&(pWrapperTable->m_BuildExecution_SetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_SetDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getjournaluuid", (void**)&(pWrapperTable->m_BuildExecution_GetJournalUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetJournalUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasattacheduser", (void**)&(pWrapperTable->m_BuildExecution_HasAttachedUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasAttachedUser == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getuseruuid", (void**)&(pWrapperTable->m_BuildExecution_GetUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetUserUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getstarttimeinutc", (void**)&(pWrapperTable->m_BuildExecution_GetStartTimeInUTC));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetStartTimeInUTC == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getstarttimestampinmilliseconds", (void**)&(pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getstarttimestampinmicroseconds", (void**)&(pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getendtimestampinmilliseconds", (void**)&(pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getendtimestampinmicroseconds", (void**)&(pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getelapsedtimeinmilliseconds", (void**)&(pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getelapsedtimeinmicroseconds", (void**)&(pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_addbinarydata", (void**)&(pWrapperTable->m_BuildExecution_AddBinaryData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddBinaryData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loaddiscretefield2dbyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loaddiscretefield2dbyuuid", (void**)&(pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_storediscretefield2d", (void**)&(pWrapperTable->m_BuildExecution_StoreDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StoreDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loadpngimagebyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loadpngimagebyuuid", (void**)&(pWrapperTable->m_BuildExecution_LoadPNGImageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadPNGImageByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_storepngimage", (void**)&(pWrapperTable->m_BuildExecution_StorePNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StorePNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_addmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_AddMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_HasMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_GetMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecutioniterator_getcurrentexecution", (void**)&(pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8646,6 +9256,38 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_storepngimage", (void**)&(pWrapperTable->m_Build_StorePNGImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StorePNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_startexecution", (void**)&(pWrapperTable->m_Build_StartExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StartExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasexecution", (void**)&(pWrapperTable->m_Build_HasExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_findexecution", (void**)&(pWrapperTable->m_Build_FindExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_FindExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_listexecutions", (void**)&(pWrapperTable->m_Build_ListExecutions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_ListExecutions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_listexecutionsbystatus", (void**)&(pWrapperTable->m_Build_ListExecutionsByStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_ListExecutionsByStatus == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_addmetadatastring", (void**)&(pWrapperTable->m_Build_AddMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasmetadatastring", (void**)&(pWrapperTable->m_Build_HasMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getmetadatastring", (void**)&(pWrapperTable->m_Build_GetMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetMetaDataString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingfileexecution_getstatus", (void**)&(pWrapperTable->m_WorkingFileExecution_GetStatus));
@@ -12171,6 +12813,455 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CBuildExecution
+	 */
+	
+	/**
+	* CBuildExecution::GetUUID - Returns uuid of the build execution.
+	* @return UUID of the build execution.
+	*/
+	std::string CBuildExecution::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededExecutionUUID = 0;
+		LibMCEnv_uint32 bytesWrittenExecutionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUUID(m_pHandle, 0, &bytesNeededExecutionUUID, nullptr));
+		std::vector<char> bufferExecutionUUID(bytesNeededExecutionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUUID(m_pHandle, bytesNeededExecutionUUID, &bytesWrittenExecutionUUID, &bufferExecutionUUID[0]));
+		
+		return std::string(&bufferExecutionUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	std::string CBuildExecution::GetBuildUUID()
+	{
+		LibMCEnv_uint32 bytesNeededBuildUUID = 0;
+		LibMCEnv_uint32 bytesWrittenBuildUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetBuildUUID(m_pHandle, 0, &bytesNeededBuildUUID, nullptr));
+		std::vector<char> bufferBuildUUID(bytesNeededBuildUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetBuildUUID(m_pHandle, bytesNeededBuildUUID, &bytesWrittenBuildUUID, &bufferBuildUUID[0]));
+		
+		return std::string(&bufferBuildUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::GetBuild - Returns the instance of the build.
+	* @return Instance of the build.
+	*/
+	PBuild CBuildExecution::GetBuild()
+	{
+		LibMCEnvHandle hBuildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetBuild(m_pHandle, &hBuildInstance));
+		
+		if (!hBuildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
+	* CBuildExecution::GetExecutionStatus - Returns the status of the execution.
+	* @return Status of the build.
+	*/
+	eBuildExecutionStatus CBuildExecution::GetExecutionStatus()
+	{
+		eBuildExecutionStatus resultExecutionStatus = (eBuildExecutionStatus) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetExecutionStatus(m_pHandle, &resultExecutionStatus));
+		
+		return resultExecutionStatus;
+	}
+	
+	/**
+	* CBuildExecution::IsInProcess - Convenience function for checking the execution status.
+	* @return Returns true if the status is InProcess.
+	*/
+	bool CBuildExecution::IsInProcess()
+	{
+		bool resultIsInProcess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_IsInProcess(m_pHandle, &resultIsInProcess));
+		
+		return resultIsInProcess;
+	}
+	
+	/**
+	* CBuildExecution::IsFinished - Convenience function for checking the execution status.
+	* @return Returns true if the status is Finished.
+	*/
+	bool CBuildExecution::IsFinished()
+	{
+		bool resultIsInProcess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_IsFinished(m_pHandle, &resultIsInProcess));
+		
+		return resultIsInProcess;
+	}
+	
+	/**
+	* CBuildExecution::IsFailed - Convenience function for checking the execution status.
+	* @return Returns true if the status is Failed.
+	*/
+	bool CBuildExecution::IsFailed()
+	{
+		bool resultIsInProcess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_IsFailed(m_pHandle, &resultIsInProcess));
+		
+		return resultIsInProcess;
+	}
+	
+	/**
+	* CBuildExecution::SetStatusToFinished - Sets build execution status to finished. Fails if Build status is not InProcess 
+	*/
+	void CBuildExecution::SetStatusToFinished()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_SetStatusToFinished(m_pHandle));
+	}
+	
+	/**
+	* CBuildExecution::SetStatusToFailed - Sets build execution status to failed. Fails if Build status is not InProcess 
+	*/
+	void CBuildExecution::SetStatusToFailed()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_SetStatusToFailed(m_pHandle));
+	}
+	
+	/**
+	* CBuildExecution::GetDescription - Returns a human readable description of the build execution for display in the User Interface.
+	* @return Description.
+	*/
+	std::string CBuildExecution::GetDescription()
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetDescription(m_pHandle, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetDescription(m_pHandle, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CBuildExecution::SetDescription - Sets a human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sDescription - Description.
+	*/
+	void CBuildExecution::SetDescription(const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_SetDescription(m_pHandle, sDescription.c_str()));
+	}
+	
+	/**
+	* CBuildExecution::GetJournalUUID - Returns the machine journal UUID that this job in executing in.
+	* @return Journal UUID of build execution.
+	*/
+	std::string CBuildExecution::GetJournalUUID()
+	{
+		LibMCEnv_uint32 bytesNeededJournalUUID = 0;
+		LibMCEnv_uint32 bytesWrittenJournalUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetJournalUUID(m_pHandle, 0, &bytesNeededJournalUUID, nullptr));
+		std::vector<char> bufferJournalUUID(bytesNeededJournalUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetJournalUUID(m_pHandle, bytesNeededJournalUUID, &bytesWrittenJournalUUID, &bufferJournalUUID[0]));
+		
+		return std::string(&bufferJournalUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::HasAttachedUser - Returns if a user is attached to the execution.
+	* @return Flag if a user is attached to the execution.
+	*/
+	bool CBuildExecution::HasAttachedUser()
+	{
+		bool resultUserIsAttached = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasAttachedUser(m_pHandle, &resultUserIsAttached));
+		
+		return resultUserIsAttached;
+	}
+	
+	/**
+	* CBuildExecution::GetUserUUID - Returns the user that started this job. Fails if no user is attached to the execution.
+	* @return User who started the job.
+	*/
+	std::string CBuildExecution::GetUserUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUserUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUserUUID(m_pHandle, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUserUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::GetStartTimeInUTC - Returns the start time of the build in ISO8601 UTC format.
+	* @return Start time of the build.
+	*/
+	std::string CBuildExecution::GetStartTimeInUTC()
+	{
+		LibMCEnv_uint32 bytesNeededStartTimeInUTC = 0;
+		LibMCEnv_uint32 bytesWrittenStartTimeInUTC = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeInUTC(m_pHandle, 0, &bytesNeededStartTimeInUTC, nullptr));
+		std::vector<char> bufferStartTimeInUTC(bytesNeededStartTimeInUTC);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeInUTC(m_pHandle, bytesNeededStartTimeInUTC, &bytesWrittenStartTimeInUTC, &bufferStartTimeInUTC[0]));
+		
+		return std::string(&bufferStartTimeInUTC[0]);
+	}
+	
+	/**
+	* CBuildExecution::GetStartTimeStampInMilliseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Milliseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetStartTimeStampInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeStampInMilliseconds(m_pHandle, &resultTimeStampInMilliseconds));
+		
+		return resultTimeStampInMilliseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Microseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetStartTimeStampInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeStampInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetEndTimeStampInMilliseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Milliseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetEndTimeStampInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetEndTimeStampInMilliseconds(m_pHandle, &resultTimeStampInMilliseconds));
+		
+		return resultTimeStampInMilliseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Microseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetEndTimeStampInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetEndTimeStampInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetElapsedTimeInMilliseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Milliseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetElapsedTimeInMilliseconds(m_pHandle, &resultTimeStampInMilliseconds));
+		
+		return resultTimeStampInMilliseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetElapsedTimeInMicroseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Microseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetElapsedTimeInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildExecution::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] ContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
+	{
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDiscreteField2DByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuildExecution::LoadDiscreteField2DByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDiscreteField2DByUUID(m_pHandle, sDataUUID.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuildExecution::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuildExecution::LoadPNGImageByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::AddMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	void CBuildExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CBuildExecution::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	bool CBuildExecution::HasMetaDataString(const std::string & sKey)
+	{
+		bool resultMetaDataStringExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasMetaDataString(m_pHandle, sKey.c_str(), &resultMetaDataStringExists));
+		
+		return resultMetaDataStringExists;
+	}
+	
+	/**
+	* CBuildExecution::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	std::string CBuildExecution::GetMetaDataString(const std::string & sKey)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetMetaDataString(m_pHandle, sKey.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetMetaDataString(m_pHandle, sKey.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	 * Method definitions for class CBuildExecutionIterator
+	 */
+	
+	/**
+	* CBuildExecutionIterator::GetCurrentExecution - Returns the execution the iterator points at.
+	* @return returns the BuildExecution instance.
+	*/
+	PBuildExecution CBuildExecutionIterator::GetCurrentExecution()
+	{
+		LibMCEnvHandle hBuildExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecutionIterator_GetCurrentExecution(m_pHandle, &hBuildExecutionInstance));
+		
+		if (!hBuildExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hBuildExecutionInstance);
+	}
+	
+	/**
 	 * Method definitions for class CBuild
 	 */
 	
@@ -12205,7 +13296,7 @@ public:
 	}
 	
 	/**
-	* CBuild::GetStorageUUID - Returns storage uuid of the build.
+	* CBuild::GetStorageUUID - Returns storage uuid of the build stream.
 	* @return Storage UUID of the build.
 	*/
 	std::string CBuild::GetStorageUUID()
@@ -12420,7 +13511,7 @@ public:
 	
 	/**
 	* CBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
@@ -12437,6 +13528,124 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::StartExecution - Starts a build execution. This function does not work in a UIEnvironment context!
+	* @param[in] sDescription - A human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sUserUUID - User who started the execution. MUST exist. If empty, no user is attached.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	PBuildExecution CBuild::StartExecution(const std::string & sDescription, const std::string & sUserUUID)
+	{
+		LibMCEnvHandle hBuildExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StartExecution(m_pHandle, sDescription.c_str(), sUserUUID.c_str(), &hBuildExecutionInstance));
+		
+		if (!hBuildExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hBuildExecutionInstance);
+	}
+	
+	/**
+	* CBuild::HasExecution - Checks if a build execution exists for this build.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Returns true if the execution exists.
+	*/
+	bool CBuild::HasExecution(const std::string & sExecutionUUID)
+	{
+		bool resultExecutionExist = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasExecution(m_pHandle, sExecutionUUID.c_str(), &resultExecutionExist));
+		
+		return resultExecutionExist;
+	}
+	
+	/**
+	* CBuild::FindExecution - Finds a build execution. Fails if execution does not exist.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	PBuildExecution CBuild::FindExecution(const std::string & sExecutionUUID)
+	{
+		LibMCEnvHandle hBuildExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_FindExecution(m_pHandle, sExecutionUUID.c_str(), &hBuildExecutionInstance));
+		
+		if (!hBuildExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hBuildExecutionInstance);
+	}
+	
+	/**
+	* CBuild::ListExecutions - Lists all Executions of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	PBuildExecutionIterator CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_ListExecutions(m_pHandle, bOnlyCurrentJournalSession, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecutionIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuild::ListExecutionsByStatus - Lists all Executions of the build by status.
+	* @param[in] eExecutionStatus - Status of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	PBuildExecutionIterator CBuild::ListExecutionsByStatus(const eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_ListExecutionsByStatus(m_pHandle, eExecutionStatus, bOnlyCurrentJournalSession, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecutionIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuild::AddMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	void CBuild::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CBuild::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	bool CBuild::HasMetaDataString(const std::string & sKey)
+	{
+		bool resultMetaDataStringExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasMetaDataString(m_pHandle, sKey.c_str(), &resultMetaDataStringExists));
+		
+		return resultMetaDataStringExists;
+	}
+	
+	/**
+	* CBuild::GetMetaDataString - Gets a metadata string of a build. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	std::string CBuild::GetMetaDataString(const std::string & sKey)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetMetaDataString(m_pHandle, sKey.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetMetaDataString(m_pHandle, sKey.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
 	}
 	
 	/**

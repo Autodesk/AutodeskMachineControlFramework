@@ -72,6 +72,54 @@ namespace AMCData {
 			std::string sIdentifierAddQuery = "ALTER TABLE `buildjobdata` ADD `identifier` varchar ( 256 ) DEFAULT ``";
 			pTransaction->executeStatement(sIdentifierAddQuery);
 		}
+
+		case 9: {
+			std::string sBuildJobMetaDataQuery = "CREATE TABLE `buildjobmetadata` (";
+			sBuildJobMetaDataQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+			sBuildJobMetaDataQuery += "`jobuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobMetaDataQuery += "`key`  varchar ( 256 ) NOT NULL,";
+			sBuildJobMetaDataQuery += "`value` TEXT NOT NULL,";
+			sBuildJobMetaDataQuery += "`active`  integer DEFAULT 0,";
+			sBuildJobMetaDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+			pTransaction->executeStatement(sBuildJobMetaDataQuery);
+
+			std::string sBuildJobExecutionQuery = "CREATE TABLE `buildjobexecutions` (";
+			sBuildJobExecutionQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+			sBuildJobExecutionQuery += "`jobuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionQuery += "`journaluuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionQuery += "`startjournaltimestamp`  INTEGER NOT NULL,";
+			sBuildJobExecutionQuery += "`endjournaltimestamp`  INTEGER NOT NULL,";
+			sBuildJobExecutionQuery += "`useruuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionQuery += "`status`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionQuery += "`description`  TEXT NOT NULL,";
+			sBuildJobExecutionQuery += "`updateuuid`  varchar ( 64 ),";
+			sBuildJobExecutionQuery += "`active`  integer DEFAULT 0,";
+			sBuildJobExecutionQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+			pTransaction->executeStatement(sBuildJobExecutionQuery);
+
+			std::string sBuildJobExecutionDataQuery = "CREATE TABLE `buildjobexecutiondata` (";
+			sBuildJobExecutionDataQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+			sBuildJobExecutionDataQuery += "`executionuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionDataQuery += "`storagestreamuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionDataQuery += "`name`  varchar ( 256 ) NOT NULL,";
+			sBuildJobExecutionDataQuery += "`datatype`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionDataQuery += "`userid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionDataQuery += "`updateuuid`  varchar ( 64 ),";
+			sBuildJobExecutionDataQuery += "`active`  integer DEFAULT 0,";
+			sBuildJobExecutionDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+			pTransaction->executeStatement(sBuildJobExecutionDataQuery);
+
+			std::string sBuildJobExecutionMetaDataQuery = "CREATE TABLE `buildjobexecutionmetadata` (";
+			sBuildJobExecutionMetaDataQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+			sBuildJobExecutionMetaDataQuery += "`executionuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobExecutionMetaDataQuery += "`key`  varchar ( 256 ) NOT NULL,";
+			sBuildJobExecutionMetaDataQuery += "`value` TEXT NOT NULL,";
+			sBuildJobExecutionMetaDataQuery += "`active`  integer DEFAULT 0,";
+			sBuildJobExecutionMetaDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+			pTransaction->executeStatement(sBuildJobExecutionMetaDataQuery);
+
+		}
+
 		}
 
 		

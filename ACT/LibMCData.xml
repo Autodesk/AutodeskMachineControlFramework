@@ -731,7 +731,7 @@
 
 		<method name="StoreNewStream" description="stores a new stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. Must be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
 			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name Description of the stream." />
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />
@@ -741,7 +741,7 @@
 
 		<method name="BeginPartialStream" description="starts storing a stream with partial uploads.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
 			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
@@ -767,7 +767,7 @@
 		
 		<method name="BeginRandomWriteStream" description="starts storing a stream with random write access. Checksums are not required.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
 			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
@@ -818,6 +818,11 @@
 			<param name="ClientFileName" type="string" pass="out" description="ClientFileName of the ticket." />	
 			<param name="SessionUUID" type="string" pass="out" description="UUID of user session." />	
 			<param name="UserUUID" type="string" pass="out" description="UUID of user that created the ticket." />	
+		</method>	
+
+		<method name="AttachStreamToJournal" description="Attaches a stream to a journal as temporary stream.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of stream. Call fails if stream does not exist." />	
+			<param name="JournalUUID" type="string" pass="in" description="UUID of journal. Call fails if journal does not exist." />	
 		</method>	
 
 	</class>
