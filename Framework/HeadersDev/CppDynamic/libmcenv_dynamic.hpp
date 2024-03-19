@@ -1888,7 +1888,9 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeStamp();
 	inline LibMCEnv_double ComputeFullAverage();
 	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval);
-	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+	inline LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
+	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+	inline PUniformJournalSampling ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples);
 	inline void ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer);
 };
 	
@@ -2711,7 +2713,9 @@ public:
 		pWrapperTable->m_JournalVariable_GetEndTimeStamp = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeFullAverage = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeAverage = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeSample = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = nullptr;
 		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = nullptr;
 		pWrapperTable->m_Alert_GetUUID = nullptr;
 		pWrapperTable->m_Alert_IsActive = nullptr;
@@ -6779,12 +6783,30 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeSample = (PLibMCEnvJournalVariable_ComputeSamplePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computesample");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeSample = (PLibMCEnvJournalVariable_ComputeSamplePtr) dlsym(hLibrary, "libmcenv_journalvariable_computesample");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeSample == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
 		#else // _WIN32
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = (PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeequidistantsamples");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = (PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeequidistantsamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeEquidistantSamples == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10222,8 +10244,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computesample", (void**)&(pWrapperTable->m_JournalVariable_ComputeSample));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeSample == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_computeuniformaveragesamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computeequidistantsamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeEquidistantSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeEquidistantSamples == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_receiverawtimestream", (void**)&(pWrapperTable->m_JournalVariable_ReceiveRawTimeStream));
@@ -16785,18 +16815,49 @@ public:
 	}
 	
 	/**
+	* CJournalVariable::ComputeSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* @param[in] nTimeInMicroSeconds - Timestamp to check.
+	* @return Value of the variable at the time step.
+	*/
+	LibMCEnv_double CJournalVariable::ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
+	{
+		LibMCEnv_double resultSampleValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeSample(m_pHandle, nTimeInMicroSeconds, &resultSampleValue));
+		
+		return resultSampleValue;
+	}
+	
+	/**
 	* CJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
 	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
-	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
+	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
+	* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
 	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
 	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 	* @return Returns an instance with the sampling results.
 	*/
-	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
 	{
 		LibMCEnvHandle hJournalSampling = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		
+		if (!hJournalSampling) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hJournalSampling);
+	}
+	
+	/**
+	* CJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
+	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
+	* @return Returns an instance with the sampling results.
+	*/
+	PUniformJournalSampling CJournalVariable::ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples)
+	{
+		LibMCEnvHandle hJournalSampling = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeEquidistantSamples(m_pHandle, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, nNumberOfSamples, &hJournalSampling));
 		
 		if (!hJournalSampling) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

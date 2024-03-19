@@ -82,7 +82,13 @@ namespace AMCData {
 
 	void CSQLStatement_SQLite::checkSQLiteError(int nError)
 	{
-		CSQLHandler_SQLite::checkSQLiteError(nError);
+		if (m_pHandler != nullptr) {
+			m_pHandler->checkSQLiteError(nError);
+		}
+		else {
+			if (nError != SQLITE_OK)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_OTHER);
+		}
 	}
 
 	bool CSQLStatement_SQLite::nextRow()

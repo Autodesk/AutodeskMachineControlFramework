@@ -66,7 +66,7 @@ namespace AMCData {
 				sTempStreamQuery += "`uuid`  varchar ( 64 ) NOT NULL,";
 				sTempStreamQuery += "`journaluuid`  varchar ( 64 ) NOT NULL,";
 				sTempStreamQuery += "`streamuuid`  varchar ( 64 ) NOT NULL)";
-				pTransaction->executeStatement(sTempStreamQuery);
+				pTransaction->executeStatement(sTempStreamQuery); 
 
 				break;
 			}

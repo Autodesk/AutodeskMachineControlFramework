@@ -71,17 +71,19 @@ namespace AMCData {
 		case 4: {
 			std::string sIdentifierAddQuery = "ALTER TABLE `buildjobdata` ADD `identifier` varchar ( 256 ) DEFAULT ``";
 			pTransaction->executeStatement(sIdentifierAddQuery);
+			break;
 		}
 
 		case 9: {
+
 			std::string sBuildJobMetaDataQuery = "CREATE TABLE `buildjobmetadata` (";
 			sBuildJobMetaDataQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
 			sBuildJobMetaDataQuery += "`jobuuid`  varchar ( 64 ) NOT NULL,";
-			sBuildJobMetaDataQuery += "`key`  varchar ( 256 ) NOT NULL,";
-			sBuildJobMetaDataQuery += "`value` TEXT NOT NULL,";
+			sBuildJobMetaDataQuery += "`metadatakey`  varchar ( 256 ) NOT NULL,";
+			sBuildJobMetaDataQuery += "`metadatavalue` TEXT NOT NULL,";
 			sBuildJobMetaDataQuery += "`active`  integer DEFAULT 0,";
 			sBuildJobMetaDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
-			pTransaction->executeStatement(sBuildJobMetaDataQuery);
+			pTransaction->executeStatement(sBuildJobMetaDataQuery); 
 
 			std::string sBuildJobExecutionQuery = "CREATE TABLE `buildjobexecutions` (";
 			sBuildJobExecutionQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
@@ -107,7 +109,7 @@ namespace AMCData {
 			sBuildJobExecutionDataQuery += "`updateuuid`  varchar ( 64 ),";
 			sBuildJobExecutionDataQuery += "`active`  integer DEFAULT 0,";
 			sBuildJobExecutionDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
-			pTransaction->executeStatement(sBuildJobExecutionDataQuery);
+			pTransaction->executeStatement(sBuildJobExecutionDataQuery); 
 
 			std::string sBuildJobExecutionMetaDataQuery = "CREATE TABLE `buildjobexecutionmetadata` (";
 			sBuildJobExecutionMetaDataQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
@@ -116,7 +118,9 @@ namespace AMCData {
 			sBuildJobExecutionMetaDataQuery += "`value` TEXT NOT NULL,";
 			sBuildJobExecutionMetaDataQuery += "`active`  integer DEFAULT 0,";
 			sBuildJobExecutionMetaDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
-			pTransaction->executeStatement(sBuildJobExecutionMetaDataQuery);
+			pTransaction->executeStatement(sBuildJobExecutionMetaDataQuery); 
+			
+			break;
 
 		}
 

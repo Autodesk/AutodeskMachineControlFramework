@@ -2591,12 +2591,24 @@
 			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
 		</method>
 		
+		<method name="ComputeSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
+			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
+			<param name="SampleValue" type="double" pass="return" description="Value of the variable at the time step." />
+		</method>
+
 		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
 			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
-			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in microseconds." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
+			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time." />
 			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
 			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
+			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
+		</method>
+
+		<method name="ComputeEquidistantSamples" description="Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.">
+			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
+			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in microseconds." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
 			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
 		</method>
 
