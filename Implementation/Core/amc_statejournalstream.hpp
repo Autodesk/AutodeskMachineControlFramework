@@ -162,6 +162,8 @@ namespace AMC {
 
 		void readRawDoubleData(const uint32_t nStorageIndex, const sStateJournalInterval& interval, double dUnits, std::vector<sJournalTimeStreamDoubleEntry>& rawTimeStream);
 
+		double getDoubleSampleAt(const uint32_t nStorageIndex, uint64_t nTimeStampInMicroseconds, double dUnits);
+
 		// Threaded function to write chunk buffers to disk!
 		void serializeChunksThreaded();
 		void writeChunksToDiskThreaded();

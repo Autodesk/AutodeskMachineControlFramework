@@ -79,6 +79,11 @@ namespace AMC {
 
 		virtual eStateJournalVariableType getType() = 0;
 
+		virtual double computeNumericSample(const uint64_t nTimeStampInMicroseconds)
+		{
+			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC, m_sName);
+		}
+
 	};
 
 
@@ -109,6 +114,11 @@ namespace AMC {
 		void setInitialValue(const bool bValue)
 		{
 			m_bCurrentValue = bValue;
+		}
+
+		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
+		{
+			return 0.0;
 		}
 
 	};
@@ -166,6 +176,12 @@ namespace AMC {
 			} */
 
 		}
+
+		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
+		{
+			return 0.0;
+		}
+
 
 
 	};
@@ -234,6 +250,10 @@ namespace AMC {
 
 		}
 
+		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) 
+		{
+			return m_pStream->getDoubleSampleAt (m_nStorageIndex, nTimeStampInMicroseconds, m_dUnits);
+		}
 
 	};
 
@@ -316,6 +336,8 @@ namespace AMC {
 		uint64_t retrieveTimeStamp_MicroSecond();
 
 		void readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
+
+		double computeSample(const std::string& sName, const uint64_t nTimeStampInMicroseconds);
 
 		void recordingThread();
 	};
@@ -546,6 +568,18 @@ namespace AMC {
 
 	}
 
+	double CStateJournalImpl::computeSample(const std::string& sName, const uint64_t nTimeStampInMicroseconds)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		if (m_JournalMode != eStateJournalMode::sjmRecording)
+			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
+
+		auto pVariable = findVariable(sName);
+		return pVariable->computeNumericSample(nTimeStampInMicroseconds);
+
+	}
+
+
 	void CStateJournalImpl::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
@@ -687,6 +721,12 @@ namespace AMC {
 	void CStateJournal::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
 		m_pImpl->readDoubleTimeStream(sName, interval, timeStream);
+	}
+
+
+	double CStateJournal::computeSample(const std::string& sName, const uint64_t nTimeStamp)
+	{
+		return m_pImpl->computeSample(sName, nTimeStamp);
 	}
 
 

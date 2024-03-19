@@ -580,6 +580,12 @@ namespace AMC {
 
 	}
 
+	double CStateJournalStream::getDoubleSampleAt(const uint32_t nStorageIndex, uint64_t nTimeStampInMicroseconds, double dUnits)
+	{
+		return 0.0;
+	}
+
+
 
 	void CStateJournalStream::setVariableCount(size_t nVariableCount)
 	{
