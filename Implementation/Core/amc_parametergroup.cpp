@@ -503,7 +503,7 @@ namespace AMC {
 			if (sDefaultValue.length() > 0)
 				dValue = AMCCommon::CUtils::stringToDouble(sDefaultValue);
 
-			double dUnits = 0.0;
+			double dUnits = 1.0;
 			if (sUnits.length() > 0)
 				dUnits = AMCCommon::CUtils::stringToDouble(sUnits);
 
