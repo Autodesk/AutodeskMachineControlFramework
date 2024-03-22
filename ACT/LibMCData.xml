@@ -362,6 +362,8 @@
 		<error name="DOWNLOADTICKETNOTFOUND" code="362" description="Download ticket not found." />		
 		<error name="EMPTYCLIENTFILENAME" code="363" description="Empty client file name." />		
 		<error name="INVALIDCLIENTFILENAME" code="364" description="Invalid client file name." />		
+		<error name="CANNOTCHANGESTATUSOFBUILDJOBEXECUTION" code="365" description="Can not change status of build job execution." />		
+		
 										
 	</errors>
 	
@@ -438,6 +440,13 @@
 		<option name="CustomBinaryData" value="100"/>
 	</enum>		
 	
+	<enum name="BuildJobExecutionStatus">
+		<option name="Unknown" value="0" />
+		<option name="InProcess" value="1" />
+		<option name="Finished" value="2" />
+		<option name="Failed" value="3" />
+	</enum>
+
 	<functiontype name="StreamReadCallback" description="Callback to call for reading a data chunk">
 		<param name="ByteData" type="pointer" pass="in" description="Pointer to a buffer to read data into"/>
 		<param name="NumBytes" type="uint64" pass="in" description="Number of bytes to read"/>
@@ -885,6 +894,66 @@
 	</class>
 
 
+    <!-- The BuildJobExecution class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecution" parent="Base" description="Build Job Execution instance, handling a specific execution of the build job.">
+
+		<method name="GetExecutionUUID" description="returns the uuid of a build job execution.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+
+		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+		
+		<method name="GetStatus" description="returns the build job execution status.">
+			<param name="ExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="return" description="Status Value" />	
+		</method>
+
+		<method name="ChangeStatus" description="sets the new build job execution status. Will fail if current status is not InProcess.">
+			<param name="NewExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="in" description="Status Value" />	
+		</method>
+
+		<method name="GetDescription" description="returns the build job description.">
+			<param name="Description" type="string" pass="return" description="Current Description." />	
+		</method>
+		
+		<method name="SetDescription" description="sets the build job description. Should not be an empty string.">
+			<param name="NewDescription" type="string" pass="in" description="New Description." />	
+		</method>
+
+		<method name="GetJournalUUID" description="returns the uuid of the execution journal.">
+			<param name="JournalUUID" type="string" pass="return" description="UUID String" />	
+		</method>
+		
+		<method name="GetUserUUID" description="returns the uuid of the user that created the build job.">
+			<param name="UserUUID" type="string" pass="return" description="UUID String or 00000000-0000-0000-0000-000000000000 if no user is attached." />	
+		</method>
+		
+		<method name="GetStartTimeInUTC" description="Returns the start time of the build in ISO8601 UTC format.">
+			<param name="StartTimeInUTC" type="string" pass="return" description="Start time of the build." />
+		</method>
+		
+		<method name="GetStartTimeStampInMicroseconds" description="Returns the start time stamp of the build execution in the current machine journal.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build started in Microseconds." />
+		</method>
+		
+		<method name="GetEndTimeStampInMicroseconds" description="Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build ended in Microseconds." />
+		</method>
+			
+		<method name="GetElapsedTimeInMicroseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
+		</method>
+		
+	</class>
+
+    <!-- The BuildJobExecutionIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecutionIterator" parent="Iterator">
+		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="BuildJobExecution" pass="return" description="returns the build job  execution instance."/>
+		</method>
+	</class>
+
     <!-- The BuildJob class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJob" parent="Base" description="Build Job instance">
 
@@ -958,7 +1027,43 @@
 			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
 		</method>
 		
-									
+		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+	
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
+		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build execution. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+
+		<method name="CreateBuildJobExecution" description="Creates a new build job execution with state InProgress.">
+			<param name="Description" type="string" pass="in" description="Description of the execution." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded." />
+			<param name="ExecutionInstance" type="class" class="BuildJobExecution" pass="return" description="Newly created execution instance." />
+		</method>
+
+		<method name="RetrieveBuildJobExecution" description="Retrieves a new build job execution by uuid.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution to retrieve." />
+			<param name="ExecutionInstance" type="optionalclass" class="BuildJobExecution" pass="return" description="If UUID exists, returns execution instance. Otherwise, returns null." />
+		</method>
+
+		<method name="RetrieveBuildJobExecutions" description="Retrieves multiple executions of the build job.">
+			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
+		
+		<method name="RetrieveBuildJobExecutionsByStatus" description="Retrieves multiple executions of the build job.">
+			<param name="StatusFilter" type="enum" class="BuildJobExecutionStatus" pass="in" description="Status to filter the executions from." />
+			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
+		
 	</class>
 
     <!-- The BuildJobIterator class is not thread safe and MUST ONLY be used in a single thread context... -->

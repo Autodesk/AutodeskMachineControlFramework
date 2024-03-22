@@ -358,6 +358,42 @@ IBuildJobData* CBuildJob::RetrieveJobData(const std::string& sDataUUID)
 }
 
 
+void CBuildJob::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+bool CBuildJob::HasMetaDataString(const std::string& sKey)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CBuildJob::GetMetaDataString(const std::string& sKey)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecution* CBuildJob::RetrieveBuildJobExecution(const std::string& sExecutionUUID)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutions(const std::string& sJournalUUIDFilter)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string& sJournalUUIDFilter)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+
 std::string CBuildJob::convertBuildJobStatusToString(const LibMCData::eBuildJobStatus eStatus)
 {
     switch (eStatus) {

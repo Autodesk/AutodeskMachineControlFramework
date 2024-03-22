@@ -66,6 +66,8 @@ class IStorageStream;
 class IStorage;
 class IBuildJobData;
 class IBuildJobDataIterator;
+class IBuildJobExecution;
+class IBuildJobExecutionIterator;
 class IBuildJob;
 class IBuildJobIterator;
 class IBuildJobHandler;
@@ -953,6 +955,106 @@ typedef IBaseSharedPtr<IBuildJobDataIterator> PIBuildJobDataIterator;
 
 
 /*************************************************************************************************************************
+ Class interface for BuildJobExecution 
+**************************************************************************************************************************/
+
+class IBuildJobExecution : public virtual IBase {
+public:
+	/**
+	* IBuildJobExecution::GetExecutionUUID - returns the uuid of a build job execution.
+	* @return UUID String
+	*/
+	virtual std::string GetExecutionUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetJobUUID - returns the uuid of the parent build job.
+	* @return UUID String
+	*/
+	virtual std::string GetJobUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetStatus - returns the build job execution status.
+	* @return Status Value
+	*/
+	virtual LibMCData::eBuildJobExecutionStatus GetStatus() = 0;
+
+	/**
+	* IBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
+	* @param[in] eNewExecutionStatus - Status Value
+	*/
+	virtual void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus) = 0;
+
+	/**
+	* IBuildJobExecution::GetDescription - returns the build job description.
+	* @return Current Description.
+	*/
+	virtual std::string GetDescription() = 0;
+
+	/**
+	* IBuildJobExecution::SetDescription - sets the build job description. Should not be an empty string.
+	* @param[in] sNewDescription - New Description.
+	*/
+	virtual void SetDescription(const std::string & sNewDescription) = 0;
+
+	/**
+	* IBuildJobExecution::GetJournalUUID - returns the uuid of the execution journal.
+	* @return UUID String
+	*/
+	virtual std::string GetJournalUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetUserUUID - returns the uuid of the user that created the build job.
+	* @return UUID String or 00000000-0000-0000-0000-000000000000 if no user is attached.
+	*/
+	virtual std::string GetUserUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetStartTimeInUTC - Returns the start time of the build in ISO8601 UTC format.
+	* @return Start time of the build.
+	*/
+	virtual std::string GetStartTimeInUTC() = 0;
+
+	/**
+	* IBuildJobExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Microseconds.
+	*/
+	virtual LibMCData_uint64 GetStartTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildJobExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Microseconds.
+	*/
+	virtual LibMCData_uint64 GetEndTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildJobExecution::GetElapsedTimeInMicroseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Microseconds.
+	*/
+	virtual LibMCData_uint64 GetElapsedTimeInMicroseconds() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecution> PIBuildJobExecution;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobExecutionIterator 
+**************************************************************************************************************************/
+
+class IBuildJobExecutionIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildJobExecutionIterator::GetCurrentJobData - Returns the build job data the iterator points at.
+	* @return returns the build job  execution instance.
+	*/
+	virtual IBuildJobExecution * GetCurrentJobData() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecutionIterator> PIBuildJobExecutionIterator;
+
+
+/*************************************************************************************************************************
  Class interface for BuildJob 
 **************************************************************************************************************************/
 
@@ -1061,6 +1163,57 @@ public:
 	* @return Build Job Data Instance.
 	*/
 	virtual IBuildJobData * RetrieveJobData(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildJob::AddMetaDataString - Adds a Metadata String to the build job.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuildJob::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildJob::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildJob::CreateBuildJobExecution - Creates a new build job execution with state InProgress.
+	* @param[in] sDescription - Description of the execution.
+	* @param[in] sUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
+	* @return Newly created execution instance.
+	*/
+	virtual IBuildJobExecution * CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID) = 0;
+
+	/**
+	* IBuildJob::RetrieveBuildJobExecution - Retrieves a new build job execution by uuid.
+	* @param[in] sExecutionUUID - UUID of the execution to retrieve.
+	* @return If UUID exists, returns execution instance. Otherwise, returns null.
+	*/
+	virtual IBuildJobExecution * RetrieveBuildJobExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IBuildJob::RetrieveBuildJobExecutions - Retrieves multiple executions of the build job.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	virtual IBuildJobExecutionIterator * RetrieveBuildJobExecutions(const std::string & sJournalUUIDFilter) = 0;
+
+	/**
+	* IBuildJob::RetrieveBuildJobExecutionsByStatus - Retrieves multiple executions of the build job.
+	* @param[in] eStatusFilter - Status to filter the executions from.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	virtual IBuildJobExecutionIterator * RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string & sJournalUUIDFilter) = 0;
 
 };
 

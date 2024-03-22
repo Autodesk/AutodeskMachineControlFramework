@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_buildexecution.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
@@ -298,20 +299,47 @@ std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const s
 
 IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const std::string& sUserUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUserUUID;
+
+	if (!sUserUUID.empty()) {
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+	}
+	else {
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	}
+
+	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID);
+
+	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID);
 
 }
 
 bool CBuild::HasExecution(const std::string& sExecutionUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution (sNormalizedExecutionUUID);
+
+	return pExecutionData.get() != nullptr;
 
 }
 
 IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
 
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution(sNormalizedExecutionUUID);
+
+	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID);
 }
 
 IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
@@ -328,19 +356,38 @@ IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildEx
 
 void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	pBuildJob->AddMetaDataString(sKey, sValue);
 
 }
 
 bool CBuild::HasMetaDataString(const std::string& sKey)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	return pBuildJob->HasMetaDataString(sKey);
 
 }
 
 std::string CBuild::GetMetaDataString(const std::string& sKey)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	return pBuildJob->GetMetaDataString(sKey);
+
 
 }
 

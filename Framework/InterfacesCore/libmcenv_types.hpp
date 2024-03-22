@@ -249,6 +249,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME 10152 /** Empty download stream filename. */
 #define LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME 10153 /** Invalid download stream filename. */
 #define LIBMCENV_ERROR_USERISNOTAUTHORIZED 10154 /** User is not authorized. */
+#define LIBMCENV_ERROR_INVALIDMETADATAKEY 10155 /** Invalid Metadata Key. */
+#define LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION 10156 /** Can not change status of build execution. */
+#define LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER 10157 /** Build execution has no attached user. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -410,6 +413,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "Empty download stream filename.";
     case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "Invalid download stream filename.";
     case LIBMCENV_ERROR_USERISNOTAUTHORIZED: return "User is not authorized.";
+    case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "Invalid Metadata Key.";
+    case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "Can not change status of build execution.";
+    case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "Build execution has no attached user.";
     default: return "unknown error";
   }
 }

@@ -192,7 +192,9 @@
 		<error name="EMPTYDOWNLOADSTREAMFILENAME" code="10152" description="Empty download stream filename." />		
 		<error name="INVALIDDOWNLOADSTREAMFILENAME" code="10153" description="Invalid download stream filename." />		
 		<error name="USERISNOTAUTHORIZED" code="10154" description="User is not authorized." />		
-		
+		<error name="INVALIDMETADATAKEY" code="10155" description="Invalid Metadata Key." />		
+		<error name="CANNOTCHANGESTATUSOFBUILDEXECUTION" code="10156" description="Can not change status of build execution." />		
+		<error name="BUILDEXECUTIONHASNOATTACHEDUSER" code="10157" description="Build execution has no attached user." />		
 		
 	</errors>
 

@@ -389,6 +389,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND 362 /** Download ticket not found. */
 #define LIBMCDATA_ERROR_EMPTYCLIENTFILENAME 363 /** Empty client file name. */
 #define LIBMCDATA_ERROR_INVALIDCLIENTFILENAME 364 /** Invalid client file name. */
+#define LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION 365 /** Can not change status of build job execution. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -690,6 +691,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "Download ticket not found.";
     case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "Empty client file name.";
     case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "Invalid client file name.";
+    case LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION: return "Can not change status of build job execution.";
     default: return "unknown error";
   }
 }
@@ -710,6 +712,8 @@ typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
 typedef LibMCDataHandle LibMCData_BuildJobData;
 typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
+typedef LibMCDataHandle LibMCData_BuildJobExecution;
+typedef LibMCDataHandle LibMCData_BuildJobExecutionIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
@@ -776,6 +780,13 @@ namespace LibMCData {
     CustomBinaryData = 100
   };
   
+  enum class eBuildJobExecutionStatus : LibMCData_int32 {
+    Unknown = 0,
+    InProcess = 1,
+    Finished = 2,
+    Failed = 3
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -839,6 +850,7 @@ typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
+typedef LibMCData::eBuildJobExecutionStatus eLibMCDataBuildJobExecutionStatus;
 typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
 typedef LibMCData::sJournalChunkIntegerEntry sLibMCDataJournalChunkIntegerEntry;
 typedef LibMCData::LogCallback LibMCDataLogCallback;

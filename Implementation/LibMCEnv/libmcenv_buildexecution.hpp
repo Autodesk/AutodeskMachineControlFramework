@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CBuildExecution
 #define __LIBMCENV_BUILDEXECUTION
 
 #include "libmcenv_interfaces.hpp"
+#include "amc_toolpathhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -45,7 +46,8 @@ Abstract: This is the class declaration of CBuildExecution
 #endif
 
 // Include custom headers here.
-
+#include "libmcdata_dynamic.hpp"
+#include <mutex>
 
 namespace LibMCEnv {
 namespace Impl {
@@ -58,26 +60,18 @@ namespace Impl {
 class CBuildExecution : public virtual IBuildExecution, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	std::string m_sExecutionUUID;
+	LibMCData::PBuildJobExecution m_pExecution;
+	LibMCData::PDataModel m_pDataModel;
+	AMC::PToolpathHandler m_pToolpathHandler;
+	std::string m_sSystemUserID;
+	std::mutex m_Mutex;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+	virtual ~CBuildExecution();
 
 	std::string GetUUID() override;
 
