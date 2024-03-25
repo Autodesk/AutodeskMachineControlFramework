@@ -453,7 +453,7 @@ IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescr
     else
         sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 
-    std::string sInsertQuery = "INSERT INTO buildjobexecutions (uuid, jobuuid, journalUUID, startjournaltimestamp, endjournaltimestamp, useruuid, status, description, active, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    std::string sInsertQuery = "INSERT INTO buildjobexecutions (uuid, jobuuid, journaluuid, startjournaltimestamp, endjournaltimestamp, useruuid, status, description, active, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     auto pInsertStatement = m_pSQLHandler->prepareStatement(sInsertQuery);
     pInsertStatement->setString(1, sExecutionUUID);
     pInsertStatement->setString(2, m_sUUID);
@@ -461,29 +461,21 @@ IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescr
     pInsertStatement->setInt64(4, (int64_t)nRelativeStartTimeStampInMicroseconds);
     pInsertStatement->setInt64(5, 0);
     pInsertStatement->setString(6, sUserUUID);
-    pInsertStatement->setString(7, convertBuildJobExecutionStatusToString (LibMCData::eBuildJobExecutionStatus::InProcess));
+    pInsertStatement->setString(7, CBuildJobExecution::convertBuildJobExecutionStatusToString (LibMCData::eBuildJobExecutionStatus::InProcess));
     pInsertStatement->setString(8, sDescription);
     pInsertStatement->setInt(9, 1);
     pInsertStatement->setString(10, sAbsoluteCreationTimeStamp);
     pInsertStatement->execute();
 
-    return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID);
+    return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID, m_pStorageState);
 
 }
 
 IBuildJobExecution* CBuildJob::RetrieveBuildJobExecution(const std::string& sExecutionUUID)
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
-    std::string sSelectQuery = "SELECT uuid FROM buildjobexecutions WHERE uuid=? AND active=1";
-    auto pSelectStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
-    pSelectStatement->setString(1, sNormalizedUUID);
 
-    if (!pSelectStatement->nextRow ())
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND, "build job execution not found: " + sNormalizedUUID);
-
-    pSelectStatement = nullptr;
-
-    return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID);
+    return new CBuildJobExecution(m_pSQLHandler, sNormalizedUUID, m_pStorageState);
 }
 
 IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutions(const std::string& sJournalUUIDFilter)
@@ -526,29 +518,4 @@ LibMCData::eBuildJobStatus CBuildJob::convertStringToBuildJobStatus(const std::s
     throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBSTATUS);
 }
 
-std::string CBuildJob::convertBuildJobExecutionStatusToString(const LibMCData::eBuildJobExecutionStatus eStatus)
-{
-    switch (eStatus) {
-    case LibMCData::eBuildJobExecutionStatus::InProcess: return "inprocess";
-    case LibMCData::eBuildJobExecutionStatus::Finished: return "finished";
-    case LibMCData::eBuildJobExecutionStatus::Failed: return "failed";
-    case LibMCData::eBuildJobExecutionStatus::Unknown: return "unknown";
-    default:
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS);
-    }
-}
-
-LibMCData::eBuildJobExecutionStatus CBuildJob::convertStringToBuildJobExecutionStatus(const std::string& sValue)
-{
-    if (sValue == "inprocess")
-        return LibMCData::eBuildJobExecutionStatus::InProcess;
-    if (sValue == "finished")
-        return LibMCData::eBuildJobExecutionStatus::Finished;
-    if (sValue == "failed")
-        return LibMCData::eBuildJobExecutionStatus::Failed;
-    if (sValue == "unknown")
-        return LibMCData::eBuildJobExecutionStatus::Unknown;
-
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS);
-}
 

@@ -368,8 +368,15 @@
 		<error name="BUILDJOBMETADATAKEYDUPLICATE" code="368" description="Build job metadata key is not unique." />		
 		<error name="BUILDJOBMETADATAKEYNOTFOUND" code="369" description="Build job metadata key not found." />		
 		<error name="INVALIDBUILDJOBEXECUTIONSTATUS" code="370" description="Invalid build job execution status." />		
-		<error name="BUILDJOBEXECUTIONNOTFOUND" code="371" description="Build job execution not found." />		
-		
+		<error name="BUILDJOBEXECUTIONNOTFOUND" code="371" description="Build job execution not found." />			
+		<error name="BUILDJOBEXECUTIONISNOTINPROCESS" code="372" description="Build job execution is not in process." />		
+		<error name="BUILDJOBEXECUTIONENDNOTAVAILABLE" code="373" description="Build job execution end is not available." />		
+		<error name="INVALIDBUILDJOBEXECUTIONSTART" code="374" description="Invalid build job execution start." />		
+		<error name="INVALIDBUILDJOBEXECUTIONEND" code="375" description="Invalid build job execution end." />		
+		<error name="BUILDJOBEXECUTIONENDISBEFORESTART" code="376" description="Build job execution end is before start." />		
+		<error name="BUILDJOBEXECUTIONISFROMPASTJOURNAL" code="377" description="Build job execution is from past journal." />		
+		<error name="BUILDJOBEXECUTIONSTARTISINTHEFUTURE" code="378" description="Build job execution start is in the future." />		
+		<error name="BUILDJOBDURATIONNOTAVAILABLE" code="379" description="Build job duration is not available." />								
 		
 	</errors>
 	
@@ -934,21 +941,18 @@
 		<method name="GetUserUUID" description="returns the uuid of the user that created the build job.">
 			<param name="UserUUID" type="string" pass="return" description="UUID String or 00000000-0000-0000-0000-000000000000 if no user is attached." />	
 		</method>
-		
-		<method name="GetStartTimeInUTC" description="Returns the start time of the build in ISO8601 UTC format.">
-			<param name="StartTimeInUTC" type="string" pass="return" description="Start time of the build." />
-		</method>
-		
-		<method name="GetStartTimeStampInMicroseconds" description="Returns the start time stamp of the build execution in the current machine journal.">
+				
+		<method name="GetStartTimeStampInMicroseconds" description="Returns the start time stamp of the build execution in the machine journal.">
 			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build started in Microseconds." />
 		</method>
 		
-		<method name="GetEndTimeStampInMicroseconds" description="Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
+		<method name="GetEndTimeStampInMicroseconds" description="Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
 			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build ended in Microseconds." />
 		</method>
 			
-		<method name="GetElapsedTimeInMicroseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
-			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
+		<method name="ComputeElapsedTimeInMicroseconds" description="Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.">
+			<param name="GlobalTimerInMicroseconds" type="uint64" pass="in" description="The current session global timer." />
+			<param name="ElapsedTimeInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
 		</method>
 		
 	</class>

@@ -1126,10 +1126,6 @@
 			<param name="UserUUID" type="string" pass="return" description="User who started the job." />
 		</method>
 
-		<method name="GetStartTimeInUTC" description="Returns the start time of the build in ISO8601 UTC format.">
-			<param name="StartTimeInUTC" type="string" pass="return" description="Start time of the build." />
-		</method>
-
 		<method name="GetStartTimeStampInMilliseconds" description="Returns the start time stamp of the build execution in the current machine journal.">
 			<param name="TimeStampInMilliseconds" type="uint64" pass="return" description="TimeStamp when the build started in Milliseconds." />
 		</method>

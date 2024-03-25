@@ -396,6 +396,14 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND 369 /** Build job metadata key not found. */
 #define LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS 370 /** Invalid build job execution status. */
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND 371 /** Build job execution not found. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS 372 /** Build job execution is not in process. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE 373 /** Build job execution end is not available. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART 374 /** Invalid build job execution start. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND 375 /** Invalid build job execution end. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART 376 /** Build job execution end is before start. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL 377 /** Build job execution is from past journal. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE 378 /** Build job execution start is in the future. */
+#define LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE 379 /** Build job duration is not available. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -704,6 +712,14 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "Build job metadata key not found.";
     case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "Invalid build job execution status.";
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "Build job execution not found.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS: return "Build job execution is not in process.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE: return "Build job execution end is not available.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART: return "Invalid build job execution start.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND: return "Invalid build job execution end.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART: return "Build job execution end is before start.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL: return "Build job execution is from past journal.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE: return "Build job execution start is in the future.";
+    case LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE: return "Build job duration is not available.";
     default: return "unknown error";
   }
 }

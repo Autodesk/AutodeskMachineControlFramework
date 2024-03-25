@@ -1009,28 +1009,23 @@ public:
 	virtual std::string GetUserUUID() = 0;
 
 	/**
-	* IBuildJobExecution::GetStartTimeInUTC - Returns the start time of the build in ISO8601 UTC format.
-	* @return Start time of the build.
-	*/
-	virtual std::string GetStartTimeInUTC() = 0;
-
-	/**
-	* IBuildJobExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* IBuildJobExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the machine journal.
 	* @return TimeStamp when the build started in Microseconds.
 	*/
 	virtual LibMCData_uint64 GetStartTimeStampInMicroseconds() = 0;
 
 	/**
-	* IBuildJobExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* IBuildJobExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.
 	* @return TimeStamp when the build ended in Microseconds.
 	*/
 	virtual LibMCData_uint64 GetEndTimeStampInMicroseconds() = 0;
 
 	/**
-	* IBuildJobExecution::GetElapsedTimeInMicroseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* IBuildJobExecution::ComputeElapsedTimeInMicroseconds - Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
+	* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
 	* @return Elapsed time in Microseconds.
 	*/
-	virtual LibMCData_uint64 GetElapsedTimeInMicroseconds() = 0;
+	virtual LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) = 0;
 
 };
 

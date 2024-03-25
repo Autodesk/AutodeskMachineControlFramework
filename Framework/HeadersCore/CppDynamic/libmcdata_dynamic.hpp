@@ -541,6 +541,14 @@ public:
 			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "BUILDJOBMETADATAKEYNOTFOUND";
 			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "INVALIDBUILDJOBEXECUTIONSTATUS";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "BUILDJOBEXECUTIONNOTFOUND";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS: return "BUILDJOBEXECUTIONISNOTINPROCESS";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE: return "BUILDJOBEXECUTIONENDNOTAVAILABLE";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART: return "INVALIDBUILDJOBEXECUTIONSTART";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND: return "INVALIDBUILDJOBEXECUTIONEND";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART: return "BUILDJOBEXECUTIONENDISBEFORESTART";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL: return "BUILDJOBEXECUTIONISFROMPASTJOURNAL";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE: return "BUILDJOBEXECUTIONSTARTISINTHEFUTURE";
+			case LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE: return "BUILDJOBDURATIONNOTAVAILABLE";
 		}
 		return "UNKNOWN";
 	}
@@ -849,6 +857,14 @@ public:
 			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "Build job metadata key not found.";
 			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "Invalid build job execution status.";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "Build job execution not found.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS: return "Build job execution is not in process.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE: return "Build job execution end is not available.";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART: return "Invalid build job execution start.";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND: return "Invalid build job execution end.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART: return "Build job execution end is before start.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL: return "Build job execution is from past journal.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE: return "Build job execution start is in the future.";
+			case LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE: return "Build job duration is not available.";
 		}
 		return "unknown error";
 	}
@@ -1321,10 +1337,9 @@ public:
 	inline void SetDescription(const std::string & sNewDescription);
 	inline std::string GetJournalUUID();
 	inline std::string GetUserUUID();
-	inline std::string GetStartTimeInUTC();
 	inline LibMCData_uint64 GetStartTimeStampInMicroseconds();
 	inline LibMCData_uint64 GetEndTimeStampInMicroseconds();
-	inline LibMCData_uint64 GetElapsedTimeInMicroseconds();
+	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds);
 };
 	
 /*************************************************************************************************************************
@@ -1741,10 +1756,9 @@ public:
 		pWrapperTable->m_BuildJobExecution_SetDescription = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetJournalUUID = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetUserUUID = nullptr;
-		pWrapperTable->m_BuildJobExecution_GetStartTimeInUTC = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds = nullptr;
-		pWrapperTable->m_BuildJobExecution_GetElapsedTimeInMicroseconds = nullptr;
+		pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds = nullptr;
 		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData = nullptr;
 		pWrapperTable->m_BuildJob_GetUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetName = nullptr;
@@ -2640,15 +2654,6 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildJobExecution_GetStartTimeInUTC = (PLibMCDataBuildJobExecution_GetStartTimeInUTCPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getstarttimeinutc");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobExecution_GetStartTimeInUTC = (PLibMCDataBuildJobExecution_GetStartTimeInUTCPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getstarttimeinutc");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobExecution_GetStartTimeInUTC == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds = (PLibMCDataBuildJobExecution_GetStartTimeStampInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getstarttimestampinmicroseconds");
 		#else // _WIN32
 		pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds = (PLibMCDataBuildJobExecution_GetStartTimeStampInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getstarttimestampinmicroseconds");
@@ -2667,12 +2672,12 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildJobExecution_GetElapsedTimeInMicroseconds = (PLibMCDataBuildJobExecution_GetElapsedTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getelapsedtimeinmicroseconds");
+		pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds = (PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds");
 		#else // _WIN32
-		pWrapperTable->m_BuildJobExecution_GetElapsedTimeInMicroseconds = (PLibMCDataBuildJobExecution_GetElapsedTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getelapsedtimeinmicroseconds");
+		pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds = (PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobExecution_GetElapsedTimeInMicroseconds == nullptr)
+		if (pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3896,10 +3901,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetUserUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getstarttimeinutc", (void**)&(pWrapperTable->m_BuildJobExecution_GetStartTimeInUTC));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetStartTimeInUTC == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getstarttimestampinmicroseconds", (void**)&(pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3908,8 +3909,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getelapsedtimeinmicroseconds", (void**)&(pWrapperTable->m_BuildJobExecution_GetElapsedTimeInMicroseconds));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetElapsedTimeInMicroseconds == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds", (void**)&(pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobexecutioniterator_getcurrentjobdata", (void**)&(pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData));
@@ -5541,22 +5542,7 @@ public:
 	}
 	
 	/**
-	* CBuildJobExecution::GetStartTimeInUTC - Returns the start time of the build in ISO8601 UTC format.
-	* @return Start time of the build.
-	*/
-	std::string CBuildJobExecution::GetStartTimeInUTC()
-	{
-		LibMCData_uint32 bytesNeededStartTimeInUTC = 0;
-		LibMCData_uint32 bytesWrittenStartTimeInUTC = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetStartTimeInUTC(m_pHandle, 0, &bytesNeededStartTimeInUTC, nullptr));
-		std::vector<char> bufferStartTimeInUTC(bytesNeededStartTimeInUTC);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetStartTimeInUTC(m_pHandle, bytesNeededStartTimeInUTC, &bytesWrittenStartTimeInUTC, &bufferStartTimeInUTC[0]));
-		
-		return std::string(&bufferStartTimeInUTC[0]);
-	}
-	
-	/**
-	* CBuildJobExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* CBuildJobExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the machine journal.
 	* @return TimeStamp when the build started in Microseconds.
 	*/
 	LibMCData_uint64 CBuildJobExecution::GetStartTimeStampInMicroseconds()
@@ -5568,7 +5554,7 @@ public:
 	}
 	
 	/**
-	* CBuildJobExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* CBuildJobExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.
 	* @return TimeStamp when the build ended in Microseconds.
 	*/
 	LibMCData_uint64 CBuildJobExecution::GetEndTimeStampInMicroseconds()
@@ -5580,15 +5566,16 @@ public:
 	}
 	
 	/**
-	* CBuildJobExecution::GetElapsedTimeInMicroseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* CBuildJobExecution::ComputeElapsedTimeInMicroseconds - Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
+	* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
 	* @return Elapsed time in Microseconds.
 	*/
-	LibMCData_uint64 CBuildJobExecution::GetElapsedTimeInMicroseconds()
+	LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds)
 	{
-		LibMCData_uint64 resultTimeStampInMicroseconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetElapsedTimeInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		LibMCData_uint64 resultElapsedTimeInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ComputeElapsedTimeInMicroseconds(m_pHandle, nGlobalTimerInMicroseconds, &resultElapsedTimeInMicroseconds));
 		
-		return resultTimeStampInMicroseconds;
+		return resultElapsedTimeInMicroseconds;
 	}
 	
 	/**

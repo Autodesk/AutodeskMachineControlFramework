@@ -1021,18 +1021,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getjournaluuid(Li
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getuseruuid(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
 
 /**
-* Returns the start time of the build in ISO8601 UTC format.
-*
-* @param[in] pBuildJobExecution - BuildJobExecution instance.
-* @param[in] nStartTimeInUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pStartTimeInUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pStartTimeInUTCBuffer -  buffer of Start time of the build., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getstarttimeinutc(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nStartTimeInUTCBufferSize, LibMCData_uint32* pStartTimeInUTCNeededChars, char * pStartTimeInUTCBuffer);
-
-/**
-* Returns the start time stamp of the build execution in the current machine journal.
+* Returns the start time stamp of the build execution in the machine journal.
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
 * @param[out] pTimeStampInMicroseconds - TimeStamp when the build started in Microseconds.
@@ -1041,7 +1030,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getstarttimeinutc
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getstarttimestampinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 * pTimeStampInMicroseconds);
 
 /**
-* Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+* Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
 * @param[out] pTimeStampInMicroseconds - TimeStamp when the build ended in Microseconds.
@@ -1050,13 +1039,14 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getstarttimestamp
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getendtimestampinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 * pTimeStampInMicroseconds);
 
 /**
-* Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+* Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
-* @param[out] pTimeStampInMicroseconds - Elapsed time in Microseconds.
+* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
+* @param[out] pElapsedTimeInMicroseconds - Elapsed time in Microseconds.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 * pTimeStampInMicroseconds);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, LibMCData_uint64 * pElapsedTimeInMicroseconds);
 
 /*************************************************************************************************************************
  Class definition for BuildJobExecutionIterator

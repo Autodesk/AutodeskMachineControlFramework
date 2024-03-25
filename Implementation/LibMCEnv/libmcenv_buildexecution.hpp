@@ -103,8 +103,6 @@ public:
 
 	std::string GetUserUUID() override;
 
-	std::string GetStartTimeInUTC() override;
-
 	LibMCEnv_uint64 GetStartTimeStampInMilliseconds() override;
 
 	LibMCEnv_uint64 GetStartTimeStampInMicroseconds() override;

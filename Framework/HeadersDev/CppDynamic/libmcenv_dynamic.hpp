@@ -1249,7 +1249,6 @@ public:
 	inline std::string GetJournalUUID();
 	inline bool HasAttachedUser();
 	inline std::string GetUserUUID();
-	inline std::string GetStartTimeInUTC();
 	inline LibMCEnv_uint64 GetStartTimeStampInMilliseconds();
 	inline LibMCEnv_uint64 GetStartTimeStampInMicroseconds();
 	inline LibMCEnv_uint64 GetEndTimeStampInMilliseconds();
@@ -2442,7 +2441,6 @@ public:
 		pWrapperTable->m_BuildExecution_GetJournalUUID = nullptr;
 		pWrapperTable->m_BuildExecution_HasAttachedUser = nullptr;
 		pWrapperTable->m_BuildExecution_GetUserUUID = nullptr;
-		pWrapperTable->m_BuildExecution_GetStartTimeInUTC = nullptr;
 		pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds = nullptr;
 		pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds = nullptr;
 		pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds = nullptr;
@@ -4293,15 +4291,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildExecution_GetUserUUID == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildExecution_GetStartTimeInUTC = (PLibMCEnvBuildExecution_GetStartTimeInUTCPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getstarttimeinutc");
-		#else // _WIN32
-		pWrapperTable->m_BuildExecution_GetStartTimeInUTC = (PLibMCEnvBuildExecution_GetStartTimeInUTCPtr) dlsym(hLibrary, "libmcenv_buildexecution_getstarttimeinutc");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildExecution_GetStartTimeInUTC == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9142,10 +9131,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetUserUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_buildexecution_getstarttimeinutc", (void**)&(pWrapperTable->m_BuildExecution_GetStartTimeInUTC));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetStartTimeInUTC == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_getstarttimestampinmilliseconds", (void**)&(pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -13025,21 +13010,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUserUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
 		
 		return std::string(&bufferUserUUID[0]);
-	}
-	
-	/**
-	* CBuildExecution::GetStartTimeInUTC - Returns the start time of the build in ISO8601 UTC format.
-	* @return Start time of the build.
-	*/
-	std::string CBuildExecution::GetStartTimeInUTC()
-	{
-		LibMCEnv_uint32 bytesNeededStartTimeInUTC = 0;
-		LibMCEnv_uint32 bytesWrittenStartTimeInUTC = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeInUTC(m_pHandle, 0, &bytesNeededStartTimeInUTC, nullptr));
-		std::vector<char> bufferStartTimeInUTC(bytesNeededStartTimeInUTC);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeInUTC(m_pHandle, bytesNeededStartTimeInUTC, &bytesWrittenStartTimeInUTC, &bufferStartTimeInUTC[0]));
-		
-		return std::string(&bufferStartTimeInUTC[0]);
 	}
 	
 	/**

@@ -3272,54 +3272,6 @@ LibMCDataResult libmcdata_buildjobexecution_getuseruuid(LibMCData_BuildJobExecut
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_getstarttimeinutc(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nStartTimeInUTCBufferSize, LibMCData_uint32* pStartTimeInUTCNeededChars, char * pStartTimeInUTCBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
-
-	try {
-		if ( (!pStartTimeInUTCBuffer) && !(pStartTimeInUTCNeededChars) )
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		std::string sStartTimeInUTC("");
-		IBuildJobExecution* pIBuildJobExecution = dynamic_cast<IBuildJobExecution*>(pIBaseClass);
-		if (!pIBuildJobExecution)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pStartTimeInUTCBuffer == nullptr);
-		if (isCacheCall) {
-			sStartTimeInUTC = pIBuildJobExecution->GetStartTimeInUTC();
-
-			pIBuildJobExecution->_setCache (new ParameterCache_1<std::string> (sStartTimeInUTC));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuildJobExecution->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-			cache->retrieveData (sStartTimeInUTC);
-			pIBuildJobExecution->_setCache (nullptr);
-		}
-		
-		if (pStartTimeInUTCNeededChars)
-			*pStartTimeInUTCNeededChars = (LibMCData_uint32) (sStartTimeInUTC.size()+1);
-		if (pStartTimeInUTCBuffer) {
-			if (sStartTimeInUTC.size() >= nStartTimeInUTCBufferSize)
-				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
-			for (size_t iStartTimeInUTC = 0; iStartTimeInUTC < sStartTimeInUTC.size(); iStartTimeInUTC++)
-				pStartTimeInUTCBuffer[iStartTimeInUTC] = sStartTimeInUTC[iStartTimeInUTC];
-			pStartTimeInUTCBuffer[sStartTimeInUTC.size()] = 0;
-		}
-		return LIBMCDATA_SUCCESS;
-	}
-	catch (ELibMCDataInterfaceException & Exception) {
-		return handleLibMCDataException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCDataResult libmcdata_buildjobexecution_getstarttimestampinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 * pTimeStampInMicroseconds)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
@@ -3372,18 +3324,18 @@ LibMCDataResult libmcdata_buildjobexecution_getendtimestampinmicroseconds(LibMCD
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_getelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 * pTimeStampInMicroseconds)
+LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, LibMCData_uint64 * pElapsedTimeInMicroseconds)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
 
 	try {
-		if (pTimeStampInMicroseconds == nullptr)
+		if (pElapsedTimeInMicroseconds == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		IBuildJobExecution* pIBuildJobExecution = dynamic_cast<IBuildJobExecution*>(pIBaseClass);
 		if (!pIBuildJobExecution)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		*pTimeStampInMicroseconds = pIBuildJobExecution->GetElapsedTimeInMicroseconds();
+		*pElapsedTimeInMicroseconds = pIBuildJobExecution->ComputeElapsedTimeInMicroseconds(nGlobalTimerInMicroseconds);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -6975,14 +6927,12 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_buildjobexecution_getjournaluuid;
 	if (sProcName == "libmcdata_buildjobexecution_getuseruuid") 
 		*ppProcAddress = (void*) &libmcdata_buildjobexecution_getuseruuid;
-	if (sProcName == "libmcdata_buildjobexecution_getstarttimeinutc") 
-		*ppProcAddress = (void*) &libmcdata_buildjobexecution_getstarttimeinutc;
 	if (sProcName == "libmcdata_buildjobexecution_getstarttimestampinmicroseconds") 
 		*ppProcAddress = (void*) &libmcdata_buildjobexecution_getstarttimestampinmicroseconds;
 	if (sProcName == "libmcdata_buildjobexecution_getendtimestampinmicroseconds") 
 		*ppProcAddress = (void*) &libmcdata_buildjobexecution_getendtimestampinmicroseconds;
-	if (sProcName == "libmcdata_buildjobexecution_getelapsedtimeinmicroseconds") 
-		*ppProcAddress = (void*) &libmcdata_buildjobexecution_getelapsedtimeinmicroseconds;
+	if (sProcName == "libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds") 
+		*ppProcAddress = (void*) &libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds;
 	if (sProcName == "libmcdata_buildjobexecutioniterator_getcurrentjobdata") 
 		*ppProcAddress = (void*) &libmcdata_buildjobexecutioniterator_getcurrentjobdata;
 	if (sProcName == "libmcdata_buildjob_getuuid") 

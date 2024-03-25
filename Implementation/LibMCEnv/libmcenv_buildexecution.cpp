@@ -180,12 +180,6 @@ std::string CBuildExecution::GetUserUUID()
 	return sNormalizedUserUUID;
 }
 
-std::string CBuildExecution::GetStartTimeInUTC()
-{
-	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	return m_pExecution->GetStartTimeInUTC();
-}
-
 LibMCEnv_uint64 CBuildExecution::GetStartTimeStampInMilliseconds()
 {
 	return GetStartTimeStampInMicroseconds() / 1000;
@@ -216,7 +210,7 @@ LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMilliseconds()
 LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
 {
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	return m_pExecution->GetElapsedTimeInMicroseconds();
+	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getExistenceTimeInMicroseconds ());
 }
 
 std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)

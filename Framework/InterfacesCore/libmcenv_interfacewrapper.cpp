@@ -4764,54 +4764,6 @@ LibMCEnvResult libmcenv_buildexecution_getuseruuid(LibMCEnv_BuildExecution pBuil
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_getstarttimeinutc(LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nStartTimeInUTCBufferSize, LibMCEnv_uint32* pStartTimeInUTCNeededChars, char * pStartTimeInUTCBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pBuildExecution;
-
-	try {
-		if ( (!pStartTimeInUTCBuffer) && !(pStartTimeInUTCNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sStartTimeInUTC("");
-		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
-		if (!pIBuildExecution)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pStartTimeInUTCBuffer == nullptr);
-		if (isCacheCall) {
-			sStartTimeInUTC = pIBuildExecution->GetStartTimeInUTC();
-
-			pIBuildExecution->_setCache (new ParameterCache_1<std::string> (sStartTimeInUTC));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuildExecution->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sStartTimeInUTC);
-			pIBuildExecution->_setCache (nullptr);
-		}
-		
-		if (pStartTimeInUTCNeededChars)
-			*pStartTimeInUTCNeededChars = (LibMCEnv_uint32) (sStartTimeInUTC.size()+1);
-		if (pStartTimeInUTCBuffer) {
-			if (sStartTimeInUTC.size() >= nStartTimeInUTCBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iStartTimeInUTC = 0; iStartTimeInUTC < sStartTimeInUTC.size(); iStartTimeInUTC++)
-				pStartTimeInUTCBuffer[iStartTimeInUTC] = sStartTimeInUTC[iStartTimeInUTC];
-			pStartTimeInUTCBuffer[sStartTimeInUTC.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCEnvResult libmcenv_buildexecution_getstarttimestampinmilliseconds(LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMilliseconds)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
@@ -20799,8 +20751,6 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_hasattacheduser;
 	if (sProcName == "libmcenv_buildexecution_getuseruuid") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_getuseruuid;
-	if (sProcName == "libmcenv_buildexecution_getstarttimeinutc") 
-		*ppProcAddress = (void*) &libmcenv_buildexecution_getstarttimeinutc;
 	if (sProcName == "libmcenv_buildexecution_getstarttimestampinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_getstarttimestampinmilliseconds;
 	if (sProcName == "libmcenv_buildexecution_getstarttimestampinmicroseconds") 

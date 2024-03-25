@@ -1537,12 +1537,6 @@ public:
 	virtual std::string GetUserUUID() = 0;
 
 	/**
-	* IBuildExecution::GetStartTimeInUTC - Returns the start time of the build in ISO8601 UTC format.
-	* @return Start time of the build.
-	*/
-	virtual std::string GetStartTimeInUTC() = 0;
-
-	/**
 	* IBuildExecution::GetStartTimeStampInMilliseconds - Returns the start time stamp of the build execution in the current machine journal.
 	* @return TimeStamp when the build started in Milliseconds.
 	*/

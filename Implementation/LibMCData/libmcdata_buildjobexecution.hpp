@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CBuildJobExecution
 
 // Include custom headers here.
 #include "amcdata_sqlhandler.hpp"
+#include "amcdata_storagestate.hpp"
 
 namespace LibMCData {
 namespace Impl {
@@ -60,11 +61,16 @@ private:
 
 	AMCData::PSQLHandler m_pSQLHandler;
 	std::string m_sExecutionUUID;
+	std::string m_sJobUUID;
+	std::string m_sUserUUID;
+	std::string m_sJournalUUID;
+	uint64_t m_nStartJournalTimestamp;
+	AMCData::PStorageState m_pStorageState;
 
 
 public:
 
-	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string & sExecutionUUID);
+	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string & sExecutionUUID, AMCData::PStorageState pStorageState);
 
 	virtual ~CBuildJobExecution();
 
@@ -84,13 +90,15 @@ public:
 
 	std::string GetUserUUID() override;
 
-	std::string GetStartTimeInUTC() override;
-
 	LibMCData_uint64 GetStartTimeStampInMicroseconds() override;
 
 	LibMCData_uint64 GetEndTimeStampInMicroseconds() override;
 
-	LibMCData_uint64 GetElapsedTimeInMicroseconds() override;
+	LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) override;
+
+	static std::string convertBuildJobExecutionStatusToString(const LibMCData::eBuildJobExecutionStatus eStatus);
+	static LibMCData::eBuildJobExecutionStatus convertStringToBuildJobExecutionStatus(const std::string& sValue);
+
 
 };
 

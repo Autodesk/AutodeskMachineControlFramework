@@ -1669,17 +1669,6 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_HasAttachedUserPtr) (LibMCEnv_B
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetUserUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
 
 /**
-* Returns the start time of the build in ISO8601 UTC format.
-*
-* @param[in] pBuildExecution - BuildExecution instance.
-* @param[in] nStartTimeInUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pStartTimeInUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pStartTimeInUTCBuffer -  buffer of Start time of the build., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetStartTimeInUTCPtr) (LibMCEnv_BuildExecution pBuildExecution, const LibMCEnv_uint32 nStartTimeInUTCBufferSize, LibMCEnv_uint32* pStartTimeInUTCNeededChars, char * pStartTimeInUTCBuffer);
-
-/**
 * Returns the start time stamp of the build execution in the current machine journal.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
@@ -6939,7 +6928,6 @@ typedef struct {
 	PLibMCEnvBuildExecution_GetJournalUUIDPtr m_BuildExecution_GetJournalUUID;
 	PLibMCEnvBuildExecution_HasAttachedUserPtr m_BuildExecution_HasAttachedUser;
 	PLibMCEnvBuildExecution_GetUserUUIDPtr m_BuildExecution_GetUserUUID;
-	PLibMCEnvBuildExecution_GetStartTimeInUTCPtr m_BuildExecution_GetStartTimeInUTC;
 	PLibMCEnvBuildExecution_GetStartTimeStampInMillisecondsPtr m_BuildExecution_GetStartTimeStampInMilliseconds;
 	PLibMCEnvBuildExecution_GetStartTimeStampInMicrosecondsPtr m_BuildExecution_GetStartTimeStampInMicroseconds;
 	PLibMCEnvBuildExecution_GetEndTimeStampInMillisecondsPtr m_BuildExecution_GetEndTimeStampInMilliseconds;
