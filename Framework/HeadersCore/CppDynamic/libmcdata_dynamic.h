@@ -1263,10 +1263,11 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_GetMetaDataStringPtr) (LibMCData_Bu
 * @param[in] pBuildJob - BuildJob instance.
 * @param[in] pDescription - Description of the execution.
 * @param[in] pUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
+* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
 * @param[out] pExecutionInstance - Newly created execution instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJob_CreateBuildJobExecutionPtr) (LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_BuildJobExecution * pExecutionInstance);
+typedef LibMCDataResult (*PLibMCDataBuildJob_CreateBuildJobExecutionPtr) (LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_uint64 nRelativeStartTimeStampInMicroseconds, LibMCData_BuildJobExecution * pExecutionInstance);
 
 /**
 * Retrieves a new build job execution by uuid.

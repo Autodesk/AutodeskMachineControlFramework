@@ -403,7 +403,7 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
 }
 
 ICryptoContext* CDriverEnvironment::CreateCryptoContext()

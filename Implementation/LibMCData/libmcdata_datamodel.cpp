@@ -79,7 +79,7 @@ CDataModel::~CDataModel()
 void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType dataBaseType, const std::string & sConnectionString)
     
 {
-    m_pStorageState = std::make_shared<AMCData::CStorageState> (sDataDirectory);
+    m_pStorageState = std::make_shared<AMCData::CStorageState> (sDataDirectory, m_sSessionUUID);
     m_pStorageState->addAcceptedContent("application/3mf");
     m_pStorageState->addAcceptedContent("text/csv");
     m_pStorageState->addAcceptedContent("image/png");

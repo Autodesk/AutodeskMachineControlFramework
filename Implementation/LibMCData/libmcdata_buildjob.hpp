@@ -47,6 +47,7 @@ Abstract: This is the class declaration of CBuildJob
 // Include custom headers here.
 #include "amcdata_storagestate.hpp"
 #include "amcdata_sqlhandler.hpp"
+#include "amcdata_journal.hpp"
 
 namespace LibMCData {
 namespace Impl {
@@ -134,7 +135,7 @@ public:
 
     std::string GetMetaDataString(const std::string& sKey) override;
 
-    IBuildJobExecution* CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID) override;
+    IBuildJobExecution* CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds) override;
 
     IBuildJobExecution* RetrieveBuildJobExecution(const std::string& sExecutionUUID) override;
 
@@ -145,6 +146,10 @@ public:
 
     static std::string convertBuildJobStatusToString(const LibMCData::eBuildJobStatus eStatus);
     static LibMCData::eBuildJobStatus convertStringToBuildJobStatus(const std::string& sValue);
+
+    static std::string convertBuildJobExecutionStatusToString(const LibMCData::eBuildJobExecutionStatus eStatus);
+    static LibMCData::eBuildJobExecutionStatus convertStringToBuildJobExecutionStatus(const std::string& sValue);
+    
 
 };
 

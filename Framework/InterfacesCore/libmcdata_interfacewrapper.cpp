@@ -4087,7 +4087,7 @@ LibMCDataResult libmcdata_buildjob_getmetadatastring(LibMCData_BuildJob pBuildJo
 	}
 }
 
-LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_BuildJobExecution * pExecutionInstance)
+LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_uint64 nRelativeStartTimeStampInMicroseconds, LibMCData_BuildJobExecution * pExecutionInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJob;
 
@@ -4105,7 +4105,7 @@ LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pB
 		if (!pIBuildJob)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pBaseExecutionInstance = pIBuildJob->CreateBuildJobExecution(sDescription, sUserUUID);
+		pBaseExecutionInstance = pIBuildJob->CreateBuildJobExecution(sDescription, sUserUUID, nRelativeStartTimeStampInMicroseconds);
 
 		*pExecutionInstance = (IBase*)(pBaseExecutionInstance);
 		return LIBMCDATA_SUCCESS;

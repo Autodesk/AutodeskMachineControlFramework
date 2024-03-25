@@ -272,6 +272,14 @@ namespace AMCCommon {
 #endif
 	}
 
+
+	// Checks if a timestamp is within a million years
+	bool CChrono::timeStampIsWithinAMillionYears(const uint64_t nMicroseconds)
+	{		
+		return (nMicroseconds < (1000000ULL * 3600ULL * 365ULL * 1000000ULL));
+	}
+
+
 /*
 
 	std::string CUtils::getCurrentISO8601TimeUTC() {

@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CBuildJob
 #include "libmcdata_buildjob.hpp"
 #include "libmcdata_interfaceexception.hpp"
 #include "libmcdata_storagestream.hpp"
+#include "libmcdata_buildjobexecution.hpp"
 
 #include "libmcdata_buildjobdata.hpp"
 #include "libmcdata_buildjobdataiterator.hpp"
@@ -360,27 +361,129 @@ IBuildJobData* CBuildJob::RetrieveJobData(const std::string& sDataUUID)
 
 void CBuildJob::AddMetaDataString(const std::string& sKey, const std::string& sValue)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (sKey.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY);
+
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID, "build job meta data key is invalid: " + sKey);
+
+    AMCCommon::CChrono chrono;
+    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+
+    std::string sMetaDataUUID = AMCCommon::CUtils::createUUID();
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sDuplicateQuery = "SELECT uuid FROM buildjobmetadata WHERE jobuuid=? AND metadatakey=? AND active=?";
+    auto pDuplicateStatement = pTransaction->prepareStatement(sDuplicateQuery);
+    pDuplicateStatement->setString(1, m_sUUID);
+    pDuplicateStatement->setString(2, sKey);
+    pDuplicateStatement->setInt(3, 1);
+
+    if (pDuplicateStatement->nextRow ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE, "build job meta data key is not unisque: " + sKey);
+    pDuplicateStatement = nullptr;
+
+    std::string sInsertQuery = "INSERT INTO buildjobmetadata (uuid, jobuuid, metadatakey, metadatavalue, active, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
+    auto pInsertStatement = pTransaction->prepareStatement(sInsertQuery);
+    pInsertStatement->setString(1, sMetaDataUUID);
+    pInsertStatement->setString(2, m_sUUID);
+    pInsertStatement->setString(3, sKey);
+    pInsertStatement->setString(4, sValue);
+    pInsertStatement->setInt(5, 1);
+    pInsertStatement->setString(6, sTimeStamp);
+    pInsertStatement->execute();
+
+    pTransaction->commit();
+
+
 }
 
 bool CBuildJob::HasMetaDataString(const std::string& sKey)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (sKey.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY);
+
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID, "build job meta data key is invalid: " + sKey);
+
+    std::string sSelectQuery = "SELECT uuid FROM buildjobmetadata WHERE jobuuid=? AND metadatakey=? AND active=?";
+    auto pSelectStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
+    pSelectStatement->setString(1, m_sUUID);
+    pSelectStatement->setString(2, sKey);
+    pSelectStatement->setInt(3, 1);
+
+    return (pSelectStatement->nextRow());
 }
 
 std::string CBuildJob::GetMetaDataString(const std::string& sKey)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (sKey.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY);
+
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID, "build job meta data key is invalid: " + sKey);
+
+    std::string sSelectQuery = "SELECT metadatavalue FROM buildjobmetadata WHERE jobuuid=? AND metadatakey=? AND active=?";
+    auto pSelectStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
+    pSelectStatement->setString(1, m_sUUID);
+    pSelectStatement->setString(2, sKey);
+    pSelectStatement->setInt(3, 1);
+
+    if (!pSelectStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND, "build job meta data key not found: " + sKey);
+
+    return pSelectStatement->getColumnString(1);
 }
 
-IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID)
+IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears (nRelativeStartTimeStampInMicroseconds))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Invalid build execution timestamp");
+
+    std::string sExecutionUUID = AMCCommon::CUtils::createUUID();
+    std::string sJournalUUID = m_pStorageState->getSessionUUID();
+
+    AMCCommon::CChrono chrono;
+    auto sAbsoluteCreationTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+
+    std::string sNormalizedUserUUID;
+    if (!sUserUUID.empty())
+        sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+    else
+        sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
+    std::string sInsertQuery = "INSERT INTO buildjobexecutions (uuid, jobuuid, journalUUID, startjournaltimestamp, endjournaltimestamp, useruuid, status, description, active, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    auto pInsertStatement = m_pSQLHandler->prepareStatement(sInsertQuery);
+    pInsertStatement->setString(1, sExecutionUUID);
+    pInsertStatement->setString(2, m_sUUID);
+    pInsertStatement->setString(3, sJournalUUID);
+    pInsertStatement->setInt64(4, (int64_t)nRelativeStartTimeStampInMicroseconds);
+    pInsertStatement->setInt64(5, 0);
+    pInsertStatement->setString(6, sUserUUID);
+    pInsertStatement->setString(7, convertBuildJobExecutionStatusToString (LibMCData::eBuildJobExecutionStatus::InProcess));
+    pInsertStatement->setString(8, sDescription);
+    pInsertStatement->setInt(9, 1);
+    pInsertStatement->setString(10, sAbsoluteCreationTimeStamp);
+    pInsertStatement->execute();
+
+    return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID);
+
 }
 
 IBuildJobExecution* CBuildJob::RetrieveBuildJobExecution(const std::string& sExecutionUUID)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+    std::string sSelectQuery = "SELECT uuid FROM buildjobexecutions WHERE uuid=? AND active=1";
+    auto pSelectStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
+    pSelectStatement->setString(1, sNormalizedUUID);
+
+    if (!pSelectStatement->nextRow ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND, "build job execution not found: " + sNormalizedUUID);
+
+    pSelectStatement = nullptr;
+
+    return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID);
 }
 
 IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutions(const std::string& sJournalUUIDFilter)
@@ -421,5 +524,31 @@ LibMCData::eBuildJobStatus CBuildJob::convertStringToBuildJobStatus(const std::s
         return LibMCData::eBuildJobStatus::Deleted;
 
     throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBSTATUS);
+}
+
+std::string CBuildJob::convertBuildJobExecutionStatusToString(const LibMCData::eBuildJobExecutionStatus eStatus)
+{
+    switch (eStatus) {
+    case LibMCData::eBuildJobExecutionStatus::InProcess: return "inprocess";
+    case LibMCData::eBuildJobExecutionStatus::Finished: return "finished";
+    case LibMCData::eBuildJobExecutionStatus::Failed: return "failed";
+    case LibMCData::eBuildJobExecutionStatus::Unknown: return "unknown";
+    default:
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS);
+    }
+}
+
+LibMCData::eBuildJobExecutionStatus CBuildJob::convertStringToBuildJobExecutionStatus(const std::string& sValue)
+{
+    if (sValue == "inprocess")
+        return LibMCData::eBuildJobExecutionStatus::InProcess;
+    if (sValue == "finished")
+        return LibMCData::eBuildJobExecutionStatus::Finished;
+    if (sValue == "failed")
+        return LibMCData::eBuildJobExecutionStatus::Failed;
+    if (sValue == "unknown")
+        return LibMCData::eBuildJobExecutionStatus::Unknown;
+
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS);
 }
 

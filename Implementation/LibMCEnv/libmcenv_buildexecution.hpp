@@ -47,6 +47,7 @@ Abstract: This is the class declaration of CBuildExecution
 
 // Include custom headers here.
 #include "libmcdata_dynamic.hpp"
+#include "common_chrono.hpp"
 #include <mutex>
 
 namespace LibMCEnv {
@@ -64,12 +65,13 @@ private:
 	LibMCData::PBuildJobExecution m_pExecution;
 	LibMCData::PDataModel m_pDataModel;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	AMCCommon::PChrono m_pGlobalChrono;
 	std::string m_sSystemUserID;
 	std::mutex m_Mutex;
 
 public:
 
-	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID);
+	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuildExecution();
 

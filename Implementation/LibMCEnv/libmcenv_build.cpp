@@ -42,6 +42,7 @@ Abstract: This is a stub class definition of CBuild
 #include "amc_toolpathhandler.hpp"
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 #include <iostream>
 
@@ -51,15 +52,18 @@ using namespace LibMCEnv::Impl;
  Class definition of CBuild 
 **************************************************************************************************************************/
 
-CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID)
+CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID, AMCCommon::PChrono pGlobalChrono)
 	: m_pDataModel(pDataModel),
 	m_sBuildJobUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildJobUUID)),
 	m_pToolpathHandler(pToolpathHandler),
-	m_sSystemUserID(sSystemUserID)
+	m_sSystemUserID(sSystemUserID),
+	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pDataModel.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get () == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
@@ -311,9 +315,9 @@ IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const s
 		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 	}
 
-	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID);
+	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
 
-	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID);
+	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
 
 }
 
@@ -339,7 +343,7 @@ IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
 
 	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution(sNormalizedExecutionUUID);
 
-	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID);
+	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
 }
 
 IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)

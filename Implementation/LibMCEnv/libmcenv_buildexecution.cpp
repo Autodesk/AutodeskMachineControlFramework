@@ -37,17 +37,19 @@ Abstract: This is a stub class definition of CBuildExecution
 // Include custom headers here.
 #include "libmcenv_build.hpp"
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
  Class definition of CBuildExecution 
 **************************************************************************************************************************/
-CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID)
+CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID, AMCCommon::PChrono pGlobalChrono)
 	: m_pExecution (pExecution), 
 	m_pDataModel (pDataModel), 
 	m_pToolpathHandler (pToolpathHandler), 
-	m_sSystemUserID (sSystemUserID)
+	m_sSystemUserID (sSystemUserID),
+	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pExecution.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -82,7 +84,7 @@ std::string CBuildExecution::GetBuildUUID()
 IBuild * CBuildExecution::GetBuild()
 {
 	std::string sBuildUUID = GetBuildUUID();
-	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_sSystemUserID);
+	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
 }
 
 LibMCEnv::eBuildExecutionStatus CBuildExecution::GetExecutionStatus()

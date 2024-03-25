@@ -88,6 +88,9 @@ namespace AMCCommon {
 
 			// Sleeps for some microseconds
 			void sleepMicroseconds(const uint64_t microseconds);
+
+			// Checks if a timestamp is within a million years
+			static bool timeStampIsWithinAMillionYears(const uint64_t nMicroseconds); 
 	};
 
 	typedef std::shared_ptr<CChrono> PChrono;

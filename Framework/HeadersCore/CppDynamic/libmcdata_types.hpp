@@ -390,6 +390,12 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_EMPTYCLIENTFILENAME 363 /** Empty client file name. */
 #define LIBMCDATA_ERROR_INVALIDCLIENTFILENAME 364 /** Invalid client file name. */
 #define LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION 365 /** Can not change status of build job execution. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY 366 /** Build job metadata key empty. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID 367 /** Build job metadata key is invalid. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE 368 /** Build job metadata key is not unique. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND 369 /** Build job metadata key not found. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS 370 /** Invalid build job execution status. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND 371 /** Build job execution not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -692,6 +698,12 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "Empty client file name.";
     case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "Invalid client file name.";
     case LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION: return "Can not change status of build job execution.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY: return "Build job metadata key empty.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID: return "Build job metadata key is invalid.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE: return "Build job metadata key is not unique.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "Build job metadata key not found.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "Invalid build job execution status.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "Build job execution not found.";
     default: return "unknown error";
   }
 }

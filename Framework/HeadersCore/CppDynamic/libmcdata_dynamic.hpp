@@ -535,6 +535,12 @@ public:
 			case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "EMPTYCLIENTFILENAME";
 			case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "INVALIDCLIENTFILENAME";
 			case LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION: return "CANNOTCHANGESTATUSOFBUILDJOBEXECUTION";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY: return "BUILDJOBMETADATAKEYEMPTY";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID: return "BUILDJOBMETADATAKEYINVALID";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE: return "BUILDJOBMETADATAKEYDUPLICATE";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "BUILDJOBMETADATAKEYNOTFOUND";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "INVALIDBUILDJOBEXECUTIONSTATUS";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "BUILDJOBEXECUTIONNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -837,6 +843,12 @@ public:
 			case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "Empty client file name.";
 			case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "Invalid client file name.";
 			case LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION: return "Can not change status of build job execution.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY: return "Build job metadata key empty.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID: return "Build job metadata key is invalid.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE: return "Build job metadata key is not unique.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "Build job metadata key not found.";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "Invalid build job execution status.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "Build job execution not found.";
 		}
 		return "unknown error";
 	}
@@ -1366,7 +1378,7 @@ public:
 	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
-	inline PBuildJobExecution CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID);
+	inline PBuildJobExecution CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds);
 	inline PBuildJobExecution RetrieveBuildJobExecution(const std::string & sExecutionUUID);
 	inline PBuildJobExecutionIterator RetrieveBuildJobExecutions(const std::string & sJournalUUIDFilter);
 	inline PBuildJobExecutionIterator RetrieveBuildJobExecutionsByStatus(const eBuildJobExecutionStatus eStatusFilter, const std::string & sJournalUUIDFilter);
@@ -5858,12 +5870,13 @@ public:
 	* CBuildJob::CreateBuildJobExecution - Creates a new build job execution with state InProgress.
 	* @param[in] sDescription - Description of the execution.
 	* @param[in] sUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
+	* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
 	* @return Newly created execution instance.
 	*/
-	PBuildJobExecution CBuildJob::CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID)
+	PBuildJobExecution CBuildJob::CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds)
 	{
 		LibMCDataHandle hExecutionInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_CreateBuildJobExecution(m_pHandle, sDescription.c_str(), sUserUUID.c_str(), &hExecutionInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_CreateBuildJobExecution(m_pHandle, sDescription.c_str(), sUserUUID.c_str(), nRelativeStartTimeStampInMicroseconds, &hExecutionInstance));
 		
 		if (!hExecutionInstance) {
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);

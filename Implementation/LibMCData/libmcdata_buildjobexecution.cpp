@@ -35,7 +35,7 @@ Abstract: This is a stub class definition of CBuildJobExecution
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include "common_utils.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -43,9 +43,21 @@ using namespace LibMCData::Impl;
  Class definition of CBuildJobExecution 
 **************************************************************************************************************************/
 
+CBuildJobExecution::CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID)
+	: m_pSQLHandler (pSQLHandler), m_sExecutionUUID (AMCCommon::CUtils::normalizeUUIDString (sExecutionUUID))
+{
+	if (pSQLHandler.get() == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+}
+
+CBuildJobExecution::~CBuildJobExecution()
+{
+
+}
+
 std::string CBuildJobExecution::GetExecutionUUID()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	return m_sExecutionUUID;
 }
 
 std::string CBuildJobExecution::GetJobUUID()

@@ -59,6 +59,7 @@ namespace Impl {
 class CBuild : public virtual IBuild, public virtual CBase {
 private:
 
+	AMCCommon::PChrono m_pGlobalChrono;
 	AMC::PToolpathHandler m_pToolpathHandler;
 	LibMCData::PDataModel m_pDataModel;
 	std::string m_sBuildJobUUID;
@@ -67,7 +68,7 @@ private:
 
 public:
 
-	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID);
+	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuild();
 

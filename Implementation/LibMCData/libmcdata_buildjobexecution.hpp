@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CBuildJobExecution
 #endif
 
 // Include custom headers here.
-
+#include "amcdata_sqlhandler.hpp"
 
 namespace LibMCData {
 namespace Impl {
@@ -58,26 +58,15 @@ namespace Impl {
 class CBuildJobExecution : public virtual IBuildJobExecution, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
+	AMCData::PSQLHandler m_pSQLHandler;
+	std::string m_sExecutionUUID;
 
-protected:
-
-	/**
-	* Put protected members here.
-	*/
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string & sExecutionUUID);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+	virtual ~CBuildJobExecution();
 
 	std::string GetExecutionUUID() override;
 

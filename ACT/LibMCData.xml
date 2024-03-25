@@ -363,8 +363,14 @@
 		<error name="EMPTYCLIENTFILENAME" code="363" description="Empty client file name." />		
 		<error name="INVALIDCLIENTFILENAME" code="364" description="Invalid client file name." />		
 		<error name="CANNOTCHANGESTATUSOFBUILDJOBEXECUTION" code="365" description="Can not change status of build job execution." />		
+		<error name="BUILDJOBMETADATAKEYEMPTY" code="366" description="Build job metadata key empty." />		
+		<error name="BUILDJOBMETADATAKEYINVALID" code="367" description="Build job metadata key is invalid." />		
+		<error name="BUILDJOBMETADATAKEYDUPLICATE" code="368" description="Build job metadata key is not unique." />		
+		<error name="BUILDJOBMETADATAKEYNOTFOUND" code="369" description="Build job metadata key not found." />		
+		<error name="INVALIDBUILDJOBEXECUTIONSTATUS" code="370" description="Invalid build job execution status." />		
+		<error name="BUILDJOBEXECUTIONNOTFOUND" code="371" description="Build job execution not found." />		
 		
-										
+		
 	</errors>
 	
 		
@@ -1045,6 +1051,7 @@
 		<method name="CreateBuildJobExecution" description="Creates a new build job execution with state InProgress.">
 			<param name="Description" type="string" pass="in" description="Description of the execution." />
 			<param name="UserUUID" type="string" pass="in" description="UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded." />
+			<param name="RelativeStartTimeStampInMicroseconds" type="uint64" pass="in" description="Start Time in Microseconds in relation to the start of the journal." />
 			<param name="ExecutionInstance" type="class" class="BuildJobExecution" pass="return" description="Newly created execution instance." />
 		</method>
 

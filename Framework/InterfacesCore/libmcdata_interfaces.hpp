@@ -1189,9 +1189,10 @@ public:
 	* IBuildJob::CreateBuildJobExecution - Creates a new build job execution with state InProgress.
 	* @param[in] sDescription - Description of the execution.
 	* @param[in] sUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
+	* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
 	* @return Newly created execution instance.
 	*/
-	virtual IBuildJobExecution * CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID) = 0;
+	virtual IBuildJobExecution * CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds) = 0;
 
 	/**
 	* IBuildJob::RetrieveBuildJobExecution - Retrieves a new build job execution by uuid.

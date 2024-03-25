@@ -517,7 +517,7 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID());
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID(), m_pUISystemState->getGlobalChronoInstance ());
 }
 
 
