@@ -116,8 +116,16 @@ namespace AMC {
 			m_bCurrentValue = bValue;
 		}
 
+		void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
+		{
+			m_pStream->readRawIntegerData(m_nStorageIndex, interval, timeStream);
+		}
+
 		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
 		{
+			if (m_pStream->sampleBoolData(m_nStorageIndex, nTimeStampInMicroseconds))
+				return 1.0;
+
 			return 0.0;
 		}
 
@@ -157,29 +165,14 @@ namespace AMC {
 		void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
 		{
 
-
 			m_pStream->readRawIntegerData (m_nStorageIndex, interval, timeStream);
-
-
-			/*for (auto& timeStreamEntry : m_TimeStream) {
-				if (timeStreamEntry.first <= nStartTimeStamp) {
-					dStartValue = timeStreamEntry.second;
-				}
-				else {
-					if (timeStreamEntry.first <= nEndTimeStamp) {
-						sJournalTimeStreamInt64Entry entry;
-						entry.m_nTimeStamp = timeStreamEntry.first;
-						entry.m_nValue = timeStreamEntry.second;
-						timeStream.push_back(entry);
-					}
-				}
-			} */
 
 		}
 
 		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
-		{
-			return 0.0;
+		{			
+
+			return (double)m_pStream->sampleIntegerData(m_nStorageIndex, nTimeStampInMicroseconds);
 		}
 
 
@@ -252,7 +245,7 @@ namespace AMC {
 
 		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) 
 		{
-			return m_pStream->getDoubleSampleAt (m_nStorageIndex, nTimeStampInMicroseconds, m_dUnits);
+			return m_pStream->sampleDoubleData (m_nStorageIndex, nTimeStampInMicroseconds, m_dUnits);
 		}
 
 	};
@@ -609,6 +602,23 @@ namespace AMC {
 
 			return;
 		}
+
+		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (pVariable);
+		if (pBoolVariable.get() != nullptr) {
+			std::vector<sJournalTimeStreamInt64Entry> intTimeStream;
+			pBoolVariable->readTimeStream(interval, intTimeStream);
+
+			timeStream.resize(intTimeStream.size());
+			for (size_t nIndex = 0; nIndex < intTimeStream.size(); nIndex++) {
+				auto& srcEntry = intTimeStream.at(nIndex);
+				auto& targetEntry = timeStream.at(nIndex);
+				targetEntry.m_nTimeStampInMicroSeconds = srcEntry.m_nTimeStampInMicroSeconds;
+				targetEntry.m_dValue = (double)srcEntry.m_nValue;
+			}
+
+			return;
+		}
+
 
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + pVariable->getName() + " is not a numeric variable");
 
