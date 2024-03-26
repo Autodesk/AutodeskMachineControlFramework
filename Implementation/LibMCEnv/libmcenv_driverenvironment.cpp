@@ -48,6 +48,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "common_utils.hpp"
 #include "amc_xmldocument.hpp"
 #include "amc_xmldocumentnode.hpp"
+#include "amc_constants.hpp"
 
 // Include custom headers here.
 
@@ -214,12 +215,22 @@ void CDriverEnvironment::RegisterUUIDParameter(const std::string& sParameterName
     m_pParameterGroup->addNewUUIDParameter(sParameterName, sDescription, AMCCommon::CUtils::normalizeUUIDString(sDefaultValue));
 }
 
-void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue)
+void CDriverEnvironment::RegisterDoubleParameterWithUnits(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits)
 {
+    if ((dUnits < AMC_PARAMETERUNITS_MINIMUM) || (dUnits > AMC_PARAMETERUNITS_MAXIMUM))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_UNITSAREOUTOFRANGE, "units are out of range for " + sParameterName);
+
     if (!m_bIsInitializing)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DRIVERISNOTINITIALISING);
 
-    m_pParameterGroup->addNewDoubleParameter(sParameterName, sDescription, dDefaultValue, 1.0);
+    m_pParameterGroup->addNewDoubleParameter(sParameterName, sDescription, dDefaultValue, dUnits);
+
+}
+
+
+void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue)
+{
+    RegisterDoubleParameterWithUnits(sParameterName, sDescription, dDefaultValue, AMC_PARAMETERUNITS_DEFAULT);
 }
 
 void CDriverEnvironment::RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_int64 nDefaultValue)

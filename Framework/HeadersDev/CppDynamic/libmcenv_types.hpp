@@ -252,6 +252,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDMETADATAKEY 10155 /** Invalid Metadata Key. */
 #define LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION 10156 /** Can not change status of build execution. */
 #define LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER 10157 /** Build execution has no attached user. */
+#define LIBMCENV_ERROR_UNITSAREOUTOFRANGE 10158 /** Units are out of range. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -416,6 +417,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "Invalid Metadata Key.";
     case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "Can not change status of build execution.";
     case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "Build execution has no attached user.";
+    case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range.";
     default: return "unknown error";
   }
 }

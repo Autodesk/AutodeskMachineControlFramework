@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter_valued.hpp"
 #include "amc_parameter_derived.hpp"
 #include "amc_statejournal.hpp"
+#include "amc_constants.hpp"
 
 #include "amc_jsonwriter.hpp"
 #include "common_utils.hpp"
@@ -503,9 +504,13 @@ namespace AMC {
 			if (sDefaultValue.length() > 0)
 				dValue = AMCCommon::CUtils::stringToDouble(sDefaultValue);
 
-			double dUnits = 1.0;
+			double dUnits = AMC_PARAMETERUNITS_DEFAULT;
 			if (sUnits.length() > 0)
 				dUnits = AMCCommon::CUtils::stringToDouble(sUnits);
+
+			if ((dUnits < AMC_PARAMETERUNITS_MINIMUM) || (dUnits > AMC_PARAMETERUNITS_MAXIMUM))
+				throw ELibMCCustomException(LIBMC_ERROR_UNITSAREOUTOFRANGE, sName);
+
 
 			addNewDoubleParameter(sName, sDescription, dValue, dUnits);
 		}

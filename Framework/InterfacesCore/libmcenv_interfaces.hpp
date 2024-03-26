@@ -3100,12 +3100,21 @@ public:
 	virtual void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue) = 0;
 
 	/**
-	* IDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* IDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation. The default units are 0.001.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sDescription - Parameter Description
 	* @param[in] dDefaultValue - default value to set
 	*/
 	virtual void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterDoubleParameterWithUnits - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	* @param[in] dUnits - unit factor to use
+	*/
+	virtual void RegisterDoubleParameterWithUnits(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits) = 0;
 
 	/**
 	* IDriverEnvironment::RegisterIntegerParameter - registers an int parameter. Must only be called during driver creation.

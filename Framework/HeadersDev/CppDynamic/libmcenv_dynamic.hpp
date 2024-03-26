@@ -493,6 +493,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "INVALIDMETADATAKEY";
 			case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "CANNOTCHANGESTATUSOFBUILDEXECUTION";
 			case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "BUILDEXECUTIONHASNOATTACHEDUSER";
+			case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "UNITSAREOUTOFRANGE";
 		}
 		return "UNKNOWN";
 	}
@@ -657,6 +658,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "Invalid Metadata Key.";
 			case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "Can not change status of build execution.";
 			case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "Build execution has no attached user.";
+			case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range.";
 		}
 		return "unknown error";
 	}
@@ -1717,6 +1719,7 @@ public:
 	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue);
+	inline void RegisterDoubleParameterWithUnits(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits);
 	inline void RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_int64 nDefaultValue);
 	inline void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue);
 	inline void SetStringParameter(const std::string & sParameterName, const std::string & sValue);
@@ -2637,6 +2640,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetStringParameter = nullptr;
@@ -6055,6 +6059,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits = (PLibMCEnvDriverEnvironment_RegisterDoubleParameterWithUnitsPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registerdoubleparameterwithunits");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits = (PLibMCEnvDriverEnvironment_RegisterDoubleParameterWithUnitsPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registerdoubleparameterwithunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9913,6 +9926,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerdoubleparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerdoubleparameterwithunits", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerintegerparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter));
@@ -15754,7 +15771,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* CDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation. The default units are 0.001.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sDescription - Parameter Description
 	* @param[in] dDefaultValue - default value to set
@@ -15762,6 +15779,18 @@ public:
 	void CDriverEnvironment::RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterDoubleParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), dDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterDoubleParameterWithUnits - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	* @param[in] dUnits - unit factor to use
+	*/
+	void CDriverEnvironment::RegisterDoubleParameterWithUnits(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterDoubleParameterWithUnits(m_pHandle, sParameterName.c_str(), sDescription.c_str(), dDefaultValue, dUnits));
 	}
 	
 	/**

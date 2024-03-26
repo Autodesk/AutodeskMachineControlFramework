@@ -692,7 +692,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerDoubleValue(const std::string& sName, const double dInitialValue, double dUnits)
 	{
-		dUnits = 1.0;
+		
 		if ((dUnits < STATEJOURNAL_VARIABLE_MINUNITS) || (dUnits > STATEJOURNAL_VARIABLE_MAXUNITS))
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLEUNITS);
 

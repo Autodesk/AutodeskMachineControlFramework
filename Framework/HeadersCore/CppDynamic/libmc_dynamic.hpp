@@ -673,6 +673,7 @@ public:
 			case LIBMC_ERROR_INVALIDALERTLEVEL: return "INVALIDALERTLEVEL";
 			case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "ALERTLISTNAMEMISSING";
 			case LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC: return "JOURNALVARIABLEISNOTNUMERIC";
+			case LIBMC_ERROR_UNITSAREOUTOFRANGE: return "UNITSAREOUTOFRANGE";
 		}
 		return "UNKNOWN";
 	}
@@ -1188,6 +1189,7 @@ public:
 			case LIBMC_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
 			case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "Alert list name missing";
 			case LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC: return "Journal variable is not numeric";
+			case LIBMC_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range";
 		}
 		return "unknown error";
 	}

@@ -11175,6 +11175,36 @@ LibMCEnvResult libmcenv_driverenvironment_registerdoubleparameter(LibMCEnv_Drive
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_registerdoubleparameterwithunits(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_double dDefaultValue, LibMCEnv_double dUnits)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sDescription(pDescription);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RegisterDoubleParameterWithUnits(sParameterName, sDescription, dDefaultValue, dUnits);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_registerintegerparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_int64 nDefaultValue)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -21143,6 +21173,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_registeruuidparameter;
 	if (sProcName == "libmcenv_driverenvironment_registerdoubleparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_registerdoubleparameter;
+	if (sProcName == "libmcenv_driverenvironment_registerdoubleparameterwithunits") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_registerdoubleparameterwithunits;
 	if (sProcName == "libmcenv_driverenvironment_registerintegerparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_registerintegerparameter;
 	if (sProcName == "libmcenv_driverenvironment_registerboolparameter") 

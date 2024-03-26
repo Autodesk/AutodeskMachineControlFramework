@@ -195,6 +195,8 @@
 		<error name="INVALIDMETADATAKEY" code="10155" description="Invalid Metadata Key." />		
 		<error name="CANNOTCHANGESTATUSOFBUILDEXECUTION" code="10156" description="Can not change status of build execution." />		
 		<error name="BUILDEXECUTIONHASNOATTACHEDUSER" code="10157" description="Build execution has no attached user." />		
+		<error name="UNITSAREOUTOFRANGE" code="10158" description="Units are out of range." />		
+		
 		
 	</errors>
 
@@ -2174,10 +2176,17 @@
 			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
 		</method>
 
-		<method name="RegisterDoubleParameter" description="registers a double parameter. Must only be called during driver creation.">
+		<method name="RegisterDoubleParameter" description="registers a double parameter. Must only be called during driver creation. The default units are 0.001.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Description" type="string" pass="in" description="Parameter Description" />
 			<param name="DefaultValue" type="double" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterDoubleParameterWithUnits" description="registers a double parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="double" pass="in" description="default value to set" />
+			<param name="Units" type="double" pass="in" description="unit factor to use" />
 		</method>
 
 		<method name="RegisterIntegerParameter" description="registers an int parameter. Must only be called during driver creation.">

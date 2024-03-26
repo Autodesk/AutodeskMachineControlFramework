@@ -3766,7 +3766,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterStringParameterPtr) 
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue);
 
 /**
-* registers a double parameter. Must only be called during driver creation.
+* registers a double parameter. Must only be called during driver creation. The default units are 0.001.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -3775,6 +3775,18 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr) (L
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterDoubleParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_double dDefaultValue);
+
+/**
+* registers a double parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] dDefaultValue - default value to set
+* @param[in] dUnits - unit factor to use
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterDoubleParameterWithUnitsPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_double dDefaultValue, LibMCEnv_double dUnits);
 
 /**
 * registers an int parameter. Must only be called during driver creation.
@@ -7124,6 +7136,7 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_RegisterStringParameterPtr m_DriverEnvironment_RegisterStringParameter;
 	PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr m_DriverEnvironment_RegisterUUIDParameter;
 	PLibMCEnvDriverEnvironment_RegisterDoubleParameterPtr m_DriverEnvironment_RegisterDoubleParameter;
+	PLibMCEnvDriverEnvironment_RegisterDoubleParameterWithUnitsPtr m_DriverEnvironment_RegisterDoubleParameterWithUnits;
 	PLibMCEnvDriverEnvironment_RegisterIntegerParameterPtr m_DriverEnvironment_RegisterIntegerParameter;
 	PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr m_DriverEnvironment_RegisterBoolParameter;
 	PLibMCEnvDriverEnvironment_SetStringParameterPtr m_DriverEnvironment_SetStringParameter;
