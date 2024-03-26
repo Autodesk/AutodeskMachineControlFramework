@@ -95,7 +95,19 @@ public:
 
 	void GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32* pSignalsBuffer) override;
 
-	std::string StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild) override;
+	void AddPacketNumbersToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
+
+	void AddXCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
+
+	void AddYCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
+
+	void AddMeasurementTagsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
+
+	void AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
+
+	void AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
+
+	void AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
 
 };
 
