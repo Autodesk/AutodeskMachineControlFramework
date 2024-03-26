@@ -33,7 +33,11 @@ cmake_minimum_required(VERSION 3.5)
 
 project(LibMC)
 
+if(IGNORE_DRIVERS)
+else()
 add_subdirectory(Drivers)
+endif()
+
 add_subdirectory(Plugins)
 
 if(INCLUDE_TESTS)
