@@ -435,6 +435,7 @@ typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
+typedef LibMCEnvHandle LibMCEnv_DataTable;
 typedef LibMCEnvHandle LibMCEnv_DataSeries;
 typedef LibMCEnvHandle LibMCEnv_MeshObject;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
@@ -547,6 +548,15 @@ namespace LibMCEnv {
     Failed = 3
   };
   
+  enum class eDataTableColumnType : LibMCEnv_int32 {
+    Unknown = 0,
+    DoubleColumn = 1,
+    Int32Column = 2,
+    Uint32Column = 3,
+    Int64Column = 4,
+    Uint64Column = 5
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -614,6 +624,7 @@ typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
+typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;

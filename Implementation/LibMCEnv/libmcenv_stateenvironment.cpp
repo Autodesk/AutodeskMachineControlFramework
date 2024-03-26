@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_streamreader.hpp"
+#include "libmcenv_datatable.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -527,6 +528,11 @@ LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLString(const std::strin
 
 	return new CXMLDocument(pDocument);
 
+}
+
+IDataTable* CStateEnvironment::CreateDataTable()
+{
+	return new CDataTable();
 }
 
 LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)

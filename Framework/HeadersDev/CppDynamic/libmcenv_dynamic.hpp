@@ -68,6 +68,7 @@ class CPNGImageData;
 class CImageData;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
+class CDataTable;
 class CDataSeries;
 class CMeshObject;
 class CToolpathPart;
@@ -119,6 +120,7 @@ typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
+typedef CDataTable CLibMCEnvDataTable;
 typedef CDataSeries CLibMCEnvDataSeries;
 typedef CMeshObject CLibMCEnvMeshObject;
 typedef CToolpathPart CLibMCEnvToolpathPart;
@@ -170,6 +172,7 @@ typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
+typedef std::shared_ptr<CDataTable> PDataTable;
 typedef std::shared_ptr<CDataSeries> PDataSeries;
 typedef std::shared_ptr<CMeshObject> PMeshObject;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
@@ -221,6 +224,7 @@ typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
+typedef PDataTable PLibMCEnvDataTable;
 typedef PDataSeries PLibMCEnvDataSeries;
 typedef PMeshObject PLibMCEnvMeshObject;
 typedef PToolpathPart PLibMCEnvToolpathPart;
@@ -784,6 +788,7 @@ private:
 	friend class CImageData;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
+	friend class CDataTable;
 	friend class CDataSeries;
 	friend class CMeshObject;
 	friend class CToolpathPart;
@@ -1062,6 +1067,41 @@ public:
 	inline void TransformField(const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
 	inline void AddField(classParam<CDiscreteFieldData2D> pOtherField, const LibMCEnv_double dScale, const LibMCEnv_double dOffset);
 	inline PDiscreteFieldData2D Duplicate();
+};
+	
+/*************************************************************************************************************************
+ Class CDataTable 
+**************************************************************************************************************************/
+class CDataTable : public CBase {
+public:
+	
+	/**
+	* CDataTable::CDataTable - Constructor for DataTable class.
+	*/
+	CDataTable(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void AddColumn(const std::string & sIdentifier, const std::string & sDescription, const eDataTableColumnType eColumnType);
+	inline void RemoveColumn(const std::string & sIdentifier);
+	inline bool HasColumn(const std::string & sIdentifier);
+	inline LibMCEnv_uint32 GetRowCount();
+	inline LibMCEnv_uint32 GetColumnCount();
+	inline std::string GetColumnIdentifier(const LibMCEnv_uint32 nColumnIndex);
+	inline std::string GetColumnDescription(const LibMCEnv_uint32 nColumnIndex);
+	inline eDataTableColumnType GetColumnType(const LibMCEnv_uint32 nColumnIndex);
+	inline void GetColumnInformation(const std::string & sIdentifier, std::string & sDescription, eDataTableColumnType & eColumnType);
+	inline void GetDoubleColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_double> & ValuesBuffer);
+	inline void GetInt32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int32> & ValuesBuffer);
+	inline void GetInt64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int64> & ValuesBuffer);
+	inline void GetUint32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint32> & ValuesBuffer);
+	inline void GetUint64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint64> & ValuesBuffer);
+	inline void SetDoubleColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_double> & ValuesBuffer);
+	inline void SetInt32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int32> & ValuesBuffer);
+	inline void SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer);
+	inline void SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer);
+	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -1709,6 +1749,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PDataTable CreateDataTable();
 	inline bool DriverHasResourceData(const std::string & sIdentifier);
 	inline bool MachineHasResourceData(const std::string & sIdentifier);
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
@@ -1898,7 +1939,7 @@ public:
 	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval);
 	inline LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
 	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
-	inline PUniformJournalSampling ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples);
+	inline PUniformJournalSampling ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples);
 	inline void ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer);
 };
 	
@@ -2091,6 +2132,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PDataTable CreateDataTable();
 	inline bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier);
 	inline PUserManagementHandler CreateUserManagement();
 	inline PJournalHandler GetCurrentJournal();
@@ -2185,6 +2227,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PDataTable CreateDataTable();
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
@@ -2351,6 +2394,25 @@ public:
 		pWrapperTable->m_DiscreteFieldData2D_TransformField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_AddField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
+		pWrapperTable->m_DataTable_AddColumn = nullptr;
+		pWrapperTable->m_DataTable_RemoveColumn = nullptr;
+		pWrapperTable->m_DataTable_HasColumn = nullptr;
+		pWrapperTable->m_DataTable_GetRowCount = nullptr;
+		pWrapperTable->m_DataTable_GetColumnCount = nullptr;
+		pWrapperTable->m_DataTable_GetColumnIdentifier = nullptr;
+		pWrapperTable->m_DataTable_GetColumnDescription = nullptr;
+		pWrapperTable->m_DataTable_GetColumnType = nullptr;
+		pWrapperTable->m_DataTable_GetColumnInformation = nullptr;
+		pWrapperTable->m_DataTable_GetDoubleColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetInt32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetInt64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetUint32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetUint64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetDoubleColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetInt32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetInt64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetUint32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetUint64ColumnValues = nullptr;
 		pWrapperTable->m_DataSeries_GetName = nullptr;
 		pWrapperTable->m_DataSeries_GetUUID = nullptr;
 		pWrapperTable->m_DataSeries_Clear = nullptr;
@@ -2630,6 +2692,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_DriverEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_DriverEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateDataTable = nullptr;
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
@@ -2820,6 +2883,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateDataTable = nullptr;
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateUserManagement = nullptr;
 		pWrapperTable->m_StateEnvironment_GetCurrentJournal = nullptr;
@@ -2882,6 +2946,7 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateDataTable = nullptr;
 		pWrapperTable->m_UIEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
@@ -3458,6 +3523,177 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_AddColumn = (PLibMCEnvDataTable_AddColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_addcolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_AddColumn = (PLibMCEnvDataTable_AddColumnPtr) dlsym(hLibrary, "libmcenv_datatable_addcolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_AddColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_RemoveColumn = (PLibMCEnvDataTable_RemoveColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_removecolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_RemoveColumn = (PLibMCEnvDataTable_RemoveColumnPtr) dlsym(hLibrary, "libmcenv_datatable_removecolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_RemoveColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_hascolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) dlsym(hLibrary, "libmcenv_datatable_hascolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_HasColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetRowCount = (PLibMCEnvDataTable_GetRowCountPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getrowcount");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetRowCount = (PLibMCEnvDataTable_GetRowCountPtr) dlsym(hLibrary, "libmcenv_datatable_getrowcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetRowCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnCount = (PLibMCEnvDataTable_GetColumnCountPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumncount");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnCount = (PLibMCEnvDataTable_GetColumnCountPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumncount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnIdentifier = (PLibMCEnvDataTable_GetColumnIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumnidentifier");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnIdentifier = (PLibMCEnvDataTable_GetColumnIdentifierPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumnidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnDescription = (PLibMCEnvDataTable_GetColumnDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumndescription");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnDescription = (PLibMCEnvDataTable_GetColumnDescriptionPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumndescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnType = (PLibMCEnvDataTable_GetColumnTypePtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumntype");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnType = (PLibMCEnvDataTable_GetColumnTypePtr) dlsym(hLibrary, "libmcenv_datatable_getcolumntype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnInformation = (PLibMCEnvDataTable_GetColumnInformationPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumninformation");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnInformation = (PLibMCEnvDataTable_GetColumnInformationPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumninformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnInformation == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetDoubleColumnValues = (PLibMCEnvDataTable_GetDoubleColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getdoublecolumnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetDoubleColumnValues = (PLibMCEnvDataTable_GetDoubleColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getdoublecolumnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetDoubleColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetInt32ColumnValues = (PLibMCEnvDataTable_GetInt32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetInt32ColumnValues = (PLibMCEnvDataTable_GetInt32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetInt32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetInt64ColumnValues = (PLibMCEnvDataTable_GetInt64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetInt64ColumnValues = (PLibMCEnvDataTable_GetInt64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetInt64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetUint32ColumnValues = (PLibMCEnvDataTable_GetUint32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getuint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetUint32ColumnValues = (PLibMCEnvDataTable_GetUint32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getuint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetUint32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetUint64ColumnValues = (PLibMCEnvDataTable_GetUint64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getuint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetUint64ColumnValues = (PLibMCEnvDataTable_GetUint64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getuint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetUint64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetDoubleColumnValues = (PLibMCEnvDataTable_SetDoubleColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setdoublecolumnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetDoubleColumnValues = (PLibMCEnvDataTable_SetDoubleColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setdoublecolumnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetDoubleColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetInt32ColumnValues = (PLibMCEnvDataTable_SetInt32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetInt32ColumnValues = (PLibMCEnvDataTable_SetInt32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetInt32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetInt64ColumnValues = (PLibMCEnvDataTable_SetInt64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetInt64ColumnValues = (PLibMCEnvDataTable_SetInt64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetInt64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetUint32ColumnValues = (PLibMCEnvDataTable_SetUint32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setuint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetUint32ColumnValues = (PLibMCEnvDataTable_SetUint32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setuint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetUint32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetUint64ColumnValues = (PLibMCEnvDataTable_SetUint64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setuint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetUint64ColumnValues = (PLibMCEnvDataTable_SetUint64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setuint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5972,6 +6208,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDataTable = (PLibMCEnvDriverEnvironment_CreateDataTablePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createdatatable");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDataTable = (PLibMCEnvDriverEnvironment_CreateDataTablePtr) dlsym(hLibrary, "libmcenv_driverenvironment_createdatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateDataTable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
@@ -7682,6 +7927,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDataTable = (PLibMCEnvStateEnvironment_CreateDataTablePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createdatatable");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDataTable = (PLibMCEnvStateEnvironment_CreateDataTablePtr) dlsym(hLibrary, "libmcenv_stateenvironment_createdatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateDataTable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
@@ -8240,6 +8494,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDataTable = (PLibMCEnvUIEnvironment_CreateDataTablePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createdatatable");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDataTable = (PLibMCEnvUIEnvironment_CreateDataTablePtr) dlsym(hLibrary, "libmcenv_uienvironment_createdatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateDataTable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasbuildjob");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasbuildjob");
@@ -8770,6 +9033,82 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2d_duplicate", (void**)&(pWrapperTable->m_DiscreteFieldData2D_Duplicate));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_addcolumn", (void**)&(pWrapperTable->m_DataTable_AddColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_AddColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_removecolumn", (void**)&(pWrapperTable->m_DataTable_RemoveColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_RemoveColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_hascolumn", (void**)&(pWrapperTable->m_DataTable_HasColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_HasColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getrowcount", (void**)&(pWrapperTable->m_DataTable_GetRowCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetRowCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumncount", (void**)&(pWrapperTable->m_DataTable_GetColumnCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumnidentifier", (void**)&(pWrapperTable->m_DataTable_GetColumnIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumndescription", (void**)&(pWrapperTable->m_DataTable_GetColumnDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumntype", (void**)&(pWrapperTable->m_DataTable_GetColumnType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumninformation", (void**)&(pWrapperTable->m_DataTable_GetColumnInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnInformation == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getdoublecolumnvalues", (void**)&(pWrapperTable->m_DataTable_GetDoubleColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetDoubleColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getint32columnvalues", (void**)&(pWrapperTable->m_DataTable_GetInt32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetInt32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getint64columnvalues", (void**)&(pWrapperTable->m_DataTable_GetInt64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetInt64ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getuint32columnvalues", (void**)&(pWrapperTable->m_DataTable_GetUint32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetUint32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getuint64columnvalues", (void**)&(pWrapperTable->m_DataTable_GetUint64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetUint64ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setdoublecolumnvalues", (void**)&(pWrapperTable->m_DataTable_SetDoubleColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetDoubleColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setint32columnvalues", (void**)&(pWrapperTable->m_DataTable_SetInt32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetInt32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setint64columnvalues", (void**)&(pWrapperTable->m_DataTable_SetInt64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetInt64ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setuint32columnvalues", (void**)&(pWrapperTable->m_DataTable_SetUint32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetUint32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setuint64columnvalues", (void**)&(pWrapperTable->m_DataTable_SetUint64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_dataseries_getname", (void**)&(pWrapperTable->m_DataSeries_GetName));
@@ -9888,6 +10227,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_ParseXMLData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createdatatable", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDataTable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_driverhasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_DriverHasResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_DriverHasResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10648,6 +10991,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createdatatable", (void**)&(pWrapperTable->m_StateEnvironment_CreateDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDataTable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_checkuserpermission", (void**)&(pWrapperTable->m_StateEnvironment_CheckUserPermission));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckUserPermission == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10894,6 +11241,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_parsexmldata", (void**)&(pWrapperTable->m_UIEnvironment_ParseXMLData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ParseXMLData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createdatatable", (void**)&(pWrapperTable->m_UIEnvironment_CreateDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDataTable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_hasbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_HasBuildJob));
@@ -11735,6 +12086,248 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hNewField);
+	}
+	
+	/**
+	 * Method definitions for class CDataTable
+	 */
+	
+	/**
+	* CDataTable::AddColumn - Adds a column to the data field.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] sDescription - Description of the column.
+	* @param[in] eColumnType - Data type of the column.
+	*/
+	void CDataTable::AddColumn(const std::string & sIdentifier, const std::string & sDescription, const eDataTableColumnType eColumnType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_AddColumn(m_pHandle, sIdentifier.c_str(), sDescription.c_str(), eColumnType));
+	}
+	
+	/**
+	* CDataTable::RemoveColumn - Removes a column from the data field. Fails if Column does not exist.
+	* @param[in] sIdentifier - Identifier of the column.
+	*/
+	void CDataTable::RemoveColumn(const std::string & sIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_RemoveColumn(m_pHandle, sIdentifier.c_str()));
+	}
+	
+	/**
+	* CDataTable::HasColumn - Returns if a column exists in the data field.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @return Returns if the columns exist.
+	*/
+	bool CDataTable::HasColumn(const std::string & sIdentifier)
+	{
+		bool resultColumnExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_HasColumn(m_pHandle, sIdentifier.c_str(), &resultColumnExists));
+		
+		return resultColumnExists;
+	}
+	
+	/**
+	* CDataTable::GetRowCount - Returns the current row count.
+	* @return Number of rows.
+	*/
+	LibMCEnv_uint32 CDataTable::GetRowCount()
+	{
+		LibMCEnv_uint32 resultRowCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetRowCount(m_pHandle, &resultRowCount));
+		
+		return resultRowCount;
+	}
+	
+	/**
+	* CDataTable::GetColumnCount - Returns the current column count.
+	* @return Number of columns.
+	*/
+	LibMCEnv_uint32 CDataTable::GetColumnCount()
+	{
+		LibMCEnv_uint32 resultColumnCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnCount(m_pHandle, &resultColumnCount));
+		
+		return resultColumnCount;
+	}
+	
+	/**
+	* CDataTable::GetColumnIdentifier - Returns the identifier of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Identifier of the column.
+	*/
+	std::string CDataTable::GetColumnIdentifier(const LibMCEnv_uint32 nColumnIndex)
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnIdentifier(m_pHandle, nColumnIndex, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnIdentifier(m_pHandle, nColumnIndex, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CDataTable::GetColumnDescription - Returns the description of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Description of the column.
+	*/
+	std::string CDataTable::GetColumnDescription(const LibMCEnv_uint32 nColumnIndex)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnDescription(m_pHandle, nColumnIndex, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnDescription(m_pHandle, nColumnIndex, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CDataTable::GetColumnType - Returns the type of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Data type of the column.
+	*/
+	eDataTableColumnType CDataTable::GetColumnType(const LibMCEnv_uint32 nColumnIndex)
+	{
+		eDataTableColumnType resultColumnType = (eDataTableColumnType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnType(m_pHandle, nColumnIndex, &resultColumnType));
+		
+		return resultColumnType;
+	}
+	
+	/**
+	* CDataTable::GetColumnInformation - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] sDescription - Description of the column.
+	* @param[out] eColumnType - Data type of the column.
+	*/
+	void CDataTable::GetColumnInformation(const std::string & sIdentifier, std::string & sDescription, eDataTableColumnType & eColumnType)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnInformation(m_pHandle, sIdentifier.c_str(), 0, &bytesNeededDescription, nullptr, &eColumnType));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnInformation(m_pHandle, sIdentifier.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], &eColumnType));
+		sDescription = std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CDataTable::GetDoubleColumnValues - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetDoubleColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_double> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetDoubleColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetDoubleColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetInt32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetInt32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int32> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt32ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt32ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetInt64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetInt64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int64> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt64ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt64ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetUint32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetUint32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint32> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint32ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint32ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetUint64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetUint64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint64> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetDoubleColumnValues - Sets the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	void CDataTable::SetDoubleColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_double> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetDoubleColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetInt32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	void CDataTable::SetInt32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int32> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetInt32ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetInt64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	void CDataTable::SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetInt64ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetUint32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	void CDataTable::SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetUint32ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetUint64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	void CDataTable::SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
 	}
 	
 	/**
@@ -15652,6 +16245,21 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	PDataTable CDriverEnvironment::CreateDataTable()
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDataTable(m_pHandle, &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
 	* CDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -16855,14 +17463,14 @@ public:
 	/**
 	* CJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
 	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
 	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
 	* @return Returns an instance with the sampling results.
 	*/
-	PUniformJournalSampling CJournalVariable::ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples)
+	PUniformJournalSampling CJournalVariable::ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples)
 	{
 		LibMCEnvHandle hJournalSampling = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeEquidistantSamples(m_pHandle, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, nNumberOfSamples, &hJournalSampling));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeEquidistantSamples(m_pHandle, nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples, &hJournalSampling));
 		
 		if (!hJournalSampling) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -18282,6 +18890,21 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	PDataTable CStateEnvironment::CreateDataTable()
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDataTable(m_pHandle, &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
 	* CStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 	* @param[in] sUserLogin - Login of user to check
 	* @param[in] sPermissionIdentifier - Permission identifier
@@ -19158,6 +19781,21 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CUIEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	PDataTable CUIEnvironment::CreateDataTable()
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDataTable(m_pHandle, &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
 	}
 	
 	/**

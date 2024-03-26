@@ -676,6 +676,220 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_addfield(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
+ Class definition for DataTable
+**************************************************************************************************************************/
+
+/**
+* Adds a column to the data field.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] pDescription - Description of the column.
+* @param[in] eColumnType - Data type of the column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_addcolumn(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const char * pDescription, LibMCEnv::eDataTableColumnType eColumnType);
+
+/**
+* Removes a column from the data field. Fails if Column does not exist.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_removecolumn(LibMCEnv_DataTable pDataTable, const char * pIdentifier);
+
+/**
+* Returns if a column exists in the data field.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[out] pColumnExists - Returns if the columns exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_hascolumn(LibMCEnv_DataTable pDataTable, const char * pIdentifier, bool * pColumnExists);
+
+/**
+* Returns the current row count.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pRowCount - Number of rows.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getrowcount(LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 * pRowCount);
+
+/**
+* Returns the current column count.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pColumnCount - Number of columns.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getcolumncount(LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 * pColumnCount);
+
+/**
+* Returns the identifier of a column. Will fail if Index is out of bounds.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] nColumnIndex - Index of column. 0-based.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Identifier of the column., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getcolumnidentifier(LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 nColumnIndex, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the description of a column. Will fail if Index is out of bounds.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] nColumnIndex - Index of column. 0-based.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the column., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getcolumndescription(LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 nColumnIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Returns the type of a column. Will fail if Index is out of bounds.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] nColumnIndex - Index of column. 0-based.
+* @param[out] pColumnType - Data type of the column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getcolumntype(LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 nColumnIndex, LibMCEnv::eDataTableColumnType * pColumnType);
+
+/**
+* Returns the values of a double column. Will fail if column does not exist or type is not double.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the column., may be NULL
+* @param[out] pColumnType - Data type of the column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getcolumninformation(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, LibMCEnv::eDataTableColumnType * pColumnType);
+
+/**
+* Returns the values of a double column. Will fail if column does not exist or type is not double.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - double  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getdoublecolumnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not int32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - int32  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getint32columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int32 * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not int64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - int64  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int64 * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not uint32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - uint32  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getuint32columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint32 * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not uint64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - uint64  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getuint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint64 * pValuesBuffer);
+
+/**
+* Sets the values of a double column. Will fail if column does not exist or type is not double.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - double buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setdoublecolumnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_double * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not int32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - int32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setint32columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int32 * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not int64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - int64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int64 * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not uint32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - uint32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint32columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint32 * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not uint64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - uint64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);
+
+/*************************************************************************************************************************
  Class definition for DataSeries
 **************************************************************************************************************************/
 
@@ -3681,6 +3895,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_parsexmlstring(LibMC
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_parsexmldata(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
+* creates an empty data table.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pDataTableInstance - Data Table Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createdatatable(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
 * retrieves if attached driver has data with the given identifier.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -4674,12 +4897,12 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeuniformaverages
 *
 * @param[in] pJournalVariable - JournalVariable instance.
 * @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
 * @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
 * @param[out] pJournalSampling - Returns an instance with the sampling results.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeequidistantsamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeequidistantsamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling);
 
 /**
 * Retrieves the raw timestream data of the variable.
@@ -5778,6 +6001,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_parsexmlstring(LibMCE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_parsexmldata(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
+* creates an empty data table.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pDataTableInstance - Data Table Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createdatatable(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
 * Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -6449,6 +6681,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmlstring(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_parsexmldata(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
+
+/**
+* creates an empty data table.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pDataTableInstance - Data Table Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createdatatable(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_DataTable * pDataTableInstance);
 
 /**
 * Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.

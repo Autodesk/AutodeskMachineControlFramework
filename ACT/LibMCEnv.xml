@@ -269,6 +269,16 @@
 		<option name="Finished" value="2" />
 		<option name="Failed" value="3" />
 	</enum>
+	
+	<enum name="DataTableColumnType">
+		<option name="Unknown" value="0" />
+		<option name="DoubleColumn" value="1" />
+		<option name="Int32Column" value="2" />
+		<option name="Uint32Column" value="3" />
+		<option name="Int64Column" value="4" />
+		<option name="Uint64Column" value="5" />
+	</enum>
+	
 		
 	
 	<struct name="Position2D">
@@ -636,6 +646,104 @@
 	</class>
 
 
+	<class name="DataTable" parent="Base" description="A in memory data table, streamable for example into a CSV file.">
+	
+		<method name="AddColumn" description="Adds a column to the data field.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column. MUST be unique, alphanumeric and not empty." />
+			<param name="Description" type="string" pass="in" description="Description of the column." />
+			<param name="ColumnType" type="enum" class="DataTableColumnType" pass="in" description="Data type of the column." />
+		</method>
+
+		<method name="RemoveColumn" description="Removes a column from the data field. Fails if Column does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+		</method>
+
+		<method name="HasColumn" description="Returns if a column exists in the data field.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="ColumnExists" type="bool" pass="return" description="Returns if the columns exist." />
+		</method>
+		
+		<method name="GetRowCount" description="Returns the current row count.">
+			<param name="RowCount" type="uint32" pass="return" description="Number of rows." />
+		</method>
+
+		<method name="GetColumnCount" description="Returns the current column count.">
+			<param name="ColumnCount" type="uint32" pass="return" description="Number of columns." />
+		</method>
+		
+		<method name="GetColumnIdentifier" description="Returns the identifier of a column. Will fail if Index is out of bounds.">
+			<param name="ColumnIndex" type="uint32" pass="in" description="Index of column. 0-based." />
+			<param name="Identifier" type="string" pass="return" description="Identifier of the column." />
+		</method>
+
+		<method name="GetColumnDescription" description="Returns the description of a column. Will fail if Index is out of bounds.">
+			<param name="ColumnIndex" type="uint32" pass="in" description="Index of column. 0-based." />
+			<param name="Description" type="string" pass="return" description="Description of the column." />
+		</method>
+
+		<method name="GetColumnType" description="Returns the type of a column. Will fail if Index is out of bounds.">
+			<param name="ColumnIndex" type="uint32" pass="in" description="Index of column. 0-based." />
+			<param name="ColumnType" type="enum" class="DataTableColumnType" pass="return" description="Data type of the column." />
+		</method>
+
+		<method name="GetColumnInformation" description="Returns the values of a double column. Will fail if column does not exist or type is not double.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Description" type="string" pass="out" description="Description of the column." />
+			<param name="ColumnType" type="enum" class="DataTableColumnType" pass="out" description="Data type of the column." />
+		</method>
+
+		<method name="GetDoubleColumnValues" description="Returns the values of a double column. Will fail if column does not exist or type is not double.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="double" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetInt32ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not int32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int32" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetInt64ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not int64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int64" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetUint32ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not uint32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint32" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetUint64ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not uint64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint64" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="SetDoubleColumnValues" description="Sets the values of a double column. Will fail if column does not exist or type is not double.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="double" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetInt32ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not int32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int32" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetInt64ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not int64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int64" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetUint32ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not uint32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint32" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetUint64ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not uint64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint64" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+	</class>
+
 	<class name="DataSeries" parent="Base" description="A data series of points.">
 	
 		<method name="GetName" description="Returns the name of the data series.">
@@ -684,6 +792,9 @@
 
 		
 	</class>
+
+
+
 
 
 
@@ -2129,6 +2240,10 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 
+		<method name="CreateDataTable" description = "creates an empty data table.">
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table Instance." />
+		</method>
+
 		<method name="DriverHasResourceData" description = "retrieves if attached driver has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
@@ -2614,7 +2729,7 @@
 
 		<method name="ComputeEquidistantSamples" description="Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.">
 			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
-			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in microseconds." />
+			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
 			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
 			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
 		</method>
@@ -3157,6 +3272,9 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 		
+		<method name="CreateDataTable" description = "creates an empty data table.">
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table Instance." />
+		</method>
 
 		<method name="CheckUserPermission" description="Returns if the a user has a certain permission. Fails if user or permission is not known to the system.">
 			<param name="UserLogin" type="string" pass="in" description="Login of user to check" />
@@ -3499,6 +3617,10 @@
 		<method name="ParseXMLData" description = "parses a XML stored in a byte array and returns an XML Document instance. . Throws an error if XML is malformatted.">
 			<param name="XMLData" type="basicarray" class="uint8" pass="in" description="XML Binary data." />
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
+		</method>
+
+		<method name="CreateDataTable" description = "creates an empty data table.">
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table Instance." />
 		</method>
 
 		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">

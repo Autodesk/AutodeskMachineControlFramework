@@ -663,6 +663,220 @@ typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_AddFieldPtr) (LibMCEnv_Dis
 typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DuplicatePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
+ Class definition for DataTable
+**************************************************************************************************************************/
+
+/**
+* Adds a column to the data field.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] pDescription - Description of the column.
+* @param[in] eColumnType - Data type of the column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_AddColumnPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, const char * pDescription, LibMCEnv::eDataTableColumnType eColumnType);
+
+/**
+* Removes a column from the data field. Fails if Column does not exist.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_RemoveColumnPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier);
+
+/**
+* Returns if a column exists in the data field.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[out] pColumnExists - Returns if the columns exist.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_HasColumnPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, bool * pColumnExists);
+
+/**
+* Returns the current row count.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pRowCount - Number of rows.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetRowCountPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 * pRowCount);
+
+/**
+* Returns the current column count.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pColumnCount - Number of columns.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetColumnCountPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 * pColumnCount);
+
+/**
+* Returns the identifier of a column. Will fail if Index is out of bounds.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] nColumnIndex - Index of column. 0-based.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Identifier of the column., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetColumnIdentifierPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 nColumnIndex, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the description of a column. Will fail if Index is out of bounds.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] nColumnIndex - Index of column. 0-based.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the column., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetColumnDescriptionPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 nColumnIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Returns the type of a column. Will fail if Index is out of bounds.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] nColumnIndex - Index of column. 0-based.
+* @param[out] pColumnType - Data type of the column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetColumnTypePtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_uint32 nColumnIndex, LibMCEnv::eDataTableColumnType * pColumnType);
+
+/**
+* Returns the values of a double column. Will fail if column does not exist or type is not double.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the column., may be NULL
+* @param[out] pColumnType - Data type of the column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetColumnInformationPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, LibMCEnv::eDataTableColumnType * pColumnType);
+
+/**
+* Returns the values of a double column. Will fail if column does not exist or type is not double.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - double  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetDoubleColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not int32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - int32  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetInt32ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int32 * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not int64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - int64  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetInt64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int64 * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not uint32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - uint32  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetUint32ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint32 * pValuesBuffer);
+
+/**
+* Returns the double columns. Will fail if column does not exist or type is not uint64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - uint64  buffer of Value array of a column.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_GetUint64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, const LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint64 * pValuesBuffer);
+
+/**
+* Sets the values of a double column. Will fail if column does not exist or type is not double.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - double buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_SetDoubleColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_double * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not int32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - int32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_SetInt32ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int32 * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not int64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - int64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_SetInt64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int64 * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not uint32.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - uint32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint32ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint32 * pValuesBuffer);
+
+/**
+* Sets the double columns. Will fail if column does not exist or type is not uint64.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pIdentifier - Identifier of the column.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[in] pValuesBuffer - uint64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);
+
+/*************************************************************************************************************************
  Class definition for DataSeries
 **************************************************************************************************************************/
 
@@ -3668,6 +3882,15 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_ParseXMLStringPtr) (LibMCEnv
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_ParseXMLDataPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
+* creates an empty data table.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pDataTableInstance - Data Table Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateDataTablePtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
 * retrieves if attached driver has data with the given identifier.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -4661,12 +4884,12 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPt
 *
 * @param[in] pJournalVariable - JournalVariable instance.
 * @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
 * @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
 * @param[out] pJournalSampling - Returns an instance with the sampling results.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling);
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling);
 
 /**
 * Retrieves the raw timestream data of the variable.
@@ -5765,6 +5988,15 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ParseXMLStringPtr) (LibMCEnv_
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ParseXMLDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
+* creates an empty data table.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pDataTableInstance - Data Table Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateDataTablePtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
 * Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -6438,6 +6670,15 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ParseXMLStringPtr) (LibMCEnv_UIE
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ParseXMLDataPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer, LibMCEnv_XMLDocument * pXMLDocument);
 
 /**
+* creates an empty data table.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pDataTableInstance - Data Table Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateDataTablePtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
 * Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -6847,6 +7088,25 @@ typedef struct {
 	PLibMCEnvDiscreteFieldData2D_TransformFieldPtr m_DiscreteFieldData2D_TransformField;
 	PLibMCEnvDiscreteFieldData2D_AddFieldPtr m_DiscreteFieldData2D_AddField;
 	PLibMCEnvDiscreteFieldData2D_DuplicatePtr m_DiscreteFieldData2D_Duplicate;
+	PLibMCEnvDataTable_AddColumnPtr m_DataTable_AddColumn;
+	PLibMCEnvDataTable_RemoveColumnPtr m_DataTable_RemoveColumn;
+	PLibMCEnvDataTable_HasColumnPtr m_DataTable_HasColumn;
+	PLibMCEnvDataTable_GetRowCountPtr m_DataTable_GetRowCount;
+	PLibMCEnvDataTable_GetColumnCountPtr m_DataTable_GetColumnCount;
+	PLibMCEnvDataTable_GetColumnIdentifierPtr m_DataTable_GetColumnIdentifier;
+	PLibMCEnvDataTable_GetColumnDescriptionPtr m_DataTable_GetColumnDescription;
+	PLibMCEnvDataTable_GetColumnTypePtr m_DataTable_GetColumnType;
+	PLibMCEnvDataTable_GetColumnInformationPtr m_DataTable_GetColumnInformation;
+	PLibMCEnvDataTable_GetDoubleColumnValuesPtr m_DataTable_GetDoubleColumnValues;
+	PLibMCEnvDataTable_GetInt32ColumnValuesPtr m_DataTable_GetInt32ColumnValues;
+	PLibMCEnvDataTable_GetInt64ColumnValuesPtr m_DataTable_GetInt64ColumnValues;
+	PLibMCEnvDataTable_GetUint32ColumnValuesPtr m_DataTable_GetUint32ColumnValues;
+	PLibMCEnvDataTable_GetUint64ColumnValuesPtr m_DataTable_GetUint64ColumnValues;
+	PLibMCEnvDataTable_SetDoubleColumnValuesPtr m_DataTable_SetDoubleColumnValues;
+	PLibMCEnvDataTable_SetInt32ColumnValuesPtr m_DataTable_SetInt32ColumnValues;
+	PLibMCEnvDataTable_SetInt64ColumnValuesPtr m_DataTable_SetInt64ColumnValues;
+	PLibMCEnvDataTable_SetUint32ColumnValuesPtr m_DataTable_SetUint32ColumnValues;
+	PLibMCEnvDataTable_SetUint64ColumnValuesPtr m_DataTable_SetUint64ColumnValues;
 	PLibMCEnvDataSeries_GetNamePtr m_DataSeries_GetName;
 	PLibMCEnvDataSeries_GetUUIDPtr m_DataSeries_GetUUID;
 	PLibMCEnvDataSeries_ClearPtr m_DataSeries_Clear;
@@ -7126,6 +7386,7 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_CreateXMLDocumentPtr m_DriverEnvironment_CreateXMLDocument;
 	PLibMCEnvDriverEnvironment_ParseXMLStringPtr m_DriverEnvironment_ParseXMLString;
 	PLibMCEnvDriverEnvironment_ParseXMLDataPtr m_DriverEnvironment_ParseXMLData;
+	PLibMCEnvDriverEnvironment_CreateDataTablePtr m_DriverEnvironment_CreateDataTable;
 	PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr m_DriverEnvironment_DriverHasResourceData;
 	PLibMCEnvDriverEnvironment_MachineHasResourceDataPtr m_DriverEnvironment_MachineHasResourceData;
 	PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr m_DriverEnvironment_RetrieveDriverData;
@@ -7316,6 +7577,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateXMLDocumentPtr m_StateEnvironment_CreateXMLDocument;
 	PLibMCEnvStateEnvironment_ParseXMLStringPtr m_StateEnvironment_ParseXMLString;
 	PLibMCEnvStateEnvironment_ParseXMLDataPtr m_StateEnvironment_ParseXMLData;
+	PLibMCEnvStateEnvironment_CreateDataTablePtr m_StateEnvironment_CreateDataTable;
 	PLibMCEnvStateEnvironment_CheckUserPermissionPtr m_StateEnvironment_CheckUserPermission;
 	PLibMCEnvStateEnvironment_CreateUserManagementPtr m_StateEnvironment_CreateUserManagement;
 	PLibMCEnvStateEnvironment_GetCurrentJournalPtr m_StateEnvironment_GetCurrentJournal;
@@ -7378,6 +7640,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_CreateXMLDocumentPtr m_UIEnvironment_CreateXMLDocument;
 	PLibMCEnvUIEnvironment_ParseXMLStringPtr m_UIEnvironment_ParseXMLString;
 	PLibMCEnvUIEnvironment_ParseXMLDataPtr m_UIEnvironment_ParseXMLData;
+	PLibMCEnvUIEnvironment_CreateDataTablePtr m_UIEnvironment_CreateDataTable;
 	PLibMCEnvUIEnvironment_HasBuildJobPtr m_UIEnvironment_HasBuildJob;
 	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;

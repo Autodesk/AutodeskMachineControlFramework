@@ -63,6 +63,7 @@ class IPNGImageData;
 class IImageData;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
+class IDataTable;
 class IDataSeries;
 class IMeshObject;
 class IToolpathPart;
@@ -816,6 +817,164 @@ public:
 };
 
 typedef IBaseSharedPtr<IDiscreteFieldData2D> PIDiscreteFieldData2D;
+
+
+/*************************************************************************************************************************
+ Class interface for DataTable 
+**************************************************************************************************************************/
+
+class IDataTable : public virtual IBase {
+public:
+	/**
+	* IDataTable::AddColumn - Adds a column to the data field.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] sDescription - Description of the column.
+	* @param[in] eColumnType - Data type of the column.
+	*/
+	virtual void AddColumn(const std::string & sIdentifier, const std::string & sDescription, const LibMCEnv::eDataTableColumnType eColumnType) = 0;
+
+	/**
+	* IDataTable::RemoveColumn - Removes a column from the data field. Fails if Column does not exist.
+	* @param[in] sIdentifier - Identifier of the column.
+	*/
+	virtual void RemoveColumn(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDataTable::HasColumn - Returns if a column exists in the data field.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @return Returns if the columns exist.
+	*/
+	virtual bool HasColumn(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDataTable::GetRowCount - Returns the current row count.
+	* @return Number of rows.
+	*/
+	virtual LibMCEnv_uint32 GetRowCount() = 0;
+
+	/**
+	* IDataTable::GetColumnCount - Returns the current column count.
+	* @return Number of columns.
+	*/
+	virtual LibMCEnv_uint32 GetColumnCount() = 0;
+
+	/**
+	* IDataTable::GetColumnIdentifier - Returns the identifier of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Identifier of the column.
+	*/
+	virtual std::string GetColumnIdentifier(const LibMCEnv_uint32 nColumnIndex) = 0;
+
+	/**
+	* IDataTable::GetColumnDescription - Returns the description of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Description of the column.
+	*/
+	virtual std::string GetColumnDescription(const LibMCEnv_uint32 nColumnIndex) = 0;
+
+	/**
+	* IDataTable::GetColumnType - Returns the type of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Data type of the column.
+	*/
+	virtual LibMCEnv::eDataTableColumnType GetColumnType(const LibMCEnv_uint32 nColumnIndex) = 0;
+
+	/**
+	* IDataTable::GetColumnInformation - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] sDescription - Description of the column.
+	* @param[out] eColumnType - Data type of the column.
+	*/
+	virtual void GetColumnInformation(const std::string & sIdentifier, std::string & sDescription, LibMCEnv::eDataTableColumnType & eColumnType) = 0;
+
+	/**
+	* IDataTable::GetDoubleColumnValues - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - double buffer of Value array of a column.
+	*/
+	virtual void GetDoubleColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetInt32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - int32 buffer of Value array of a column.
+	*/
+	virtual void GetInt32ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetInt64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - int64 buffer of Value array of a column.
+	*/
+	virtual void GetInt64ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetUint32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - uint32 buffer of Value array of a column.
+	*/
+	virtual void GetUint32ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetUint64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - uint64 buffer of Value array of a column.
+	*/
+	virtual void GetUint64ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetDoubleColumnValues - Sets the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	virtual void SetDoubleColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_double * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetInt32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	virtual void SetInt32ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetInt64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	virtual void SetInt64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetUint32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	virtual void SetUint32ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetUint64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	*/
+	virtual void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataTable> PIDataTable;
 
 
 /*************************************************************************************************************************
@@ -3029,6 +3188,12 @@ public:
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 	/**
+	* IDriverEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	virtual IDataTable * CreateDataTable() = 0;
+
+	/**
 	* IDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -3747,11 +3912,11 @@ public:
 	/**
 	* IJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
 	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
+	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
 	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
 	* @return Returns an instance with the sampling results.
 	*/
-	virtual IUniformJournalSampling * ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples) = 0;
+	virtual IUniformJournalSampling * ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples) = 0;
 
 	/**
 	* IJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
@@ -4526,6 +4691,12 @@ public:
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 	/**
+	* IStateEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	virtual IDataTable * CreateDataTable() = 0;
+
+	/**
 	* IStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 	* @param[in] sUserLogin - Login of user to check
 	* @param[in] sPermissionIdentifier - Permission identifier
@@ -5001,6 +5172,12 @@ public:
 	* @return XML Document Instance.
 	*/
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
+
+	/**
+	* IUIEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	virtual IDataTable * CreateDataTable() = 0;
 
 	/**
 	* IUIEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.

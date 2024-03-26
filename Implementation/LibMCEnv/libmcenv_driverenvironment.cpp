@@ -43,6 +43,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_cryptocontext.hpp"
+#include "libmcenv_datatable.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -360,6 +361,12 @@ LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::ParseXMLData(const LibMCEnv_ui
 
     return new CXMLDocument(pDocument);
 
+}
+
+
+IDataTable* CDriverEnvironment::CreateDataTable()
+{
+    return new CDataTable ();
 }
 
 IDiscreteFieldData2D* CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
