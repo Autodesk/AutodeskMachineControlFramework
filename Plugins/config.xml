@@ -501,38 +501,7 @@
 
     <page name="modelview">
 
-      <glscene name="glscene1">
-
-        <models>
-          <model name="platform" resource="bptest" />
-        </models>
-
-        <lights>
-          <spotlight name="spotlight">
-
-          </spotlight>
-        </lights>
-
-
-        <fog>
-          
-        </fog>
-
-
-        <scene>
-          
-          <instance name="platform_view" model="platform" visible="1">
-            <color red="0.8" green="0.9" blue="0.5" shininess="50" specular_red="0.1" specular_green="0.1" specular_blue="0.1" />
-            
-            <position x="100" y="20" z="30" />
-            <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
-            
-          </instance>
-
-
-        </scene>
-
-      </glscene>
+     
 
     </page>
 
