@@ -70,6 +70,8 @@ class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
 class CDataTable;
 class CDataSeries;
+class CDateTimeDifference;
+class CDateTime;
 class CMeshObject;
 class CToolpathPart;
 class CToolpathLayer;
@@ -122,6 +124,8 @@ typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOption
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
 typedef CDataTable CLibMCEnvDataTable;
 typedef CDataSeries CLibMCEnvDataSeries;
+typedef CDateTimeDifference CLibMCEnvDateTimeDifference;
+typedef CDateTime CLibMCEnvDateTime;
 typedef CMeshObject CLibMCEnvMeshObject;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
@@ -174,6 +178,8 @@ typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DSt
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
 typedef std::shared_ptr<CDataTable> PDataTable;
 typedef std::shared_ptr<CDataSeries> PDataSeries;
+typedef std::shared_ptr<CDateTimeDifference> PDateTimeDifference;
+typedef std::shared_ptr<CDateTime> PDateTime;
 typedef std::shared_ptr<CMeshObject> PMeshObject;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
@@ -226,6 +232,8 @@ typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOption
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
 typedef PDataTable PLibMCEnvDataTable;
 typedef PDataSeries PLibMCEnvDataSeries;
+typedef PDateTimeDifference PLibMCEnvDateTimeDifference;
+typedef PDateTime PLibMCEnvDateTime;
 typedef PMeshObject PLibMCEnvMeshObject;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
@@ -790,6 +798,8 @@ private:
 	friend class CDiscreteFieldData2D;
 	friend class CDataTable;
 	friend class CDataSeries;
+	friend class CDateTimeDifference;
+	friend class CDateTime;
 	friend class CMeshObject;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
@@ -1129,6 +1139,90 @@ public:
 	inline void SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta);
 	inline LibMCEnv_uint32 GetVersion();
 	inline void IncreaseVersion();
+};
+	
+/*************************************************************************************************************************
+ Class CDateTimeDifference 
+**************************************************************************************************************************/
+class CDateTimeDifference : public CBase {
+public:
+	
+	/**
+	* CDateTimeDifference::CDateTimeDifference - Constructor for DateTimeDifference class.
+	*/
+	CDateTimeDifference(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 ToMicroseconds();
+	inline LibMCEnv_uint64 ToMilliseconds();
+	inline LibMCEnv_uint64 ToSeconds();
+	inline LibMCEnv_uint64 ToMinutes();
+	inline LibMCEnv_uint64 ToHours();
+	inline LibMCEnv_uint64 ToDays();
+	inline void RoundDownToDay();
+	inline void RoundDownToHour();
+	inline void RoundDownToMinute();
+	inline void RoundDownToSeconds();
+	inline void RoundDownToMilliseconds();
+	inline void RoundUpToDay();
+	inline void RoundUpToHour();
+	inline void RoundUpToMinute();
+	inline void RoundUpToSeconds();
+	inline void RoundupToMilliseconds();
+};
+	
+/*************************************************************************************************************************
+ Class CDateTime 
+**************************************************************************************************************************/
+class CDateTime : public CBase {
+public:
+	
+	/**
+	* CDateTime::CDateTime - Constructor for DateTime class.
+	*/
+	CDateTime(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 ToMicrosecondsSince1900();
+	inline LibMCEnv_uint64 ToUnixTimestamp();
+	inline std::string ToUTCDateTime();
+	inline std::string ToUTCDateTimeInMilliseconds();
+	inline std::string ToUTCDateTimeInMicroseconds();
+	inline void GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay);
+	inline void GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond);
+	inline PDateTime Duplicate();
+	inline bool IsLeapYear();
+	inline bool IsLaterThan(classParam<CDateTime> pOtherTimeStamp);
+	inline bool IsEarlierThan(classParam<CDateTime> pOtherTimeStamp);
+	inline bool IsEqualTo(classParam<CDateTime> pOtherTimeStamp);
+	inline void GetTimeDifference(classParam<CDateTime> pOtherTimeStamp, classParam<CDateTimeDifference> pDifference);
+	inline void AddDuration(classParam<CDateTimeDifference> pDuration);
+	inline void SubtractDuration(classParam<CDateTimeDifference> pDuration);
+	inline void ShiftByYears(const LibMCEnv_int64 nDeltaYears);
+	inline void ShiftByDays(const LibMCEnv_int64 nDeltaDays);
+	inline void ShiftByHours(const LibMCEnv_int64 nDeltaHours);
+	inline void ShiftByMinutes(const LibMCEnv_int64 nDeltaMinutes);
+	inline void ShiftBySeconds(const LibMCEnv_int64 nDeltaSeconds);
+	inline void ShiftByMilliseconds(const LibMCEnv_int64 nDeltaMilliseconds);
+	inline void ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds);
+	inline void RoundDownToYear();
+	inline void RoundDownToMonth();
+	inline void RoundDownToDay();
+	inline void RoundDownToHour();
+	inline void RoundDownToMinute();
+	inline void RoundDownToSeconds();
+	inline void RoundDownToMilliseconds();
+	inline void RoundUpToYear();
+	inline void RoundUpToMonth();
+	inline void RoundUpToDay();
+	inline void RoundUpToHour();
+	inline void RoundUpToMinute();
+	inline void RoundUpToSeconds();
+	inline void RoundUpToMilliseconds();
 };
 	
 /*************************************************************************************************************************
@@ -1965,6 +2059,7 @@ public:
 	inline bool NeedsAcknowledgement();
 	inline bool HasBeenAcknowledged();
 	inline void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime);
+	inline PDateTime GetAcknowledgementTime();
 	inline void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment);
 	inline void AcknowledgeAlertForCurrentUser(const std::string & sUserComment);
 	inline void DeactivateAlert();
@@ -2003,10 +2098,7 @@ public:
 	
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
 	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
-	inline LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
-	inline bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName);
-	inline LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
-	inline void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, std::vector<LibMCEnv_uint64> & TimeStampsBuffer);
+	inline PDateTime GetStartTime();
 };
 	
 /*************************************************************************************************************************
@@ -2424,6 +2516,58 @@ public:
 		pWrapperTable->m_DataSeries_SampleJournalVariable = nullptr;
 		pWrapperTable->m_DataSeries_GetVersion = nullptr;
 		pWrapperTable->m_DataSeries_IncreaseVersion = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToMicroseconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToMilliseconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToSeconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToMinutes = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToHours = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToDays = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToDay = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToHour = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToMinute = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToSeconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToDay = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToHour = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToMinute = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToSeconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1900 = nullptr;
+		pWrapperTable->m_DateTime_ToUnixTimestamp = nullptr;
+		pWrapperTable->m_DateTime_ToUTCDateTime = nullptr;
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds = nullptr;
+		pWrapperTable->m_DateTime_GetDate = nullptr;
+		pWrapperTable->m_DateTime_GetTime = nullptr;
+		pWrapperTable->m_DateTime_Duplicate = nullptr;
+		pWrapperTable->m_DateTime_IsLeapYear = nullptr;
+		pWrapperTable->m_DateTime_IsLaterThan = nullptr;
+		pWrapperTable->m_DateTime_IsEarlierThan = nullptr;
+		pWrapperTable->m_DateTime_IsEqualTo = nullptr;
+		pWrapperTable->m_DateTime_GetTimeDifference = nullptr;
+		pWrapperTable->m_DateTime_AddDuration = nullptr;
+		pWrapperTable->m_DateTime_SubtractDuration = nullptr;
+		pWrapperTable->m_DateTime_ShiftByYears = nullptr;
+		pWrapperTable->m_DateTime_ShiftByDays = nullptr;
+		pWrapperTable->m_DateTime_ShiftByHours = nullptr;
+		pWrapperTable->m_DateTime_ShiftByMinutes = nullptr;
+		pWrapperTable->m_DateTime_ShiftBySeconds = nullptr;
+		pWrapperTable->m_DateTime_ShiftByMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_ShiftByMicroseconds = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToYear = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToMonth = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToDay = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToHour = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToMinute = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToSeconds = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToYear = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToMonth = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToDay = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToHour = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToMinute = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToSeconds = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToMilliseconds = nullptr;
 		pWrapperTable->m_MeshObject_GetName = nullptr;
 		pWrapperTable->m_MeshObject_GetUUID = nullptr;
 		pWrapperTable->m_MeshObject_GetTriangleCount = nullptr;
@@ -2796,16 +2940,14 @@ public:
 		pWrapperTable->m_Alert_NeedsAcknowledgement = nullptr;
 		pWrapperTable->m_Alert_HasBeenAcknowledged = nullptr;
 		pWrapperTable->m_Alert_GetAcknowledgementInformation = nullptr;
+		pWrapperTable->m_Alert_GetAcknowledgementTime = nullptr;
 		pWrapperTable->m_Alert_AcknowledgeForUser = nullptr;
 		pWrapperTable->m_Alert_AcknowledgeAlertForCurrentUser = nullptr;
 		pWrapperTable->m_Alert_DeactivateAlert = nullptr;
 		pWrapperTable->m_AlertIterator_GetCurrentAlert = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
-		pWrapperTable->m_JournalHandler_StoreJournalMarker = nullptr;
-		pWrapperTable->m_JournalHandler_HasJournalMarker = nullptr;
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = nullptr;
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = nullptr;
+		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
 		pWrapperTable->m_UserDetailList_Count = nullptr;
 		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
 		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
@@ -3793,6 +3935,474 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataSeries_IncreaseVersion == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMicroseconds = (PLibMCEnvDateTimeDifference_ToMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tomicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMicroseconds = (PLibMCEnvDateTimeDifference_ToMicrosecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tomicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMilliseconds = (PLibMCEnvDateTimeDifference_ToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMilliseconds = (PLibMCEnvDateTimeDifference_ToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToSeconds = (PLibMCEnvDateTimeDifference_ToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_toseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToSeconds = (PLibMCEnvDateTimeDifference_ToSecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_toseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMinutes = (PLibMCEnvDateTimeDifference_ToMinutesPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tominutes");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMinutes = (PLibMCEnvDateTimeDifference_ToMinutesPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tominutes");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToMinutes == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToHours = (PLibMCEnvDateTimeDifference_ToHoursPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tohours");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToHours = (PLibMCEnvDateTimeDifference_ToHoursPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tohours");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToHours == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToDays = (PLibMCEnvDateTimeDifference_ToDaysPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_todays");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToDays = (PLibMCEnvDateTimeDifference_ToDaysPtr) dlsym(hLibrary, "libmcenv_datetimedifference_todays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToDays == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToDay = (PLibMCEnvDateTimeDifference_RoundDownToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToDay = (PLibMCEnvDateTimeDifference_RoundDownToDayPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToHour = (PLibMCEnvDateTimeDifference_RoundDownToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToHour = (PLibMCEnvDateTimeDifference_RoundDownToHourPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMinute = (PLibMCEnvDateTimeDifference_RoundDownToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMinute = (PLibMCEnvDateTimeDifference_RoundDownToMinutePtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToSeconds = (PLibMCEnvDateTimeDifference_RoundDownToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToSeconds = (PLibMCEnvDateTimeDifference_RoundDownToSecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds = (PLibMCEnvDateTimeDifference_RoundDownToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds = (PLibMCEnvDateTimeDifference_RoundDownToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToDay = (PLibMCEnvDateTimeDifference_RoundUpToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToDay = (PLibMCEnvDateTimeDifference_RoundUpToDayPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToHour = (PLibMCEnvDateTimeDifference_RoundUpToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToHour = (PLibMCEnvDateTimeDifference_RoundUpToHourPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToMinute = (PLibMCEnvDateTimeDifference_RoundUpToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToMinute = (PLibMCEnvDateTimeDifference_RoundUpToMinutePtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToSeconds = (PLibMCEnvDateTimeDifference_RoundUpToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToSeconds = (PLibMCEnvDateTimeDifference_RoundUpToSecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds = (PLibMCEnvDateTimeDifference_RoundupToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds = (PLibMCEnvDateTimeDifference_RoundupToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1900 = (PLibMCEnvDateTime_ToMicrosecondsSince1900Ptr) GetProcAddress(hLibrary, "libmcenv_datetime_tomicrosecondssince1900");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1900 = (PLibMCEnvDateTime_ToMicrosecondsSince1900Ptr) dlsym(hLibrary, "libmcenv_datetime_tomicrosecondssince1900");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToMicrosecondsSince1900 == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUnixTimestamp = (PLibMCEnvDateTime_ToUnixTimestampPtr) GetProcAddress(hLibrary, "libmcenv_datetime_tounixtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUnixTimestamp = (PLibMCEnvDateTime_ToUnixTimestampPtr) dlsym(hLibrary, "libmcenv_datetime_tounixtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUnixTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTime = (PLibMCEnvDateTime_ToUTCDateTimePtr) GetProcAddress(hLibrary, "libmcenv_datetime_toutcdatetime");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTime = (PLibMCEnvDateTime_ToUTCDateTimePtr) dlsym(hLibrary, "libmcenv_datetime_toutcdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUTCDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_toutcdatetimeinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_toutcdatetimeinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_toutcdatetimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_datetime_toutcdatetimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_GetDate = (PLibMCEnvDateTime_GetDatePtr) GetProcAddress(hLibrary, "libmcenv_datetime_getdate");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_GetDate = (PLibMCEnvDateTime_GetDatePtr) dlsym(hLibrary, "libmcenv_datetime_getdate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_GetDate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_GetTime = (PLibMCEnvDateTime_GetTimePtr) GetProcAddress(hLibrary, "libmcenv_datetime_gettime");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_GetTime = (PLibMCEnvDateTime_GetTimePtr) dlsym(hLibrary, "libmcenv_datetime_gettime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_GetTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_Duplicate = (PLibMCEnvDateTime_DuplicatePtr) GetProcAddress(hLibrary, "libmcenv_datetime_duplicate");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_Duplicate = (PLibMCEnvDateTime_DuplicatePtr) dlsym(hLibrary, "libmcenv_datetime_duplicate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_Duplicate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsLeapYear = (PLibMCEnvDateTime_IsLeapYearPtr) GetProcAddress(hLibrary, "libmcenv_datetime_isleapyear");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsLeapYear = (PLibMCEnvDateTime_IsLeapYearPtr) dlsym(hLibrary, "libmcenv_datetime_isleapyear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsLeapYear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsLaterThan = (PLibMCEnvDateTime_IsLaterThanPtr) GetProcAddress(hLibrary, "libmcenv_datetime_islaterthan");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsLaterThan = (PLibMCEnvDateTime_IsLaterThanPtr) dlsym(hLibrary, "libmcenv_datetime_islaterthan");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsLaterThan == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsEarlierThan = (PLibMCEnvDateTime_IsEarlierThanPtr) GetProcAddress(hLibrary, "libmcenv_datetime_isearlierthan");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsEarlierThan = (PLibMCEnvDateTime_IsEarlierThanPtr) dlsym(hLibrary, "libmcenv_datetime_isearlierthan");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsEarlierThan == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsEqualTo = (PLibMCEnvDateTime_IsEqualToPtr) GetProcAddress(hLibrary, "libmcenv_datetime_isequalto");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsEqualTo = (PLibMCEnvDateTime_IsEqualToPtr) dlsym(hLibrary, "libmcenv_datetime_isequalto");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsEqualTo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_GetTimeDifference = (PLibMCEnvDateTime_GetTimeDifferencePtr) GetProcAddress(hLibrary, "libmcenv_datetime_gettimedifference");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_GetTimeDifference = (PLibMCEnvDateTime_GetTimeDifferencePtr) dlsym(hLibrary, "libmcenv_datetime_gettimedifference");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_GetTimeDifference == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_AddDuration = (PLibMCEnvDateTime_AddDurationPtr) GetProcAddress(hLibrary, "libmcenv_datetime_addduration");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_AddDuration = (PLibMCEnvDateTime_AddDurationPtr) dlsym(hLibrary, "libmcenv_datetime_addduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_AddDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_SubtractDuration = (PLibMCEnvDateTime_SubtractDurationPtr) GetProcAddress(hLibrary, "libmcenv_datetime_subtractduration");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_SubtractDuration = (PLibMCEnvDateTime_SubtractDurationPtr) dlsym(hLibrary, "libmcenv_datetime_subtractduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_SubtractDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByYears = (PLibMCEnvDateTime_ShiftByYearsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyyears");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByYears = (PLibMCEnvDateTime_ShiftByYearsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyyears");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByYears == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByDays = (PLibMCEnvDateTime_ShiftByDaysPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbydays");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByDays = (PLibMCEnvDateTime_ShiftByDaysPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbydays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByDays == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByHours = (PLibMCEnvDateTime_ShiftByHoursPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyhours");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByHours = (PLibMCEnvDateTime_ShiftByHoursPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyhours");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByHours == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByMinutes = (PLibMCEnvDateTime_ShiftByMinutesPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyminutes");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByMinutes = (PLibMCEnvDateTime_ShiftByMinutesPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyminutes");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByMinutes == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftBySeconds = (PLibMCEnvDateTime_ShiftBySecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftBySeconds = (PLibMCEnvDateTime_ShiftBySecondsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftBySeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByMilliseconds = (PLibMCEnvDateTime_ShiftByMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbymilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByMilliseconds = (PLibMCEnvDateTime_ShiftByMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbymilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByMicroseconds = (PLibMCEnvDateTime_ShiftByMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbymicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByMicroseconds = (PLibMCEnvDateTime_ShiftByMicrosecondsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbymicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToYear = (PLibMCEnvDateTime_RoundDownToYearPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntoyear");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToYear = (PLibMCEnvDateTime_RoundDownToYearPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntoyear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToYear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMonth = (PLibMCEnvDateTime_RoundDownToMonthPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntomonth");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMonth = (PLibMCEnvDateTime_RoundDownToMonthPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntomonth");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToMonth == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToDay = (PLibMCEnvDateTime_RoundDownToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToDay = (PLibMCEnvDateTime_RoundDownToDayPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToHour = (PLibMCEnvDateTime_RoundDownToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToHour = (PLibMCEnvDateTime_RoundDownToHourPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMinute = (PLibMCEnvDateTime_RoundDownToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMinute = (PLibMCEnvDateTime_RoundDownToMinutePtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToSeconds = (PLibMCEnvDateTime_RoundDownToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToSeconds = (PLibMCEnvDateTime_RoundDownToSecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMilliseconds = (PLibMCEnvDateTime_RoundDownToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMilliseconds = (PLibMCEnvDateTime_RoundDownToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToYear = (PLibMCEnvDateTime_RoundUpToYearPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptoyear");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToYear = (PLibMCEnvDateTime_RoundUpToYearPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptoyear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToYear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMonth = (PLibMCEnvDateTime_RoundUpToMonthPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptomonth");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMonth = (PLibMCEnvDateTime_RoundUpToMonthPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptomonth");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToMonth == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToDay = (PLibMCEnvDateTime_RoundUpToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToDay = (PLibMCEnvDateTime_RoundUpToDayPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToHour = (PLibMCEnvDateTime_RoundUpToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToHour = (PLibMCEnvDateTime_RoundUpToHourPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMinute = (PLibMCEnvDateTime_RoundUpToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMinute = (PLibMCEnvDateTime_RoundUpToMinutePtr) dlsym(hLibrary, "libmcenv_datetime_rounduptominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToSeconds = (PLibMCEnvDateTime_RoundUpToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToSeconds = (PLibMCEnvDateTime_RoundUpToSecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMilliseconds = (PLibMCEnvDateTime_RoundUpToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMilliseconds = (PLibMCEnvDateTime_RoundUpToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToMilliseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7144,6 +7754,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementTime = (PLibMCEnvAlert_GetAcknowledgementTimePtr) GetProcAddress(hLibrary, "libmcenv_alert_getacknowledgementtime");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementTime = (PLibMCEnvAlert_GetAcknowledgementTimePtr) dlsym(hLibrary, "libmcenv_alert_getacknowledgementtime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetAcknowledgementTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Alert_AcknowledgeForUser = (PLibMCEnvAlert_AcknowledgeForUserPtr) GetProcAddress(hLibrary, "libmcenv_alert_acknowledgeforuser");
 		#else // _WIN32
 		pWrapperTable->m_Alert_AcknowledgeForUser = (PLibMCEnvAlert_AcknowledgeForUserPtr) dlsym(hLibrary, "libmcenv_alert_acknowledgeforuser");
@@ -7198,39 +7817,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_StoreJournalMarker = (PLibMCEnvJournalHandler_StoreJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_storejournalmarker");
+		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getstarttime");
 		#else // _WIN32
-		pWrapperTable->m_JournalHandler_StoreJournalMarker = (PLibMCEnvJournalHandler_StoreJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_storejournalmarker");
+		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) dlsym(hLibrary, "libmcenv_journalhandler_getstarttime");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_StoreJournalMarker == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_HasJournalMarker = (PLibMCEnvJournalHandler_HasJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_hasjournalmarker");
-		#else // _WIN32
-		pWrapperTable->m_JournalHandler_HasJournalMarker = (PLibMCEnvJournalHandler_HasJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_hasjournalmarker");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_HasJournalMarker == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = (PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalmarker");
-		#else // _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = (PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalmarker");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_RetrieveJournalMarker == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = (PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalmarkers");
-		#else // _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = (PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalmarkers");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_RetrieveJournalMarkers == nullptr)
+		if (pWrapperTable->m_JournalHandler_GetStartTime == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9155,6 +9747,214 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataSeries_IncreaseVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tomicroseconds", (void**)&(pWrapperTable->m_DateTimeDifference_ToMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tomilliseconds", (void**)&(pWrapperTable->m_DateTimeDifference_ToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_toseconds", (void**)&(pWrapperTable->m_DateTimeDifference_ToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tominutes", (void**)&(pWrapperTable->m_DateTimeDifference_ToMinutes));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToMinutes == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tohours", (void**)&(pWrapperTable->m_DateTimeDifference_ToHours));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToHours == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_todays", (void**)&(pWrapperTable->m_DateTimeDifference_ToDays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToDays == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntoday", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntohour", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntominute", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntoseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntomilliseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptoday", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptohour", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptominute", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptoseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptomilliseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_tomicrosecondssince1900", (void**)&(pWrapperTable->m_DateTime_ToMicrosecondsSince1900));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToMicrosecondsSince1900 == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_tounixtimestamp", (void**)&(pWrapperTable->m_DateTime_ToUnixTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUnixTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_toutcdatetime", (void**)&(pWrapperTable->m_DateTime_ToUTCDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUTCDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_toutcdatetimeinmilliseconds", (void**)&(pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_toutcdatetimeinmicroseconds", (void**)&(pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_getdate", (void**)&(pWrapperTable->m_DateTime_GetDate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_GetDate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_gettime", (void**)&(pWrapperTable->m_DateTime_GetTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_GetTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_duplicate", (void**)&(pWrapperTable->m_DateTime_Duplicate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_Duplicate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_isleapyear", (void**)&(pWrapperTable->m_DateTime_IsLeapYear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsLeapYear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_islaterthan", (void**)&(pWrapperTable->m_DateTime_IsLaterThan));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsLaterThan == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_isearlierthan", (void**)&(pWrapperTable->m_DateTime_IsEarlierThan));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsEarlierThan == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_isequalto", (void**)&(pWrapperTable->m_DateTime_IsEqualTo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsEqualTo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_gettimedifference", (void**)&(pWrapperTable->m_DateTime_GetTimeDifference));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_GetTimeDifference == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_addduration", (void**)&(pWrapperTable->m_DateTime_AddDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_AddDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_subtractduration", (void**)&(pWrapperTable->m_DateTime_SubtractDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_SubtractDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyyears", (void**)&(pWrapperTable->m_DateTime_ShiftByYears));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByYears == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbydays", (void**)&(pWrapperTable->m_DateTime_ShiftByDays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByDays == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyhours", (void**)&(pWrapperTable->m_DateTime_ShiftByHours));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByHours == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyminutes", (void**)&(pWrapperTable->m_DateTime_ShiftByMinutes));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByMinutes == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyseconds", (void**)&(pWrapperTable->m_DateTime_ShiftBySeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftBySeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbymilliseconds", (void**)&(pWrapperTable->m_DateTime_ShiftByMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbymicroseconds", (void**)&(pWrapperTable->m_DateTime_ShiftByMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntoyear", (void**)&(pWrapperTable->m_DateTime_RoundDownToYear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToYear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntomonth", (void**)&(pWrapperTable->m_DateTime_RoundDownToMonth));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToMonth == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntoday", (void**)&(pWrapperTable->m_DateTime_RoundDownToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntohour", (void**)&(pWrapperTable->m_DateTime_RoundDownToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntominute", (void**)&(pWrapperTable->m_DateTime_RoundDownToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntoseconds", (void**)&(pWrapperTable->m_DateTime_RoundDownToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntomilliseconds", (void**)&(pWrapperTable->m_DateTime_RoundDownToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptoyear", (void**)&(pWrapperTable->m_DateTime_RoundUpToYear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToYear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptomonth", (void**)&(pWrapperTable->m_DateTime_RoundUpToMonth));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToMonth == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptoday", (void**)&(pWrapperTable->m_DateTime_RoundUpToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptohour", (void**)&(pWrapperTable->m_DateTime_RoundUpToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptominute", (void**)&(pWrapperTable->m_DateTime_RoundUpToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptoseconds", (void**)&(pWrapperTable->m_DateTime_RoundUpToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptomilliseconds", (void**)&(pWrapperTable->m_DateTime_RoundUpToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_meshobject_getname", (void**)&(pWrapperTable->m_MeshObject_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10643,6 +11443,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetAcknowledgementInformation == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_alert_getacknowledgementtime", (void**)&(pWrapperTable->m_Alert_GetAcknowledgementTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetAcknowledgementTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_alert_acknowledgeforuser", (void**)&(pWrapperTable->m_Alert_AcknowledgeForUser));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_AcknowledgeForUser == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10667,20 +11471,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_storejournalmarker", (void**)&(pWrapperTable->m_JournalHandler_StoreJournalMarker));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_StoreJournalMarker == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_hasjournalmarker", (void**)&(pWrapperTable->m_JournalHandler_HasJournalMarker));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_HasJournalMarker == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalmarker", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalMarker));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalMarker == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalmarkers", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalMarkers));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalMarkers == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetStartTime == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
@@ -12460,6 +13252,534 @@ public:
 	void CDataSeries::IncreaseVersion()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_IncreaseVersion(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CDateTimeDifference
+	 */
+	
+	/**
+	* CDateTimeDifference::ToMicroseconds - Returns the duration in Microseconds.
+	* @return The duration in Microseconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToMicroseconds()
+	{
+		LibMCEnv_uint64 resultMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToMicroseconds(m_pHandle, &resultMicroseconds));
+		
+		return resultMicroseconds;
+	}
+	
+	/**
+	* CDateTimeDifference::ToMilliseconds - Returns the duration in Milliseconds. Partial milliseconds are rounded down.
+	* @return The duration in Milliseconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToMilliseconds()
+	{
+		LibMCEnv_uint64 resultMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToMilliseconds(m_pHandle, &resultMilliseconds));
+		
+		return resultMilliseconds;
+	}
+	
+	/**
+	* CDateTimeDifference::ToSeconds - Returns the duration in Seconds. Partial seconds are rounded down.
+	* @return The duration in seconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToSeconds()
+	{
+		LibMCEnv_uint64 resultSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToSeconds(m_pHandle, &resultSeconds));
+		
+		return resultSeconds;
+	}
+	
+	/**
+	* CDateTimeDifference::ToMinutes - Returns the duration in Seconds. Partial minutes are rounded down.
+	* @return The duration in seconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToMinutes()
+	{
+		LibMCEnv_uint64 resultMinutes = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToMinutes(m_pHandle, &resultMinutes));
+		
+		return resultMinutes;
+	}
+	
+	/**
+	* CDateTimeDifference::ToHours - Returns the duration in Hours. Partial hours are rounded down.
+	* @return The duration in hours.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToHours()
+	{
+		LibMCEnv_uint64 resultHours = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToHours(m_pHandle, &resultHours));
+		
+		return resultHours;
+	}
+	
+	/**
+	* CDateTimeDifference::ToDays - Returns the duration in Days. Partial days are rounded down.
+	* @return The duration in days.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToDays()
+	{
+		LibMCEnv_uint64 resultDays = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToDays(m_pHandle, &resultDays));
+		
+		return resultDays;
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToDay - Rounds down the duration to the full day.
+	*/
+	void CDateTimeDifference::RoundDownToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToHour - Rounds down the duration to the full hour.
+	*/
+	void CDateTimeDifference::RoundDownToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToMinute - Rounds down the duration to the full minute.
+	*/
+	void CDateTimeDifference::RoundDownToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToSeconds - Rounds down the duration to the full second.
+	*/
+	void CDateTimeDifference::RoundDownToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToMilliseconds - Rounds down the duration to the full millisecond.
+	*/
+	void CDateTimeDifference::RoundDownToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToMilliseconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToDay - Rounds up the duration to the full day.
+	*/
+	void CDateTimeDifference::RoundUpToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToHour - Rounds up the duration to the full hour.
+	*/
+	void CDateTimeDifference::RoundUpToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToMinute - Rounds up the duration to the full minute.
+	*/
+	void CDateTimeDifference::RoundUpToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToSeconds - Rounds up the duration to the full second.
+	*/
+	void CDateTimeDifference::RoundUpToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundupToMilliseconds - Rounds up the duration to the full millisecond.
+	*/
+	void CDateTimeDifference::RoundupToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundupToMilliseconds(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CDateTime
+	 */
+	
+	/**
+	* CDateTime::ToMicrosecondsSince1900 - Returns the maximum accuracy date time.
+	* @return Returns the date in Microseconds since midnight first of January 1900.
+	*/
+	LibMCEnv_uint64 CDateTime::ToMicrosecondsSince1900()
+	{
+		LibMCEnv_uint64 resultMicrosecondsSince1900 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToMicrosecondsSince1900(m_pHandle, &resultMicrosecondsSince1900));
+		
+		return resultMicrosecondsSince1900;
+	}
+	
+	/**
+	* CDateTime::ToUnixTimestamp - Returns the unix time stamp of the date time
+	* @return Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present.
+	*/
+	LibMCEnv_uint64 CDateTime::ToUnixTimestamp()
+	{
+		LibMCEnv_uint64 resultSecondsSince1970 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUnixTimestamp(m_pHandle, &resultSecondsSince1970));
+		
+		return resultSecondsSince1970;
+	}
+	
+	/**
+	* CDateTime::ToUTCDateTime - Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC
+	*/
+	std::string CDateTime::ToUTCDateTime()
+	{
+		LibMCEnv_uint32 bytesNeededUTCDateTime = 0;
+		LibMCEnv_uint32 bytesWrittenUTCDateTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTime(m_pHandle, 0, &bytesNeededUTCDateTime, nullptr));
+		std::vector<char> bufferUTCDateTime(bytesNeededUTCDateTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTime(m_pHandle, bytesNeededUTCDateTime, &bytesWrittenUTCDateTime, &bufferUTCDateTime[0]));
+		
+		return std::string(&bufferUTCDateTime[0]);
+	}
+	
+	/**
+	* CDateTime::ToUTCDateTimeInMilliseconds - Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC
+	*/
+	std::string CDateTime::ToUTCDateTimeInMilliseconds()
+	{
+		LibMCEnv_uint32 bytesNeededUTCDateTime = 0;
+		LibMCEnv_uint32 bytesWrittenUTCDateTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMilliseconds(m_pHandle, 0, &bytesNeededUTCDateTime, nullptr));
+		std::vector<char> bufferUTCDateTime(bytesNeededUTCDateTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMilliseconds(m_pHandle, bytesNeededUTCDateTime, &bytesWrittenUTCDateTime, &bufferUTCDateTime[0]));
+		
+		return std::string(&bufferUTCDateTime[0]);
+	}
+	
+	/**
+	* CDateTime::ToUTCDateTimeInMicroseconds - Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.
+	* @return The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC
+	*/
+	std::string CDateTime::ToUTCDateTimeInMicroseconds()
+	{
+		LibMCEnv_uint32 bytesNeededUTCDateTime = 0;
+		LibMCEnv_uint32 bytesWrittenUTCDateTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMicroseconds(m_pHandle, 0, &bytesNeededUTCDateTime, nullptr));
+		std::vector<char> bufferUTCDateTime(bytesNeededUTCDateTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMicroseconds(m_pHandle, bytesNeededUTCDateTime, &bytesWrittenUTCDateTime, &bufferUTCDateTime[0]));
+		
+		return std::string(&bufferUTCDateTime[0]);
+	}
+	
+	/**
+	* CDateTime::GetDate - Returns the date information.
+	* @param[out] nYear - Year of the date.
+	* @param[out] nMonth - Month of the date.
+	* @param[out] nDay - Day of the date.
+	*/
+	void CDateTime::GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetDate(m_pHandle, &nYear, &nMonth, &nDay));
+	}
+	
+	/**
+	* CDateTime::GetTime - Returns the time information.
+	* @param[out] nHour - Hour of the time. Returns 0-23.
+	* @param[out] nMinute - Minute of the time. Returns 0-59.
+	* @param[out] nSecond - Seconds of the time. Returns 0-59.
+	* @param[out] nMicrosecond - Partial microseconds of the time. Returns 0-999999.
+	*/
+	void CDateTime::GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetTime(m_pHandle, &nHour, &nMinute, &nSecond, &nMicrosecond));
+	}
+	
+	/**
+	* CDateTime::Duplicate - Duplicates the date time instance.
+	* @return Returns a copied instance.
+	*/
+	PDateTime CDateTime::Duplicate()
+	{
+		LibMCEnvHandle hNewInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_Duplicate(m_pHandle, &hNewInstance));
+		
+		if (!hNewInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hNewInstance);
+	}
+	
+	/**
+	* CDateTime::IsLeapYear - Returns if the year is a leap year.
+	* @return Returns true if the year is a leap year.
+	*/
+	bool CDateTime::IsLeapYear()
+	{
+		bool resultIsLeapYear = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsLeapYear(m_pHandle, &resultIsLeapYear));
+		
+		return resultIsLeapYear;
+	}
+	
+	/**
+	* CDateTime::IsLaterThan - Checks if this timestamp is later than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is later than OtherTimeStamp.
+	*/
+	bool CDateTime::IsLaterThan(classParam<CDateTime> pOtherTimeStamp)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		bool resultIsLater = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsLaterThan(m_pHandle, hOtherTimeStamp, &resultIsLater));
+		
+		return resultIsLater;
+	}
+	
+	/**
+	* CDateTime::IsEarlierThan - Checks if this timestamp is earlier than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is earlier than OtherTimeStamp.
+	*/
+	bool CDateTime::IsEarlierThan(classParam<CDateTime> pOtherTimeStamp)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		bool resultIsEarlier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsEarlierThan(m_pHandle, hOtherTimeStamp, &resultIsEarlier));
+		
+		return resultIsEarlier;
+	}
+	
+	/**
+	* CDateTime::IsEqualTo - Checks if this timestamp is equal to another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is equal to the OtherTimeStamp.
+	*/
+	bool CDateTime::IsEqualTo(classParam<CDateTime> pOtherTimeStamp)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		bool resultIsEqual = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsEqualTo(m_pHandle, hOtherTimeStamp, &resultIsEqual));
+		
+		return resultIsEqual;
+	}
+	
+	/**
+	* CDateTime::GetTimeDifference - Returns the time difference to another time stamp as positive duration value.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @param[in] pDifference - Difference between the two time stamps. Value will always be positive.
+	*/
+	void CDateTime::GetTimeDifference(classParam<CDateTime> pOtherTimeStamp, classParam<CDateTimeDifference> pDifference)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		LibMCEnvHandle hDifference = pDifference.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetTimeDifference(m_pHandle, hOtherTimeStamp, hDifference));
+	}
+	
+	/**
+	* CDateTime::AddDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to add to the time stamp.
+	*/
+	void CDateTime::AddDuration(classParam<CDateTimeDifference> pDuration)
+	{
+		LibMCEnvHandle hDuration = pDuration.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_AddDuration(m_pHandle, hDuration));
+	}
+	
+	/**
+	* CDateTime::SubtractDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to subtract from the time stamp.
+	*/
+	void CDateTime::SubtractDuration(classParam<CDateTimeDifference> pDuration)
+	{
+		LibMCEnvHandle hDuration = pDuration.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_SubtractDuration(m_pHandle, hDuration));
+	}
+	
+	/**
+	* CDateTime::ShiftByYears - Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaYears - Years to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByYears(const LibMCEnv_int64 nDeltaYears)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByYears(m_pHandle, nDeltaYears));
+	}
+	
+	/**
+	* CDateTime::ShiftByDays - Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaDays - Days to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByDays(const LibMCEnv_int64 nDeltaDays)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByDays(m_pHandle, nDeltaDays));
+	}
+	
+	/**
+	* CDateTime::ShiftByHours - Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaHours - Hours to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByHours(const LibMCEnv_int64 nDeltaHours)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByHours(m_pHandle, nDeltaHours));
+	}
+	
+	/**
+	* CDateTime::ShiftByMinutes - Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMinutes - Minutes to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByMinutes(const LibMCEnv_int64 nDeltaMinutes)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByMinutes(m_pHandle, nDeltaMinutes));
+	}
+	
+	/**
+	* CDateTime::ShiftBySeconds - Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaSeconds - Seconds to shift the date time stamp.
+	*/
+	void CDateTime::ShiftBySeconds(const LibMCEnv_int64 nDeltaSeconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftBySeconds(m_pHandle, nDeltaSeconds));
+	}
+	
+	/**
+	* CDateTime::ShiftByMilliseconds - Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMilliseconds - Milliseconds to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByMilliseconds(const LibMCEnv_int64 nDeltaMilliseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByMilliseconds(m_pHandle, nDeltaMilliseconds));
+	}
+	
+	/**
+	* CDateTime::ShiftByMicroseconds - Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMicroseconds - Microseconds to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByMicroseconds(m_pHandle, nDeltaMicroseconds));
+	}
+	
+	/**
+	* CDateTime::RoundDownToYear - Rounds down the timestamp to the start of the year. Takes leap years into account.
+	*/
+	void CDateTime::RoundDownToYear()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToYear(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToMonth - Rounds down the timestamp to the start of the month. Takes leap years into account.
+	*/
+	void CDateTime::RoundDownToMonth()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToMonth(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToDay - Rounds down the timestamp to the full day.
+	*/
+	void CDateTime::RoundDownToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToHour - Rounds down the timestamp to the full hour.
+	*/
+	void CDateTime::RoundDownToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToMinute - Rounds down the timestamp to the full minute.
+	*/
+	void CDateTime::RoundDownToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToSeconds - Rounds down the timestamp to the full second.
+	*/
+	void CDateTime::RoundDownToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToMilliseconds - Rounds down the timestamp to the full millisecond.
+	*/
+	void CDateTime::RoundDownToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToMilliseconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToYear - Rounds up the timestamp to the start of the year. Takes leap years into account.
+	*/
+	void CDateTime::RoundUpToYear()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToYear(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToMonth - Rounds up the timestamp to the start of the month. Takes leap years into account.
+	*/
+	void CDateTime::RoundUpToMonth()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToMonth(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToDay - Rounds up the timestamp to the full day.
+	*/
+	void CDateTime::RoundUpToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToHour - Rounds up the timestamp to the full hour.
+	*/
+	void CDateTime::RoundUpToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToMinute - Rounds up the timestamp to the full minute.
+	*/
+	void CDateTime::RoundUpToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToSeconds - Rounds up the timestamp to the full second.
+	*/
+	void CDateTime::RoundUpToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToMilliseconds - Rounds up the timestamp to the full millisecond.
+	*/
+	void CDateTime::RoundUpToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToMilliseconds(m_pHandle));
 	}
 	
 	/**
@@ -17613,6 +18933,21 @@ public:
 	}
 	
 	/**
+	* CAlert::GetAcknowledgementTime - Returns the time stamp of the the acknowledgement. Fails if the alert is not acknowledged.
+	* @return Timestamp Instance.
+	*/
+	PDateTime CAlert::GetAcknowledgementTime()
+	{
+		LibMCEnvHandle hAckTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetAcknowledgementTime(m_pHandle, &hAckTime));
+		
+		if (!hAckTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hAckTime);
+	}
+	
+	/**
 	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
@@ -17698,62 +19033,18 @@ public:
 	}
 	
 	/**
-	* CJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-	* @return Returns the stored time stamp in microseconds.
+	* CJournalHandler::GetStartTime - Retrieves the reference start time of the journal.
+	* @return DateTime Instance
 	*/
-	LibMCEnv_uint64 CJournalHandler::StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
+	PDateTime CJournalHandler::GetStartTime()
 	{
-		LibMCEnv_uint64 resultTimeStamp = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_StoreJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStamp));
+		LibMCEnvHandle hDateTimeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetStartTime(m_pHandle, &hDateTimeInstance));
 		
-		return resultTimeStamp;
-	}
-	
-	/**
-	* CJournalHandler::HasJournalMarker - Checks if a journal marker tag exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @return Returns true if the marker exists.
-	*/
-	bool CJournalHandler::HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName)
-	{
-		bool resultMarkerExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_HasJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), &resultMarkerExists));
-		
-		return resultMarkerExists;
-	}
-	
-	/**
-	* CJournalHandler::RetrieveJournalMarker - Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-	* @return Returns the time stamp in microseconds.
-	*/
-	LibMCEnv_uint64 CJournalHandler::RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
-	{
-		LibMCEnv_uint64 resultTimeStampInMicroSeconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStampInMicroSeconds));
-		
-		return resultTimeStampInMicroSeconds;
-	}
-	
-	/**
-	* CJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[out] TimeStampsBuffer - Returns an array of time stamps in microseconds.
-	*/
-	void CJournalHandler::RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, std::vector<LibMCEnv_uint64> & TimeStampsBuffer)
-	{
-		LibMCEnv_uint64 elementsNeededTimeStamps = 0;
-		LibMCEnv_uint64 elementsWrittenTimeStamps = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarkers(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), 0, &elementsNeededTimeStamps, nullptr));
-		TimeStampsBuffer.resize((size_t) elementsNeededTimeStamps);
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarkers(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), elementsNeededTimeStamps, &elementsWrittenTimeStamps, TimeStampsBuffer.data()));
+		if (!hDateTimeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
 	}
 	
 	/**

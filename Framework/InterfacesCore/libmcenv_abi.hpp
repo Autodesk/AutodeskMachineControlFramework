@@ -1000,6 +1000,473 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_getversion(LibMCEnv_DataSer
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_dataseries_increaseversion(LibMCEnv_DataSeries pDataSeries);
 
 /*************************************************************************************************************************
+ Class definition for DateTimeDifference
+**************************************************************************************************************************/
+
+/**
+* Returns the duration in Microseconds.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @param[out] pMicroseconds - The duration in Microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_tomicroseconds(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pMicroseconds);
+
+/**
+* Returns the duration in Milliseconds. Partial milliseconds are rounded down.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @param[out] pMilliseconds - The duration in Milliseconds.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_tomilliseconds(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pMilliseconds);
+
+/**
+* Returns the duration in Seconds. Partial seconds are rounded down.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @param[out] pSeconds - The duration in seconds.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_toseconds(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pSeconds);
+
+/**
+* Returns the duration in Seconds. Partial minutes are rounded down.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @param[out] pMinutes - The duration in seconds.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_tominutes(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pMinutes);
+
+/**
+* Returns the duration in Hours. Partial hours are rounded down.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @param[out] pHours - The duration in hours.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_tohours(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pHours);
+
+/**
+* Returns the duration in Days. Partial days are rounded down.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @param[out] pDays - The duration in days.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_todays(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pDays);
+
+/**
+* Rounds down the duration to the full day.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounddowntoday(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds down the duration to the full hour.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounddowntohour(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds down the duration to the full minute.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounddowntominute(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds down the duration to the full second.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounddowntoseconds(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds down the duration to the full millisecond.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounddowntomilliseconds(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds up the duration to the full day.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounduptoday(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds up the duration to the full hour.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounduptohour(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds up the duration to the full minute.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounduptominute(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds up the duration to the full second.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounduptoseconds(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/**
+* Rounds up the duration to the full millisecond.
+*
+* @param[in] pDateTimeDifference - DateTimeDifference instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounduptomilliseconds(LibMCEnv_DateTimeDifference pDateTimeDifference);
+
+/*************************************************************************************************************************
+ Class definition for DateTime
+**************************************************************************************************************************/
+
+/**
+* Returns the maximum accuracy date time.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[out] pMicrosecondsSince1900 - Returns the date in Microseconds since midnight first of January 1900.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_tomicrosecondssince1900(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1900);
+
+/**
+* Returns the unix time stamp of the date time
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[out] pSecondsSince1970 - Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_tounixtimestamp(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pSecondsSince1970);
+
+/**
+* Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nUTCDateTimeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUTCDateTimeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUTCDateTimeBuffer -  buffer of The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_toutcdatetime(LibMCEnv_DateTime pDateTime, const LibMCEnv_uint32 nUTCDateTimeBufferSize, LibMCEnv_uint32* pUTCDateTimeNeededChars, char * pUTCDateTimeBuffer);
+
+/**
+* Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nUTCDateTimeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUTCDateTimeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUTCDateTimeBuffer -  buffer of The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_toutcdatetimeinmilliseconds(LibMCEnv_DateTime pDateTime, const LibMCEnv_uint32 nUTCDateTimeBufferSize, LibMCEnv_uint32* pUTCDateTimeNeededChars, char * pUTCDateTimeBuffer);
+
+/**
+* Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nUTCDateTimeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUTCDateTimeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUTCDateTimeBuffer -  buffer of The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_toutcdatetimeinmicroseconds(LibMCEnv_DateTime pDateTime, const LibMCEnv_uint32 nUTCDateTimeBufferSize, LibMCEnv_uint32* pUTCDateTimeNeededChars, char * pUTCDateTimeBuffer);
+
+/**
+* Returns the date information.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[out] pYear - Year of the date.
+* @param[out] pMonth - Month of the date.
+* @param[out] pDay - Day of the date.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_getdate(LibMCEnv_DateTime pDateTime, LibMCEnv_uint32 * pYear, LibMCEnv_uint32 * pMonth, LibMCEnv_uint32 * pDay);
+
+/**
+* Returns the time information.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[out] pHour - Hour of the time. Returns 0-23.
+* @param[out] pMinute - Minute of the time. Returns 0-59.
+* @param[out] pSecond - Seconds of the time. Returns 0-59.
+* @param[out] pMicrosecond - Partial microseconds of the time. Returns 0-999999.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_gettime(LibMCEnv_DateTime pDateTime, LibMCEnv_uint32 * pHour, LibMCEnv_uint32 * pMinute, LibMCEnv_uint32 * pSecond, LibMCEnv_uint32 * pMicrosecond);
+
+/**
+* Duplicates the date time instance.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[out] pNewInstance - Returns a copied instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_duplicate(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime * pNewInstance);
+
+/**
+* Returns if the year is a leap year.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[out] pIsLeapYear - Returns true if the year is a leap year.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_isleapyear(LibMCEnv_DateTime pDateTime, bool * pIsLeapYear);
+
+/**
+* Checks if this timestamp is later than another timestamp.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] pOtherTimeStamp - Instance to check against.
+* @param[out] pIsLater - Returns true if the instance is later than OtherTimeStamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_islaterthan(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, bool * pIsLater);
+
+/**
+* Checks if this timestamp is earlier than another timestamp.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] pOtherTimeStamp - Instance to check against.
+* @param[out] pIsEarlier - Returns true if the instance is earlier than OtherTimeStamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_isearlierthan(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, bool * pIsEarlier);
+
+/**
+* Checks if this timestamp is equal to another timestamp.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] pOtherTimeStamp - Instance to check against.
+* @param[out] pIsEqual - Returns true if the instance is equal to the OtherTimeStamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_isequalto(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, bool * pIsEqual);
+
+/**
+* Returns the time difference to another time stamp as positive duration value.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] pOtherTimeStamp - Instance to check against.
+* @param[in] pDifference - Difference between the two time stamps. Value will always be positive.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_gettimedifference(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference pDifference);
+
+/**
+* Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] pDuration - Duration to add to the time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_addduration(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTimeDifference pDuration);
+
+/**
+* Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] pDuration - Duration to subtract from the time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_subtractduration(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTimeDifference pDuration);
+
+/**
+* Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nDeltaYears - Years to shift the date time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_shiftbyyears(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaYears);
+
+/**
+* Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nDeltaDays - Days to shift the date time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_shiftbydays(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaDays);
+
+/**
+* Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nDeltaHours - Hours to shift the date time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_shiftbyhours(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaHours);
+
+/**
+* Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nDeltaMinutes - Minutes to shift the date time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_shiftbyminutes(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaMinutes);
+
+/**
+* Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nDeltaSeconds - Seconds to shift the date time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_shiftbyseconds(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaSeconds);
+
+/**
+* Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nDeltaMilliseconds - Milliseconds to shift the date time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_shiftbymilliseconds(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaMilliseconds);
+
+/**
+* Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+*
+* @param[in] pDateTime - DateTime instance.
+* @param[in] nDeltaMicroseconds - Microseconds to shift the date time stamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_shiftbymicroseconds(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaMicroseconds);
+
+/**
+* Rounds down the timestamp to the start of the year. Takes leap years into account.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounddowntoyear(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds down the timestamp to the start of the month. Takes leap years into account.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounddowntomonth(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds down the timestamp to the full day.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounddowntoday(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds down the timestamp to the full hour.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounddowntohour(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds down the timestamp to the full minute.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounddowntominute(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds down the timestamp to the full second.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounddowntoseconds(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds down the timestamp to the full millisecond.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounddowntomilliseconds(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds up the timestamp to the start of the year. Takes leap years into account.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounduptoyear(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds up the timestamp to the start of the month. Takes leap years into account.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounduptomonth(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds up the timestamp to the full day.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounduptoday(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds up the timestamp to the full hour.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounduptohour(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds up the timestamp to the full minute.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounduptominute(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds up the timestamp to the full second.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounduptoseconds(LibMCEnv_DateTime pDateTime);
+
+/**
+* Rounds up the timestamp to the full millisecond.
+*
+* @param[in] pDateTime - DateTime instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_rounduptomilliseconds(LibMCEnv_DateTime pDateTime);
+
+/*************************************************************************************************************************
  Class definition for MeshObject
 **************************************************************************************************************************/
 
@@ -5006,6 +5473,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_alert_hasbeenacknowledged(LibMCEnv_Ale
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_alert_getacknowledgementinformation(LibMCEnv_Alert pAlert, const LibMCEnv_uint32 nUserUUIDBufferSize, LibMCEnv_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCEnv_uint32 nUserCommentBufferSize, LibMCEnv_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCEnv_uint32 nAckTimeBufferSize, LibMCEnv_uint32* pAckTimeNeededChars, char * pAckTimeBuffer);
 
 /**
+* Returns the time stamp of the the acknowledgement. Fails if the alert is not acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pAckTime - Timestamp Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_alert_getacknowledgementtime(LibMCEnv_Alert pAlert, LibMCEnv_DateTime * pAckTime);
+
+/**
 * Acknowledges an alert for a specific user and sets it inactive. 
 *
 * @param[in] pAlert - Alert instance.
@@ -5073,52 +5549,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable);
 
 /**
-* Stores a journal marker tag at the current time stamp.
+* Retrieves the reference start time of the journal.
 *
 * @param[in] pJournalHandler - JournalHandler instance.
-* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-* @param[out] pTimeStamp - Returns the stored time stamp in microseconds.
+* @param[out] pDateTimeInstance - DateTime Instance
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_storejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp);
-
-/**
-* Checks if a journal marker tag exists.
-*
-* @param[in] pJournalHandler - JournalHandler instance.
-* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[out] pMarkerExists - Returns true if the marker exists.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_hasjournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool * pMarkerExists);
-
-/**
-* Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
-*
-* @param[in] pJournalHandler - JournalHandler instance.
-* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-* @param[out] pTimeStampInMicroSeconds - Returns the time stamp in microseconds.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStampInMicroSeconds);
-
-/**
-* Retrieves all existing journal marker time stamps. Fails if no marker exists.
-*
-* @param[in] pJournalHandler - JournalHandler instance.
-* @param[in] pMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[in] pMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-* @param[in] nTimeStampsBufferSize - Number of elements in buffer
-* @param[out] pTimeStampsNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pTimeStampsBuffer - uint64  buffer of Returns an array of time stamps in microseconds.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalmarkers(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getstarttime(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
 
 /*************************************************************************************************************************
  Class definition for UserDetailList

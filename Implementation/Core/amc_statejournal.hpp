@@ -106,6 +106,8 @@ namespace AMC {
 
 		void registerAlias (const std::string& sName, const std::string& sSourceName);
 
+		std::string getStartTimeAsUTC();
+
 	};
 
 	

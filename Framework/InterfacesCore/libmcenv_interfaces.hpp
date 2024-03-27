@@ -65,6 +65,8 @@ class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
 class IDataTable;
 class IDataSeries;
+class IDateTimeDifference;
+class IDateTime;
 class IMeshObject;
 class IToolpathPart;
 class IToolpathLayer;
@@ -1055,6 +1057,325 @@ public:
 };
 
 typedef IBaseSharedPtr<IDataSeries> PIDataSeries;
+
+
+/*************************************************************************************************************************
+ Class interface for DateTimeDifference 
+**************************************************************************************************************************/
+
+class IDateTimeDifference : public virtual IBase {
+public:
+	/**
+	* IDateTimeDifference::ToMicroseconds - Returns the duration in Microseconds.
+	* @return The duration in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 ToMicroseconds() = 0;
+
+	/**
+	* IDateTimeDifference::ToMilliseconds - Returns the duration in Milliseconds. Partial milliseconds are rounded down.
+	* @return The duration in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 ToMilliseconds() = 0;
+
+	/**
+	* IDateTimeDifference::ToSeconds - Returns the duration in Seconds. Partial seconds are rounded down.
+	* @return The duration in seconds.
+	*/
+	virtual LibMCEnv_uint64 ToSeconds() = 0;
+
+	/**
+	* IDateTimeDifference::ToMinutes - Returns the duration in Seconds. Partial minutes are rounded down.
+	* @return The duration in seconds.
+	*/
+	virtual LibMCEnv_uint64 ToMinutes() = 0;
+
+	/**
+	* IDateTimeDifference::ToHours - Returns the duration in Hours. Partial hours are rounded down.
+	* @return The duration in hours.
+	*/
+	virtual LibMCEnv_uint64 ToHours() = 0;
+
+	/**
+	* IDateTimeDifference::ToDays - Returns the duration in Days. Partial days are rounded down.
+	* @return The duration in days.
+	*/
+	virtual LibMCEnv_uint64 ToDays() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToDay - Rounds down the duration to the full day.
+	*/
+	virtual void RoundDownToDay() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToHour - Rounds down the duration to the full hour.
+	*/
+	virtual void RoundDownToHour() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToMinute - Rounds down the duration to the full minute.
+	*/
+	virtual void RoundDownToMinute() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToSeconds - Rounds down the duration to the full second.
+	*/
+	virtual void RoundDownToSeconds() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToMilliseconds - Rounds down the duration to the full millisecond.
+	*/
+	virtual void RoundDownToMilliseconds() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToDay - Rounds up the duration to the full day.
+	*/
+	virtual void RoundUpToDay() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToHour - Rounds up the duration to the full hour.
+	*/
+	virtual void RoundUpToHour() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToMinute - Rounds up the duration to the full minute.
+	*/
+	virtual void RoundUpToMinute() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToSeconds - Rounds up the duration to the full second.
+	*/
+	virtual void RoundUpToSeconds() = 0;
+
+	/**
+	* IDateTimeDifference::RoundupToMilliseconds - Rounds up the duration to the full millisecond.
+	*/
+	virtual void RoundupToMilliseconds() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDateTimeDifference> PIDateTimeDifference;
+
+
+/*************************************************************************************************************************
+ Class interface for DateTime 
+**************************************************************************************************************************/
+
+class IDateTime : public virtual IBase {
+public:
+	/**
+	* IDateTime::ToMicrosecondsSince1900 - Returns the maximum accuracy date time.
+	* @return Returns the date in Microseconds since midnight first of January 1900.
+	*/
+	virtual LibMCEnv_uint64 ToMicrosecondsSince1900() = 0;
+
+	/**
+	* IDateTime::ToUnixTimestamp - Returns the unix time stamp of the date time
+	* @return Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present.
+	*/
+	virtual LibMCEnv_uint64 ToUnixTimestamp() = 0;
+
+	/**
+	* IDateTime::ToUTCDateTime - Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC
+	*/
+	virtual std::string ToUTCDateTime() = 0;
+
+	/**
+	* IDateTime::ToUTCDateTimeInMilliseconds - Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC
+	*/
+	virtual std::string ToUTCDateTimeInMilliseconds() = 0;
+
+	/**
+	* IDateTime::ToUTCDateTimeInMicroseconds - Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.
+	* @return The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC
+	*/
+	virtual std::string ToUTCDateTimeInMicroseconds() = 0;
+
+	/**
+	* IDateTime::GetDate - Returns the date information.
+	* @param[out] nYear - Year of the date.
+	* @param[out] nMonth - Month of the date.
+	* @param[out] nDay - Day of the date.
+	*/
+	virtual void GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay) = 0;
+
+	/**
+	* IDateTime::GetTime - Returns the time information.
+	* @param[out] nHour - Hour of the time. Returns 0-23.
+	* @param[out] nMinute - Minute of the time. Returns 0-59.
+	* @param[out] nSecond - Seconds of the time. Returns 0-59.
+	* @param[out] nMicrosecond - Partial microseconds of the time. Returns 0-999999.
+	*/
+	virtual void GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond) = 0;
+
+	/**
+	* IDateTime::Duplicate - Duplicates the date time instance.
+	* @return Returns a copied instance.
+	*/
+	virtual IDateTime * Duplicate() = 0;
+
+	/**
+	* IDateTime::IsLeapYear - Returns if the year is a leap year.
+	* @return Returns true if the year is a leap year.
+	*/
+	virtual bool IsLeapYear() = 0;
+
+	/**
+	* IDateTime::IsLaterThan - Checks if this timestamp is later than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is later than OtherTimeStamp.
+	*/
+	virtual bool IsLaterThan(IDateTime* pOtherTimeStamp) = 0;
+
+	/**
+	* IDateTime::IsEarlierThan - Checks if this timestamp is earlier than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is earlier than OtherTimeStamp.
+	*/
+	virtual bool IsEarlierThan(IDateTime* pOtherTimeStamp) = 0;
+
+	/**
+	* IDateTime::IsEqualTo - Checks if this timestamp is equal to another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is equal to the OtherTimeStamp.
+	*/
+	virtual bool IsEqualTo(IDateTime* pOtherTimeStamp) = 0;
+
+	/**
+	* IDateTime::GetTimeDifference - Returns the time difference to another time stamp as positive duration value.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @param[in] pDifference - Difference between the two time stamps. Value will always be positive.
+	*/
+	virtual void GetTimeDifference(IDateTime* pOtherTimeStamp, IDateTimeDifference* pDifference) = 0;
+
+	/**
+	* IDateTime::AddDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to add to the time stamp.
+	*/
+	virtual void AddDuration(IDateTimeDifference* pDuration) = 0;
+
+	/**
+	* IDateTime::SubtractDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to subtract from the time stamp.
+	*/
+	virtual void SubtractDuration(IDateTimeDifference* pDuration) = 0;
+
+	/**
+	* IDateTime::ShiftByYears - Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaYears - Years to shift the date time stamp.
+	*/
+	virtual void ShiftByYears(const LibMCEnv_int64 nDeltaYears) = 0;
+
+	/**
+	* IDateTime::ShiftByDays - Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaDays - Days to shift the date time stamp.
+	*/
+	virtual void ShiftByDays(const LibMCEnv_int64 nDeltaDays) = 0;
+
+	/**
+	* IDateTime::ShiftByHours - Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaHours - Hours to shift the date time stamp.
+	*/
+	virtual void ShiftByHours(const LibMCEnv_int64 nDeltaHours) = 0;
+
+	/**
+	* IDateTime::ShiftByMinutes - Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMinutes - Minutes to shift the date time stamp.
+	*/
+	virtual void ShiftByMinutes(const LibMCEnv_int64 nDeltaMinutes) = 0;
+
+	/**
+	* IDateTime::ShiftBySeconds - Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaSeconds - Seconds to shift the date time stamp.
+	*/
+	virtual void ShiftBySeconds(const LibMCEnv_int64 nDeltaSeconds) = 0;
+
+	/**
+	* IDateTime::ShiftByMilliseconds - Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMilliseconds - Milliseconds to shift the date time stamp.
+	*/
+	virtual void ShiftByMilliseconds(const LibMCEnv_int64 nDeltaMilliseconds) = 0;
+
+	/**
+	* IDateTime::ShiftByMicroseconds - Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMicroseconds - Microseconds to shift the date time stamp.
+	*/
+	virtual void ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds) = 0;
+
+	/**
+	* IDateTime::RoundDownToYear - Rounds down the timestamp to the start of the year. Takes leap years into account.
+	*/
+	virtual void RoundDownToYear() = 0;
+
+	/**
+	* IDateTime::RoundDownToMonth - Rounds down the timestamp to the start of the month. Takes leap years into account.
+	*/
+	virtual void RoundDownToMonth() = 0;
+
+	/**
+	* IDateTime::RoundDownToDay - Rounds down the timestamp to the full day.
+	*/
+	virtual void RoundDownToDay() = 0;
+
+	/**
+	* IDateTime::RoundDownToHour - Rounds down the timestamp to the full hour.
+	*/
+	virtual void RoundDownToHour() = 0;
+
+	/**
+	* IDateTime::RoundDownToMinute - Rounds down the timestamp to the full minute.
+	*/
+	virtual void RoundDownToMinute() = 0;
+
+	/**
+	* IDateTime::RoundDownToSeconds - Rounds down the timestamp to the full second.
+	*/
+	virtual void RoundDownToSeconds() = 0;
+
+	/**
+	* IDateTime::RoundDownToMilliseconds - Rounds down the timestamp to the full millisecond.
+	*/
+	virtual void RoundDownToMilliseconds() = 0;
+
+	/**
+	* IDateTime::RoundUpToYear - Rounds up the timestamp to the start of the year. Takes leap years into account.
+	*/
+	virtual void RoundUpToYear() = 0;
+
+	/**
+	* IDateTime::RoundUpToMonth - Rounds up the timestamp to the start of the month. Takes leap years into account.
+	*/
+	virtual void RoundUpToMonth() = 0;
+
+	/**
+	* IDateTime::RoundUpToDay - Rounds up the timestamp to the full day.
+	*/
+	virtual void RoundUpToDay() = 0;
+
+	/**
+	* IDateTime::RoundUpToHour - Rounds up the timestamp to the full hour.
+	*/
+	virtual void RoundUpToHour() = 0;
+
+	/**
+	* IDateTime::RoundUpToMinute - Rounds up the timestamp to the full minute.
+	*/
+	virtual void RoundUpToMinute() = 0;
+
+	/**
+	* IDateTime::RoundUpToSeconds - Rounds up the timestamp to the full second.
+	*/
+	virtual void RoundUpToSeconds() = 0;
+
+	/**
+	* IDateTime::RoundUpToMilliseconds - Rounds up the timestamp to the full millisecond.
+	*/
+	virtual void RoundUpToMilliseconds() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDateTime> PIDateTime;
 
 
 /*************************************************************************************************************************
@@ -3988,6 +4309,12 @@ public:
 	virtual void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) = 0;
 
 	/**
+	* IAlert::GetAcknowledgementTime - Returns the time stamp of the the acknowledgement. Fails if the alert is not acknowledged.
+	* @return Timestamp Instance.
+	*/
+	virtual IDateTime * GetAcknowledgementTime() = 0;
+
+	/**
 	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
@@ -4051,40 +4378,10 @@ public:
 	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
 	/**
-	* IJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-	* @return Returns the stored time stamp in microseconds.
+	* IJournalHandler::GetStartTime - Retrieves the reference start time of the journal.
+	* @return DateTime Instance
 	*/
-	virtual LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
-
-	/**
-	* IJournalHandler::HasJournalMarker - Checks if a journal marker tag exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @return Returns true if the marker exists.
-	*/
-	virtual bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName) = 0;
-
-	/**
-	* IJournalHandler::RetrieveJournalMarker - Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-	* @return Returns the time stamp in microseconds.
-	*/
-	virtual LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
-
-	/**
-	* IJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] nTimeStampsBufferSize - Number of elements in buffer
-	* @param[out] pTimeStampsNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pTimeStampsBuffer - uint64 buffer of Returns an array of time stamps in microseconds.
-	*/
-	virtual void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer) = 0;
+	virtual IDateTime * GetStartTime() = 0;
 
 };
 

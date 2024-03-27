@@ -100,7 +100,9 @@ public:
 	bool HasBeenAcknowledged() override;
 
 	void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) override;
-	
+
+	IDateTime* GetAcknowledgementTime() override;
+
 	void AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment) override;
 
 	void AcknowledgeAlertForCurrentUser(const std::string& sUserComment) override;

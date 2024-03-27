@@ -796,6 +796,208 @@
 
 
 
+	<class name="DateTimeDifference" parent="Base" description="Represents a duration between two DateTimeStamps. Accuracy is milliseconds. Can contain durations up to 1000000 years.">
+
+		<method name="ToMicroseconds" description = "Returns the duration in Microseconds.">
+			<param name="Microseconds" type="uint64" pass="return" description="The duration in Microseconds." />
+		</method>
+
+		<method name="ToMilliseconds" description = "Returns the duration in Milliseconds. Partial milliseconds are rounded down.">
+			<param name="Milliseconds" type="uint64" pass="return" description="The duration in Milliseconds." />
+		</method>
+
+		<method name="ToSeconds" description = "Returns the duration in Seconds. Partial seconds are rounded down.">
+			<param name="Seconds" type="uint64" pass="return" description="The duration in seconds." />
+		</method>
+
+		<method name="ToMinutes" description = "Returns the duration in Seconds. Partial minutes are rounded down.">
+			<param name="Minutes" type="uint64" pass="return" description="The duration in seconds." />
+		</method>
+
+		<method name="ToHours" description = "Returns the duration in Hours. Partial hours are rounded down.">
+			<param name="Hours" type="uint64" pass="return" description="The duration in hours." />
+		</method>
+
+		<method name="ToDays" description = "Returns the duration in Days. Partial days are rounded down.">
+			<param name="Days" type="uint64" pass="return" description="The duration in days." />
+		</method>
+
+		<method name="RoundDownToDay" description = "Rounds down the duration to the full day.">
+		</method>
+
+		<method name="RoundDownToHour" description = "Rounds down the duration to the full hour.">
+		</method>
+
+		<method name="RoundDownToMinute" description = "Rounds down the duration to the full minute.">
+		</method>
+
+		<method name="RoundDownToSeconds" description = "Rounds down the duration to the full second.">
+		</method>
+
+		<method name="RoundDownToMilliseconds" description = "Rounds down the duration to the full millisecond.">
+		</method>
+
+		<method name="RoundUpToDay" description = "Rounds up the duration to the full day.">
+		</method>
+
+		<method name="RoundUpToHour" description = "Rounds up the duration to the full hour.">
+		</method>
+
+		<method name="RoundUpToMinute" description = "Rounds up the duration to the full minute.">
+		</method>
+
+		<method name="RoundUpToSeconds" description = "Rounds up the duration to the full second.">
+		</method>
+
+		<method name="RoundupToMilliseconds" description = "Rounds up the duration to the full millisecond.">
+		</method>
+
+	</class>
+
+
+	<class name="DateTime" parent="Base" description="Represents a date and time in UTC time zone. Must be after first of January 1900. Accuracy is Microseconds.">
+	
+		<method name="ToMicrosecondsSince1900" description = "Returns the maximum accuracy date time.">
+			<param name="MicrosecondsSince1900" type="uint64" pass="return" description="Returns the date in Microseconds since midnight first of January 1900." />
+		</method>
+		
+		<method name="ToUnixTimestamp" description = "Returns the unix time stamp of the date time">
+			<param name="SecondsSince1970" type="uint64" pass="return" description="Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present." />
+		</method>
+		
+		<method name="ToUTCDateTime" description = "Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.">
+			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC" />
+		</method>
+
+		<method name="ToUTCDateTimeInMilliseconds" description = "Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.">
+			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC" />
+		</method>
+
+		<method name="ToUTCDateTimeInMicroseconds" description = "Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.">
+			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC" />
+		</method>
+
+		<method name="GetDate" description = "Returns the date information.">
+			<param name="Year" type="uint32" pass="out" description="Year of the date." />
+			<param name="Month" type="uint32" pass="out" description="Month of the date." />
+			<param name="Day" type="uint32" pass="out" description="Day of the date." />
+		</method>
+		
+		<method name="GetTime" description = "Returns the time information.">
+			<param name="Hour" type="uint32" pass="out" description="Hour of the time. Returns 0-23." />
+			<param name="Minute" type="uint32" pass="out" description="Minute of the time. Returns 0-59." />
+			<param name="Second" type="uint32" pass="out" description="Seconds of the time. Returns 0-59." />
+			<param name="Microsecond" type="uint32" pass="out" description="Partial microseconds of the time. Returns 0-999999." />
+		</method>
+
+		<method name="Duplicate" description = "Duplicates the date time instance.">
+			<param name="NewInstance" type="class" class="DateTime" pass="return" description="Returns a copied instance." />
+		</method>
+
+		<method name="IsLeapYear" description = "Returns if the year is a leap year.">
+			<param name="IsLeapYear" type="bool" pass="return" description="Returns true if the year is a leap year." />
+		</method>
+
+		<method name="IsLaterThan" description = "Checks if this timestamp is later than another timestamp.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="IsLater" type="bool" pass="return" description="Returns true if the instance is later than OtherTimeStamp." />
+		</method>
+
+		<method name="IsEarlierThan" description = "Checks if this timestamp is earlier than another timestamp.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="IsEarlier" type="bool" pass="return" description="Returns true if the instance is earlier than OtherTimeStamp." />
+		</method>
+
+		<method name="IsEqualTo" description = "Checks if this timestamp is equal to another timestamp.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="IsEqual" type="bool" pass="return" description="Returns true if the instance is equal to the OtherTimeStamp." />
+		</method>
+
+		<method name="GetTimeDifference" description = "Returns the time difference to another time stamp as positive duration value.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="Difference" type="class" class="DateTimeDifference" pass="in" description="Difference between the two time stamps. Value will always be positive." />
+		</method>
+
+		<method name="AddDuration" description = "Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="Duration" type="class" class="DateTimeDifference" pass="in" description="Duration to add to the time stamp." />
+		</method>
+
+		<method name="SubtractDuration" description = "Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="Duration" type="class" class="DateTimeDifference" pass="in" description="Duration to subtract from the time stamp." />
+		</method>
+
+		<method name="ShiftByYears" description = "Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaYears" type="int64" pass="in" description="Years to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByDays" description = "Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaDays" type="int64" pass="in" description="Days to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByHours" description = "Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaHours" type="int64" pass="in" description="Hours to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByMinutes" description = "Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaMinutes" type="int64" pass="in" description="Minutes to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftBySeconds" description = "Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaSeconds" type="int64" pass="in" description="Seconds to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByMilliseconds" description = "Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaMilliseconds" type="int64" pass="in" description="Milliseconds to shift the date time stamp." />
+		</method>
+		
+		<method name="ShiftByMicroseconds" description = "Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaMicroseconds" type="int64" pass="in" description="Microseconds to shift the date time stamp." />
+		</method>
+
+		<method name="RoundDownToYear" description = "Rounds down the timestamp to the start of the year. Takes leap years into account.">
+		</method>
+
+		<method name="RoundDownToMonth" description = "Rounds down the timestamp to the start of the month. Takes leap years into account.">
+		</method>
+
+		<method name="RoundDownToDay" description = "Rounds down the timestamp to the full day.">
+		</method>
+
+		<method name="RoundDownToHour" description = "Rounds down the timestamp to the full hour.">
+		</method>
+
+		<method name="RoundDownToMinute" description = "Rounds down the timestamp to the full minute.">
+		</method>
+
+		<method name="RoundDownToSeconds" description = "Rounds down the timestamp to the full second.">
+		</method>
+
+		<method name="RoundDownToMilliseconds" description = "Rounds down the timestamp to the full millisecond.">
+		</method>
+				
+		<method name="RoundUpToYear" description = "Rounds up the timestamp to the start of the year. Takes leap years into account.">
+		</method>
+
+		<method name="RoundUpToMonth" description = "Rounds up the timestamp to the start of the month. Takes leap years into account.">
+		</method>
+
+		<method name="RoundUpToDay" description = "Rounds up the timestamp to the full day.">
+		</method>
+
+		<method name="RoundUpToHour" description = "Rounds up the timestamp to the full hour.">
+		</method>
+
+		<method name="RoundUpToMinute" description = "Rounds up the timestamp to the full minute.">
+		</method>
+
+		<method name="RoundUpToSeconds" description = "Rounds up the timestamp to the full second.">
+		</method>
+
+		<method name="RoundUpToMilliseconds" description = "Rounds up the timestamp to the full millisecond.">
+		</method>
+
+	</class>
+
 
 
 	<class name="MeshObject" parent="Base">
@@ -2776,6 +2978,10 @@
 			<param name="AckTime" type="string" pass="out" description="Timestamp in ISO8601 UTC format." />
 		</method>
 
+		<method name="GetAcknowledgementTime" description="Returns the time stamp of the the acknowledgement. Fails if the alert is not acknowledged.">
+			<param name="AckTime" type="class" class="DateTime" pass="return" description="Timestamp Instance." />
+		</method>
+
 		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
 			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
 			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
@@ -2797,112 +3003,6 @@
 	</class>
 
 
-	<class name="DateTime" parent="Base" description="Represents a date and time in UTC time zone. Must be after first of January 1900. Accuracy is Microseconds.">
-	
-		<method name="GetGlobalMicrosecondsSince1900" description = "Returns the maximum accuracy date time.">
-			<param name="MicrosecondsSince1900" type="uint64" pass="return" description="Returns the date in Microseconds since midnight first of January 1900." />
-		</method>
-		
-		<method name="GetUnixTimestamp" description = "Returns the unix time stamp of the date time">
-			<param name="SecondsSince1970" type="uint64" pass="return" description="Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present." />
-		</method>
-		
-		<method name="GetUTCDateTime" description = "Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.">
-			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC" />
-		</method>
-
-		<method name="GetUTCDateTimeInMilliseconds" description = "Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.">
-			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC" />
-		</method>
-
-		<method name="GetUTCDateTimeInMicroseconds" description = "Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.">
-			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC" />
-		</method>
-
-		<method name="GetDate" description = "Returns the date information.">
-			<param name="Year" type="uint32" pass="out" description="Year of the date." />
-			<param name="Month" type="uint32" pass="out" description="Month of the date." />
-			<param name="Day" type="uint32" pass="out" description="Day of the date." />
-		</method>
-		
-		<method name="GetTime" description = "Returns the time information.">
-			<param name="Hour" type="uint32" pass="out" description="Hour of the time. Returns 0-23." />
-			<param name="Minute" type="uint32" pass="out" description="Minute of the time. Returns 0-59." />
-			<param name="Second" type="uint32" pass="out" description="Seconds of the time. Returns 0-59." />
-			<param name="Microsecond" type="uint32" pass="out" description="Partial microseconds of the time. Returns 0-999999." />
-		</method>
-
-		<method name="Duplicate" description = "Duplicates the date time instance.">
-			<param name="NewInstance" type="class" class="DateTime" pass="return" description="Returns a copied instance." />
-		</method>
-
-		<method name="IsLaterThan" description = "Checks if this timestamp is later than another timestamp.">
-			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
-			<param name="IsLater" type="bool" pass="return" description="Returns true if the instance is later than OtherTimeStamp." />
-		</method>
-
-		<method name="IsEarlierThan" description = "Checks if this timestamp is earlier than another timestamp.">
-			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
-			<param name="IsEarlier" type="bool" pass="return" description="Returns true if the instance is earlier than OtherTimeStamp." />
-		</method>
-
-		<method name="IsEqualTo" description = "Checks if this timestamp is equal to another timestamp.">
-			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
-			<param name="IsEqual" type="bool" pass="return" description="Returns true if the instance is equal to the OtherTimeStamp." />
-		</method>
-		
-		<method name="ShiftByYears" description = "Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.">
-			<param name="DeltaYears" type="int64" pass="in" description="Years to shift the date time stamp." />
-		</method>
-
-		<method name="ShiftByDays" description = "Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.">
-			<param name="DeltaDays" type="int64" pass="in" description="Days to shift the date time stamp." />
-		</method>
-
-		<method name="ShiftByHours" description = "Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.">
-			<param name="DeltaHours" type="int64" pass="in" description="Hours to shift the date time stamp." />
-		</method>
-
-		<method name="ShiftByMinutes" description = "Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.">
-			<param name="DeltaMinutes" type="int64" pass="in" description="Minutes to shift the date time stamp." />
-		</method>
-
-		<method name="ShiftBySeconds" description = "Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
-			<param name="DeltaSeconds" type="int64" pass="in" description="Seconds to shift the date time stamp." />
-		</method>
-
-		<method name="ShiftByMilliseconds" description = "Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
-			<param name="DeltaMilliseconds" type="int64" pass="in" description="Milliseconds to shift the date time stamp." />
-		</method>
-		
-		<method name="ShiftByMicroseconds" description = "Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
-			<param name="DeltaMicroseconds" type="int64" pass="in" description="Microseconds to shift the date time stamp." />
-		</method>
-
-		<method name="RoundDownToYear" description = "Rounds down the timestamp to the start of the year. Takes leap years into account.">
-		</method>
-
-		<method name="RoundDownToMonth" description = "Rounds down the timestamp to the start of the month. Takes leap years into account.">
-		</method>
-
-		<method name="RoundDownToDay" description = "Rounds down the timestamp to the full day.">
-		</method>
-
-		<method name="RoundDownToHour" description = "Rounds down the timestamp to the full hour.">
-		</method>
-
-		<method name="RoundDownToMinute" description = "Rounds down the timestamp to the full minute.">
-		</method>
-
-		<method name="RoundDownToSeconds" description = "Rounds down the timestamp to the full second.">
-		</method>
-
-		<method name="RoundDownToMilliseconds" description = "Rounds down the timestamp to the full millisecond.">
-		</method>
-		
-		
-	</class>
-
 
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
 
@@ -2920,7 +3020,7 @@
 		</method>
 						
 		<method name="GetStartTime" description="Retrieves the reference start time of the journal.">
-			<param name="DateTimeInstance" type="class" class="DateTime" pass="in" description="DateTime Instance" />
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>
 	
 	</class>

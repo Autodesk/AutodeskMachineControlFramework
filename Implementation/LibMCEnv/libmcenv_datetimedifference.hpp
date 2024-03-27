@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalHandler
+Abstract: This is the class declaration of CDateTimeDifference
 
 */
 
 
-#ifndef __LIBMCENV_JOURNALHANDLER
-#define __LIBMCENV_JOURNALHANDLER
+#ifndef __LIBMCENV_DATETIMEDIFFERENCE
+#define __LIBMCENV_DATETIMEDIFFERENCE
 
 #include "libmcenv_interfaces.hpp"
 
@@ -45,32 +45,72 @@ Abstract: This is the class declaration of CJournalHandler
 #endif
 
 // Include custom headers here.
-#include "amc_statejournal.hpp"
+
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CJournalHandler 
+ Class declaration of CDateTimeDifference 
 **************************************************************************************************************************/
 
-class CJournalHandler : public virtual IJournalHandler, public virtual CBase {
+class CDateTimeDifference : public virtual IDateTimeDifference, public virtual CBase {
+private:
+
+	/**
+	* Put private members here.
+	*/
+
 protected:
 
-    AMC::PStateJournal m_pStateJournal;
+	/**
+	* Put protected members here.
+	*/
 
 public:
 
-    CJournalHandler(AMC::PStateJournal pStateJournal);
+	/**
+	* Put additional public members here. They will not be visible in the external API.
+	*/
 
-    virtual ~CJournalHandler();
 
-	IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) override;
+	/**
+	* Public member functions to implement.
+	*/
 
-	IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds) override;
+	LibMCEnv_uint64 ToMicroseconds() override;
 
-    IDateTime* GetStartTime() override;
+	LibMCEnv_uint64 ToMilliseconds() override;
+
+	LibMCEnv_uint64 ToSeconds() override;
+
+	LibMCEnv_uint64 ToMinutes() override;
+
+	LibMCEnv_uint64 ToHours() override;
+
+	LibMCEnv_uint64 ToDays() override;
+
+	void RoundDownToDay() override;
+
+	void RoundDownToHour() override;
+
+	void RoundDownToMinute() override;
+
+	void RoundDownToSeconds() override;
+
+	void RoundDownToMilliseconds() override;
+
+	void RoundUpToDay() override;
+
+	void RoundUpToHour() override;
+
+	void RoundUpToMinute() override;
+
+	void RoundUpToSeconds() override;
+
+	void RoundupToMilliseconds() override;
+
 };
 
 } // namespace Impl
@@ -79,4 +119,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_JOURNALHANDLER
+#endif // __LIBMCENV_DATETIMEDIFFERENCE

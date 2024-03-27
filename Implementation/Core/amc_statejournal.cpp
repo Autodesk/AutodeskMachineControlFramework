@@ -330,6 +330,9 @@ namespace AMC {
 		double computeSample(const std::string& sName, const uint64_t nTimeStampInMicroseconds);
 
 		void recordingThread();
+		
+		std::string getStartTimeAsUTC();
+
 	};
 
 
@@ -622,6 +625,10 @@ namespace AMC {
 
 	}
 
+	std::string CStateJournalImpl::getStartTimeAsUTC()
+	{
+		return m_Chrono.getStartTimeISO8601TimeUTC();
+	}
 
 	uint64_t CStateJournalImpl::retrieveTimeStamp_MicroSecond()
 	{
@@ -830,6 +837,11 @@ namespace AMC {
 	void CStateJournal::registerAlias(const std::string& sName, const std::string& sSourceName)
 	{
 		m_pImpl->createAlias(sName, sSourceName);
+	}
+
+	std::string CStateJournal::getStartTimeAsUTC()
+	{
+		return m_pImpl->getStartTimeAsUTC();
 	}
 
 }

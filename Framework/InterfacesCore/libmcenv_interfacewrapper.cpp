@@ -2638,6 +2638,1411 @@ LibMCEnvResult libmcenv_dataseries_increaseversion(LibMCEnv_DataSeries pDataSeri
 
 
 /*************************************************************************************************************************
+ Class implementation for DateTimeDifference
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_datetimedifference_tomicroseconds(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		if (pMicroseconds == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMicroseconds = pIDateTimeDifference->ToMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_tomilliseconds(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pMilliseconds)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		if (pMilliseconds == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMilliseconds = pIDateTimeDifference->ToMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_toseconds(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pSeconds)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		if (pSeconds == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pSeconds = pIDateTimeDifference->ToSeconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_tominutes(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pMinutes)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		if (pMinutes == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMinutes = pIDateTimeDifference->ToMinutes();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_tohours(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pHours)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		if (pHours == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHours = pIDateTimeDifference->ToHours();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_todays(LibMCEnv_DateTimeDifference pDateTimeDifference, LibMCEnv_uint64 * pDays)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		if (pDays == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDays = pIDateTimeDifference->ToDays();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounddowntoday(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundDownToDay();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounddowntohour(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundDownToHour();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounddowntominute(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundDownToMinute();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounddowntoseconds(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundDownToSeconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounddowntomilliseconds(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundDownToMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounduptoday(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundUpToDay();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounduptohour(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundUpToHour();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounduptominute(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundUpToMinute();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounduptoseconds(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundUpToSeconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetimedifference_rounduptomilliseconds(LibMCEnv_DateTimeDifference pDateTimeDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTimeDifference;
+
+	try {
+		IDateTimeDifference* pIDateTimeDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClass);
+		if (!pIDateTimeDifference)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTimeDifference->RoundupToMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for DateTime
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_datetime_tomicrosecondssince1900(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1900)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (pMicrosecondsSince1900 == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMicrosecondsSince1900 = pIDateTime->ToMicrosecondsSince1900();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_tounixtimestamp(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pSecondsSince1970)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (pSecondsSince1970 == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pSecondsSince1970 = pIDateTime->ToUnixTimestamp();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_toutcdatetime(LibMCEnv_DateTime pDateTime, const LibMCEnv_uint32 nUTCDateTimeBufferSize, LibMCEnv_uint32* pUTCDateTimeNeededChars, char * pUTCDateTimeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if ( (!pUTCDateTimeBuffer) && !(pUTCDateTimeNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUTCDateTime("");
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUTCDateTimeBuffer == nullptr);
+		if (isCacheCall) {
+			sUTCDateTime = pIDateTime->ToUTCDateTime();
+
+			pIDateTime->_setCache (new ParameterCache_1<std::string> (sUTCDateTime));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDateTime->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUTCDateTime);
+			pIDateTime->_setCache (nullptr);
+		}
+		
+		if (pUTCDateTimeNeededChars)
+			*pUTCDateTimeNeededChars = (LibMCEnv_uint32) (sUTCDateTime.size()+1);
+		if (pUTCDateTimeBuffer) {
+			if (sUTCDateTime.size() >= nUTCDateTimeBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUTCDateTime = 0; iUTCDateTime < sUTCDateTime.size(); iUTCDateTime++)
+				pUTCDateTimeBuffer[iUTCDateTime] = sUTCDateTime[iUTCDateTime];
+			pUTCDateTimeBuffer[sUTCDateTime.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_toutcdatetimeinmilliseconds(LibMCEnv_DateTime pDateTime, const LibMCEnv_uint32 nUTCDateTimeBufferSize, LibMCEnv_uint32* pUTCDateTimeNeededChars, char * pUTCDateTimeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if ( (!pUTCDateTimeBuffer) && !(pUTCDateTimeNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUTCDateTime("");
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUTCDateTimeBuffer == nullptr);
+		if (isCacheCall) {
+			sUTCDateTime = pIDateTime->ToUTCDateTimeInMilliseconds();
+
+			pIDateTime->_setCache (new ParameterCache_1<std::string> (sUTCDateTime));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDateTime->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUTCDateTime);
+			pIDateTime->_setCache (nullptr);
+		}
+		
+		if (pUTCDateTimeNeededChars)
+			*pUTCDateTimeNeededChars = (LibMCEnv_uint32) (sUTCDateTime.size()+1);
+		if (pUTCDateTimeBuffer) {
+			if (sUTCDateTime.size() >= nUTCDateTimeBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUTCDateTime = 0; iUTCDateTime < sUTCDateTime.size(); iUTCDateTime++)
+				pUTCDateTimeBuffer[iUTCDateTime] = sUTCDateTime[iUTCDateTime];
+			pUTCDateTimeBuffer[sUTCDateTime.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_toutcdatetimeinmicroseconds(LibMCEnv_DateTime pDateTime, const LibMCEnv_uint32 nUTCDateTimeBufferSize, LibMCEnv_uint32* pUTCDateTimeNeededChars, char * pUTCDateTimeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if ( (!pUTCDateTimeBuffer) && !(pUTCDateTimeNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUTCDateTime("");
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUTCDateTimeBuffer == nullptr);
+		if (isCacheCall) {
+			sUTCDateTime = pIDateTime->ToUTCDateTimeInMicroseconds();
+
+			pIDateTime->_setCache (new ParameterCache_1<std::string> (sUTCDateTime));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDateTime->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUTCDateTime);
+			pIDateTime->_setCache (nullptr);
+		}
+		
+		if (pUTCDateTimeNeededChars)
+			*pUTCDateTimeNeededChars = (LibMCEnv_uint32) (sUTCDateTime.size()+1);
+		if (pUTCDateTimeBuffer) {
+			if (sUTCDateTime.size() >= nUTCDateTimeBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUTCDateTime = 0; iUTCDateTime < sUTCDateTime.size(); iUTCDateTime++)
+				pUTCDateTimeBuffer[iUTCDateTime] = sUTCDateTime[iUTCDateTime];
+			pUTCDateTimeBuffer[sUTCDateTime.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_getdate(LibMCEnv_DateTime pDateTime, LibMCEnv_uint32 * pYear, LibMCEnv_uint32 * pMonth, LibMCEnv_uint32 * pDay)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (!pYear)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMonth)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pDay)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->GetDate(*pYear, *pMonth, *pDay);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_gettime(LibMCEnv_DateTime pDateTime, LibMCEnv_uint32 * pHour, LibMCEnv_uint32 * pMinute, LibMCEnv_uint32 * pSecond, LibMCEnv_uint32 * pMicrosecond)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (!pHour)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMinute)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pSecond)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMicrosecond)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->GetTime(*pHour, *pMinute, *pSecond, *pMicrosecond);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_duplicate(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime * pNewInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (pNewInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseNewInstance(nullptr);
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseNewInstance = pIDateTime->Duplicate();
+
+		*pNewInstance = (IBase*)(pBaseNewInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_isleapyear(LibMCEnv_DateTime pDateTime, bool * pIsLeapYear)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (pIsLeapYear == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsLeapYear = pIDateTime->IsLeapYear();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_islaterthan(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, bool * pIsLater)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (pIsLater == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassOtherTimeStamp = (IBase *)pOtherTimeStamp;
+		IDateTime* pIOtherTimeStamp = dynamic_cast<IDateTime*>(pIBaseClassOtherTimeStamp);
+		if (!pIOtherTimeStamp)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsLater = pIDateTime->IsLaterThan(pIOtherTimeStamp);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_isearlierthan(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, bool * pIsEarlier)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (pIsEarlier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassOtherTimeStamp = (IBase *)pOtherTimeStamp;
+		IDateTime* pIOtherTimeStamp = dynamic_cast<IDateTime*>(pIBaseClassOtherTimeStamp);
+		if (!pIOtherTimeStamp)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsEarlier = pIDateTime->IsEarlierThan(pIOtherTimeStamp);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_isequalto(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, bool * pIsEqual)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		if (pIsEqual == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassOtherTimeStamp = (IBase *)pOtherTimeStamp;
+		IDateTime* pIOtherTimeStamp = dynamic_cast<IDateTime*>(pIBaseClassOtherTimeStamp);
+		if (!pIOtherTimeStamp)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsEqual = pIDateTime->IsEqualTo(pIOtherTimeStamp);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_gettimedifference(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference pDifference)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IBase* pIBaseClassOtherTimeStamp = (IBase *)pOtherTimeStamp;
+		IDateTime* pIOtherTimeStamp = dynamic_cast<IDateTime*>(pIBaseClassOtherTimeStamp);
+		if (!pIOtherTimeStamp)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pIBaseClassDifference = (IBase *)pDifference;
+		IDateTimeDifference* pIDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClassDifference);
+		if (!pIDifference)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->GetTimeDifference(pIOtherTimeStamp, pIDifference);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_addduration(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTimeDifference pDuration)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IBase* pIBaseClassDuration = (IBase *)pDuration;
+		IDateTimeDifference* pIDuration = dynamic_cast<IDateTimeDifference*>(pIBaseClassDuration);
+		if (!pIDuration)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->AddDuration(pIDuration);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_subtractduration(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTimeDifference pDuration)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IBase* pIBaseClassDuration = (IBase *)pDuration;
+		IDateTimeDifference* pIDuration = dynamic_cast<IDateTimeDifference*>(pIBaseClassDuration);
+		if (!pIDuration)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->SubtractDuration(pIDuration);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_shiftbyyears(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaYears)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->ShiftByYears(nDeltaYears);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_shiftbydays(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaDays)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->ShiftByDays(nDeltaDays);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_shiftbyhours(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaHours)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->ShiftByHours(nDeltaHours);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_shiftbyminutes(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaMinutes)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->ShiftByMinutes(nDeltaMinutes);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_shiftbyseconds(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaSeconds)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->ShiftBySeconds(nDeltaSeconds);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_shiftbymilliseconds(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaMilliseconds)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->ShiftByMilliseconds(nDeltaMilliseconds);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_shiftbymicroseconds(LibMCEnv_DateTime pDateTime, LibMCEnv_int64 nDeltaMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->ShiftByMicroseconds(nDeltaMicroseconds);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounddowntoyear(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundDownToYear();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounddowntomonth(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundDownToMonth();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounddowntoday(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundDownToDay();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounddowntohour(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundDownToHour();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounddowntominute(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundDownToMinute();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounddowntoseconds(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundDownToSeconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounddowntomilliseconds(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundDownToMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounduptoyear(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundUpToYear();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounduptomonth(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundUpToMonth();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounduptoday(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundUpToDay();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounduptohour(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundUpToHour();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounduptominute(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundUpToMinute();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounduptoseconds(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundUpToSeconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datetime_rounduptomilliseconds(LibMCEnv_DateTime pDateTime)
+{
+	IBase* pIBaseClass = (IBase *)pDateTime;
+
+	try {
+		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
+		if (!pIDateTime)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDateTime->RoundUpToMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for MeshObject
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_meshobject_getname(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
@@ -14863,6 +16268,34 @@ LibMCEnvResult libmcenv_alert_getacknowledgementinformation(LibMCEnv_Alert pAler
 	}
 }
 
+LibMCEnvResult libmcenv_alert_getacknowledgementtime(LibMCEnv_Alert pAlert, LibMCEnv_DateTime * pAckTime)
+{
+	IBase* pIBaseClass = (IBase *)pAlert;
+
+	try {
+		if (pAckTime == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseAckTime(nullptr);
+		IAlert* pIAlert = dynamic_cast<IAlert*>(pIBaseClass);
+		if (!pIAlert)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseAckTime = pIAlert->GetAcknowledgementTime();
+
+		*pAckTime = (IBase*)(pBaseAckTime);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_alert_acknowledgeforuser(LibMCEnv_Alert pAlert, const char * pUserUUID, const char * pUserComment)
 {
 	IBase* pIBaseClass = (IBase *)pAlert;
@@ -15042,121 +16475,21 @@ LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(L
 	}
 }
 
-LibMCEnvResult libmcenv_journalhandler_storejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStamp)
+LibMCEnvResult libmcenv_journalhandler_getstarttime(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance)
 {
 	IBase* pIBaseClass = (IBase *)pJournalHandler;
 
 	try {
-		if (pMarkerType == nullptr)
+		if (pDateTimeInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMarkerName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pTimeStamp == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMarkerType(pMarkerType);
-		std::string sMarkerName(pMarkerName);
+		IBase* pBaseDateTimeInstance(nullptr);
 		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
 		if (!pIJournalHandler)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pTimeStamp = pIJournalHandler->StoreJournalMarker(sMarkerType, sMarkerName, bMustBeUnique);
+		pBaseDateTimeInstance = pIJournalHandler->GetStartTime();
 
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_journalhandler_hasjournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool * pMarkerExists)
-{
-	IBase* pIBaseClass = (IBase *)pJournalHandler;
-
-	try {
-		if (pMarkerType == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMarkerName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMarkerExists == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMarkerType(pMarkerType);
-		std::string sMarkerName(pMarkerName);
-		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
-		if (!pIJournalHandler)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pMarkerExists = pIJournalHandler->HasJournalMarker(sMarkerType, sMarkerName);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_journalhandler_retrievejournalmarker(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, bool bMustBeUnique, LibMCEnv_uint64 * pTimeStampInMicroSeconds)
-{
-	IBase* pIBaseClass = (IBase *)pJournalHandler;
-
-	try {
-		if (pMarkerType == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMarkerName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pTimeStampInMicroSeconds == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMarkerType(pMarkerType);
-		std::string sMarkerName(pMarkerName);
-		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
-		if (!pIJournalHandler)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pTimeStampInMicroSeconds = pIJournalHandler->RetrieveJournalMarker(sMarkerType, sMarkerName, bMustBeUnique);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_journalhandler_retrievejournalmarkers(LibMCEnv_JournalHandler pJournalHandler, const char * pMarkerType, const char * pMarkerName, const LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pJournalHandler;
-
-	try {
-		if (pMarkerType == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMarkerName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ((!pTimeStampsBuffer) && !(pTimeStampsNeededCount))
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMarkerType(pMarkerType);
-		std::string sMarkerName(pMarkerName);
-		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
-		if (!pIJournalHandler)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pIJournalHandler->RetrieveJournalMarkers(sMarkerType, sMarkerName, nTimeStampsBufferSize, pTimeStampsNeededCount, pTimeStampsBuffer);
-
+		*pDateTimeInstance = (IBase*)(pBaseDateTimeInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -21346,6 +22679,110 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_dataseries_getversion;
 	if (sProcName == "libmcenv_dataseries_increaseversion") 
 		*ppProcAddress = (void*) &libmcenv_dataseries_increaseversion;
+	if (sProcName == "libmcenv_datetimedifference_tomicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_tomicroseconds;
+	if (sProcName == "libmcenv_datetimedifference_tomilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_tomilliseconds;
+	if (sProcName == "libmcenv_datetimedifference_toseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_toseconds;
+	if (sProcName == "libmcenv_datetimedifference_tominutes") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_tominutes;
+	if (sProcName == "libmcenv_datetimedifference_tohours") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_tohours;
+	if (sProcName == "libmcenv_datetimedifference_todays") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_todays;
+	if (sProcName == "libmcenv_datetimedifference_rounddowntoday") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounddowntoday;
+	if (sProcName == "libmcenv_datetimedifference_rounddowntohour") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounddowntohour;
+	if (sProcName == "libmcenv_datetimedifference_rounddowntominute") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounddowntominute;
+	if (sProcName == "libmcenv_datetimedifference_rounddowntoseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounddowntoseconds;
+	if (sProcName == "libmcenv_datetimedifference_rounddowntomilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounddowntomilliseconds;
+	if (sProcName == "libmcenv_datetimedifference_rounduptoday") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounduptoday;
+	if (sProcName == "libmcenv_datetimedifference_rounduptohour") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounduptohour;
+	if (sProcName == "libmcenv_datetimedifference_rounduptominute") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounduptominute;
+	if (sProcName == "libmcenv_datetimedifference_rounduptoseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounduptoseconds;
+	if (sProcName == "libmcenv_datetimedifference_rounduptomilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounduptomilliseconds;
+	if (sProcName == "libmcenv_datetime_tomicrosecondssince1900") 
+		*ppProcAddress = (void*) &libmcenv_datetime_tomicrosecondssince1900;
+	if (sProcName == "libmcenv_datetime_tounixtimestamp") 
+		*ppProcAddress = (void*) &libmcenv_datetime_tounixtimestamp;
+	if (sProcName == "libmcenv_datetime_toutcdatetime") 
+		*ppProcAddress = (void*) &libmcenv_datetime_toutcdatetime;
+	if (sProcName == "libmcenv_datetime_toutcdatetimeinmilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_toutcdatetimeinmilliseconds;
+	if (sProcName == "libmcenv_datetime_toutcdatetimeinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_toutcdatetimeinmicroseconds;
+	if (sProcName == "libmcenv_datetime_getdate") 
+		*ppProcAddress = (void*) &libmcenv_datetime_getdate;
+	if (sProcName == "libmcenv_datetime_gettime") 
+		*ppProcAddress = (void*) &libmcenv_datetime_gettime;
+	if (sProcName == "libmcenv_datetime_duplicate") 
+		*ppProcAddress = (void*) &libmcenv_datetime_duplicate;
+	if (sProcName == "libmcenv_datetime_isleapyear") 
+		*ppProcAddress = (void*) &libmcenv_datetime_isleapyear;
+	if (sProcName == "libmcenv_datetime_islaterthan") 
+		*ppProcAddress = (void*) &libmcenv_datetime_islaterthan;
+	if (sProcName == "libmcenv_datetime_isearlierthan") 
+		*ppProcAddress = (void*) &libmcenv_datetime_isearlierthan;
+	if (sProcName == "libmcenv_datetime_isequalto") 
+		*ppProcAddress = (void*) &libmcenv_datetime_isequalto;
+	if (sProcName == "libmcenv_datetime_gettimedifference") 
+		*ppProcAddress = (void*) &libmcenv_datetime_gettimedifference;
+	if (sProcName == "libmcenv_datetime_addduration") 
+		*ppProcAddress = (void*) &libmcenv_datetime_addduration;
+	if (sProcName == "libmcenv_datetime_subtractduration") 
+		*ppProcAddress = (void*) &libmcenv_datetime_subtractduration;
+	if (sProcName == "libmcenv_datetime_shiftbyyears") 
+		*ppProcAddress = (void*) &libmcenv_datetime_shiftbyyears;
+	if (sProcName == "libmcenv_datetime_shiftbydays") 
+		*ppProcAddress = (void*) &libmcenv_datetime_shiftbydays;
+	if (sProcName == "libmcenv_datetime_shiftbyhours") 
+		*ppProcAddress = (void*) &libmcenv_datetime_shiftbyhours;
+	if (sProcName == "libmcenv_datetime_shiftbyminutes") 
+		*ppProcAddress = (void*) &libmcenv_datetime_shiftbyminutes;
+	if (sProcName == "libmcenv_datetime_shiftbyseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_shiftbyseconds;
+	if (sProcName == "libmcenv_datetime_shiftbymilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_shiftbymilliseconds;
+	if (sProcName == "libmcenv_datetime_shiftbymicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_shiftbymicroseconds;
+	if (sProcName == "libmcenv_datetime_rounddowntoyear") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounddowntoyear;
+	if (sProcName == "libmcenv_datetime_rounddowntomonth") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounddowntomonth;
+	if (sProcName == "libmcenv_datetime_rounddowntoday") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounddowntoday;
+	if (sProcName == "libmcenv_datetime_rounddowntohour") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounddowntohour;
+	if (sProcName == "libmcenv_datetime_rounddowntominute") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounddowntominute;
+	if (sProcName == "libmcenv_datetime_rounddowntoseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounddowntoseconds;
+	if (sProcName == "libmcenv_datetime_rounddowntomilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounddowntomilliseconds;
+	if (sProcName == "libmcenv_datetime_rounduptoyear") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounduptoyear;
+	if (sProcName == "libmcenv_datetime_rounduptomonth") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounduptomonth;
+	if (sProcName == "libmcenv_datetime_rounduptoday") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounduptoday;
+	if (sProcName == "libmcenv_datetime_rounduptohour") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounduptohour;
+	if (sProcName == "libmcenv_datetime_rounduptominute") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounduptominute;
+	if (sProcName == "libmcenv_datetime_rounduptoseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounduptoseconds;
+	if (sProcName == "libmcenv_datetime_rounduptomilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_datetime_rounduptomilliseconds;
 	if (sProcName == "libmcenv_meshobject_getname") 
 		*ppProcAddress = (void*) &libmcenv_meshobject_getname;
 	if (sProcName == "libmcenv_meshobject_getuuid") 
@@ -22090,6 +23527,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_alert_hasbeenacknowledged;
 	if (sProcName == "libmcenv_alert_getacknowledgementinformation") 
 		*ppProcAddress = (void*) &libmcenv_alert_getacknowledgementinformation;
+	if (sProcName == "libmcenv_alert_getacknowledgementtime") 
+		*ppProcAddress = (void*) &libmcenv_alert_getacknowledgementtime;
 	if (sProcName == "libmcenv_alert_acknowledgeforuser") 
 		*ppProcAddress = (void*) &libmcenv_alert_acknowledgeforuser;
 	if (sProcName == "libmcenv_alert_acknowledgealertforcurrentuser") 
@@ -22102,14 +23541,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariable;
 	if (sProcName == "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariablefromtimeinterval;
-	if (sProcName == "libmcenv_journalhandler_storejournalmarker") 
-		*ppProcAddress = (void*) &libmcenv_journalhandler_storejournalmarker;
-	if (sProcName == "libmcenv_journalhandler_hasjournalmarker") 
-		*ppProcAddress = (void*) &libmcenv_journalhandler_hasjournalmarker;
-	if (sProcName == "libmcenv_journalhandler_retrievejournalmarker") 
-		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalmarker;
-	if (sProcName == "libmcenv_journalhandler_retrievejournalmarkers") 
-		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalmarkers;
+	if (sProcName == "libmcenv_journalhandler_getstarttime") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_getstarttime;
 	if (sProcName == "libmcenv_userdetaillist_count") 
 		*ppProcAddress = (void*) &libmcenv_userdetaillist_count;
 	if (sProcName == "libmcenv_userdetaillist_getuserproperties") 
