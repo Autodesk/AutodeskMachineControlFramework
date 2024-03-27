@@ -40,12 +40,12 @@ using namespace LibMCEnv::Impl;
  Class definition of CDateTime 
 **************************************************************************************************************************/
 
-CDateTime* makefromUTC(const std::string & sUTCTime)
+CDateTime* CDateTime::makefromUTC(const std::string & sUTCTime)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-PDateTime makeSharedfromUTC(const std::string & sUTCTime)
+PDateTime CDateTime::makeSharedfromUTC(const std::string & sUTCTime)
 {
 	return std::shared_ptr<CDateTime>(makefromUTC(sUTCTime));
 }
