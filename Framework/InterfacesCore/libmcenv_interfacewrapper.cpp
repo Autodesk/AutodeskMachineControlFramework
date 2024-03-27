@@ -16413,7 +16413,7 @@ LibMCEnvResult libmcenv_alertiterator_getcurrentalert(LibMCEnv_AlertIterator pAl
 /*************************************************************************************************************************
  Class implementation for JournalHandler
 **************************************************************************************************************************/
-LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMilliseconds, LibMCEnv_JournalVariable * pJournalVariable)
+LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable)
 {
 	IBase* pIBaseClass = (IBase *)pJournalHandler;
 
@@ -16428,7 +16428,7 @@ LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalH
 		if (!pIJournalHandler)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseJournalVariable = pIJournalHandler->RetrieveJournalVariable(sVariableName, nTimeDeltaInMilliseconds);
+		pBaseJournalVariable = pIJournalHandler->RetrieveJournalVariable(sVariableName, nTimeDeltaInMicroseconds);
 
 		*pJournalVariable = (IBase*)(pBaseJournalVariable);
 		return LIBMCENV_SUCCESS;

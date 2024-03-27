@@ -820,9 +820,8 @@ namespace AMC {
 	}
 
 
-	void CStateJournal::retrieveRecentInterval(uint64_t nLastMilliSeconds, sStateJournalInterval& interval)
+	void CStateJournal::retrieveRecentInterval(uint64_t nLastMicroSeconds, sStateJournalInterval& interval)
 	{
-		uint64_t nLastMicroSeconds = nLastMilliSeconds * 1000;
 
 		interval.m_nEndTimeInMicroSeconds = m_pImpl->retrieveTimeStamp_MicroSecond();
 		if (nLastMicroSeconds < interval.m_nEndTimeInMicroSeconds)

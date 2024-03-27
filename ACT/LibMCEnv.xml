@@ -3008,7 +3008,7 @@
 
 		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
 				
