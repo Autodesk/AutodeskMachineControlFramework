@@ -631,17 +631,19 @@ export default class AMCApplication extends Common.AMCObject {
 
     }
 	
-	streamDownload (downloadticketuuid, downloadfilename) 
+	streamDownload (downloadticketuuid) 
 	{
 				
 	
-		// Start download in Browser
+		/*// Start download in Browser
 		const a = document.createElement('a');
 		a.href = this.getDownloadURL (downloadticketuuid);
 		a.download = downloadfilename;
 		document.body.appendChild(a);    
 		a.click();
-		document.body.removeChild(a);
+		document.body.removeChild(a); */
+			
+		window.open (this.getDownloadURL (downloadticketuuid), "_blank");
 		
 	}
 
@@ -680,7 +682,7 @@ export default class AMCApplication extends Common.AMCObject {
 							this.closeAllDialogs();
 						}
 						if (action.action === "streamdownload") {
-							this.streamDownload(action.downloadticket, action.downloadfilename);
+							this.streamDownload(action.downloadticket);
 						}
 						
 						//this.updateContentItemResult(item.uuid, item);
