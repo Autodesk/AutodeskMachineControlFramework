@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_chrono.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "amc_logger.hpp"
-
+#include "amc_constants.hpp"
 #include <map>
 #include <thread>
 #include <future>
@@ -44,10 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	#define STATEJOURNAL_MAXVARIABLECOUNT  (16 * 1024 * 1024)
 
-	#define STATEJOURNAL_VARIABLE_MINUNITS 1.0E-6
-	#define STATEJOURNAL_VARIABLE_MAXUNITS 1.0E6
 
 	class CStateJournalImplVariable {
 	protected:
