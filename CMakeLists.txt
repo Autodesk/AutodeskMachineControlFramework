@@ -36,7 +36,7 @@ project(LibMC)
 option(INCLUDE_DRIVERS "Include the drivers in the build" ON)
 option(INCLUDE_TESTS "Include the test system in the build" OFF)
 
-if(IGNORE_DRIVERS)
+if(INCLUDE_DRIVERS)
 message(STATUS "Including Drivers in build")
 add_subdirectory(Drivers)
 endif()
