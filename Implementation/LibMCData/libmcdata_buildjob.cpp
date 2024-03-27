@@ -268,7 +268,7 @@ bool CBuildJob::JobCanBeArchived()
 
 }
 
-void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string& sUserID)
+void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID)
 {
     if (pStream == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -292,7 +292,7 @@ CBuildJobData * CBuildJob::makeJobDataEx(AMCData::CSQLStatement* pStatement)
     std::string sJobUUID = pStatement->getColumnString(2);
     std::string sIdentifier = pStatement->getColumnString(3);
     std::string sName = pStatement->getColumnString(4);
-    LibMCData::eBuildJobDataType eDataType = CBuildJobData::convertStringToBuildJobDataType(pStatement->getColumnString(5));
+    LibMCData::eCustomDataType eDataType = CBuildJobData::convertStringToCustomDataType(pStatement->getColumnString(5));
     std::string sTimeStamp = pStatement->getColumnString(6);
     std::string sStorageStreamUUID = pStatement->getColumnUUID(7);
     std::string sUserID = pStatement->getColumnString(8);
@@ -318,14 +318,14 @@ IBuildJobDataIterator* CBuildJob::listJobDataEx(AMCData::CSQLStatement* pStateme
 }
 
 
-IBuildJobDataIterator* CBuildJob::ListJobDataByType(const LibMCData::eBuildJobDataType eDataType)
+IBuildJobDataIterator* CBuildJob::ListJobDataByType(const LibMCData::eCustomDataType eDataType)
 {
 
     std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobdata.timestamp";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString (1, m_sUUID);
     pStatement->setInt(2, 1);
-    pStatement->setString(3, CBuildJobData::convertBuildJobDataTypeToString(eDataType));
+    pStatement->setString(3, CBuildJobData::convertCustomDataTypeToString(eDataType));
 
     return listJobDataEx (pStatement.get());
 }

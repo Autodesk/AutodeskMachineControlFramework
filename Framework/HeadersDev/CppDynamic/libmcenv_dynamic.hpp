@@ -12094,7 +12094,7 @@ public:
 	
 	/**
 	* CDataTable::AddColumn - Adds a column to the data field.
-	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] sIdentifier - Identifier of the column. MUST be unique, alphanumeric and not empty.
 	* @param[in] sDescription - Description of the column.
 	* @param[in] eColumnType - Data type of the column.
 	*/
@@ -12283,7 +12283,7 @@ public:
 	/**
 	* CDataTable::SetDoubleColumnValues - Sets the values of a double column. Will fail if column does not exist or type is not double.
 	* @param[in] sIdentifier - Identifier of the column.
-	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	void CDataTable::SetDoubleColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_double> & ValuesBuffer)
 	{
@@ -12293,7 +12293,7 @@ public:
 	/**
 	* CDataTable::SetInt32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int32.
 	* @param[in] sIdentifier - Identifier of the column.
-	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	void CDataTable::SetInt32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int32> & ValuesBuffer)
 	{
@@ -12303,7 +12303,7 @@ public:
 	/**
 	* CDataTable::SetInt64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int64.
 	* @param[in] sIdentifier - Identifier of the column.
-	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	void CDataTable::SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer)
 	{
@@ -12313,7 +12313,7 @@ public:
 	/**
 	* CDataTable::SetUint32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint32.
 	* @param[in] sIdentifier - Identifier of the column.
-	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	void CDataTable::SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer)
 	{
@@ -12323,7 +12323,7 @@ public:
 	/**
 	* CDataTable::SetUint64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint64.
 	* @param[in] sIdentifier - Identifier of the column.
-	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	void CDataTable::SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer)
 	{

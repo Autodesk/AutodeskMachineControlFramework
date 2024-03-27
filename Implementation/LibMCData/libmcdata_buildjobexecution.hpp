@@ -96,6 +96,12 @@ public:
 
 	LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) override;
 
+	void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
+
+	bool HasMetaDataString(const std::string& sKey) override;
+
+	std::string GetMetaDataString(const std::string& sKey) override;
+
 	static std::string convertBuildJobExecutionStatusToString(const LibMCData::eBuildJobExecutionStatus eStatus);
 	static LibMCData::eBuildJobExecutionStatus convertStringToBuildJobExecutionStatus(const std::string& sValue);
 

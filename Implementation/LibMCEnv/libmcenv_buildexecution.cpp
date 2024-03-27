@@ -250,16 +250,19 @@ std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifie
 
 void CBuildExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	m_pExecution->AddMetaDataString(sKey, sValue);
 }
 
 bool CBuildExecution::HasMetaDataString(const std::string & sKey)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	return m_pExecution->HasMetaDataString(sKey);
 }
 
 std::string CBuildExecution::GetMetaDataString(const std::string & sKey)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	return m_pExecution->GetMetaDataString(sKey);
 }
 

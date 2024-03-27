@@ -195,7 +195,7 @@ std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::str
 	pStorage->StoreNewStream(sDataUUID, pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
-	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eBuildJobDataType::CustomBinaryData, sSystemUserID);
+	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID);
 
 	return sDataUUID;
 
@@ -211,7 +211,7 @@ IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByIdentifier(const std::string&
 	auto pJobDataIterator = pBuildJob->ListJobData();
 	while (pJobDataIterator->MoveNext()) {
 		auto pJobData = pJobDataIterator->GetCurrentJobData();
-		std::string sJobDataIdentifier = pJobData->GetContextIdentifier();
+		std::string sJobDataIdentifier = pJobData->GetIdentifier();
 		if (sJobDataIdentifier == sContextIdentifier)
 			sFoundUUID = pJobData->GetDataUUID();
 	}

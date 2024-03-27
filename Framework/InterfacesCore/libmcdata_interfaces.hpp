@@ -64,8 +64,11 @@ class IAlertSession;
 class IJournalSession;
 class IStorageStream;
 class IStorage;
+class ICustomDataStream;
 class IBuildJobData;
 class IBuildJobDataIterator;
+class IBuildJobExecutionData;
+class IBuildJobExecutionDataIterator;
 class IBuildJobExecution;
 class IBuildJobExecutionIterator;
 class IBuildJob;
@@ -861,76 +864,99 @@ typedef IBaseSharedPtr<IStorage> PIStorage;
 
 
 /*************************************************************************************************************************
- Class interface for BuildJobData 
+ Class interface for CustomDataStream 
 **************************************************************************************************************************/
 
-class IBuildJobData : public virtual IBase {
+class ICustomDataStream : public virtual IBase {
 public:
 	/**
-	* IBuildJobData::GetDataUUID - returns the uuid of a build job data.
+	* ICustomDataStream::GetDataUUID - returns the uuid of the custom data.
 	* @return UUID String
 	*/
 	virtual std::string GetDataUUID() = 0;
 
 	/**
-	* IBuildJobData::GetJobUUID - returns the uuid of the parent build job.
-	* @return UUID String
+	* ICustomDataStream::GetIdentifier - returns the identifier of the custom data.
+	* @return Name String
 	*/
-	virtual std::string GetJobUUID() = 0;
+	virtual std::string GetIdentifier() = 0;
 
 	/**
-	* IBuildJobData::GetName - returns the name of the job data.
+	* ICustomDataStream::GetName - returns the name of the custom data.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
 
 	/**
-	* IBuildJobData::GetContextIdentifier - returns the unique context identifier of the job data.
-	* @return Context Identifier String
-	*/
-	virtual std::string GetContextIdentifier() = 0;
-
-	/**
-	* IBuildJobData::GetTimeStamp - returns the timestamp when the job data was created.
+	* ICustomDataStream::GetTimeStamp - returns the timestamp when the custom data was created.
 	* @return Timestamp in ISO8601 UTC format
 	*/
 	virtual std::string GetTimeStamp() = 0;
 
 	/**
-	* IBuildJobData::GetStorageStream - returns the storage stream of the build.
+	* ICustomDataStream::GetStorageStream - returns the storage stream.
 	* @return Stream Instance.
 	*/
 	virtual IStorageStream * GetStorageStream() = 0;
 
 	/**
-	* IBuildJobData::GetStorageStreamSHA2 - returns the checksum of the storage stream of the build.
+	* ICustomDataStream::GetStorageStreamUUID - returns the UUID of the storage stream.
+	* @return UUID of the storage stream.
+	*/
+	virtual std::string GetStorageStreamUUID() = 0;
+
+	/**
+	* ICustomDataStream::GetStorageStreamSHA2 - returns the checksum of the storage stream.
 	* @return SHA256 of the storage stream.
 	*/
 	virtual std::string GetStorageStreamSHA2() = 0;
 
 	/**
-	* IBuildJobData::GetStorageStreamSize - returns the size of the storage stream of the build.
+	* ICustomDataStream::GetStorageStreamSize - returns the size of the storage stream of the build.
 	* @return size of the storage stream in bytes.
 	*/
 	virtual LibMCData_uint64 GetStorageStreamSize() = 0;
 
 	/**
-	* IBuildJobData::GetDataType - returns the data type of the job data.
-	* @return Data type of the job data
+	* ICustomDataStream::GetUserUUID - returns the UUID of the user who created the stream.
+	* @return UUID of the user who create the stream.
 	*/
-	virtual LibMCData::eBuildJobDataType GetDataType() = 0;
+	virtual std::string GetUserUUID() = 0;
 
 	/**
-	* IBuildJobData::GetDataTypeAsString - returns the data type of the job data as string.
+	* ICustomDataStream::GetDataType - returns the data type of the custom data.
+	* @return Data type of the custom data
+	*/
+	virtual LibMCData::eCustomDataType GetDataType() = 0;
+
+	/**
+	* ICustomDataStream::GetDataTypeAsString - returns the data type of the custom data as string.
 	* @return Data type of the job data
 	*/
 	virtual std::string GetDataTypeAsString() = 0;
 
 	/**
-	* IBuildJobData::GetMIMEType - returns the mime type of a storage stream.
+	* ICustomDataStream::GetMIMEType - returns the mime type of a storage stream.
 	* @return Mime Type String
 	*/
 	virtual std::string GetMIMEType() = 0;
+
+};
+
+typedef IBaseSharedPtr<ICustomDataStream> PICustomDataStream;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobData 
+**************************************************************************************************************************/
+
+class IBuildJobData : public virtual ICustomDataStream {
+public:
+	/**
+	* IBuildJobData::GetJobUUID - returns the uuid of the parent build job.
+	* @return UUID String
+	*/
+	virtual std::string GetJobUUID() = 0;
 
 };
 
@@ -952,6 +978,40 @@ public:
 };
 
 typedef IBaseSharedPtr<IBuildJobDataIterator> PIBuildJobDataIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobExecutionData 
+**************************************************************************************************************************/
+
+class IBuildJobExecutionData : public virtual ICustomDataStream {
+public:
+	/**
+	* IBuildJobExecutionData::GetExecutionUUID - returns the uuid of the parent build job execution.
+	* @return UUID String
+	*/
+	virtual std::string GetExecutionUUID() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecutionData> PIBuildJobExecutionData;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobExecutionDataIterator 
+**************************************************************************************************************************/
+
+class IBuildJobExecutionDataIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildJobExecutionDataIterator::GetCurrentJobExecutionData - Returns the build job execution data the iterator points at.
+	* @return returns the build job execution instance.
+	*/
+	virtual IBuildJobExecutionData * GetCurrentJobExecutionData() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecutionDataIterator> PIBuildJobExecutionDataIterator;
 
 
 /*************************************************************************************************************************
@@ -1026,6 +1086,27 @@ public:
 	* @return Elapsed time in Microseconds.
 	*/
 	virtual LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) = 0;
+
+	/**
+	* IBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuildJobExecution::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildJobExecution::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
 
 };
 
@@ -1137,14 +1218,14 @@ public:
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string & sUserID) = 0;
+	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
 	* @param[in] eDataType - Datatype of Job data.
 	* @return Build Job Data Iterator Instance.
 	*/
-	virtual IBuildJobDataIterator * ListJobDataByType(const LibMCData::eBuildJobDataType eDataType) = 0;
+	virtual IBuildJobDataIterator * ListJobDataByType(const LibMCData::eCustomDataType eDataType) = 0;
 
 	/**
 	* IBuildJob::ListJobData - Retrieves a list of build job data objects.

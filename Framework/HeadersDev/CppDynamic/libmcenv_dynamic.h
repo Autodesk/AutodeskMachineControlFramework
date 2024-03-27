@@ -670,7 +670,7 @@ typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DuplicatePtr) (LibMCEnv_Di
 * Adds a column to the data field.
 *
 * @param[in] pDataTable - DataTable instance.
-* @param[in] pIdentifier - Identifier of the column.
+* @param[in] pIdentifier - Identifier of the column. MUST be unique, alphanumeric and not empty.
 * @param[in] pDescription - Description of the column.
 * @param[in] eColumnType - Data type of the column.
 * @return error code or 0 (success)
@@ -827,7 +827,7 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_GetUint64ColumnValuesPtr) (LibMCEnv_
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - double buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - double buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_SetDoubleColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_double * pValuesBuffer);
@@ -838,7 +838,7 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_SetDoubleColumnValuesPtr) (LibMCEnv_
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - int32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - int32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_SetInt32ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int32 * pValuesBuffer);
@@ -849,7 +849,7 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_SetInt32ColumnValuesPtr) (LibMCEnv_D
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - int64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - int64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_SetInt64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int64 * pValuesBuffer);
@@ -860,7 +860,7 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_SetInt64ColumnValuesPtr) (LibMCEnv_D
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - uint32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - uint32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint32ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint32 * pValuesBuffer);
@@ -871,7 +871,7 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint32ColumnValuesPtr) (LibMCEnv_
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - uint64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - uint64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);

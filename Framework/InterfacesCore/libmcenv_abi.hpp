@@ -683,7 +683,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv
 * Adds a column to the data field.
 *
 * @param[in] pDataTable - DataTable instance.
-* @param[in] pIdentifier - Identifier of the column.
+* @param[in] pIdentifier - Identifier of the column. MUST be unique, alphanumeric and not empty.
 * @param[in] pDescription - Description of the column.
 * @param[in] eColumnType - Data type of the column.
 * @return error code or 0 (success)
@@ -840,7 +840,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_getuint64columnvalues(LibMCE
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - double buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - double buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setdoublecolumnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_double * pValuesBuffer);
@@ -851,7 +851,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setdoublecolumnvalues(LibMCE
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - int32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - int32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setint32columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int32 * pValuesBuffer);
@@ -862,7 +862,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setint32columnvalues(LibMCEn
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - int64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - int64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int64 * pValuesBuffer);
@@ -873,7 +873,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setint64columnvalues(LibMCEn
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - uint32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - uint32 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint32columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint32 * pValuesBuffer);
@@ -884,7 +884,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint32columnvalues(LibMCE
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pIdentifier - Identifier of the column.
 * @param[in] nValuesBufferSize - Number of elements in buffer
-* @param[in] pValuesBuffer - uint64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up.
+* @param[in] pValuesBuffer - uint64 buffer of New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);

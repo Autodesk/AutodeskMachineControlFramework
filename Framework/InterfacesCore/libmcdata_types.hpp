@@ -404,6 +404,10 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL 377 /** Build job execution is from past journal. */
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE 378 /** Build job execution start is in the future. */
 #define LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE 379 /** Build job duration is not available. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY 380 /** Build job execution metadata key is empty. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID 381 /** Build job execution metadata key is invalid. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND 382 /** Build job execution metadata key not found. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE 383 /** Build job execution metadata key is duplicate. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -720,6 +724,10 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL: return "Build job execution is from past journal.";
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE: return "Build job execution start is in the future.";
     case LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE: return "Build job duration is not available.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY: return "Build job execution metadata key is empty.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "Build job execution metadata key is invalid.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "Build job execution metadata key not found.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "Build job execution metadata key is duplicate.";
     default: return "unknown error";
   }
 }
@@ -738,8 +746,11 @@ typedef LibMCDataHandle LibMCData_AlertSession;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
+typedef LibMCDataHandle LibMCData_CustomDataStream;
 typedef LibMCDataHandle LibMCData_BuildJobData;
 typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
+typedef LibMCDataHandle LibMCData_BuildJobExecutionData;
+typedef LibMCDataHandle LibMCData_BuildJobExecutionDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJobExecution;
 typedef LibMCDataHandle LibMCData_BuildJobExecutionIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
@@ -797,7 +808,7 @@ namespace LibMCData {
     Deleted = 400
   };
   
-  enum class eBuildJobDataType : LibMCData_int32 {
+  enum class eCustomDataType : LibMCData_int32 {
     Unknown = 0,
     Toolpath = 1,
     PNGImage = 2,
@@ -877,7 +888,7 @@ typedef LibMCData::eLogLevel eLibMCDataLogLevel;
 typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
-typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
+typedef LibMCData::eCustomDataType eLibMCDataCustomDataType;
 typedef LibMCData::eBuildJobExecutionStatus eLibMCDataBuildJobExecutionStatus;
 typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
 typedef LibMCData::sJournalChunkIntegerEntry sLibMCDataJournalChunkIntegerEntry;

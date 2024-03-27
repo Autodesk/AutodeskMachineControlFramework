@@ -376,7 +376,11 @@
 		<error name="BUILDJOBEXECUTIONENDISBEFORESTART" code="376" description="Build job execution end is before start." />		
 		<error name="BUILDJOBEXECUTIONISFROMPASTJOURNAL" code="377" description="Build job execution is from past journal." />		
 		<error name="BUILDJOBEXECUTIONSTARTISINTHEFUTURE" code="378" description="Build job execution start is in the future." />		
-		<error name="BUILDJOBDURATIONNOTAVAILABLE" code="379" description="Build job duration is not available." />								
+		<error name="BUILDJOBDURATIONNOTAVAILABLE" code="379" description="Build job duration is not available." />										
+		<error name="BUILDJOBEXECUTIONMETADATAKEYEMPTY" code="380" description="Build job execution metadata key is empty." />								
+		<error name="BUILDJOBEXECUTIONMETADATAKEYINVALID" code="381" description="Build job execution metadata key is invalid." />								
+		<error name="BUILDJOBEXECUTIONMETADATAKEYNOTFOUND" code="382" description="Build job execution metadata key not found." />								
+		<error name="BUILDJOBEXECUTIONMETADATAKEYDUPLICATE" code="383" description="Build job execution metadata key is duplicate." />										
 		
 	</errors>
 	
@@ -442,7 +446,7 @@
 		<option name="Deleted" value="400"/>
 	</enum>	
 
-	<enum name="BuildJobDataType">
+	<enum name="CustomDataType">
 		<option name="Unknown" value="0"/>
 		<option name="Toolpath" value="1"/>
 		<option name="PNGImage" value="2"/>
@@ -850,34 +854,34 @@
 	</class>
 
 
-    <!-- The BuildJobData class is not thread safe and MUST ONLY be used in a single thread context... -->
-	<class name="BuildJobData" parent="Base" description="Build Job Data instance">
+    <!-- The CustomDataStream class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="CustomDataStream" parent="Base" description="Base class for an associated custom data stream.">
 
-		<method name="GetDataUUID" description="returns the uuid of a build job data.">
+		<method name="GetDataUUID" description="returns the uuid of the custom data.">
 			<param name="UUID" type="string" pass="return" description="UUID String" />	
 		</method>
 
-		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
-			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		<method name="GetIdentifier" description="returns the identifier of the custom data.">
+			<param name="Identifier" type="string" pass="return" description="Name String" />	
 		</method>
 
-		<method name="GetName" description="returns the name of the job data.">
+		<method name="GetName" description="returns the name of the custom data.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
-		<method name="GetContextIdentifier" description="returns the unique context identifier of the job data.">
-			<param name="ContextIdentifier" type="string" pass="return" description="Context Identifier String" />	
-		</method>
-
-		<method name="GetTimeStamp" description="returns the timestamp when the job data was created.">
+		<method name="GetTimeStamp" description="returns the timestamp when the custom data was created.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
 				
-		<method name="GetStorageStream" description="returns the storage stream of the build.">
+		<method name="GetStorageStream" description="returns the storage stream.">
 			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
 		</method>
 
-		<method name="GetStorageStreamSHA2" description="returns the checksum of the storage stream of the build.">
+		<method name="GetStorageStreamUUID" description="returns the UUID of the storage stream.">
+			<param name="SHA2" type="string" pass="return" description="UUID of the storage stream." />
+		</method>
+
+		<method name="GetStorageStreamSHA2" description="returns the checksum of the storage stream.">
 			<param name="SHA2" type="string" pass="return" description="SHA256 of the storage stream." />
 		</method>
 
@@ -885,11 +889,15 @@
 			<param name="Size" type="uint64" pass="return" description="size of the storage stream in bytes." />
 		</method>
 
-		<method name="GetDataType" description="returns the data type of the job data.">
-			<param name="DataType" type="enum" class="BuildJobDataType" pass="return" description="Data type of the job data" />	
+		<method name="GetUserUUID" description="returns the UUID of the user who created the stream.">
+			<param name="UserUUID" type="string" pass="return" description="UUID of the user who create the stream." />
 		</method>
 
-		<method name="GetDataTypeAsString" description="returns the data type of the job data as string.">
+		<method name="GetDataType" description="returns the data type of the custom data.">
+			<param name="DataType" type="enum" class="CustomDataType" pass="return" description="Data type of the custom data" />	
+		</method>
+
+		<method name="GetDataTypeAsString" description="returns the data type of the custom data as string.">
 			<param name="DataType" type="string" pass="return" description="Data type of the job data" />	
 		</method>
 
@@ -899,10 +907,34 @@
 
 	</class>
 
+
+    <!-- The BuildJobData class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobData" parent="CustomDataStream" description="Build Job Data instance">
+		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+				
+	</class>
+
     <!-- The BuildJobDataIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobDataIterator" parent="Iterator">
 		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
 			<param name="CurrentInstance" type="handle" class="BuildJobData" pass="return" description="returns the build job instance."/>
+		</method>
+	</class>
+
+    <!-- The BuildJobExecutionData class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecutionData" parent="CustomDataStream" description="Build Job Data instance">
+		<method name="GetExecutionUUID" description="returns the uuid of the parent build job execution.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+				
+	</class>
+
+    <!-- The BuildJobDataIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecutionDataIterator" parent="Iterator">
+		<method name="GetCurrentJobExecutionData" description="Returns the build job execution data the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="BuildJobExecutionData" pass="return" description="returns the build job execution instance."/>
 		</method>
 	</class>
 
@@ -954,7 +986,22 @@
 			<param name="GlobalTimerInMicroseconds" type="uint64" pass="in" description="The current session global timer." />
 			<param name="ElapsedTimeInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
 		</method>
+
+		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+	
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
 		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build execution. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+
 	</class>
 
     <!-- The BuildJobExecutionIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
@@ -1019,12 +1066,12 @@
 			<param name="Identifier" type="string" pass="in" description="Unique identifier for the job data." />
 			<param name="Name" type="string" pass="in" description="Name of the job data" />
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
-			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data" />
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job data" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
 		</method>
 
 		<method name="ListJobDataByType" description="Retrieves a list of build job data objects, filtered by type.">
-			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data." />	
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job data." />	
 			<param name="IteratorInstance" type="class" class="BuildJobDataIterator" pass="return" description="Build Job Data Iterator Instance." />
 		</method>
 

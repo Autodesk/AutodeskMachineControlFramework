@@ -827,7 +827,7 @@ class IDataTable : public virtual IBase {
 public:
 	/**
 	* IDataTable::AddColumn - Adds a column to the data field.
-	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] sIdentifier - Identifier of the column. MUST be unique, alphanumeric and not empty.
 	* @param[in] sDescription - Description of the column.
 	* @param[in] eColumnType - Data type of the column.
 	*/
@@ -936,7 +936,7 @@ public:
 	* IDataTable::SetDoubleColumnValues - Sets the values of a double column. Will fail if column does not exist or type is not double.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @param[in] nValuesBufferSize - Number of elements in buffer
-	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	virtual void SetDoubleColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_double * pValuesBuffer) = 0;
 
@@ -944,7 +944,7 @@ public:
 	* IDataTable::SetInt32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int32.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @param[in] nValuesBufferSize - Number of elements in buffer
-	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	virtual void SetInt32ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int32 * pValuesBuffer) = 0;
 
@@ -952,7 +952,7 @@ public:
 	* IDataTable::SetInt64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int64.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @param[in] nValuesBufferSize - Number of elements in buffer
-	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	virtual void SetInt64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int64 * pValuesBuffer) = 0;
 
@@ -960,7 +960,7 @@ public:
 	* IDataTable::SetUint32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint32.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @param[in] nValuesBufferSize - Number of elements in buffer
-	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	virtual void SetUint32ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint32 * pValuesBuffer) = 0;
 
@@ -968,7 +968,7 @@ public:
 	* IDataTable::SetUint64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint64.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @param[in] nValuesBufferSize - Number of elements in buffer
-	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up.
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	virtual void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) = 0;
 
