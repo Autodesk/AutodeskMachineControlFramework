@@ -209,6 +209,8 @@
 		<error name="COLUMNISNOTOFTYPEUINT64" code="10169" description="Column is not of type uint64." />		
 		<error name="COLUMNISNOTOFTYPEINT32" code="10170" description="Column is not of type int32." />		
 		<error name="COLUMNISNOTOFTYPEINT64" code="10171" description="Column is not of type int64" />		
+		<error name="INVALIDCSVSEPARATOR" code="10172" description="Invalid CSV Separator" />		
+
 		
 		
 	</errors>
@@ -658,6 +660,8 @@
 
 	</class>
 
+	<class name="DataTableWriteOptions" parent="Base" description="Configurates the writing of data table streams to disk.">
+	</class>
 
 	<class name="DataTable" parent="Base" description="A in memory data table, streamable for example into a CSV file.">
 	
@@ -753,6 +757,16 @@
 		<method name="SetUint64ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not uint64.">
 			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
 			<param name="Values" type="basicarray" class="uint64" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+		
+		<method name="WriteCSVToStream" description="Writes the data as CSV to a temporary stream.">
+			<param name="Writer" type="class" class="TempStreamWriter" pass="in" description="Stream writer to use." />
+			<param name="Separator" type="string" pass="in" description="Seperator to use between the Cells. MUST be a single character string." />
+		</method>
+		
+		<method name="WriteDataToStream" description="Writes the data as binary to a temporary stream.">
+			<param name="Writer" type="class" class="TempStreamWriter" pass="in" description="Stream writer instance to use." />
+			<param name="Options" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Optional writer options to use." />
 		</method>
 
 	</class>

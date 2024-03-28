@@ -716,3 +716,20 @@ void CDataTable::updateMaxRowCount()
 	}
 }
 
+void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, const std::string& sSeparator)
+{
+	if (pWriter == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	//if (sSeparator.length () != 1)
+//		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCSVSEPARATOR);
+
+}
+
+void CDataTable::WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions)
+{
+	if (pWriter == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+}
+

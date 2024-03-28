@@ -663,6 +663,10 @@ typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_AddFieldPtr) (LibMCEnv_Dis
 typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DuplicatePtr) (LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
+ Class definition for DataTableWriteOptions
+**************************************************************************************************************************/
+
+/*************************************************************************************************************************
  Class definition for DataTable
 **************************************************************************************************************************/
 
@@ -875,6 +879,26 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint32ColumnValuesPtr) (LibMCEnv_
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);
+
+/**
+* Writes the data as CSV to a temporary stream.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pWriter - Stream writer to use.
+* @param[in] pSeparator - Seperator to use between the Cells. MUST be a single character string.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteCSVToStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, const char * pSeparator);
+
+/**
+* Writes the data as binary to a temporary stream.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pWriter - Stream writer instance to use.
+* @param[in] pOptions - Optional writer options to use.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteDataToStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableWriteOptions pOptions);
 
 /*************************************************************************************************************************
  Class definition for DataSeries
@@ -7544,6 +7568,8 @@ typedef struct {
 	PLibMCEnvDataTable_SetInt64ColumnValuesPtr m_DataTable_SetInt64ColumnValues;
 	PLibMCEnvDataTable_SetUint32ColumnValuesPtr m_DataTable_SetUint32ColumnValues;
 	PLibMCEnvDataTable_SetUint64ColumnValuesPtr m_DataTable_SetUint64ColumnValues;
+	PLibMCEnvDataTable_WriteCSVToStreamPtr m_DataTable_WriteCSVToStream;
+	PLibMCEnvDataTable_WriteDataToStreamPtr m_DataTable_WriteDataToStream;
 	PLibMCEnvDataSeries_GetNamePtr m_DataSeries_GetName;
 	PLibMCEnvDataSeries_GetUUIDPtr m_DataSeries_GetUUID;
 	PLibMCEnvDataSeries_ClearPtr m_DataSeries_Clear;

@@ -63,6 +63,7 @@ class IPNGImageData;
 class IImageData;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
+class IDataTableWriteOptions;
 class IDataTable;
 class IDataSeries;
 class IDateTimeDifference;
@@ -822,6 +823,17 @@ typedef IBaseSharedPtr<IDiscreteFieldData2D> PIDiscreteFieldData2D;
 
 
 /*************************************************************************************************************************
+ Class interface for DataTableWriteOptions 
+**************************************************************************************************************************/
+
+class IDataTableWriteOptions : public virtual IBase {
+public:
+};
+
+typedef IBaseSharedPtr<IDataTableWriteOptions> PIDataTableWriteOptions;
+
+
+/*************************************************************************************************************************
  Class interface for DataTable 
 **************************************************************************************************************************/
 
@@ -973,6 +985,20 @@ public:
 	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
 	*/
 	virtual void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
+	* @param[in] pWriter - Stream writer to use.
+	* @param[in] sSeparator - Seperator to use between the Cells. MUST be a single character string.
+	*/
+	virtual void WriteCSVToStream(ITempStreamWriter* pWriter, const std::string & sSeparator) = 0;
+
+	/**
+	* IDataTable::WriteDataToStream - Writes the data as binary to a temporary stream.
+	* @param[in] pWriter - Stream writer instance to use.
+	* @param[in] pOptions - Optional writer options to use.
+	*/
+	virtual void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) = 0;
 
 };
 

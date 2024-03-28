@@ -68,6 +68,7 @@ class CPNGImageData;
 class CImageData;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
+class CDataTableWriteOptions;
 class CDataTable;
 class CDataSeries;
 class CDateTimeDifference;
@@ -122,6 +123,7 @@ typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
+typedef CDataTableWriteOptions CLibMCEnvDataTableWriteOptions;
 typedef CDataTable CLibMCEnvDataTable;
 typedef CDataSeries CLibMCEnvDataSeries;
 typedef CDateTimeDifference CLibMCEnvDateTimeDifference;
@@ -176,6 +178,7 @@ typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
+typedef std::shared_ptr<CDataTableWriteOptions> PDataTableWriteOptions;
 typedef std::shared_ptr<CDataTable> PDataTable;
 typedef std::shared_ptr<CDataSeries> PDataSeries;
 typedef std::shared_ptr<CDateTimeDifference> PDateTimeDifference;
@@ -230,6 +233,7 @@ typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
+typedef PDataTableWriteOptions PLibMCEnvDataTableWriteOptions;
 typedef PDataTable PLibMCEnvDataTable;
 typedef PDataSeries PLibMCEnvDataSeries;
 typedef PDateTimeDifference PLibMCEnvDateTimeDifference;
@@ -519,6 +523,7 @@ public:
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "COLUMNISNOTOFTYPEUINT64";
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "COLUMNISNOTOFTYPEINT32";
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "COLUMNISNOTOFTYPEINT64";
+			case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "INVALIDCSVSEPARATOR";
 		}
 		return "UNKNOWN";
 	}
@@ -697,6 +702,7 @@ public:
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "Column is not of type uint64.";
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "Column is not of type int32.";
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
+			case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
 		}
 		return "unknown error";
 	}
@@ -822,6 +828,7 @@ private:
 	friend class CImageData;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
+	friend class CDataTableWriteOptions;
 	friend class CDataTable;
 	friend class CDataSeries;
 	friend class CDateTimeDifference;
@@ -1106,6 +1113,22 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDataTableWriteOptions 
+**************************************************************************************************************************/
+class CDataTableWriteOptions : public CBase {
+public:
+	
+	/**
+	* CDataTableWriteOptions::CDataTableWriteOptions - Constructor for DataTableWriteOptions class.
+	*/
+	CDataTableWriteOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+};
+	
+/*************************************************************************************************************************
  Class CDataTable 
 **************************************************************************************************************************/
 class CDataTable : public CBase {
@@ -1138,6 +1161,8 @@ public:
 	inline void SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer);
 	inline void SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer);
 	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
+	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, const std::string & sSeparator);
+	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
 };
 	
 /*************************************************************************************************************************
@@ -2531,6 +2556,8 @@ public:
 		pWrapperTable->m_DataTable_SetInt64ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_SetUint32ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_SetUint64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_WriteCSVToStream = nullptr;
+		pWrapperTable->m_DataTable_WriteDataToStream = nullptr;
 		pWrapperTable->m_DataSeries_GetName = nullptr;
 		pWrapperTable->m_DataSeries_GetUUID = nullptr;
 		pWrapperTable->m_DataSeries_Clear = nullptr;
@@ -3862,6 +3889,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_WriteCSVToStream = (PLibMCEnvDataTable_WriteCSVToStreamPtr) GetProcAddress(hLibrary, "libmcenv_datatable_writecsvtostream");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_WriteCSVToStream = (PLibMCEnvDataTable_WriteCSVToStreamPtr) dlsym(hLibrary, "libmcenv_datatable_writecsvtostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_WriteCSVToStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_WriteDataToStream = (PLibMCEnvDataTable_WriteDataToStreamPtr) GetProcAddress(hLibrary, "libmcenv_datatable_writedatatostream");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_WriteDataToStream = (PLibMCEnvDataTable_WriteDataToStreamPtr) dlsym(hLibrary, "libmcenv_datatable_writedatatostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_WriteDataToStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9729,6 +9774,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatable_writecsvtostream", (void**)&(pWrapperTable->m_DataTable_WriteCSVToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteCSVToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_writedatatostream", (void**)&(pWrapperTable->m_DataTable_WriteDataToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteDataToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_dataseries_getname", (void**)&(pWrapperTable->m_DataSeries_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataSeries_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12907,6 +12960,10 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CDataTableWriteOptions
+	 */
+	
+	/**
 	 * Method definitions for class CDataTable
 	 */
 	
@@ -13146,6 +13203,29 @@ public:
 	void CDataTable::SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
+	* @param[in] pWriter - Stream writer to use.
+	* @param[in] sSeparator - Seperator to use between the Cells. MUST be a single character string.
+	*/
+	void CDataTable::WriteCSVToStream(classParam<CTempStreamWriter> pWriter, const std::string & sSeparator)
+	{
+		LibMCEnvHandle hWriter = pWriter.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteCSVToStream(m_pHandle, hWriter, sSeparator.c_str()));
+	}
+	
+	/**
+	* CDataTable::WriteDataToStream - Writes the data as binary to a temporary stream.
+	* @param[in] pWriter - Stream writer instance to use.
+	* @param[in] pOptions - Optional writer options to use.
+	*/
+	void CDataTable::WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions)
+	{
+		LibMCEnvHandle hWriter = pWriter.GetHandle();
+		LibMCEnvHandle hOptions = pOptions.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteDataToStream(m_pHandle, hWriter, hOptions));
 	}
 	
 	/**

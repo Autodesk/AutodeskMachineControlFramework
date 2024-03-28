@@ -1698,6 +1698,10 @@ LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData
 
 
 /*************************************************************************************************************************
+ Class implementation for DataTableWriteOptions
+**************************************************************************************************************************/
+
+/*************************************************************************************************************************
  Class implementation for DataTable
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_datatable_addcolumn(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const char * pDescription, eLibMCEnvDataTableColumnType eColumnType)
@@ -2289,6 +2293,69 @@ LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pData
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIDataTable->SetUint64ColumnValues(sIdentifier, nValuesBufferSize, pValuesBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, const char * pSeparator)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		if (pSeparator == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassWriter = (IBase *)pWriter;
+		ITempStreamWriter* pIWriter = dynamic_cast<ITempStreamWriter*>(pIBaseClassWriter);
+		if (!pIWriter)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		std::string sSeparator(pSeparator);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTable->WriteCSVToStream(pIWriter, sSeparator);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatable_writedatatostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableWriteOptions pOptions)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		IBase* pIBaseClassWriter = (IBase *)pWriter;
+		ITempStreamWriter* pIWriter = dynamic_cast<ITempStreamWriter*>(pIBaseClassWriter);
+		if (!pIWriter)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pIBaseClassOptions = (IBase *)pOptions;
+		IDataTableWriteOptions* pIOptions = dynamic_cast<IDataTableWriteOptions*>(pIBaseClassOptions);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTable->WriteDataToStream(pIWriter, pIOptions);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -22657,6 +22724,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datatable_setuint32columnvalues;
 	if (sProcName == "libmcenv_datatable_setuint64columnvalues") 
 		*ppProcAddress = (void*) &libmcenv_datatable_setuint64columnvalues;
+	if (sProcName == "libmcenv_datatable_writecsvtostream") 
+		*ppProcAddress = (void*) &libmcenv_datatable_writecsvtostream;
+	if (sProcName == "libmcenv_datatable_writedatatostream") 
+		*ppProcAddress = (void*) &libmcenv_datatable_writedatatostream;
 	if (sProcName == "libmcenv_dataseries_getname") 
 		*ppProcAddress = (void*) &libmcenv_dataseries_getname;
 	if (sProcName == "libmcenv_dataseries_getuuid") 

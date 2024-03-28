@@ -676,6 +676,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_addfield(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData2D pDiscreteFieldData2D, LibMCEnv_DiscreteFieldData2D * pNewField);
 
 /*************************************************************************************************************************
+ Class definition for DataTableWriteOptions
+**************************************************************************************************************************/
+
+/*************************************************************************************************************************
  Class definition for DataTable
 **************************************************************************************************************************/
 
@@ -888,6 +892,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint32columnvalues(LibMCE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);
+
+/**
+* Writes the data as CSV to a temporary stream.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pWriter - Stream writer to use.
+* @param[in] pSeparator - Seperator to use between the Cells. MUST be a single character string.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, const char * pSeparator);
+
+/**
+* Writes the data as binary to a temporary stream.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pWriter - Stream writer instance to use.
+* @param[in] pOptions - Optional writer options to use.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_writedatatostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableWriteOptions pOptions);
 
 /*************************************************************************************************************************
  Class definition for DataSeries

@@ -266,6 +266,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64 10169 /** Column is not of type uint64. */
 #define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32 10170 /** Column is not of type int32. */
 #define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64 10171 /** Column is not of type int64 */
+#define LIBMCENV_ERROR_INVALIDCSVSEPARATOR 10172 /** Invalid CSV Separator */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -444,6 +445,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "Column is not of type uint64.";
     case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "Column is not of type int32.";
     case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
+    case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
     default: return "unknown error";
   }
 }
@@ -461,6 +463,7 @@ typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
+typedef LibMCEnvHandle LibMCEnv_DataTableWriteOptions;
 typedef LibMCEnvHandle LibMCEnv_DataTable;
 typedef LibMCEnvHandle LibMCEnv_DataSeries;
 typedef LibMCEnvHandle LibMCEnv_DateTimeDifference;
