@@ -438,7 +438,7 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddM
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
 
 /**
-* Writes a certain RTC channel to a data table as int32 columns.
+* Writes a certain sensor channel to a data table as int32 columns.
 *
 * @param[in] pDataRecording - DataRecording instance.
 * @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
@@ -448,6 +448,20 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddR
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddSensorSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes a certain sensor channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+* @param[in] dOffset - Offset that the raw value is scaled with.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddScaledSensorSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLabOIE_double dScaleFactor, LibMCDriver_ScanLabOIE_double dOffset);
 
 /**
 * Writes a certain RTC channel to a data table as int32 columns.
@@ -983,6 +997,7 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEDataRecording_AddMeasurementTagsToDataTablePtr m_DataRecording_AddMeasurementTagsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr m_DataRecording_AddRTCSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddSensorSignalsToDataTablePtr m_DataRecording_AddSensorSignalsToDataTable;
+	PLibMCDriver_ScanLabOIEDataRecording_AddScaledSensorSignalsToDataTablePtr m_DataRecording_AddScaledSensorSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddAdditionalSignalsToDataTablePtr m_DataRecording_AddAdditionalSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetDeviceNamePtr m_OIEDevice_GetDeviceName;
 	PLibMCDriver_ScanLabOIEOIEDevice_SetHostNamePtr m_OIEDevice_SetHostName;

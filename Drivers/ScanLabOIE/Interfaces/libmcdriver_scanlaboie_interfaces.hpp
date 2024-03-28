@@ -553,13 +553,24 @@ public:
 	virtual void AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
 
 	/**
-	* IDataRecording::AddSensorSignalsToDataTable - Writes a certain RTC channel to a data table as int32 columns.
+	* IDataRecording::AddSensorSignalsToDataTable - Writes a certain sensor channel to a data table as int32 columns.
 	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
 	* @param[in] pDataTable - Data table instance to write to.
 	* @param[in] sColumnIdentifier - Identifier of the Column.
 	* @param[in] sColumnDescription - Description of the Column.
 	*/
 	virtual void AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddScaledSensorSignalsToDataTable - Writes a certain sensor channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+	* @param[in] dOffset - Offset that the raw value is scaled with.
+	*/
+	virtual void AddScaledSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset) = 0;
 
 	/**
 	* IDataRecording::AddAdditionalSignalsToDataTable - Writes a certain RTC channel to a data table as int32 columns.

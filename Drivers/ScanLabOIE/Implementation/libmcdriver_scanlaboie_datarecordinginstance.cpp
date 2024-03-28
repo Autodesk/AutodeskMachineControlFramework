@@ -280,6 +280,21 @@ void CDataRecordingInstance::copySensorSignals(size_t nRecordIndex, int32_t* pSe
 
 }
 
+void CDataRecordingInstance::copyScaledSensorSignals(size_t nRecordIndex, double* pSensorSignalBuffer, size_t nSensorSignalBufferSize, double dScaleFactor, double dOffset)
+{
+    uint32_t nSensorValuesPerRecord = getSensorValuesPerRecord();
+    int32_t* pSensorData = getSensorData(nRecordIndex);
+
+    if (nSensorSignalBufferSize < (size_t)nSensorValuesPerRecord)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    for (uint32_t nIndex = 0; nIndex < nSensorValuesPerRecord; nIndex++)
+        pSensorSignalBuffer[nIndex] = pSensorData[nIndex] * dScaleFactor + dOffset;
+
+
+}
+
+
 void CDataRecordingInstance::copyAdditionalSignals(size_t nRecordIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize)
 {
     uint32_t nAdditionalValuesPerRecord = getAdditionalValuesPerRecord();

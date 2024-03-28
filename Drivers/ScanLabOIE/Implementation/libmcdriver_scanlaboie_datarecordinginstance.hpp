@@ -147,6 +147,8 @@ public:
 
     void copySensorSignals(size_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
     
+    void copyScaledSensorSignals(size_t nRecordIndex, double* pSensorSignalBuffer, size_t nSensorSignalBufferSize, double dScaleFactor, double dOffset);
+
     void copyAdditionalSignals(size_t nRecordIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize);
 
     void copyXCoordinates(double * pCoordinateBuffer, size_t nCoordinateBufferSize);

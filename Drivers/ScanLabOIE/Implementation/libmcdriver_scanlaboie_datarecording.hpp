@@ -107,6 +107,8 @@ public:
 
 	void AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
 
+	void AddScaledSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset) override;
+
 	void AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription) override;
 
 };
