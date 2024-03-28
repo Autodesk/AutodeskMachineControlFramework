@@ -196,6 +196,19 @@
 		<error name="CANNOTCHANGESTATUSOFBUILDEXECUTION" code="10156" description="Can not change status of build execution." />		
 		<error name="BUILDEXECUTIONHASNOATTACHEDUSER" code="10157" description="Build execution has no attached user." />		
 		<error name="UNITSAREOUTOFRANGE" code="10158" description="Units are out of range." />		
+		<error name="COLUMNIDENTIFIEREMPTY" code="10159" description="Column identifier is empty." />		
+		<error name="INVALIDCOLUMNIDENTIFIER" code="10160" description="Invalid column identifier." />		
+		<error name="DUPLICATECOLUMNIDENTIFIER" code="10161" description="Duplicate column identifier." />		
+		<error name="INVALIDCOLUMNDATATYPE" code="10162" description="Invalid column data type." />		
+		<error name="DATATABLEHASTOOMANYCOLUMS" code="10163" description="Data table has too many columns." />		
+		<error name="COLUMNIDENTIFIERNOTFOUND" code="10164" description="Column identifier not found." />		
+		<error name="INVALIDCOLUMNINDEX" code="10165" description="Invalid column index." />		
+		<error name="COLUMNBUFFERISNULL" code="10166" description="Column buffer is null." />				
+		<error name="COLUMNISNOTOFTYPEDOUBLE" code="10167" description="Column is not of type double." />		
+		<error name="COLUMNISNOTOFTYPEUINT32" code="10168" description="Column is not of type uint32." />		
+		<error name="COLUMNISNOTOFTYPEUINT64" code="10169" description="Column is not of type uint64." />		
+		<error name="COLUMNISNOTOFTYPEINT32" code="10170" description="Column is not of type int32." />		
+		<error name="COLUMNISNOTOFTYPEINT64" code="10171" description="Column is not of type int64" />		
 		
 		
 	</errors>

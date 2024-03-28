@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CDataTable
 #endif
 
 // Include custom headers here.
-
+#include <map>
 
 namespace LibMCEnv {
 namespace Impl {
@@ -55,8 +55,44 @@ namespace Impl {
  Class declaration of CDataTable 
 **************************************************************************************************************************/
 
+class CDataTableColumn
+{
+private:
+	
+	std::string m_sIdentifier;
+	std::string m_sDescription;
+
+public:
+
+	CDataTableColumn(const std::string& sIdentifier, const std::string & sDescription);
+
+	virtual ~CDataTableColumn();
+
+	virtual size_t getRowCount() = 0;
+
+	virtual LibMCEnv::eDataTableColumnType getColumnType() = 0;
+
+	std::string getIdentifier();
+
+	std::string getDescription();
+
+	void setDescription(const std::string& sDescription);
+};
+
+typedef std::shared_ptr<CDataTableColumn> PDataTableColumn;
+
+
 class CDataTable : public virtual IDataTable, public virtual CBase {
 private:
+
+	size_t m_nMaxRowCount;
+
+	std::map<std::string, PDataTableColumn> m_ColumnMap;
+	std::vector<PDataTableColumn> m_Columns;
+
+	void updateMaxRowCount ();
+
+	CDataTableColumn* findColumn(const std::string& sIdentifier, bool bMustExist);
 
 public:
 

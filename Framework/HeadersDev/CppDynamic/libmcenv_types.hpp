@@ -253,6 +253,19 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION 10156 /** Can not change status of build execution. */
 #define LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER 10157 /** Build execution has no attached user. */
 #define LIBMCENV_ERROR_UNITSAREOUTOFRANGE 10158 /** Units are out of range. */
+#define LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY 10159 /** Column identifier is empty. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER 10160 /** Invalid column identifier. */
+#define LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER 10161 /** Duplicate column identifier. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE 10162 /** Invalid column data type. */
+#define LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS 10163 /** Data table has too many columns. */
+#define LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND 10164 /** Column identifier not found. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNINDEX 10165 /** Invalid column index. */
+#define LIBMCENV_ERROR_COLUMNBUFFERISNULL 10166 /** Column buffer is null. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE 10167 /** Column is not of type double. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32 10168 /** Column is not of type uint32. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64 10169 /** Column is not of type uint64. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32 10170 /** Column is not of type int32. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64 10171 /** Column is not of type int64 */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -418,6 +431,19 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "Can not change status of build execution.";
     case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "Build execution has no attached user.";
     case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range.";
+    case LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY: return "Column identifier is empty.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER: return "Invalid column identifier.";
+    case LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER: return "Duplicate column identifier.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE: return "Invalid column data type.";
+    case LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS: return "Data table has too many columns.";
+    case LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND: return "Column identifier not found.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNINDEX: return "Invalid column index.";
+    case LIBMCENV_ERROR_COLUMNBUFFERISNULL: return "Column buffer is null.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE: return "Column is not of type double.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32: return "Column is not of type uint32.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "Column is not of type uint64.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "Column is not of type int32.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
     default: return "unknown error";
   }
 }
