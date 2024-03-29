@@ -37,10 +37,39 @@ Abstract: This is a stub class definition of CDataTable
 // Include custom headers here.
 #include "common_utils.hpp"
 #include <vector>
+#include <sstream>
 
 #include "amc_constants.hpp"
 
 using namespace LibMCEnv::Impl;
+
+
+#pragma pack(push)
+#pragma pack(1)
+
+
+struct sLibMCDataTableStreamHeader {
+	uint32_t m_nSignature;
+	uint8_t m_nMajorVersion;
+	uint8_t m_nMinorVersion;
+	uint8_t m_nPatchVersion;
+	uint8_t m_nBuildVersion;
+	uint64_t m_nColumnTableStart;
+	uint32_t m_nColumnCount;
+	uint32_t m_nReserved[8];
+};
+
+
+struct sLibMCDataTableColumnHeader {
+	uint32_t m_nColumnDataType;
+	uint32_t m_nEncodingType;
+	uint64_t m_nEntryCount;
+	uint32_t m_nReserved[8];
+};
+
+
+
+#pragma pack(pop)
 
 
 class CDataTableColumn_Double : public CDataTableColumn 
@@ -106,6 +135,22 @@ public:
 		}
 	}
 
+	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	{
+		if (nRowIndex < m_Rows.size()) {
+			std::string sValue = std::to_string(m_Rows[nRowIndex]);
+			for (auto ch : sValue) {
+				buffer.at(nBufferPosition) = ch;
+				nBufferPosition++;
+
+			}
+
+		} else {
+			buffer.at(nBufferPosition) = '0';
+			nBufferPosition++;
+
+		}
+	}
 
 };
 
@@ -174,6 +219,23 @@ public:
 		}
 	}
 
+	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	{
+		if (nRowIndex < m_Rows.size()) {
+			std::string sValue = std::to_string(m_Rows[nRowIndex]);
+			for (auto ch : sValue) {
+				buffer.at(nBufferPosition) = ch;
+				nBufferPosition++;
+
+			}
+
+		}
+		else {
+			buffer.at(nBufferPosition) = '0';
+			nBufferPosition++;
+
+		}
+	}
 
 };
 
@@ -241,6 +303,23 @@ public:
 		}
 	}
 
+	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	{
+		if (nRowIndex < m_Rows.size()) {
+			std::string sValue = std::to_string(m_Rows[nRowIndex]);
+			for (auto ch : sValue) {
+				buffer.at(nBufferPosition) = ch;
+				nBufferPosition++;
+
+			}
+
+		}
+		else {
+			buffer.at(nBufferPosition) = '0';
+			nBufferPosition++;
+
+		}
+	}
 
 
 };
@@ -309,6 +388,24 @@ public:
 		}
 	}
 
+	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	{
+		if (nRowIndex < m_Rows.size()) {
+			std::string sValue = std::to_string(m_Rows[nRowIndex]);
+			for (auto ch : sValue) {
+				buffer.at(nBufferPosition) = ch;
+				nBufferPosition++;
+
+			}
+
+		}
+		else {
+			buffer.at(nBufferPosition) = '0';
+			nBufferPosition++;
+
+		}
+	}
+
 };
 
 
@@ -371,6 +468,24 @@ public:
 
 			for (size_t nIndex = 0; nIndex < nBufferSize; nIndex++)
 				m_Rows.at(nIndex) = pBuffer[nIndex];
+
+		}
+	}
+
+	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	{
+		if (nRowIndex < m_Rows.size()) {
+			std::string sValue = std::to_string(m_Rows[nRowIndex]);
+			for (auto ch : sValue) {
+				buffer.at(nBufferPosition) = ch;
+				nBufferPosition++;
+
+			}
+
+		}
+		else {
+			buffer.at(nBufferPosition) = '0';
+			nBufferPosition++;
 
 		}
 	}
@@ -495,7 +610,7 @@ CDataTableColumn* CDataTable::findColumn(const std::string& sIdentifier, bool bM
 
 LibMCEnv_uint32 CDataTable::GetRowCount()
 {
-	return m_nMaxRowCount;
+	return (uint32_t) m_nMaxRowCount;
 }
 
 LibMCEnv_uint32 CDataTable::GetColumnCount()
@@ -721,8 +836,70 @@ void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, const std::string&
 	if (pWriter == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	//if (sSeparator.length () != 1)
-//		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCSVSEPARATOR);
+	if (sSeparator.length () != 1)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCSVSEPARATOR);
+
+	char cSeparator = sSeparator.at(0);
+	char cNewLine = 13;
+
+	std::stringstream sHeader;
+	auto iIter = m_Columns.begin();
+	while (iIter != m_Columns.end()) {
+		sHeader << (*iIter)->getDescription ();
+		iIter++;
+
+		if (iIter != m_Columns.end())
+			sHeader << sSeparator;
+	}
+
+	pWriter->WriteLine(sHeader.str ());
+
+	size_t nRowCount = m_nMaxRowCount;
+	size_t nMaxBytesPerEntry = 32;
+	size_t nChunkSize = 4;
+	size_t nBufferSize = nChunkSize * nMaxBytesPerEntry * (m_Columns.size() + 1);
+	std::vector<char> buffer (nBufferSize);
+
+	size_t nChunkCount = (nRowCount + nChunkSize - 1) / nChunkSize;
+
+	for (size_t nChunkIndex = 0; nChunkIndex < nChunkCount; nChunkIndex++) {
+
+		size_t nChunkPosition = 0;
+
+		for (size_t nRowIndexInChunk = 0; nRowIndexInChunk < nChunkSize; nRowIndexInChunk++) {
+			size_t nRowIndex = nChunkIndex * nChunkSize + nRowIndexInChunk;
+			if (nRowIndex >= m_nMaxRowCount)
+				break;
+
+			auto iIter = m_Columns.begin();
+			while (iIter != m_Columns.end()) {
+
+				(*iIter)->writeValue(nRowIndex, buffer, nChunkPosition);
+
+				if (nChunkPosition + 1 >= nBufferSize)
+					throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW);
+
+				iIter++;
+
+				if (iIter != m_Columns.end()) {
+					buffer.at(nChunkPosition) = cSeparator;
+					nChunkPosition++;
+				}
+
+			}
+
+			if (nChunkPosition + 1 >= nBufferSize)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW);
+
+			buffer.at(nChunkPosition) = cNewLine;
+			nChunkPosition++;
+
+		}
+
+		pWriter->WriteData(nChunkPosition, (uint8_t*)buffer.data());
+	}
+
+
 
 }
 
@@ -730,6 +907,7 @@ void CDataTable::WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOp
 {
 	if (pWriter == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
 
 }
 

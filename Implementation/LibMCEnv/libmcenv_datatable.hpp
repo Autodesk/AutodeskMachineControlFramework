@@ -77,6 +77,8 @@ public:
 	std::string getDescription();
 
 	void setDescription(const std::string& sDescription);
+
+	virtual void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) = 0;
 };
 
 typedef std::shared_ptr<CDataTableColumn> PDataTableColumn;

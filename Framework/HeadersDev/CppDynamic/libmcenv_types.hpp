@@ -267,6 +267,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32 10170 /** Column is not of type int32. */
 #define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64 10171 /** Column is not of type int64 */
 #define LIBMCENV_ERROR_INVALIDCSVSEPARATOR 10172 /** Invalid CSV Separator */
+#define LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW 10173 /** Data Table CSV buffer overflow */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -446,6 +447,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "Column is not of type int32.";
     case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
     case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
+    case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "Data Table CSV buffer overflow";
     default: return "unknown error";
   }
 }
