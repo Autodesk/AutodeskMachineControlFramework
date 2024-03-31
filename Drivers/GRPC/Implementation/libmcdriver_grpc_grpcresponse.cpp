@@ -27,57 +27,47 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CGRPCConnection
+Abstract: This is a stub class definition of CGRPCResponse
 
 */
 
-
-#ifndef __LIBMCDRIVER_GRPC_GRPCCONNECTION
-#define __LIBMCDRIVER_GRPC_GRPCCONNECTION
-
-#include "libmcdriver_grpc_interfaces.hpp"
-
-// Parent classes
-#include "libmcdriver_grpc_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcdriver_grpc_grpcresponse.hpp"
+#include "libmcdriver_grpc_interfaceexception.hpp"
 
 // Include custom headers here.
-#include "libgrpcwrapper_dynamic.hpp"
 
-namespace LibMCDriver_GRPC {
-namespace Impl {
 
+using namespace LibMCDriver_GRPC::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CGRPCConnection 
+ Class definition of CGRPCResponse 
 **************************************************************************************************************************/
 
-class CGRPCConnection : public virtual IGRPCConnection, public virtual CBase {
-private:
-    LibGRPCWrapper::PConnection m_pConnection;
-    LibGRPCWrapper::PWrapper m_pWrapper;
+CGRPCResponse::CGRPCResponse(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PResponse pResponse)
+    : CGRPCMessage (pWrapper, pResponse)
+{
 
-public:
+}
 
-    CGRPCConnection(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PConnection pConnection);
+CGRPCResponse::~CGRPCResponse()
+{
 
-    virtual ~CGRPCConnection();
+}
 
-	std::string GetEndPoint() override;
+std::string CGRPCResponse::GetResponseType()
+{
+    auto pResponse = getResponse();
+    return pResponse->GetResponseType();
+}
 
-	void Close() override;
+LibGRPCWrapper::CResponse* CGRPCResponse::getResponse()
+{
+    auto pResponse = dynamic_cast<LibGRPCWrapper::CResponse*> (getMessage().get ());
+    if (pResponse == nullptr)
+        throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCRESPONSE);
 
-	IGRPCRequest* CreateStaticRequest(const std::string& sRequestTypeIdentifier, const std::string& sResponseTypeIdentifier) override;
+    return pResponse;
 
-};
+}
 
-} // namespace Impl
-} // namespace LibMCDriver_GRPC
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_GRPC_GRPCCONNECTION

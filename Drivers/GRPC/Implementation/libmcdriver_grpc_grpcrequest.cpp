@@ -27,57 +27,54 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CGRPCConnection
+Abstract: This is a stub class definition of CGRPCRequest
 
 */
 
-
-#ifndef __LIBMCDRIVER_GRPC_GRPCCONNECTION
-#define __LIBMCDRIVER_GRPC_GRPCCONNECTION
-
-#include "libmcdriver_grpc_interfaces.hpp"
-
-// Parent classes
-#include "libmcdriver_grpc_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcdriver_grpc_grpcrequest.hpp"
+#include "libmcdriver_grpc_interfaceexception.hpp"
 
 // Include custom headers here.
-#include "libgrpcwrapper_dynamic.hpp"
 
-namespace LibMCDriver_GRPC {
-namespace Impl {
 
+using namespace LibMCDriver_GRPC::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CGRPCConnection 
+ Class definition of CGRPCRequest 
 **************************************************************************************************************************/
+CGRPCRequest::CGRPCRequest(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PRequest pRequest)
+    : CGRPCMessage(pWrapper, pRequest)
+{
 
-class CGRPCConnection : public virtual IGRPCConnection, public virtual CBase {
-private:
-    LibGRPCWrapper::PConnection m_pConnection;
-    LibGRPCWrapper::PWrapper m_pWrapper;
+}
 
-public:
+CGRPCRequest::~CGRPCRequest()
+{
 
-    CGRPCConnection(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PConnection pConnection);
+}
 
-    virtual ~CGRPCConnection();
+LibGRPCWrapper::CRequest* CGRPCRequest::getRequest()
+{
+    auto pRequest = dynamic_cast<LibGRPCWrapper::CRequest*> (getMessage().get());
+    if (pRequest == nullptr)
+        throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCREQUEST);
 
-	std::string GetEndPoint() override;
+    return pRequest;
 
-	void Close() override;
+}
 
-	IGRPCRequest* CreateStaticRequest(const std::string& sRequestTypeIdentifier, const std::string& sResponseTypeIdentifier) override;
+std::string CGRPCRequest::GetRequestType()
+{
+	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
+}
 
-};
+std::string CGRPCRequest::GetExpectedResponseType()
+{
+	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
+}
 
-} // namespace Impl
-} // namespace LibMCDriver_GRPC
+IGRPCResponse * CGRPCRequest::SendBlocking(const std::string & sServiceMethod, const LibMCDriver_GRPC_uint32 nTimeOutInMS)
+{
+	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
+}
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_GRPC_GRPCCONNECTION

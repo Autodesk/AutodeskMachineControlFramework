@@ -27,50 +27,50 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CGRPCConnection
+Abstract: This is the class declaration of CGRPCRequest
 
 */
 
 
-#ifndef __LIBMCDRIVER_GRPC_GRPCCONNECTION
-#define __LIBMCDRIVER_GRPC_GRPCCONNECTION
+#ifndef __LIBMCDRIVER_GRPC_GRPCREQUEST
+#define __LIBMCDRIVER_GRPC_GRPCREQUEST
 
 #include "libmcdriver_grpc_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriver_grpc_base.hpp"
+#include "libmcdriver_grpc_grpcmessage.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "libgrpcwrapper_dynamic.hpp"
+
 
 namespace LibMCDriver_GRPC {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CGRPCConnection 
+ Class declaration of CGRPCRequest 
 **************************************************************************************************************************/
 
-class CGRPCConnection : public virtual IGRPCConnection, public virtual CBase {
+class CGRPCRequest : public virtual IGRPCRequest, public virtual CGRPCMessage {
 private:
-    LibGRPCWrapper::PConnection m_pConnection;
-    LibGRPCWrapper::PWrapper m_pWrapper;
 
 public:
 
-    CGRPCConnection(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PConnection pConnection);
+    CGRPCRequest(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PRequest pRequest);
 
-    virtual ~CGRPCConnection();
+    virtual ~CGRPCRequest();
 
-	std::string GetEndPoint() override;
+    LibGRPCWrapper::CRequest* getRequest();
 
-	void Close() override;
+	std::string GetRequestType() override;
 
-	IGRPCRequest* CreateStaticRequest(const std::string& sRequestTypeIdentifier, const std::string& sResponseTypeIdentifier) override;
+	std::string GetExpectedResponseType() override;
+
+	IGRPCResponse * SendBlocking(const std::string & sServiceMethod, const LibMCDriver_GRPC_uint32 nTimeOutInMS) override;
 
 };
 
@@ -80,4 +80,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_GRPC_GRPCCONNECTION
+#endif // __LIBMCDRIVER_GRPC_GRPCREQUEST

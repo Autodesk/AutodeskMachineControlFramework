@@ -53,8 +53,15 @@
 		<error name="DRIVERNOTCONNECTED" code="1011" description="the driver is not connected" />
 		<error name="COULDNOTLOADGRPCWRAPPER" code="1012" description="Could not load grpc wrapper" />
 		<error name="DRIVERTYPENOTSUPPORTED" code="1013" description="the driver type is not supported" />
+		<error name="EMPTYCONNECTIONIDENTIFIER" code="1014" description="Empty connection identifier" />
+		<error name="INVALIDCONNECTIONIDENTIFIER" code="1015" description="Invalid connection identifier" />
+		<error name="GRPCWRAPPERNOTLOADED" code="1016" description="GRPC Wrapper not loaded" />
+		<error name="COULDNOTFINDCONNECTIONIDENTIFIER" code="1017" description="Could not find connection identifier" />
+		<error name="DUPLICATECONNECTIONIDENTIFIER" code="1018" description="Duplicate connection identifier" />
+		<error name="COULDNOTCASTTOGRPCREQUEST" code="1019" description="Could not cast to GRPC Request" />
+		<error name="COULDNOTCASTTOGRPCRESPONSE" code="1020" description="Could not cast to GRPC Response" />
 		
-
+		
 	</errors>
 
 	
@@ -111,7 +118,140 @@ Custom implementation
 
 -->
 
+	<class name="GRPCMessage" parent="Base">
+
+		<method name="HasField" description="Returns if the message has a field of a certain name.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="FieldExists" type="bool" pass="return" description="True if field exists." />
+		</method>
+
+		<method name="HasStringField" description="Returns if the message has a field of a certain name and this field is a string field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="StringFieldExists" type="bool" pass="return" description="True if field exists and is of type string." />
+		</method>
+
+		<method name="SetStringField" description="Sets a string field of the message. Fails if the field does not exist or is not a string field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="string" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetStringField" description="Gets a string field of the message. Fails if the field does not exist or is not a string field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="string" pass="return" description="Current value of the field." />
+		</method>
+
+		<method name="SetInt32Field" description="Sets a int32 field of the message. Fails if the field does not exist or is not a int32 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="int32" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetInt32Field" description="Gets a int32 field of the message. Fails if the field does not exist or is not a int32 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="int32" pass="return" description="Current value of the field." />
+		</method>
+
+		<method name="SetUInt32Field" description="Sets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="uint32" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetUInt32Field" description="Gets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="uint32" pass="return" description="Current value of the field." />
+		</method>
+		
+		<method name="SetInt64Field" description="Sets a int64 field of the message. Fails if the field does not exist or is not a int64 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="int64" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetInt64Field" description="Gets a int64 field of the message. Fails if the field does not exist or is not a int64 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="int64" pass="return" description="Current value of the field." />
+		</method>
+
+		<method name="SetUInt64Field" description="Sets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="uint64" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetUInt64Field" description="Gets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="uint64" pass="return" description="Current value of the field." />
+		</method>
+
+		<method name="SetBoolField" description="Sets a bool field of the message. Fails if the field does not exist or is not a bool field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="bool" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetBoolField" description="Gets a bool field of the message. Fails if the field does not exist or is not a bool field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="bool" pass="return" description="Current value of the field." />
+		</method>
+		
+		<method name="SetFloatField" description="Sets a float field of the message. Fails if the field does not exist or is not a float field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="single" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetFloatField" description="Gets a float field of the message. Fails if the field does not exist or is not a float field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="single" pass="return" description="Current value of the field." />
+		</method>
+
+		<method name="SetDoubleField" description="Sets a double field of the message. Fails if the field does not exist or is not a double field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="double" pass="in" description="New value of the field." />
+		</method>
+
+		<method name="GetDoubleField" description="Gets a double field of the message. Fails if the field does not exist or is not a double field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="Value" type="double" pass="return" description="Current value of the field." />
+		</method>
+
+	</class>	
+
+	<class name="GRPCResponse" parent="GRPCMessage">
+
+		<method name="GetResponseType" description="Returns the response type of the connection.">
+			<param name="ResponseType" type="string" pass="return" description="Message type identifier." />
+		</method>
+
+	</class>	
+
+	<class name="GRPCRequest" parent="GRPCMessage">
+		<method name="GetRequestType" description="Returns the request type of the connection.">
+			<param name="RequestType" type="string" pass="return" description="Message type identifier." />
+		</method>
+		
+		<method name="GetExpectedResponseType" description="Returns the expected response type of the connection.">
+			<param name="ExpectedResponseType" type="string" pass="return" description="Message type identifier." />
+		</method>
+		
+		
+		<method name="SendBlocking" description="Sends the request to the end point and waits for a response.">
+			<param name="ServiceMethod" type="string" pass="in" description="Service method to call." />
+			<param name="TimeOutInMS" type="uint32" pass="in" description="Timeout for the response in MS." />
+			<param name="ResponseInstance" type="class" class="GRPCResponse" pass="return" description="Response Instance" />			
+		</method>
+		
+	</class>	
+
 	<class name="GRPCConnection" description="A Connection instance of a GRPC communication end point.">
+	
+		<method name="GetEndPoint" description="Returns the end point of the connection.">
+			<param name="EndPoint" type="string" pass="return" description="End point of the connection." />
+		</method>
+
+		<method name="Close" description="Closes the connection. All subsequent calls to the connection will fail.">
+		</method>
+
+		<method name="CreateStaticRequest" description="Creates a message request to the end point.">		
+			<param name="RequestTypeIdentifier" type="string" pass="in" description="Message Type Identifier of the request." />
+			<param name="ResponseTypeIdentifier" type="string" pass="in" description="Message Type Identifier of the expected response." />
+			<param name="RequestInstance" type="class" class="GRPCRequest" pass="return" description="Request Instance" />			
+		</method>
 	
 	</class>
 
@@ -133,6 +273,9 @@ Custom implementation
 		</method>
 
 		<method name="FindConnection" description= "Finds a connection with a certain name.">
+			<param name="Identifier" type="string" pass="in" description="Connection Identifier." />
+			<param name="MustExist" type="bool" pass="in" description="Connection Identifier. If true, the call fails if the connection does not exist." />
+			<param name="ConnectionInstance" type="optionalclass" class="GRPCConnection" pass="return" description="Connection instance in case of success. Null if the connection is not found." />
 		</method>
 
 

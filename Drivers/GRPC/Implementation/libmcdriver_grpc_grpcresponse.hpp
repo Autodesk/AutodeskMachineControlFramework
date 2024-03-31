@@ -27,50 +27,42 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CGRPCConnection
+Abstract: This is the class declaration of CGRPCResponse
 
 */
 
 
-#ifndef __LIBMCDRIVER_GRPC_GRPCCONNECTION
-#define __LIBMCDRIVER_GRPC_GRPCCONNECTION
+#ifndef __LIBMCDRIVER_GRPC_GRPCRESPONSE
+#define __LIBMCDRIVER_GRPC_GRPCRESPONSE
 
 #include "libmcdriver_grpc_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriver_grpc_base.hpp"
+#include "libmcdriver_grpc_grpcmessage.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
-
-// Include custom headers here.
-#include "libgrpcwrapper_dynamic.hpp"
 
 namespace LibMCDriver_GRPC {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CGRPCConnection 
+ Class declaration of CGRPCResponse 
 **************************************************************************************************************************/
 
-class CGRPCConnection : public virtual IGRPCConnection, public virtual CBase {
-private:
-    LibGRPCWrapper::PConnection m_pConnection;
-    LibGRPCWrapper::PWrapper m_pWrapper;
-
+class CGRPCResponse : public virtual IGRPCResponse, public virtual CGRPCMessage {
 public:
 
-    CGRPCConnection(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PConnection pConnection);
+    CGRPCResponse(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PResponse pResponse);
 
-    virtual ~CGRPCConnection();
+    virtual ~CGRPCResponse();
 
-	std::string GetEndPoint() override;
+	std::string GetResponseType() override;
 
-	void Close() override;
+    LibGRPCWrapper::CResponse* getResponse();
 
-	IGRPCRequest* CreateStaticRequest(const std::string& sRequestTypeIdentifier, const std::string& sResponseTypeIdentifier) override;
 
 };
 
@@ -80,4 +72,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_GRPC_GRPCCONNECTION
+#endif // __LIBMCDRIVER_GRPC_GRPCRESPONSE

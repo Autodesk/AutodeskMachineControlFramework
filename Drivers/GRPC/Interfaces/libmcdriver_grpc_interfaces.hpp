@@ -57,6 +57,9 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IGRPCMessage;
+class IGRPCResponse;
+class IGRPCRequest;
 class IGRPCConnection;
 class IDriver_GRPC;
 
@@ -310,11 +313,215 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for GRPCMessage 
+**************************************************************************************************************************/
+
+class IGRPCMessage : public virtual IBase {
+public:
+	/**
+	* IGRPCMessage::HasField - Returns if the message has a field of a certain name.
+	* @param[in] sFieldName - Name of the field.
+	* @return True if field exists.
+	*/
+	virtual bool HasField(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::HasStringField - Returns if the message has a field of a certain name and this field is a string field.
+	* @param[in] sFieldName - Name of the field.
+	* @return True if field exists and is of type string.
+	*/
+	virtual bool HasStringField(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetStringField - Sets a string field of the message. Fails if the field does not exist or is not a string field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] sValue - New value of the field.
+	*/
+	virtual void SetStringField(const std::string & sFieldName, const std::string & sValue) = 0;
+
+	/**
+	* IGRPCMessage::GetStringField - Gets a string field of the message. Fails if the field does not exist or is not a string field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual std::string GetStringField(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetInt32Field - Sets a int32 field of the message. Fails if the field does not exist or is not a int32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	virtual void SetInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_int32 nValue) = 0;
+
+	/**
+	* IGRPCMessage::GetInt32Field - Gets a int32 field of the message. Fails if the field does not exist or is not a int32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual LibMCDriver_GRPC_int32 GetInt32Field(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetUInt32Field - Sets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	virtual void SetUInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint32 nValue) = 0;
+
+	/**
+	* IGRPCMessage::GetUInt32Field - Gets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual LibMCDriver_GRPC_uint32 GetUInt32Field(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetInt64Field - Sets a int64 field of the message. Fails if the field does not exist or is not a int64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	virtual void SetInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_int64 nValue) = 0;
+
+	/**
+	* IGRPCMessage::GetInt64Field - Gets a int64 field of the message. Fails if the field does not exist or is not a int64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual LibMCDriver_GRPC_int64 GetInt64Field(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetUInt64Field - Sets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	virtual void SetUInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint64 nValue) = 0;
+
+	/**
+	* IGRPCMessage::GetUInt64Field - Gets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual LibMCDriver_GRPC_uint64 GetUInt64Field(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetBoolField - Sets a bool field of the message. Fails if the field does not exist or is not a bool field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] bValue - New value of the field.
+	*/
+	virtual void SetBoolField(const std::string & sFieldName, const bool bValue) = 0;
+
+	/**
+	* IGRPCMessage::GetBoolField - Gets a bool field of the message. Fails if the field does not exist or is not a bool field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual bool GetBoolField(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetFloatField - Sets a float field of the message. Fails if the field does not exist or is not a float field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] fValue - New value of the field.
+	*/
+	virtual void SetFloatField(const std::string & sFieldName, const LibMCDriver_GRPC_single fValue) = 0;
+
+	/**
+	* IGRPCMessage::GetFloatField - Gets a float field of the message. Fails if the field does not exist or is not a float field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual LibMCDriver_GRPC_single GetFloatField(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::SetDoubleField - Sets a double field of the message. Fails if the field does not exist or is not a double field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] dValue - New value of the field.
+	*/
+	virtual void SetDoubleField(const std::string & sFieldName, const LibMCDriver_GRPC_double dValue) = 0;
+
+	/**
+	* IGRPCMessage::GetDoubleField - Gets a double field of the message. Fails if the field does not exist or is not a double field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	virtual LibMCDriver_GRPC_double GetDoubleField(const std::string & sFieldName) = 0;
+
+};
+
+typedef IBaseSharedPtr<IGRPCMessage> PIGRPCMessage;
+
+
+/*************************************************************************************************************************
+ Class interface for GRPCResponse 
+**************************************************************************************************************************/
+
+class IGRPCResponse : public virtual IGRPCMessage {
+public:
+	/**
+	* IGRPCResponse::GetResponseType - Returns the response type of the connection.
+	* @return Message type identifier.
+	*/
+	virtual std::string GetResponseType() = 0;
+
+};
+
+typedef IBaseSharedPtr<IGRPCResponse> PIGRPCResponse;
+
+
+/*************************************************************************************************************************
+ Class interface for GRPCRequest 
+**************************************************************************************************************************/
+
+class IGRPCRequest : public virtual IGRPCMessage {
+public:
+	/**
+	* IGRPCRequest::GetRequestType - Returns the request type of the connection.
+	* @return Message type identifier.
+	*/
+	virtual std::string GetRequestType() = 0;
+
+	/**
+	* IGRPCRequest::GetExpectedResponseType - Returns the expected response type of the connection.
+	* @return Message type identifier.
+	*/
+	virtual std::string GetExpectedResponseType() = 0;
+
+	/**
+	* IGRPCRequest::SendBlocking - Sends the request to the end point and waits for a response.
+	* @param[in] sServiceMethod - Service method to call.
+	* @param[in] nTimeOutInMS - Timeout for the response in MS.
+	* @return Response Instance
+	*/
+	virtual IGRPCResponse * SendBlocking(const std::string & sServiceMethod, const LibMCDriver_GRPC_uint32 nTimeOutInMS) = 0;
+
+};
+
+typedef IBaseSharedPtr<IGRPCRequest> PIGRPCRequest;
+
+
+/*************************************************************************************************************************
  Class interface for GRPCConnection 
 **************************************************************************************************************************/
 
 class IGRPCConnection : public virtual IBase {
 public:
+	/**
+	* IGRPCConnection::GetEndPoint - Returns the end point of the connection.
+	* @return End point of the connection.
+	*/
+	virtual std::string GetEndPoint() = 0;
+
+	/**
+	* IGRPCConnection::Close - Closes the connection. All subsequent calls to the connection will fail.
+	*/
+	virtual void Close() = 0;
+
+	/**
+	* IGRPCConnection::CreateStaticRequest - Creates a message request to the end point.
+	* @param[in] sRequestTypeIdentifier - Message Type Identifier of the request.
+	* @param[in] sResponseTypeIdentifier - Message Type Identifier of the expected response.
+	* @return Request Instance
+	*/
+	virtual IGRPCRequest * CreateStaticRequest(const std::string & sRequestTypeIdentifier, const std::string & sResponseTypeIdentifier) = 0;
+
 };
 
 typedef IBaseSharedPtr<IGRPCConnection> PIGRPCConnection;
@@ -348,8 +555,11 @@ public:
 
 	/**
 	* IDriver_GRPC::FindConnection - Finds a connection with a certain name.
+	* @param[in] sIdentifier - Connection Identifier.
+	* @param[in] bMustExist - Connection Identifier. If true, the call fails if the connection does not exist.
+	* @return Connection instance in case of success. Null if the connection is not found.
 	*/
-	virtual void FindConnection() = 0;
+	virtual IGRPCConnection * FindConnection(const std::string & sIdentifier, const bool bMustExist) = 0;
 
 };
 

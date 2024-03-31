@@ -109,6 +109,13 @@ typedef void * LibMCDriver_GRPC_pvoid;
 #define LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED 1011 /** the driver is not connected */
 #define LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER 1012 /** Could not load grpc wrapper */
 #define LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED 1013 /** the driver type is not supported */
+#define LIBMCDRIVER_GRPC_ERROR_EMPTYCONNECTIONIDENTIFIER 1014 /** Empty connection identifier */
+#define LIBMCDRIVER_GRPC_ERROR_INVALIDCONNECTIONIDENTIFIER 1015 /** Invalid connection identifier */
+#define LIBMCDRIVER_GRPC_ERROR_GRPCWRAPPERNOTLOADED 1016 /** GRPC Wrapper not loaded */
+#define LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDCONNECTIONIDENTIFIER 1017 /** Could not find connection identifier */
+#define LIBMCDRIVER_GRPC_ERROR_DUPLICATECONNECTIONIDENTIFIER 1018 /** Duplicate connection identifier */
+#define LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCREQUEST 1019 /** Could not cast to GRPC Request */
+#define LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCRESPONSE 1020 /** Could not cast to GRPC Response */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_GRPC
@@ -130,6 +137,13 @@ inline const char * LIBMCDRIVER_GRPC_GETERRORSTRING (LibMCDriver_GRPCResult nErr
     case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
     case LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER: return "Could not load grpc wrapper";
     case LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED: return "the driver type is not supported";
+    case LIBMCDRIVER_GRPC_ERROR_EMPTYCONNECTIONIDENTIFIER: return "Empty connection identifier";
+    case LIBMCDRIVER_GRPC_ERROR_INVALIDCONNECTIONIDENTIFIER: return "Invalid connection identifier";
+    case LIBMCDRIVER_GRPC_ERROR_GRPCWRAPPERNOTLOADED: return "GRPC Wrapper not loaded";
+    case LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDCONNECTIONIDENTIFIER: return "Could not find connection identifier";
+    case LIBMCDRIVER_GRPC_ERROR_DUPLICATECONNECTIONIDENTIFIER: return "Duplicate connection identifier";
+    case LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCREQUEST: return "Could not cast to GRPC Request";
+    case LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCRESPONSE: return "Could not cast to GRPC Response";
     default: return "unknown error";
   }
 }
@@ -140,6 +154,9 @@ inline const char * LIBMCDRIVER_GRPC_GETERRORSTRING (LibMCDriver_GRPCResult nErr
 
 typedef LibMCDriver_GRPCHandle LibMCDriver_GRPC_Base;
 typedef LibMCDriver_GRPCHandle LibMCDriver_GRPC_Driver;
+typedef LibMCDriver_GRPCHandle LibMCDriver_GRPC_GRPCMessage;
+typedef LibMCDriver_GRPCHandle LibMCDriver_GRPC_GRPCResponse;
+typedef LibMCDriver_GRPCHandle LibMCDriver_GRPC_GRPCRequest;
 typedef LibMCDriver_GRPCHandle LibMCDriver_GRPC_GRPCConnection;
 typedef LibMCDriver_GRPCHandle LibMCDriver_GRPC_Driver_GRPC;
 

@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CGRPCConnection
+Abstract: This is the class declaration of CGRPCMessage
 
 */
 
 
-#ifndef __LIBMCDRIVER_GRPC_GRPCCONNECTION
-#define __LIBMCDRIVER_GRPC_GRPCCONNECTION
+#ifndef __LIBMCDRIVER_GRPC_GRPCMESSAGE
+#define __LIBMCDRIVER_GRPC_GRPCMESSAGE
 
 #include "libmcdriver_grpc_interfaces.hpp"
 
@@ -52,25 +52,60 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CGRPCConnection 
+ Class declaration of CGRPCMessage 
 **************************************************************************************************************************/
 
-class CGRPCConnection : public virtual IGRPCConnection, public virtual CBase {
+class CGRPCMessage : public virtual IGRPCMessage, public virtual CBase {
 private:
-    LibGRPCWrapper::PConnection m_pConnection;
-    LibGRPCWrapper::PWrapper m_pWrapper;
+
+	LibGRPCWrapper::PWrapper m_pWrapper;
+	LibGRPCWrapper::PMessage m_pMessage;
 
 public:
 
-    CGRPCConnection(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PConnection pConnection);
+	CGRPCMessage(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PMessage pMessage);
 
-    virtual ~CGRPCConnection();
+	virtual ~CGRPCMessage();
 
-	std::string GetEndPoint() override;
+	bool HasField(const std::string & sFieldName) override;
 
-	void Close() override;
+	bool HasStringField(const std::string & sFieldName) override;
 
-	IGRPCRequest* CreateStaticRequest(const std::string& sRequestTypeIdentifier, const std::string& sResponseTypeIdentifier) override;
+	void SetStringField(const std::string & sFieldName, const std::string & sValue) override;
+
+	std::string GetStringField(const std::string & sFieldName) override;
+
+	void SetInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_int32 nValue) override;
+
+	LibMCDriver_GRPC_int32 GetInt32Field(const std::string & sFieldName) override;
+
+	void SetUInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint32 nValue) override;
+
+	LibMCDriver_GRPC_uint32 GetUInt32Field(const std::string & sFieldName) override;
+
+	void SetInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_int64 nValue) override;
+
+	LibMCDriver_GRPC_int64 GetInt64Field(const std::string & sFieldName) override;
+
+	void SetUInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint64 nValue) override;
+
+	LibMCDriver_GRPC_uint64 GetUInt64Field(const std::string & sFieldName) override;
+
+	void SetBoolField(const std::string & sFieldName, const bool bValue) override;
+
+	bool GetBoolField(const std::string & sFieldName) override;
+
+	void SetFloatField(const std::string & sFieldName, const LibMCDriver_GRPC_single fValue) override;
+
+	LibMCDriver_GRPC_single GetFloatField(const std::string & sFieldName) override;
+
+	void SetDoubleField(const std::string & sFieldName, const LibMCDriver_GRPC_double dValue) override;
+
+	LibMCDriver_GRPC_double GetDoubleField(const std::string & sFieldName) override;
+
+	LibGRPCWrapper::PMessage getMessage();
+
+	LibGRPCWrapper::PWrapper getWrapper();
 
 };
 
@@ -80,4 +115,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_GRPC_GRPCCONNECTION
+#endif // __LIBMCDRIVER_GRPC_GRPCMESSAGE

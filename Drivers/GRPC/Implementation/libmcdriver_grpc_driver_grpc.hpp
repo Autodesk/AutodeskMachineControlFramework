@@ -46,7 +46,7 @@ Abstract: This is the class declaration of CDriver_GRPC
 
 // Include custom headers here.
 #include "libgrpcwrapper_dynamic.hpp"
-
+#include <map>
 namespace LibMCDriver_GRPC {
 namespace Impl {
 
@@ -63,6 +63,8 @@ private:
 	bool m_bSimulationMode;
 
 	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+
+	std::map<std::string, LibGRPCWrapper::PConnection> m_Connections;
 
 #ifdef _WIN32
 
@@ -108,7 +110,7 @@ public:
 
 	IGRPCConnection* ConnectUnsecure(const std::string& sIdentifier, const std::string& sNetworkCredentials, const std::string& sProtobufDefinition);
 
-	void FindConnection() override;
+	IGRPCConnection* FindConnection(const std::string& sIdentifier, const bool bMustExist) override;
 
 };
 
