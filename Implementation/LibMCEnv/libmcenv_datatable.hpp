@@ -82,7 +82,7 @@ public:
 
 	virtual void WriteDataToStream(ITempStreamWriter* pWriter) = 0;
 
-	virtual size_t getEntrySizeInBytes();
+	virtual size_t getEntrySizeInBytes() = 0;
 };
 
 typedef std::shared_ptr<CDataTableColumn> PDataTableColumn;
