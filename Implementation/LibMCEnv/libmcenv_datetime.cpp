@@ -96,7 +96,7 @@ void CDateTime::GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibM
 	uint64_t nMicroSecondsOfTheDay = (m_nMicrosecondsSince1970 % (24ULL * 3600ULL * 1000000ULL));
 	uint64_t nSecondsOfTheDay = nMicroSecondsOfTheDay / 1000000ULL;
 	uint64_t nMinutesOfTheDay = nSecondsOfTheDay / 60;
-	uint32_t nHour = (uint32_t) (nMinutesOfTheDay / 60);
+	nHour = (uint32_t) (nMinutesOfTheDay / 60);
 	nMinute = (uint32_t)(nMinutesOfTheDay % 60);
 	nSecond = (uint32_t)(nSecondsOfTheDay % 60);
 	nMicrosecond = (uint32_t)(nMicroSecondsOfTheDay % 1000000ULL);
