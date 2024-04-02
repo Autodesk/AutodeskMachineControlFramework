@@ -81,6 +81,8 @@ public:
 	virtual void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) = 0;
 
 	virtual void WriteDataToStream(ITempStreamWriter* pWriter) = 0;
+
+	virtual size_t getEntrySizeInBytes();
 };
 
 typedef std::shared_ptr<CDataTableColumn> PDataTableColumn;

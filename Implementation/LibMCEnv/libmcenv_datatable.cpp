@@ -154,10 +154,15 @@ public:
 		}
 	}
 
+	size_t getEntrySizeInBytes() override
+	{
+		return sizeof(double);
+	}
+
 	void WriteDataToStream(ITempStreamWriter* pWriter) override
 	{
 		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
-			pWriter->WriteData(m_Rows.size() * sizeof(double), (uint8_t*)m_Rows.data());
+			pWriter->WriteData(m_Rows.size() * getEntrySizeInBytes (), (uint8_t*)m_Rows.data());
 		}
 	}
 
@@ -247,10 +252,15 @@ public:
 		}
 	}
 
+	size_t getEntrySizeInBytes() override
+	{
+		return sizeof(uint32_t);
+	}
+
 	void WriteDataToStream(ITempStreamWriter* pWriter) override
 	{
 		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
-			pWriter->WriteData(m_Rows.size() * sizeof(uint32_t), (uint8_t*)m_Rows.data());
+			pWriter->WriteData(m_Rows.size() * getEntrySizeInBytes(), (uint8_t*)m_Rows.data());
 		}
 	}
 
@@ -339,10 +349,15 @@ public:
 		}
 	}
 
+	size_t getEntrySizeInBytes() override
+	{
+		return sizeof(uint64_t);
+	}
+
 	void WriteDataToStream(ITempStreamWriter* pWriter) override
 	{
 		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
-			pWriter->WriteData(m_Rows.size() * sizeof(uint64_t), (uint8_t*)m_Rows.data());
+			pWriter->WriteData(m_Rows.size() * getEntrySizeInBytes(), (uint8_t*)m_Rows.data());
 		}
 	}
 
@@ -430,10 +445,15 @@ public:
 		}
 	}
 
+	size_t getEntrySizeInBytes() override
+	{
+		return sizeof(int32_t);
+	}
+
 	void WriteDataToStream(ITempStreamWriter* pWriter) override
 	{
 		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
-			pWriter->WriteData(m_Rows.size() * sizeof(int32_t), (uint8_t*)m_Rows.data());
+			pWriter->WriteData(m_Rows.size() * getEntrySizeInBytes(), (uint8_t*)m_Rows.data());
 		}
 	}
 
@@ -523,10 +543,15 @@ public:
 
 	}
 
+	size_t getEntrySizeInBytes() override
+	{
+		return sizeof(int64_t);
+	}
+
 	void WriteDataToStream(ITempStreamWriter* pWriter) override
 	{
 		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
-			pWriter->WriteData(m_Rows.size() * sizeof(int64_t), (uint8_t*)m_Rows.data());
+			pWriter->WriteData(m_Rows.size() * getEntrySizeInBytes(), (uint8_t*)m_Rows.data());
 		}
 	}
 
@@ -979,14 +1004,20 @@ void CDataTable::WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOp
 		columnHeader.m_nColumnDataType = (uint32_t)pColumn->getColumnType();
 		columnHeader.m_nEncodingType = (uint32_t)DATATABLE_ENCODINGTYPE_RAW;
 		columnHeader.m_nColumnDataStart = currentDataStart;
-		//currentDataStart += columnHeader.m_nEntryCount * pColumn->getEntrySizeInBytes();
+		
+		currentDataStart += columnHeader.m_nEntryCount * pColumn->getEntrySizeInBytes();
 
 		pWriter->WriteData(sizeof(columnHeader), (uint8_t*)&columnHeader);
-
-
 	}
 
 	for (auto pColumn : m_Columns) {
+		std::string sIdentifier = pColumn->getIdentifier();
+		std::string sDescription = pColumn->getDescription();		
+		if (sIdentifier.size() > 0)
+			pWriter->WriteData(sIdentifier.length(), (const uint8_t*)sIdentifier.c_str());
+		if (sDescription.size() > 0)
+			pWriter->WriteData(sIdentifier.length(), (const uint8_t*)sDescription.c_str());
+
 		pColumn->WriteDataToStream(pWriter);
 	}
 
