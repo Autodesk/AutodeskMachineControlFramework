@@ -1156,10 +1156,10 @@ typedef LibMCEnvResult (*PLibMCEnvDateTimeDifference_RoundupToMillisecondsPtr) (
 * Returns the maximum accuracy date time.
 *
 * @param[in] pDateTime - DateTime instance.
-* @param[out] pMicrosecondsSince1900 - Returns the date in Microseconds since midnight first of January 1900.
+* @param[out] pMicrosecondsSince1970 - Returns the date in Microseconds since midnight first of January 1970.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvDateTime_ToMicrosecondsSince1900Ptr) (LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1900);
+typedef LibMCEnvResult (*PLibMCEnvDateTime_ToMicrosecondsSince1970Ptr) (LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1970);
 
 /**
 * Returns the unix time stamp of the date time
@@ -1279,10 +1279,10 @@ typedef LibMCEnvResult (*PLibMCEnvDateTime_IsEqualToPtr) (LibMCEnv_DateTime pDat
 *
 * @param[in] pDateTime - DateTime instance.
 * @param[in] pOtherTimeStamp - Instance to check against.
-* @param[in] pDifference - Difference between the two time stamps. Value will always be positive.
+* @param[out] pDifference - Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvDateTime_GetTimeDifferencePtr) (LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference pDifference);
+typedef LibMCEnvResult (*PLibMCEnvDateTime_GetTimeDifferencePtr) (LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference * pDifference);
 
 /**
 * Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
@@ -7597,7 +7597,7 @@ typedef struct {
 	PLibMCEnvDateTimeDifference_RoundUpToMinutePtr m_DateTimeDifference_RoundUpToMinute;
 	PLibMCEnvDateTimeDifference_RoundUpToSecondsPtr m_DateTimeDifference_RoundUpToSeconds;
 	PLibMCEnvDateTimeDifference_RoundupToMillisecondsPtr m_DateTimeDifference_RoundupToMilliseconds;
-	PLibMCEnvDateTime_ToMicrosecondsSince1900Ptr m_DateTime_ToMicrosecondsSince1900;
+	PLibMCEnvDateTime_ToMicrosecondsSince1970Ptr m_DateTime_ToMicrosecondsSince1970;
 	PLibMCEnvDateTime_ToUnixTimestampPtr m_DateTime_ToUnixTimestamp;
 	PLibMCEnvDateTime_ToUTCDateTimePtr m_DateTime_ToUTCDateTime;
 	PLibMCEnvDateTime_ToUTCDateTimeInMillisecondsPtr m_DateTime_ToUTCDateTimeInMilliseconds;

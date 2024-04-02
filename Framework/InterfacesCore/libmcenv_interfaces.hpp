@@ -1189,10 +1189,10 @@ typedef IBaseSharedPtr<IDateTimeDifference> PIDateTimeDifference;
 class IDateTime : public virtual IBase {
 public:
 	/**
-	* IDateTime::ToMicrosecondsSince1900 - Returns the maximum accuracy date time.
-	* @return Returns the date in Microseconds since midnight first of January 1900.
+	* IDateTime::ToMicrosecondsSince1970 - Returns the maximum accuracy date time.
+	* @return Returns the date in Microseconds since midnight first of January 1970.
 	*/
-	virtual LibMCEnv_uint64 ToMicrosecondsSince1900() = 0;
+	virtual LibMCEnv_uint64 ToMicrosecondsSince1970() = 0;
 
 	/**
 	* IDateTime::ToUnixTimestamp - Returns the unix time stamp of the date time
@@ -1271,9 +1271,9 @@ public:
 	/**
 	* IDateTime::GetTimeDifference - Returns the time difference to another time stamp as positive duration value.
 	* @param[in] pOtherTimeStamp - Instance to check against.
-	* @param[in] pDifference - Difference between the two time stamps. Value will always be positive.
+	* @return Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering.
 	*/
-	virtual void GetTimeDifference(IDateTime* pOtherTimeStamp, IDateTimeDifference* pDifference) = 0;
+	virtual IDateTimeDifference * GetTimeDifference(IDateTime* pOtherTimeStamp) = 0;
 
 	/**
 	* IDateTime::AddDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.

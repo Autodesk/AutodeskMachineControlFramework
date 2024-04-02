@@ -886,8 +886,8 @@
 
 	<class name="DateTime" parent="Base" description="Represents a date and time in UTC time zone. Must be after first of January 1900. Accuracy is Microseconds.">
 	
-		<method name="ToMicrosecondsSince1900" description = "Returns the maximum accuracy date time.">
-			<param name="MicrosecondsSince1900" type="uint64" pass="return" description="Returns the date in Microseconds since midnight first of January 1900." />
+		<method name="ToMicrosecondsSince1970" description = "Returns the maximum accuracy date time.">
+			<param name="MicrosecondsSince1970" type="uint64" pass="return" description="Returns the date in Microseconds since midnight first of January 1970." />
 		</method>
 		
 		<method name="ToUnixTimestamp" description = "Returns the unix time stamp of the date time">
@@ -944,7 +944,7 @@
 
 		<method name="GetTimeDifference" description = "Returns the time difference to another time stamp as positive duration value.">
 			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
-			<param name="Difference" type="class" class="DateTimeDifference" pass="in" description="Difference between the two time stamps. Value will always be positive." />
+			<param name="Difference" type="class" class="DateTimeDifference" pass="return" description="Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering." />
 		</method>
 
 		<method name="AddDuration" description = "Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.">

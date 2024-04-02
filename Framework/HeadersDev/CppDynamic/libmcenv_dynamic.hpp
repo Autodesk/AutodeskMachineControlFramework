@@ -1240,7 +1240,7 @@ public:
 	{
 	}
 	
-	inline LibMCEnv_uint64 ToMicrosecondsSince1900();
+	inline LibMCEnv_uint64 ToMicrosecondsSince1970();
 	inline LibMCEnv_uint64 ToUnixTimestamp();
 	inline std::string ToUTCDateTime();
 	inline std::string ToUTCDateTimeInMilliseconds();
@@ -1252,7 +1252,7 @@ public:
 	inline bool IsLaterThan(classParam<CDateTime> pOtherTimeStamp);
 	inline bool IsEarlierThan(classParam<CDateTime> pOtherTimeStamp);
 	inline bool IsEqualTo(classParam<CDateTime> pOtherTimeStamp);
-	inline void GetTimeDifference(classParam<CDateTime> pOtherTimeStamp, classParam<CDateTimeDifference> pDifference);
+	inline PDateTimeDifference GetTimeDifference(classParam<CDateTime> pOtherTimeStamp);
 	inline void AddDuration(classParam<CDateTimeDifference> pDuration);
 	inline void SubtractDuration(classParam<CDateTimeDifference> pDuration);
 	inline void ShiftByYears(const LibMCEnv_int64 nDeltaYears);
@@ -2587,7 +2587,7 @@ public:
 		pWrapperTable->m_DateTimeDifference_RoundUpToMinute = nullptr;
 		pWrapperTable->m_DateTimeDifference_RoundUpToSeconds = nullptr;
 		pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds = nullptr;
-		pWrapperTable->m_DateTime_ToMicrosecondsSince1900 = nullptr;
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1970 = nullptr;
 		pWrapperTable->m_DateTime_ToUnixTimestamp = nullptr;
 		pWrapperTable->m_DateTime_ToUTCDateTime = nullptr;
 		pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds = nullptr;
@@ -4155,12 +4155,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DateTime_ToMicrosecondsSince1900 = (PLibMCEnvDateTime_ToMicrosecondsSince1900Ptr) GetProcAddress(hLibrary, "libmcenv_datetime_tomicrosecondssince1900");
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1970 = (PLibMCEnvDateTime_ToMicrosecondsSince1970Ptr) GetProcAddress(hLibrary, "libmcenv_datetime_tomicrosecondssince1970");
 		#else // _WIN32
-		pWrapperTable->m_DateTime_ToMicrosecondsSince1900 = (PLibMCEnvDateTime_ToMicrosecondsSince1900Ptr) dlsym(hLibrary, "libmcenv_datetime_tomicrosecondssince1900");
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1970 = (PLibMCEnvDateTime_ToMicrosecondsSince1970Ptr) dlsym(hLibrary, "libmcenv_datetime_tomicrosecondssince1970");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DateTime_ToMicrosecondsSince1900 == nullptr)
+		if (pWrapperTable->m_DateTime_ToMicrosecondsSince1970 == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9892,8 +9892,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_datetime_tomicrosecondssince1900", (void**)&(pWrapperTable->m_DateTime_ToMicrosecondsSince1900));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToMicrosecondsSince1900 == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_datetime_tomicrosecondssince1970", (void**)&(pWrapperTable->m_DateTime_ToMicrosecondsSince1970));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToMicrosecondsSince1970 == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_datetime_tounixtimestamp", (void**)&(pWrapperTable->m_DateTime_ToUnixTimestamp));
@@ -13523,15 +13523,15 @@ public:
 	 */
 	
 	/**
-	* CDateTime::ToMicrosecondsSince1900 - Returns the maximum accuracy date time.
-	* @return Returns the date in Microseconds since midnight first of January 1900.
+	* CDateTime::ToMicrosecondsSince1970 - Returns the maximum accuracy date time.
+	* @return Returns the date in Microseconds since midnight first of January 1970.
 	*/
-	LibMCEnv_uint64 CDateTime::ToMicrosecondsSince1900()
+	LibMCEnv_uint64 CDateTime::ToMicrosecondsSince1970()
 	{
-		LibMCEnv_uint64 resultMicrosecondsSince1900 = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToMicrosecondsSince1900(m_pHandle, &resultMicrosecondsSince1900));
+		LibMCEnv_uint64 resultMicrosecondsSince1970 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToMicrosecondsSince1970(m_pHandle, &resultMicrosecondsSince1970));
 		
-		return resultMicrosecondsSince1900;
+		return resultMicrosecondsSince1970;
 	}
 	
 	/**
@@ -13686,13 +13686,18 @@ public:
 	/**
 	* CDateTime::GetTimeDifference - Returns the time difference to another time stamp as positive duration value.
 	* @param[in] pOtherTimeStamp - Instance to check against.
-	* @param[in] pDifference - Difference between the two time stamps. Value will always be positive.
+	* @return Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering.
 	*/
-	void CDateTime::GetTimeDifference(classParam<CDateTime> pOtherTimeStamp, classParam<CDateTimeDifference> pDifference)
+	PDateTimeDifference CDateTime::GetTimeDifference(classParam<CDateTime> pOtherTimeStamp)
 	{
 		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
-		LibMCEnvHandle hDifference = pDifference.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetTimeDifference(m_pHandle, hOtherTimeStamp, hDifference));
+		LibMCEnvHandle hDifference = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetTimeDifference(m_pHandle, hOtherTimeStamp, &hDifference));
+		
+		if (!hDifference) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTimeDifference>(m_pWrapper, hDifference);
 	}
 	
 	/**

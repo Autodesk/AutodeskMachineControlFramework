@@ -45,8 +45,6 @@ Abstract: This is the class declaration of CDateTime
 #endif
 
 // Include custom headers here.
-#include <cstdint>
-#include <memory>
 
 
 namespace LibMCEnv {
@@ -57,24 +55,20 @@ namespace Impl {
  Class declaration of CDateTime 
 **************************************************************************************************************************/
 
-class CDateTime;
-typedef std::shared_ptr<CDateTime> PDateTime;
-
 class CDateTime : public virtual IDateTime, public virtual CBase {
 private:
-
-	uint64_t m_nMicrosecondsSince1900;
+	// Holds the microseconds since Midnight, January 1st, 1970 UTC.
+	uint64_t m_nMicrosecondsSince1970;
 
 public:
 
-	static CDateTime * makefromUTC (const std::string & sUTCTime);
-	static PDateTime makeSharedfromUTC(const std::string & sUTCTime);
+	static CDateTime* makefromUTC(const std::string & sUTCTimeString);
 
-	CDateTime(uint64_t nMicrosecondsSince1900);
+	CDateTime(const uint64_t nMicrosecondsSince1970);
 
-	virtual ~CDateTime ();
+	virtual ~CDateTime();
 
-	LibMCEnv_uint64 ToMicrosecondsSince1900() override;
+	LibMCEnv_uint64 ToMicrosecondsSince1970() override;
 
 	LibMCEnv_uint64 ToUnixTimestamp() override;
 
@@ -98,7 +92,7 @@ public:
 
 	bool IsEqualTo(IDateTime* pOtherTimeStamp) override;
 
-	void GetTimeDifference(IDateTime* pOtherTimeStamp, IDateTimeDifference* pDifference) override;
+	IDateTimeDifference* GetTimeDifference(IDateTime* pOtherTimeStamp) override;
 
 	void AddDuration(IDateTimeDifference* pDuration) override;
 

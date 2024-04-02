@@ -34,24 +34,22 @@ Abstract: This is a stub class definition of CDateTime
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
+#include "common_chrono.hpp"
+
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
  Class definition of CDateTime 
 **************************************************************************************************************************/
 
-CDateTime* CDateTime::makefromUTC(const std::string & sUTCTime)
+CDateTime* CDateTime::makefromUTC(const std::string& sUTCTimeString)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-PDateTime CDateTime::makeSharedfromUTC(const std::string & sUTCTime)
-{
-	return std::shared_ptr<CDateTime>(makefromUTC(sUTCTime));
-}
 
-CDateTime::CDateTime(uint64_t nMicrosecondsSince1900)
-	: m_nMicrosecondsSince1900 (nMicrosecondsSince1900)
+CDateTime::CDateTime(const uint64_t nMicrosecondsSince1970)
+	: m_nMicrosecondsSince1970 (nMicrosecondsSince1970)
 {
 
 }
@@ -61,15 +59,14 @@ CDateTime::~CDateTime()
 
 }
 
-
-LibMCEnv_uint64 CDateTime::ToMicrosecondsSince1900()
+LibMCEnv_uint64 CDateTime::ToMicrosecondsSince1970()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nMicrosecondsSince1970;
 }
 
 LibMCEnv_uint64 CDateTime::ToUnixTimestamp()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nMicrosecondsSince1970 / 1000000;
 }
 
 std::string CDateTime::ToUTCDateTime()
@@ -89,17 +86,25 @@ std::string CDateTime::ToUTCDateTimeInMicroseconds()
 
 void CDateTime::GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	
+	uint32_t nDayOfTheWeek = 0;
+	AMCCommon::CChrono::parseDateFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nDayOfTheWeek);
 }
 
 void CDateTime::GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint64_t nMicroSecondsOfTheDay = (m_nMicrosecondsSince1970 % (24ULL * 3600ULL * 1000000ULL));
+	uint64_t nSecondsOfTheDay = nMicroSecondsOfTheDay / 1000000ULL;
+	uint64_t nMinutesOfTheDay = nSecondsOfTheDay / 60;
+	uint32_t nHour = (uint32_t) (nMinutesOfTheDay / 60);
+	nMinute = (uint32_t)(nMinutesOfTheDay % 60);
+	nSecond = (uint32_t)(nSecondsOfTheDay % 60);
+	nMicrosecond = (uint32_t)(nMicroSecondsOfTheDay % 1000000ULL);
 }
 
 IDateTime * CDateTime::Duplicate()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return new CDateTime(m_nMicrosecondsSince1970);
 }
 
 bool CDateTime::IsLeapYear()
@@ -109,20 +114,29 @@ bool CDateTime::IsLeapYear()
 
 bool CDateTime::IsLaterThan(IDateTime* pOtherTimeStamp)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pOtherTimeStamp == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	return (m_nMicrosecondsSince1970 > pOtherTimeStamp->ToMicrosecondsSince1970());
 }
 
 bool CDateTime::IsEarlierThan(IDateTime* pOtherTimeStamp)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pOtherTimeStamp == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	return (m_nMicrosecondsSince1970 < pOtherTimeStamp->ToMicrosecondsSince1970());
 }
 
 bool CDateTime::IsEqualTo(IDateTime* pOtherTimeStamp)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pOtherTimeStamp == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	return (m_nMicrosecondsSince1970 == pOtherTimeStamp->ToMicrosecondsSince1970());
 }
 
-void CDateTime::GetTimeDifference(IDateTime* pOtherTimeStamp, IDateTimeDifference* pDifference)
+IDateTimeDifference* CDateTime::GetTimeDifference(IDateTime* pOtherTimeStamp)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }

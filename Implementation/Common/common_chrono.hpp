@@ -91,6 +91,11 @@ namespace AMCCommon {
 
 			// Checks if a timestamp is within a million years
 			static bool timeStampIsWithinAMillionYears(const uint64_t nMicroseconds); 
+
+			// Parses the date of a date time since 1970
+			// Returns the year, the month (1-12), the day of the month (1-31), and the day of the week (1-7, 1 = Monday)
+			static void parseDateFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t & nDayOfTheWeek);
+
 	};
 
 	typedef std::shared_ptr<CChrono> PChrono;

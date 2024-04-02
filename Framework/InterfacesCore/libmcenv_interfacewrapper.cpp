@@ -3107,18 +3107,18 @@ LibMCEnvResult libmcenv_datetimedifference_rounduptomilliseconds(LibMCEnv_DateTi
 /*************************************************************************************************************************
  Class implementation for DateTime
 **************************************************************************************************************************/
-LibMCEnvResult libmcenv_datetime_tomicrosecondssince1900(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1900)
+LibMCEnvResult libmcenv_datetime_tomicrosecondssince1970(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1970)
 {
 	IBase* pIBaseClass = (IBase *)pDateTime;
 
 	try {
-		if (pMicrosecondsSince1900 == nullptr)
+		if (pMicrosecondsSince1970 == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
 		if (!pIDateTime)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pMicrosecondsSince1900 = pIDateTime->ToMicrosecondsSince1900();
+		*pMicrosecondsSince1970 = pIDateTime->ToMicrosecondsSince1970();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -3512,27 +3512,26 @@ LibMCEnvResult libmcenv_datetime_isequalto(LibMCEnv_DateTime pDateTime, LibMCEnv
 	}
 }
 
-LibMCEnvResult libmcenv_datetime_gettimedifference(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference pDifference)
+LibMCEnvResult libmcenv_datetime_gettimedifference(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference * pDifference)
 {
 	IBase* pIBaseClass = (IBase *)pDateTime;
 
 	try {
+		if (pDifference == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IBase* pIBaseClassOtherTimeStamp = (IBase *)pOtherTimeStamp;
 		IDateTime* pIOtherTimeStamp = dynamic_cast<IDateTime*>(pIBaseClassOtherTimeStamp);
 		if (!pIOtherTimeStamp)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
 		
-		IBase* pIBaseClassDifference = (IBase *)pDifference;
-		IDateTimeDifference* pIDifference = dynamic_cast<IDateTimeDifference*>(pIBaseClassDifference);
-		if (!pIDifference)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
-		
+		IBase* pBaseDifference(nullptr);
 		IDateTime* pIDateTime = dynamic_cast<IDateTime*>(pIBaseClass);
 		if (!pIDateTime)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIDateTime->GetTimeDifference(pIOtherTimeStamp, pIDifference);
+		pBaseDifference = pIDateTime->GetTimeDifference(pIOtherTimeStamp);
 
+		*pDifference = (IBase*)(pBaseDifference);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -22782,8 +22781,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounduptoseconds;
 	if (sProcName == "libmcenv_datetimedifference_rounduptomilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_datetimedifference_rounduptomilliseconds;
-	if (sProcName == "libmcenv_datetime_tomicrosecondssince1900") 
-		*ppProcAddress = (void*) &libmcenv_datetime_tomicrosecondssince1900;
+	if (sProcName == "libmcenv_datetime_tomicrosecondssince1970") 
+		*ppProcAddress = (void*) &libmcenv_datetime_tomicrosecondssince1970;
 	if (sProcName == "libmcenv_datetime_tounixtimestamp") 
 		*ppProcAddress = (void*) &libmcenv_datetime_tounixtimestamp;
 	if (sProcName == "libmcenv_datetime_toutcdatetime") 

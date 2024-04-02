@@ -1169,10 +1169,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetimedifference_rounduptomillisecon
 * Returns the maximum accuracy date time.
 *
 * @param[in] pDateTime - DateTime instance.
-* @param[out] pMicrosecondsSince1900 - Returns the date in Microseconds since midnight first of January 1900.
+* @param[out] pMicrosecondsSince1970 - Returns the date in Microseconds since midnight first of January 1970.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_tomicrosecondssince1900(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1900);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_tomicrosecondssince1970(LibMCEnv_DateTime pDateTime, LibMCEnv_uint64 * pMicrosecondsSince1970);
 
 /**
 * Returns the unix time stamp of the date time
@@ -1292,10 +1292,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_isequalto(LibMCEnv_DateTime p
 *
 * @param[in] pDateTime - DateTime instance.
 * @param[in] pOtherTimeStamp - Instance to check against.
-* @param[in] pDifference - Difference between the two time stamps. Value will always be positive.
+* @param[out] pDifference - Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_gettimedifference(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference pDifference);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datetime_gettimedifference(LibMCEnv_DateTime pDateTime, LibMCEnv_DateTime pOtherTimeStamp, LibMCEnv_DateTimeDifference * pDifference);
 
 /**
 * Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
