@@ -160,9 +160,9 @@ void CDataRecording::GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBuff
 		*pYArrayNeededCount = nRecordCount;
 
 	if (pXArrayBuffer != nullptr)
-		m_pDataRecordingInstance->copyXCoordinates(pXArrayBuffer, nXArrayBufferSize);
+		m_pDataRecordingInstance->copyAllXCoordinates(pXArrayBuffer, nXArrayBufferSize);
 	if (pYArrayBuffer != nullptr)
-		m_pDataRecordingInstance->copyYCoordinates(pYArrayBuffer, nYArrayBufferSize);
+		m_pDataRecordingInstance->copyAllYCoordinates(pYArrayBuffer, nYArrayBufferSize);
 
 }
 
@@ -173,7 +173,7 @@ void CDataRecording::GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNu
 		*pPacketNumersNeededCount = nRecordCount;
 
 	if (pPacketNumersBuffer != nullptr)
-		m_pDataRecordingInstance->copyPacketNumbers(pPacketNumersBuffer, nPacketNumersBufferSize);
+		m_pDataRecordingInstance->copyAllPacketNumbers(pPacketNumersBuffer, nPacketNumersBufferSize);
 }
 
 void CDataRecording::GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32* pMeasurementTagsBuffer)
@@ -183,7 +183,7 @@ void CDataRecording::GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasur
 		*pMeasurementTagsNeededCount = nRecordCount;
 
 	if (pMeasurementTagsBuffer != nullptr)
-		m_pDataRecordingInstance->copyMeasurementTags(pMeasurementTagsBuffer, nMeasurementTagsBufferSize);
+		m_pDataRecordingInstance->copyAllMeasurementTags(pMeasurementTagsBuffer, nMeasurementTagsBufferSize);
 
 }
 
@@ -229,7 +229,7 @@ void CDataRecording::AddPacketNumbersToDataTable(LibMCEnv::PDataTable pDataTable
 	if (nRecordCount > 0) {
 		std::vector<uint32_t> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copyPacketNumbers(buffer.data (), buffer.size ());
+		m_pDataRecordingInstance->copyAllPacketNumbers(buffer.data (), buffer.size ());
 		pDataTable->SetUint32ColumnValues(sColumnIdentifier, buffer);
 	}
 
@@ -246,7 +246,7 @@ void CDataRecording::AddXCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable,
 	if (nRecordCount > 0) {
 		std::vector<double> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copyXCoordinates(buffer.data(), buffer.size());
+		m_pDataRecordingInstance->copyAllXCoordinates(buffer.data(), buffer.size());
 		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
 	}
 
@@ -263,7 +263,7 @@ void CDataRecording::AddYCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable,
 	if (nRecordCount > 0) {
 		std::vector<double> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copyYCoordinates(buffer.data(), buffer.size());
+		m_pDataRecordingInstance->copyAllYCoordinates(buffer.data(), buffer.size());
 		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
 	}
 
@@ -280,7 +280,7 @@ void CDataRecording::AddMeasurementTagsToDataTable(LibMCEnv::PDataTable pDataTab
 	if (nRecordCount > 0) {
 		std::vector<uint32_t> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copyMeasurementTags(buffer.data(), buffer.size());
+		m_pDataRecordingInstance->copyAllMeasurementTags(buffer.data(), buffer.size());
 		pDataTable->SetUint32ColumnValues(sColumnIdentifier, buffer);
 	}
 
@@ -300,7 +300,7 @@ void CDataRecording::AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint3
 	if (nRecordCount > 0) {
 		std::vector<int32_t> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copyRTCSignals(nRTCIndex, buffer.data(), buffer.size());
+		m_pDataRecordingInstance->copyAllRTCSignalsByIndex(nRTCIndex, buffer.data(), buffer.size());
 		pDataTable->SetInt32ColumnValues(sColumnIdentifier, buffer);
 	}
 
@@ -320,7 +320,7 @@ void CDataRecording::AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_ui
 	if (nRecordCount > 0) {
 		std::vector<int32_t> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copySensorSignals(nSignalIndex, buffer.data(), buffer.size());
+		m_pDataRecordingInstance->copyAllSensorSignalsByIndex(nSignalIndex, buffer.data(), buffer.size());
 		pDataTable->SetInt32ColumnValues(sColumnIdentifier, buffer);
 	}
 
@@ -340,7 +340,7 @@ void CDataRecording::AddScaledSensorSignalsToDataTable(const LibMCDriver_ScanLab
 	if (nRecordCount > 0) {
 		std::vector<double> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copyScaledSensorSignals(nSignalIndex, buffer.data(), buffer.size(), dScaleFactor, dOffset);
+		m_pDataRecordingInstance->copyAllScaledSensorSignalsByIndex(nSignalIndex, buffer.data(), buffer.size(), dScaleFactor, dOffset);
 		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
 	}
 
@@ -360,7 +360,7 @@ void CDataRecording::AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOI
 	if (nRecordCount > 0) {
 		std::vector<int32_t> buffer;
 		buffer.resize(nRecordCount);
-		m_pDataRecordingInstance->copyAdditionalSignals(nAdditionalIndex, buffer.data(), buffer.size());
+		m_pDataRecordingInstance->copyAllAdditionalSignalsByIndex(nAdditionalIndex, buffer.data(), buffer.size());
 		pDataTable->SetInt32ColumnValues(sColumnIdentifier, buffer);
 	}
 

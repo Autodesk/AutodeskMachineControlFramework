@@ -147,23 +147,24 @@ public:
 
     void copySensorSignals(size_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
     
-    void copyScaledSensorSignals(size_t nRecordIndex, double* pSensorSignalBuffer, size_t nSensorSignalBufferSize, double dScaleFactor, double dOffset);
-
     void copyAdditionalSignals(size_t nRecordIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize);
 
-    void copyXCoordinates(double * pCoordinateBuffer, size_t nCoordinateBufferSize);
+    void copyAllXCoordinates(double * pCoordinateBuffer, size_t nCoordinateBufferSize);
 
-    void copyYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize);
+    void copyAllYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize);
 
-    void copyPacketNumbers(uint32_t* pPacketNumberBuffer, size_t nPacketNumberBufferSize);
+    void copyAllPacketNumbers(uint32_t* pPacketNumberBuffer, size_t nPacketNumberBufferSize);
 
-    void copyMeasurementTags(uint32_t* pMeasurementTagBuffer, size_t nMeasurementTagBufferSize);
+    void copyAllMeasurementTags(uint32_t* pMeasurementTagBuffer, size_t nMeasurementTagBufferSize);
 
     void copyAllRTCSignalsByIndex(uint32_t nRTCIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize);
 
     void copyAllSensorSignalsByIndex(uint32_t nSensorIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
 
+    void copyAllScaledSensorSignalsByIndex(uint32_t nSensorIndex, double* pSensorSignalBuffer, size_t nSensorSignalBufferSize, double dScaleFactor, double dOffset);
+
     void copyAllAdditionalSignalsByIndex(uint32_t nSensnAdditionalIndexorIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize);
+
 
     void writeToFile(const std::string & sFileName);
 
