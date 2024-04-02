@@ -50,10 +50,7 @@ using namespace LibMCEnv::Impl;
 
 struct sLibMCDataTableStreamHeader {
 	uint32_t m_nSignature;
-	uint8_t m_nMajorVersion;
-	uint8_t m_nMinorVersion;
-	uint8_t m_nPatchVersion;
-	uint8_t m_nBuildVersion;
+	uint32_t m_nVersion;
 	uint64_t m_nColumnTableStart;
 	uint32_t m_nColumnCount;
 	uint32_t m_nReserved[8];
@@ -63,6 +60,11 @@ struct sLibMCDataTableStreamHeader {
 struct sLibMCDataTableColumnHeader {
 	uint32_t m_nColumnDataType;
 	uint32_t m_nEncodingType;
+	uint64_t m_nColumnDataStart;
+	uint64_t m_nIdentifierStart;
+	uint32_t m_nIdentifierLength;
+	uint64_t m_nDescriptionStart;
+	uint32_t m_nDescriptionLength;
 	uint64_t m_nEntryCount;
 	uint32_t m_nReserved[8];
 };
@@ -135,7 +137,7 @@ public:
 		}
 	}
 
-	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
 			std::string sValue = std::to_string(m_Rows[nRowIndex]);
@@ -151,6 +153,14 @@ public:
 
 		}
 	}
+
+	void WriteDataToStream(ITempStreamWriter* pWriter) override
+	{
+		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
+			pWriter->WriteData(m_Rows.size() * sizeof(double), (uint8_t*)m_Rows.data());
+		}
+	}
+
 
 };
 
@@ -200,7 +210,7 @@ public:
 
 			// Fill up buffer with 0.0 as value, when buffer is larger than the column's rowcount
 			for (size_t nFillIndex = nCopyCount; nFillIndex < nBufferSize; nFillIndex++)
-				pBuffer[nFillIndex] = 0.0;
+				pBuffer[nFillIndex] = 0;
 		}
 	}
 
@@ -219,7 +229,7 @@ public:
 		}
 	}
 
-	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
 			std::string sValue = std::to_string(m_Rows[nRowIndex]);
@@ -236,6 +246,14 @@ public:
 
 		}
 	}
+
+	void WriteDataToStream(ITempStreamWriter* pWriter) override
+	{
+		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
+			pWriter->WriteData(m_Rows.size() * sizeof(uint32_t), (uint8_t*)m_Rows.data());
+		}
+	}
+
 
 };
 
@@ -284,7 +302,7 @@ public:
 
 			// Fill up buffer with 0.0 as value, when buffer is larger than the column's rowcount
 			for (size_t nFillIndex = nCopyCount; nFillIndex < nBufferSize; nFillIndex++)
-				pBuffer[nFillIndex] = 0.0;
+				pBuffer[nFillIndex] = 0;
 		}
 	}
 
@@ -303,7 +321,7 @@ public:
 		}
 	}
 
-	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
 			std::string sValue = std::to_string(m_Rows[nRowIndex]);
@@ -321,6 +339,12 @@ public:
 		}
 	}
 
+	void WriteDataToStream(ITempStreamWriter* pWriter) override
+	{
+		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
+			pWriter->WriteData(m_Rows.size() * sizeof(uint64_t), (uint8_t*)m_Rows.data());
+		}
+	}
 
 };
 
@@ -369,7 +393,7 @@ public:
 
 			// Fill up buffer with 0.0 as value, when buffer is larger than the column's rowcount
 			for (size_t nFillIndex = nCopyCount; nFillIndex < nBufferSize; nFillIndex++)
-				pBuffer[nFillIndex] = 0.0;
+				pBuffer[nFillIndex] = 0;
 		}
 	}
 
@@ -388,7 +412,7 @@ public:
 		}
 	}
 
-	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
 			std::string sValue = std::to_string(m_Rows[nRowIndex]);
@@ -405,6 +429,14 @@ public:
 
 		}
 	}
+
+	void WriteDataToStream(ITempStreamWriter* pWriter) override
+	{
+		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
+			pWriter->WriteData(m_Rows.size() * sizeof(int32_t), (uint8_t*)m_Rows.data());
+		}
+	}
+
 
 };
 
@@ -453,7 +485,7 @@ public:
 
 			// Fill up buffer with 0.0 as value, when buffer is larger than the column's rowcount
 			for (size_t nFillIndex = nCopyCount; nFillIndex < nBufferSize; nFillIndex++)
-				pBuffer[nFillIndex] = 0.0;
+				pBuffer[nFillIndex] = 0;
 		}
 	}
 
@@ -472,7 +504,7 @@ public:
 		}
 	}
 
-	void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
+	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
 			std::string sValue = std::to_string(m_Rows[nRowIndex]);
@@ -488,7 +520,16 @@ public:
 			nBufferPosition++;
 
 		}
+
 	}
+
+	void WriteDataToStream(ITempStreamWriter* pWriter) override
+	{
+		if ((m_Rows.size() > 0) && (pWriter != nullptr)) {
+			pWriter->WriteData(m_Rows.size() * sizeof(int64_t), (uint8_t*)m_Rows.data());
+		}
+	}
+
 
 };
 
@@ -856,7 +897,7 @@ void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, const std::string&
 
 	size_t nRowCount = m_nMaxRowCount;
 	size_t nMaxBytesPerEntry = 32;
-	size_t nChunkSize = 4;
+	size_t nChunkSize = 4096;
 	size_t nBufferSize = nChunkSize * nMaxBytesPerEntry * (m_Columns.size() + 1);
 	std::vector<char> buffer (nBufferSize);
 
@@ -874,7 +915,7 @@ void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, const std::string&
 			auto iIter = m_Columns.begin();
 			while (iIter != m_Columns.end()) {
 
-				(*iIter)->writeValue(nRowIndex, buffer, nChunkPosition);
+				(*iIter)->writeCSVValue(nRowIndex, buffer, nChunkPosition);
 
 				if (nChunkPosition + 1 >= nBufferSize)
 					throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW);
@@ -908,6 +949,46 @@ void CDataTable::WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOp
 	if (pWriter == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+	sLibMCDataTableStreamHeader header;
+	memset((void*)&header, 0, sizeof(header));
+
+	uint64_t currentDataStart = sizeof (header);
+	header.m_nSignature = DATATABLE_HEADERSIGNATURE;
+	header.m_nColumnTableStart = currentDataStart;
+	header.m_nColumnCount = (uint32_t)m_Columns.size();
+	pWriter->WriteData(sizeof (header), (uint8_t*)&header);
+
+	currentDataStart += m_Columns.size() * sizeof(sLibMCDataTableColumnHeader);
+
+	for (auto pColumn : m_Columns) {
+		std::string sIdentifier = pColumn->getIdentifier();
+		std::string sDescription = pColumn->getDescription();
+
+		sLibMCDataTableColumnHeader columnHeader;
+		memset((void*)&columnHeader, 0, sizeof(columnHeader));
+
+		columnHeader.m_nIdentifierStart = currentDataStart;
+		columnHeader.m_nIdentifierLength = (uint32_t)sIdentifier.length();
+		currentDataStart += columnHeader.m_nIdentifierLength;
+
+		columnHeader.m_nDescriptionStart = currentDataStart;
+		columnHeader.m_nDescriptionLength = (uint32_t)sDescription.length();
+		currentDataStart += columnHeader.m_nDescriptionLength;
+
+		columnHeader.m_nEntryCount = pColumn->getRowCount();
+		columnHeader.m_nColumnDataType = (uint32_t)pColumn->getColumnType();
+		columnHeader.m_nEncodingType = (uint32_t)DATATABLE_ENCODINGTYPE_RAW;
+		columnHeader.m_nColumnDataStart = currentDataStart;
+		//currentDataStart += columnHeader.m_nEntryCount * pColumn->getEntrySizeInBytes();
+
+		pWriter->WriteData(sizeof(columnHeader), (uint8_t*)&columnHeader);
+
+
+	}
+
+	for (auto pColumn : m_Columns) {
+		pColumn->WriteDataToStream(pWriter);
+	}
 
 }
 

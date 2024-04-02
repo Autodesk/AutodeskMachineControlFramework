@@ -78,7 +78,9 @@ public:
 
 	void setDescription(const std::string& sDescription);
 
-	virtual void writeValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) = 0;
+	virtual void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) = 0;
+
+	virtual void WriteDataToStream(ITempStreamWriter* pWriter) = 0;
 };
 
 typedef std::shared_ptr<CDataTableColumn> PDataTableColumn;
