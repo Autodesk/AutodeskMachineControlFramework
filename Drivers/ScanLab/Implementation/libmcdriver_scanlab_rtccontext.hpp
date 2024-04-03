@@ -365,6 +365,8 @@ public:
 
 	LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) override;
 
+	IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) override;
+
 };
 
 

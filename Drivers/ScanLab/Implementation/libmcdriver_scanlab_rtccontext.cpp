@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdriver_scanlab_rtccontext.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
+#include "libmcdriver_scanlab_uartconnection.hpp"
 
 // Include custom headers here.
 #include <math.h>
@@ -2126,4 +2127,9 @@ LibMCDriver_ScanLab_int32 CRTCContext::ReadMultiMCBSP(const LibMCDriver_ScanLab_
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	return nRegisterContent;
+}
+
+IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate)
+{
+	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate);
 }

@@ -57,6 +57,7 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IUARTConnection;
 class IRTCContext;
 class IRTCSelector;
 class IDriver_ScanLab;
@@ -445,6 +446,79 @@ public:
 };
 
 typedef IBaseSharedPtr<IDriver> PIDriver;
+
+
+/*************************************************************************************************************************
+ Class interface for UARTConnection 
+**************************************************************************************************************************/
+
+class IUARTConnection : public virtual IBase {
+public:
+	/**
+	* IUARTConnection::GetBaudRate - Returns the actual baud rate of the RS232 Interface.
+	* @return Baud rate.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetBaudRate() = 0;
+
+	/**
+	* IUARTConnection::GetConfiguredBaudRate - Returns the configured baud rate of the RS232 Interface.
+	* @return Baud rate.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetConfiguredBaudRate() = 0;
+
+	/**
+	* IUARTConnection::ClearReceiveBuffer - Clears the receive buffer.
+	*/
+	virtual void ClearReceiveBuffer() = 0;
+
+	/**
+	* IUARTConnection::AvailableBytes - Returns the number of currently received bytes.
+	* @return Number of currently received bytes.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 AvailableBytes() = 0;
+
+	/**
+	* IUARTConnection::WriteString - Sends a string over the interface. The call is blocking.
+	* @param[in] sValue - String to send.
+	*/
+	virtual void WriteString(const std::string & sValue) = 0;
+
+	/**
+	* IUARTConnection::WriteData - Sends a data buffer over the interface. The call is blocking.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[in] pDataBuffer - Data to send.
+	*/
+	virtual void WriteData(const LibMCDriver_ScanLab_uint64 nDataBufferSize, const LibMCDriver_ScanLab_uint8 * pDataBuffer) = 0;
+
+	/**
+	* IUARTConnection::ReadData - Blocking call for reading a certain number of bytes. Will remove the bytes from the received buffer. Fails if not enough data is available after the timeout.
+	* @param[in] nByteCount - Number of bytes to read.
+	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBuffer - uint8 buffer of Receive buffer.
+	*/
+	virtual void ReadData(const LibMCDriver_ScanLab_uint32 nByteCount, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer) = 0;
+
+	/**
+	* IUARTConnection::ReadLine - Blocking call for reading until a line end signature is coming. Fails if timeout is hit or number of bytes have been reached.
+	* @param[in] sSeparator - Line Separator to search for.
+	* @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
+	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBuffer - uint8 buffer of Receive buffer.
+	*/
+	virtual void ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer) = 0;
+
+	/**
+	* IUARTConnection::Close - Closes the connection. All subsequent calls will fail.
+	*/
+	virtual void Close() = 0;
+
+};
+
+typedef IBaseSharedPtr<IUARTConnection> PIUARTConnection;
 
 
 /*************************************************************************************************************************
@@ -1165,6 +1239,13 @@ public:
 	* @return Value of the register.
 	*/
 	virtual LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) = 0;
+
+	/**
+	* IRTCContext::CreateUARTConnection - Creates a new UART Connection. Closes any other one that might be active.
+	* @param[in] nDesiredBaudRate - Desired baud rate. 160 Bd…12.8 MBd.  The other RS-232 interface parameters cannot be altered (data bits: 8, start bits: 1, stop bits: 1, parity: none).
+	* @return UART Connection instance.
+	*/
+	virtual IUARTConnection * CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) = 0;
 
 };
 

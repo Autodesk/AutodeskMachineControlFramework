@@ -268,6 +268,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
 
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Base;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_UARTConnection;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCContext;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCSelector;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab;

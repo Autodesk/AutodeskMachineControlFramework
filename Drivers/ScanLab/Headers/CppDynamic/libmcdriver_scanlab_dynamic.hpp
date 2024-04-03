@@ -62,6 +62,7 @@ namespace LibMCDriver_ScanLab {
 class CWrapper;
 class CBase;
 class CDriver;
+class CUARTConnection;
 class CRTCContext;
 class CRTCSelector;
 class CDriver_ScanLab;
@@ -74,6 +75,7 @@ class CDriver_ScanLab_RTC6xN;
 typedef CWrapper CLibMCDriver_ScanLabWrapper;
 typedef CBase CLibMCDriver_ScanLabBase;
 typedef CDriver CLibMCDriver_ScanLabDriver;
+typedef CUARTConnection CLibMCDriver_ScanLabUARTConnection;
 typedef CRTCContext CLibMCDriver_ScanLabRTCContext;
 typedef CRTCSelector CLibMCDriver_ScanLabRTCSelector;
 typedef CDriver_ScanLab CLibMCDriver_ScanLabDriver_ScanLab;
@@ -86,6 +88,7 @@ typedef CDriver_ScanLab_RTC6xN CLibMCDriver_ScanLabDriver_ScanLab_RTC6xN;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
+typedef std::shared_ptr<CUARTConnection> PUARTConnection;
 typedef std::shared_ptr<CRTCContext> PRTCContext;
 typedef std::shared_ptr<CRTCSelector> PRTCSelector;
 typedef std::shared_ptr<CDriver_ScanLab> PDriver_ScanLab;
@@ -98,6 +101,7 @@ typedef std::shared_ptr<CDriver_ScanLab_RTC6xN> PDriver_ScanLab_RTC6xN;
 typedef PWrapper PLibMCDriver_ScanLabWrapper;
 typedef PBase PLibMCDriver_ScanLabBase;
 typedef PDriver PLibMCDriver_ScanLabDriver;
+typedef PUARTConnection PLibMCDriver_ScanLabUARTConnection;
 typedef PRTCContext PLibMCDriver_ScanLabRTCContext;
 typedef PRTCSelector PLibMCDriver_ScanLabRTCSelector;
 typedef PDriver_ScanLab PLibMCDriver_ScanLabDriver_ScanLab;
@@ -467,6 +471,7 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
+	friend class CUARTConnection;
 	friend class CRTCContext;
 	friend class CRTCSelector;
 	friend class CDriver_ScanLab;
@@ -552,6 +557,31 @@ public:
 	inline void GetVersion(LibMCDriver_ScanLab_uint32 & nMajor, LibMCDriver_ScanLab_uint32 & nMinor, LibMCDriver_ScanLab_uint32 & nMicro, std::string & sBuild);
 	inline void QueryParameters();
 	inline void QueryParametersEx(classParam<LibMCEnv::CDriverStatusUpdateSession> pDriverUpdateInstance);
+};
+	
+/*************************************************************************************************************************
+ Class CUARTConnection 
+**************************************************************************************************************************/
+class CUARTConnection : public CBase {
+public:
+	
+	/**
+	* CUARTConnection::CUARTConnection - Constructor for UARTConnection class.
+	*/
+	CUARTConnection(CWrapper* pWrapper, LibMCDriver_ScanLabHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCDriver_ScanLab_uint32 GetBaudRate();
+	inline LibMCDriver_ScanLab_uint32 GetConfiguredBaudRate();
+	inline void ClearReceiveBuffer();
+	inline LibMCDriver_ScanLab_uint32 AvailableBytes();
+	inline void WriteString(const std::string & sValue);
+	inline void WriteData(const CInputVector<LibMCDriver_ScanLab_uint8> & DataBuffer);
+	inline void ReadData(const LibMCDriver_ScanLab_uint32 nByteCount, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, std::vector<LibMCDriver_ScanLab_uint8> & DataBuffer);
+	inline void ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, std::vector<LibMCDriver_ScanLab_uint8> & DataBuffer);
+	inline void Close();
 };
 	
 /*************************************************************************************************************************
@@ -670,6 +700,7 @@ public:
 	inline void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold);
 	inline void DisableLineSubdivision();
 	inline LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo);
+	inline PUARTConnection CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate);
 };
 	
 /*************************************************************************************************************************
@@ -927,6 +958,15 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
+		pWrapperTable->m_UARTConnection_GetBaudRate = nullptr;
+		pWrapperTable->m_UARTConnection_GetConfiguredBaudRate = nullptr;
+		pWrapperTable->m_UARTConnection_ClearReceiveBuffer = nullptr;
+		pWrapperTable->m_UARTConnection_AvailableBytes = nullptr;
+		pWrapperTable->m_UARTConnection_WriteString = nullptr;
+		pWrapperTable->m_UARTConnection_WriteData = nullptr;
+		pWrapperTable->m_UARTConnection_ReadData = nullptr;
+		pWrapperTable->m_UARTConnection_ReadLine = nullptr;
+		pWrapperTable->m_UARTConnection_Close = nullptr;
 		pWrapperTable->m_RTCContext_LoadFirmware = nullptr;
 		pWrapperTable->m_RTCContext_LoadCorrectionFile = nullptr;
 		pWrapperTable->m_RTCContext_SelectCorrectionTable = nullptr;
@@ -1029,6 +1069,7 @@ public:
 		pWrapperTable->m_RTCContext_EnableLineSubdivision = nullptr;
 		pWrapperTable->m_RTCContext_DisableLineSubdivision = nullptr;
 		pWrapperTable->m_RTCContext_ReadMultiMCBSP = nullptr;
+		pWrapperTable->m_RTCContext_CreateUARTConnection = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1201,6 +1242,87 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParametersEx == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_GetBaudRate = (PLibMCDriver_ScanLabUARTConnection_GetBaudRatePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_getbaudrate");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_GetBaudRate = (PLibMCDriver_ScanLabUARTConnection_GetBaudRatePtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_getbaudrate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_GetBaudRate == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_GetConfiguredBaudRate = (PLibMCDriver_ScanLabUARTConnection_GetConfiguredBaudRatePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_getconfiguredbaudrate");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_GetConfiguredBaudRate = (PLibMCDriver_ScanLabUARTConnection_GetConfiguredBaudRatePtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_getconfiguredbaudrate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_GetConfiguredBaudRate == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_ClearReceiveBuffer = (PLibMCDriver_ScanLabUARTConnection_ClearReceiveBufferPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_clearreceivebuffer");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_ClearReceiveBuffer = (PLibMCDriver_ScanLabUARTConnection_ClearReceiveBufferPtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_clearreceivebuffer");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_ClearReceiveBuffer == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_AvailableBytes = (PLibMCDriver_ScanLabUARTConnection_AvailableBytesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_availablebytes");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_AvailableBytes = (PLibMCDriver_ScanLabUARTConnection_AvailableBytesPtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_availablebytes");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_AvailableBytes == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_WriteString = (PLibMCDriver_ScanLabUARTConnection_WriteStringPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_writestring");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_WriteString = (PLibMCDriver_ScanLabUARTConnection_WriteStringPtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_writestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_WriteString == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_WriteData = (PLibMCDriver_ScanLabUARTConnection_WriteDataPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_writedata");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_WriteData = (PLibMCDriver_ScanLabUARTConnection_WriteDataPtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_writedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_WriteData == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_ReadData = (PLibMCDriver_ScanLabUARTConnection_ReadDataPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_readdata");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_ReadData = (PLibMCDriver_ScanLabUARTConnection_ReadDataPtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_readdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_ReadData == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_ReadLine = (PLibMCDriver_ScanLabUARTConnection_ReadLinePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_readline");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_ReadLine = (PLibMCDriver_ScanLabUARTConnection_ReadLinePtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_readline");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_ReadLine == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UARTConnection_Close = (PLibMCDriver_ScanLabUARTConnection_ClosePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_close");
+		#else // _WIN32
+		pWrapperTable->m_UARTConnection_Close = (PLibMCDriver_ScanLabUARTConnection_ClosePtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_close");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UARTConnection_Close == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2122,6 +2244,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_CreateUARTConnection = (PLibMCDriver_ScanLabRTCContext_CreateUARTConnectionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_createuartconnection");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_CreateUARTConnection = (PLibMCDriver_ScanLabRTCContext_CreateUARTConnectionPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_createuartconnection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_CreateUARTConnection == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
 		#else // _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
@@ -2791,6 +2922,42 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParametersEx == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_getbaudrate", (void**)&(pWrapperTable->m_UARTConnection_GetBaudRate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_GetBaudRate == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_getconfiguredbaudrate", (void**)&(pWrapperTable->m_UARTConnection_GetConfiguredBaudRate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_GetConfiguredBaudRate == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_clearreceivebuffer", (void**)&(pWrapperTable->m_UARTConnection_ClearReceiveBuffer));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_ClearReceiveBuffer == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_availablebytes", (void**)&(pWrapperTable->m_UARTConnection_AvailableBytes));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_AvailableBytes == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_writestring", (void**)&(pWrapperTable->m_UARTConnection_WriteString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_WriteString == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_writedata", (void**)&(pWrapperTable->m_UARTConnection_WriteData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_WriteData == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_readdata", (void**)&(pWrapperTable->m_UARTConnection_ReadData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_ReadData == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_readline", (void**)&(pWrapperTable->m_UARTConnection_ReadLine));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_ReadLine == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_close", (void**)&(pWrapperTable->m_UARTConnection_Close));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_Close == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_loadfirmware", (void**)&(pWrapperTable->m_RTCContext_LoadFirmware));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_LoadFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3199,6 +3366,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ReadMultiMCBSP == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_createuartconnection", (void**)&(pWrapperTable->m_RTCContext_CreateUARTConnection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_CreateUARTConnection == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCSelector_SearchCards == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3564,6 +3735,111 @@ public:
 	{
 		LibMCEnvHandle hDriverUpdateInstance = pDriverUpdateInstance.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParametersEx(m_pHandle, hDriverUpdateInstance));
+	}
+	
+	/**
+	 * Method definitions for class CUARTConnection
+	 */
+	
+	/**
+	* CUARTConnection::GetBaudRate - Returns the actual baud rate of the RS232 Interface.
+	* @return Baud rate.
+	*/
+	LibMCDriver_ScanLab_uint32 CUARTConnection::GetBaudRate()
+	{
+		LibMCDriver_ScanLab_uint32 resultBaudRate = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_GetBaudRate(m_pHandle, &resultBaudRate));
+		
+		return resultBaudRate;
+	}
+	
+	/**
+	* CUARTConnection::GetConfiguredBaudRate - Returns the configured baud rate of the RS232 Interface.
+	* @return Baud rate.
+	*/
+	LibMCDriver_ScanLab_uint32 CUARTConnection::GetConfiguredBaudRate()
+	{
+		LibMCDriver_ScanLab_uint32 resultBaudRate = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_GetConfiguredBaudRate(m_pHandle, &resultBaudRate));
+		
+		return resultBaudRate;
+	}
+	
+	/**
+	* CUARTConnection::ClearReceiveBuffer - Clears the receive buffer.
+	*/
+	void CUARTConnection::ClearReceiveBuffer()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ClearReceiveBuffer(m_pHandle));
+	}
+	
+	/**
+	* CUARTConnection::AvailableBytes - Returns the number of currently received bytes.
+	* @return Number of currently received bytes.
+	*/
+	LibMCDriver_ScanLab_uint32 CUARTConnection::AvailableBytes()
+	{
+		LibMCDriver_ScanLab_uint32 resultByteCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_AvailableBytes(m_pHandle, &resultByteCount));
+		
+		return resultByteCount;
+	}
+	
+	/**
+	* CUARTConnection::WriteString - Sends a string over the interface. The call is blocking.
+	* @param[in] sValue - String to send.
+	*/
+	void CUARTConnection::WriteString(const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_WriteString(m_pHandle, sValue.c_str()));
+	}
+	
+	/**
+	* CUARTConnection::WriteData - Sends a data buffer over the interface. The call is blocking.
+	* @param[in] DataBuffer - Data to send.
+	*/
+	void CUARTConnection::WriteData(const CInputVector<LibMCDriver_ScanLab_uint8> & DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_WriteData(m_pHandle, (LibMCDriver_ScanLab_uint64)DataBuffer.size(), DataBuffer.data()));
+	}
+	
+	/**
+	* CUARTConnection::ReadData - Blocking call for reading a certain number of bytes. Will remove the bytes from the received buffer. Fails if not enough data is available after the timeout.
+	* @param[in] nByteCount - Number of bytes to read.
+	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+	* @param[out] DataBuffer - Receive buffer.
+	*/
+	void CUARTConnection::ReadData(const LibMCDriver_ScanLab_uint32 nByteCount, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, std::vector<LibMCDriver_ScanLab_uint8> & DataBuffer)
+	{
+		LibMCDriver_ScanLab_uint64 elementsNeededData = 0;
+		LibMCDriver_ScanLab_uint64 elementsWrittenData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadData(m_pHandle, nByteCount, nTimeOutInMS, 0, &elementsNeededData, nullptr));
+		DataBuffer.resize((size_t) elementsNeededData);
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadData(m_pHandle, nByteCount, nTimeOutInMS, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
+	}
+	
+	/**
+	* CUARTConnection::ReadLine - Blocking call for reading until a line end signature is coming. Fails if timeout is hit or number of bytes have been reached.
+	* @param[in] sSeparator - Line Separator to search for.
+	* @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
+	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+	* @param[out] DataBuffer - Receive buffer.
+	*/
+	void CUARTConnection::ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, std::vector<LibMCDriver_ScanLab_uint8> & DataBuffer)
+	{
+		LibMCDriver_ScanLab_uint64 elementsNeededData = 0;
+		LibMCDriver_ScanLab_uint64 elementsWrittenData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadLine(m_pHandle, sSeparator.c_str(), nMaxLineLength, nTimeOutInMS, 0, &elementsNeededData, nullptr));
+		DataBuffer.resize((size_t) elementsNeededData);
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadLine(m_pHandle, sSeparator.c_str(), nMaxLineLength, nTimeOutInMS, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
+	}
+	
+	/**
+	* CUARTConnection::Close - Closes the connection. All subsequent calls will fail.
+	*/
+	void CUARTConnection::Close()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_Close(m_pHandle));
 	}
 	
 	/**
@@ -4628,6 +4904,22 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ReadMultiMCBSP(m_pHandle, nRegisterNo, &resultRegisterContent));
 		
 		return resultRegisterContent;
+	}
+	
+	/**
+	* CRTCContext::CreateUARTConnection - Creates a new UART Connection. Closes any other one that might be active.
+	* @param[in] nDesiredBaudRate - Desired baud rate. 160 Bd…12.8 MBd.  The other RS-232 interface parameters cannot be altered (data bits: 8, start bits: 1, stop bits: 1, parity: none).
+	* @return UART Connection instance.
+	*/
+	PUARTConnection CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate)
+	{
+		LibMCDriver_ScanLabHandle hConnection = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_CreateUARTConnection(m_pHandle, nDesiredBaudRate, &hConnection));
+		
+		if (!hConnection) {
+			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUARTConnection>(m_pWrapper, hConnection);
 	}
 	
 	/**
