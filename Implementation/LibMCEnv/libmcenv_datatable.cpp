@@ -897,16 +897,27 @@ void CDataTable::updateMaxRowCount()
 	}
 }
 
-void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, const std::string& sSeparator)
+void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, IDataTableCSVWriteOptions* pOptions) 
 {
 	if (pWriter == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	std::string sSeparator = DATATABLE_DEFAULTCSVSEPARATOR;
+	std::string sNewLine = DATATABLE_DEFAULTCSVNEWLINE;
+	size_t nMaxBytesPerEntry = DATATABLE_DEFAULTCSVMAXBYTESPERENTRY;
+	size_t nChunkSize = DATATABLE_DEFAULTCSVCHUNKSIZE;
+
+	if (pOptions != nullptr) {
+		sSeparator = pOptions->GetSeparator();
+	}
 
 	if (sSeparator.length () != 1)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCSVSEPARATOR);
 
 	char cSeparator = sSeparator.at(0);
-	char cNewLine = 13;
+	if ((cSeparator < DATATABLE_MINCSVSEPARATOR) || (cSeparator > DATATABLE_MAXCSVSEPARATOR))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCSVSEPARATOR);
+	
 
 	std::stringstream sHeader;
 	auto iIter = m_Columns.begin();
@@ -921,8 +932,6 @@ void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, const std::string&
 	pWriter->WriteLine(sHeader.str ());
 
 	size_t nRowCount = m_nMaxRowCount;
-	size_t nMaxBytesPerEntry = 32;
-	size_t nChunkSize = 4096;
 	size_t nBufferSize = nChunkSize * nMaxBytesPerEntry * (m_Columns.size() + 1);
 	std::vector<char> buffer (nBufferSize);
 
@@ -957,8 +966,10 @@ void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, const std::string&
 			if (nChunkPosition + 1 >= nBufferSize)
 				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW);
 
-			buffer.at(nChunkPosition) = cNewLine;
-			nChunkPosition++;
+			for (auto ch : sNewLine) {
+				buffer.at(nChunkPosition) = ch;
+				nChunkPosition++;
+			}
 
 		}
 

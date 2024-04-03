@@ -32,9 +32,12 @@ Abstract: This is a stub class definition of CDateTime
 */
 
 #include "libmcenv_datetime.hpp"
+#include "libmcenv_datetimedifference.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
 #include "common_chrono.hpp"
+
+#include "amc_constants.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -51,6 +54,8 @@ CDateTime* CDateTime::makefromUTC(const std::string& sUTCTimeString)
 CDateTime::CDateTime(const uint64_t nMicrosecondsSince1970)
 	: m_nMicrosecondsSince1970 (nMicrosecondsSince1970)
 {
+	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nMicrosecondsSince1970))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATETIMEISINVALID, std::to_string(nMicrosecondsSince1970));
 
 }
 
@@ -138,17 +143,42 @@ bool CDateTime::IsEqualTo(IDateTime* pOtherTimeStamp)
 
 IDateTimeDifference* CDateTime::GetTimeDifference(IDateTime* pOtherTimeStamp)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pOtherTimeStamp == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	uint64_t nOtherMicroSeconds = pOtherTimeStamp->ToMicrosecondsSince1970();
+	uint64_t nDeltaMicroSeconds;
+	if (nOtherMicroSeconds >= m_nMicrosecondsSince1970) {
+		nDeltaMicroSeconds = nOtherMicroSeconds - m_nMicrosecondsSince1970;
+	}
+	else {
+		nDeltaMicroSeconds = m_nMicrosecondsSince1970 - nOtherMicroSeconds;
+	}
+
+	return new CDateTimeDifference(nDeltaMicroSeconds);
 }
 
 void CDateTime::AddDuration(IDateTimeDifference* pDuration)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pDuration == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	uint64_t nDuration = pDuration->ToMicroseconds();
 }
+
 
 void CDateTime::SubtractDuration(IDateTimeDifference* pDuration)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pDuration == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	uint64_t nDuration = pDuration->ToMicroseconds();
+	uint64_t nNewTime = m_nMicrosecondsSince1970 + nDuration;
+
+	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nNewTime))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS);
+
+	m_nMicrosecondsSince1970 = nNewTime;
 }
 
 void CDateTime::ShiftByYears(const LibMCEnv_int64 nDeltaYears)
@@ -158,32 +188,39 @@ void CDateTime::ShiftByYears(const LibMCEnv_int64 nDeltaYears)
 
 void CDateTime::ShiftByDays(const LibMCEnv_int64 nDeltaDays)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	ShiftByMicroseconds(nDeltaDays * (int64_t) MICROSECONDS_PER_DAY);
 }
 
 void CDateTime::ShiftByHours(const LibMCEnv_int64 nDeltaHours)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	ShiftByMicroseconds(nDeltaHours * (int64_t)MICROSECONDS_PER_HOUR);
 }
 
 void CDateTime::ShiftByMinutes(const LibMCEnv_int64 nDeltaMinutes)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	ShiftByMicroseconds(nDeltaMinutes * (int64_t)MICROSECONDS_PER_MINUTE);
 }
 
 void CDateTime::ShiftBySeconds(const LibMCEnv_int64 nDeltaSeconds)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	ShiftByMicroseconds(nDeltaSeconds * (int64_t)MICROSECONDS_PER_SECOND);
 }
 
 void CDateTime::ShiftByMilliseconds(const LibMCEnv_int64 nDeltaMilliseconds)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	ShiftByMicroseconds(nDeltaMilliseconds * (int64_t)MICROSECONDS_PER_MILLISECOND);
 }
 
 void CDateTime::ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	int64_t nNewTime = (int64_t)m_nMicrosecondsSince1970 + nDeltaMicroseconds;
+	if (nNewTime < 0)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS);
+	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears((uint64_t) nNewTime))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS);
+
+	m_nMicrosecondsSince1970 = (uint64_t) nNewTime;
 }
 
 void CDateTime::RoundDownToYear()
@@ -198,27 +235,27 @@ void CDateTime::RoundDownToMonth()
 
 void CDateTime::RoundDownToDay()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nMicrosecondsSince1970 = (m_nMicrosecondsSince1970 / MICROSECONDS_PER_DAY) * MICROSECONDS_PER_DAY;
 }
 
 void CDateTime::RoundDownToHour()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nMicrosecondsSince1970 = (m_nMicrosecondsSince1970 / MICROSECONDS_PER_HOUR) * MICROSECONDS_PER_HOUR;
 }
 
 void CDateTime::RoundDownToMinute()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nMicrosecondsSince1970 = (m_nMicrosecondsSince1970 / MICROSECONDS_PER_MINUTE) * MICROSECONDS_PER_MINUTE;
 }
 
 void CDateTime::RoundDownToSeconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nMicrosecondsSince1970 = (m_nMicrosecondsSince1970 / MICROSECONDS_PER_SECOND) * MICROSECONDS_PER_SECOND;
 }
 
 void CDateTime::RoundDownToMilliseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nMicrosecondsSince1970 = (m_nMicrosecondsSince1970 / MICROSECONDS_PER_MILLISECOND) * MICROSECONDS_PER_MILLISECOND;
 }
 
 void CDateTime::RoundUpToYear()
@@ -233,26 +270,31 @@ void CDateTime::RoundUpToMonth()
 
 void CDateTime::RoundUpToDay()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nMicrosecondsSince1970 % MICROSECONDS_PER_DAY) != 0ULL)
+		m_nMicrosecondsSince1970 = ((m_nMicrosecondsSince1970 / MICROSECONDS_PER_DAY) + 1) * MICROSECONDS_PER_DAY;
 }
 
 void CDateTime::RoundUpToHour()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nMicrosecondsSince1970 % MICROSECONDS_PER_HOUR) != 0ULL)
+		m_nMicrosecondsSince1970 = ((m_nMicrosecondsSince1970 / MICROSECONDS_PER_HOUR) + 1) * MICROSECONDS_PER_HOUR;
 }
 
 void CDateTime::RoundUpToMinute()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nMicrosecondsSince1970 % MICROSECONDS_PER_MINUTE) != 0ULL)
+		m_nMicrosecondsSince1970 = ((m_nMicrosecondsSince1970 / MICROSECONDS_PER_MINUTE) + 1) * MICROSECONDS_PER_MINUTE;
 }
 
 void CDateTime::RoundUpToSeconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nMicrosecondsSince1970 % MICROSECONDS_PER_SECOND) != 0ULL)
+		m_nMicrosecondsSince1970 = ((m_nMicrosecondsSince1970 / MICROSECONDS_PER_SECOND) + 1) * MICROSECONDS_PER_SECOND;
 }
 
 void CDateTime::RoundUpToMilliseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nMicrosecondsSince1970 % MICROSECONDS_PER_MILLISECOND) != 0ULL)
+		m_nMicrosecondsSince1970 = ((m_nMicrosecondsSince1970 / MICROSECONDS_PER_MILLISECOND) + 1) * MICROSECONDS_PER_MILLISECOND;
 }
 

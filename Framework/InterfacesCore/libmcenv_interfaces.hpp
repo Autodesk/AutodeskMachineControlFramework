@@ -64,6 +64,7 @@ class IImageData;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
 class IDataTableWriteOptions;
+class IDataTableCSVWriteOptions;
 class IDataTable;
 class IDataSeries;
 class IDateTimeDifference;
@@ -834,6 +835,29 @@ typedef IBaseSharedPtr<IDataTableWriteOptions> PIDataTableWriteOptions;
 
 
 /*************************************************************************************************************************
+ Class interface for DataTableCSVWriteOptions 
+**************************************************************************************************************************/
+
+class IDataTableCSVWriteOptions : public virtual IBase {
+public:
+	/**
+	* IDataTableCSVWriteOptions::GetSeparator - Returns the desired separator of the CSV file. Default is semicolon.
+	* @return Separator to use.
+	*/
+	virtual std::string GetSeparator() = 0;
+
+	/**
+	* IDataTableCSVWriteOptions::SetSeparator - Sets the desired separator of the CSV file.
+	* @param[in] sSeparator - Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)
+	*/
+	virtual void SetSeparator(const std::string & sSeparator) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataTableCSVWriteOptions> PIDataTableCSVWriteOptions;
+
+
+/*************************************************************************************************************************
  Class interface for DataTable 
 **************************************************************************************************************************/
 
@@ -989,9 +1013,9 @@ public:
 	/**
 	* IDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
 	* @param[in] pWriter - Stream writer to use.
-	* @param[in] sSeparator - Seperator to use between the Cells. MUST be a single character string.
+	* @param[in] pOptions - Optional CSV writer options to use.
 	*/
-	virtual void WriteCSVToStream(ITempStreamWriter* pWriter, const std::string & sSeparator) = 0;
+	virtual void WriteCSVToStream(ITempStreamWriter* pWriter, IDataTableCSVWriteOptions* pOptions) = 0;
 
 	/**
 	* IDataTable::WriteDataToStream - Writes the data as binary to a temporary stream.

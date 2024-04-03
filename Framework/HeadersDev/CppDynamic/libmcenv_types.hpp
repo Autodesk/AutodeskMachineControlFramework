@@ -268,6 +268,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64 10171 /** Column is not of type int64 */
 #define LIBMCENV_ERROR_INVALIDCSVSEPARATOR 10172 /** Invalid CSV Separator */
 #define LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW 10173 /** Data Table CSV buffer overflow */
+#define LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID 10174 /** Date Time difference is invalid */
+#define LIBMCENV_ERROR_DATETIMEISINVALID 10175 /** Date Time is invalid */
+#define LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS 10176 /** Date Time out of bounds */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -448,6 +451,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
     case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
     case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "Data Table CSV buffer overflow";
+    case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
+    case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
+    case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
     default: return "unknown error";
   }
 }
@@ -466,6 +472,7 @@ typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
 typedef LibMCEnvHandle LibMCEnv_DataTableWriteOptions;
+typedef LibMCEnvHandle LibMCEnv_DataTableCSVWriteOptions;
 typedef LibMCEnvHandle LibMCEnv_DataTable;
 typedef LibMCEnvHandle LibMCEnv_DataSeries;
 typedef LibMCEnvHandle LibMCEnv_DateTimeDifference;

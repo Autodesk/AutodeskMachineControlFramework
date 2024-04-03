@@ -211,8 +211,9 @@
 		<error name="COLUMNISNOTOFTYPEINT64" code="10171" description="Column is not of type int64" />		
 		<error name="INVALIDCSVSEPARATOR" code="10172" description="Invalid CSV Separator" />		
 		<error name="DATATABLECSVBUFFEROVERFLOW" code="10173" description="Data Table CSV buffer overflow" />		
-		
-
+		<error name="DATETIMEDIFFERENCEISINVALID" code="10174" description="Date Time difference is invalid" />		
+		<error name="DATETIMEISINVALID" code="10175" description="Date Time is invalid" />		
+		<error name="DATETIMEOUTOFBOUNDS" code="10176" description="Date Time out of bounds" />		
 		
 		
 	</errors>
@@ -665,6 +666,18 @@
 	<class name="DataTableWriteOptions" parent="Base" description="Configurates the writing of data table streams to disk.">
 	</class>
 
+	<class name="DataTableCSVWriteOptions" parent="Base" description="Configurates the writing of data table streams to disk as CSV.">
+
+		<method name="GetSeparator" description="Returns the desired separator of the CSV file. Default is semicolon.">
+			<param name="Separator" type="string" pass="return" description="Separator to use." />
+		</method>
+
+		<method name="SetSeparator" description="Sets the desired separator of the CSV file.">
+			<param name="Separator" type="string" pass="in" description="Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)" />
+		</method>
+
+	</class>
+	
 	<class name="DataTable" parent="Base" description="A in memory data table, streamable for example into a CSV file.">
 	
 		<method name="AddColumn" description="Adds a column to the data field.">
@@ -763,7 +776,7 @@
 		
 		<method name="WriteCSVToStream" description="Writes the data as CSV to a temporary stream.">
 			<param name="Writer" type="class" class="TempStreamWriter" pass="in" description="Stream writer to use." />
-			<param name="Separator" type="string" pass="in" description="Seperator to use between the Cells. MUST be a single character string." />
+			<param name="Options" type="optionalclass" class="DataTableCSVWriteOptions" pass="in" description="Optional CSV writer options to use." />
 		</method>
 		
 		<method name="WriteDataToStream" description="Writes the data as binary to a temporary stream.">

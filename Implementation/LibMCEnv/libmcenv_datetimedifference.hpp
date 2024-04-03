@@ -58,26 +58,15 @@ namespace Impl {
 class CDateTimeDifference : public virtual IDateTimeDifference, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	// A Time difference in microseconds
+	uint64_t m_nDateTimeDifferenceInMicroseconds;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CDateTimeDifference(uint64_t nDateTimeDifferenceInMicroseconds);
 
+	virtual ~CDateTimeDifference();
 
-	/**
-	* Public member functions to implement.
-	*/
 
 	LibMCEnv_uint64 ToMicroseconds() override;
 

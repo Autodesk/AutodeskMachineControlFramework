@@ -667,6 +667,30 @@ typedef LibMCEnvResult (*PLibMCEnvDiscreteFieldData2D_DuplicatePtr) (LibMCEnv_Di
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for DataTableCSVWriteOptions
+**************************************************************************************************************************/
+
+/**
+* Returns the desired separator of the CSV file. Default is semicolon.
+*
+* @param[in] pDataTableCSVWriteOptions - DataTableCSVWriteOptions instance.
+* @param[in] nSeparatorBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSeparatorNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSeparatorBuffer -  buffer of Separator to use., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr) (LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const LibMCEnv_uint32 nSeparatorBufferSize, LibMCEnv_uint32* pSeparatorNeededChars, char * pSeparatorBuffer);
+
+/**
+* Sets the desired separator of the CSV file.
+*
+* @param[in] pDataTableCSVWriteOptions - DataTableCSVWriteOptions instance.
+* @param[in] pSeparator - Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr) (LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const char * pSeparator);
+
+/*************************************************************************************************************************
  Class definition for DataTable
 **************************************************************************************************************************/
 
@@ -885,10 +909,10 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint64ColumnValuesPtr) (LibMCEnv_
 *
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pWriter - Stream writer to use.
-* @param[in] pSeparator - Seperator to use between the Cells. MUST be a single character string.
+* @param[in] pOptions - Optional CSV writer options to use.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteCSVToStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, const char * pSeparator);
+typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteCSVToStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableCSVWriteOptions pOptions);
 
 /**
 * Writes the data as binary to a temporary stream.
@@ -7549,6 +7573,8 @@ typedef struct {
 	PLibMCEnvDiscreteFieldData2D_TransformFieldPtr m_DiscreteFieldData2D_TransformField;
 	PLibMCEnvDiscreteFieldData2D_AddFieldPtr m_DiscreteFieldData2D_AddField;
 	PLibMCEnvDiscreteFieldData2D_DuplicatePtr m_DiscreteFieldData2D_Duplicate;
+	PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr m_DataTableCSVWriteOptions_GetSeparator;
+	PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr m_DataTableCSVWriteOptions_SetSeparator;
 	PLibMCEnvDataTable_AddColumnPtr m_DataTable_AddColumn;
 	PLibMCEnvDataTable_RemoveColumnPtr m_DataTable_RemoveColumn;
 	PLibMCEnvDataTable_HasColumnPtr m_DataTable_HasColumn;

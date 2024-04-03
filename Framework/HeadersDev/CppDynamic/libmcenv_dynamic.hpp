@@ -69,6 +69,7 @@ class CImageData;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
 class CDataTableWriteOptions;
+class CDataTableCSVWriteOptions;
 class CDataTable;
 class CDataSeries;
 class CDateTimeDifference;
@@ -124,6 +125,7 @@ typedef CImageData CLibMCEnvImageData;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
 typedef CDataTableWriteOptions CLibMCEnvDataTableWriteOptions;
+typedef CDataTableCSVWriteOptions CLibMCEnvDataTableCSVWriteOptions;
 typedef CDataTable CLibMCEnvDataTable;
 typedef CDataSeries CLibMCEnvDataSeries;
 typedef CDateTimeDifference CLibMCEnvDateTimeDifference;
@@ -179,6 +181,7 @@ typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
 typedef std::shared_ptr<CDataTableWriteOptions> PDataTableWriteOptions;
+typedef std::shared_ptr<CDataTableCSVWriteOptions> PDataTableCSVWriteOptions;
 typedef std::shared_ptr<CDataTable> PDataTable;
 typedef std::shared_ptr<CDataSeries> PDataSeries;
 typedef std::shared_ptr<CDateTimeDifference> PDateTimeDifference;
@@ -234,6 +237,7 @@ typedef PImageData PLibMCEnvImageData;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
 typedef PDataTableWriteOptions PLibMCEnvDataTableWriteOptions;
+typedef PDataTableCSVWriteOptions PLibMCEnvDataTableCSVWriteOptions;
 typedef PDataTable PLibMCEnvDataTable;
 typedef PDataSeries PLibMCEnvDataSeries;
 typedef PDateTimeDifference PLibMCEnvDateTimeDifference;
@@ -525,6 +529,9 @@ public:
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "COLUMNISNOTOFTYPEINT64";
 			case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "INVALIDCSVSEPARATOR";
 			case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "DATATABLECSVBUFFEROVERFLOW";
+			case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "DATETIMEDIFFERENCEISINVALID";
+			case LIBMCENV_ERROR_DATETIMEISINVALID: return "DATETIMEISINVALID";
+			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "DATETIMEOUTOFBOUNDS";
 		}
 		return "UNKNOWN";
 	}
@@ -705,6 +712,9 @@ public:
 			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
 			case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
 			case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "Data Table CSV buffer overflow";
+			case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
+			case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
+			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
 		}
 		return "unknown error";
 	}
@@ -831,6 +841,7 @@ private:
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
 	friend class CDataTableWriteOptions;
+	friend class CDataTableCSVWriteOptions;
 	friend class CDataTable;
 	friend class CDataSeries;
 	friend class CDateTimeDifference;
@@ -1131,6 +1142,24 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDataTableCSVWriteOptions 
+**************************************************************************************************************************/
+class CDataTableCSVWriteOptions : public CBase {
+public:
+	
+	/**
+	* CDataTableCSVWriteOptions::CDataTableCSVWriteOptions - Constructor for DataTableCSVWriteOptions class.
+	*/
+	CDataTableCSVWriteOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetSeparator();
+	inline void SetSeparator(const std::string & sSeparator);
+};
+	
+/*************************************************************************************************************************
  Class CDataTable 
 **************************************************************************************************************************/
 class CDataTable : public CBase {
@@ -1163,7 +1192,7 @@ public:
 	inline void SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer);
 	inline void SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer);
 	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
-	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, const std::string & sSeparator);
+	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions);
 	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
 };
 	
@@ -2539,6 +2568,8 @@ public:
 		pWrapperTable->m_DiscreteFieldData2D_TransformField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_AddField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
+		pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator = nullptr;
+		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = nullptr;
 		pWrapperTable->m_DataTable_AddColumn = nullptr;
 		pWrapperTable->m_DataTable_RemoveColumn = nullptr;
 		pWrapperTable->m_DataTable_HasColumn = nullptr;
@@ -3720,6 +3751,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator = (PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr) GetProcAddress(hLibrary, "libmcenv_datatablecsvwriteoptions_getseparator");
+		#else // _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator = (PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr) dlsym(hLibrary, "libmcenv_datatablecsvwriteoptions_getseparator");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = (PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr) GetProcAddress(hLibrary, "libmcenv_datatablecsvwriteoptions_setseparator");
+		#else // _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = (PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr) dlsym(hLibrary, "libmcenv_datatablecsvwriteoptions_setseparator");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9700,6 +9749,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatablecsvwriteoptions_getseparator", (void**)&(pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablecsvwriteoptions_setseparator", (void**)&(pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_datatable_addcolumn", (void**)&(pWrapperTable->m_DataTable_AddColumn));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_AddColumn == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12966,6 +13023,34 @@ public:
 	 */
 	
 	/**
+	 * Method definitions for class CDataTableCSVWriteOptions
+	 */
+	
+	/**
+	* CDataTableCSVWriteOptions::GetSeparator - Returns the desired separator of the CSV file. Default is semicolon.
+	* @return Separator to use.
+	*/
+	std::string CDataTableCSVWriteOptions::GetSeparator()
+	{
+		LibMCEnv_uint32 bytesNeededSeparator = 0;
+		LibMCEnv_uint32 bytesWrittenSeparator = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableCSVWriteOptions_GetSeparator(m_pHandle, 0, &bytesNeededSeparator, nullptr));
+		std::vector<char> bufferSeparator(bytesNeededSeparator);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableCSVWriteOptions_GetSeparator(m_pHandle, bytesNeededSeparator, &bytesWrittenSeparator, &bufferSeparator[0]));
+		
+		return std::string(&bufferSeparator[0]);
+	}
+	
+	/**
+	* CDataTableCSVWriteOptions::SetSeparator - Sets the desired separator of the CSV file.
+	* @param[in] sSeparator - Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)
+	*/
+	void CDataTableCSVWriteOptions::SetSeparator(const std::string & sSeparator)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableCSVWriteOptions_SetSeparator(m_pHandle, sSeparator.c_str()));
+	}
+	
+	/**
 	 * Method definitions for class CDataTable
 	 */
 	
@@ -13210,12 +13295,13 @@ public:
 	/**
 	* CDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
 	* @param[in] pWriter - Stream writer to use.
-	* @param[in] sSeparator - Seperator to use between the Cells. MUST be a single character string.
+	* @param[in] pOptions - Optional CSV writer options to use.
 	*/
-	void CDataTable::WriteCSVToStream(classParam<CTempStreamWriter> pWriter, const std::string & sSeparator)
+	void CDataTable::WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions)
 	{
 		LibMCEnvHandle hWriter = pWriter.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteCSVToStream(m_pHandle, hWriter, sSeparator.c_str()));
+		LibMCEnvHandle hOptions = pOptions.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteCSVToStream(m_pHandle, hWriter, hOptions));
 	}
 	
 	/**

@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CDateTimeDifference
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "common_chrono.hpp"
+#include "amc_constants.hpp"
 
 
 using namespace LibMCEnv::Impl;
@@ -43,83 +45,106 @@ using namespace LibMCEnv::Impl;
  Class definition of CDateTimeDifference 
 **************************************************************************************************************************/
 
+CDateTimeDifference::CDateTimeDifference(uint64_t nDateTimeDifferenceInMicroseconds)
+	: m_nDateTimeDifferenceInMicroseconds (nDateTimeDifferenceInMicroseconds)
+{
+	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nDateTimeDifferenceInMicroseconds))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID, std::to_string (nDateTimeDifferenceInMicroseconds));
+}
+
+CDateTimeDifference::~CDateTimeDifference()
+{
+
+}
+
 LibMCEnv_uint64 CDateTimeDifference::ToMicroseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nDateTimeDifferenceInMicroseconds;
 }
 
 LibMCEnv_uint64 CDateTimeDifference::ToMilliseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nDateTimeDifferenceInMicroseconds / MICROSECONDS_PER_MILLISECOND;
 }
 
 LibMCEnv_uint64 CDateTimeDifference::ToSeconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nDateTimeDifferenceInMicroseconds / MICROSECONDS_PER_SECOND;
 }
 
 LibMCEnv_uint64 CDateTimeDifference::ToMinutes()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nDateTimeDifferenceInMicroseconds / MICROSECONDS_PER_MINUTE;
 }
 
 LibMCEnv_uint64 CDateTimeDifference::ToHours()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nDateTimeDifferenceInMicroseconds / MICROSECONDS_PER_HOUR;
 }
 
 LibMCEnv_uint64 CDateTimeDifference::ToDays()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nDateTimeDifferenceInMicroseconds / MICROSECONDS_PER_DAY;
 }
 
 void CDateTimeDifference::RoundDownToDay()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nDateTimeDifferenceInMicroseconds = ToDays() * MICROSECONDS_PER_DAY;
 }
 
 void CDateTimeDifference::RoundDownToHour()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nDateTimeDifferenceInMicroseconds = ToHours() * MICROSECONDS_PER_HOUR;
 }
 
 void CDateTimeDifference::RoundDownToMinute()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nDateTimeDifferenceInMicroseconds = ToMinutes() * MICROSECONDS_PER_MINUTE;
 }
 
 void CDateTimeDifference::RoundDownToSeconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nDateTimeDifferenceInMicroseconds = ToSeconds() * MICROSECONDS_PER_SECOND;
 }
 
 void CDateTimeDifference::RoundDownToMilliseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	m_nDateTimeDifferenceInMicroseconds = ToSeconds() * MICROSECONDS_PER_MILLISECOND;
 }
 
 void CDateTimeDifference::RoundUpToDay()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nDateTimeDifferenceInMicroseconds % MICROSECONDS_PER_DAY) != 0ULL) {
+		m_nDateTimeDifferenceInMicroseconds = (ToDays() + 1) * MICROSECONDS_PER_DAY;
+	}
+		
 }
 
 void CDateTimeDifference::RoundUpToHour()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nDateTimeDifferenceInMicroseconds % MICROSECONDS_PER_HOUR) != 0ULL) {
+		m_nDateTimeDifferenceInMicroseconds = (ToHours() + 1) * MICROSECONDS_PER_HOUR;
+	}
 }
 
 void CDateTimeDifference::RoundUpToMinute()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nDateTimeDifferenceInMicroseconds % MICROSECONDS_PER_MINUTE) != 0ULL) {
+		m_nDateTimeDifferenceInMicroseconds = (ToMinutes() + 1) * MICROSECONDS_PER_MINUTE;
+	}
 }
 
 void CDateTimeDifference::RoundUpToSeconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nDateTimeDifferenceInMicroseconds % MICROSECONDS_PER_SECOND) != 0ULL) {
+		m_nDateTimeDifferenceInMicroseconds = (ToSeconds() + 1) * MICROSECONDS_PER_SECOND;
+	}
 }
 
 void CDateTimeDifference::RoundupToMilliseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if ((m_nDateTimeDifferenceInMicroseconds % MICROSECONDS_PER_SECOND) != 0ULL) {
+		m_nDateTimeDifferenceInMicroseconds = (ToMilliseconds() + 1) * MICROSECONDS_PER_SECOND;
+	}
 }
 

@@ -680,6 +680,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for DataTableCSVWriteOptions
+**************************************************************************************************************************/
+
+/**
+* Returns the desired separator of the CSV file. Default is semicolon.
+*
+* @param[in] pDataTableCSVWriteOptions - DataTableCSVWriteOptions instance.
+* @param[in] nSeparatorBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSeparatorNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSeparatorBuffer -  buffer of Separator to use., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablecsvwriteoptions_getseparator(LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const LibMCEnv_uint32 nSeparatorBufferSize, LibMCEnv_uint32* pSeparatorNeededChars, char * pSeparatorBuffer);
+
+/**
+* Sets the desired separator of the CSV file.
+*
+* @param[in] pDataTableCSVWriteOptions - DataTableCSVWriteOptions instance.
+* @param[in] pSeparator - Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablecsvwriteoptions_setseparator(LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const char * pSeparator);
+
+/*************************************************************************************************************************
  Class definition for DataTable
 **************************************************************************************************************************/
 
@@ -898,10 +922,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCE
 *
 * @param[in] pDataTable - DataTable instance.
 * @param[in] pWriter - Stream writer to use.
-* @param[in] pSeparator - Seperator to use between the Cells. MUST be a single character string.
+* @param[in] pOptions - Optional CSV writer options to use.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, const char * pSeparator);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableCSVWriteOptions pOptions);
 
 /**
 * Writes the data as binary to a temporary stream.

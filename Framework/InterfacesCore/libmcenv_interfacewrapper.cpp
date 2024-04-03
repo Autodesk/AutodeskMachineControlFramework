@@ -1702,6 +1702,85 @@ LibMCEnvResult libmcenv_discretefielddata2d_duplicate(LibMCEnv_DiscreteFieldData
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class implementation for DataTableCSVWriteOptions
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_datatablecsvwriteoptions_getseparator(LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const LibMCEnv_uint32 nSeparatorBufferSize, LibMCEnv_uint32* pSeparatorNeededChars, char * pSeparatorBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableCSVWriteOptions;
+
+	try {
+		if ( (!pSeparatorBuffer) && !(pSeparatorNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sSeparator("");
+		IDataTableCSVWriteOptions* pIDataTableCSVWriteOptions = dynamic_cast<IDataTableCSVWriteOptions*>(pIBaseClass);
+		if (!pIDataTableCSVWriteOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSeparatorBuffer == nullptr);
+		if (isCacheCall) {
+			sSeparator = pIDataTableCSVWriteOptions->GetSeparator();
+
+			pIDataTableCSVWriteOptions->_setCache (new ParameterCache_1<std::string> (sSeparator));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataTableCSVWriteOptions->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSeparator);
+			pIDataTableCSVWriteOptions->_setCache (nullptr);
+		}
+		
+		if (pSeparatorNeededChars)
+			*pSeparatorNeededChars = (LibMCEnv_uint32) (sSeparator.size()+1);
+		if (pSeparatorBuffer) {
+			if (sSeparator.size() >= nSeparatorBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSeparator = 0; iSeparator < sSeparator.size(); iSeparator++)
+				pSeparatorBuffer[iSeparator] = sSeparator[iSeparator];
+			pSeparatorBuffer[sSeparator.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablecsvwriteoptions_setseparator(LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const char * pSeparator)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableCSVWriteOptions;
+
+	try {
+		if (pSeparator == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sSeparator(pSeparator);
+		IDataTableCSVWriteOptions* pIDataTableCSVWriteOptions = dynamic_cast<IDataTableCSVWriteOptions*>(pIBaseClass);
+		if (!pIDataTableCSVWriteOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTableCSVWriteOptions->SetSeparator(sSeparator);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DataTable
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_datatable_addcolumn(LibMCEnv_DataTable pDataTable, const char * pIdentifier, const char * pDescription, eLibMCEnvDataTableColumnType eColumnType)
@@ -2307,24 +2386,23 @@ LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pData
 	}
 }
 
-LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, const char * pSeparator)
+LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableCSVWriteOptions pOptions)
 {
 	IBase* pIBaseClass = (IBase *)pDataTable;
 
 	try {
-		if (pSeparator == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IBase* pIBaseClassWriter = (IBase *)pWriter;
 		ITempStreamWriter* pIWriter = dynamic_cast<ITempStreamWriter*>(pIBaseClassWriter);
 		if (!pIWriter)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
 		
-		std::string sSeparator(pSeparator);
+		IBase* pIBaseClassOptions = (IBase *)pOptions;
+		IDataTableCSVWriteOptions* pIOptions = dynamic_cast<IDataTableCSVWriteOptions*>(pIBaseClassOptions);
 		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
 		if (!pIDataTable)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIDataTable->WriteCSVToStream(pIWriter, sSeparator);
+		pIDataTable->WriteCSVToStream(pIWriter, pIOptions);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -22685,6 +22763,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_addfield;
 	if (sProcName == "libmcenv_discretefielddata2d_duplicate") 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2d_duplicate;
+	if (sProcName == "libmcenv_datatablecsvwriteoptions_getseparator") 
+		*ppProcAddress = (void*) &libmcenv_datatablecsvwriteoptions_getseparator;
+	if (sProcName == "libmcenv_datatablecsvwriteoptions_setseparator") 
+		*ppProcAddress = (void*) &libmcenv_datatablecsvwriteoptions_setseparator;
 	if (sProcName == "libmcenv_datatable_addcolumn") 
 		*ppProcAddress = (void*) &libmcenv_datatable_addcolumn;
 	if (sProcName == "libmcenv_datatable_removecolumn") 
