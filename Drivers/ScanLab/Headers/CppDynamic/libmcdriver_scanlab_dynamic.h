@@ -192,20 +192,12 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ReadDataP
 * @param[in] pSeparator - Line Separator to search for.
 * @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
 * @param[in] nTimeOutInMS - Timeout in Milliseconds.
-* @param[in] nDataBufferSize - Number of elements in buffer
-* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pDataBuffer - uint8  buffer of Receive buffer.
+* @param[in] nLineBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLineBuffer -  buffer of Received line., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ReadLinePtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer);
-
-/**
-* Closes the connection. All subsequent calls will fail.
-*
-* @param[in] pUARTConnection - UARTConnection instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ClosePtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ReadLinePtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint32 nLineBufferSize, LibMCDriver_ScanLab_uint32* pLineNeededChars, char * pLineBuffer);
 
 /*************************************************************************************************************************
  Class definition for RTCContext
@@ -2018,7 +2010,6 @@ typedef struct {
 	PLibMCDriver_ScanLabUARTConnection_WriteDataPtr m_UARTConnection_WriteData;
 	PLibMCDriver_ScanLabUARTConnection_ReadDataPtr m_UARTConnection_ReadData;
 	PLibMCDriver_ScanLabUARTConnection_ReadLinePtr m_UARTConnection_ReadLine;
-	PLibMCDriver_ScanLabUARTConnection_ClosePtr m_UARTConnection_Close;
 	PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr m_RTCContext_LoadFirmware;
 	PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr m_RTCContext_LoadCorrectionFile;
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;
