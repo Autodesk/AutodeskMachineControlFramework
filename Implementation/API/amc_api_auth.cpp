@@ -92,10 +92,25 @@ PUserInformation CAPIAuth::getUserInformation()
 std::string CAPIAuth::getUserName() 
 {
 	return m_pUserInformation->getLogin();
-
 }
+
+std::string CAPIAuth::getUserUUID()
+{
+	return m_pUserInformation->getUUID();
+}
+
 
 PParameterHandler CAPIAuth::getClientVariableHandler()
 {
 	return m_pClientVariableHandler;
+}
+
+std::string CAPIAuth::createStreamDownloadTicket(const std::string& sStreamUUID, const std::string& sDownloadFileName)
+{
+	std::string sTicketUUID = AMCCommon::CUtils::createUUID();
+	std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+
+	m_DownloadTickets.insert(std::make_pair (sTicketUUID, std::make_pair (sNormalizedStreamUUID, sDownloadFileName)));
+
+	return sTicketUUID;
 }

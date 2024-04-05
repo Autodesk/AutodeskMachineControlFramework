@@ -298,6 +298,12 @@ public:
 	*/
 	virtual void GetResultData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer) = 0;
 
+	/**
+	* IAPIRequestHandler::GetContentDispositionName - returns the cached stream content disposition string of the resulting data. Call only after Handle().
+	* @return Returns non-empty string if content disposition header should be added.
+	*/
+	virtual std::string GetContentDispositionName() = 0;
+
 };
 
 typedef IBaseSharedPtr<IAPIRequestHandler> PIAPIRequestHandler;

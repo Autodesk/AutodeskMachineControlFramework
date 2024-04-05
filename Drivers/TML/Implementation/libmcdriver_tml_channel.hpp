@@ -59,17 +59,18 @@ class CChannel : public virtual IChannel, public virtual CBase {
 private:
 
     PTMLInstance m_pTMLInstance;
-    std::string m_sChannelIdentifier;
+    std::string m_sChannelIdentifier; 
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 public:
 
-    CChannel(PTMLInstance pTMLInstance, const std::string & sChannelIdentifier);
+    CChannel(PTMLInstance pTMLInstance, const std::string & sChannelIdentifier, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     virtual ~CChannel();
 
     std::string GetIdentifier() override;
 
-    IAxis* SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer) override;
+    IAxis* SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM) override;
 
     IAxis* FindAxis(const std::string& sIdentifier) override;
 

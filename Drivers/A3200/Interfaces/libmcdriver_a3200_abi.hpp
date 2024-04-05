@@ -313,6 +313,61 @@ LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a320
 */
 LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writetaskstringvariable(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nTaskID, const char * pName, const char * pValue);
 
+/**
+* Reads out the position information of an axis.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+* @param[out] pValue - Axis position value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxisposition(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue);
+
+/**
+* Reads out the target position information of an axis.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+* @param[out] pValue - Axis target position value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxistargetposition(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue);
+
+/**
+* Reads out the velocity information of an axis.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+* @param[out] pValue - Axis velocity value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxisvelocity(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue);
+
+/**
+* Reads out the target velocity information of an axis.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+* @param[out] pValue - Axis target velocity value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxistargetvelocity(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue);
+
+/**
+* Reads out all information of an axis.
+*
+* @param[in] pDriver_A3200 - Driver_A3200 instance.
+* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+* @param[out] pCurrentPositionValue - Current Position.
+* @param[out] pTargetPositionValue - Target Position.
+* @param[out] pPositionErrorValue - Position Error Value.
+* @param[out] pCurrentVelocityValue - Current Velocity.
+* @param[out] pTargetVelocityValue - Target Velocity.
+* @param[out] pVelocityErrorValue - Velocity Error Value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_A3200_DECLSPEC LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxisinformation(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pCurrentPositionValue, LibMCDriver_A3200_double * pTargetPositionValue, LibMCDriver_A3200_double * pPositionErrorValue, LibMCDriver_A3200_double * pCurrentVelocityValue, LibMCDriver_A3200_double * pTargetVelocityValue, LibMCDriver_A3200_double * pVelocityErrorValue);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/

@@ -62,6 +62,9 @@ namespace LibMCDriver_GRPC {
 class CWrapper;
 class CBase;
 class CDriver;
+class CGRPCMessage;
+class CGRPCResponse;
+class CGRPCRequest;
 class CGRPCConnection;
 class CDriver_GRPC;
 
@@ -71,6 +74,9 @@ class CDriver_GRPC;
 typedef CWrapper CLibMCDriver_GRPCWrapper;
 typedef CBase CLibMCDriver_GRPCBase;
 typedef CDriver CLibMCDriver_GRPCDriver;
+typedef CGRPCMessage CLibMCDriver_GRPCGRPCMessage;
+typedef CGRPCResponse CLibMCDriver_GRPCGRPCResponse;
+typedef CGRPCRequest CLibMCDriver_GRPCGRPCRequest;
 typedef CGRPCConnection CLibMCDriver_GRPCGRPCConnection;
 typedef CDriver_GRPC CLibMCDriver_GRPCDriver_GRPC;
 
@@ -80,6 +86,9 @@ typedef CDriver_GRPC CLibMCDriver_GRPCDriver_GRPC;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
+typedef std::shared_ptr<CGRPCMessage> PGRPCMessage;
+typedef std::shared_ptr<CGRPCResponse> PGRPCResponse;
+typedef std::shared_ptr<CGRPCRequest> PGRPCRequest;
 typedef std::shared_ptr<CGRPCConnection> PGRPCConnection;
 typedef std::shared_ptr<CDriver_GRPC> PDriver_GRPC;
 
@@ -89,6 +98,9 @@ typedef std::shared_ptr<CDriver_GRPC> PDriver_GRPC;
 typedef PWrapper PLibMCDriver_GRPCWrapper;
 typedef PBase PLibMCDriver_GRPCBase;
 typedef PDriver PLibMCDriver_GRPCDriver;
+typedef PGRPCMessage PLibMCDriver_GRPCGRPCMessage;
+typedef PGRPCResponse PLibMCDriver_GRPCGRPCResponse;
+typedef PGRPCRequest PLibMCDriver_GRPCGRPCRequest;
 typedef PGRPCConnection PLibMCDriver_GRPCGRPCConnection;
 typedef PDriver_GRPC PLibMCDriver_GRPCDriver_GRPC;
 
@@ -181,71 +193,15 @@ public:
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERERROR: return "DRIVERERROR";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTINITIALISED: return "DRIVERNOTINITIALISED";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED: return "DRIVERNOTCONNECTED";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDDRIVERPROTOCOL: return "INVALIDDRIVERPROTOCOL";
-			case LIBMCDRIVER_GRPC_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "COULDNOTPARSEDRIVERPROTOCOL";
-			case LIBMCDRIVER_GRPC_ERROR_NOWORKINGDIRECTORY: return "NOWORKINGDIRECTORY";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDTASKID: return "INVALIDTASKID";
-			case LIBMCDRIVER_GRPC_ERROR_VERSIONMISMATCH: return "VERSIONMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_FEATURELOCKED: return "FEATURELOCKED";
-			case LIBMCDRIVER_GRPC_ERROR_UNSUPPORTEDHARDWARE: return "UNSUPPORTEDHARDWARE";
-			case LIBMCDRIVER_GRPC_ERROR_RESETTIMEOUT: return "RESETTIMEOUT";
-			case LIBMCDRIVER_GRPC_ERROR_ALLOCATIONFAILED: return "ALLOCATIONFAILED";
-			case LIBMCDRIVER_GRPC_ERROR_NOTCONNECTED: return "NOTCONNECTED";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDAXISINDEX: return "INVALIDAXISINDEX";
-			case LIBMCDRIVER_GRPC_ERROR_TOOLTABLEERROR: return "TOOLTABLEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDLOST: return "DRIVECOMMANDLOST";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDRESPONSE: return "DRIVECOMMANDRESPONSE";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREISONCHRONOUSERROR: return "FIREWIREISONCHRONOUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREASYNCHRONOUSERROR: return "FIREWIREASYNCHRONOUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_PCMODBUSERROR: return "PCMODBUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_COMMUNICATIONLOST: return "COMMUNICATIONLOST";
-			case LIBMCDRIVER_GRPC_ERROR_ETHERNETCOMMUNICATIONLOST: return "ETHERNETCOMMUNICATIONLOST";
-			case LIBMCDRIVER_GRPC_ERROR_SERVICECOMMUNICATIONLOST: return "SERVICECOMMUNICATIONLOST";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECARDCONFIGURATION: return "FIREWIRECARDCONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_PCICARDERROR: return "PCICARDERROR";
-			case LIBMCDRIVER_GRPC_ERROR_AXISMISMATCH: return "AXISMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_TASKMISMATCH: return "TASKMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDCOMMANDLINE: return "INVALIDCOMMANDLINE";
-			case LIBMCDRIVER_GRPC_ERROR_MACHINECONFIGURATION: return "MACHINECONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECONFIGURATION: return "FIREWIRECONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYCONFIGURATION: return "GANTRYCONFIGURATION";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKTIMEOUT: return "CALLBACKTIMEOUT";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKERROR: return "CALLBACKERROR";
-			case LIBMCDRIVER_GRPC_ERROR_TOOMANYSTATUSITEMS: return "TOOMANYSTATUSITEMS";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMERROR: return "PROGRAMERROR";
-			case LIBMCDRIVER_GRPC_ERROR_STRINGOVERFLOW: return "STRINGOVERFLOW";
-			case LIBMCDRIVER_GRPC_ERROR_DIVIDEBYZERO: return "DIVIDEBYZERO";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMTIMEOUT: return "PROGRAMTIMEOUT";
-			case LIBMCDRIVER_GRPC_ERROR_PROFILEQUEUEERROR: return "PROFILEQUEUEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDARGUMENT: return "INVALIDARGUMENT";
-			case LIBMCDRIVER_GRPC_ERROR_PARAMETERNOTPASSED: return "PARAMETERNOTPASSED";
-			case LIBMCDRIVER_GRPC_ERROR_QUEUEBUFFERFULL: return "QUEUEBUFFERFULL";
-			case LIBMCDRIVER_GRPC_ERROR_NULLPROGRAMLINE: return "NULLPROGRAMLINE";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMNUMBEROUTOFBOUNDS: return "PROGRAMNUMBEROUTOFBOUNDS";
-			case LIBMCDRIVER_GRPC_ERROR_CANNEDFUNCTIONERROR: return "CANNEDFUNCTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_ZEROSPEED: return "ZEROSPEED";
-			case LIBMCDRIVER_GRPC_ERROR_STACKERROR: return "STACKERROR";
-			case LIBMCDRIVER_GRPC_ERROR_SLICEERROR: return "SLICEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_LOOKAHEADERROR: return "LOOKAHEADERROR";
-			case LIBMCDRIVER_GRPC_ERROR_RETRACEERROR: return "RETRACEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_AXISINFAULT: return "AXISINFAULT";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTENABLED: return "AXISNOTENABLED";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONERROR: return "MOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYMOTIONERROR: return "GANTRYMOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CUTTERCOMPENSATIONERROR: return "CUTTERCOMPENSATIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARMOTIONERROR: return "CIRCULARMOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARRADIUSERROR: return "CIRCULARRADIUSERROR";
-			case LIBMCDRIVER_GRPC_ERROR_NORMALCYERROR: return "NORMALCYERROR";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONTYPEMISMATCH: return "MOTIONTYPEMISMATCH";
-			case LIBMCDRIVER_GRPC_ERROR_SPINDLENUMBERNOTASSIGNED: return "SPINDLENUMBERNOTASSIGNED";
-			case LIBMCDRIVER_GRPC_ERROR_ELLIPTICALMOTIONERROR: return "ELLIPTICALMOTIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONACTIVE: return "MOTIONACTIVE";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDEPENDENT: return "AXISNOTDEPENDENT";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDOMINANT: return "AXISNOTDOMINANT";
-			case LIBMCDRIVER_GRPC_ERROR_NOJOYSTICKGROUPS: return "NOJOYSTICKGROUPS";
-			case LIBMCDRIVER_GRPC_ERROR_TRANSFORMATIONERROR: return "TRANSFORMATIONERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CALIBRATIONTABLEERROR: return "CALIBRATIONTABLEERROR";
-			case LIBMCDRIVER_GRPC_ERROR_CAMTABLEERROR: return "CAMTABLEERROR";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER: return "COULDNOTLOADGRPCWRAPPER";
+			case LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED: return "DRIVERTYPENOTSUPPORTED";
+			case LIBMCDRIVER_GRPC_ERROR_EMPTYCONNECTIONIDENTIFIER: return "EMPTYCONNECTIONIDENTIFIER";
+			case LIBMCDRIVER_GRPC_ERROR_INVALIDCONNECTIONIDENTIFIER: return "INVALIDCONNECTIONIDENTIFIER";
+			case LIBMCDRIVER_GRPC_ERROR_GRPCWRAPPERNOTLOADED: return "GRPCWRAPPERNOTLOADED";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDCONNECTIONIDENTIFIER: return "COULDNOTFINDCONNECTIONIDENTIFIER";
+			case LIBMCDRIVER_GRPC_ERROR_DUPLICATECONNECTIONIDENTIFIER: return "DUPLICATECONNECTIONIDENTIFIER";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCREQUEST: return "COULDNOTCASTTOGRPCREQUEST";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCRESPONSE: return "COULDNOTCASTTOGRPCRESPONSE";
 		}
 		return "UNKNOWN";
 	}
@@ -265,71 +221,15 @@ public:
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERERROR: return "a driver error occured";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
 			case LIBMCDRIVER_GRPC_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
-			case LIBMCDRIVER_GRPC_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
-			case LIBMCDRIVER_GRPC_ERROR_NOWORKINGDIRECTORY: return "No working directory";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDTASKID: return "Invalid task ID";
-			case LIBMCDRIVER_GRPC_ERROR_VERSIONMISMATCH: return "An incompatible version was detected";
-			case LIBMCDRIVER_GRPC_ERROR_FEATURELOCKED: return "A license error occurred";
-			case LIBMCDRIVER_GRPC_ERROR_UNSUPPORTEDHARDWARE: return "A connected hardware type is no longer supported";
-			case LIBMCDRIVER_GRPC_ERROR_RESETTIMEOUT: return "A timeout occurred while waiting for the controller reset to finish.";
-			case LIBMCDRIVER_GRPC_ERROR_ALLOCATIONFAILED: return "An attempt to allocate memory on the SMC failed";
-			case LIBMCDRIVER_GRPC_ERROR_NOTCONNECTED: return "The specified controller handle is invalid";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDAXISINDEX: return "The specified axis index is invalid.";
-			case LIBMCDRIVER_GRPC_ERROR_TOOLTABLEERROR: return "A problem occurred with a tool table";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDLOST: return "A drive command was overwritten and lost.";
-			case LIBMCDRIVER_GRPC_ERROR_DRIVECOMMANDRESPONSE: return "A timeout occurred while waiting for a drive response";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREISONCHRONOUSERROR: return "An error occurred with isochronous communication";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIREASYNCHRONOUSERROR: return "An error occurred during an asynchronous communication";
-			case LIBMCDRIVER_GRPC_ERROR_PCMODBUSERROR: return "An error occurred with PC Modbus communication";
-			case LIBMCDRIVER_GRPC_ERROR_COMMUNICATIONLOST: return "FireWire communications were interrupted.";
-			case LIBMCDRIVER_GRPC_ERROR_ETHERNETCOMMUNICATIONLOST: return "Ethernet communications were interrupted.";
-			case LIBMCDRIVER_GRPC_ERROR_SERVICECOMMUNICATIONLOST: return "Communication Service communications were interrupted.";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECARDCONFIGURATION: return "The FireWire card configuration is invalid.";
-			case LIBMCDRIVER_GRPC_ERROR_PCICARDERROR: return "A problem exists with PCI card configuration.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISMISMATCH: return "An incorrect number of axes are attached.";
-			case LIBMCDRIVER_GRPC_ERROR_TASKMISMATCH: return "An insufficient number of tasks are enabled.";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDCOMMANDLINE: return "An invalid SMC command line argument was specified.";
-			case LIBMCDRIVER_GRPC_ERROR_MACHINECONFIGURATION: return "An error occurred while accessing the machine configuration.";
-			case LIBMCDRIVER_GRPC_ERROR_FIREWIRECONFIGURATION: return "An error was detected in the FireWire configuration.";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYCONFIGURATION: return "An error gantry configuration was detected.";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKTIMEOUT: return "A timeout occurred while responding to a callback.";
-			case LIBMCDRIVER_GRPC_ERROR_CALLBACKERROR: return "A timeout occurred while responding to a callback.";
-			case LIBMCDRIVER_GRPC_ERROR_TOOMANYSTATUSITEMS: return "The maximum number of status items was exceeded.";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMERROR: return "An error occurred in program execution.";
-			case LIBMCDRIVER_GRPC_ERROR_STRINGOVERFLOW: return "The maximum string length was exceeded.";
-			case LIBMCDRIVER_GRPC_ERROR_DIVIDEBYZERO: return "A divide-by-zero was detected.";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMTIMEOUT: return "A program timeout occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_PROFILEQUEUEERROR: return "An error occurred in the execution queue";
-			case LIBMCDRIVER_GRPC_ERROR_INVALIDARGUMENT: return "An invalid argument was specified.";
-			case LIBMCDRIVER_GRPC_ERROR_PARAMETERNOTPASSED: return "A callstack argument was not passed to a subroutine.";
-			case LIBMCDRIVER_GRPC_ERROR_QUEUEBUFFERFULL: return "The buffered program queue is full.";
-			case LIBMCDRIVER_GRPC_ERROR_NULLPROGRAMLINE: return "A NULL code line pointer was specified.";
-			case LIBMCDRIVER_GRPC_ERROR_PROGRAMNUMBEROUTOFBOUNDS: return "The specified program number is outside of the valid range of values.";
-			case LIBMCDRIVER_GRPC_ERROR_CANNEDFUNCTIONERROR: return "An error occurred with a canned function.";
-			case LIBMCDRIVER_GRPC_ERROR_ZEROSPEED: return "The move speed is zero.";
-			case LIBMCDRIVER_GRPC_ERROR_STACKERROR: return "A stack error occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_SLICEERROR: return "An error occurred while executing the SLICE command.";
-			case LIBMCDRIVER_GRPC_ERROR_LOOKAHEADERROR: return "A error occurred while performing lookahead.";
-			case LIBMCDRIVER_GRPC_ERROR_RETRACEERROR: return "An error occurred while doing retrace.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISINFAULT: return "An axis fault occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTENABLED: return "The axis is not enabled.";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONERROR: return "An error occurred with a motion command.";
-			case LIBMCDRIVER_GRPC_ERROR_GANTRYMOTIONERROR: return "An error occurred while performing gantry motion.";
-			case LIBMCDRIVER_GRPC_ERROR_CUTTERCOMPENSATIONERROR: return "An error occurred while peforming cutter compensation.";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARMOTIONERROR: return "An error occurred while performing circular motion.";
-			case LIBMCDRIVER_GRPC_ERROR_CIRCULARRADIUSERROR: return "A circular radius error occurred.";
-			case LIBMCDRIVER_GRPC_ERROR_NORMALCYERROR: return "An error occurred while performing normalcy.";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONTYPEMISMATCH: return "A LINEAR move is required to execute this command.";
-			case LIBMCDRIVER_GRPC_ERROR_SPINDLENUMBERNOTASSIGNED: return "The specified spindle is not assigned to an axis.";
-			case LIBMCDRIVER_GRPC_ERROR_ELLIPTICALMOTIONERROR: return "An error occurred while performing elliptical motion.";
-			case LIBMCDRIVER_GRPC_ERROR_MOTIONACTIVE: return "Motion is already active.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDEPENDENT: return "This feature is only available on dependent axes.";
-			case LIBMCDRIVER_GRPC_ERROR_AXISNOTDOMINANT: return "This feature is only available on dominant axes.";
-			case LIBMCDRIVER_GRPC_ERROR_NOJOYSTICKGROUPS: return "No joystick groups have been specified.";
-			case LIBMCDRIVER_GRPC_ERROR_TRANSFORMATIONERROR: return "An error occurred performing a transformation.";
-			case LIBMCDRIVER_GRPC_ERROR_CALIBRATIONTABLEERROR: return "An error occurred with a calibration table.";
-			case LIBMCDRIVER_GRPC_ERROR_CAMTABLEERROR: return "An error occurred with a cam table command.";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTLOADGRPCWRAPPER: return "Could not load grpc wrapper";
+			case LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED: return "the driver type is not supported";
+			case LIBMCDRIVER_GRPC_ERROR_EMPTYCONNECTIONIDENTIFIER: return "Empty connection identifier";
+			case LIBMCDRIVER_GRPC_ERROR_INVALIDCONNECTIONIDENTIFIER: return "Invalid connection identifier";
+			case LIBMCDRIVER_GRPC_ERROR_GRPCWRAPPERNOTLOADED: return "GRPC Wrapper not loaded";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDCONNECTIONIDENTIFIER: return "Could not find connection identifier";
+			case LIBMCDRIVER_GRPC_ERROR_DUPLICATECONNECTIONIDENTIFIER: return "Duplicate connection identifier";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCREQUEST: return "Could not cast to GRPC Request";
+			case LIBMCDRIVER_GRPC_ERROR_COULDNOTCASTTOGRPCRESPONSE: return "Could not cast to GRPC Response";
 		}
 		return "unknown error";
 	}
@@ -453,6 +353,9 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
+	friend class CGRPCMessage;
+	friend class CGRPCResponse;
+	friend class CGRPCRequest;
 	friend class CGRPCConnection;
 	friend class CDriver_GRPC;
 
@@ -538,6 +441,76 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CGRPCMessage 
+**************************************************************************************************************************/
+class CGRPCMessage : public CBase {
+public:
+	
+	/**
+	* CGRPCMessage::CGRPCMessage - Constructor for GRPCMessage class.
+	*/
+	CGRPCMessage(CWrapper* pWrapper, LibMCDriver_GRPCHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool HasField(const std::string & sFieldName);
+	inline bool HasStringField(const std::string & sFieldName);
+	inline void SetStringField(const std::string & sFieldName, const std::string & sValue);
+	inline std::string GetStringField(const std::string & sFieldName);
+	inline void SetInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_int32 nValue);
+	inline LibMCDriver_GRPC_int32 GetInt32Field(const std::string & sFieldName);
+	inline void SetUInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint32 nValue);
+	inline LibMCDriver_GRPC_uint32 GetUInt32Field(const std::string & sFieldName);
+	inline void SetInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_int64 nValue);
+	inline LibMCDriver_GRPC_int64 GetInt64Field(const std::string & sFieldName);
+	inline void SetUInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint64 nValue);
+	inline LibMCDriver_GRPC_uint64 GetUInt64Field(const std::string & sFieldName);
+	inline void SetBoolField(const std::string & sFieldName, const bool bValue);
+	inline bool GetBoolField(const std::string & sFieldName);
+	inline void SetFloatField(const std::string & sFieldName, const LibMCDriver_GRPC_single fValue);
+	inline LibMCDriver_GRPC_single GetFloatField(const std::string & sFieldName);
+	inline void SetDoubleField(const std::string & sFieldName, const LibMCDriver_GRPC_double dValue);
+	inline LibMCDriver_GRPC_double GetDoubleField(const std::string & sFieldName);
+};
+	
+/*************************************************************************************************************************
+ Class CGRPCResponse 
+**************************************************************************************************************************/
+class CGRPCResponse : public CGRPCMessage {
+public:
+	
+	/**
+	* CGRPCResponse::CGRPCResponse - Constructor for GRPCResponse class.
+	*/
+	CGRPCResponse(CWrapper* pWrapper, LibMCDriver_GRPCHandle pHandle)
+		: CGRPCMessage(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetResponseType();
+};
+	
+/*************************************************************************************************************************
+ Class CGRPCRequest 
+**************************************************************************************************************************/
+class CGRPCRequest : public CGRPCMessage {
+public:
+	
+	/**
+	* CGRPCRequest::CGRPCRequest - Constructor for GRPCRequest class.
+	*/
+	CGRPCRequest(CWrapper* pWrapper, LibMCDriver_GRPCHandle pHandle)
+		: CGRPCMessage(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetRequestType();
+	inline std::string GetExpectedResponseType();
+	inline PGRPCResponse SendBlocking(const std::string & sServiceMethod, const LibMCDriver_GRPC_uint32 nTimeOutInMS);
+};
+	
+/*************************************************************************************************************************
  Class CGRPCConnection 
 **************************************************************************************************************************/
 class CGRPCConnection : public CBase {
@@ -551,6 +524,9 @@ public:
 	{
 	}
 	
+	inline std::string GetEndPoint();
+	inline void Close();
+	inline PGRPCRequest CreateStaticRequest(const std::string & sRequestTypeIdentifier, const std::string & sResponseTypeIdentifier);
 };
 	
 /*************************************************************************************************************************
@@ -569,8 +545,8 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
-	inline void Connect();
-	inline void FindConnection();
+	inline PGRPCConnection ConnectUnsecure(const std::string & sIdentifier, const std::string & sNetworkCredentials, const std::string & sProtobufDefinition);
+	inline PGRPCConnection FindConnection(const std::string & sIdentifier, const bool bMustExist);
 };
 	
 	/**
@@ -701,9 +677,34 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
+		pWrapperTable->m_GRPCMessage_HasField = nullptr;
+		pWrapperTable->m_GRPCMessage_HasStringField = nullptr;
+		pWrapperTable->m_GRPCMessage_SetStringField = nullptr;
+		pWrapperTable->m_GRPCMessage_GetStringField = nullptr;
+		pWrapperTable->m_GRPCMessage_SetInt32Field = nullptr;
+		pWrapperTable->m_GRPCMessage_GetInt32Field = nullptr;
+		pWrapperTable->m_GRPCMessage_SetUInt32Field = nullptr;
+		pWrapperTable->m_GRPCMessage_GetUInt32Field = nullptr;
+		pWrapperTable->m_GRPCMessage_SetInt64Field = nullptr;
+		pWrapperTable->m_GRPCMessage_GetInt64Field = nullptr;
+		pWrapperTable->m_GRPCMessage_SetUInt64Field = nullptr;
+		pWrapperTable->m_GRPCMessage_GetUInt64Field = nullptr;
+		pWrapperTable->m_GRPCMessage_SetBoolField = nullptr;
+		pWrapperTable->m_GRPCMessage_GetBoolField = nullptr;
+		pWrapperTable->m_GRPCMessage_SetFloatField = nullptr;
+		pWrapperTable->m_GRPCMessage_GetFloatField = nullptr;
+		pWrapperTable->m_GRPCMessage_SetDoubleField = nullptr;
+		pWrapperTable->m_GRPCMessage_GetDoubleField = nullptr;
+		pWrapperTable->m_GRPCResponse_GetResponseType = nullptr;
+		pWrapperTable->m_GRPCRequest_GetRequestType = nullptr;
+		pWrapperTable->m_GRPCRequest_GetExpectedResponseType = nullptr;
+		pWrapperTable->m_GRPCRequest_SendBlocking = nullptr;
+		pWrapperTable->m_GRPCConnection_GetEndPoint = nullptr;
+		pWrapperTable->m_GRPCConnection_Close = nullptr;
+		pWrapperTable->m_GRPCConnection_CreateStaticRequest = nullptr;
 		pWrapperTable->m_Driver_GRPC_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_GRPC_IsSimulationMode = nullptr;
-		pWrapperTable->m_Driver_GRPC_Connect = nullptr;
+		pWrapperTable->m_Driver_GRPC_ConnectUnsecure = nullptr;
 		pWrapperTable->m_Driver_GRPC_FindConnection = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -817,6 +818,231 @@ public:
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_HasField = (PLibMCDriver_GRPCGRPCMessage_HasFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_hasfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_HasField = (PLibMCDriver_GRPCGRPCMessage_HasFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_hasfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_HasField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_HasStringField = (PLibMCDriver_GRPCGRPCMessage_HasStringFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_hasstringfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_HasStringField = (PLibMCDriver_GRPCGRPCMessage_HasStringFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_hasstringfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_HasStringField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetStringField = (PLibMCDriver_GRPCGRPCMessage_SetStringFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setstringfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetStringField = (PLibMCDriver_GRPCGRPCMessage_SetStringFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setstringfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetStringField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetStringField = (PLibMCDriver_GRPCGRPCMessage_GetStringFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getstringfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetStringField = (PLibMCDriver_GRPCGRPCMessage_GetStringFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getstringfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetStringField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetInt32Field = (PLibMCDriver_GRPCGRPCMessage_SetInt32FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setint32field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetInt32Field = (PLibMCDriver_GRPCGRPCMessage_SetInt32FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setint32field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetInt32Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetInt32Field = (PLibMCDriver_GRPCGRPCMessage_GetInt32FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getint32field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetInt32Field = (PLibMCDriver_GRPCGRPCMessage_GetInt32FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getint32field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetInt32Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetUInt32Field = (PLibMCDriver_GRPCGRPCMessage_SetUInt32FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setuint32field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetUInt32Field = (PLibMCDriver_GRPCGRPCMessage_SetUInt32FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setuint32field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetUInt32Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetUInt32Field = (PLibMCDriver_GRPCGRPCMessage_GetUInt32FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getuint32field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetUInt32Field = (PLibMCDriver_GRPCGRPCMessage_GetUInt32FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getuint32field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetUInt32Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetInt64Field = (PLibMCDriver_GRPCGRPCMessage_SetInt64FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setint64field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetInt64Field = (PLibMCDriver_GRPCGRPCMessage_SetInt64FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setint64field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetInt64Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetInt64Field = (PLibMCDriver_GRPCGRPCMessage_GetInt64FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getint64field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetInt64Field = (PLibMCDriver_GRPCGRPCMessage_GetInt64FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getint64field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetInt64Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetUInt64Field = (PLibMCDriver_GRPCGRPCMessage_SetUInt64FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setuint64field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetUInt64Field = (PLibMCDriver_GRPCGRPCMessage_SetUInt64FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setuint64field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetUInt64Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetUInt64Field = (PLibMCDriver_GRPCGRPCMessage_GetUInt64FieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getuint64field");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetUInt64Field = (PLibMCDriver_GRPCGRPCMessage_GetUInt64FieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getuint64field");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetUInt64Field == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetBoolField = (PLibMCDriver_GRPCGRPCMessage_SetBoolFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setboolfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetBoolField = (PLibMCDriver_GRPCGRPCMessage_SetBoolFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setboolfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetBoolField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetBoolField = (PLibMCDriver_GRPCGRPCMessage_GetBoolFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getboolfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetBoolField = (PLibMCDriver_GRPCGRPCMessage_GetBoolFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getboolfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetBoolField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetFloatField = (PLibMCDriver_GRPCGRPCMessage_SetFloatFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setfloatfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetFloatField = (PLibMCDriver_GRPCGRPCMessage_SetFloatFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setfloatfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetFloatField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetFloatField = (PLibMCDriver_GRPCGRPCMessage_GetFloatFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getfloatfield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetFloatField = (PLibMCDriver_GRPCGRPCMessage_GetFloatFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getfloatfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetFloatField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_SetDoubleField = (PLibMCDriver_GRPCGRPCMessage_SetDoubleFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_setdoublefield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_SetDoubleField = (PLibMCDriver_GRPCGRPCMessage_SetDoubleFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_setdoublefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_SetDoubleField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetDoubleField = (PLibMCDriver_GRPCGRPCMessage_GetDoubleFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getdoublefield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetDoubleField = (PLibMCDriver_GRPCGRPCMessage_GetDoubleFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getdoublefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetDoubleField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCResponse_GetResponseType = (PLibMCDriver_GRPCGRPCResponse_GetResponseTypePtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcresponse_getresponsetype");
+		#else // _WIN32
+		pWrapperTable->m_GRPCResponse_GetResponseType = (PLibMCDriver_GRPCGRPCResponse_GetResponseTypePtr) dlsym(hLibrary, "libmcdriver_grpc_grpcresponse_getresponsetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCResponse_GetResponseType == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCRequest_GetRequestType = (PLibMCDriver_GRPCGRPCRequest_GetRequestTypePtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcrequest_getrequesttype");
+		#else // _WIN32
+		pWrapperTable->m_GRPCRequest_GetRequestType = (PLibMCDriver_GRPCGRPCRequest_GetRequestTypePtr) dlsym(hLibrary, "libmcdriver_grpc_grpcrequest_getrequesttype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCRequest_GetRequestType == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCRequest_GetExpectedResponseType = (PLibMCDriver_GRPCGRPCRequest_GetExpectedResponseTypePtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcrequest_getexpectedresponsetype");
+		#else // _WIN32
+		pWrapperTable->m_GRPCRequest_GetExpectedResponseType = (PLibMCDriver_GRPCGRPCRequest_GetExpectedResponseTypePtr) dlsym(hLibrary, "libmcdriver_grpc_grpcrequest_getexpectedresponsetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCRequest_GetExpectedResponseType == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCRequest_SendBlocking = (PLibMCDriver_GRPCGRPCRequest_SendBlockingPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcrequest_sendblocking");
+		#else // _WIN32
+		pWrapperTable->m_GRPCRequest_SendBlocking = (PLibMCDriver_GRPCGRPCRequest_SendBlockingPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcrequest_sendblocking");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCRequest_SendBlocking == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCConnection_GetEndPoint = (PLibMCDriver_GRPCGRPCConnection_GetEndPointPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcconnection_getendpoint");
+		#else // _WIN32
+		pWrapperTable->m_GRPCConnection_GetEndPoint = (PLibMCDriver_GRPCGRPCConnection_GetEndPointPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcconnection_getendpoint");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCConnection_GetEndPoint == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCConnection_Close = (PLibMCDriver_GRPCGRPCConnection_ClosePtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcconnection_close");
+		#else // _WIN32
+		pWrapperTable->m_GRPCConnection_Close = (PLibMCDriver_GRPCGRPCConnection_ClosePtr) dlsym(hLibrary, "libmcdriver_grpc_grpcconnection_close");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCConnection_Close == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCConnection_CreateStaticRequest = (PLibMCDriver_GRPCGRPCConnection_CreateStaticRequestPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcconnection_createstaticrequest");
+		#else // _WIN32
+		pWrapperTable->m_GRPCConnection_CreateStaticRequest = (PLibMCDriver_GRPCGRPCConnection_CreateStaticRequestPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcconnection_createstaticrequest");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCConnection_CreateStaticRequest == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_GRPC_SetToSimulationMode = (PLibMCDriver_GRPCDriver_GRPC_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_grpc_driver_grpc_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_Driver_GRPC_SetToSimulationMode = (PLibMCDriver_GRPCDriver_GRPC_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_grpc_driver_grpc_settosimulationmode");
@@ -835,12 +1061,12 @@ public:
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_GRPC_Connect = (PLibMCDriver_GRPCDriver_GRPC_ConnectPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_driver_grpc_connect");
+		pWrapperTable->m_Driver_GRPC_ConnectUnsecure = (PLibMCDriver_GRPCDriver_GRPC_ConnectUnsecurePtr) GetProcAddress(hLibrary, "libmcdriver_grpc_driver_grpc_connectunsecure");
 		#else // _WIN32
-		pWrapperTable->m_Driver_GRPC_Connect = (PLibMCDriver_GRPCDriver_GRPC_ConnectPtr) dlsym(hLibrary, "libmcdriver_grpc_driver_grpc_connect");
+		pWrapperTable->m_Driver_GRPC_ConnectUnsecure = (PLibMCDriver_GRPCDriver_GRPC_ConnectUnsecurePtr) dlsym(hLibrary, "libmcdriver_grpc_driver_grpc_connectunsecure");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_GRPC_Connect == nullptr)
+		if (pWrapperTable->m_Driver_GRPC_ConnectUnsecure == nullptr)
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -955,6 +1181,106 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParametersEx == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_hasfield", (void**)&(pWrapperTable->m_GRPCMessage_HasField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_HasField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_hasstringfield", (void**)&(pWrapperTable->m_GRPCMessage_HasStringField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_HasStringField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setstringfield", (void**)&(pWrapperTable->m_GRPCMessage_SetStringField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetStringField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getstringfield", (void**)&(pWrapperTable->m_GRPCMessage_GetStringField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetStringField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setint32field", (void**)&(pWrapperTable->m_GRPCMessage_SetInt32Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetInt32Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getint32field", (void**)&(pWrapperTable->m_GRPCMessage_GetInt32Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetInt32Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setuint32field", (void**)&(pWrapperTable->m_GRPCMessage_SetUInt32Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetUInt32Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getuint32field", (void**)&(pWrapperTable->m_GRPCMessage_GetUInt32Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetUInt32Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setint64field", (void**)&(pWrapperTable->m_GRPCMessage_SetInt64Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetInt64Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getint64field", (void**)&(pWrapperTable->m_GRPCMessage_GetInt64Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetInt64Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setuint64field", (void**)&(pWrapperTable->m_GRPCMessage_SetUInt64Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetUInt64Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getuint64field", (void**)&(pWrapperTable->m_GRPCMessage_GetUInt64Field));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetUInt64Field == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setboolfield", (void**)&(pWrapperTable->m_GRPCMessage_SetBoolField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetBoolField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getboolfield", (void**)&(pWrapperTable->m_GRPCMessage_GetBoolField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetBoolField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setfloatfield", (void**)&(pWrapperTable->m_GRPCMessage_SetFloatField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetFloatField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getfloatfield", (void**)&(pWrapperTable->m_GRPCMessage_GetFloatField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetFloatField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_setdoublefield", (void**)&(pWrapperTable->m_GRPCMessage_SetDoubleField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_SetDoubleField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getdoublefield", (void**)&(pWrapperTable->m_GRPCMessage_GetDoubleField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetDoubleField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcresponse_getresponsetype", (void**)&(pWrapperTable->m_GRPCResponse_GetResponseType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCResponse_GetResponseType == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcrequest_getrequesttype", (void**)&(pWrapperTable->m_GRPCRequest_GetRequestType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCRequest_GetRequestType == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcrequest_getexpectedresponsetype", (void**)&(pWrapperTable->m_GRPCRequest_GetExpectedResponseType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCRequest_GetExpectedResponseType == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcrequest_sendblocking", (void**)&(pWrapperTable->m_GRPCRequest_SendBlocking));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCRequest_SendBlocking == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcconnection_getendpoint", (void**)&(pWrapperTable->m_GRPCConnection_GetEndPoint));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCConnection_GetEndPoint == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcconnection_close", (void**)&(pWrapperTable->m_GRPCConnection_Close));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCConnection_Close == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcconnection_createstaticrequest", (void**)&(pWrapperTable->m_GRPCConnection_CreateStaticRequest));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCConnection_CreateStaticRequest == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_grpc_driver_grpc_settosimulationmode", (void**)&(pWrapperTable->m_Driver_GRPC_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GRPC_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -963,8 +1289,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GRPC_IsSimulationMode == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_grpc_driver_grpc_connect", (void**)&(pWrapperTable->m_Driver_GRPC_Connect));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GRPC_Connect == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_grpc_driver_grpc_connectunsecure", (void**)&(pWrapperTable->m_Driver_GRPC_ConnectUnsecure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GRPC_ConnectUnsecure == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_grpc_driver_grpc_findconnection", (void**)&(pWrapperTable->m_Driver_GRPC_FindConnection));
@@ -1087,8 +1413,335 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CGRPCMessage
+	 */
+	
+	/**
+	* CGRPCMessage::HasField - Returns if the message has a field of a certain name.
+	* @param[in] sFieldName - Name of the field.
+	* @return True if field exists.
+	*/
+	bool CGRPCMessage::HasField(const std::string & sFieldName)
+	{
+		bool resultFieldExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_HasField(m_pHandle, sFieldName.c_str(), &resultFieldExists));
+		
+		return resultFieldExists;
+	}
+	
+	/**
+	* CGRPCMessage::HasStringField - Returns if the message has a field of a certain name and this field is a string field.
+	* @param[in] sFieldName - Name of the field.
+	* @return True if field exists and is of type string.
+	*/
+	bool CGRPCMessage::HasStringField(const std::string & sFieldName)
+	{
+		bool resultStringFieldExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_HasStringField(m_pHandle, sFieldName.c_str(), &resultStringFieldExists));
+		
+		return resultStringFieldExists;
+	}
+	
+	/**
+	* CGRPCMessage::SetStringField - Sets a string field of the message. Fails if the field does not exist or is not a string field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] sValue - New value of the field.
+	*/
+	void CGRPCMessage::SetStringField(const std::string & sFieldName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetStringField(m_pHandle, sFieldName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CGRPCMessage::GetStringField - Gets a string field of the message. Fails if the field does not exist or is not a string field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	std::string CGRPCMessage::GetStringField(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPC_uint32 bytesNeededValue = 0;
+		LibMCDriver_GRPC_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetStringField(m_pHandle, sFieldName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetStringField(m_pHandle, sFieldName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CGRPCMessage::SetInt32Field - Sets a int32 field of the message. Fails if the field does not exist or is not a int32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	void CGRPCMessage::SetInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_int32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetInt32Field(m_pHandle, sFieldName.c_str(), nValue));
+	}
+	
+	/**
+	* CGRPCMessage::GetInt32Field - Gets a int32 field of the message. Fails if the field does not exist or is not a int32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	LibMCDriver_GRPC_int32 CGRPCMessage::GetInt32Field(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPC_int32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetInt32Field(m_pHandle, sFieldName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CGRPCMessage::SetUInt32Field - Sets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	void CGRPCMessage::SetUInt32Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetUInt32Field(m_pHandle, sFieldName.c_str(), nValue));
+	}
+	
+	/**
+	* CGRPCMessage::GetUInt32Field - Gets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	LibMCDriver_GRPC_uint32 CGRPCMessage::GetUInt32Field(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPC_uint32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetUInt32Field(m_pHandle, sFieldName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CGRPCMessage::SetInt64Field - Sets a int64 field of the message. Fails if the field does not exist or is not a int64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	void CGRPCMessage::SetInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetInt64Field(m_pHandle, sFieldName.c_str(), nValue));
+	}
+	
+	/**
+	* CGRPCMessage::GetInt64Field - Gets a int64 field of the message. Fails if the field does not exist or is not a int64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	LibMCDriver_GRPC_int64 CGRPCMessage::GetInt64Field(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPC_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetInt64Field(m_pHandle, sFieldName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CGRPCMessage::SetUInt64Field - Sets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] nValue - New value of the field.
+	*/
+	void CGRPCMessage::SetUInt64Field(const std::string & sFieldName, const LibMCDriver_GRPC_uint64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetUInt64Field(m_pHandle, sFieldName.c_str(), nValue));
+	}
+	
+	/**
+	* CGRPCMessage::GetUInt64Field - Gets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	LibMCDriver_GRPC_uint64 CGRPCMessage::GetUInt64Field(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPC_uint64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetUInt64Field(m_pHandle, sFieldName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CGRPCMessage::SetBoolField - Sets a bool field of the message. Fails if the field does not exist or is not a bool field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] bValue - New value of the field.
+	*/
+	void CGRPCMessage::SetBoolField(const std::string & sFieldName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetBoolField(m_pHandle, sFieldName.c_str(), bValue));
+	}
+	
+	/**
+	* CGRPCMessage::GetBoolField - Gets a bool field of the message. Fails if the field does not exist or is not a bool field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	bool CGRPCMessage::GetBoolField(const std::string & sFieldName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetBoolField(m_pHandle, sFieldName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CGRPCMessage::SetFloatField - Sets a float field of the message. Fails if the field does not exist or is not a float field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] fValue - New value of the field.
+	*/
+	void CGRPCMessage::SetFloatField(const std::string & sFieldName, const LibMCDriver_GRPC_single fValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetFloatField(m_pHandle, sFieldName.c_str(), fValue));
+	}
+	
+	/**
+	* CGRPCMessage::GetFloatField - Gets a float field of the message. Fails if the field does not exist or is not a float field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	LibMCDriver_GRPC_single CGRPCMessage::GetFloatField(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPC_single resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetFloatField(m_pHandle, sFieldName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CGRPCMessage::SetDoubleField - Sets a double field of the message. Fails if the field does not exist or is not a double field.
+	* @param[in] sFieldName - Name of the field.
+	* @param[in] dValue - New value of the field.
+	*/
+	void CGRPCMessage::SetDoubleField(const std::string & sFieldName, const LibMCDriver_GRPC_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_SetDoubleField(m_pHandle, sFieldName.c_str(), dValue));
+	}
+	
+	/**
+	* CGRPCMessage::GetDoubleField - Gets a double field of the message. Fails if the field does not exist or is not a double field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Current value of the field.
+	*/
+	LibMCDriver_GRPC_double CGRPCMessage::GetDoubleField(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPC_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetDoubleField(m_pHandle, sFieldName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	 * Method definitions for class CGRPCResponse
+	 */
+	
+	/**
+	* CGRPCResponse::GetResponseType - Returns the response type of the connection.
+	* @return Message type identifier.
+	*/
+	std::string CGRPCResponse::GetResponseType()
+	{
+		LibMCDriver_GRPC_uint32 bytesNeededResponseType = 0;
+		LibMCDriver_GRPC_uint32 bytesWrittenResponseType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCResponse_GetResponseType(m_pHandle, 0, &bytesNeededResponseType, nullptr));
+		std::vector<char> bufferResponseType(bytesNeededResponseType);
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCResponse_GetResponseType(m_pHandle, bytesNeededResponseType, &bytesWrittenResponseType, &bufferResponseType[0]));
+		
+		return std::string(&bufferResponseType[0]);
+	}
+	
+	/**
+	 * Method definitions for class CGRPCRequest
+	 */
+	
+	/**
+	* CGRPCRequest::GetRequestType - Returns the request type of the connection.
+	* @return Message type identifier.
+	*/
+	std::string CGRPCRequest::GetRequestType()
+	{
+		LibMCDriver_GRPC_uint32 bytesNeededRequestType = 0;
+		LibMCDriver_GRPC_uint32 bytesWrittenRequestType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCRequest_GetRequestType(m_pHandle, 0, &bytesNeededRequestType, nullptr));
+		std::vector<char> bufferRequestType(bytesNeededRequestType);
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCRequest_GetRequestType(m_pHandle, bytesNeededRequestType, &bytesWrittenRequestType, &bufferRequestType[0]));
+		
+		return std::string(&bufferRequestType[0]);
+	}
+	
+	/**
+	* CGRPCRequest::GetExpectedResponseType - Returns the expected response type of the connection.
+	* @return Message type identifier.
+	*/
+	std::string CGRPCRequest::GetExpectedResponseType()
+	{
+		LibMCDriver_GRPC_uint32 bytesNeededExpectedResponseType = 0;
+		LibMCDriver_GRPC_uint32 bytesWrittenExpectedResponseType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCRequest_GetExpectedResponseType(m_pHandle, 0, &bytesNeededExpectedResponseType, nullptr));
+		std::vector<char> bufferExpectedResponseType(bytesNeededExpectedResponseType);
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCRequest_GetExpectedResponseType(m_pHandle, bytesNeededExpectedResponseType, &bytesWrittenExpectedResponseType, &bufferExpectedResponseType[0]));
+		
+		return std::string(&bufferExpectedResponseType[0]);
+	}
+	
+	/**
+	* CGRPCRequest::SendBlocking - Sends the request to the end point and waits for a response.
+	* @param[in] sServiceMethod - Service method to call.
+	* @param[in] nTimeOutInMS - Timeout for the response in MS.
+	* @return Response Instance
+	*/
+	PGRPCResponse CGRPCRequest::SendBlocking(const std::string & sServiceMethod, const LibMCDriver_GRPC_uint32 nTimeOutInMS)
+	{
+		LibMCDriver_GRPCHandle hResponseInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCRequest_SendBlocking(m_pHandle, sServiceMethod.c_str(), nTimeOutInMS, &hResponseInstance));
+		
+		if (!hResponseInstance) {
+			CheckError(LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CGRPCResponse>(m_pWrapper, hResponseInstance);
+	}
+	
+	/**
 	 * Method definitions for class CGRPCConnection
 	 */
+	
+	/**
+	* CGRPCConnection::GetEndPoint - Returns the end point of the connection.
+	* @return End point of the connection.
+	*/
+	std::string CGRPCConnection::GetEndPoint()
+	{
+		LibMCDriver_GRPC_uint32 bytesNeededEndPoint = 0;
+		LibMCDriver_GRPC_uint32 bytesWrittenEndPoint = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCConnection_GetEndPoint(m_pHandle, 0, &bytesNeededEndPoint, nullptr));
+		std::vector<char> bufferEndPoint(bytesNeededEndPoint);
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCConnection_GetEndPoint(m_pHandle, bytesNeededEndPoint, &bytesWrittenEndPoint, &bufferEndPoint[0]));
+		
+		return std::string(&bufferEndPoint[0]);
+	}
+	
+	/**
+	* CGRPCConnection::Close - Closes the connection. All subsequent calls to the connection will fail.
+	*/
+	void CGRPCConnection::Close()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCConnection_Close(m_pHandle));
+	}
+	
+	/**
+	* CGRPCConnection::CreateStaticRequest - Creates a message request to the end point.
+	* @param[in] sRequestTypeIdentifier - Message Type Identifier of the request.
+	* @param[in] sResponseTypeIdentifier - Message Type Identifier of the expected response.
+	* @return Request Instance
+	*/
+	PGRPCRequest CGRPCConnection::CreateStaticRequest(const std::string & sRequestTypeIdentifier, const std::string & sResponseTypeIdentifier)
+	{
+		LibMCDriver_GRPCHandle hRequestInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCConnection_CreateStaticRequest(m_pHandle, sRequestTypeIdentifier.c_str(), sResponseTypeIdentifier.c_str(), &hRequestInstance));
+		
+		if (!hRequestInstance) {
+			CheckError(LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CGRPCRequest>(m_pWrapper, hRequestInstance);
+	}
 	
 	/**
 	 * Method definitions for class CDriver_GRPC
@@ -1115,19 +1768,39 @@ public:
 	}
 	
 	/**
-	* CDriver_GRPC::Connect - Connects to a GRPC end point.
+	* CDriver_GRPC::ConnectUnsecure - Connects to a GRPC end point.
+	* @param[in] sIdentifier - Connection Identifier.
+	* @param[in] sNetworkCredentials - Network Credentials.
+	* @param[in] sProtobufDefinition - Protobuf definition file.
+	* @return Connection instance in case of success.
 	*/
-	void CDriver_GRPC::Connect()
+	PGRPCConnection CDriver_GRPC::ConnectUnsecure(const std::string & sIdentifier, const std::string & sNetworkCredentials, const std::string & sProtobufDefinition)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GRPC_Connect(m_pHandle));
+		LibMCDriver_GRPCHandle hConnectionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GRPC_ConnectUnsecure(m_pHandle, sIdentifier.c_str(), sNetworkCredentials.c_str(), sProtobufDefinition.c_str(), &hConnectionInstance));
+		
+		if (!hConnectionInstance) {
+			CheckError(LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CGRPCConnection>(m_pWrapper, hConnectionInstance);
 	}
 	
 	/**
 	* CDriver_GRPC::FindConnection - Finds a connection with a certain name.
+	* @param[in] sIdentifier - Connection Identifier.
+	* @param[in] bMustExist - Connection Identifier. If true, the call fails if the connection does not exist.
+	* @return Connection instance in case of success. Null if the connection is not found.
 	*/
-	void CDriver_GRPC::FindConnection()
+	PGRPCConnection CDriver_GRPC::FindConnection(const std::string & sIdentifier, const bool bMustExist)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GRPC_FindConnection(m_pHandle));
+		LibMCDriver_GRPCHandle hConnectionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GRPC_FindConnection(m_pHandle, sIdentifier.c_str(), bMustExist, &hConnectionInstance));
+		
+		if (hConnectionInstance) {
+			return std::make_shared<CGRPCConnection>(m_pWrapper, hConnectionInstance);
+		} else {
+			return nullptr;
+		}
 	}
 
 } // namespace LibMCDriver_GRPC

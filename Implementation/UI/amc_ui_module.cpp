@@ -61,10 +61,11 @@ PResourcePackage CUIModuleEnvironment::resourcePackage()
 	return m_pResourcePackage;
 }
 
-LibMCData::PBuildJobHandler CUIModuleEnvironment::buildJobHandler()
+LibMCData::PDataModel CUIModuleEnvironment::dataModel()
 {
-	return m_pUISystemState->getBuildJobHandler();
+	return m_pUISystemState->getDataModel();
 }
+
 
 CUIModule_ContentRegistry* CUIModuleEnvironment::contentRegistry()
 {

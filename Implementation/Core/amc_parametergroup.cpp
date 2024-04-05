@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter_valued.hpp"
 #include "amc_parameter_derived.hpp"
 #include "amc_statejournal.hpp"
+#include "amc_constants.hpp"
 
 #include "amc_jsonwriter.hpp"
 #include "common_utils.hpp"
@@ -406,6 +407,11 @@ namespace AMC {
 
 	}
 
+	std::string CParameterGroup::getParameterPath (const std::string & sName)
+	{
+		return (m_sInstanceName + "." + m_sName + "." + sName);
+	}
+
 
 	void CParameterGroup::addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
 	{
@@ -413,7 +419,7 @@ namespace AMC {
 
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerStringValue(m_sInstanceName + "." + m_sName + "." + sName, sDefaultValue);
+			nVariableID = m_pStateJournal->registerStringValue(getParameterPath (sName), sDefaultValue);
 
 		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, eParameterDataType::String, m_pStateJournal, nVariableID));
 	}
@@ -424,7 +430,7 @@ namespace AMC {
 
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerDoubleValue(m_sInstanceName + "." + m_sName + "." + sName, dDefaultValue, dUnits);
+			nVariableID = m_pStateJournal->registerDoubleValue(getParameterPath (sName), dDefaultValue, dUnits);
 
 		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, eParameterDataType::Double, m_pStateJournal, nVariableID));
 	}
@@ -435,7 +441,7 @@ namespace AMC {
 
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerIntegerValue(m_sInstanceName + "." + m_sName + "." + sName, nDefaultValue);
+			nVariableID = m_pStateJournal->registerIntegerValue(getParameterPath (sName), nDefaultValue);
 
 		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, eParameterDataType::Integer, m_pStateJournal, nVariableID));
 	}
@@ -446,7 +452,7 @@ namespace AMC {
 
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerBooleanValue(m_sInstanceName + "." + m_sName + "." + sName, bDefaultValue);
+			nVariableID = m_pStateJournal->registerBooleanValue(getParameterPath (sName), bDefaultValue);
 
 		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, eParameterDataType::Bool, m_pStateJournal, nVariableID));
 	}
@@ -457,7 +463,7 @@ namespace AMC {
 
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerStringValue(m_sInstanceName + "." + m_sName + "." + sName, sDefaultValue);
+			nVariableID = m_pStateJournal->registerStringValue(getParameterPath(sName), sDefaultValue);
 
 		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, AMCCommon::CUtils::normalizeUUIDString (sDefaultValue), eParameterDataType::UUID, m_pStateJournal, nVariableID));
 	}
@@ -498,9 +504,13 @@ namespace AMC {
 			if (sDefaultValue.length() > 0)
 				dValue = AMCCommon::CUtils::stringToDouble(sDefaultValue);
 
-			double dUnits = 0.0;
+			double dUnits = AMC_PARAMETERUNITS_DEFAULT;
 			if (sUnits.length() > 0)
 				dUnits = AMCCommon::CUtils::stringToDouble(sUnits);
+
+			if ((dUnits < AMC_PARAMETERUNITS_MINIMUM) || (dUnits > AMC_PARAMETERUNITS_MAXIMUM))
+				throw ELibMCCustomException(LIBMC_ERROR_UNITSAREOUTOFRANGE, sName);
+
 
 			addNewDoubleParameter(sName, sDescription, dValue, dUnits);
 		}
@@ -514,7 +524,12 @@ namespace AMC {
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		LibMCAssertNotNull(pParameterGroup.get());
 
-		addParameterInternal(std::make_shared<CParameter_Derived>(sName, pParameterGroup, sSourceParameterName));
+		auto pDerivedParameter = std::make_shared<CParameter_Derived>(sName, pParameterGroup, sSourceParameterName);
+		if (m_pStateJournal.get () != nullptr) {
+			m_pStateJournal->registerAlias (getParameterPath (sName), pParameterGroup->getParameterPath (sSourceParameterName));
+		}
+
+		addParameterInternal(pDerivedParameter);
 
 	}
 

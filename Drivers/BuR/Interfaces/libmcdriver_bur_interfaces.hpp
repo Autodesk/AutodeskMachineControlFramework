@@ -382,6 +382,11 @@ public:
 	*/
 	virtual void ResumeList() = 0;
 
+	/**
+	* IPLCCommandList::DeleteList - Delete list. MUST not be in execution for this.
+	*/
+	virtual void DeleteList() = 0;
+
 };
 
 typedef IBaseSharedPtr<IPLCCommandList> PIPLCCommandList;

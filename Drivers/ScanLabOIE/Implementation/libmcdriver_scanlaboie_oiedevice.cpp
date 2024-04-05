@@ -635,10 +635,12 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 				//std::cout << "Packet: " << " X: " << dX << " Y: " << dY << std::endl;
 
-				// First uint32 of packet is packed number
+				// First uint32 of packet is packet number
 				uint32_t* pPacketNumber = (uint32_t*)pkt;
+				// Second uint32 of packet is measurement tag...
+				uint32_t* pMeasurementTag = (pPacketNumber + 1); 
 
-				m_pCurrentDataRecording->startRecord(*pPacketNumber, dX, dY);
+				m_pCurrentDataRecording->startRecord(*pPacketNumber, *pMeasurementTag, dX, dY);
 
 				// Record sensor values first.
 				uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);

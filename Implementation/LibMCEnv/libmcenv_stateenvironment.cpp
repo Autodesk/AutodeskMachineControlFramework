@@ -45,6 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_alert.hpp"
+#include "libmcenv_alertiterator.hpp"
+#include "libmcenv_cryptocontext.hpp"
+#include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_streamreader.hpp"
+#include "libmcenv_datatable.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -70,20 +75,27 @@ using namespace LibMCEnv::Impl;
  Class definition of CStateEnvironment 
 **************************************************************************************************************************/
 
-CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName)
-	: m_pSystemState (pSystemState), m_pParameterHandler (pParameterHandler), m_sInstanceName(sInstanceName)
+CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName)
+	: m_pSystemState (pSystemState), m_pParameterHandler (pParameterHandler), m_sInstanceName(sInstanceName),
+	  m_nEndTimeOfPreviousStateInMicroseconds (nEndTimeOfPreviousStateInMicroseconds), m_sPreviousStateName (sPreviousStateName)
 {
 	if (pSystemState.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pParameterHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+	m_nStartTimeOfStateInMicroseconds = pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
 }
 
 
 std::string CStateEnvironment::GetMachineState(const std::string& sMachineInstance)
 {
 	return m_pSystemState->stateMachineData()->getInstanceStateName(sMachineInstance);
+}
+
+std::string CStateEnvironment::GetPreviousState()
+{
+	return m_sPreviousStateName;
 }
 
 
@@ -158,7 +170,8 @@ bool CStateEnvironment::HasBuildJob(const std::string& sBuildUUID)
 {
 	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	try {
 		pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
 		return true;
@@ -172,9 +185,10 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
 	std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-	return new CBuild(pBuildJob, m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getStorageInstance(), m_pSystemState->getSystemUserID ());
+	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getSystemUserID (), m_pSystemState->getGlobalChronoInstance ());
 }
 
 
@@ -275,7 +289,7 @@ void CStateEnvironment::SetStringParameter(const std::string& sParameterGroup, c
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setParameterValueByName(sParameterName, sValue);
 }
@@ -288,7 +302,7 @@ void CStateEnvironment::SetUUIDParameter(const std::string& sParameterGroup, con
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
 }
@@ -301,7 +315,7 @@ void CStateEnvironment::SetDoubleParameter(const std::string& sParameterGroup, c
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setDoubleParameterValueByName(sParameterName, dValue);
 }
@@ -313,7 +327,7 @@ void CStateEnvironment::SetIntegerParameter(const std::string& sParameterGroup, 
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setIntParameterValueByName(sParameterName, nValue);
 }
@@ -325,7 +339,7 @@ void CStateEnvironment::SetBoolParameter(const std::string& sParameterGroup, con
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	pGroup->setBoolParameterValueByName(sParameterName, bValue);
 }
@@ -337,7 +351,7 @@ std::string CStateEnvironment::GetStringParameter(const std::string& sParameterG
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getParameterValueByName(sParameterName);
 }
@@ -350,7 +364,7 @@ std::string CStateEnvironment::GetUUIDParameter(const std::string& sParameterGro
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sParameterName));
 }
@@ -362,7 +376,7 @@ LibMCEnv_double CStateEnvironment::GetDoubleParameter(const std::string& sParame
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getDoubleParameterValueByName(sParameterName);
 }
@@ -374,7 +388,7 @@ LibMCEnv_int64 CStateEnvironment::GetIntegerParameter(const std::string& sParame
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getIntParameterValueByName(sParameterName);
 }
@@ -386,7 +400,7 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 
 	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
 	if (!pGroup->hasParameter(sParameterName))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sParameterGroup + "/" + sParameterName);
 
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
@@ -453,6 +467,40 @@ LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMicroseconds()
 	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
 }
 
+LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMilliseconds()
+{
+	return m_nStartTimeOfStateInMicroseconds / 1000;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMicroseconds()
+{
+	return m_nStartTimeOfStateInMicroseconds;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds()
+{
+	return m_nEndTimeOfPreviousStateInMicroseconds / 1000;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds()
+{
+	return m_nEndTimeOfPreviousStateInMicroseconds;
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMilliseconds()
+{
+	uint64_t nElapsedTimeInMicroseconds = GetGlobalTimerInMicroseconds() - m_nStartTimeOfStateInMicroseconds;
+	return nElapsedTimeInMicroseconds / 1000;
+}
+
+
+LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMicroseconds()
+{
+	uint64_t nElapsedTimeInMicroseconds = GetGlobalTimerInMicroseconds() - m_nStartTimeOfStateInMicroseconds;
+	return nElapsedTimeInMicroseconds;
+}
+
+
 ITestEnvironment* CStateEnvironment::GetTestEnvironment()
 {
 	return new CTestEnvironment(m_pSystemState->getTestEnvironmentPath ());
@@ -480,6 +528,11 @@ LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLString(const std::strin
 
 	return new CXMLDocument(pDocument);
 
+}
+
+IDataTable* CStateEnvironment::CreateDataTable()
+{
+	return new CDataTable();
 }
 
 LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)
@@ -541,7 +594,8 @@ bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPermissionIdentifier))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPERMISSIONIDENTIFIER, sPermissionIdentifier);
 
-	auto pLoginHandler = m_pSystemState->getLoginHandlerInstance();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pLoginHandler = pDataModel->CreateLoginHandler();
 	auto pAccessControl = m_pSystemState->accessControl();
 
 	std::string sUserRole = pLoginHandler->GetUserRole (sUserLogin);
@@ -556,7 +610,7 @@ bool CStateEnvironment::CheckUserPermission(const std::string& sUserLogin, const
 
 IUserManagementHandler* CStateEnvironment::CreateUserManagement()
 {
-	return new CUserManagementHandler (m_pSystemState->getLoginHandlerInstance (), m_pSystemState->getAccessControlInstance (), m_pSystemState->getLanguageHandlerInstance ());
+	return new CUserManagementHandler (m_pSystemState->getDataModelInstance (), m_pSystemState->getAccessControlInstance (), m_pSystemState->getLanguageHandlerInstance ());
 }
 
 IJournalHandler* CStateEnvironment::GetCurrentJournal()
@@ -634,7 +688,7 @@ void CStateEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 }
 
 
-IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation, const bool bAutomaticLogEntry) 
 {
 	if (sIdentifier.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
@@ -649,20 +703,167 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 	auto pDefinition = m_pSystemState->alertHandler()->findDefinition(sIdentifier, true);
 	auto alertDescription = pDefinition->getDescription();
+	auto alertLevel = pDefinition->getAlertLevel();
 
-	auto pAlertSession = m_pSystemState->createAlertSession ();
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
 
-	pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), pDefinition->getAlertLevel (), alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
+	auto pAlertData = pAlertSession->AddAlert (sNewUUID, pDefinition->getIdentifier (), alertLevel, alertDescription.getCustomValue (), alertDescription.getStringIdentifier (), sReadableContextInformation, pDefinition->needsAcknowledgement (), sTimeStamp);
 
-	return new CAlert (sNewUUID, pAlertSession);
+	if (bAutomaticLogEntry) {
+		std::string sLogString = "Created alert " + sNewUUID + ": " + pDefinition->getIdentifier() + " / " + alertDescription.getCustomValue();
+		AMC::eLogLevel logLevel;
+		switch (alertLevel) {
+		case LibMCData::eAlertLevel::FatalError:
+			logLevel = AMC::eLogLevel::FatalError;
+			break;
+		case LibMCData::eAlertLevel::CriticalError:
+			logLevel = AMC::eLogLevel::CriticalError;
+			break;
+		case LibMCData::eAlertLevel::Message:
+			logLevel = AMC::eLogLevel::Message;
+			break;
+		case LibMCData::eAlertLevel::Warning:
+			logLevel = AMC::eLogLevel::Warning;
+			break;
+		default:
+			logLevel = AMC::eLogLevel::Unknown;
+			break;
+
+		}
+
+		auto pLogger = m_pSystemState->getLoggerInstance();
+		pLogger->logMessage(sLogString, m_sInstanceName, logLevel);
+	}
+
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	return new CAlert (pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName);
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 {
-	return nullptr;
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+
+	if (!pAlertSession->HasAlert(sNormalizedUUID))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+
+	auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
+
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	return new CAlert(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName);
+
 }
 
-void CStateEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
+bool CStateEnvironment::AlertExists(const std::string& sUUID)
 {
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+
+	return pAlertSession->HasAlert(sNormalizedUUID);
+
 }
 
+IAlertIterator* CStateEnvironment::RetrieveAlerts(const bool bOnlyActive)
+{
+	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator (new CAlertIterator ());
+
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID ();
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+
+	auto pLogger = m_pSystemState->getLoggerInstance();
+
+	auto pAlertIterator = pAlertSession->RetrieveAlerts(bOnlyActive);
+	while (pAlertIterator->MoveNext()) {
+		auto pAlertData = pAlertIterator->GetCurrentAlert();
+
+		// State Environments have no user context...
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, pLogger, m_sInstanceName));
+	}
+
+	return returnIterator.release();
+}
+
+IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
+{
+	std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
+
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+	auto pLogger = m_pSystemState->getLoggerInstance();
+
+	auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+	while (pAlertIterator->MoveNext()) {
+		auto pAlertData = pAlertIterator->GetCurrentAlert();
+
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, pLogger, m_sInstanceName));
+	}
+
+	return returnIterator.release();
+}
+
+
+bool CStateEnvironment::HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive)
+{
+	// State Environments have no user context...
+	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pAlertSession = pDataModel->CreateAlertSession();
+	auto pLogger = m_pSystemState->getLoggerInstance();
+
+	auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+	return (pAlertIterator->MoveNext());
+}
+
+ICryptoContext* CStateEnvironment::CreateCryptoContext()
+{
+	return new CCryptoContext();
+}
+
+
+ITempStreamWriter* CStateEnvironment::CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType)
+{
+	if (sName.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+	if (sMIMEType.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);
+
+
+	std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	return new CTempStreamWriter(m_pSystemState->getDataModelInstance(), sName, sMIMEType, sUserUUID);
+}
+
+
+IStreamReader* CStateEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+{
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
+
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	if (pStorage->StreamIsReady(sNormalizedUUID)) {
+
+		auto pStorageStream = pStorage->RetrieveStream(sNormalizedUUID);
+		return new CStreamReader(pStorage, pStorageStream);
+
+	}
+	else {
+		if (bMustExist)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_STORAGESTREAMNOTFOUND, "Storage Stream not found: " + sUUID);
+	}
+
+	return nullptr;
+
+}

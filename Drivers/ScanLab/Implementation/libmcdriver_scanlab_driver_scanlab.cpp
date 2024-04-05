@@ -45,7 +45,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab::CDriver_ScanLab(LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_pDriverEnvironment (pDriverEnvironment), m_nDLLVersion (0)
+    : m_pDriverEnvironment (pDriverEnvironment), m_nDLLVersion (0), m_bEnableJournaling (false)
 {
     if (pDriverEnvironment.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -96,7 +96,11 @@ void CDriver_ScanLab::LoadSDK(const std::string& sResourceName)
     m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
     m_pOwnerData->setScanLabSDK(m_pScanLabSDK);
 
-    //m_pScanLabSDK->setJournal(std::make_shared<CScanLabSDKJournal>("C:/Temp/journal.txt"));
+    if (m_bEnableJournaling) {
+        std::string sJournalFileName = "journal.txt";
+        m_pJournalFile = m_pWorkingDirectory->AddManagedFile(sJournalFileName);
+        m_pScanLabSDK->setJournal(std::make_shared<CScanLabSDKJournal>(m_pJournalFile->GetAbsoluteFileName()));
+    }
 
     m_nDLLVersion = m_pScanLabSDK->get_dll_version();
 
@@ -134,3 +138,9 @@ uint32_t CDriver_ScanLab::getDLLVersion()
 {
     return m_nDLLVersion;
 }
+
+void CDriver_ScanLab::EnableJournaling()
+{
+    m_bEnableJournaling = true;
+}
+

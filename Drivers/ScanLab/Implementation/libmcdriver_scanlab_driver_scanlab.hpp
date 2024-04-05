@@ -83,10 +83,12 @@ protected:
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
     LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
     LibMCEnv::PWorkingFile m_pSDKLibraryFile;
+    LibMCEnv::PWorkingFile m_pJournalFile;
 
     PRTCContextOwnerData m_pOwnerData;
 
     uint32_t m_nDLLVersion;
+    bool m_bEnableJournaling;
 
     virtual void updateDLLVersionParameter(uint32_t nDLLVersionParameter) = 0;
 
@@ -99,6 +101,8 @@ public:
     void LoadSDK(const std::string& sResourceName) override;
 
     void LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8* pScanlabDLLBuffer) override;
+
+    void EnableJournaling() override;
 
     uint32_t getDLLVersion();
 

@@ -35,11 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CToolpathEntity::CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName)
-		: m_ReferenceCount (0), m_pStorageStream (pStorageStream), m_sDebugName (sDebugName)
+	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName)
+		: m_ReferenceCount (0), m_sDebugName (sDebugName)
 	{
-		LibMCAssertNotNull(pStorageStream.get());
+		LibMCAssertNotNull(pDataModel.get());
 		LibMCAssertNotNull(p3MFWrapper.get());
+
+		auto pStorage = pDataModel->CreateStorage();
+		m_pStorageStream = pStorage->RetrieveStream(sStorageStreamUUID);
 
 		void* pReadCallback = nullptr;
 		void* pSeekCallback = nullptr;
@@ -81,6 +84,7 @@ namespace AMC {
 		m_p3MFReader = nullptr;
 		m_pPersistentSource = nullptr;
 		m_p3MFModel = nullptr;
+		m_pStorageStream = nullptr;
 	}
 
 	void CToolpathEntity::IncRef()

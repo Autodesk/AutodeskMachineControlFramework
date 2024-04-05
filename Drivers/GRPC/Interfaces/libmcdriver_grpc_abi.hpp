@@ -128,8 +128,276 @@ LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_querypa
 LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_queryparametersex(LibMCDriver_GRPC_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
+ Class definition for GRPCMessage
+**************************************************************************************************************************/
+
+/**
+* Returns if the message has a field of a certain name.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pFieldExists - True if field exists.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pFieldExists);
+
+/**
+* Returns if the message has a field of a certain name and this field is a string field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pStringFieldExists - True if field exists and is of type string.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasstringfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pStringFieldExists);
+
+/**
+* Sets a string field of the message. Fails if the field does not exist or is not a string field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] pValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setstringfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, const char * pValue);
+
+/**
+* Gets a string field of the message. Fails if the field does not exist or is not a string field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Current value of the field., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getstringfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, const LibMCDriver_GRPC_uint32 nValueBufferSize, LibMCDriver_GRPC_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Sets a int32 field of the message. Fails if the field does not exist or is not a int32 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] nValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int32 nValue);
+
+/**
+* Gets a int32 field of the message. Fails if the field does not exist or is not a int32 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pValue - Current value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int32 * pValue);
+
+/**
+* Sets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] nValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setuint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint32 nValue);
+
+/**
+* Gets a uint32 field of the message. Fails if the field does not exist or is not a uint32 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pValue - Current value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getuint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint32 * pValue);
+
+/**
+* Sets a int64 field of the message. Fails if the field does not exist or is not a int64 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] nValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int64 nValue);
+
+/**
+* Gets a int64 field of the message. Fails if the field does not exist or is not a int64 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pValue - Current value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int64 * pValue);
+
+/**
+* Sets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] nValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setuint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint64 nValue);
+
+/**
+* Gets a uint64 field of the message. Fails if the field does not exist or is not a uint64 field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pValue - Current value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getuint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint64 * pValue);
+
+/**
+* Sets a bool field of the message. Fails if the field does not exist or is not a bool field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] bValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setboolfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool bValue);
+
+/**
+* Gets a bool field of the message. Fails if the field does not exist or is not a bool field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pValue - Current value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getboolfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pValue);
+
+/**
+* Sets a float field of the message. Fails if the field does not exist or is not a float field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] fValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setfloatfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_single fValue);
+
+/**
+* Gets a float field of the message. Fails if the field does not exist or is not a float field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pValue - Current value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getfloatfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_single * pValue);
+
+/**
+* Sets a double field of the message. Fails if the field does not exist or is not a double field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[in] dValue - New value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setdoublefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_double dValue);
+
+/**
+* Gets a double field of the message. Fails if the field does not exist or is not a double field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pValue - Current value of the field.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getdoublefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_double * pValue);
+
+/*************************************************************************************************************************
+ Class definition for GRPCResponse
+**************************************************************************************************************************/
+
+/**
+* Returns the response type of the connection.
+*
+* @param[in] pGRPCResponse - GRPCResponse instance.
+* @param[in] nResponseTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pResponseTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pResponseTypeBuffer -  buffer of Message type identifier., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcresponse_getresponsetype(LibMCDriver_GRPC_GRPCResponse pGRPCResponse, const LibMCDriver_GRPC_uint32 nResponseTypeBufferSize, LibMCDriver_GRPC_uint32* pResponseTypeNeededChars, char * pResponseTypeBuffer);
+
+/*************************************************************************************************************************
+ Class definition for GRPCRequest
+**************************************************************************************************************************/
+
+/**
+* Returns the request type of the connection.
+*
+* @param[in] pGRPCRequest - GRPCRequest instance.
+* @param[in] nRequestTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRequestTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRequestTypeBuffer -  buffer of Message type identifier., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcrequest_getrequesttype(LibMCDriver_GRPC_GRPCRequest pGRPCRequest, const LibMCDriver_GRPC_uint32 nRequestTypeBufferSize, LibMCDriver_GRPC_uint32* pRequestTypeNeededChars, char * pRequestTypeBuffer);
+
+/**
+* Returns the expected response type of the connection.
+*
+* @param[in] pGRPCRequest - GRPCRequest instance.
+* @param[in] nExpectedResponseTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pExpectedResponseTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pExpectedResponseTypeBuffer -  buffer of Message type identifier., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcrequest_getexpectedresponsetype(LibMCDriver_GRPC_GRPCRequest pGRPCRequest, const LibMCDriver_GRPC_uint32 nExpectedResponseTypeBufferSize, LibMCDriver_GRPC_uint32* pExpectedResponseTypeNeededChars, char * pExpectedResponseTypeBuffer);
+
+/**
+* Sends the request to the end point and waits for a response.
+*
+* @param[in] pGRPCRequest - GRPCRequest instance.
+* @param[in] pServiceMethod - Service method to call.
+* @param[in] nTimeOutInMS - Timeout for the response in MS.
+* @param[out] pResponseInstance - Response Instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcrequest_sendblocking(LibMCDriver_GRPC_GRPCRequest pGRPCRequest, const char * pServiceMethod, LibMCDriver_GRPC_uint32 nTimeOutInMS, LibMCDriver_GRPC_GRPCResponse * pResponseInstance);
+
+/*************************************************************************************************************************
  Class definition for GRPCConnection
 **************************************************************************************************************************/
+
+/**
+* Returns the end point of the connection.
+*
+* @param[in] pGRPCConnection - GRPCConnection instance.
+* @param[in] nEndPointBufferSize - size of the buffer (including trailing 0)
+* @param[out] pEndPointNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pEndPointBuffer -  buffer of End point of the connection., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcconnection_getendpoint(LibMCDriver_GRPC_GRPCConnection pGRPCConnection, const LibMCDriver_GRPC_uint32 nEndPointBufferSize, LibMCDriver_GRPC_uint32* pEndPointNeededChars, char * pEndPointBuffer);
+
+/**
+* Closes the connection. All subsequent calls to the connection will fail.
+*
+* @param[in] pGRPCConnection - GRPCConnection instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcconnection_close(LibMCDriver_GRPC_GRPCConnection pGRPCConnection);
+
+/**
+* Creates a message request to the end point.
+*
+* @param[in] pGRPCConnection - GRPCConnection instance.
+* @param[in] pRequestTypeIdentifier - Message Type Identifier of the request.
+* @param[in] pResponseTypeIdentifier - Message Type Identifier of the expected response.
+* @param[out] pRequestInstance - Request Instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcconnection_createstaticrequest(LibMCDriver_GRPC_GRPCConnection pGRPCConnection, const char * pRequestTypeIdentifier, const char * pResponseTypeIdentifier, LibMCDriver_GRPC_GRPCRequest * pRequestInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_GRPC
@@ -156,17 +424,24 @@ LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_is
 * Connects to a GRPC end point.
 *
 * @param[in] pDriver_GRPC - Driver_GRPC instance.
+* @param[in] pIdentifier - Connection Identifier.
+* @param[in] pNetworkCredentials - Network Credentials.
+* @param[in] pProtobufDefinition - Protobuf definition file.
+* @param[out] pConnectionInstance - Connection instance in case of success.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connect(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC);
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connectunsecure(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC, const char * pIdentifier, const char * pNetworkCredentials, const char * pProtobufDefinition, LibMCDriver_GRPC_GRPCConnection * pConnectionInstance);
 
 /**
 * Finds a connection with a certain name.
 *
 * @param[in] pDriver_GRPC - Driver_GRPC instance.
+* @param[in] pIdentifier - Connection Identifier.
+* @param[in] bMustExist - Connection Identifier. If true, the call fails if the connection does not exist.
+* @param[out] pConnectionInstance - Connection instance in case of success. Null if the connection is not found.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_findconnection(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC);
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_findconnection(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC, const char * pIdentifier, bool bMustExist, LibMCDriver_GRPC_GRPCConnection * pConnectionInstance);
 
 /*************************************************************************************************************************
  Global functions

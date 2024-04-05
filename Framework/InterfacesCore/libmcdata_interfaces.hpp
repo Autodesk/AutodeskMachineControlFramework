@@ -58,18 +58,26 @@ class IBase;
 class IIterator;
 class ILogEntryList;
 class ILogSession;
+class IAlert;
+class IAlertIterator;
 class IAlertSession;
 class IJournalSession;
 class IStorageStream;
 class IStorage;
+class ICustomDataStream;
 class IBuildJobData;
 class IBuildJobDataIterator;
+class IBuildJobExecutionData;
+class IBuildJobExecutionDataIterator;
+class IBuildJobExecution;
+class IBuildJobExecutionIterator;
 class IBuildJob;
 class IBuildJobIterator;
 class IBuildJobHandler;
 class IUserList;
 class ILoginHandler;
 class IPersistencyHandler;
+class IInstallationInformation;
 class IDataModel;
 
 
@@ -175,58 +183,6 @@ template <class T1, class T2, class T3, class T4, class T5> class ParameterCache
 			param3 = m_param3;
 			param4 = m_param4;
 			param5 = m_param5;
-		}
-};
-
-template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
-	private:
-		T1 m_param1;
-		T2 m_param2;
-		T3 m_param3;
-		T4 m_param4;
-		T5 m_param5;
-		T6 m_param6;
-	public:
-		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
-			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
-		{
-		}
-
-		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
-		{
-			param1 = m_param1;
-			param2 = m_param2;
-			param3 = m_param3;
-			param4 = m_param4;
-			param5 = m_param5;
-			param6 = m_param6;
-		}
-};
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7> class ParameterCache_7 : public ParameterCache {
-	private:
-		T1 m_param1;
-		T2 m_param2;
-		T3 m_param3;
-		T4 m_param4;
-		T5 m_param5;
-		T6 m_param6;
-		T7 m_param7;
-	public:
-		ParameterCache_7 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7)
-			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7)
-		{
-		}
-
-		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7)
-		{
-			param1 = m_param1;
-			param2 = m_param2;
-			param3 = m_param3;
-			param4 = m_param4;
-			param5 = m_param5;
-			param6 = m_param6;
-			param7 = m_param7;
 		}
 };
 
@@ -440,6 +396,12 @@ typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 class ILogSession : public virtual IBase {
 public:
 	/**
+	* ILogSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
+	/**
 	* ILogSession::AddEntry - adds a new log entry.
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
@@ -469,6 +431,121 @@ typedef IBaseSharedPtr<ILogSession> PILogSession;
 
 
 /*************************************************************************************************************************
+ Class interface for Alert 
+**************************************************************************************************************************/
+
+class IAlert : public virtual IBase {
+public:
+	/**
+	* IAlert::GetUUID - Returns the Alert UUID.
+	* @return Value.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IAlert::GetIdentifier - Returns the Alert Identifier.
+	* @return Value.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IAlert::IsActive - Returns if the alert is actuve.
+	* @return Returns if the alert is active.
+	*/
+	virtual bool IsActive() = 0;
+
+	/**
+	* IAlert::GetLevel - Returns the Alert Level.
+	* @return Value.
+	*/
+	virtual LibMCData::eAlertLevel GetLevel() = 0;
+
+	/**
+	* IAlert::GetLevelString - Returns the Alert Level string.
+	* @return Value.
+	*/
+	virtual std::string GetLevelString() = 0;
+
+	/**
+	* IAlert::GetDescription - Returns the Alert Description.
+	* @return Value.
+	*/
+	virtual std::string GetDescription() = 0;
+
+	/**
+	* IAlert::GetDescriptionIdentifier - Returns the Alert DescriptionIdentifier.
+	* @return Value.
+	*/
+	virtual std::string GetDescriptionIdentifier() = 0;
+
+	/**
+	* IAlert::GetReadableContextInformation - Returns the Alert ReadableContextInformation.
+	* @return Value.
+	*/
+	virtual std::string GetReadableContextInformation() = 0;
+
+	/**
+	* IAlert::GetNeedsAcknowledgement - Returns if the Alert needs acknowledgement.
+	* @return Value.
+	*/
+	virtual bool GetNeedsAcknowledgement() = 0;
+
+	/**
+	* IAlert::GetTimestampUTC - Returns the Alert Timestamp in UTC file format.
+	* @return Value.
+	*/
+	virtual std::string GetTimestampUTC() = 0;
+
+	/**
+	* IAlert::HasBeenAcknowledged - Checks if the alert has been acknowledged.
+	* @return Flag if the alert has been acknowledged.
+	*/
+	virtual bool HasBeenAcknowledged() = 0;
+
+	/**
+	* IAlert::GetAcknowledgementInformation - Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+	* @param[out] sUserUUID - User who acknowledged the alert.
+	* @param[out] sUserComment - Comment of the acknowledgement.
+	* @param[out] sAckTime - Timestamp in ISO8601 UTC format.
+	*/
+	virtual void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) = 0;
+
+	/**
+	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	* @param[in] sTimestampUTC - Timestamp in UTC format.
+	*/
+	virtual void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC) = 0;
+
+	/**
+	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	*/
+	virtual void DeactivateAlert() = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlert> PIAlert;
+
+
+/*************************************************************************************************************************
+ Class interface for AlertIterator 
+**************************************************************************************************************************/
+
+class IAlertIterator : public virtual IIterator {
+public:
+	/**
+	* IAlertIterator::GetCurrentAlert - Returns the alert the iterator points at.
+	* @return returns the Alert instance.
+	*/
+	virtual IAlert * GetCurrentAlert() = 0;
+
+};
+
+typedef IBaseSharedPtr<IAlertIterator> PIAlertIterator;
+
+
+/*************************************************************************************************************************
  Class interface for AlertSession 
 **************************************************************************************************************************/
 
@@ -484,8 +561,9 @@ public:
 	* @param[in] sReadableContextInformation - Readable Context Information in default language
 	* @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
 	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* @return Alert Instance
 	*/
-	virtual void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC) = 0;
+	virtual IAlert * AddAlert(const std::string & sUUID, const std::string & sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC) = 0;
 
 	/**
 	* IAlertSession::HasAlert - Checks if an alert with a certain UUID exists.
@@ -495,42 +573,26 @@ public:
 	virtual bool HasAlert(const std::string & sUUID) = 0;
 
 	/**
-	* IAlertSession::GetAlertInformation - Retrieves information of an alert. Fails if alert does not exist.
+	* IAlertSession::GetAlertByUUID - Retrieves the alert object. Fails if alert does not exist.
 	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @param[out] sIdentifier - Alert Identifier
-	* @param[out] eLevel - Alert level.
-	* @param[out] sDescription - Alert Description in default language
-	* @param[out] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
-	* @param[out] sReadableContextInformation - Readable Context Information in default language
-	* @param[out] bNeedsAcknowledgement - Flag if acknowledgement is needed
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* @return Alert Instance
 	*/
-	virtual void GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, LibMCData::eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC) = 0;
+	virtual IAlert * GetAlertByUUID(const std::string & sUUID) = 0;
 
 	/**
-	* IAlertSession::AcknowledgeAlert - Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
-	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @param[in] sUserUUID - User UUID that acknowledged the alert.
-	* @param[in] sUserComment - Comment of the user.
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* IAlertSession::RetrieveAlerts - Retrieves all or all active alerts.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
 	*/
-	virtual void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC) = 0;
+	virtual IAlertIterator * RetrieveAlerts(const bool bOnlyActive) = 0;
 
 	/**
-	* IAlertSession::AlertHasBeenAcknowledged - Checks if an alert has been acknowledged. Fails if alert does not exist.
-	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @return Flag if the alert has been acknowledged.
+	* IAlertSession::RetrieveAlertsByType - Retrieves alerts of a certain type identifier.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
 	*/
-	virtual bool AlertHasBeenAcknowledged(const std::string & sUUID) = 0;
-
-	/**
-	* IAlertSession::GetAcknowledgementInformation - Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
-	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @param[out] sUserUUID - User UUID that acknowledged the alert.
-	* @param[out] sUserComment - Comment of the user.
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
-	*/
-	virtual void GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC) = 0;
+	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
 
 };
 
@@ -543,6 +605,12 @@ typedef IBaseSharedPtr<IAlertSession> PIAlertSession;
 
 class IJournalSession : public virtual IBase {
 public:
+	/**
+	* IJournalSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
 	/**
 	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
 	* @param[in] nChunkIndex - Index of the Chunk to write
@@ -664,7 +732,7 @@ public:
 	/**
 	* IStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -677,7 +745,7 @@ public:
 	/**
 	* IStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -710,6 +778,39 @@ public:
 	virtual void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2) = 0;
 
 	/**
+	* IStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
+	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+	* @param[in] sName - Name of the stream.
+	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
+	* @param[in] sUserID - Currently authenticated user
+	*/
+	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID) = 0;
+
+	/**
+	* IStorage::StoreRandomWriteStream - stores data in a stream with random write access. Writing may be in arbitrary order.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @param[in] nOffset - Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size.
+	* @param[in] nContentBufferSize - Number of elements in buffer
+	* @param[in] pContentBuffer - Data block to store in stream.
+	*/
+	virtual void StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) = 0;
+
+	/**
+	* IStorage::GetRandomWriteStreamSize - Returns the size random write stream .
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @return Current size in bytes.
+	*/
+	virtual LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID) = 0;
+
+	/**
+	* IStorage::FinishRandomWriteStream - Finishes storing a random write stream.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	*/
+	virtual void FinishRandomWriteStream(const std::string & sUUID) = 0;
+
+	/**
 	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
 	* @return Maximum Stream Size in Bytes.
 	*/
@@ -729,82 +830,133 @@ public:
 	*/
 	virtual bool StreamIsImage(const std::string & sUUID) = 0;
 
+	/**
+	* IStorage::CreateDownloadTicket - Creates a new download ticket for a stream and a user.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sStreamUUID - UUID of storage stream.
+	* @param[in] sClientFileName - ClientFileName of the ticket. MUST NOT be empty.
+	* @param[in] sSessionUUID - UUID of user session.
+	* @param[in] sUserUUID - UUID of user that created the ticket.
+	*/
+	virtual void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID) = 0;
+
+	/**
+	* IStorage::RequestDownloadTicket - Returns the details of a download ticket and creates an entry in an access log with time stamp.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sIPAddress - IP Address where the request came from.
+	* @param[out] sStreamUUID - UUID of storage stream.
+	* @param[out] sClientFileName - ClientFileName of the ticket.
+	* @param[out] sSessionUUID - UUID of user session.
+	* @param[out] sUserUUID - UUID of user that created the ticket.
+	*/
+	virtual void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID) = 0;
+
+	/**
+	* IStorage::AttachStreamToJournal - Attaches a stream to a journal as temporary stream.
+	* @param[in] sStreamUUID - UUID of stream. Call fails if stream does not exist.
+	* @param[in] sJournalUUID - UUID of journal. Call fails if journal does not exist.
+	*/
+	virtual void AttachStreamToJournal(const std::string & sStreamUUID, const std::string & sJournalUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStorage> PIStorage;
 
 
 /*************************************************************************************************************************
- Class interface for BuildJobData 
+ Class interface for CustomDataStream 
 **************************************************************************************************************************/
 
-class IBuildJobData : public virtual IBase {
+class ICustomDataStream : public virtual IBase {
 public:
 	/**
-	* IBuildJobData::GetDataUUID - returns the uuid of a build job data.
+	* ICustomDataStream::GetDataUUID - returns the uuid of the custom data.
 	* @return UUID String
 	*/
 	virtual std::string GetDataUUID() = 0;
 
 	/**
-	* IBuildJobData::GetJobUUID - returns the uuid of the parent build job.
-	* @return UUID String
+	* ICustomDataStream::GetIdentifier - returns the identifier of the custom data.
+	* @return Name String
 	*/
-	virtual std::string GetJobUUID() = 0;
+	virtual std::string GetIdentifier() = 0;
 
 	/**
-	* IBuildJobData::GetName - returns the name of the job data.
+	* ICustomDataStream::GetName - returns the name of the custom data.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
 
 	/**
-	* IBuildJobData::GetContextIdentifier - returns the unique context identifier of the job data.
-	* @return Context Identifier String
-	*/
-	virtual std::string GetContextIdentifier() = 0;
-
-	/**
-	* IBuildJobData::GetTimeStamp - returns the timestamp when the job data was created.
+	* ICustomDataStream::GetTimeStamp - returns the timestamp when the custom data was created.
 	* @return Timestamp in ISO8601 UTC format
 	*/
 	virtual std::string GetTimeStamp() = 0;
 
 	/**
-	* IBuildJobData::GetStorageStream - returns the storage stream of the build.
+	* ICustomDataStream::GetStorageStream - returns the storage stream.
 	* @return Stream Instance.
 	*/
 	virtual IStorageStream * GetStorageStream() = 0;
 
 	/**
-	* IBuildJobData::GetStorageStreamSHA2 - returns the checksum of the storage stream of the build.
+	* ICustomDataStream::GetStorageStreamUUID - returns the UUID of the storage stream.
+	* @return UUID of the storage stream.
+	*/
+	virtual std::string GetStorageStreamUUID() = 0;
+
+	/**
+	* ICustomDataStream::GetStorageStreamSHA2 - returns the checksum of the storage stream.
 	* @return SHA256 of the storage stream.
 	*/
 	virtual std::string GetStorageStreamSHA2() = 0;
 
 	/**
-	* IBuildJobData::GetStorageStreamSize - returns the size of the storage stream of the build.
+	* ICustomDataStream::GetStorageStreamSize - returns the size of the storage stream of the build.
 	* @return size of the storage stream in bytes.
 	*/
 	virtual LibMCData_uint64 GetStorageStreamSize() = 0;
 
 	/**
-	* IBuildJobData::GetDataType - returns the data type of the job data.
-	* @return Data type of the job data
+	* ICustomDataStream::GetUserUUID - returns the UUID of the user who created the stream.
+	* @return UUID of the user who create the stream.
 	*/
-	virtual LibMCData::eBuildJobDataType GetDataType() = 0;
+	virtual std::string GetUserUUID() = 0;
 
 	/**
-	* IBuildJobData::GetDataTypeAsString - returns the data type of the job data as string.
+	* ICustomDataStream::GetDataType - returns the data type of the custom data.
+	* @return Data type of the custom data
+	*/
+	virtual LibMCData::eCustomDataType GetDataType() = 0;
+
+	/**
+	* ICustomDataStream::GetDataTypeAsString - returns the data type of the custom data as string.
 	* @return Data type of the job data
 	*/
 	virtual std::string GetDataTypeAsString() = 0;
 
 	/**
-	* IBuildJobData::GetMIMEType - returns the mime type of a storage stream.
+	* ICustomDataStream::GetMIMEType - returns the mime type of a storage stream.
 	* @return Mime Type String
 	*/
 	virtual std::string GetMIMEType() = 0;
+
+};
+
+typedef IBaseSharedPtr<ICustomDataStream> PICustomDataStream;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobData 
+**************************************************************************************************************************/
+
+class IBuildJobData : public virtual ICustomDataStream {
+public:
+	/**
+	* IBuildJobData::GetJobUUID - returns the uuid of the parent build job.
+	* @return UUID String
+	*/
+	virtual std::string GetJobUUID() = 0;
 
 };
 
@@ -826,6 +978,156 @@ public:
 };
 
 typedef IBaseSharedPtr<IBuildJobDataIterator> PIBuildJobDataIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobExecutionData 
+**************************************************************************************************************************/
+
+class IBuildJobExecutionData : public virtual ICustomDataStream {
+public:
+	/**
+	* IBuildJobExecutionData::GetExecutionUUID - returns the uuid of the parent build job execution.
+	* @return UUID String
+	*/
+	virtual std::string GetExecutionUUID() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecutionData> PIBuildJobExecutionData;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobExecutionDataIterator 
+**************************************************************************************************************************/
+
+class IBuildJobExecutionDataIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildJobExecutionDataIterator::GetCurrentJobExecutionData - Returns the build job execution data the iterator points at.
+	* @return returns the build job execution instance.
+	*/
+	virtual IBuildJobExecutionData * GetCurrentJobExecutionData() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecutionDataIterator> PIBuildJobExecutionDataIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobExecution 
+**************************************************************************************************************************/
+
+class IBuildJobExecution : public virtual IBase {
+public:
+	/**
+	* IBuildJobExecution::GetExecutionUUID - returns the uuid of a build job execution.
+	* @return UUID String
+	*/
+	virtual std::string GetExecutionUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetJobUUID - returns the uuid of the parent build job.
+	* @return UUID String
+	*/
+	virtual std::string GetJobUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetStatus - returns the build job execution status.
+	* @return Status Value
+	*/
+	virtual LibMCData::eBuildJobExecutionStatus GetStatus() = 0;
+
+	/**
+	* IBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
+	* @param[in] eNewExecutionStatus - Status Value
+	*/
+	virtual void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus) = 0;
+
+	/**
+	* IBuildJobExecution::GetDescription - returns the build job description.
+	* @return Current Description.
+	*/
+	virtual std::string GetDescription() = 0;
+
+	/**
+	* IBuildJobExecution::SetDescription - sets the build job description. Should not be an empty string.
+	* @param[in] sNewDescription - New Description.
+	*/
+	virtual void SetDescription(const std::string & sNewDescription) = 0;
+
+	/**
+	* IBuildJobExecution::GetJournalUUID - returns the uuid of the execution journal.
+	* @return UUID String
+	*/
+	virtual std::string GetJournalUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetUserUUID - returns the uuid of the user that created the build job.
+	* @return UUID String or 00000000-0000-0000-0000-000000000000 if no user is attached.
+	*/
+	virtual std::string GetUserUUID() = 0;
+
+	/**
+	* IBuildJobExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the machine journal.
+	* @return TimeStamp when the build started in Microseconds.
+	*/
+	virtual LibMCData_uint64 GetStartTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildJobExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Microseconds.
+	*/
+	virtual LibMCData_uint64 GetEndTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildJobExecution::ComputeElapsedTimeInMicroseconds - Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
+	* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
+	* @return Elapsed time in Microseconds.
+	*/
+	virtual LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) = 0;
+
+	/**
+	* IBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuildJobExecution::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildJobExecution::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecution> PIBuildJobExecution;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobExecutionIterator 
+**************************************************************************************************************************/
+
+class IBuildJobExecutionIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildJobExecutionIterator::GetCurrentJobData - Returns the build job data the iterator points at.
+	* @return returns the build job  execution instance.
+	*/
+	virtual IBuildJobExecution * GetCurrentJobData() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobExecutionIterator> PIBuildJobExecutionIterator;
 
 
 /*************************************************************************************************************************
@@ -916,14 +1218,14 @@ public:
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string & sUserID) = 0;
+	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
 	* @param[in] eDataType - Datatype of Job data.
 	* @return Build Job Data Iterator Instance.
 	*/
-	virtual IBuildJobDataIterator * ListJobDataByType(const LibMCData::eBuildJobDataType eDataType) = 0;
+	virtual IBuildJobDataIterator * ListJobDataByType(const LibMCData::eCustomDataType eDataType) = 0;
 
 	/**
 	* IBuildJob::ListJobData - Retrieves a list of build job data objects.
@@ -937,6 +1239,58 @@ public:
 	* @return Build Job Data Instance.
 	*/
 	virtual IBuildJobData * RetrieveJobData(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildJob::AddMetaDataString - Adds a Metadata String to the build job.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuildJob::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildJob::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildJob::CreateBuildJobExecution - Creates a new build job execution with state InProgress.
+	* @param[in] sDescription - Description of the execution.
+	* @param[in] sUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
+	* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
+	* @return Newly created execution instance.
+	*/
+	virtual IBuildJobExecution * CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds) = 0;
+
+	/**
+	* IBuildJob::RetrieveBuildJobExecution - Retrieves a new build job execution by uuid.
+	* @param[in] sExecutionUUID - UUID of the execution to retrieve.
+	* @return If UUID exists, returns execution instance. Otherwise, returns null.
+	*/
+	virtual IBuildJobExecution * RetrieveBuildJobExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IBuildJob::RetrieveBuildJobExecutions - Retrieves multiple executions of the build job.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	virtual IBuildJobExecutionIterator * RetrieveBuildJobExecutions(const std::string & sJournalUUIDFilter) = 0;
+
+	/**
+	* IBuildJob::RetrieveBuildJobExecutionsByStatus - Retrieves multiple executions of the build job.
+	* @param[in] eStatusFilter - Status to filter the executions from.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	virtual IBuildJobExecutionIterator * RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string & sJournalUUIDFilter) = 0;
 
 };
 
@@ -1056,6 +1410,13 @@ public:
 	* @return Flag if users exists
 	*/
 	virtual bool UserExists(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::UserUUIDExists - Checks if a user UUID exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Flag if users exists
+	*/
+	virtual bool UserUUIDExists(const std::string & sUUID) = 0;
 
 	/**
 	* ILoginHandler::GetUserDetails - Retrieves login relevant users data. Fails if user does not exist.
@@ -1339,6 +1700,35 @@ typedef IBaseSharedPtr<IPersistencyHandler> PIPersistencyHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for InstallationInformation 
+**************************************************************************************************************************/
+
+class IInstallationInformation : public virtual IBase {
+public:
+	/**
+	* IInstallationInformation::GetInstallationUUID - Returns the installation UUID.
+	* @return Installation UUID. Public value to document which installation was used for something.
+	*/
+	virtual std::string GetInstallationUUID() = 0;
+
+	/**
+	* IInstallationInformation::GetInstallationSecret - Returns the installation Secret.
+	* @return Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	*/
+	virtual std::string GetInstallationSecret() = 0;
+
+	/**
+	* IInstallationInformation::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* @return Temp directory path.
+	*/
+	virtual std::string GetBaseTempDirectory() = 0;
+
+};
+
+typedef IBaseSharedPtr<IInstallationInformation> PIInstallationInformation;
+
+
+/*************************************************************************************************************************
  Class interface for DataModel 
 **************************************************************************************************************************/
 
@@ -1359,11 +1749,17 @@ public:
 	virtual LibMCData_uint32 GetDataModelVersion() = 0;
 
 	/**
-	* IDataModel::GetInstallationInformation - returns unique identifiers for the current installation.
-	* @param[out] sInstallationUUID - Installation UUID. Public value to document which installation was used for something.
-	* @param[out] sInstallationSecret - Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	* IDataModel::GetInstallationInformation - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.
+	* @param[out] sDEPRECIATEDInstallationUUID - DEPRECIATED Installation UUID. Public value to document which installation was used for something.
+	* @param[out] sDEPRECIATEDInstallationSecret - DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
 	*/
-	virtual void GetInstallationInformation(std::string & sInstallationUUID, std::string & sInstallationSecret) = 0;
+	virtual void GetInstallationInformation(std::string & sDEPRECIATEDInstallationUUID, std::string & sDEPRECIATEDInstallationSecret) = 0;
+
+	/**
+	* IDataModel::GetInstallationInformationObject - returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.
+	* @return Installation information instance.
+	*/
+	virtual IInstallationInformation * GetInstallationInformationObject() = 0;
 
 	/**
 	* IDataModel::CreateStorage - creates a storage access class.
@@ -1414,7 +1810,7 @@ public:
 	virtual void SetBaseTempDirectory(const std::string & sTempDirectory) = 0;
 
 	/**
-	* IDataModel::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* IDataModel::GetBaseTempDirectory - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.
 	* @return Temp directory path.
 	*/
 	virtual std::string GetBaseTempDirectory() = 0;

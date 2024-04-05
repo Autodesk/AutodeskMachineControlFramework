@@ -630,6 +630,22 @@ export default class AMCApplication extends Common.AMCObject {
 		
 
     }
+	
+	streamDownload (downloadticketuuid) 
+	{
+				
+	
+		/*// Start download in Browser
+		const a = document.createElement('a');
+		a.href = this.getDownloadURL (downloadticketuuid);
+		a.download = downloadfilename;
+		document.body.appendChild(a);    
+		a.click();
+		document.body.removeChild(a); */
+			
+		window.open (this.getDownloadURL (downloadticketuuid), "_blank");
+		
+	}
 
     getImageURL(uuid) {
         return this.API.baseURL + '/ui/image/' + uuid;
@@ -639,6 +655,9 @@ export default class AMCApplication extends Common.AMCObject {
         return this.API.baseURL + '/ui/chart/' + uuid;
     }
 	
+    getDownloadURL(uuid) {
+        return this.API.baseURL + '/ui/download/' + uuid;
+    }
 
     triggerUIEvent(eventname, senderuuid, eventValues, executionCallback) {
 
@@ -661,6 +680,9 @@ export default class AMCApplication extends Common.AMCObject {
 						}
 						if (action.action === "closemodaldialog") {
 							this.closeAllDialogs();
+						}
+						if (action.action === "streamdownload") {
+							this.streamDownload(action.downloadticket);
 						}
 						
 						//this.updateContentItemResult(item.uuid, item);

@@ -39,14 +39,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCData {
 
+	CStorageWriter::CStorageWriter()
+	{
 
-	CStorageWriter::CStorageWriter(const std::string& sUUID, const std::string& sPath, uint64_t nSize)	
-		: m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sPath (sPath)
+	}
+
+	CStorageWriter::~CStorageWriter()
+	{
+
+	}
+
+
+	CStorageWriter_Partial::CStorageWriter_Partial(const std::string& sUUID, const std::string& sPath, uint64_t nSize)
+		: CStorageWriter(), m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sPath (sPath)
 	{
 		m_pExportStream = std::make_shared<AMCCommon::CExportStream_Native>(sPath);
 	}
 
-	CStorageWriter::~CStorageWriter()
+	CStorageWriter_Partial::~CStorageWriter_Partial()
 	{
 		if (m_pExportStream.get() != nullptr) {
 			m_pExportStream = nullptr;
@@ -54,8 +64,17 @@ namespace AMCData {
 		}
 	}
 
-	void CStorageWriter::writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset)
+	std::string CStorageWriter_Partial::getUUID()
 	{
+		return m_sUUID;
+	}
+
+
+	void CStorageWriter_Partial::writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset)
+	{
+
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
 		if (nChunkSize > 0) {
 			m_pExportStream->seekFromEnd(0, true);
 			auto nSize = m_pExportStream->getPosition();
@@ -74,9 +93,11 @@ namespace AMCData {
 
 	}
 
-	void CStorageWriter::finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string & sCalculatedSHA256, std::string & sCalculatedBlockSHA256)
+	void CStorageWriter_Partial::finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string & sCalculatedSHA256, std::string & sCalculatedBlockSHA256)
 	{
-		if (m_pExportStream.get() == nullptr) 
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (m_pExportStream.get() == nullptr)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
 		
 		try {	
@@ -113,6 +134,90 @@ namespace AMCData {
 		}
 	}
 
+
+	CStorageWriter_RandomAccess::CStorageWriter_RandomAccess(const std::string& sUUID, const std::string& sPath)
+		: CStorageWriter(), m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)), m_sPath(sPath)
+	{
+		m_pExportStream = std::make_shared<AMCCommon::CExportStream_Native>(sPath);
+	}
+
+	CStorageWriter_RandomAccess::~CStorageWriter_RandomAccess()
+	{
+		if (m_pExportStream.get() != nullptr) {
+			m_pExportStream = nullptr;
+			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
+		}
+	}
+
+	std::string CStorageWriter_RandomAccess::getUUID()
+	{
+		return m_sUUID;
+	}
+
+
+	void CStorageWriter_RandomAccess::writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset)
+	{
+
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (nChunkSize > 0) {
+			m_pExportStream->seekFromEnd(0, true);
+			auto nSize = m_pExportStream->getPosition();
+
+			if (nOffset > nSize) {
+				m_pExportStream->writeZeros(nOffset - nSize);
+			}
+
+			if (nOffset < nSize) {
+				m_pExportStream->seekPosition(nOffset, true);
+			}
+
+
+			m_pExportStream->writeBuffer(pChunkData, nChunkSize);
+		}
+
+	}
+
+	void CStorageWriter_RandomAccess::finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (m_pExportStream.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+
+		try {
+
+			m_pExportStream->seekFromEnd(0, true);
+			auto nSize = m_pExportStream->getPosition();
+
+			// Free ExportStream and close file
+			m_pExportStream = nullptr;
+
+			sCalculatedSHA256 = AMCCommon::CUtils::calculateSHA256FromFile(m_sPath);
+			sCalculatedBlockSHA256 = AMCCommon::CUtils::calculateBlockwiseSHA256FromFile(m_sPath, 65536);
+
+		}
+		catch (...) {
+			m_pExportStream = nullptr;
+
+			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
+			throw;
+		}
+	}
+
+	uint64_t CStorageWriter_RandomAccess::getCurrentSize()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (m_pExportStream.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+
+		m_pExportStream->seekFromEnd(0, true);
+		auto nSize = m_pExportStream->getPosition();
+
+		return nSize;
+
+	}
 
 }
 

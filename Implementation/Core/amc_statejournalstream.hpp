@@ -80,6 +80,7 @@ namespace AMC {
 		int64_t m_nValue;
 	} sJournalTimeStreamInt64Entry;
 
+
 	typedef struct _sStateJournalInterval {
 		uint64_t m_nStartTimeInMicroSeconds;
 		uint64_t m_nEndTimeInMicroSeconds;
@@ -103,6 +104,13 @@ namespace AMC {
 		virtual void readRawIntegerData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStampInMicroSeconds, uint64_t nIntervalEndTimeStampInMicroSeconds, std::vector<sJournalTimeStreamInt64Entry> & rawTimeStream) = 0;
 
 		virtual void readRawDoubleData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStampInMicroSeconds, uint64_t nIntervalEndTimeStampInMicroSeconds, double dUnits, std::vector<sJournalTimeStreamDoubleEntry> & rawTimeStream) = 0;
+
+		virtual int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) = 0;
+		
+		virtual double sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits) = 0;
+
+		virtual bool sampleBoolData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) = 0;
+
 
 	};
 
@@ -161,6 +169,10 @@ namespace AMC {
 		void readRawIntegerData(const uint32_t nStorageIndex, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& rawTimeStream);
 
 		void readRawDoubleData(const uint32_t nStorageIndex, const sStateJournalInterval& interval, double dUnits, std::vector<sJournalTimeStreamDoubleEntry>& rawTimeStream);
+
+		int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds);
+		double sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits);
+		bool sampleBoolData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds);
 
 		// Threaded function to write chunk buffers to disk!
 		void serializeChunksThreaded();

@@ -317,6 +317,61 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IAxis : public virtual IBase {
 public:
 	/**
+	* IAxis::MoveRelative - Moves the selected drive a relative distance.
+	* @param[in] dDistance - Distance (mm)
+	* @param[in] dSpeed - Speed (mm/s)
+	* @param[in] dAcceleration - Acceleration (mm/s^2)
+	*/
+	virtual void MoveRelative(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) = 0;
+
+	/**
+	* IAxis::MoveAbsolute - Moves the selected drive to an absolute location.
+	* @param[in] dDistance - Distance (mm)
+	* @param[in] dSpeed - Speed (mm/s)
+	* @param[in] dAcceleration - Acceleration (mm/s^2)
+	*/
+	virtual void MoveAbsolute(const LibMCDriver_TML_double dDistance, const LibMCDriver_TML_double dSpeed, const LibMCDriver_TML_double dAcceleration) = 0;
+
+	/**
+	* IAxis::CallSubroutine - Runs a subroutine on the selected drive.
+	* @param[in] sRoutine - Label of routine
+	*/
+	virtual void CallSubroutine(const std::string & sRoutine) = 0;
+
+	/**
+	* IAxis::GetPosition - Retrieves the current position of the drive.
+	* @param[in] eReference - Reference type to use for the position.
+	* @return Position (mm)
+	*/
+	virtual LibMCDriver_TML_double GetPosition(const LibMCDriver_TML::eReferenceType eReference) = 0;
+
+	/**
+	* IAxis::GetSpeed - Retrieves the current speed of the drive.
+	* @param[in] eReference - Reference type to use for the speed.
+	* @return Speed (mm/s)
+	*/
+	virtual LibMCDriver_TML_double GetSpeed(const LibMCDriver_TML::eReferenceType eReference) = 0;
+
+	/**
+	* IAxis::GetIntVariable - Retrieves the current position of the drive.
+	* @param[in] sVariableName - Variable name
+	* @return Value
+	*/
+	virtual LibMCDriver_TML_int32 GetIntVariable(const std::string & sVariableName) = 0;
+
+	/**
+	* IAxis::MotionComplete - Checks to see if the  is currently moving.
+	* @return Boolean reflecting if the drive is in currently moving.
+	*/
+	virtual bool MotionComplete() = 0;
+
+	/**
+	* IAxis::TargetReached - Checks to see if the drive is in position.
+	* @return Boolean reflecting if the drive is in position.
+	*/
+	virtual bool TargetReached() = 0;
+
+	/**
 	* IAxis::GetIdentifier - Returns the axis identifier.
 	* @return Axis identifier.
 	*/
@@ -333,6 +388,32 @@ public:
 	* @param[in] bEnable - Flag if the power is enabled or not enabled.
 	*/
 	virtual void SetPower(const bool bEnable) = 0;
+
+	/**
+	* IAxis::ReadRegister - Reads the selected register of an axis.
+	* @param[in] nRegister - Selected register.
+	* @return Value inside register.
+	*/
+	virtual LibMCDriver_TML_uint32 ReadRegister(const LibMCDriver_TML_uint32 nRegister) = 0;
+
+	/**
+	* IAxis::CheckPower - Checks the power of the selected axis.
+	* @return True for power on.
+	*/
+	virtual bool CheckPower() = 0;
+
+	/**
+	* IAxis::CheckAxisError - Checks for any errors on the selected axis, ignores limits.
+	* @param[out] nErrorRegister - Error register.
+	* @return True for error.
+	*/
+	virtual bool CheckAxisError(LibMCDriver_TML_uint16 & nErrorRegister) = 0;
+
+	/**
+	* IAxis::ResetAxis - Resets the selected axis, homing will be required.
+	* @param[in] bForceFull - To set if a full or just fault reset is run (false=faultreset, true=fullreset).
+	*/
+	virtual void ResetAxis(const bool bForceFull) = 0;
 
 };
 
@@ -357,9 +438,10 @@ public:
 	* @param[in] nAxisID - Hardware ID of the axis. MUST be unique in the channel.
 	* @param[in] nConfigurationBufferSize - Number of elements in buffer
 	* @param[in] pConfigurationBuffer - Configuration ZIP file for the axis.
+	* @param[in] nCountsPerMM - Sets the mm per count used for all moves and accelerations.
 	* @return Returns the axis instance.
 	*/
-	virtual IAxis * SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer) = 0;
+	virtual IAxis * SetupAxis(const std::string & sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8 * pConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM) = 0;
 
 	/**
 	* IChannel::FindAxis - Finds an existing axis of this channel.

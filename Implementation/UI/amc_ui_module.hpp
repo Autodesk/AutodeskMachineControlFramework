@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger.hpp"
 
 namespace LibMCData {
-	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+	amcDeclareDependingClass(CDataModel, PDataModel);
 }
 
 
@@ -77,7 +77,7 @@ namespace AMC {
 		PMeshHandler meshHandler();
 		PToolpathHandler toolpathHandler();
 		PDataSeriesHandler dataSeriesHandler();
-		LibMCData::PBuildJobHandler buildJobHandler ();
+		LibMCData::PDataModel dataModel ();
 		CUIModule_ContentRegistry* contentRegistry ();
 		CLogger* getLogger();
 

@@ -94,6 +94,8 @@ public:
 	void Handle(const LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8* pRawBodyBuffer, std::string& sContentType, LibMC_uint32& nHTTPCode) override;
 
 	void GetResultData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer) override;
+
+	std::string GetContentDispositionName() override;
 	
 };
 

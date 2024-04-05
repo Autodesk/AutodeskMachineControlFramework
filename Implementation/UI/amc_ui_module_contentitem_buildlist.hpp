@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pugixml.hpp"
 
 namespace LibMCData {
-	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+	amcDeclareDependingClass(CDataModel, PDataModel);
 }
 
 namespace AMC {
@@ -65,13 +65,13 @@ namespace AMC {
 
 		uint32_t m_nEntriesPerPage;
 
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		LibMCData::PDataModel m_pDataModel;
 
 	public:
 
 		static PUIModule_ContentBuildList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath);
+		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentBuildList();
 

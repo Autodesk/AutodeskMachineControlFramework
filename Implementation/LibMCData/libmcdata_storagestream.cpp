@@ -124,11 +124,11 @@ CStorageStream* CStorageStream::make(AMCCommon::PImportStream pImportStream, con
 	return new CStorageStream (pImportStream, sUUID, sContextIdentifier, sName, nSize, sMIMEType, sSHA2, sTimeStamp, sUserID);
 }
 
-CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath)
+CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
 	if (pSQLHandler.get() == nullptr)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
-	if (pStoragePath.get() == nullptr)
+	if (pStorageState.get() == nullptr)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
 	auto sParsedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
@@ -136,7 +136,7 @@ CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID,
 	std::string sQuery = "SELECT uuid, identifier, name, mimetype, sha2, size, userid, timestamp FROM storage_streams WHERE uuid=?";
 	auto pStatement = pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, sParsedStreamUUID);
-	//pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
+	//pStatement->setString(2, AMCData::CStorageState::storageStreamStatusToString(AMCData::sssValidated));
 	if (!pStatement->nextRow())
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND);
 
@@ -149,7 +149,7 @@ CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID,
 	auto sUserID = pStatement->getColumnString(7);
 	auto sTimeStamp = pStatement->getColumnString(8);
 
-	auto pImportStream = std::make_shared<AMCCommon::CImportStream_Native>(pStoragePath->getStreamPath(sParsedStreamUUID));
+	auto pImportStream = std::make_shared<AMCCommon::CImportStream_Native>(pStorageState->getStreamPath(sParsedStreamUUID));
 	
 	return make (pImportStream, sUUID, sContextIdentifier, sName, (uint64_t)nSize, sMIMEType, sSHA2, sTimeStamp, sUserID);
 }
@@ -159,9 +159,9 @@ PStorageStream CStorageStream::makeShared(AMCCommon::PImportStream pImportStream
 	return std::shared_ptr<CStorageStream>(make(pImportStream, sUUID, sContextIdentifier, sName, nSize, sMIMEType, sSHA2, sTimeStamp, sUserID));
 }
 
-PStorageStream CStorageStream::makeSharedFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath)
+PStorageStream CStorageStream::makeSharedFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
-	return std::shared_ptr<CStorageStream>(makeFromDatabase(sStreamUUID, pSQLHandler, pStoragePath));
+	return std::shared_ptr<CStorageStream>(makeFromDatabase(sStreamUUID, pSQLHandler, pStorageState));
 }
 
 

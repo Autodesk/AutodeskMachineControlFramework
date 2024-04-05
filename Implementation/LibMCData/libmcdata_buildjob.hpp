@@ -45,8 +45,9 @@ Abstract: This is the class declaration of CBuildJob
 #endif
 
 // Include custom headers here.
-#include "amcdata_storagepath.hpp"
+#include "amcdata_storagestate.hpp"
 #include "amcdata_sqlhandler.hpp"
+#include "amcdata_journal.hpp"
 
 namespace LibMCData {
 namespace Impl {
@@ -72,7 +73,7 @@ private:
     std::string m_sStorageStreamUUID;
     std::string m_sUserID;
     uint32_t m_nLayerCount;
-    AMCData::PStoragePath m_pStoragePath;
+    AMCData::PStorageState m_pStorageState;
     AMCData::PSQLHandler m_pSQLHandler;
 
     void ensureUpdate (const std::string sUpdateUUID, uint32_t nErrorCode);
@@ -82,16 +83,16 @@ private:
 
 protected:
 
-    CBuildJob(const std::string& sUUID, const std::string sName, LibMCData::eBuildJobStatus eJobStatus, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, uint32_t nLayerCount, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    CBuildJob(const std::string& sUUID, const std::string sName, LibMCData::eBuildJobStatus eJobStatus, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, uint32_t nLayerCount, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
 public:
 
-    static CBuildJob* make(const std::string& sUUID, const std::string sName, LibMCData::eBuildJobStatus eJobStatus, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, uint32_t nLayerCount, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
-    static CBuildJob* makeFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static CBuildJob* make(const std::string& sUUID, const std::string sName, LibMCData::eBuildJobStatus eJobStatus, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, uint32_t nLayerCount, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static CBuildJob* makeFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static CBuildJob* makeFrom(CBuildJob* pBuildJob);
 
-    static PBuildJob makeShared(const std::string& sUUID, const std::string sName, LibMCData::eBuildJobStatus eJobStatus, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, uint32_t nLayerCount, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
-    static PBuildJob makeSharedFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static PBuildJob makeShared(const std::string& sUUID, const std::string sName, LibMCData::eBuildJobStatus eJobStatus, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, uint32_t nLayerCount, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static PBuildJob makeSharedFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static PBuildJob makeSharedFrom(CBuildJob* pBuildJob);
 
     std::string GetUUID() override;
@@ -120,16 +121,33 @@ public:
     
     bool JobCanBeArchived() override;
     
-    void AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string& sUserID) override;
+    void AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID) override;
     
-    IBuildJobDataIterator* ListJobDataByType(const LibMCData::eBuildJobDataType eDataType) override;
+    IBuildJobDataIterator* ListJobDataByType(const LibMCData::eCustomDataType eDataType) override;
 
     IBuildJobDataIterator* ListJobData() override;
 
     IBuildJobData* RetrieveJobData(const std::string& sDataUUID) override;
 
+    void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
+
+    bool HasMetaDataString(const std::string& sKey) override;
+
+    std::string GetMetaDataString(const std::string& sKey) override;
+
+    IBuildJobExecution* CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds) override;
+
+    IBuildJobExecution* RetrieveBuildJobExecution(const std::string& sExecutionUUID) override;
+
+    IBuildJobExecutionIterator* RetrieveBuildJobExecutions(const std::string& sJournalUUIDFilter) override;
+
+    IBuildJobExecutionIterator* RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string& sJournalUUIDFilter) override;
+
+
     static std::string convertBuildJobStatusToString(const LibMCData::eBuildJobStatus eStatus);
     static LibMCData::eBuildJobStatus convertStringToBuildJobStatus(const std::string& sValue);
+
+    
 
 };
 

@@ -142,6 +142,54 @@ template <class T1, class T2, class T3, class T4> class ParameterCache_4 : publi
 		}
 };
 
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+		}
+};
+
 
 /*************************************************************************************************************************
  Class interface for Base 
@@ -440,6 +488,46 @@ public:
 	* @param[in] sValue - Value of variable to set.
 	*/
 	virtual void WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* IDriver_A3200::ReadAxisPosition - Reads out the position information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis position value.
+	*/
+	virtual LibMCDriver_A3200_double ReadAxisPosition(const LibMCDriver_A3200_uint32 nAxisID) = 0;
+
+	/**
+	* IDriver_A3200::ReadAxisTargetPosition - Reads out the target position information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis target position value.
+	*/
+	virtual LibMCDriver_A3200_double ReadAxisTargetPosition(const LibMCDriver_A3200_uint32 nAxisID) = 0;
+
+	/**
+	* IDriver_A3200::ReadAxisVelocity - Reads out the velocity information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis velocity value.
+	*/
+	virtual LibMCDriver_A3200_double ReadAxisVelocity(const LibMCDriver_A3200_uint32 nAxisID) = 0;
+
+	/**
+	* IDriver_A3200::ReadAxisTargetVelocity - Reads out the target velocity information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis target velocity value.
+	*/
+	virtual LibMCDriver_A3200_double ReadAxisTargetVelocity(const LibMCDriver_A3200_uint32 nAxisID) = 0;
+
+	/**
+	* IDriver_A3200::ReadAxisInformation - Reads out all information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @param[out] dCurrentPositionValue - Current Position.
+	* @param[out] dTargetPositionValue - Target Position.
+	* @param[out] dPositionErrorValue - Position Error Value.
+	* @param[out] dCurrentVelocityValue - Current Velocity.
+	* @param[out] dTargetVelocityValue - Target Velocity.
+	* @param[out] dVelocityErrorValue - Velocity Error Value.
+	*/
+	virtual void ReadAxisInformation(const LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double & dCurrentPositionValue, LibMCDriver_A3200_double & dTargetPositionValue, LibMCDriver_A3200_double & dPositionErrorValue, LibMCDriver_A3200_double & dCurrentVelocityValue, LibMCDriver_A3200_double & dTargetVelocityValue, LibMCDriver_A3200_double & dVelocityErrorValue) = 0;
 
 };
 

@@ -63,34 +63,40 @@ namespace AMCData {
 
     void CSQLHandler_SQLite::checkSQLiteError(int nError)
 	{
+		std::string sErrorMessage;
+		if (nError != SQLITE_OK) {
+			if (m_pDBHandle != nullptr)
+				sErrorMessage = sqlite3_errmsg((sqlite3*)m_pDBHandle);
+		}
+
 		switch (nError) {
 		case SQLITE_OK: return;
-		case SQLITE_ERROR: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_ERROR);
-		case SQLITE_INTERNAL: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_INTERNAL);
-		case SQLITE_PERM: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_PERM);
-		case SQLITE_ABORT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_ABORT);
-		case SQLITE_BUSY: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_BUSY);
-		case SQLITE_LOCKED: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_LOCKED);
-		case SQLITE_NOMEM: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOMEM);
-		case SQLITE_READONLY: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_READONLY);
-		case SQLITE_INTERRUPT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_INTERRUPT);
-		case SQLITE_IOERR: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_IOERR);
-		case SQLITE_CORRUPT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_CORRUPT);
-		case SQLITE_NOTFOUND: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOTFOUND);
-		case SQLITE_FULL: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_FULL);
-		case SQLITE_CANTOPEN: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_CANTOPEN);
-		case SQLITE_PROTOCOL: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_PROTOCOL);
-		case SQLITE_SCHEMA: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_SCHEMA);
-		case SQLITE_TOOBIG: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_TOOBIG);
-		case SQLITE_CONSTRAINT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_CONSTRAINT);
-		case SQLITE_MISMATCH: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_MISMATCH);
-		case SQLITE_MISUSE: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_MISUSE);
-		case SQLITE_NOLFS: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOLFS);
-		case SQLITE_AUTH: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_AUTH);
-		case SQLITE_RANGE: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_RANGE);
-		case SQLITE_NOTADB: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOTADB);
-		case SQLITE_NOTICE: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOTICE);
-		case SQLITE_WARNING: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_WARNING);
+		case SQLITE_ERROR: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_ERROR, sErrorMessage);
+		case SQLITE_INTERNAL: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_INTERNAL, sErrorMessage);
+		case SQLITE_PERM: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_PERM, sErrorMessage);
+		case SQLITE_ABORT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_ABORT, sErrorMessage);
+		case SQLITE_BUSY: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_BUSY, sErrorMessage);
+		case SQLITE_LOCKED: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_LOCKED, sErrorMessage);
+		case SQLITE_NOMEM: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOMEM, sErrorMessage);
+		case SQLITE_READONLY: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_READONLY, sErrorMessage);
+		case SQLITE_INTERRUPT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_INTERRUPT, sErrorMessage);
+		case SQLITE_IOERR: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_IOERR, sErrorMessage);
+		case SQLITE_CORRUPT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_CORRUPT, sErrorMessage);
+		case SQLITE_NOTFOUND: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOTFOUND, sErrorMessage);
+		case SQLITE_FULL: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_FULL, sErrorMessage);
+		case SQLITE_CANTOPEN: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_CANTOPEN, sErrorMessage);
+		case SQLITE_PROTOCOL: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_PROTOCOL, sErrorMessage);
+		case SQLITE_SCHEMA: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_SCHEMA, sErrorMessage);
+		case SQLITE_TOOBIG: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_TOOBIG, sErrorMessage);
+		case SQLITE_CONSTRAINT: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_CONSTRAINT, sErrorMessage);
+		case SQLITE_MISMATCH: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_MISMATCH, sErrorMessage);
+		case SQLITE_MISUSE: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_MISUSE, sErrorMessage);
+		case SQLITE_NOLFS: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOLFS, sErrorMessage);
+		case SQLITE_AUTH: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_AUTH, sErrorMessage);
+		case SQLITE_RANGE: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_RANGE, sErrorMessage);
+		case SQLITE_NOTADB: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOTADB, sErrorMessage);
+		case SQLITE_NOTICE: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_NOTICE, sErrorMessage);
+		case SQLITE_WARNING: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_WARNING, sErrorMessage);
 		default: throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_OTHER);
 
 		}

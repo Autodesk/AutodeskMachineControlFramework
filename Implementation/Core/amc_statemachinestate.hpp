@@ -85,7 +85,7 @@ namespace AMC {
 
 		void setPluginState(LibMCPlugin::PState pPluginState);
 
-		void execute(std::string& sNextState, PSystemState pSystemState, PParameterHandler pParameterHandler);
+		void execute(std::string& sNextState, PSystemState pSystemState, PParameterHandler pParameterHandler, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName);
 
 	};
 

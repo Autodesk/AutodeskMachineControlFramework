@@ -36,7 +36,7 @@ Abstract: This is a stub class definition of CDataSeries
 #include "libmcenv_journalvariable.hpp"
 
 // Include custom headers here.
-
+#include <cmath>
 
 using namespace LibMCEnv::Impl;
 
@@ -181,7 +181,7 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 
 			uint64_t nMovingAverageDeltaInMicroSeconds = 0;
 			if (dMovingAverageDelta > 0.0)
-				nMovingAverageDeltaInMicroSeconds = (uint64_t) round(dMovingAverageDelta * 1000000);			
+				nMovingAverageDeltaInMicroSeconds = (uint64_t) std::round(dMovingAverageDelta * 1000000);			
 			if (nMovingAverageDeltaInMicroSeconds < 1)
 				nMovingAverageDeltaInMicroSeconds = 1;
 

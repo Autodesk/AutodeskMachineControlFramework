@@ -53,14 +53,21 @@ namespace AMCData {
 		std::mutex m_JournalMutex;
 		std::atomic<uint32_t> m_LogID;
 		std::atomic<uint32_t> m_AlertID;		
+		std::string m_sSessionUUID;
 
 		AMCCommon::PExportStream_Native m_pJournalStream;
 		
 	public:
 
-		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath);
+		static std::string convertAlertLevelToString(const LibMCData::eAlertLevel eLevel);
+		
+		static LibMCData::eAlertLevel convertStringToAlertLevel(const std::string & sValue, bool bFailIfUnknown);
+
+		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string & sSessionUUID);
 
 		virtual ~CJournal();
+
+		std::string getSessionUUID();
 
 		uint32_t getSchemaVersion();
 
@@ -81,11 +88,19 @@ namespace AMCData {
 
 		void acknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string & sTimeStampUTC);
 
-		bool alertHasBeenAcknowledged(const std::string& sUUID);
+		bool alertHasBeenAcknowledged (const std::string& sUUID);
+
+		bool alertIsActive(const std::string& sUUID);
 
 		void getAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC);
 
+		void retrieveAlerts(std::vector<std::string> & alertUUIDs);
+		void retrieveActiveAlerts(std::vector<std::string>& alertUUIDs);
+		void retrieveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
+		void retrieveActiveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
 
+		void acknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimeStampUTC);
+		void deactivateAlert(const std::string& sAlertUUID);
 	};
 
 	typedef std::shared_ptr<CJournal> PJournal;

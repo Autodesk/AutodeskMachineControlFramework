@@ -132,6 +132,11 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		err = addFile (zipWriter, DevPackageDir + "create_package_xml.exe", "create_package_xml.exe");
+		if err != nil {
+			log.Fatal(err)
+		}
 		
 	} else if (systemprefix == "linux64") {
 
@@ -139,14 +144,24 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
+		err = addFile (zipWriter, DevPackageDir + "create_package_xml", "create_package_xml");
+		if err != nil {
+			log.Fatal(err)
+		}
+
 	} else if (systemprefix == "rpi") {
 	
 		err = addFile (zipWriter, DevPackageDir + "buildresources.arm", "buildresources.arm");
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
+		err = addFile (zipWriter, DevPackageDir + "create_package_xml", "create_package_xml");
+		if err != nil {
+			log.Fatal(err)
+		}
+
 	} else {
 		log.Fatal("Invalid system prefix: " + systemprefix);
 	}

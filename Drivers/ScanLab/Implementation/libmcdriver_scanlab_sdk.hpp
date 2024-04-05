@@ -202,7 +202,10 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_range_checking) (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nMode, uint32_t nData);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_stop_execution) (uint32_t nCardNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_timed_mark_abs) (uint32_t nCardNo, int32_t nX, int32_t nY, double dTime);
-		
+		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_read_multi_mcbsp) (uint32_t nCardNo, uint32_t nRegisterNo);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_uart_config) (uint32_t nCardNo, uint32_t nBaudRate);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_rs232_write_data) (uint32_t nCardNo, uint32_t nData);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_rs232_read_data) (uint32_t nCardNo);
 
 		class CScanLabSDKJournal {
 		private:
@@ -371,6 +374,10 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_range_checking ptr_n_range_checking = nullptr;
 			PScanLabPtr_n_stop_execution ptr_n_stop_execution = nullptr;
 			PScanLabPtr_n_timed_mark_abs ptr_n_timed_mark_abs = nullptr;
+			PScanLabPtr_n_read_multi_mcbsp ptr_n_read_multi_mcbsp = nullptr;
+			PScanLabPtr_n_uart_config ptr_n_uart_config = nullptr;
+			PScanLabPtr_n_rs232_write_data ptr_n_rs232_write_data = nullptr;
+			PScanLabPtr_n_rs232_read_data ptr_n_rs232_read_data = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -530,6 +537,10 @@ namespace LibMCDriver_ScanLab {
 			void n_range_checking (uint32_t nCardNo, uint32_t nHeadNo, uint32_t nMode, uint32_t nData);
 			void n_stop_execution (uint32_t nCardNo);
 			void n_timed_mark_abs (uint32_t nCardNo, int32_t nX, int32_t nY, double dTime);
+			int32_t n_read_multi_mcbsp(uint32_t nCardNo, uint32_t nRegisterNo);
+			uint32_t n_uart_config(uint32_t nCardNo, uint32_t nBaudRate);
+			void n_rs232_write_data(uint32_t nCardNo, uint32_t nData);
+			uint32_t n_rs232_read_data(uint32_t nCardNo);
 
 		};
 

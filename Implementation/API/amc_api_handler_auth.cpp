@@ -46,15 +46,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash, PAccessControl pAccessControl)
-	: CAPIHandler (sClientHash), m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash), m_pAccessControl (pAccessControl)
+CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PDataModel pDataModel, const std::string& sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash, PAccessControl pAccessControl)
+	: CAPIHandler (sClientHash), 
+	m_pSessionHandler(pSessionHandler),
+	m_sInstallationSecret(sInstallationSecret), 
+	m_sGitHash (sGitHash), 
+	m_pAccessControl (pAccessControl),
+	m_pDataModel (pDataModel)
 {
 
 	if (pAccessControl.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pSessionHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pLoginHandler.get() == nullptr)
+	if (pDataModel.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
@@ -142,9 +147,11 @@ void CAPIHandler_Auth::handleNewSessionRequest(const uint8_t* pBodyData, const s
 	auto sUserName = pRequest.getNameString(AMC_API_KEY_AUTH_USERNAME, LIBMC_ERROR_INVALIDUSERNAME);
 	if (sUserName.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDUSERNAME);	
+
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
 	
 	std::string sLoginSalt;
-	if (m_pLoginHandler->UserExists (sUserName)) {
+	if (pLoginHandler->UserExists (sUserName)) {
 		std::string sHashedPassword;
 		std::string sUserUUID;
 		std::string sUserDescription;
@@ -152,8 +159,8 @@ void CAPIHandler_Auth::handleNewSessionRequest(const uint8_t* pBodyData, const s
 		std::string sUserLanguageIdentifier;
 
 		// password hash is calculateSHA256FromString(sLoginSalt + "password"); 
-		m_pLoginHandler->GetUserDetails(sUserName, sLoginSalt, sHashedPassword);
-		m_pLoginHandler->GetUserProperties(sUserName, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
+		pLoginHandler->GetUserDetails(sUserName, sLoginSalt, sHashedPassword);
+		pLoginHandler->GetUserProperties(sUserName, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
 				
 		if (sUserRoleIdentifier.empty())
 			sUserRoleIdentifier = m_pAccessControl->getDefaultRole()->getIdentifier();

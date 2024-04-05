@@ -217,6 +217,14 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_pa
 */
 LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_resumelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
 
+/**
+* Delete list. MUST not be in execution for this.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_deletelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
 /*************************************************************************************************************************
  Class definition for Driver_BuR
 **************************************************************************************************************************/

@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
 #include "libmcdata_persistencyhandler.hpp"
+#include "libmcdata_installationinformation.hpp"
 
 #include "amcdata_databasemigrator.hpp"
 #include "amcdata_sqlhandler_sqlite.hpp"
@@ -78,7 +79,16 @@ CDataModel::~CDataModel()
 void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType dataBaseType, const std::string & sConnectionString)
     
 {
-    m_pStoragePath = std::make_shared<AMCData::CStoragePath> (sDataDirectory);
+    m_pStorageState = std::make_shared<AMCData::CStorageState> (sDataDirectory, m_sSessionUUID);
+    m_pStorageState->addAcceptedContent("application/3mf");
+    m_pStorageState->addAcceptedContent("text/csv");
+    m_pStorageState->addAcceptedContent("image/png");
+    m_pStorageState->addAcceptedContent("image/jpeg");
+    m_pStorageState->addAcceptedContent("application/amcf-discretefield2d");
+
+    m_pStorageState->addAcceptedContent("image/png");
+    m_pStorageState->addAcceptedContent("image/jpeg");
+
     if (dataBaseType == eDataBaseType::SqLite) {
         m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sConnectionString);
     }
@@ -98,12 +108,12 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     // Store Database type after successful initialisation
     m_eDataBaseType = dataBaseType;
 
-    auto sJournalPath = m_pStoragePath->getJournalPath(m_sTimeFileName);
-    auto sJournalDataPath = m_pStoragePath->getJournalDataPath(m_sTimeFileName);
-    auto sJournalName = m_pStoragePath->getJournalFileName(m_sTimeFileName);
-    auto sJournalDataName = m_pStoragePath->getJournalDataFileName(m_sTimeFileName);
+    auto sJournalPath = m_pStorageState->getJournalPath(m_sTimeFileName);
+    auto sJournalDataPath = m_pStorageState->getJournalDataPath(m_sTimeFileName);
+    auto sJournalName = m_pStorageState->getJournalFileName(m_sTimeFileName);
+    auto sJournalDataName = m_pStorageState->getJournalDataFileName(m_sTimeFileName);
 
-    m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath);
+    m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath, m_sSessionUUID);
 
     auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion) VALUES (?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);
@@ -124,6 +134,8 @@ LibMCData_uint32 CDataModel::GetDataModelVersion()
 
 void CDataModel::GetInstallationInformation(std::string& sInstallationUUID, std::string& sInstallationSecret)
 {
+    /* DEPRECIATED! use GetInstallationInformationObject instead! */
+
     if (m_eDataBaseType == eDataBaseType::Unknown)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATABASETYPE);
 
@@ -132,21 +144,23 @@ void CDataModel::GetInstallationInformation(std::string& sInstallationUUID, std:
 
 }
 
+IInstallationInformation* CDataModel::GetInstallationInformationObject()
+{
+    return new CInstallationInformation(m_sInstallationUUID, m_sInstallationSecret, m_sTempBasePath);
+}
+
 IStorage * CDataModel::CreateStorage()
 {
     if (m_eDataBaseType == eDataBaseType::Unknown)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATABASETYPE);
-    if (m_pStoragePath.get() == nullptr)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGEPATH);
+    if (m_pStorageState.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGESTATE);
 
-	return new CStorage (m_pSQLHandler, m_pStoragePath);
+	return new CStorage (m_pSQLHandler, m_pStorageState);
 }
 
 ILogSession* CDataModel::CreateNewLogSession()
 {
-    if (m_pStoragePath.get() == nullptr)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGEPATH);
-
     if (m_pJournal.get () == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
 
@@ -155,9 +169,6 @@ ILogSession* CDataModel::CreateNewLogSession()
 
 IJournalSession* CDataModel::CreateJournalSession()
 {
-    if (m_pStoragePath.get() == nullptr)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGEPATH);
-
     if (m_pJournal.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
 
@@ -167,9 +178,6 @@ IJournalSession* CDataModel::CreateJournalSession()
 
 IAlertSession* CDataModel::CreateAlertSession()
 {
-    if (m_pStoragePath.get() == nullptr)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGEPATH);
-
     if (m_pJournal.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
 
@@ -181,7 +189,10 @@ IAlertSession* CDataModel::CreateAlertSession()
 IBuildJobHandler* CDataModel::CreateBuildJobHandler()
 {
 
-    return new CBuildJobHandler(m_pSQLHandler, m_pStoragePath);
+    if (m_pStorageState.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGESTATE);
+
+    return new CBuildJobHandler(m_pSQLHandler, m_pStorageState);
 }
 
 ILoginHandler* CDataModel::CreateLoginHandler()
@@ -209,6 +220,7 @@ void CDataModel::SetBaseTempDirectory(const std::string& sTempDirectory)
 
 std::string CDataModel::GetBaseTempDirectory()
 {
+    // DEPRECIATED. Use GetInstallationInformationObject instead!
     return m_sTempBasePath;
 }
 

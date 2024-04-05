@@ -66,18 +66,18 @@ PUIModule_ContentBuildList CUIModule_ContentBuildList::makeFromXML(const pugi::x
 		nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 	}
 
-	return std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sSelectEvent, pUIModuleEnvironment->buildJobHandler(), sItemName, sModulePath);
+	return std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sSelectEvent, pUIModuleEnvironment->dataModel(), sItemName, sModulePath);
 
 }
 
-CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sSelectEvent(sSelectEvent), m_pBuildJobHandler (pBuildJobHandler)
+CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sSelectEvent(sSelectEvent), m_pDataModel (pDataModel)
 {
 	if (sModulePath.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULEPATH);
 	if (sItemName.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_BUILDLISTNAMEMISSING);
-	if (pBuildJobHandler.get() == nullptr)
+	if (pDataModel.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	m_sBuildNameCaption = "Build name";
@@ -132,7 +132,8 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 
 	CJSONWriterArray entryArray(writer);
 
-	auto pBuildJobIterator = m_pBuildJobHandler->ListJobsByStatus(LibMCData::eBuildJobStatus::Validated);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJobIterator = pBuildJobHandler->ListJobsByStatus(LibMCData::eBuildJobStatus::Validated);
 	while (pBuildJobIterator->MoveNext ()) {
 		
 		auto pBuildJob = pBuildJobIterator->GetCurrentJob();

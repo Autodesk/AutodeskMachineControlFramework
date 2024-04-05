@@ -175,7 +175,47 @@
 		<error name="INVALIDNUMBEROFSAMPLES" code="10135" description="Invalid number of samples"/>
 		<error name="EMPTYALERTIDENTIFIER" code="10136" description="Empty alert identifier"/>
 		<error name="INVALIDALERTIDENTIFIER" code="10137" description="Invalid alert identifier"/>
-
+		<error name="ALERTNOTFOUND" code="10138" description="Alert not found."/>
+		<error name="USERDOESNOTEXIST" code="10139" description="User does not exist."/>
+		<error name="EMPTYSHA256SOURCE" code="10140" description="Empty SHA256 Source."/>
+		<error name="ALERTHASNOUSERCONTEXT" code="10141" description="Alert has no user context."/>
+		<error name="EMPTYJOURNALSTREAMNAME" code="10142" description="Empty journal stream name."/>
+		<error name="EMPTYJOURNALSTREAMMIMETYPE" code="10143" description="Empty journal stream mime type."/>		
+		<error name="INVALIDSTREAMREADCALLBACK" code="10144" description="Invalid stream read callback." />		
+		<error name="INVALIDSTREAMSEEKCALLBACK" code="10145" description="Invalid stream seek callback." />		
+		<error name="INVALIDSTREAMCALLBACKUSERDATA" code="10146" description="Invalid stream callback user data." />		
+		<error name="STREAMREADEXCEEDSSTREAMSIZE" code="10147" description="Stream read exceeds stream size." />		
+		<error name="INVALIDSTREAMREADSIZE" code="10148" description="Invalid stream read size." />		
+		<error name="INVALIDSTREAMSEEKPOSITION" code="10149" description="Invalid stream seek position." />		
+		<error name="STORAGESTREAMNOTFOUND" code="10150" description="Storage Stream not found." />		
+		<error name="DOWNLOADSTREAMDOESNOTEXIST" code="10151" description="Download stream does not exist." />		
+		<error name="EMPTYDOWNLOADSTREAMFILENAME" code="10152" description="Empty download stream filename." />		
+		<error name="INVALIDDOWNLOADSTREAMFILENAME" code="10153" description="Invalid download stream filename." />		
+		<error name="USERISNOTAUTHORIZED" code="10154" description="User is not authorized." />		
+		<error name="INVALIDMETADATAKEY" code="10155" description="Invalid Metadata Key." />		
+		<error name="CANNOTCHANGESTATUSOFBUILDEXECUTION" code="10156" description="Can not change status of build execution." />		
+		<error name="BUILDEXECUTIONHASNOATTACHEDUSER" code="10157" description="Build execution has no attached user." />		
+		<error name="UNITSAREOUTOFRANGE" code="10158" description="Units are out of range." />		
+		<error name="COLUMNIDENTIFIEREMPTY" code="10159" description="Column identifier is empty." />		
+		<error name="INVALIDCOLUMNIDENTIFIER" code="10160" description="Invalid column identifier." />		
+		<error name="DUPLICATECOLUMNIDENTIFIER" code="10161" description="Duplicate column identifier." />		
+		<error name="INVALIDCOLUMNDATATYPE" code="10162" description="Invalid column data type." />		
+		<error name="DATATABLEHASTOOMANYCOLUMS" code="10163" description="Data table has too many columns." />		
+		<error name="COLUMNIDENTIFIERNOTFOUND" code="10164" description="Column identifier not found." />		
+		<error name="INVALIDCOLUMNINDEX" code="10165" description="Invalid column index." />		
+		<error name="COLUMNBUFFERISNULL" code="10166" description="Column buffer is null." />				
+		<error name="COLUMNISNOTOFTYPEDOUBLE" code="10167" description="Column is not of type double." />		
+		<error name="COLUMNISNOTOFTYPEUINT32" code="10168" description="Column is not of type uint32." />		
+		<error name="COLUMNISNOTOFTYPEUINT64" code="10169" description="Column is not of type uint64." />		
+		<error name="COLUMNISNOTOFTYPEINT32" code="10170" description="Column is not of type int32." />		
+		<error name="COLUMNISNOTOFTYPEINT64" code="10171" description="Column is not of type int64" />		
+		<error name="INVALIDCSVSEPARATOR" code="10172" description="Invalid CSV Separator" />		
+		<error name="DATATABLECSVBUFFEROVERFLOW" code="10173" description="Data Table CSV buffer overflow" />		
+		<error name="DATETIMEDIFFERENCEISINVALID" code="10174" description="Date Time difference is invalid" />		
+		<error name="DATETIMEISINVALID" code="10175" description="Date Time is invalid" />		
+		<error name="DATETIMEOUTOFBOUNDS" code="10176" description="Date Time out of bounds" />		
+		
+		
 	</errors>
 
 	<enum name="AlertLevel">
@@ -183,6 +223,7 @@
 		<option name="CriticalError" value="2"/>
 		<option name="Warning" value="3"/>
 		<option name="Message" value="4"/>
+		<option name="Unknown" value="7"/>
 	</enum>	
 
 
@@ -240,6 +281,23 @@
 		<option name="DialogYesNoCancel" value="4" />
 	</enum>
 	
+	<enum name="BuildExecutionStatus">
+		<option name="Unknown" value="0" />
+		<option name="InProcess" value="1" />
+		<option name="Finished" value="2" />
+		<option name="Failed" value="3" />
+	</enum>
+	
+	<enum name="DataTableColumnType">
+		<option name="Unknown" value="0" />
+		<option name="DoubleColumn" value="1" />
+		<option name="Int32Column" value="2" />
+		<option name="Uint32Column" value="3" />
+		<option name="Int64Column" value="4" />
+		<option name="Uint64Column" value="5" />
+	</enum>
+	
+		
 	
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
@@ -322,6 +380,39 @@
 		</method>
 		
 	</class>
+	
+	<class name="CryptoContext" parent="Base">
+	
+		<method name="CalculateSHA256FromString" description="Calculates SHA256 from a string. Fails if string is empty.">
+			<param name="Value" type="string" pass="in" description="Input value."/>
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+		
+		<method name="CalculateSHA256FromBytes" description="Calculates SHA256 from a byte array. Fails if array is empty.">
+			<param name="Value" type="basicarray" class="uint8" pass="in" description="Input value."/>
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+
+		<method name="NormalizeSHA256String" description="Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.">
+			<param name="Value" type="string" pass="in" description="Input value."/>
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+
+		<method name="CreateRandomSHA256Hash" description="Generates a random SHA256 hash value with operating system APIs.">
+			<param name="SHA256Value" type="string" pass="return" description="SHA256 Return value."/>
+		</method>
+
+		<method name="CreateUUID" description="Generates a random UUID with operating system APIs.">
+			<param name="UUIDValue" type="string" pass="return" description="UUID Return value."/>
+		</method>
+		
+		<method name="NormalizeUUIDString" description="Normalizes a standard string into UUID format. Fails if string does not have a proper UUID format.">
+			<param name="Value" type="string" pass="in" description="Input value."/>
+			<param name="UUIDValue" type="string" pass="return" description="UUID Return value."/>
+		</method>
+		
+	</class>	
+	
 
 	
 	<class name="PNGImageStoreOptions" parent="Base" description="Option class to parametrize saving of PNG Images.">
@@ -415,7 +506,7 @@
 			<param name="Value" type="uint32" pass="in" description="New Pixel value at this position" />
 		</method>		
 
-		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data.">
+		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data. DEPRECIATED.">
 			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
 			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
 			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
@@ -423,7 +514,7 @@
 			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
 		</method>		
 
-		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
+		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data. DEPRECIATED.">
 			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
 			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
 			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
@@ -572,6 +663,128 @@
 
 	</class>
 
+	<class name="DataTableWriteOptions" parent="Base" description="Configurates the writing of data table streams to disk.">
+	</class>
+
+	<class name="DataTableCSVWriteOptions" parent="Base" description="Configurates the writing of data table streams to disk as CSV.">
+
+		<method name="GetSeparator" description="Returns the desired separator of the CSV file. Default is semicolon.">
+			<param name="Separator" type="string" pass="return" description="Separator to use." />
+		</method>
+
+		<method name="SetSeparator" description="Sets the desired separator of the CSV file.">
+			<param name="Separator" type="string" pass="in" description="Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)" />
+		</method>
+
+	</class>
+	
+	<class name="DataTable" parent="Base" description="A in memory data table, streamable for example into a CSV file.">
+	
+		<method name="AddColumn" description="Adds a column to the data field.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column. MUST be unique, alphanumeric and not empty." />
+			<param name="Description" type="string" pass="in" description="Description of the column." />
+			<param name="ColumnType" type="enum" class="DataTableColumnType" pass="in" description="Data type of the column." />
+		</method>
+
+		<method name="RemoveColumn" description="Removes a column from the data field. Fails if Column does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+		</method>
+
+		<method name="HasColumn" description="Returns if a column exists in the data field.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="ColumnExists" type="bool" pass="return" description="Returns if the columns exist." />
+		</method>
+		
+		<method name="GetRowCount" description="Returns the current row count.">
+			<param name="RowCount" type="uint32" pass="return" description="Number of rows." />
+		</method>
+
+		<method name="GetColumnCount" description="Returns the current column count.">
+			<param name="ColumnCount" type="uint32" pass="return" description="Number of columns." />
+		</method>
+		
+		<method name="GetColumnIdentifier" description="Returns the identifier of a column. Will fail if Index is out of bounds.">
+			<param name="ColumnIndex" type="uint32" pass="in" description="Index of column. 0-based." />
+			<param name="Identifier" type="string" pass="return" description="Identifier of the column." />
+		</method>
+
+		<method name="GetColumnDescription" description="Returns the description of a column. Will fail if Index is out of bounds.">
+			<param name="ColumnIndex" type="uint32" pass="in" description="Index of column. 0-based." />
+			<param name="Description" type="string" pass="return" description="Description of the column." />
+		</method>
+
+		<method name="GetColumnType" description="Returns the type of a column. Will fail if Index is out of bounds.">
+			<param name="ColumnIndex" type="uint32" pass="in" description="Index of column. 0-based." />
+			<param name="ColumnType" type="enum" class="DataTableColumnType" pass="return" description="Data type of the column." />
+		</method>
+
+		<method name="GetColumnInformation" description="Returns the values of a double column. Will fail if column does not exist or type is not double.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Description" type="string" pass="out" description="Description of the column." />
+			<param name="ColumnType" type="enum" class="DataTableColumnType" pass="out" description="Data type of the column." />
+		</method>
+
+		<method name="GetDoubleColumnValues" description="Returns the values of a double column. Will fail if column does not exist or type is not double.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="double" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetInt32ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not int32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int32" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetInt64ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not int64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int64" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetUint32ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not uint32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint32" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="GetUint64ColumnValues" description="Returns the double columns. Will fail if column does not exist or type is not uint64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint64" pass="out" description="Value array of a column." />
+		</method>
+
+		<method name="SetDoubleColumnValues" description="Sets the values of a double column. Will fail if column does not exist or type is not double.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="double" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetInt32ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not int32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int32" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetInt64ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not int64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="int64" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetUint32ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not uint32.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint32" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+
+		<method name="SetUint64ColumnValues" description="Sets the double columns. Will fail if column does not exist or type is not uint64.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
+			<param name="Values" type="basicarray" class="uint64" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
+		</method>
+		
+		<method name="WriteCSVToStream" description="Writes the data as CSV to a temporary stream.">
+			<param name="Writer" type="class" class="TempStreamWriter" pass="in" description="Stream writer to use." />
+			<param name="Options" type="optionalclass" class="DataTableCSVWriteOptions" pass="in" description="Optional CSV writer options to use." />
+		</method>
+		
+		<method name="WriteDataToStream" description="Writes the data as binary to a temporary stream.">
+			<param name="Writer" type="class" class="TempStreamWriter" pass="in" description="Stream writer instance to use." />
+			<param name="Options" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Optional writer options to use." />
+		</method>
+
+	</class>
 
 	<class name="DataSeries" parent="Base" description="A data series of points.">
 	
@@ -620,6 +833,211 @@
 		</method>
 
 		
+	</class>
+
+
+
+
+	<class name="DateTimeDifference" parent="Base" description="Represents a duration between two DateTimeStamps. Accuracy is milliseconds. Can contain durations up to 1000000 years.">
+
+		<method name="ToMicroseconds" description = "Returns the duration in Microseconds.">
+			<param name="Microseconds" type="uint64" pass="return" description="The duration in Microseconds." />
+		</method>
+
+		<method name="ToMilliseconds" description = "Returns the duration in Milliseconds. Partial milliseconds are rounded down.">
+			<param name="Milliseconds" type="uint64" pass="return" description="The duration in Milliseconds." />
+		</method>
+
+		<method name="ToSeconds" description = "Returns the duration in Seconds. Partial seconds are rounded down.">
+			<param name="Seconds" type="uint64" pass="return" description="The duration in seconds." />
+		</method>
+
+		<method name="ToMinutes" description = "Returns the duration in Seconds. Partial minutes are rounded down.">
+			<param name="Minutes" type="uint64" pass="return" description="The duration in seconds." />
+		</method>
+
+		<method name="ToHours" description = "Returns the duration in Hours. Partial hours are rounded down.">
+			<param name="Hours" type="uint64" pass="return" description="The duration in hours." />
+		</method>
+
+		<method name="ToDays" description = "Returns the duration in Days. Partial days are rounded down.">
+			<param name="Days" type="uint64" pass="return" description="The duration in days." />
+		</method>
+
+		<method name="RoundDownToDay" description = "Rounds down the duration to the full day.">
+		</method>
+
+		<method name="RoundDownToHour" description = "Rounds down the duration to the full hour.">
+		</method>
+
+		<method name="RoundDownToMinute" description = "Rounds down the duration to the full minute.">
+		</method>
+
+		<method name="RoundDownToSeconds" description = "Rounds down the duration to the full second.">
+		</method>
+
+		<method name="RoundDownToMilliseconds" description = "Rounds down the duration to the full millisecond.">
+		</method>
+
+		<method name="RoundUpToDay" description = "Rounds up the duration to the full day.">
+		</method>
+
+		<method name="RoundUpToHour" description = "Rounds up the duration to the full hour.">
+		</method>
+
+		<method name="RoundUpToMinute" description = "Rounds up the duration to the full minute.">
+		</method>
+
+		<method name="RoundUpToSeconds" description = "Rounds up the duration to the full second.">
+		</method>
+
+		<method name="RoundupToMilliseconds" description = "Rounds up the duration to the full millisecond.">
+		</method>
+
+	</class>
+
+
+	<class name="DateTime" parent="Base" description="Represents a date and time in UTC time zone. Must be after first of January 1900. Accuracy is Microseconds.">
+	
+		<method name="ToMicrosecondsSince1970" description = "Returns the maximum accuracy date time.">
+			<param name="MicrosecondsSince1970" type="uint64" pass="return" description="Returns the date in Microseconds since midnight first of January 1970." />
+		</method>
+		
+		<method name="ToUnixTimestamp" description = "Returns the unix time stamp of the date time">
+			<param name="SecondsSince1970" type="uint64" pass="return" description="Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present." />
+		</method>
+		
+		<method name="ToUTCDateTime" description = "Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.">
+			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC" />
+		</method>
+
+		<method name="ToUTCDateTimeInMilliseconds" description = "Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.">
+			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC" />
+		</method>
+
+		<method name="ToUTCDateTimeInMicroseconds" description = "Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.">
+			<param name="UTCDateTime" type="string" pass="return" description="The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC" />
+		</method>
+
+		<method name="GetDate" description = "Returns the date information.">
+			<param name="Year" type="uint32" pass="out" description="Year of the date." />
+			<param name="Month" type="uint32" pass="out" description="Month of the date." />
+			<param name="Day" type="uint32" pass="out" description="Day of the date." />
+		</method>
+		
+		<method name="GetTime" description = "Returns the time information.">
+			<param name="Hour" type="uint32" pass="out" description="Hour of the time. Returns 0-23." />
+			<param name="Minute" type="uint32" pass="out" description="Minute of the time. Returns 0-59." />
+			<param name="Second" type="uint32" pass="out" description="Seconds of the time. Returns 0-59." />
+			<param name="Microsecond" type="uint32" pass="out" description="Partial microseconds of the time. Returns 0-999999." />
+		</method>
+
+		<method name="Duplicate" description = "Duplicates the date time instance.">
+			<param name="NewInstance" type="class" class="DateTime" pass="return" description="Returns a copied instance." />
+		</method>
+
+		<method name="IsLeapYear" description = "Returns if the year is a leap year.">
+			<param name="IsLeapYear" type="bool" pass="return" description="Returns true if the year is a leap year." />
+		</method>
+
+		<method name="IsLaterThan" description = "Checks if this timestamp is later than another timestamp.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="IsLater" type="bool" pass="return" description="Returns true if the instance is later than OtherTimeStamp." />
+		</method>
+
+		<method name="IsEarlierThan" description = "Checks if this timestamp is earlier than another timestamp.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="IsEarlier" type="bool" pass="return" description="Returns true if the instance is earlier than OtherTimeStamp." />
+		</method>
+
+		<method name="IsEqualTo" description = "Checks if this timestamp is equal to another timestamp.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="IsEqual" type="bool" pass="return" description="Returns true if the instance is equal to the OtherTimeStamp." />
+		</method>
+
+		<method name="GetTimeDifference" description = "Returns the time difference to another time stamp as positive duration value.">
+			<param name="OtherTimeStamp" type="class" class="DateTime" pass="in" description="Instance to check against." />
+			<param name="Difference" type="class" class="DateTimeDifference" pass="return" description="Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering." />
+		</method>
+
+		<method name="AddDuration" description = "Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="Duration" type="class" class="DateTimeDifference" pass="in" description="Duration to add to the time stamp." />
+		</method>
+
+		<method name="SubtractDuration" description = "Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="Duration" type="class" class="DateTimeDifference" pass="in" description="Duration to subtract from the time stamp." />
+		</method>
+
+		<method name="ShiftByYears" description = "Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaYears" type="int64" pass="in" description="Years to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByDays" description = "Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaDays" type="int64" pass="in" description="Days to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByHours" description = "Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaHours" type="int64" pass="in" description="Hours to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByMinutes" description = "Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaMinutes" type="int64" pass="in" description="Minutes to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftBySeconds" description = "Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaSeconds" type="int64" pass="in" description="Seconds to shift the date time stamp." />
+		</method>
+
+		<method name="ShiftByMilliseconds" description = "Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaMilliseconds" type="int64" pass="in" description="Milliseconds to shift the date time stamp." />
+		</method>
+		
+		<method name="ShiftByMicroseconds" description = "Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.">
+			<param name="DeltaMicroseconds" type="int64" pass="in" description="Microseconds to shift the date time stamp." />
+		</method>
+
+		<method name="RoundDownToYear" description = "Rounds down the timestamp to the start of the year. Takes leap years into account.">
+		</method>
+
+		<method name="RoundDownToMonth" description = "Rounds down the timestamp to the start of the month. Takes leap years into account.">
+		</method>
+
+		<method name="RoundDownToDay" description = "Rounds down the timestamp to the full day.">
+		</method>
+
+		<method name="RoundDownToHour" description = "Rounds down the timestamp to the full hour.">
+		</method>
+
+		<method name="RoundDownToMinute" description = "Rounds down the timestamp to the full minute.">
+		</method>
+
+		<method name="RoundDownToSeconds" description = "Rounds down the timestamp to the full second.">
+		</method>
+
+		<method name="RoundDownToMilliseconds" description = "Rounds down the timestamp to the full millisecond.">
+		</method>
+				
+		<method name="RoundUpToYear" description = "Rounds up the timestamp to the start of the year. Takes leap years into account.">
+		</method>
+
+		<method name="RoundUpToMonth" description = "Rounds up the timestamp to the start of the month. Takes leap years into account.">
+		</method>
+
+		<method name="RoundUpToDay" description = "Rounds up the timestamp to the full day.">
+		</method>
+
+		<method name="RoundUpToHour" description = "Rounds up the timestamp to the full hour.">
+		</method>
+
+		<method name="RoundUpToMinute" description = "Rounds up the timestamp to the full minute.">
+		</method>
+
+		<method name="RoundUpToSeconds" description = "Rounds up the timestamp to the full second.">
+		</method>
+
+		<method name="RoundUpToMilliseconds" description = "Rounds up the timestamp to the full millisecond.">
+		</method>
+
 	</class>
 
 
@@ -687,6 +1105,21 @@
 			<param name="Type" type="enum" class="ToolpathSegmentType" pass="return" description="Segment Type" />
 		</method>
 
+		<method name="SegmentIsLoop" description="Returns if segment is a loop.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="IsLoop" type="bool" pass="return" description="Flag if segment is a loop." />
+		</method>
+
+		<method name="SegmentIsPolyline" description="Returns if segment is a polyline.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="IsPolyline" type="bool" pass="return" description="Flag if segment is a polyline." />
+		</method>
+
+		<method name="SegmentIsHatchSegment" description="Returns if segment is a hatch segment.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="IsHatchSegment" type="bool" pass="return" description="Flag if segment is a hatch segment." />
+		</method>
+		
 		<method name="GetSegmentIntegerAttribute" description="Retrieves the segment integer attribute with the corresponding ID. Fails if attribute does not exist or does have different type.">
 			<param name="Index" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
 			<param name="AttributeID" type="uint32" pass="in" description="ID of the attribute." />
@@ -884,6 +1317,20 @@
 			<param name="Name" type="string" pass="in" description="Name of the metadata" />
 			<param name="XMLNode" type="class" class="XMLDocumentNode" pass="return" description="XML Metadata Object" />
 		</method>		
+
+		<method name="CalculateExtents" description="Calculates the layers extents in units">
+			<param name="MinX" type="int32" pass="out" description="Minimal X value of the layer in units." />
+			<param name="MinY" type="int32" pass="out" description="Minimal Y value of the layer in units." />
+			<param name="MaxX" type="int32" pass="out" description="Maximal X value of the layer in units." />
+			<param name="MaxY" type="int32" pass="out" description="Maximal Y value of the layer in units." />
+		</method>
+		
+		<method name="CalculateExtentsInMM" description="Calculates the layers extents in millimeters">
+			<param name="MinX" type="double" pass="out" description="Minimal X value of the layer in mm." />
+			<param name="MinY" type="double" pass="out" description="Minimal Y value of the layer in mm." />
+			<param name="MaxX" type="double" pass="out" description="Maximal X value of the layer in mm." />
+			<param name="MaxY" type="double" pass="out" description="Maximal Y value of the layer in mm." />
+		</method>
 		
 	</class>
 
@@ -980,6 +1427,155 @@
 	</class>
 
 
+	<class name="BuildExecution" parent="Base" description="A build execution is a physical run of a build.">
+
+		<method name="GetUUID" description="Returns uuid of the build execution.">
+			<param name="ExecutionUUID" type="string" pass="return" description="UUID of the build execution." />
+		</method>
+
+		<method name="GetBuildUUID" description="Returns uuid of the build.">
+			<param name="BuildUUID" type="string" pass="return" description="UUID of the build." />
+		</method>
+
+		<method name="GetBuild" description="Returns the instance of the build.">
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Instance of the build." />
+		</method>
+
+		<method name="GetExecutionStatus" description="Returns the status of the execution.">
+			<param name="ExecutionStatus" type="enum" class="BuildExecutionStatus" pass="return" description="Status of the build." />
+		</method>
+		
+		<method name="IsInProcess" description="Convenience function for checking the execution status.">
+			<param name="IsInProcess" type="bool" pass="return" description="Returns true if the status is InProcess." />
+		</method>		
+
+		<method name="IsFinished" description="Convenience function for checking the execution status.">
+			<param name="IsInProcess" type="bool" pass="return" description="Returns true if the status is Finished." />
+		</method>		
+
+		<method name="IsFailed" description="Convenience function for checking the execution status.">
+			<param name="IsInProcess" type="bool" pass="return" description="Returns true if the status is Failed." />
+		</method>		
+		
+		<method name="SetStatusToFinished" description="Sets build execution status to finished. Fails if Build status is not InProcess ">
+		</method>
+		
+		<method name="SetStatusToFailed" description="Sets build execution status to failed. Fails if Build status is not InProcess ">
+		</method>
+		
+		<method name="GetDescription" description="Returns a human readable description of the build execution for display in the User Interface.">
+			<param name="Description" type="string" pass="return" description="Description." />
+		</method>
+		
+		<method name="SetDescription" description="Sets a human readable description of the build execution for display in the User Interface. Should not be empty.">
+			<param name="Description" type="string" pass="in" description="Description." />
+		</method>
+		
+		<method name="GetJournalUUID" description="Returns the machine journal UUID that this job in executing in.">
+			<param name="JournalUUID" type="string" pass="return" description="Journal UUID of build execution." />
+		</method>
+
+		<method name="HasAttachedUser" description="Returns if a user is attached to the execution.">
+			<param name="UserIsAttached" type="bool" pass="return" description="Flag if a user is attached to the execution." />
+		</method>
+
+		<method name="GetUserUUID" description="Returns the user that started this job. Fails if no user is attached to the execution.">
+			<param name="UserUUID" type="string" pass="return" description="User who started the job." />
+		</method>
+
+		<method name="GetStartTimeStampInMilliseconds" description="Returns the start time stamp of the build execution in the current machine journal.">
+			<param name="TimeStampInMilliseconds" type="uint64" pass="return" description="TimeStamp when the build started in Milliseconds." />
+		</method>
+
+		<method name="GetStartTimeStampInMicroseconds" description="Returns the start time stamp of the build execution in the current machine journal.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build started in Microseconds." />
+		</method>
+		
+		<method name="GetEndTimeStampInMilliseconds" description="Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
+			<param name="TimeStampInMilliseconds" type="uint64" pass="return" description="TimeStamp when the build ended in Milliseconds." />
+		</method>
+
+		<method name="GetEndTimeStampInMicroseconds" description="Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build ended in Microseconds." />
+		</method>
+		
+		<method name="GetElapsedTimeInMilliseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
+			<param name="TimeStampInMilliseconds" type="uint64" pass="return" description="Elapsed time in Milliseconds." />
+		</method>
+
+		<method name="GetElapsedTimeInMicroseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
+		</method>
+		
+		<method name="AddBinaryData" description="Adds binary data to store with the build.">
+			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
+			<param name="Name" type="string" pass="in" description="Name of the attache data" />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>
+		
+		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+		
+		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
+		</method>	
+
+		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
+			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
+
+		<method name="LoadPNGImageByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+		
+		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
+		</method>	
+
+		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
+			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>			
+
+		<method name="AddMetaDataString" description="Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+		
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
+		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build execution. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+
+	</class>
+	
+	
+	<class name="BuildExecutionIterator" parent="Iterator">
+		<method name="GetCurrentExecution" description="Returns the execution the iterator points at.">
+			<param name="BuildExecutionInstance" type="handle" class="BuildExecution" pass="return" description="returns the BuildExecution instance."/>
+		</method>
+	</class>
+
+
 	<class name="Build" parent="Base" description="Build instance to access build files">
 
 		<method name="GetName" description="Returns name of the build.">
@@ -990,7 +1586,7 @@
 			<param name="BuildUUID" type="string" pass="return" description="UUID of the build." />
 		</method>
 
-		<method name="GetStorageUUID" description="Returns storage uuid of the build.">
+		<method name="GetStorageUUID" description="Returns storage uuid of the build stream.">
 			<param name="StorageUUID" type="string" pass="return" description="Storage UUID of the build." />
 		</method>
 
@@ -1062,14 +1658,55 @@
 		</method>	
 
 		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does already exist or has invalid Mime type." />
 			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
 			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
+		<method name="StartExecution" description="Starts a build execution. This function does not work in a UIEnvironment context!">
+			<param name="Description" type="string" pass="in" description="A human readable description of the build execution for display in the User Interface. Should not be empty." />
+			<param name="UserUUID" type="string" pass="in" description="User who started the execution. MUST exist. If empty, no user is attached." />
+			<param name="BuildExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance. Will be newly created and has the status InProcess." />
+		</method>
+
+		<method name="HasExecution" description="Checks if a build execution exists for this build.">
+			<param name="ExecutionUUID" type="string" pass="in" description="The UUID of the exceution." />
+			<param name="ExecutionExist" type="bool" pass="return" description="Returns true if the execution exists." />
+		</method>
 				
+		<method name="FindExecution" description="Finds a build execution. Fails if execution does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="The UUID of the exceution." />
+			<param name="BuildExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance. Will be newly created and has the status InProcess." />
+		</method>
+
+		<method name="ListExecutions" description="Lists all Executions of the build.">
+			<param name="OnlyCurrentJournalSession" type="bool" pass="in" description="If true, only the builds that have been created in the current machine session." />
+			<param name="IteratorInstance" type="class" class="BuildExecutionIterator" pass="return" description="Iterator instance." />
+		</method>
+
+		<method name="ListExecutionsByStatus" description="Lists all Executions of the build by status.">
+			<param name="ExecutionStatus" type="enum" class="BuildExecutionStatus" pass="in" description="Status of the build." />
+			<param name="OnlyCurrentJournalSession" type="bool" pass="in" description="If true, only the builds that have been created in the current machine session." />
+			<param name="IteratorInstance" type="class" class="BuildExecutionIterator" pass="return" description="Iterator instance." />
+		</method>
+		
+		<method name="AddMetaDataString" description="Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+		
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
+		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+		
 	</class>
 	
 	
@@ -1847,6 +2484,10 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 
+		<method name="CreateDataTable" description = "creates an empty data table.">
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table Instance." />
+		</method>
+
 		<method name="DriverHasResourceData" description = "retrieves if attached driver has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
@@ -1894,10 +2535,17 @@
 			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
 		</method>
 
-		<method name="RegisterDoubleParameter" description="registers a double parameter. Must only be called during driver creation.">
+		<method name="RegisterDoubleParameter" description="registers a double parameter. Must only be called during driver creation. The default units are 0.001.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Description" type="string" pass="in" description="Parameter Description" />
 			<param name="DefaultValue" type="double" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterDoubleParameterWithUnits" description="registers a double parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="double" pass="in" description="default value to set" />
+			<param name="Units" type="double" pass="in" description="unit factor to use" />
 		</method>
 
 		<method name="RegisterIntegerParameter" description="registers an int parameter. Must only be called during driver creation.">
@@ -2007,6 +2655,10 @@
 		<method name="GetBuildJob" description="Returns a instance of a build object. Fails if build uuid does not exist.">
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
+		</method>
+
+		<method name="CreateCryptoContext" description="Creates a crypto context.">
+			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
 		</method>
 
 	</class>
@@ -2164,6 +2816,91 @@
 	</class>
 
 
+	<class name="TempStreamWriter" parent="Base" description="A writer that allows to create a temporary storage stream.">
+	
+		<method name="GetUUID" description="Returns the UUID of the stream.">
+			<param name="UUID" type="string" pass="return" description="Returns stream uuid." />
+		</method>
+		
+		<method name="GetName" description="Returns the name of the stream.">
+			<param name="Name" type="string" pass="return" description="Returns stream name." />
+		</method>
+		
+		<method name="GetMIMEType" description="Returns the MIME type of the stream.">
+			<param name="MIMEType" type="string" pass="return" description="Returns stream MIME Type." />
+		</method>		
+		
+		<method name="GetSize" description="Returns the current size of the stream.">
+			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
+		</method>
+		
+		<method name="GetWritePosition" description="Returns the current write position of the stream.">
+			<param name="WritePosition" type="uint64" pass="return" description="Current write position of the stream." />
+		</method>		
+
+		<method name="Seek" description="Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.">
+			<param name="WritePosition" type="uint64" pass="in" description="New write position of the stream." />
+		</method>		
+
+		<method name="IsFinished" description="Returns if the stream writing has been finished.">
+			<param name="WritingIsFinished" type="bool" pass="return" description="Returns true if writing is finished." />
+		</method>
+		
+		<method name="WriteData" description="Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data array to write into the stream" />
+		</method>
+		
+		<method name="WriteString" description="Writes a string into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
+			<param name="Data" type="string" pass="in" description="String to write into the stream" />
+		</method>
+		
+		<method name="WriteLine" description="Writes a string into the stream and adds a newline character. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
+			<param name="Line" type="string" pass="in" description="String to write into the stream" />
+		</method>
+
+		<method name="Finish" description="Finishes the stream writing. Fails if stream has been finished already.">
+		</method>
+		
+	</class>
+	
+	
+	<class name="StreamReader" parent="Base" description="A reader class that allows to access a storage stream.">
+	
+		<method name="GetUUID" description="Returns the UUID of the stream.">
+			<param name="UUID" type="string" pass="return" description="Returns stream uuid." />
+		</method>
+
+		<method name="GetName" description="Returns the name of the stream.">
+			<param name="Name" type="string" pass="return" description="Returns stream name." />
+		</method>
+		
+		<method name="GetMIMEType" description="Returns the MIME type of the stream.">
+			<param name="MIMEType" type="string" pass="return" description="Returns stream MIME Type." />
+		</method>
+
+		<method name="GetSize" description="Returns the current size of the stream.">
+			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
+		</method>
+		
+		<method name="GetReadPosition" description="Returns the current read position of the stream.">
+			<param name="ReadPosition" type="uint64" pass="return" description="Current read position of the stream." />
+		</method>		
+
+		<method name="Seek" description="Moves the current read position to a certain address. New position MUST be smaller or equal the stream size.">
+			<param name="ReadPosition" type="uint64" pass="in" description="New read position of the stream." />
+		</method>		
+		
+		<method name="ReadData" description="Reads a data array from the stream from the current read position. Fails if reading outside of the stream data.">
+			<param name="SizeToRead" type="uint64" pass="in" description="Bytes to read. MUST be larger than 0." />
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Return data array. In case of success, will have SizeToRead elements." />
+		</method>
+
+		<method name="ReadAllData" description="Seeks to the beginning of the stream and returns all the stream data.">
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Return data array. In case of success, will have stream size elements." />
+		</method>
+		
+	</class>	
+
 	<class name="UniformJournalSampling" parent="Base" description="Result class for Journal Sampling">
 
 		<method name="GetVariableName" description="returns the name of the recorded variable.">
@@ -2220,12 +2957,24 @@
 			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
 		</method>
 		
+		<method name="ComputeSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
+			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
+			<param name="SampleValue" type="double" pass="return" description="Value of the variable at the time step." />
+		</method>
+
 		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
 			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
-			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in microseconds." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
+			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time." />
 			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
 			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
+			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
+		</method>
+
+		<method name="ComputeEquidistantSamples" description="Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.">
+			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
+			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
 			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
 		</method>
 
@@ -2239,6 +2988,10 @@
 	
 		<method name="GetUUID" description="Returns Alert UUID.">
 			<param name="UUID" type="string" pass="return" description="Returns the alert uuid." />
+		</method>
+
+		<method name="IsActive" description="Returns if the alert is actuve.">
+			<param name="Active" type="bool" pass="return" description="Returns if the alert is active." />
 		</method>
 
 		<method name="GetAlertLevel" description="Returns Alert Level.">
@@ -2257,7 +3010,7 @@
 			<param name="Value" type="bool" pass="return" description="Flag if alert needs acknowledgement." />
 		</method>
 	
-		<method name="IsAcknowledged" description="Returns if the alert is acknowledged.">
+		<method name="HasBeenAcknowledged" description="Returns if the alert is acknowledged.">
 			<param name="Value" type="bool" pass="return" description="Flag if alert is acknowledged." />
 		</method>
 
@@ -2267,6 +3020,22 @@
 			<param name="AckTime" type="string" pass="out" description="Timestamp in ISO8601 UTC format." />
 		</method>
 
+		<method name="GetAcknowledgementTime" description="Returns the time stamp of the the acknowledgement. Fails if the alert is not acknowledged.">
+			<param name="AckTime" type="class" class="DateTime" pass="return" description="Timestamp Instance." />
+		</method>
+
+		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+
+		<method name="AcknowledgeAlertForCurrentUser" description="Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.">
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		</method>
+
+		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">
+		</method>
+		
 	</class>
 
 	<class name="AlertIterator" parent="Iterator">
@@ -2276,11 +3045,12 @@
 	</class>
 
 
+
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
 
 		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="TimeDeltaInMilliseconds" type="uint64" pass="in" description="How many milliseconds the journal should be retrieved in the past." />
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
 				
@@ -2290,34 +3060,10 @@
 			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
-				
-		
-		<method name="StoreJournalMarker" description="Stores a journal marker tag at the current time stamp.">
-			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal." />
-			<param name="TimeStamp" type="uint64" pass="return" description="Returns the stored time stamp in microseconds." />
+						
+		<method name="GetStartTime" description="Retrieves the reference start time of the journal.">
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>
-
-		<method name="HasJournalMarker" description="Checks if a journal marker tag exists.">
-			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="MarkerExists" type="bool" pass="return" description="Returns true if the marker exists." />
-		</method>
-
-		<method name="RetrieveJournalMarker" description="Retrieves the first existing journal marker time stamp. Fails if marker does not exist.">
-			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="MustBeUnique" type="bool" pass="in" description="If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple." />
-			<param name="TimeStampInMicroSeconds" type="uint64" pass="return" description="Returns the time stamp in microseconds." />
-		</method>
-		
-		<method name="RetrieveJournalMarkers" description="Retrieves all existing journal marker time stamps. Fails if no marker exists.">
-			<param name="MarkerType" type="string" pass="in" description="Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="MarkerName" type="string" pass="in" description="Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)" />
-			<param name="TimeStamps" type="basicarray" class="uint64" pass="out" description="Returns an array of time stamps in microseconds." />
-		</method>
-		
 	
 	</class>
 
@@ -2370,6 +3116,11 @@
 			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
 		</method>
 	
+		<method name="UserUUIDExists" description="Checks if a user uuid exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
+		</method>
+
 		<method name="GetUserProperties" description="Retrieves all users data with one Transaction. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="UUID" type="string" pass="out" description="UUID of the user." />
@@ -2491,6 +3242,9 @@
 			<param name="StateName" type="string" pass="return" description="Name of current state" />
 		</method>
 
+		<method name="GetPreviousState" description="Retrieves the previous state before this execution. Returns the init state name, if called during the first state during runtime.">
+			<param name="StateName" type="string" pass="return" description="Name of previous state" />
+		</method>
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
@@ -2698,6 +3452,31 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
 		</method>
 
+		<method name="GetStartTimeOfStateInMilliseconds" description="Returns the global start time of the current state in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetStartTimeOfStateInMicroseconds" description="Returns the global start time of the current state in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetEndTimeOfPreviousStateInMicroseconds" description="Returns the global finish time of the previous state in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
+		<method name="GetEndTimeOfPreviousStateInMilliseconds" description="Returns the global finish time of the previous state in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetElapsedTimeInStateInMilliseconds" description="Returns the global finish time of the previous state in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="GetElapsedTimeInStateInMicroseconds" description="Returns the global finish time of the previous state in microseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
+		</method>
+
+
 		<method name="GetTestEnvironment" description="Returns a test environment instance.">
 			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
 		</method>
@@ -2718,6 +3497,9 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 		
+		<method name="CreateDataTable" description = "creates an empty data table.">
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table Instance." />
+		</method>
 
 		<method name="CheckUserPermission" description="Returns if the a user has a certain permission. Fails if user or permission is not known to the system.">
 			<param name="UserLogin" type="string" pass="in" description="Login of user to check" />
@@ -2770,20 +3552,53 @@
 		<method name="CreateAlert" description="creates a new alert">
 			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
 			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="AutomaticLogEntry" type="bool" pass="in" description="If this flag is set to true, an automatic message will be posted to the system log." />
 			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 
-		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+		<method name="FindAlert" description="finds an alert by UUID. Fails if alert does not exist.">
 			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
-			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 
-		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
-			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
-			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
-			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		<method name="AlertExists" description="Checks if a certain alert exists.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Value" type="bool" pass="return" description="True if alert exists." />
 		</method>
-5
+
+		<method name="RetrieveAlerts" description="Retrieves all or all active alerts.">
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>	
+
+		<method name="RetrieveAlertsByType" description="Retrieves alerts of a certain type identifier.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>				
+
+		<method name="HasAlertOfType" description="Checks, if an alert of a certain type identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be taken into account." />	
+			<param name="HasAlert" type="bool" pass="return" description="Flag, if the alert exists." />	
+		</method>				
+
+		<method name="CreateCryptoContext" description="Creates a crypto context.">
+			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
+		</method>
+		
+		<method name="CreateTemporaryStream" description="Creates a new writer to store temporary data. This data will be attached to the current journal.">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
+		</method>
+		
+		<method name="FindStream" description="Finds a stream in the storage system.">
+			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
+			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
+			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
+		</method>
+
 	</class>
 
 	<class name="UIItem" parent="Base" description="Base item that represents a user interface element.">
@@ -2832,6 +3647,11 @@
 		</method>
 
 		<method name="HideHint" description="Hides hint if any is displayed.">
+		</method>
+
+		<method name="StartStreamDownload" description="Starts a stream download on the client. Fails if stream does not exist.">
+			<param name="UUID" type="string" pass="in" description="Stream UUID." />
+			<param name="Filename" type="string" pass="in" description="Filename on disk. Fails if empty string." />
 		</method>
 
 		<method name="ShowMessageDlg" description="Shows a message dialog in the user interface.">
@@ -3024,6 +3844,10 @@
 			<param name="XMLDocument" type="class" class="XMLDocument" pass="return" description="XML Document Instance." />
 		</method>
 
+		<method name="CreateDataTable" description = "creates an empty data table.">
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table Instance." />
+		</method>
+
 		<method name="HasBuildJob" description="Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.">
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildExists" type="bool" pass="return" description="Returns true if build exists" />
@@ -3126,25 +3950,53 @@
 		<method name="CreateAlert" description="creates a new alert">
 			<param name="Identifier" type="string" pass="in" description="Alert type identifier. Call fails if identifier is not registered." />
 			<param name="ReadableContextInformation" type="string" pass="in" description="Context information string that can be displayed to the user." />
+			<param name="AutomaticLogEntry" type="bool" pass="in" description="If this flag is set to true, an automatic message will be posted to the system log." />
 			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 
-		<method name="FindAlert" description="finds an alert by UUID. Returns null if alert does not exist.">
+		<method name="FindAlert" description="finds an alert by UUID. Fails if alert does not exist.">
 			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
-			<param name="Alert" type="optionalclass" class="Alert" pass="return" description="Alert instance." />
+			<param name="Alert" type="class" class="Alert" pass="return" description="Alert instance." />
 		</method>
 
-		<method name="AcknowledgeAlert" description="Acknowledges an alert for the current user. ">
-			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
-			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+		<method name="AlertExists" description="Checks if a certain alert exists.">
+			<param name="UUID" type="string" pass="in" description="UUID of the alert to return." />
+			<param name="Value" type="bool" pass="return" description="True if alert exists." />
 		</method>
-		
-		<method name="AcknowledgeAlertForUser" description="Acknowledges an alert for a specific user. ">
-			<param name="AlertUUID" type="string" pass="in" description="UUID of the alert to acknowledge. Fails if alert does not exist." />
-			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
-			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+
+		<method name="RetrieveAlerts" description="Retrieves all or all active alerts.">
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>	
+
+		<method name="RetrieveAlertsByType" description="Retrieves alerts of a certain type identifier.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>				
+
+		<method name="HasAlertOfType" description="Checks, if an alert of a certain type identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be taken into account." />	
+			<param name="HasAlert" type="bool" pass="return" description="Flag, if the alert exists." />	
+		</method>				
+
+		<method name="CreateCryptoContext" description="Creates a crypto context.">
+			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
 		</method>
-		
+
+		<method name="CreateTemporaryStream" description="Creates a new writer to store temporary data. This data will be attached to the current journal.">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
+		</method>
+
+		<method name="FindStream" description="Finds a stream in the storage system.">
+			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
+			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
+			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
+		</method>
+
 	</class>
 
 

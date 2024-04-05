@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CAlert
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_languagestring.hpp"
+#include "amc_logger.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -47,6 +48,7 @@ Abstract: This is the class declaration of CAlert
 
 // Include custom headers here.
 #include "libmcdata_dynamic.hpp"
+#include <mutex>
 
 namespace LibMCEnv {
 namespace Impl {
@@ -59,25 +61,33 @@ namespace Impl {
 class CAlert : public virtual IAlert, public virtual CBase {
 private:
 
-	std::string m_sAlertUUID;
+	// ATTENTION: Alert Session is not thread safe.
+	// So the Alert session needs to be private and surrounded by a mutex
+	std::mutex m_AlertMutex;
 
+	LibMCData::PDataModel m_pDataModel;
 	LibMCData::PAlertSession m_pAlertSession;
+	LibMCData::PAlert m_pAlertData;
+	AMC::PLogger m_pLogger;
+	std::string m_sLogInstance;
 
-	LibMCEnv::eAlertLevel m_AlertLevel;
+	std::string m_sCurrentUserUUID;
+	bool m_bUserContextExists;
 
-	std::string m_sIdentifier;	
-
-	std::string m_sReadableContextInformation;
-
-	bool m_bNeedsAcknowledgement;
 
 public:
 
-	CAlert (const std::string & sAlertUUID, LibMCData::PAlertSession pAlertSession);
+	static CAlert* makeFrom(CAlert * pAlert);
+
+	static std::shared_ptr<CAlert> makeSharedFrom(CAlert* pAlert);
+
+	CAlert(LibMCData::PDataModel pDataModel, const std::string & sUUID, const std::string & sCurrentUserUUID, AMC::PLogger pLogger, const std::string & sLogInstance);
 
 	virtual ~CAlert();
 
 	std::string GetUUID() override;
+
+	bool IsActive() override;
 
 	LibMCEnv::eAlertLevel GetAlertLevel() override;
 
@@ -87,9 +97,25 @@ public:
 
 	bool NeedsAcknowledgement() override;
 
-	bool IsAcknowledged() override;
+	bool HasBeenAcknowledged() override;
 
 	void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) override;
+
+	IDateTime* GetAcknowledgementTime() override;
+
+	void AcknowledgeForUser(const std::string& sUserUUID, const std::string& sUserComment) override;
+
+	void AcknowledgeAlertForCurrentUser(const std::string& sUserComment) override;
+
+	void DeactivateAlert() override;
+
+	LibMCData::PDataModel getDataModel ();
+
+	std::string getCurrentUserUUID ();
+
+	AMC::PLogger getLogger();
+
+	std::string getLogInstance();
 
 };
 

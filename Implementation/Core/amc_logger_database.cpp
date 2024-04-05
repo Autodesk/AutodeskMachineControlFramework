@@ -36,11 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 		
-	CLogger_Database::CLogger_Database(LibMCData::PLogSession pLogSession)
-		: m_pLogSession (pLogSession),
-		m_MaxLogMessageRequestCount (AMC_MAXLOGMESSAGE_REQUESTCOUNT)
+	CLogger_Database::CLogger_Database(LibMCData::PDataModel pDataModel)
+		: m_MaxLogMessageRequestCount (AMC_MAXLOGMESSAGE_REQUESTCOUNT)
 	{
-		LibMCAssertNotNull(pLogSession.get());
+		LibMCAssertNotNull(pDataModel.get());
+
+		m_pLogSession = pDataModel->CreateNewLogSession();
 
 	}
 	

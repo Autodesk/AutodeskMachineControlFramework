@@ -42,10 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 	
 	
-	CService_BuildFileParsing::CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PBuildJob pBuildJob, Lib3MF::PWrapper p3MFWrapper, const std::string& sUserID)
-		: CService (pServiceHandler), m_pBuildJob (pBuildJob), m_p3MFWrapper (p3MFWrapper), m_sUserID (sUserID)
+	CService_BuildFileParsing::CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sUserID)
+		: CService (pServiceHandler), m_pDataModel (pDataModel), m_p3MFWrapper (p3MFWrapper), m_sUserID (sUserID), m_sBuildJobUUID (AMCCommon::CUtils::normalizeUUIDString (sBuildJobUUID))
 	{
-		LibMCAssertNotNull(pBuildJob.get());
+		LibMCAssertNotNull(pDataModel.get());
 		LibMCAssertNotNull(p3MFWrapper.get());
 
 	}
@@ -60,12 +60,14 @@ namespace AMC {
 	void CService_BuildFileParsing::executeBlocking()
 	{
 		
-		auto pStorageStream = m_pBuildJob->GetStorageStream();
+		auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+		auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+		auto pStorageStream = pBuildJob->GetStorageStream();
 		
 		// TODO: Check Toolpath Entity Integrity
-		CToolpathEntity toolpathEntity (pStorageStream, m_p3MFWrapper, m_pBuildJob->GetName ());		
-		m_pBuildJob->FinishValidating (toolpathEntity.getLayerCount ());
-		m_pBuildJob->AddJobData(pStorageStream->GetContextIdentifier (),  pStorageStream->GetName(), pStorageStream, LibMCData::eBuildJobDataType::Toolpath, m_sUserID);
+		CToolpathEntity toolpathEntity (m_pDataModel, pStorageStream->GetUUID(), m_p3MFWrapper, pBuildJob->GetName ());		
+		pBuildJob->FinishValidating (toolpathEntity.getLayerCount ());
+		pBuildJob->AddJobData(pStorageStream->GetContextIdentifier (),  pStorageStream->GetName(), pStorageStream, LibMCData::eCustomDataType::Toolpath, m_sUserID);
 		
 
 	}

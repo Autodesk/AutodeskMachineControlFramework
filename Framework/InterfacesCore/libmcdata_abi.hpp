@@ -176,6 +176,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logentrylist_hasentry(LibMCData_Log
 **************************************************************************************************************************/
 
 /**
+* retrieves the session UUID.
+*
+* @param[in] pLogSession - LogSession instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_getsessionuuid(LibMCData_LogSession pLogSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
+
+/**
 * adds a new log entry.
 *
 * @param[in] pLogSession - LogSession instance.
@@ -209,6 +220,172 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_getmaxlogentryid(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
 
 /*************************************************************************************************************************
+ Class definition for Alert
+**************************************************************************************************************************/
+
+/**
+* Returns the Alert UUID.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getuuid(LibMCData_Alert pAlert, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the Alert Identifier.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getidentifier(LibMCData_Alert pAlert, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns if the alert is actuve.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pActive - Returns if the alert is active.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_isactive(LibMCData_Alert pAlert, bool * pActive);
+
+/**
+* Returns the Alert Level.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pLevel - Value.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getlevel(LibMCData_Alert pAlert, LibMCData::eAlertLevel * pLevel);
+
+/**
+* Returns the Alert Level string.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nLevelStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLevelStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLevelStringBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getlevelstring(LibMCData_Alert pAlert, const LibMCData_uint32 nLevelStringBufferSize, LibMCData_uint32* pLevelStringNeededChars, char * pLevelStringBuffer);
+
+/**
+* Returns the Alert Description.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getdescription(LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Returns the Alert DescriptionIdentifier.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nDescriptionIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionIdentifierBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getdescriptionidentifier(LibMCData_Alert pAlert, const LibMCData_uint32 nDescriptionIdentifierBufferSize, LibMCData_uint32* pDescriptionIdentifierNeededChars, char * pDescriptionIdentifierBuffer);
+
+/**
+* Returns the Alert ReadableContextInformation.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nReadableContextInformationBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReadableContextInformationNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReadableContextInformationBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getreadablecontextinformation(LibMCData_Alert pAlert, const LibMCData_uint32 nReadableContextInformationBufferSize, LibMCData_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer);
+
+/**
+* Returns if the Alert needs acknowledgement.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pNeedsAcknowledgement - Value.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getneedsacknowledgement(LibMCData_Alert pAlert, bool * pNeedsAcknowledgement);
+
+/**
+* Returns the Alert Timestamp in UTC file format.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampUTCBuffer -  buffer of Value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_gettimestamputc(LibMCData_Alert pAlert, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+
+/**
+* Checks if the alert has been acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[out] pHasBeenAcknowledged - Flag if the alert has been acknowledged.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_hasbeenacknowledged(LibMCData_Alert pAlert, bool * pHasBeenAcknowledged);
+
+/**
+* Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of User who acknowledged the alert., may be NULL
+* @param[in] nUserCommentBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserCommentNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserCommentBuffer -  buffer of Comment of the acknowledgement., may be NULL
+* @param[in] nAckTimeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pAckTimeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pAckTimeBuffer -  buffer of Timestamp in ISO8601 UTC format., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_getacknowledgementinformation(LibMCData_Alert pAlert, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCData_uint32 nUserCommentBufferSize, LibMCData_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCData_uint32 nAckTimeBufferSize, LibMCData_uint32* pAckTimeNeededChars, char * pAckTimeBuffer);
+
+/**
+* Acknowledges an alert for a specific user and sets it inactive. 
+*
+* @param[in] pAlert - Alert instance.
+* @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+* @param[in] pUserComment - User comment to store. May be empty.
+* @param[in] pTimestampUTC - Timestamp in UTC format.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_acknowledgeforuser(LibMCData_Alert pAlert, const char * pUserUUID, const char * pUserComment, const char * pTimestampUTC);
+
+/**
+* Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+*
+* @param[in] pAlert - Alert instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alert_deactivatealert(LibMCData_Alert pAlert);
+
+/*************************************************************************************************************************
+ Class definition for AlertIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the alert the iterator points at.
+*
+* @param[in] pAlertIterator - AlertIterator instance.
+* @param[out] pCurrentInstance - returns the Alert instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertiterator_getcurrentalert(LibMCData_AlertIterator pAlertIterator, LibMCData_Alert * pCurrentInstance);
+
+/*************************************************************************************************************************
  Class definition for AlertSession
 **************************************************************************************************************************/
 
@@ -224,9 +401,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(L
 * @param[in] pReadableContextInformation - Readable Context Information in default language
 * @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
 * @param[in] pTimestampUTC - Timestamp in ISO8601 UTC format
+* @param[out] pAlertInstance - Alert Instance
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_addalert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, LibMCData::eAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_addalert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pIdentifier, LibMCData::eAlertLevel eLevel, const char * pDescription, const char * pDescriptionIdentifier, const char * pReadableContextInformation, bool bNeedsAcknowledgement, const char * pTimestampUTC, LibMCData_Alert * pAlertInstance);
 
 /**
 * Checks if an alert with a certain UUID exists.
@@ -239,76 +417,50 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_addalert(LibMCData_Ale
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_hasalert(LibMCData_AlertSession pAlertSession, const char * pUUID, bool * pAlertExists);
 
 /**
-* Retrieves information of an alert. Fails if alert does not exist.
+* Retrieves the alert object. Fails if alert does not exist.
 *
 * @param[in] pAlertSession - AlertSession instance.
 * @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pIdentifierBuffer -  buffer of Alert Identifier, may be NULL
-* @param[out] pLevel - Alert level.
-* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDescriptionBuffer -  buffer of Alert Description in default language, may be NULL
-* @param[in] nDescriptionIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDescriptionIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDescriptionIdentifierBuffer -  buffer of Alert Description Identifier for internationalization. May be empty., may be NULL
-* @param[in] nReadableContextInformationBufferSize - size of the buffer (including trailing 0)
-* @param[out] pReadableContextInformationNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pReadableContextInformationBuffer -  buffer of Readable Context Information in default language, may be NULL
-* @param[out] pNeedsAcknowledgement - Flag if acknowledgement is needed
-* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @param[out] pAlertInstance - Alert Instance
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_getalertinformation(LibMCData_AlertSession pAlertSession, const char * pUUID, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer, LibMCData::eAlertLevel * pLevel, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer, const LibMCData_uint32 nDescriptionIdentifierBufferSize, LibMCData_uint32* pDescriptionIdentifierNeededChars, char * pDescriptionIdentifierBuffer, const LibMCData_uint32 nReadableContextInformationBufferSize, LibMCData_uint32* pReadableContextInformationNeededChars, char * pReadableContextInformationBuffer, bool * pNeedsAcknowledgement, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_getalertbyuuid(LibMCData_AlertSession pAlertSession, const char * pUUID, LibMCData_Alert * pAlertInstance);
 
 /**
-* Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
+* Retrieves all or all active alerts.
 *
 * @param[in] pAlertSession - AlertSession instance.
-* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[in] pUserUUID - User UUID that acknowledged the alert.
-* @param[in] pUserComment - Comment of the user.
-* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
+* @param[out] pIteratorInstance - AlertIterator Instance
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_acknowledgealert(LibMCData_AlertSession pAlertSession, const char * pUUID, const char * pUserUUID, const char * pUserComment, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrievealerts(LibMCData_AlertSession pAlertSession, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
 /**
-* Checks if an alert has been acknowledged. Fails if alert does not exist.
+* Retrieves alerts of a certain type identifier.
 *
 * @param[in] pAlertSession - AlertSession instance.
-* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[out] pHasBeenAcknowledged - Flag if the alert has been acknowledged.
+* @param[in] pIdentifier - Alert Identifier to look for. Fails if empty.
+* @param[in] bOnlyActive - If true, only active alerts will be returned.
+* @param[out] pIteratorInstance - AlertIterator Instance
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_alerthasbeenacknowledged(LibMCData_AlertSession pAlertSession, const char * pUUID, bool * pHasBeenAcknowledged);
-
-/**
-* Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
-*
-* @param[in] pAlertSession - AlertSession instance.
-* @param[in] pUUID - Alert UUID. Fails if not a valid UUID is given.
-* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserUUIDBuffer -  buffer of User UUID that acknowledged the alert., may be NULL
-* @param[in] nUserCommentBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUserCommentNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUserCommentBuffer -  buffer of Comment of the user., may be NULL
-* @param[in] nTimestampUTCBufferSize - size of the buffer (including trailing 0)
-* @param[out] pTimestampUTCNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pTimestampUTCBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_getacknowledgementinformation(LibMCData_AlertSession pAlertSession, const char * pUUID, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer, const LibMCData_uint32 nUserCommentBufferSize, LibMCData_uint32* pUserCommentNeededChars, char * pUserCommentBuffer, const LibMCData_uint32 nTimestampUTCBufferSize, LibMCData_uint32* pTimestampUTCNeededChars, char * pTimestampUTCBuffer);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrievealertsbytype(LibMCData_AlertSession pAlertSession, const char * pIdentifier, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/
+
+/**
+* retrieves the session UUID.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMCData_JournalSession pJournalSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
 
 /**
 * writes detailed journal state data to disk.
@@ -473,7 +625,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_retrievestream(LibMCData_St
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. Must be unique and newly generated.
-* @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 * @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name Description of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
@@ -489,7 +641,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_St
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
-* @param[in] pContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 * @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
@@ -532,6 +684,51 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstream(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstreamblockwisesha256(LibMCData_Storage pStorage, const char * pUUID, const char * pBlockwiseSHA2);
 
 /**
+* starts storing a stream with random write access. Checksums are not required.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
+* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
+* @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+* @param[in] pName - Name of the stream.
+* @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
+* @param[in] pUserID - Currently authenticated user
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID);
+
+/**
+* stores data in a stream with random write access. Writing may be in arbitrary order.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+* @param[in] nOffset - Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size.
+* @param[in] nContentBufferSize - Number of elements in buffer
+* @param[in] pContentBuffer - uint8 buffer of Data block to store in stream.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storerandomwritestream(LibMCData_Storage pStorage, const char * pUUID, LibMCData_uint64 nOffset, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer);
+
+/**
+* Returns the size random write stream .
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+* @param[out] pCurrentSize - Current size in bytes.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_getrandomwritestreamsize(LibMCData_Storage pStorage, const char * pUUID, LibMCData_uint64 * pCurrentSize);
+
+/**
+* Finishes storing a random write stream.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishrandomwritestream(LibMCData_Storage pStorage, const char * pUUID);
+
+/**
 * Returns the maximum stream size that the data model allows.
 *
 * @param[in] pStorage - Storage instance.
@@ -560,20 +757,184 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_contenttypeisaccepted(LibMC
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Storage pStorage, const char * pUUID, bool * pIsImage);
 
+/**
+* Creates a new download ticket for a stream and a user.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pTicketUUID - UUID of download ticket.
+* @param[in] pStreamUUID - UUID of storage stream.
+* @param[in] pClientFileName - ClientFileName of the ticket. MUST NOT be empty.
+* @param[in] pSessionUUID - UUID of user session.
+* @param[in] pUserUUID - UUID of user that created the ticket.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pClientFileName, const char * pSessionUUID, const char * pUserUUID);
+
+/**
+* Returns the details of a download ticket and creates an entry in an access log with time stamp.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pTicketUUID - UUID of download ticket.
+* @param[in] pIPAddress - IP Address where the request came from.
+* @param[in] nStreamUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStreamUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStreamUUIDBuffer -  buffer of UUID of storage stream., may be NULL
+* @param[in] nClientFileNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pClientFileNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pClientFileNameBuffer -  buffer of ClientFileName of the ticket., may be NULL
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of UUID of user session., may be NULL
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of UUID of user that created the ticket., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+
+/**
+* Attaches a stream to a journal as temporary stream.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pStreamUUID - UUID of stream. Call fails if stream does not exist.
+* @param[in] pJournalUUID - UUID of journal. Call fails if journal does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_attachstreamtojournal(LibMCData_Storage pStorage, const char * pStreamUUID, const char * pJournalUUID);
+
 /*************************************************************************************************************************
- Class definition for BuildJobData
+ Class definition for CustomDataStream
 **************************************************************************************************************************/
 
 /**
-* returns the uuid of a build job data.
+* returns the uuid of the custom data.
 *
-* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] pCustomDataStream - CustomDataStream instance.
 * @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatauuid(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getdatauuid(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the identifier of the custom data.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Name String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getidentifier(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* returns the name of the custom data.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getname(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the timestamp when the custom data was created.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_gettimestamp(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* returns the storage stream.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[out] pStreamInstance - Stream Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getstoragestream(LibMCData_CustomDataStream pCustomDataStream, LibMCData_StorageStream * pStreamInstance);
+
+/**
+* returns the UUID of the storage stream.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of UUID of the storage stream., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getstoragestreamuuid(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nSHA2BufferSize, LibMCData_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* returns the checksum of the storage stream.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of SHA256 of the storage stream., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getstoragestreamsha2(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nSHA2BufferSize, LibMCData_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* returns the size of the storage stream of the build.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[out] pSize - size of the storage stream in bytes.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getstoragestreamsize(LibMCData_CustomDataStream pCustomDataStream, LibMCData_uint64 * pSize);
+
+/**
+* returns the UUID of the user who created the stream.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of UUID of the user who create the stream., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getuseruuid(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+
+/**
+* returns the data type of the custom data.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[out] pDataType - Data type of the custom data
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getdatatype(LibMCData_CustomDataStream pCustomDataStream, LibMCData::eCustomDataType * pDataType);
+
+/**
+* returns the data type of the custom data as string.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nDataTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataTypeBuffer -  buffer of Data type of the job data, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getdatatypeasstring(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nDataTypeBufferSize, LibMCData_uint32* pDataTypeNeededChars, char * pDataTypeBuffer);
+
+/**
+* returns the mime type of a storage stream.
+*
+* @param[in] pCustomDataStream - CustomDataStream instance.
+* @param[in] nMimeTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMimeTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMimeTypeBuffer -  buffer of Mime Type String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_customdatastream_getmimetype(LibMCData_CustomDataStream pCustomDataStream, const LibMCData_uint32 nMimeTypeBufferSize, LibMCData_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer);
+
+/*************************************************************************************************************************
+ Class definition for BuildJobData
+**************************************************************************************************************************/
 
 /**
 * returns the uuid of the parent build job.
@@ -585,99 +946,6 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatauuid(LibMCData_
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getjobuuid(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
-
-/**
-* returns the name of the job data.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pNameBuffer -  buffer of Name String, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getname(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer);
-
-/**
-* returns the unique context identifier of the job data.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[in] nContextIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pContextIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pContextIdentifierBuffer -  buffer of Context Identifier String, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getcontextidentifier(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nContextIdentifierBufferSize, LibMCData_uint32* pContextIdentifierNeededChars, char * pContextIdentifierBuffer);
-
-/**
-* returns the timestamp when the job data was created.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
-* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_gettimestamp(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
-
-/**
-* returns the storage stream of the build.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[out] pStreamInstance - Stream Instance.
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestream(LibMCData_BuildJobData pBuildJobData, LibMCData_StorageStream * pStreamInstance);
-
-/**
-* returns the checksum of the storage stream of the build.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
-* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pSHA2Buffer -  buffer of SHA256 of the storage stream., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestreamsha2(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nSHA2BufferSize, LibMCData_uint32* pSHA2NeededChars, char * pSHA2Buffer);
-
-/**
-* returns the size of the storage stream of the build.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[out] pSize - size of the storage stream in bytes.
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestreamsize(LibMCData_BuildJobData pBuildJobData, LibMCData_uint64 * pSize);
-
-/**
-* returns the data type of the job data.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[out] pDataType - Data type of the job data
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatatype(LibMCData_BuildJobData pBuildJobData, LibMCData::eBuildJobDataType * pDataType);
-
-/**
-* returns the data type of the job data as string.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[in] nDataTypeBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDataTypeBuffer -  buffer of Data type of the job data, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatatypeasstring(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nDataTypeBufferSize, LibMCData_uint32* pDataTypeNeededChars, char * pDataTypeBuffer);
-
-/**
-* returns the mime type of a storage stream.
-*
-* @param[in] pBuildJobData - BuildJobData instance.
-* @param[in] nMimeTypeBufferSize - size of the buffer (including trailing 0)
-* @param[out] pMimeTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pMimeTypeBuffer -  buffer of Mime Type String, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getmimetype(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nMimeTypeBufferSize, LibMCData_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer);
 
 /*************************************************************************************************************************
  Class definition for BuildJobDataIterator
@@ -691,6 +959,193 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getmimetype(LibMCData_
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdataiterator_getcurrentjobdata(LibMCData_BuildJobDataIterator pBuildJobDataIterator, LibMCData_BuildJobData * pCurrentInstance);
+
+/*************************************************************************************************************************
+ Class definition for BuildJobExecutionData
+**************************************************************************************************************************/
+
+/**
+* returns the uuid of the parent build job execution.
+*
+* @param[in] pBuildJobExecutionData - BuildJobExecutionData instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecutiondata_getexecutionuuid(LibMCData_BuildJobExecutionData pBuildJobExecutionData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/*************************************************************************************************************************
+ Class definition for BuildJobExecutionDataIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the build job execution data the iterator points at.
+*
+* @param[in] pBuildJobExecutionDataIterator - BuildJobExecutionDataIterator instance.
+* @param[out] pCurrentInstance - returns the build job execution instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecutiondataiterator_getcurrentjobexecutiondata(LibMCData_BuildJobExecutionDataIterator pBuildJobExecutionDataIterator, LibMCData_BuildJobExecutionData * pCurrentInstance);
+
+/*************************************************************************************************************************
+ Class definition for BuildJobExecution
+**************************************************************************************************************************/
+
+/**
+* returns the uuid of a build job execution.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getexecutionuuid(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the uuid of the parent build job.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getjobuuid(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the build job execution status.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[out] pExecutionStatus - Status Value
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getstatus(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobExecutionStatus * pExecutionStatus);
+
+/**
+* sets the new build job execution status. Will fail if current status is not InProcess.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] eNewExecutionStatus - Status Value
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobExecutionStatus eNewExecutionStatus);
+
+/**
+* returns the build job description.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Current Description., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getdescription(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* sets the build job description. Should not be an empty string.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pNewDescription - New Description.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_setdescription(LibMCData_BuildJobExecution pBuildJobExecution, const char * pNewDescription);
+
+/**
+* returns the uuid of the execution journal.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nJournalUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pJournalUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pJournalUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getjournaluuid(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nJournalUUIDBufferSize, LibMCData_uint32* pJournalUUIDNeededChars, char * pJournalUUIDBuffer);
+
+/**
+* returns the uuid of the user that created the build job.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nUserUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUserUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUserUUIDBuffer -  buffer of UUID String or 00000000-0000-0000-0000-000000000000 if no user is attached., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getuseruuid(LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+
+/**
+* Returns the start time stamp of the build execution in the machine journal.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[out] pTimeStampInMicroseconds - TimeStamp when the build started in Microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getstarttimestampinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 * pTimeStampInMicroseconds);
+
+/**
+* Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[out] pTimeStampInMicroseconds - TimeStamp when the build ended in Microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getendtimestampinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 * pTimeStampInMicroseconds);
+
+/**
+* Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
+* @param[out] pElapsedTimeInMicroseconds - Elapsed time in Microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, LibMCData_uint64 * pElapsedTimeInMicroseconds);
+
+/**
+* Adds a Metadata String to the build job.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+* @param[in] pValue - Value to store.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue);
+
+/**
+* Checks if a metadata string exists.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[out] pMetaDataStringExists - Returns if metadata string exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_hasmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, bool * pMetaDataStringExists);
+
+/**
+* Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Return value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer);
+
+/*************************************************************************************************************************
+ Class definition for BuildJobExecutionIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the build job data the iterator points at.
+*
+* @param[in] pBuildJobExecutionIterator - BuildJobExecutionIterator instance.
+* @param[out] pCurrentInstance - returns the build job  execution instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecutioniterator_getcurrentjobdata(LibMCData_BuildJobExecutionIterator pBuildJobExecutionIterator, LibMCData_BuildJobExecution * pCurrentInstance);
 
 /*************************************************************************************************************************
  Class definition for BuildJob
@@ -828,7 +1283,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_jobcanbearchived(LibMCData
 * @param[in] pUserID - Currently authenticated user
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eBuildJobDataType eDataType, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID);
 
 /**
 * Retrieves a list of build job data objects, filtered by type.
@@ -838,7 +1293,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_Build
 * @param[out] pIteratorInstance - Build Job Data Iterator Instance.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdatabytype(LibMCData_BuildJob pBuildJob, LibMCData::eBuildJobDataType eDataType, LibMCData_BuildJobDataIterator * pIteratorInstance);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdatabytype(LibMCData_BuildJob pBuildJob, LibMCData::eCustomDataType eDataType, LibMCData_BuildJobDataIterator * pIteratorInstance);
 
 /**
 * Retrieves a list of build job data objects.
@@ -858,6 +1313,81 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdata(LibMCData_Buil
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievejobdata(LibMCData_BuildJob pBuildJob, const char * pDataUUID, LibMCData_BuildJobData * pBuildJobData);
+
+/**
+* Adds a Metadata String to the build job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+* @param[in] pValue - Value to store.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue);
+
+/**
+* Checks if a metadata string exists.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[out] pMetaDataStringExists - Returns if metadata string exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_hasmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, bool * pMetaDataStringExists);
+
+/**
+* Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pKey - Unique key of value. Fails if Key already exists.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Return value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Creates a new build job execution with state InProgress.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pDescription - Description of the execution.
+* @param[in] pUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
+* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
+* @param[out] pExecutionInstance - Newly created execution instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_uint64 nRelativeStartTimeStampInMicroseconds, LibMCData_BuildJobExecution * pExecutionInstance);
+
+/**
+* Retrieves a new build job execution by uuid.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pExecutionUUID - UUID of the execution to retrieve.
+* @param[out] pExecutionInstance - If UUID exists, returns execution instance. Otherwise, returns null.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievebuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pExecutionUUID, LibMCData_BuildJobExecution * pExecutionInstance);
+
+/**
+* Retrieves multiple executions of the build job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+* @param[out] pIteratorInstance - Returns the list of execution instances that are queried. List may be empty.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievebuildjobexecutions(LibMCData_BuildJob pBuildJob, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance);
+
+/**
+* Retrieves multiple executions of the build job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] eStatusFilter - Status to filter the executions from.
+* @param[in] pJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+* @param[out] pIteratorInstance - Returns the list of execution instances that are queried. List may be empty.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievebuildjobexecutionsbystatus(LibMCData_BuildJob pBuildJob, LibMCData::eBuildJobExecutionStatus eStatusFilter, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for BuildJobIterator
@@ -991,6 +1521,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_userlist_getuserproperties(LibMCDat
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_LoginHandler pLoginHandler, const char * pUsername, bool * pUserExists);
+
+/**
+* Checks if a user UUID exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUUID - UUID of the user.
+* @param[out] pUserExists - Flag if users exists
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_useruuidexists(LibMCData_LoginHandler pLoginHandler, const char * pUUID, bool * pUserExists);
 
 /**
 * Retrieves login relevant users data. Fails if user does not exist.
@@ -1411,6 +1951,43 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_retrievepersiste
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_retrievepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pValue);
 
 /*************************************************************************************************************************
+ Class definition for InstallationInformation
+**************************************************************************************************************************/
+
+/**
+* Returns the installation UUID.
+*
+* @param[in] pInstallationInformation - InstallationInformation instance.
+* @param[in] nInstallationUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pInstallationUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pInstallationUUIDBuffer -  buffer of Installation UUID. Public value to document which installation was used for something., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_installationinformation_getinstallationuuid(LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nInstallationUUIDBufferSize, LibMCData_uint32* pInstallationUUIDNeededChars, char * pInstallationUUIDBuffer);
+
+/**
+* Returns the installation Secret.
+*
+* @param[in] pInstallationInformation - InstallationInformation instance.
+* @param[in] nInstallationSecretBufferSize - size of the buffer (including trailing 0)
+* @param[out] pInstallationSecretNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pInstallationSecretBuffer -  buffer of Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_installationinformation_getinstallationsecret(LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nInstallationSecretBufferSize, LibMCData_uint32* pInstallationSecretNeededChars, char * pInstallationSecretBuffer);
+
+/**
+* Returns a custom base temp directory. An empty string defaults to the system temp directory.
+*
+* @param[in] pInstallationInformation - InstallationInformation instance.
+* @param[in] nTempDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTempDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTempDirectoryBuffer -  buffer of Temp directory path., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_installationinformation_getbasetempdirectory(LibMCData_InstallationInformation pInstallationInformation, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer);
+
+/*************************************************************************************************************************
  Class definition for DataModel
 **************************************************************************************************************************/
 
@@ -1435,18 +2012,27 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_initialisedatabase(LibMCD
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getdatamodelversion(LibMCData_DataModel pDataModel, LibMCData_uint32 * pVersion);
 
 /**
-* returns unique identifiers for the current installation.
+* DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.
 *
 * @param[in] pDataModel - DataModel instance.
-* @param[in] nInstallationUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pInstallationUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pInstallationUUIDBuffer -  buffer of Installation UUID. Public value to document which installation was used for something., may be NULL
-* @param[in] nInstallationSecretBufferSize - size of the buffer (including trailing 0)
-* @param[out] pInstallationSecretNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pInstallationSecretBuffer -  buffer of Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application., may be NULL
+* @param[in] nDEPRECIATEDInstallationUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDEPRECIATEDInstallationUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDEPRECIATEDInstallationUUIDBuffer -  buffer of DEPRECIATED Installation UUID. Public value to document which installation was used for something., may be NULL
+* @param[in] nDEPRECIATEDInstallationSecretBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDEPRECIATEDInstallationSecretNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDEPRECIATEDInstallationSecretBuffer -  buffer of DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getinstallationinformation(LibMCData_DataModel pDataModel, const LibMCData_uint32 nInstallationUUIDBufferSize, LibMCData_uint32* pInstallationUUIDNeededChars, char * pInstallationUUIDBuffer, const LibMCData_uint32 nInstallationSecretBufferSize, LibMCData_uint32* pInstallationSecretNeededChars, char * pInstallationSecretBuffer);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getinstallationinformation(LibMCData_DataModel pDataModel, const LibMCData_uint32 nDEPRECIATEDInstallationUUIDBufferSize, LibMCData_uint32* pDEPRECIATEDInstallationUUIDNeededChars, char * pDEPRECIATEDInstallationUUIDBuffer, const LibMCData_uint32 nDEPRECIATEDInstallationSecretBufferSize, LibMCData_uint32* pDEPRECIATEDInstallationSecretNeededChars, char * pDEPRECIATEDInstallationSecretBuffer);
+
+/**
+* returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pInstallationInformation - Installation information instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getinstallationinformationobject(LibMCData_DataModel pDataModel, LibMCData_InstallationInformation * pInstallationInformation);
 
 /**
 * creates a storage access class.
@@ -1521,7 +2107,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createpersistencyhandler(
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_setbasetempdirectory(LibMCData_DataModel pDataModel, const char * pTempDirectory);
 
 /**
-* Returns a custom base temp directory. An empty string defaults to the system temp directory.
+* DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.
 *
 * @param[in] pDataModel - DataModel instance.
 * @param[in] nTempDirectoryBufferSize - size of the buffer (including trailing 0)

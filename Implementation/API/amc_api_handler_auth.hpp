@@ -54,7 +54,8 @@ namespace AMC {
 		std::string m_sGitHash;
 
 		PAPISessionHandler m_pSessionHandler;
-		LibMCData::PLoginHandler m_pLoginHandler;
+		LibMCData::PDataModel m_pDataModel;
+
 		PAccessControl m_pAccessControl;
 
 		APIHandler_AuthType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sSessionUUID);
@@ -64,7 +65,7 @@ namespace AMC {
 
 	public:
 
-		CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string & sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash, PAccessControl pAccessControl);
+		CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PDataModel pDataModel, const std::string & sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash, PAccessControl pAccessControl);
 
 		virtual ~CAPIHandler_Auth();
 				

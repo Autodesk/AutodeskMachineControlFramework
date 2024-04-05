@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
+#include <map>
 
 namespace AMC {
 
@@ -57,6 +58,9 @@ namespace AMC {
 		PUserInformation m_pUserInformation;
 		PParameterHandler m_pClientVariableHandler;
 
+		std::map<std::string, std::pair<std::string, std::string>> m_DownloadTickets;
+
+
 	protected:
 
 	public:
@@ -69,6 +73,8 @@ namespace AMC {
 
 		std::string getUserName();
 
+		std::string getUserUUID();
+
 		std::string getSessionUUID();
 
 		std::string getSessionKey();
@@ -78,6 +84,8 @@ namespace AMC {
 		bool contextUUIDIsAuthorized(std::string & sContextUUID);
 
 		PParameterHandler getClientVariableHandler ();
+
+		std::string createStreamDownloadTicket(const std::string & sStreamUUID, const std::string & sDownloadFileName);
 								
 	};
 

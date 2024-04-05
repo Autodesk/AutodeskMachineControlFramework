@@ -205,7 +205,7 @@ void CSMCJobInstance::Execute(const bool bBlocking)
     slsc_ExecState execState1 = slsc_ExecState_NotInitOrError;
     while (execState1 != slsc_ExecState_ReadyForExecution) {
         m_pSDK->checkError(m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState1));
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     } 
 
     //std::cout << "Starting execution" << std::endl;

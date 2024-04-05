@@ -181,6 +181,7 @@ public:
 			case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "COULDNOTPARSEDRIVERPROTOCOL";
 			case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "NOWORKINGDIRECTORY";
 			case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "INVALIDTASKID";
+			case LIBMCDRIVER_A3200_ERROR_INVALIDAXISID: return "INVALIDAXISID";
 			case LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH: return "VERSIONMISMATCH";
 			case LIBMCDRIVER_A3200_ERROR_FEATURELOCKED: return "FEATURELOCKED";
 			case LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE: return "UNSUPPORTEDHARDWARE";
@@ -265,6 +266,7 @@ public:
 			case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
 			case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "No working directory";
 			case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "Invalid task ID";
+			case LIBMCDRIVER_A3200_ERROR_INVALIDAXISID: return "Invalid axis ID";
 			case LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH: return "An incompatible version was detected";
 			case LIBMCDRIVER_A3200_ERROR_FEATURELOCKED: return "A license error occurred";
 			case LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE: return "A connected hardware type is no longer supported";
@@ -563,6 +565,11 @@ public:
 	inline void WriteTaskNumberVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const LibMCDriver_A3200_double dValue);
 	inline std::string ReadTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName);
 	inline void WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const std::string & sValue);
+	inline LibMCDriver_A3200_double ReadAxisPosition(const LibMCDriver_A3200_uint32 nAxisID);
+	inline LibMCDriver_A3200_double ReadAxisTargetPosition(const LibMCDriver_A3200_uint32 nAxisID);
+	inline LibMCDriver_A3200_double ReadAxisVelocity(const LibMCDriver_A3200_uint32 nAxisID);
+	inline LibMCDriver_A3200_double ReadAxisTargetVelocity(const LibMCDriver_A3200_uint32 nAxisID);
+	inline void ReadAxisInformation(const LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double & dCurrentPositionValue, LibMCDriver_A3200_double & dTargetPositionValue, LibMCDriver_A3200_double & dPositionErrorValue, LibMCDriver_A3200_double & dCurrentVelocityValue, LibMCDriver_A3200_double & dTargetVelocityValue, LibMCDriver_A3200_double & dVelocityErrorValue);
 };
 	
 	/**
@@ -710,6 +717,11 @@ public:
 		pWrapperTable->m_Driver_A3200_WriteTaskNumberVariable = nullptr;
 		pWrapperTable->m_Driver_A3200_ReadTaskStringVariable = nullptr;
 		pWrapperTable->m_Driver_A3200_WriteTaskStringVariable = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadAxisPosition = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadAxisTargetPosition = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadAxisVelocity = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadAxisTargetVelocity = nullptr;
+		pWrapperTable->m_Driver_A3200_ReadAxisInformation = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -975,6 +987,51 @@ public:
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisPosition = (PLibMCDriver_A3200Driver_A3200_ReadAxisPositionPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readaxisposition");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisPosition = (PLibMCDriver_A3200Driver_A3200_ReadAxisPositionPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readaxisposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadAxisPosition == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisTargetPosition = (PLibMCDriver_A3200Driver_A3200_ReadAxisTargetPositionPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readaxistargetposition");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisTargetPosition = (PLibMCDriver_A3200Driver_A3200_ReadAxisTargetPositionPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readaxistargetposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadAxisTargetPosition == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisVelocity = (PLibMCDriver_A3200Driver_A3200_ReadAxisVelocityPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readaxisvelocity");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisVelocity = (PLibMCDriver_A3200Driver_A3200_ReadAxisVelocityPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readaxisvelocity");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadAxisVelocity == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisTargetVelocity = (PLibMCDriver_A3200Driver_A3200_ReadAxisTargetVelocityPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readaxistargetvelocity");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisTargetVelocity = (PLibMCDriver_A3200Driver_A3200_ReadAxisTargetVelocityPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readaxistargetvelocity");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadAxisTargetVelocity == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisInformation = (PLibMCDriver_A3200Driver_A3200_ReadAxisInformationPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_driver_a3200_readaxisinformation");
+		#else // _WIN32
+		pWrapperTable->m_Driver_A3200_ReadAxisInformation = (PLibMCDriver_A3200Driver_A3200_ReadAxisInformationPtr) dlsym(hLibrary, "libmcdriver_a3200_driver_a3200_readaxisinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_A3200_ReadAxisInformation == nullptr)
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_A3200GetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_a3200_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_A3200GetVersionPtr) dlsym(hLibrary, "libmcdriver_a3200_getversion");
@@ -1143,6 +1200,26 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_writetaskstringvariable", (void**)&(pWrapperTable->m_Driver_A3200_WriteTaskStringVariable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_WriteTaskStringVariable == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readaxisposition", (void**)&(pWrapperTable->m_Driver_A3200_ReadAxisPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadAxisPosition == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readaxistargetposition", (void**)&(pWrapperTable->m_Driver_A3200_ReadAxisTargetPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadAxisTargetPosition == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readaxisvelocity", (void**)&(pWrapperTable->m_Driver_A3200_ReadAxisVelocity));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadAxisVelocity == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readaxistargetvelocity", (void**)&(pWrapperTable->m_Driver_A3200_ReadAxisTargetVelocity));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadAxisTargetVelocity == nullptr) )
+			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_a3200_driver_a3200_readaxisinformation", (void**)&(pWrapperTable->m_Driver_A3200_ReadAxisInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_A3200_ReadAxisInformation == nullptr) )
 			return LIBMCDRIVER_A3200_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_a3200_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1456,6 +1533,73 @@ public:
 	void CDriver_A3200::WriteTaskStringVariable(const LibMCDriver_A3200_uint32 nTaskID, const std::string & sName, const std::string & sValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_WriteTaskStringVariable(m_pHandle, nTaskID, sName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriver_A3200::ReadAxisPosition - Reads out the position information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis position value.
+	*/
+	LibMCDriver_A3200_double CDriver_A3200::ReadAxisPosition(const LibMCDriver_A3200_uint32 nAxisID)
+	{
+		LibMCDriver_A3200_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadAxisPosition(m_pHandle, nAxisID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriver_A3200::ReadAxisTargetPosition - Reads out the target position information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis target position value.
+	*/
+	LibMCDriver_A3200_double CDriver_A3200::ReadAxisTargetPosition(const LibMCDriver_A3200_uint32 nAxisID)
+	{
+		LibMCDriver_A3200_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadAxisTargetPosition(m_pHandle, nAxisID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriver_A3200::ReadAxisVelocity - Reads out the velocity information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis velocity value.
+	*/
+	LibMCDriver_A3200_double CDriver_A3200::ReadAxisVelocity(const LibMCDriver_A3200_uint32 nAxisID)
+	{
+		LibMCDriver_A3200_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadAxisVelocity(m_pHandle, nAxisID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriver_A3200::ReadAxisTargetVelocity - Reads out the target velocity information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @return Axis target velocity value.
+	*/
+	LibMCDriver_A3200_double CDriver_A3200::ReadAxisTargetVelocity(const LibMCDriver_A3200_uint32 nAxisID)
+	{
+		LibMCDriver_A3200_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadAxisTargetVelocity(m_pHandle, nAxisID, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriver_A3200::ReadAxisInformation - Reads out all information of an axis.
+	* @param[in] nAxisID - AxisID. MUST be between 0 and 31.
+	* @param[out] dCurrentPositionValue - Current Position.
+	* @param[out] dTargetPositionValue - Target Position.
+	* @param[out] dPositionErrorValue - Position Error Value.
+	* @param[out] dCurrentVelocityValue - Current Velocity.
+	* @param[out] dTargetVelocityValue - Target Velocity.
+	* @param[out] dVelocityErrorValue - Velocity Error Value.
+	*/
+	void CDriver_A3200::ReadAxisInformation(const LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double & dCurrentPositionValue, LibMCDriver_A3200_double & dTargetPositionValue, LibMCDriver_A3200_double & dPositionErrorValue, LibMCDriver_A3200_double & dCurrentVelocityValue, LibMCDriver_A3200_double & dTargetVelocityValue, LibMCDriver_A3200_double & dVelocityErrorValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_A3200_ReadAxisInformation(m_pHandle, nAxisID, &dCurrentPositionValue, &dTargetPositionValue, &dPositionErrorValue, &dCurrentVelocityValue, &dTargetVelocityValue, &dVelocityErrorValue));
 	}
 
 } // namespace LibMCDriver_A3200

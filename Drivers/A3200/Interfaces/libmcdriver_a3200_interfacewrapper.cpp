@@ -840,6 +840,146 @@ LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_writetaskstringvariable(L
 	}
 }
 
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxisposition(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_A3200;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
+		if (!pIDriver_A3200)
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
+		
+		*pValue = pIDriver_A3200->ReadAxisPosition(nAxisID);
+
+		return LIBMCDRIVER_A3200_SUCCESS;
+	}
+	catch (ELibMCDriver_A3200InterfaceException & Exception) {
+		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxistargetposition(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_A3200;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
+		if (!pIDriver_A3200)
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
+		
+		*pValue = pIDriver_A3200->ReadAxisTargetPosition(nAxisID);
+
+		return LIBMCDRIVER_A3200_SUCCESS;
+	}
+	catch (ELibMCDriver_A3200InterfaceException & Exception) {
+		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxisvelocity(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_A3200;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
+		if (!pIDriver_A3200)
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
+		
+		*pValue = pIDriver_A3200->ReadAxisVelocity(nAxisID);
+
+		return LIBMCDRIVER_A3200_SUCCESS;
+	}
+	catch (ELibMCDriver_A3200InterfaceException & Exception) {
+		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxistargetvelocity(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_A3200;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
+		if (!pIDriver_A3200)
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
+		
+		*pValue = pIDriver_A3200->ReadAxisTargetVelocity(nAxisID);
+
+		return LIBMCDRIVER_A3200_SUCCESS;
+	}
+	catch (ELibMCDriver_A3200InterfaceException & Exception) {
+		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_A3200Result libmcdriver_a3200_driver_a3200_readaxisinformation(LibMCDriver_A3200_Driver_A3200 pDriver_A3200, LibMCDriver_A3200_uint32 nAxisID, LibMCDriver_A3200_double * pCurrentPositionValue, LibMCDriver_A3200_double * pTargetPositionValue, LibMCDriver_A3200_double * pPositionErrorValue, LibMCDriver_A3200_double * pCurrentVelocityValue, LibMCDriver_A3200_double * pTargetVelocityValue, LibMCDriver_A3200_double * pVelocityErrorValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_A3200;
+
+	try {
+		if (!pCurrentPositionValue)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		if (!pTargetPositionValue)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		if (!pPositionErrorValue)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		if (!pCurrentVelocityValue)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		if (!pTargetVelocityValue)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		if (!pVelocityErrorValue)
+			throw ELibMCDriver_A3200InterfaceException (LIBMCDRIVER_A3200_ERROR_INVALIDPARAM);
+		IDriver_A3200* pIDriver_A3200 = dynamic_cast<IDriver_A3200*>(pIBaseClass);
+		if (!pIDriver_A3200)
+			throw ELibMCDriver_A3200InterfaceException(LIBMCDRIVER_A3200_ERROR_INVALIDCAST);
+		
+		pIDriver_A3200->ReadAxisInformation(nAxisID, *pCurrentPositionValue, *pTargetPositionValue, *pPositionErrorValue, *pCurrentVelocityValue, *pTargetVelocityValue, *pVelocityErrorValue);
+
+		return LIBMCDRIVER_A3200_SUCCESS;
+	}
+	catch (ELibMCDriver_A3200InterfaceException & Exception) {
+		return handleLibMCDriver_A3200Exception(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -901,6 +1041,16 @@ LibMCDriver_A3200Result LibMCDriver_A3200::Impl::LibMCDriver_A3200_GetProcAddres
 		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readtaskstringvariable;
 	if (sProcName == "libmcdriver_a3200_driver_a3200_writetaskstringvariable") 
 		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_writetaskstringvariable;
+	if (sProcName == "libmcdriver_a3200_driver_a3200_readaxisposition") 
+		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readaxisposition;
+	if (sProcName == "libmcdriver_a3200_driver_a3200_readaxistargetposition") 
+		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readaxistargetposition;
+	if (sProcName == "libmcdriver_a3200_driver_a3200_readaxisvelocity") 
+		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readaxisvelocity;
+	if (sProcName == "libmcdriver_a3200_driver_a3200_readaxistargetvelocity") 
+		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readaxistargetvelocity;
+	if (sProcName == "libmcdriver_a3200_driver_a3200_readaxisinformation") 
+		*ppProcAddress = (void*) &libmcdriver_a3200_driver_a3200_readaxisinformation;
 	if (sProcName == "libmcdriver_a3200_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_a3200_getversion;
 	if (sProcName == "libmcdriver_a3200_getlasterror") 

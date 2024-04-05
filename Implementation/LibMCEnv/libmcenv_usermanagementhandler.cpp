@@ -44,11 +44,11 @@ using namespace LibMCEnv::Impl;
  Class definition of CUserManagementHandler 
 **************************************************************************************************************************/
 
-CUserManagementHandler::CUserManagementHandler(LibMCData::PLoginHandler pLoginHandler, AMC::PAccessControl pAccessControl, AMC::PLanguageHandler pLanguageHandler)
-	: m_pLoginHandler (pLoginHandler), m_pAccessControl (pAccessControl), m_pLanguageHandler (pLanguageHandler)
+CUserManagementHandler::CUserManagementHandler(LibMCData::PDataModel pDataModel, AMC::PAccessControl pAccessControl, AMC::PLanguageHandler pLanguageHandler)
+	: m_pDataModel(pDataModel), m_pAccessControl (pAccessControl), m_pLanguageHandler (pLanguageHandler)
 {
 
-	if (pLoginHandler.get() == nullptr)
+	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pAccessControl.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -71,8 +71,21 @@ bool CUserManagementHandler::UserExists(const std::string & sUsername)
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sUsername))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, "invalid user login: " + sUsername);
 
-	return m_pLoginHandler->UserExists(sUsername);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+
+	return pLoginHandler->UserExists(sUsername);
 }
+
+bool CUserManagementHandler::UserUUIDExists(const std::string& sUUID)
+{
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+
+	return pLoginHandler->UserExists(sNormalizedUUID);
+
+}
+
 
 void CUserManagementHandler::GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
 {
@@ -82,19 +95,24 @@ void CUserManagementHandler::GetUserProperties(const std::string & sUsername, st
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, "invalid user login: " + sUsername);
 
-	m_pLoginHandler->GetUserProperties(sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->GetUserProperties(sUsername, sUUID, sDescription, sRole, sLanguageIdentifier);
 }
 
 void CUserManagementHandler::GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-	m_pLoginHandler->GetUserPropertiesByUUID(sNormalizedUUID, sUsername, sDescription, sRole, sLanguageIdentifier);
+	
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->GetUserPropertiesByUUID(sNormalizedUUID, sUsername, sDescription, sRole, sLanguageIdentifier);
 }
 
 std::string CUserManagementHandler::GetUsernameByUUID(const std::string & sUUID)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-	return m_pLoginHandler->GetUsernameByUUID(sNormalizedUUID);
+
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUsernameByUUID(sNormalizedUUID);
 }
 
 std::string CUserManagementHandler::GetUserUUID(const std::string & sUsername)
@@ -105,7 +123,8 @@ std::string CUserManagementHandler::GetUserUUID(const std::string & sUsername)
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, "invalid user login: " + sUsername);
 
-	return m_pLoginHandler->GetUserUUID(sUsername);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUserUUID(sUsername);
 }
 
 std::string CUserManagementHandler::GetUserDescription(const std::string & sUsername)
@@ -116,14 +135,16 @@ std::string CUserManagementHandler::GetUserDescription(const std::string & sUser
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, "invalid user login: " + sUsername);
 
-	return m_pLoginHandler->GetUserDescription(sUsername);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUserDescription(sUsername);
 }
 
 std::string CUserManagementHandler::GetUserDescriptionByUUID(const std::string & sUUID)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-	return m_pLoginHandler->GetUserDescriptionByUUID(sUUID);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUserDescriptionByUUID(sUUID);
 }
 
 std::string CUserManagementHandler::GetUserRole(const std::string & sUsername)
@@ -134,14 +155,16 @@ std::string CUserManagementHandler::GetUserRole(const std::string & sUsername)
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, "invalid user login: " + sUsername);
 
-	return m_pLoginHandler->GetUserRole(sUsername);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUserRole(sUsername);
 }
 
 std::string CUserManagementHandler::GetUserRoleByUUID(const std::string & sUUID)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-	return m_pLoginHandler->GetUserRoleByUUID(sNormalizedUUID);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUserRoleByUUID(sNormalizedUUID);
 }
 
 std::string CUserManagementHandler::GetUserLanguage(const std::string & sUsername)
@@ -152,14 +175,16 @@ std::string CUserManagementHandler::GetUserLanguage(const std::string & sUsernam
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, "invalid user login: " + sUsername);
 
-	return m_pLoginHandler->GetUserLanguage(sUsername);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUserLanguage(sUsername);
 }
 
 std::string CUserManagementHandler::GetUserLanguageByUUID(const std::string & sUUID)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-	return m_pLoginHandler->GetUserLanguageByUUID(sNormalizedUUID);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->GetUserLanguageByUUID(sNormalizedUUID);
 }
 
 std::string CUserManagementHandler::CreateUser(const std::string & sUsername, const std::string & sRole, const std::string & sSalt, const std::string & sHashedPassword, const std::string & sDescription)
@@ -177,7 +202,8 @@ std::string CUserManagementHandler::CreateUser(const std::string & sUsername, co
 	std::string sNormalizedSalt = AMCCommon::CUtils::normalizeSHA256String(sSalt);
 	std::string sNormalizedHash = AMCCommon::CUtils::normalizeSHA256String(sHashedPassword);
 
-	return m_pLoginHandler->CreateUser(sUsername, sRole, sNormalizedSalt, sNormalizedHash, sDescription);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	return pLoginHandler->CreateUser(sUsername, sRole, sNormalizedSalt, sNormalizedHash, sDescription);
 }
 
 void CUserManagementHandler::SetUserLanguage(const std::string & sUsername, const std::string & sLanguageIdentifier)
@@ -195,7 +221,8 @@ void CUserManagementHandler::SetUserLanguage(const std::string & sUsername, cons
 	if (!m_pLanguageHandler->hasLanguage(sLanguageIdentifier))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLANGUAGE, "invalid user language: " + sLanguageIdentifier);
 
-	m_pLoginHandler->SetUserLanguage(sUsername, sLanguageIdentifier);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserLanguage(sUsername, sLanguageIdentifier);
 
 }
 
@@ -214,7 +241,8 @@ void CUserManagementHandler::SetUserRole(const std::string & sUsername, const st
 	if (!m_pAccessControl->hasRole(sRole))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERROLE, "invalid user role: " + sRole);
 
-	m_pLoginHandler->SetUserRole(sUsername, sRole);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserRole(sUsername, sRole);
 }
 
 void CUserManagementHandler::SetUserDescription(const std::string & sUsername, const std::string & sDescription)
@@ -224,7 +252,8 @@ void CUserManagementHandler::SetUserDescription(const std::string & sUsername, c
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sUsername))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLOGIN, "invalid user login: " + sUsername);
 
-	m_pLoginHandler->SetUserDescription(sUsername, sDescription);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserDescription(sUsername, sDescription);
 }
 
 void CUserManagementHandler::SetUserPassword(const std::string & sUsername, const std::string & sSalt, const std::string & sHashedPassword)
@@ -237,7 +266,8 @@ void CUserManagementHandler::SetUserPassword(const std::string & sUsername, cons
 	std::string sNormalizedSalt = AMCCommon::CUtils::normalizeSHA256String(sSalt);
 	std::string sNormalizedHash = AMCCommon::CUtils::normalizeSHA256String(sHashedPassword);
 
-	m_pLoginHandler->SetUserPassword(sUsername, sNormalizedSalt, sNormalizedHash);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserPassword(sUsername, sNormalizedSalt, sNormalizedHash);
 }
 
 void CUserManagementHandler::SetUserLanguageByUUID(const std::string & sUUID, const std::string & sLanguageIdentifier)
@@ -251,7 +281,8 @@ void CUserManagementHandler::SetUserLanguageByUUID(const std::string & sUUID, co
 	if (!m_pLanguageHandler->hasLanguage(sLanguageIdentifier))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERLANGUAGE, "invalid user language: " + sLanguageIdentifier);
 
-	m_pLoginHandler->SetUserLanguageByUUID(sNormalizedUUID, sLanguageIdentifier);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserLanguageByUUID(sNormalizedUUID, sLanguageIdentifier);
 
 }
 
@@ -266,13 +297,15 @@ void CUserManagementHandler::SetUserRoleByUUID(const std::string & sUUID, const 
 	if (!m_pAccessControl->hasRole(sRole))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDUSERROLE, "invalid user role: " + sRole);
 
-	m_pLoginHandler->SetUserRoleByUUID(sNormalizedUUID, sRole);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserRoleByUUID(sNormalizedUUID, sRole);
 }
 
 void CUserManagementHandler::SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription)
 {
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-	m_pLoginHandler->SetUserDescriptionByUUID(sNormalizedUUID, sDescription);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserDescriptionByUUID(sNormalizedUUID, sDescription);
 }
 
 void CUserManagementHandler::SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword)
@@ -281,12 +314,14 @@ void CUserManagementHandler::SetUserPasswordByUUID(const std::string & sUUID, co
 	std::string sNormalizedSalt = AMCCommon::CUtils::normalizeSHA256String(sSalt);
 	std::string sNormalizedHash = AMCCommon::CUtils::normalizeSHA256String(sHashedPassword);
 
-	m_pLoginHandler->SetUserPasswordByUUID(sNormalizedUUID, sNormalizedSalt, sNormalizedHash);
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	pLoginHandler->SetUserPasswordByUUID(sNormalizedUUID, sNormalizedSalt, sNormalizedHash);
 }
 
 IUserDetailList* CUserManagementHandler::GetActiveUsers()
 {
-	auto pUserList = m_pLoginHandler->GetActiveUsers();
+	auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+	auto pUserList = pLoginHandler->GetActiveUsers();
 	auto pResultList = std::make_unique<CUserDetailList> ();
 
 	

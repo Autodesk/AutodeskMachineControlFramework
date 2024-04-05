@@ -59,15 +59,16 @@ namespace Impl {
 class CBuild : public virtual IBuild, public virtual CBase {
 private:
 
+	AMCCommon::PChrono m_pGlobalChrono;
 	AMC::PToolpathHandler m_pToolpathHandler;
-	LibMCData::PBuildJob m_pBuildJob;
-	LibMCData::PStorage m_pStorage;
+	LibMCData::PDataModel m_pDataModel;
+	std::string m_sBuildJobUUID;
 	std::string m_sSystemUserID;
 
 
 public:
 
-	CBuild(LibMCData::PBuildJob pBuildJob, AMC::PToolpathHandler pToolpathHandler, LibMCData::PStorage pStorage, const std::string & sSystemUserID);
+	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuild();
 
@@ -106,6 +107,22 @@ public:
 	IImageData* LoadPNGImageByUUID(const std::string& sDataUUID) override;
 
 	std::string StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
+
+	IBuildExecution* StartExecution(const std::string& sDescription, const std::string& sUserUUID) override;
+
+	bool HasExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecution* FindExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecutionIterator* ListExecutions(const bool bOnlyCurrentJournalSession) override;
+
+	IBuildExecutionIterator* ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession) override;
+
+	void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
+
+	bool HasMetaDataString(const std::string& sKey) override;
+
+	std::string GetMetaDataString(const std::string& sKey) override;
 
 };
 

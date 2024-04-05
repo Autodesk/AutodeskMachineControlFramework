@@ -57,20 +57,20 @@ template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_p
 	return pExternalInstance;
 }
 
-CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, PStateJournal pStateJournal)
 	: m_pEnvironmentWrapper (pEnvironmentWrapper), 
 	m_pToolpathHandler (pToolpathHandler), 
 	m_pLogger (pLogger),
-	m_pBuildJobHandler (pBuildJobHandler),
+	m_pDataModel (pDataModel),
 	m_pGlobalChrono (pGlobalChrono),
-	m_pStorage (pStorage)
+	m_pStateJournal(pStateJournal)
 {
 	LibMCAssertNotNull(pEnvironmentWrapper.get());
 	LibMCAssertNotNull(pToolpathHandler.get());
 	LibMCAssertNotNull(pLogger.get());
-	LibMCAssertNotNull(pBuildJobHandler.get());
-	LibMCAssertNotNull(pStorage.get());
+	LibMCAssertNotNull(pDataModel.get());
 	LibMCAssertNotNull(pGlobalChrono.get());
+	LibMCAssertNotNull(pStateJournal.get());
 
 }
 
@@ -104,8 +104,9 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	}
 
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
+	pParameterGroup->setJournal(m_pStateJournal, sName);
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_sTempBasePath, m_pLogger, m_pBuildJobHandler, m_pStorage, m_pGlobalChrono, m_sSystemUserID, sName);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, m_sSystemUserID, sName);
 
 	pInternalEnvironment->setIsInitializing(true);
 

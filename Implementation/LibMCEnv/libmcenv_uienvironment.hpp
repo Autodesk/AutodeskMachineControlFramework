@@ -43,6 +43,7 @@ Abstract: This is the class declaration of CUIEnvironment
 #include "amc_systemstate.hpp"
 #include "amc_userinformation.hpp"
 #include "amc_ui_systemstate.hpp"
+#include "amc_api_auth.hpp"
 
 #include <vector>
 
@@ -79,8 +80,7 @@ private:
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
 
-	AMC::PUserInformation m_pUserInformation;
-	AMC::PParameterHandler m_pClientVariableHandler;
+	AMC::PAPIAuth m_pAPIAuth;
 
 	std::vector<AMC::PUIClientAction> m_ClientActions;
 
@@ -88,7 +88,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandle, const std::string & sTestEnvironmentPath, AMC::PUserInformation pUserInformation);
+	CUIEnvironment(AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PAPIAuth pAPIAuth, const std::string & sTestEnvironmentPath);
 
 	virtual ~CUIEnvironment();
 
@@ -97,6 +97,8 @@ public:
 	void CloseModalDialog() override;
 
 	void ActivatePage(const std::string& sPageName) override;
+
+	void StartStreamDownload(const std::string& sUUID, const std::string& sFilename) override;
 
 	std::string RetrieveEventSender() override;
 
@@ -173,6 +175,8 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
+	IDataTable* CreateDataTable() override;
+
 	bool HasBuildJob(const std::string& sBuildUUID) override;
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
@@ -211,13 +215,23 @@ public:
 
 	void ReleaseDataSeries(const std::string& sDataSeriesUUID) override;
 
-	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation) override;
+	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation, const bool bAutomaticLogEntry) override;
 
 	IAlert* FindAlert(const std::string& sUUID) override;
 
-	void AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment) override;
+	bool AlertExists(const std::string& sUUID) override;
 
-	void AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
+	IAlertIterator* RetrieveAlerts(const bool bOnlyActive) override;
+
+	IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
+
+	bool HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive) override;
+
+	ICryptoContext* CreateCryptoContext() override;
+
+	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;
+
+	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
 
 };
 

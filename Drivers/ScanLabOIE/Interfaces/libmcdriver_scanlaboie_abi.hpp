@@ -277,6 +277,16 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getrecordinformation(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pPacketNumber, LibMCDriver_ScanLabOIE_double * pX, LibMCDriver_ScanLabOIE_double * pY);
 
 /**
+* Returns the measurement tag of a specific record.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+* @param[out] pMeasurementTag - Measurement Tag of the record.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getmeasurementtag(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTag);
+
+/**
 * Returns the RTC signals of a specific record.
 *
 * @param[in] pDataRecording - DataRecording instance.
@@ -338,6 +348,17 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getallpacketnumbers(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer);
 
 /**
+* Returns an array of all measurement tags.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nMeasurementTagsBufferSize - Number of elements in buffer
+* @param[out] pMeasurementTagsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pMeasurementTagsBuffer - uint32  buffer of Array of Measurement Tags of all records.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getallmeasurementtags(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTagsBuffer);
+
+/**
 * Returns an array of all RTC signals of a specific index.
 *
 * @param[in] pDataRecording - DataRecording instance.
@@ -374,17 +395,98 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getalladditionalsignals(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, const LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer);
 
 /**
-* Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.
+* Writes the packet numbers to a data table as uint32 columns.
 *
 * @param[in] pDataRecording - DataRecording instance.
-* @param[in] pName - Name of the recording to be stored.
-* @param[in] pBuild - Build that should store the data.
-* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the build data., may be NULL
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_storeasbuilddata(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const char * pName, LibMCEnv_Build pBuild, const LibMCDriver_ScanLabOIE_uint32 nDataUUIDBufferSize, LibMCDriver_ScanLabOIE_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addpacketnumberstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes the X coordinates to a data table as double columns.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addxcoordinatestodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes the Y coordinates to a data table as double columns.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addycoordinatestodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes the measurement tags to a data table as uint32 columns.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addmeasurementtagstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes a certain RTC channel to a data table as int32 columns.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addrtcsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes a certain sensor channel to a data table as int32 columns.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addsensorsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes a certain sensor channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+* @param[in] dOffset - Offset that the raw value is scaled with.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addscaledsensorsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLabOIE_double dScaleFactor, LibMCDriver_ScanLabOIE_double dOffset);
+
+/**
+* Writes a certain RTC channel to a data table as int32 columns.
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addadditionalsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
 
 /*************************************************************************************************************************
  Class definition for OIEDevice

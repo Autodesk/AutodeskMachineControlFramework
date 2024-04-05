@@ -553,6 +553,30 @@ LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_resumelist(LibMCDriver_BuR_
 	}
 }
 
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_deletelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommandList->DeleteList();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_BuR
@@ -858,6 +882,8 @@ LibMCDriver_BuRResult LibMCDriver_BuR::Impl::LibMCDriver_BuR_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_pauselist;
 	if (sProcName == "libmcdriver_bur_plccommandlist_resumelist") 
 		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_resumelist;
+	if (sProcName == "libmcdriver_bur_plccommandlist_deletelist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_deletelist;
 	if (sProcName == "libmcdriver_bur_driver_bur_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_settosimulationmode;
 	if (sProcName == "libmcdriver_bur_driver_bur_issimulationmode") 

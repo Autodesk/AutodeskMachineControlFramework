@@ -56,8 +56,10 @@ namespace AMC {
 	private:		
 		uint32_t m_ReferenceCount;
 
+		// ATTENTION: PStorageStream is not thread safe, so it needs to be always protected by a mutex
 		std::mutex m_Mutex;
 		LibMCData::PStorageStream m_pStorageStream;
+
 		Lib3MF::PModel m_p3MFModel;
 		Lib3MF::PReader m_p3MFReader;
 		Lib3MF::PToolpath m_pToolpath;
@@ -75,7 +77,7 @@ namespace AMC {
 
 	public:
 
-		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
+		CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string & sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
 		virtual ~CToolpathEntity();		
 
 		void IncRef();

@@ -59,17 +59,19 @@ namespace Impl {
 
 class CUserManagementHandler : public virtual IUserManagementHandler, public virtual CBase {
 private:
-	LibMCData::PLoginHandler m_pLoginHandler;
+	LibMCData::PDataModel m_pDataModel;
 	AMC::PAccessControl m_pAccessControl;
 	AMC::PLanguageHandler m_pLanguageHandler;
 
 public:
 
-	CUserManagementHandler(LibMCData::PLoginHandler pLoginHandler, AMC::PAccessControl pAccessControl, AMC::PLanguageHandler pLanguageHandler);
+	CUserManagementHandler(LibMCData::PDataModel pDataModel, AMC::PAccessControl pAccessControl, AMC::PLanguageHandler pLanguageHandler);
 
 	virtual ~CUserManagementHandler();
 
 	bool UserExists(const std::string & sUsername) override;
+
+	bool UserUUIDExists(const std::string& sUUID) override;
 
 	void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier) override;
 

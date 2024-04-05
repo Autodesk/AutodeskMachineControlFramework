@@ -71,3 +71,9 @@ LibMCData_uint32 CJournalSession::GetFlushInterval()
 {
     return 10;
 }
+
+std::string CJournalSession::GetSessionUUID()
+{
+    return m_pJournal->getSessionUUID();
+}
+

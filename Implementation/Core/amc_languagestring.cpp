@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
 
-
+#include "PugiXML/pugixml.hpp"
 
 namespace AMC {
 
@@ -51,6 +51,23 @@ namespace AMC {
 
 
 	}
+
+
+	CLanguageString::CLanguageString(pugi::xml_node & xmlNode, const std::string & sAttributeName)
+	{
+		std::string sStringIdentifier = xmlNode.attribute("i18n:description").as_string ();
+
+		if (!sStringIdentifier.empty()) {
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sStringIdentifier))
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER, sStringIdentifier);
+
+			m_sStringIdentifier = sStringIdentifier;
+		}
+
+		m_sCustomValue = xmlNode.attribute("description").as_string ();
+
+	}
+
 
 	CLanguageString::~CLanguageString()
 	{

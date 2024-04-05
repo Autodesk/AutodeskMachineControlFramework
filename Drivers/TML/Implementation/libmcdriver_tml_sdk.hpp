@@ -52,6 +52,7 @@ namespace LibMCDriver_TML {
 
 
 		typedef int32_t tmlInt;
+		typedef int32_t tmlLong;		
 		typedef int32_t tmlBool;
 		typedef int8_t tmlByte;
 		typedef int16_t tmlShort;
@@ -60,22 +61,56 @@ namespace LibMCDriver_TML {
 
 		typedef tmlInt (TML_CALLINGCONVENTION* PTS_LoadSetup) (const char * pszSetupPath);
 		typedef tmlInt (TML_CALLINGCONVENTION* PTS_OpenChannel) (const char * pszDeviceName, uint8_t nType, uint8_t nHostID, uint32_t nBaudRate);		
-		typedef void(TML_CALLINGCONVENTION* PTS_CloseChannel) (tmlInt nFileDescriptor);		
+		typedef void(TML_CALLINGCONVENTION* PTS_CloseChannel) (tmlInt nFileDescriptor);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_DriveInitialisation) ();
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_SetupAxis) (tmlByte nAxisID, tmlInt nSetupID);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_SelectAxis) (tmlByte nAxisID);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_ResetFault) ();
+		typedef tmlBool(TML_CALLINGCONVENTION* PTS_Reset) ();
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_Power) (tmlBool bEnable);
 		typedef tmlBool(TML_CALLINGCONVENTION* PTS_ReadStatus) (tmlShort nSelectionIndex, tmlWord & nStatus);
 		typedef tmlLPCSTR(TML_CALLINGCONVENTION* PTS_GetLastErrorText) ();
-		
+
+		typedef bool(TML_CALLINGCONVENTION* PTS_SelectChannel) (tmlInt nFileDescriptor);
+		typedef bool(TML_CALLINGCONVENTION* PTS_MoveAbsolute) (tmlLong nAbsPosition, double dSpeed, double dAcceleration, tmlShort nMoveMoment, tmlShort nReferenceBase);
+		typedef bool(TML_CALLINGCONVENTION* PTS_MoveRelative) (tmlLong nRelativePosition, double dSpeed, double dAcceleration, tmlBool isAdditive, tmlShort nMoveMoment, tmlShort nReferenceBase);
+		typedef bool(TML_CALLINGCONVENTION* PTS_MoveVelocity) (double dSpeed, double dAcceleration, tmlShort nMoveMoment, tmlShort nReferenceBase);
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetIntVariable) (const char* sVariableName, tmlShort& variable);
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetLongVariable) (const char* sVariableName, tmlLong& variable);
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetFixedVariable) (const char* sVariableName, double& variable);
+		typedef bool(TML_CALLINGCONVENTION* PTS_CALL_Label) (const char* pszRoutine);
+
+		typedef bool(TML_CALLINGCONVENTION* PTS_Stop) ();
+		typedef bool(TML_CALLINGCONVENTION* PTS_SetPosition) (tmlLong nPositionValue);
+		typedef bool(TML_CALLINGCONVENTION* PTS_SetTargetPositionToActual) ();
+		typedef bool(TML_CALLINGCONVENTION* PTS_CancelableCALL_Label) (const char * pszFunctionName);
+		typedef bool(TML_CALLINGCONVENTION* PTS_ABORT) ();
+		typedef bool(TML_CALLINGCONVENTION* PTS_GetInput) (tmlByte nIO, tmlByte & nInValue);				
 		
 
+		
+		class CTMLSDK_DLLDirectoryCache {
+		private:
+#ifdef _WIN32
+			std::wstring m_sCachedDLLDirectoryW;
+#endif // _WIN32
+
+		public:
+			CTMLSDK_DLLDirectoryCache();
+			virtual ~CTMLSDK_DLLDirectoryCache();
+
+		};
+
+		typedef std::shared_ptr<CTMLSDK_DLLDirectoryCache> PTMLSDK_DLLDirectoryCache;
 
 		class CTMLSDK {
 		private:
+			std::wstring m_sDLLDirectoryW;
+
 			void* m_LibraryHandle;
 			void resetFunctionPtrs ();
+
+			PTMLSDK_DLLDirectoryCache cacheDllDirectory();
 		public:
 
 			PTS_LoadSetup TS_LoadSetup = nullptr;
@@ -85,11 +120,18 @@ namespace LibMCDriver_TML {
 			PTS_SetupAxis TS_SetupAxis = nullptr;
 			PTS_SelectAxis TS_SelectAxis = nullptr;
 			PTS_ResetFault TS_ResetFault = nullptr;
+			PTS_Reset TS_Reset = nullptr;
 			PTS_Power TS_Power = nullptr;
 			PTS_ReadStatus TS_ReadStatus = nullptr;
 			PTS_GetLastErrorText TS_GetLastErrorText = nullptr;
+			PTS_MoveRelative TS_MoveRelative = nullptr;
+			PTS_MoveAbsolute TS_MoveAbsolute = nullptr;
+			PTS_GetIntVariable TS_GetIntVariable = nullptr;
+			PTS_GetLongVariable TS_GetLongVariable = nullptr;
+			PTS_CALL_Label TS_CALL_Label = nullptr;
+			PTS_GetFixedVariable TS_GetFixedVariable = nullptr;
 
-			CTMLSDK(const std::string & sDLLNameUTF8);			
+			CTMLSDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);			
 			virtual ~CTMLSDK();
 
 			void checkError(bool bSuccess);

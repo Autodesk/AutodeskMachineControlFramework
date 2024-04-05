@@ -170,7 +170,7 @@ void CRasterizerInstance::CalculateImage(LibMCEnv::CImageData* pImageData, const
 	}
 
 
-	pImageData->SetPixelRange(0, 0, m_nPixelCountX, m_nPixelCountY, pImage->getBuffer ());
+	pImageData->SetPixelRange(0, 0, m_nPixelCountX - 1, m_nPixelCountY - 1, pImage->getBuffer ());
 }
 
 

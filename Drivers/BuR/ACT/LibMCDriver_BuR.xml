@@ -241,6 +241,9 @@ Custom implementation
 		<method name="ResumeList" description="Resume command list. Must be paused before.">
 		</method>		
 
+		<method name="DeleteList" description="Delete list. MUST not be in execution for this.">
+		</method>		
+		
 	</class>
 
 

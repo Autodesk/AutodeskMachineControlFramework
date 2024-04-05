@@ -601,6 +601,7 @@ public:
 	inline bool WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS);
 	inline void PauseList();
 	inline void ResumeList();
+	inline void DeleteList();
 };
 	
 /*************************************************************************************************************************
@@ -766,6 +767,7 @@ public:
 		pWrapperTable->m_PLCCommandList_WaitForList = nullptr;
 		pWrapperTable->m_PLCCommandList_PauseList = nullptr;
 		pWrapperTable->m_PLCCommandList_ResumeList = nullptr;
+		pWrapperTable->m_PLCCommandList_DeleteList = nullptr;
 		pWrapperTable->m_Driver_BuR_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_BuR_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_BuR_Connect = nullptr;
@@ -966,6 +968,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PLCCommandList_ResumeList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_DeleteList = (PLibMCDriver_BuRPLCCommandList_DeleteListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_deletelist");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_DeleteList = (PLibMCDriver_BuRPLCCommandList_DeleteListPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_deletelist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_DeleteList == nullptr)
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1195,6 +1206,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_resumelist", (void**)&(pWrapperTable->m_PLCCommandList_ResumeList));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ResumeList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_deletelist", (void**)&(pWrapperTable->m_PLCCommandList_DeleteList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_DeleteList == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_settosimulationmode", (void**)&(pWrapperTable->m_Driver_BuR_SetToSimulationMode));
@@ -1444,6 +1459,14 @@ public:
 	void CPLCCommandList::ResumeList()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_ResumeList(m_pHandle));
+	}
+	
+	/**
+	* CPLCCommandList::DeleteList - Delete list. MUST not be in execution for this.
+	*/
+	void CPLCCommandList::DeleteList()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_DeleteList(m_pHandle));
 	}
 	
 	/**

@@ -63,15 +63,21 @@ private:
 	AMC::PSystemState m_pSystemState;
 	AMC::PParameterHandler m_pParameterHandler;
 
-	
+	uint64_t m_nStartTimeOfStateInMicroseconds;
+	uint64_t m_nEndTimeOfPreviousStateInMicroseconds;
+
+	std::string m_sPreviousStateName;
+
 protected:
 
 
 public:
 
-	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName);
+	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string & sPreviousStateName);
 
 	std::string GetMachineState(const std::string& sMachineInstance);
+
+	std::string GetPreviousState() override;
 
 	ISignalTrigger* PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName) override;
 
@@ -143,6 +149,18 @@ public:
 
 	LibMCEnv_uint64 GetGlobalTimerInMicroseconds() override;
 
+	LibMCEnv_uint64 GetStartTimeOfStateInMilliseconds() override;
+
+	LibMCEnv_uint64 GetStartTimeOfStateInMicroseconds() override;
+
+	LibMCEnv_uint64 GetEndTimeOfPreviousStateInMicroseconds() override;
+
+	LibMCEnv_uint64 GetEndTimeOfPreviousStateInMilliseconds() override;
+
+	LibMCEnv_uint64 GetElapsedTimeInStateInMilliseconds() override;
+
+	LibMCEnv_uint64 GetElapsedTimeInStateInMicroseconds() override;
+
 	ITestEnvironment* GetTestEnvironment() override;
 
 	IXMLDocument* CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace) override;
@@ -150,6 +168,8 @@ public:
 	IXMLDocument* ParseXMLString(const std::string& sXMLString) override;
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
+	
+	IDataTable* CreateDataTable() override;
 
 	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;	
 
@@ -175,11 +195,23 @@ public:
 
 	void ReleaseDataSeries(const std::string& sDataSeriesUUID) override;
 
-	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation) override;
+	IAlert* CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation, const bool bAutomaticLogEntry) override;
 
 	IAlert* FindAlert(const std::string& sUUID) override;
 
-	void AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment) override;
+	bool AlertExists(const std::string& sUUID) override;
+
+	IAlertIterator* RetrieveAlerts(const bool bOnlyActive) override;
+
+	IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
+
+	bool HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive) override;
+
+	ICryptoContext* CreateCryptoContext() override;
+
+	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;
+
+	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
 
 };
 
