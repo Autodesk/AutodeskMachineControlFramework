@@ -263,6 +263,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "INVALIDSUBDIVISIONTHRESHOLD";
 			case LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID: return "MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIEMEASUREMENTTAG: return "INVALIDOIEMEASUREMENTTAG";
+			case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232READTIMEOUT";
+			case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232READLINEOVERRUN";
+			case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232RINGBUFFEROVERRUN";
 		}
 		return "UNKNOWN";
 	}
@@ -348,6 +351,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "Invalid subdivision threshold.";
 			case LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID: return "Multiple laser ports are not compatible with PID control.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIEMEASUREMENTTAG: return "Invalid OIE measurement tag.";
+			case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232 read timeout.";
+			case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232 read line overrun.";
+			case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232 ring buffer overrun.";
 		}
 		return "unknown error";
 	}
@@ -580,8 +586,7 @@ public:
 	inline void WriteString(const std::string & sValue);
 	inline void WriteData(const CInputVector<LibMCDriver_ScanLab_uint8> & DataBuffer);
 	inline void ReadData(const LibMCDriver_ScanLab_uint32 nByteCount, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, std::vector<LibMCDriver_ScanLab_uint8> & DataBuffer);
-	inline void ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, std::vector<LibMCDriver_ScanLab_uint8> & DataBuffer);
-	inline void Close();
+	inline std::string ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS);
 };
 	
 /*************************************************************************************************************************
@@ -966,7 +971,6 @@ public:
 		pWrapperTable->m_UARTConnection_WriteData = nullptr;
 		pWrapperTable->m_UARTConnection_ReadData = nullptr;
 		pWrapperTable->m_UARTConnection_ReadLine = nullptr;
-		pWrapperTable->m_UARTConnection_Close = nullptr;
 		pWrapperTable->m_RTCContext_LoadFirmware = nullptr;
 		pWrapperTable->m_RTCContext_LoadCorrectionFile = nullptr;
 		pWrapperTable->m_RTCContext_SelectCorrectionTable = nullptr;
@@ -1314,15 +1318,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UARTConnection_ReadLine == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_UARTConnection_Close = (PLibMCDriver_ScanLabUARTConnection_ClosePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_uartconnection_close");
-		#else // _WIN32
-		pWrapperTable->m_UARTConnection_Close = (PLibMCDriver_ScanLabUARTConnection_ClosePtr) dlsym(hLibrary, "libmcdriver_scanlab_uartconnection_close");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_UARTConnection_Close == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2954,10 +2949,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_ReadLine == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_uartconnection_close", (void**)&(pWrapperTable->m_UARTConnection_Close));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_Close == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_loadfirmware", (void**)&(pWrapperTable->m_RTCContext_LoadFirmware));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_LoadFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3823,23 +3814,17 @@ public:
 	* @param[in] sSeparator - Line Separator to search for.
 	* @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
 	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
-	* @param[out] DataBuffer - Receive buffer.
+	* @return Received line.
 	*/
-	void CUARTConnection::ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, std::vector<LibMCDriver_ScanLab_uint8> & DataBuffer)
+	std::string CUARTConnection::ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS)
 	{
-		LibMCDriver_ScanLab_uint64 elementsNeededData = 0;
-		LibMCDriver_ScanLab_uint64 elementsWrittenData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadLine(m_pHandle, sSeparator.c_str(), nMaxLineLength, nTimeOutInMS, 0, &elementsNeededData, nullptr));
-		DataBuffer.resize((size_t) elementsNeededData);
-		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadLine(m_pHandle, sSeparator.c_str(), nMaxLineLength, nTimeOutInMS, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
-	}
-	
-	/**
-	* CUARTConnection::Close - Closes the connection. All subsequent calls will fail.
-	*/
-	void CUARTConnection::Close()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_Close(m_pHandle));
+		LibMCDriver_ScanLab_uint32 bytesNeededLine = 0;
+		LibMCDriver_ScanLab_uint32 bytesWrittenLine = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadLine(m_pHandle, sSeparator.c_str(), nMaxLineLength, nTimeOutInMS, 0, &bytesNeededLine, nullptr));
+		std::vector<char> bufferLine(bytesNeededLine);
+		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadLine(m_pHandle, sSeparator.c_str(), nMaxLineLength, nTimeOutInMS, bytesNeededLine, &bytesWrittenLine, &bufferLine[0]));
+		
+		return std::string(&bufferLine[0]);
 	}
 	
 	/**

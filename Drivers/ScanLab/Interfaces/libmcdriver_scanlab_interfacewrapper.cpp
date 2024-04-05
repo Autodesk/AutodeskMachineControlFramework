@@ -498,46 +498,44 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readdata(LibMCDrive
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint32 nLineBufferSize, LibMCDriver_ScanLab_uint32* pLineNeededChars, char * pLineBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUARTConnection;
 
 	try {
 		if (pSeparator == nullptr)
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		if ((!pDataBuffer) && !(pDataNeededCount))
+		if ( (!pLineBuffer) && !(pLineNeededChars) )
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		std::string sSeparator(pSeparator);
+		std::string sLine("");
 		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
 		if (!pIUARTConnection)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIUARTConnection->ReadLine(sSeparator, nMaxLineLength, nTimeOutInMS, nDataBufferSize, pDataNeededCount, pDataBuffer);
+		bool isCacheCall = (pLineBuffer == nullptr);
+		if (isCacheCall) {
+			sLine = pIUARTConnection->ReadLine(sSeparator, nMaxLineLength, nTimeOutInMS);
 
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_close(LibMCDriver_ScanLab_UARTConnection pUARTConnection)
-{
-	IBase* pIBaseClass = (IBase *)pUARTConnection;
-
-	try {
-		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
-		if (!pIUARTConnection)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+			pIUARTConnection->_setCache (new ParameterCache_1<std::string> (sLine));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUARTConnection->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+			cache->retrieveData (sLine);
+			pIUARTConnection->_setCache (nullptr);
+		}
 		
-		pIUARTConnection->Close();
-
+		if (pLineNeededChars)
+			*pLineNeededChars = (LibMCDriver_ScanLab_uint32) (sLine.size()+1);
+		if (pLineBuffer) {
+			if (sLine.size() >= nLineBufferSize)
+				throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_BUFFERTOOSMALL);
+			for (size_t iLine = 0; iLine < sLine.size(); iLine++)
+				pLineBuffer[iLine] = sLine[iLine];
+			pLineBuffer[sLine.size()] = 0;
+		}
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
@@ -5032,8 +5030,6 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_readdata;
 	if (sProcName == "libmcdriver_scanlab_uartconnection_readline") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_readline;
-	if (sProcName == "libmcdriver_scanlab_uartconnection_close") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_close;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadfirmware") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadfirmware;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadcorrectionfile") 

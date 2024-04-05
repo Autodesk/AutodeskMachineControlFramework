@@ -205,20 +205,12 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartc
 * @param[in] pSeparator - Line Separator to search for.
 * @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
 * @param[in] nTimeOutInMS - Timeout in Milliseconds.
-* @param[in] nDataBufferSize - Number of elements in buffer
-* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pDataBuffer - uint8  buffer of Receive buffer.
+* @param[in] nLineBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLineBuffer -  buffer of Received line., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer);
-
-/**
-* Closes the connection. All subsequent calls will fail.
-*
-* @param[in] pUARTConnection - UARTConnection instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_close(LibMCDriver_ScanLab_UARTConnection pUARTConnection);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint32 nLineBufferSize, LibMCDriver_ScanLab_uint32* pLineNeededChars, char * pLineBuffer);
 
 /*************************************************************************************************************************
  Class definition for RTCContext

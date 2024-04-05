@@ -505,16 +505,9 @@ public:
 	* @param[in] sSeparator - Line Separator to search for.
 	* @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
 	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
-	* @param[in] nDataBufferSize - Number of elements in buffer
-	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pDataBuffer - uint8 buffer of Receive buffer.
+	* @return Received line.
 	*/
-	virtual void ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer) = 0;
-
-	/**
-	* IUARTConnection::Close - Closes the connection. All subsequent calls will fail.
-	*/
-	virtual void Close() = 0;
+	virtual std::string ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS) = 0;
 
 };
 

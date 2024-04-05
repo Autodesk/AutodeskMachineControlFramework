@@ -173,6 +173,9 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD 1066 /** Invalid subdivision threshold. */
 #define LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID 1067 /** Multiple laser ports are not compatible with PID control. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIEMEASUREMENTTAG 1068 /** Invalid OIE measurement tag. */
+#define LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT 1069 /** RS232 read timeout. */
+#define LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN 1070 /** RS232 read line overrun. */
+#define LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN 1071 /** RS232 ring buffer overrun. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -258,6 +261,9 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSUBDIVISIONTHRESHOLD: return "Invalid subdivision threshold.";
     case LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID: return "Multiple laser ports are not compatible with PID control.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIEMEASUREMENTTAG: return "Invalid OIE measurement tag.";
+    case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232 read timeout.";
+    case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232 read line overrun.";
+    case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232 ring buffer overrun.";
     default: return "unknown error";
   }
 }
