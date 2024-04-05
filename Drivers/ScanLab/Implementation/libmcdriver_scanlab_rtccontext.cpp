@@ -756,12 +756,12 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 		SetOIEPIDMode(nOIEPIDControlIndex);
 
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
+		pPoint++;
 
 		sendOIEMeasurementTag((uint32_t)index);
 
 		markAbsoluteEx(pPrevPoint->m_X, pPrevPoint->m_Y, pPoint->m_X, pPoint->m_Y, fPower, bOIEControlFlag);
 		pPrevPoint = pPoint;
-		pPoint++;		
 
 	}
 
