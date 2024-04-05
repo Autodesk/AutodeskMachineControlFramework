@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcui_eventhandler.hpp"
 #include "libmcui_event.hpp"
 
+#include <cmath>
+#include <sstream>
 using namespace LibMCUI::Impl;
 
 #ifdef _MSC_VER
@@ -64,7 +66,69 @@ public:
 		pUIEnvironment->LogMessage("User Permission for permission_that_nobody_has: " + std::to_string(pUIEnvironment->CheckPermission("permission_that_nobody_has")));
 		pUIEnvironment->LogMessage("User Permission for permission_view_builds: " + std::to_string(pUIEnvironment->CheckPermission("permission_view_builds")));
 		pUIEnvironment->LogMessage("User Permission for permission_invalid: " + std::to_string(pUIEnvironment->CheckPermission("permission_invalid")));
+
 		pUIEnvironment->LogOut();
+
+	}
+
+};
+
+/*************************************************************************************************************************
+ Class declaration of CEvent_Logout
+**************************************************************************************************************************/
+
+class CEvent_CreateAlert : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "createalert";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		auto pTempStream = pUIEnvironment->CreateTemporaryStream("mystream", "text/plain");
+		pTempStream->WriteLine("TEST123");
+		pTempStream->WriteLine("NextLine");
+		pTempStream->Finish();
+		std::string sUUID = pTempStream->GetUUID();
+
+
+		pUIEnvironment->StartStreamDownload(sUUID, "Test.txt");
+
+
+
+		pUIEnvironment->LogMessage("Temp Stream UUID: " + sUUID);
+
+		auto pStream = pUIEnvironment->FindStream(sUUID, true);
+		pUIEnvironment->LogMessage("Stream Size: " + std::to_string (pStream->GetSize()));
+		pUIEnvironment->LogMessage("Stream Name: " + pStream->GetName());
+
+		std::vector<uint8_t> Data;
+		pStream->ReadData(15, Data);
+
+		Data.push_back(0);
+		pUIEnvironment->LogMessage("Stream Content: " + std::string ((char*)Data.data ()));
+
+		//pUIEnvironment->SetUIProperty("mainpage.preview.image1", "image", sUUID);
+		
+
+		/*auto pAlert = pUIEnvironment->CreateAlert("testalert", "readable context information.");
+		
+		auto pAlertIterator = pUIEnvironment->RetrieveAlertsByType("testalert", true);
+		while (pAlertIterator->MoveNext()) {
+			auto pNewAlert = pAlertIterator->GetCurrentAlert();
+			pNewAlert->DeactivateAlert();
+			//pNewAlert->AcknowledgeAlertForCurrentUser("testcomment");
+		} */
+
+
+		//pAlert->AcknowledgeAlertForCurrentUser("I acknowledges this!");
+
+		//pUIEnvironment->LogMessage("alert uuid: " + pAlert->GetUUID());
+
 
 	}
 
@@ -171,13 +235,35 @@ public:
 		std::string sUserDescription = pUserManagement->GetUserDescription("test");
 		pUIEnvironment->LogMessage("user description: " + sUserDescription);
 
-		pUIEnvironment->LogMessage("creating user dummy");
+		pUIEnvironment->LogMessage("creating user dummy"); */
 
 		//pUserManagement->CreateUser("dummy", "administrator", "3fbde1f66fb512223edb195d247fe770130f59fdd914e3ffa7327af53fe4cb46", "dd9a86491eb7572c1a9cda800e6eb81bb9dad55576b01416d06cdf6ae181fb33", "This is the new dummy user."); */
 
-
 		auto pJournal = pUIEnvironment->GetCurrentJournal();
-		auto pJournalVariable = pJournal->RetrieveJournalVariable ("main.jobinfo.countertest", 10000);
+
+
+
+/*		uint64_t nTimeStampInMicroseconds = pUIEnvironment->GetGlobalTimerInMicroseconds();
+		uint64_t nTimeStampInSeconds = (nTimeStampInMicroseconds / 1000000);
+
+		uint64_t nCount = nTimeStampInSeconds;
+
+		std::vector<LibMCEnv::PJournalVariable> journalVariables;
+		journalVariables.push_back (pJournal->RetrieveJournalVariableFromTimeInterval ("plc.plcstate.main_testcounter", 0, nCount * 1000000));
+
+		for (uint64_t nIndex = 1; nIndex < nCount; nIndex++) {
+			uint64_t nTimeStampInMicroSeconds = nIndex * 1000000;
+
+			std::stringstream sLine;
+			for (auto pJournalVariable : journalVariables) {
+				double dValue = pJournalVariable->ComputeAverage(nTimeStampInMicroSeconds - 100, nTimeStampInMicroSeconds, true);
+				sLine << dValue << ";";
+
+			}
+
+			pTempStream->WriteLine(sLine.str());
+		}
+
 		pUIEnvironment->LogMessage("Variable Name: " +  pJournalVariable->GetVariableName());
 		auto nStartTime = pJournalVariable->GetStartTimeStamp();
 		auto nEndTime = pJournalVariable->GetEndTimeStamp();
@@ -189,16 +275,24 @@ public:
 		pUIEnvironment->LogMessage("Average: " + std::to_string(dAverage));
 
 		std::vector <LibMCEnv::sTimeStreamEntry> timeStream;
-		pJournalVariable->ReceiveRawTimeStream(timeStream);
+		pJournalVariable->ReceiveRawTimeStream(timeStream);*/
 
-		std::vector<LibMCEnv::sTimeStreamEntry> entryBuffer;
+		std::vector<LibMCEnv::sTimeStreamEntry> entryBuffer;// = timeStream; 
 
 		uint64_t nTimer = pUIEnvironment->GetGlobalTimerInMilliseconds();
-		pUIEnvironment->LogMessage("timer: " + std::to_string (nTimer));
-		uint32_t nCount = nTimer / 10;
+		pUIEnvironment->LogMessage("timer: " + std::to_string (nTimer)); 
+
+		auto pJournalVariable = pJournal->RetrieveJournalVariable("main.jobinfo.countertest", 5000);
+
+		uint64_t nStartTimeStamp = pJournalVariable->GetStartTimeStamp();
+
+		uint32_t nCount = 1000;
 		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
-			entryBuffer.push_back({ nIndex, sin (nIndex * 0.01) * 100 });
-		}
+			double dValue = pJournalVariable->ComputeSample(nStartTimeStamp + 5000 * nIndex);
+			//entryBuffer.push_back({ nIndex, sin (nIndex * 0.01) * 100 });
+			entryBuffer.push_back({ nIndex, dValue });
+			
+		} 
 
 		std::string sDataSeriesUUID = pUIEnvironment->GetUIPropertyAsUUID("main.infobox.chart1", "dataseries");
 		if (pUIEnvironment->HasDataSeries(sDataSeriesUUID)) {
@@ -214,7 +308,7 @@ public:
 			pUIEnvironment->SetUIPropertyAsUUID("main.infobox.chart1", "dataseries", sUUID);
 		}
 
-
+		
 
 	}
 
@@ -552,6 +646,8 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 	if (createEventInstanceByName<CEvent_NewLayerStarted>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_Logout>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_CreateAlert>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_TestJournal>(sEventName, pEventInstance))
 		return pEventInstance;

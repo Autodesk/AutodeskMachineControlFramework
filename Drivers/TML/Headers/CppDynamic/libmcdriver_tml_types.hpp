@@ -127,6 +127,7 @@ typedef void * LibMCDriver_TML_pvoid;
 #define LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID 1020 /** Invalid Axis Hardware ID */
 #define LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS 1021 /** Axis already exists */
 #define LIBMCDRIVER_TML_ERROR_AXISNOTFOUND 1022 /** Axis not found */
+#define LIBMCDRIVER_TML_ERROR_AXISNOTINCHANNEL 1023 /** Axis not in channel */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_TML
@@ -166,6 +167,7 @@ inline const char * LIBMCDRIVER_TML_GETERRORSTRING (LibMCDriver_TMLResult nError
     case LIBMCDRIVER_TML_ERROR_INVALIDAXISHARDWAREID: return "Invalid Axis Hardware ID";
     case LIBMCDRIVER_TML_ERROR_AXISALREADYEXISTS: return "Axis already exists";
     case LIBMCDRIVER_TML_ERROR_AXISNOTFOUND: return "Axis not found";
+    case LIBMCDRIVER_TML_ERROR_AXISNOTINCHANNEL: return "Axis not in channel";
     default: return "unknown error";
   }
 }
@@ -196,16 +198,45 @@ namespace LibMCDriver_TML {
     CHANNEL_ESD_CAN = 1005 /** CHANNEL_ESD_CAN Canbus Channel */
   };
   
+  enum class eReferenceType : LibMCDriver_TML_int32 {
+    Unknown = 0, /** Unknown Reference */
+    Target = 1000, /** Use the target reference (no feedback). */
+    Actual_Motor = 1001, /** Use the motor reference. */
+    Actual_Load = 1002, /** Use the load reference. */
+    Error = 1003 /** Get the error. */
+  };
+  
   enum class eProtocolType : LibMCDriver_TML_int32 {
     Unknown = 0, /** Unknown Protocol */
     TMLCAN = 1, /** TMLCAN Protocol */
     TechnoCAN = 2 /** TechnoCAN Protocol */
   };
   
+  enum class eMERType : LibMCDriver_TML_int32 {
+    CANBER = 0, /** CANBus */
+    SCER = 1, /** short-circuit protection */
+    STPLTBL = 2, /** setup table */
+    CTRER = 3, /** control */
+    SCIER = 4, /** communication */
+    WRPSER = 5, /** feedback */
+    LSPST = 6, /** positive limit */
+    LSNST = 7, /** negative limit */
+    OCER = 8, /** over-current */
+    I2TER = 9, /** I2T protection */
+    OTERM = 10, /** motor temperature */
+    OTERD = 11, /** drive temperature */
+    OVER = 12, /** over voltage */
+    UVER = 13, /** under voltage */
+    CMDER = 14, /** command */
+    ENST = 15 /** enable status */
+  };
+  
 } // namespace LibMCDriver_TML;
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_TML::eChannelType eLibMCDriver_TMLChannelType;
+typedef LibMCDriver_TML::eReferenceType eLibMCDriver_TMLReferenceType;
 typedef LibMCDriver_TML::eProtocolType eLibMCDriver_TMLProtocolType;
+typedef LibMCDriver_TML::eMERType eLibMCDriver_TMLMERType;
 
 #endif // __LIBMCDRIVER_TML_TYPES_HEADER_CPP

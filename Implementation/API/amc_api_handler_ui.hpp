@@ -49,7 +49,8 @@ namespace AMC {
 		utEvent = 5,
 		utChart = 6,
 		utMeshGeometry = 7,
-		utMeshEdges = 8
+		utMeshEdges = 8,
+		utDownload = 9
 	};
 
 	class CAPIHandler_UI : public CAPIHandler {
@@ -64,7 +65,8 @@ namespace AMC {
 		void handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth, uint32_t nStateID);
 		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);
 		PAPIResponse handleChartRequest(const std::string& sParameterUUID, PAPIAuth pAuth);
-		
+		PAPIResponse handleDownloadRequest(const std::string& sParameterUUID, PAPIAuth pAuth);
+
 		void handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:

@@ -71,6 +71,22 @@ LibMCEnv::eToolpathSegmentType CToolpathLayer::GetSegmentType(const LibMCEnv_uin
 	return m_pToolpathLayerData->getSegmentType(nIndex);
 }
 
+bool CToolpathLayer::SegmentIsLoop(const LibMCEnv_uint32 nIndex)
+{
+	return (m_pToolpathLayerData->getSegmentType(nIndex) == LibMCEnv::eToolpathSegmentType::Loop);
+}
+
+bool CToolpathLayer::SegmentIsPolyline(const LibMCEnv_uint32 nIndex)
+{
+	return (m_pToolpathLayerData->getSegmentType(nIndex) == LibMCEnv::eToolpathSegmentType::Polyline);
+}
+
+bool CToolpathLayer::SegmentIsHatchSegment(const LibMCEnv_uint32 nIndex)
+{
+	return (m_pToolpathLayerData->getSegmentType(nIndex) == LibMCEnv::eToolpathSegmentType::Hatch);
+}
+
+
 LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nIndex)
 {
 	return m_pToolpathLayerData->getSegmentPointCount(nIndex);
@@ -416,5 +432,26 @@ IXMLDocumentNode* CToolpathLayer::FindUniqueMetaData(const std::string& sNamespa
 {
 	auto pXMLDocumentInstance = m_pToolpathLayerData->findUniqueMetaData(sNamespace, sName);
 	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
+
+}
+
+void CToolpathLayer::CalculateExtents(LibMCEnv_int32& nMinX, LibMCEnv_int32& nMinY, LibMCEnv_int32& nMaxX, LibMCEnv_int32& nMaxY)
+{
+	m_pToolpathLayerData->calculateExtents(nMinX, nMinY, nMaxX, nMaxY);
+}
+
+void CToolpathLayer::CalculateExtentsInMM(LibMCEnv_double& dMinX, LibMCEnv_double& dMinY, LibMCEnv_double& dMaxX, LibMCEnv_double& dMaxY)
+{
+	int32_t nMinX = 0;
+	int32_t nMinY = 0;
+	int32_t nMaxX = 0;
+	int32_t nMaxY = 0;
+
+	m_pToolpathLayerData->calculateExtents(nMinX, nMinY, nMaxX, nMaxY);
+	double dUnits = m_pToolpathLayerData->getUnits();
+	dMinX = nMinX * dUnits;
+	dMinY = nMinY * dUnits;
+	dMaxX = nMaxX * dUnits;
+	dMaxY = nMaxY * dUnits;
 
 }

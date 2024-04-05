@@ -315,8 +315,832 @@ LibMCDriver_GRPCResult libmcdriver_grpc_driver_queryparametersex(LibMCDriver_GRP
 
 
 /*************************************************************************************************************************
+ Class implementation for GRPCMessage
+**************************************************************************************************************************/
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pFieldExists)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pFieldExists == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pFieldExists = pIGRPCMessage->HasField(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasstringfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pStringFieldExists)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pStringFieldExists == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pStringFieldExists = pIGRPCMessage->HasStringField(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setstringfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		std::string sValue(pValue);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetStringField(sFieldName, sValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getstringfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, const LibMCDriver_GRPC_uint32 nValueBufferSize, LibMCDriver_GRPC_uint32* pValueNeededChars, char * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if ( (!pValueBuffer) && !(pValueNeededChars) )
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		std::string sValue("");
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pValueBuffer == nullptr);
+		if (isCacheCall) {
+			sValue = pIGRPCMessage->GetStringField(sFieldName);
+
+			pIGRPCMessage->_setCache (new ParameterCache_1<std::string> (sValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIGRPCMessage->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+			cache->retrieveData (sValue);
+			pIGRPCMessage->_setCache (nullptr);
+		}
+		
+		if (pValueNeededChars)
+			*pValueNeededChars = (LibMCDriver_GRPC_uint32) (sValue.size()+1);
+		if (pValueBuffer) {
+			if (sValue.size() >= nValueBufferSize)
+				throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_BUFFERTOOSMALL);
+			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
+				pValueBuffer[iValue] = sValue[iValue];
+			pValueBuffer[sValue.size()] = 0;
+		}
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetInt32Field(sFieldName, nValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int32 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pValue = pIGRPCMessage->GetInt32Field(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setuint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetUInt32Field(sFieldName, nValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getuint32field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint32 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pValue = pIGRPCMessage->GetUInt32Field(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetInt64Field(sFieldName, nValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_int64 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pValue = pIGRPCMessage->GetInt64Field(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setuint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetUInt64Field(sFieldName, nValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getuint64field(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_uint64 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pValue = pIGRPCMessage->GetUInt64Field(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setboolfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetBoolField(sFieldName, bValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getboolfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pValue = pIGRPCMessage->GetBoolField(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setfloatfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_single fValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetFloatField(sFieldName, fValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getfloatfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_single * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pValue = pIGRPCMessage->GetFloatField(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_setdoublefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCMessage->SetDoubleField(sFieldName, dValue);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getdoublefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pValue = pIGRPCMessage->GetDoubleField(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for GRPCResponse
+**************************************************************************************************************************/
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcresponse_getresponsetype(LibMCDriver_GRPC_GRPCResponse pGRPCResponse, const LibMCDriver_GRPC_uint32 nResponseTypeBufferSize, LibMCDriver_GRPC_uint32* pResponseTypeNeededChars, char * pResponseTypeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCResponse;
+
+	try {
+		if ( (!pResponseTypeBuffer) && !(pResponseTypeNeededChars) )
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sResponseType("");
+		IGRPCResponse* pIGRPCResponse = dynamic_cast<IGRPCResponse*>(pIBaseClass);
+		if (!pIGRPCResponse)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pResponseTypeBuffer == nullptr);
+		if (isCacheCall) {
+			sResponseType = pIGRPCResponse->GetResponseType();
+
+			pIGRPCResponse->_setCache (new ParameterCache_1<std::string> (sResponseType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIGRPCResponse->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+			cache->retrieveData (sResponseType);
+			pIGRPCResponse->_setCache (nullptr);
+		}
+		
+		if (pResponseTypeNeededChars)
+			*pResponseTypeNeededChars = (LibMCDriver_GRPC_uint32) (sResponseType.size()+1);
+		if (pResponseTypeBuffer) {
+			if (sResponseType.size() >= nResponseTypeBufferSize)
+				throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_BUFFERTOOSMALL);
+			for (size_t iResponseType = 0; iResponseType < sResponseType.size(); iResponseType++)
+				pResponseTypeBuffer[iResponseType] = sResponseType[iResponseType];
+			pResponseTypeBuffer[sResponseType.size()] = 0;
+		}
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for GRPCRequest
+**************************************************************************************************************************/
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcrequest_getrequesttype(LibMCDriver_GRPC_GRPCRequest pGRPCRequest, const LibMCDriver_GRPC_uint32 nRequestTypeBufferSize, LibMCDriver_GRPC_uint32* pRequestTypeNeededChars, char * pRequestTypeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCRequest;
+
+	try {
+		if ( (!pRequestTypeBuffer) && !(pRequestTypeNeededChars) )
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sRequestType("");
+		IGRPCRequest* pIGRPCRequest = dynamic_cast<IGRPCRequest*>(pIBaseClass);
+		if (!pIGRPCRequest)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pRequestTypeBuffer == nullptr);
+		if (isCacheCall) {
+			sRequestType = pIGRPCRequest->GetRequestType();
+
+			pIGRPCRequest->_setCache (new ParameterCache_1<std::string> (sRequestType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIGRPCRequest->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+			cache->retrieveData (sRequestType);
+			pIGRPCRequest->_setCache (nullptr);
+		}
+		
+		if (pRequestTypeNeededChars)
+			*pRequestTypeNeededChars = (LibMCDriver_GRPC_uint32) (sRequestType.size()+1);
+		if (pRequestTypeBuffer) {
+			if (sRequestType.size() >= nRequestTypeBufferSize)
+				throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_BUFFERTOOSMALL);
+			for (size_t iRequestType = 0; iRequestType < sRequestType.size(); iRequestType++)
+				pRequestTypeBuffer[iRequestType] = sRequestType[iRequestType];
+			pRequestTypeBuffer[sRequestType.size()] = 0;
+		}
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcrequest_getexpectedresponsetype(LibMCDriver_GRPC_GRPCRequest pGRPCRequest, const LibMCDriver_GRPC_uint32 nExpectedResponseTypeBufferSize, LibMCDriver_GRPC_uint32* pExpectedResponseTypeNeededChars, char * pExpectedResponseTypeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCRequest;
+
+	try {
+		if ( (!pExpectedResponseTypeBuffer) && !(pExpectedResponseTypeNeededChars) )
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sExpectedResponseType("");
+		IGRPCRequest* pIGRPCRequest = dynamic_cast<IGRPCRequest*>(pIBaseClass);
+		if (!pIGRPCRequest)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pExpectedResponseTypeBuffer == nullptr);
+		if (isCacheCall) {
+			sExpectedResponseType = pIGRPCRequest->GetExpectedResponseType();
+
+			pIGRPCRequest->_setCache (new ParameterCache_1<std::string> (sExpectedResponseType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIGRPCRequest->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+			cache->retrieveData (sExpectedResponseType);
+			pIGRPCRequest->_setCache (nullptr);
+		}
+		
+		if (pExpectedResponseTypeNeededChars)
+			*pExpectedResponseTypeNeededChars = (LibMCDriver_GRPC_uint32) (sExpectedResponseType.size()+1);
+		if (pExpectedResponseTypeBuffer) {
+			if (sExpectedResponseType.size() >= nExpectedResponseTypeBufferSize)
+				throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_BUFFERTOOSMALL);
+			for (size_t iExpectedResponseType = 0; iExpectedResponseType < sExpectedResponseType.size(); iExpectedResponseType++)
+				pExpectedResponseTypeBuffer[iExpectedResponseType] = sExpectedResponseType[iExpectedResponseType];
+			pExpectedResponseTypeBuffer[sExpectedResponseType.size()] = 0;
+		}
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcrequest_sendblocking(LibMCDriver_GRPC_GRPCRequest pGRPCRequest, const char * pServiceMethod, LibMCDriver_GRPC_uint32 nTimeOutInMS, LibMCDriver_GRPC_GRPCResponse * pResponseInstance)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCRequest;
+
+	try {
+		if (pServiceMethod == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pResponseInstance == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sServiceMethod(pServiceMethod);
+		IBase* pBaseResponseInstance(nullptr);
+		IGRPCRequest* pIGRPCRequest = dynamic_cast<IGRPCRequest*>(pIBaseClass);
+		if (!pIGRPCRequest)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pBaseResponseInstance = pIGRPCRequest->SendBlocking(sServiceMethod, nTimeOutInMS);
+
+		*pResponseInstance = (IBase*)(pBaseResponseInstance);
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for GRPCConnection
 **************************************************************************************************************************/
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcconnection_getendpoint(LibMCDriver_GRPC_GRPCConnection pGRPCConnection, const LibMCDriver_GRPC_uint32 nEndPointBufferSize, LibMCDriver_GRPC_uint32* pEndPointNeededChars, char * pEndPointBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCConnection;
+
+	try {
+		if ( (!pEndPointBuffer) && !(pEndPointNeededChars) )
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sEndPoint("");
+		IGRPCConnection* pIGRPCConnection = dynamic_cast<IGRPCConnection*>(pIBaseClass);
+		if (!pIGRPCConnection)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pEndPointBuffer == nullptr);
+		if (isCacheCall) {
+			sEndPoint = pIGRPCConnection->GetEndPoint();
+
+			pIGRPCConnection->_setCache (new ParameterCache_1<std::string> (sEndPoint));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIGRPCConnection->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+			cache->retrieveData (sEndPoint);
+			pIGRPCConnection->_setCache (nullptr);
+		}
+		
+		if (pEndPointNeededChars)
+			*pEndPointNeededChars = (LibMCDriver_GRPC_uint32) (sEndPoint.size()+1);
+		if (pEndPointBuffer) {
+			if (sEndPoint.size() >= nEndPointBufferSize)
+				throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_BUFFERTOOSMALL);
+			for (size_t iEndPoint = 0; iEndPoint < sEndPoint.size(); iEndPoint++)
+				pEndPointBuffer[iEndPoint] = sEndPoint[iEndPoint];
+			pEndPointBuffer[sEndPoint.size()] = 0;
+		}
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcconnection_close(LibMCDriver_GRPC_GRPCConnection pGRPCConnection)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCConnection;
+
+	try {
+		IGRPCConnection* pIGRPCConnection = dynamic_cast<IGRPCConnection*>(pIBaseClass);
+		if (!pIGRPCConnection)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pIGRPCConnection->Close();
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcconnection_createstaticrequest(LibMCDriver_GRPC_GRPCConnection pGRPCConnection, const char * pRequestTypeIdentifier, const char * pResponseTypeIdentifier, LibMCDriver_GRPC_GRPCRequest * pRequestInstance)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCConnection;
+
+	try {
+		if (pRequestTypeIdentifier == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pResponseTypeIdentifier == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pRequestInstance == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sRequestTypeIdentifier(pRequestTypeIdentifier);
+		std::string sResponseTypeIdentifier(pResponseTypeIdentifier);
+		IBase* pBaseRequestInstance(nullptr);
+		IGRPCConnection* pIGRPCConnection = dynamic_cast<IGRPCConnection*>(pIBaseClass);
+		if (!pIGRPCConnection)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pBaseRequestInstance = pIGRPCConnection->CreateStaticRequest(sRequestTypeIdentifier, sResponseTypeIdentifier);
+
+		*pRequestInstance = (IBase*)(pBaseRequestInstance);
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_GRPC
@@ -371,17 +1195,30 @@ LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_issimulationmode(LibMCDriver
 	}
 }
 
-LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connect(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC)
+LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connectunsecure(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC, const char * pIdentifier, const char * pNetworkCredentials, const char * pProtobufDefinition, LibMCDriver_GRPC_GRPCConnection * pConnectionInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_GRPC;
 
 	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pNetworkCredentials == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pProtobufDefinition == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pConnectionInstance == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		std::string sNetworkCredentials(pNetworkCredentials);
+		std::string sProtobufDefinition(pProtobufDefinition);
+		IBase* pBaseConnectionInstance(nullptr);
 		IDriver_GRPC* pIDriver_GRPC = dynamic_cast<IDriver_GRPC*>(pIBaseClass);
 		if (!pIDriver_GRPC)
 			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
 		
-		pIDriver_GRPC->Connect();
+		pBaseConnectionInstance = pIDriver_GRPC->ConnectUnsecure(sIdentifier, sNetworkCredentials, sProtobufDefinition);
 
+		*pConnectionInstance = (IBase*)(pBaseConnectionInstance);
 		return LIBMCDRIVER_GRPC_SUCCESS;
 	}
 	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
@@ -395,17 +1232,24 @@ LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_connect(LibMCDriver_GRPC_Dri
 	}
 }
 
-LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_findconnection(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC)
+LibMCDriver_GRPCResult libmcdriver_grpc_driver_grpc_findconnection(LibMCDriver_GRPC_Driver_GRPC pDriver_GRPC, const char * pIdentifier, bool bMustExist, LibMCDriver_GRPC_GRPCConnection * pConnectionInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_GRPC;
 
 	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pConnectionInstance == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IBase* pBaseConnectionInstance(nullptr);
 		IDriver_GRPC* pIDriver_GRPC = dynamic_cast<IDriver_GRPC*>(pIBaseClass);
 		if (!pIDriver_GRPC)
 			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
 		
-		pIDriver_GRPC->FindConnection();
+		pBaseConnectionInstance = pIDriver_GRPC->FindConnection(sIdentifier, bMustExist);
 
+		*pConnectionInstance = (IBase*)(pBaseConnectionInstance);
 		return LIBMCDRIVER_GRPC_SUCCESS;
 	}
 	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
@@ -446,12 +1290,62 @@ LibMCDriver_GRPCResult LibMCDriver_GRPC::Impl::LibMCDriver_GRPC_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_queryparameters;
 	if (sProcName == "libmcdriver_grpc_driver_queryparametersex") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_queryparametersex;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_hasfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_hasfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_hasstringfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_hasstringfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setstringfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setstringfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getstringfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getstringfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setint32field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setint32field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getint32field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getint32field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setuint32field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setuint32field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getuint32field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getuint32field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setint64field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setint64field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getint64field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getint64field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setuint64field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setuint64field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getuint64field") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getuint64field;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setboolfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setboolfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getboolfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getboolfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setfloatfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setfloatfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getfloatfield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getfloatfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_setdoublefield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_setdoublefield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getdoublefield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getdoublefield;
+	if (sProcName == "libmcdriver_grpc_grpcresponse_getresponsetype") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcresponse_getresponsetype;
+	if (sProcName == "libmcdriver_grpc_grpcrequest_getrequesttype") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcrequest_getrequesttype;
+	if (sProcName == "libmcdriver_grpc_grpcrequest_getexpectedresponsetype") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcrequest_getexpectedresponsetype;
+	if (sProcName == "libmcdriver_grpc_grpcrequest_sendblocking") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcrequest_sendblocking;
+	if (sProcName == "libmcdriver_grpc_grpcconnection_getendpoint") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcconnection_getendpoint;
+	if (sProcName == "libmcdriver_grpc_grpcconnection_close") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcconnection_close;
+	if (sProcName == "libmcdriver_grpc_grpcconnection_createstaticrequest") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcconnection_createstaticrequest;
 	if (sProcName == "libmcdriver_grpc_driver_grpc_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_settosimulationmode;
 	if (sProcName == "libmcdriver_grpc_driver_grpc_issimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_issimulationmode;
-	if (sProcName == "libmcdriver_grpc_driver_grpc_connect") 
-		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_connect;
+	if (sProcName == "libmcdriver_grpc_driver_grpc_connectunsecure") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_connectunsecure;
 	if (sProcName == "libmcdriver_grpc_driver_grpc_findconnection") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_grpc_findconnection;
 	if (sProcName == "libmcdriver_grpc_getversion") 

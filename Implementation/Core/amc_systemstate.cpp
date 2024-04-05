@@ -77,14 +77,8 @@ namespace AMC {
 		m_pAccessControl = std::make_shared<CAccessControl> ();
 		m_pStringResourceHandler = std::make_shared<CStringResourceHandler> ();
 
-		// Create Data Model Instances
-		m_pStorage = m_pDataModel->CreateStorage();
-		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
-		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
-		m_pPersistencyHandler = m_pDataModel->CreatePersistencyHandler();
-
-		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage);
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger, m_pBuildJobHandler, m_pStorage, m_pGlobalChrono, getSystemUserID ());
+		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pDataModel);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger, m_pDataModel, m_pGlobalChrono, getSystemUserID (), m_pStateJournal);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
@@ -93,7 +87,7 @@ namespace AMC {
 		m_pDataSeriesHandler = std::make_shared<CDataSeriesHandler>();
 		m_pAlertHandler = std::make_shared<CAlertHandler>();
 
-		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pBuildJobHandler, m_pStorage, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pLoginHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono);
+		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono, m_pAlertHandler, m_pDataModel);
 		m_pUIHandler = std::make_shared<CUIHandler>(pEnvWrapper, pUISystemState);
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
@@ -116,15 +110,10 @@ namespace AMC {
 		m_pToolpathHandler = nullptr;
 		m_pServiceHandler = nullptr;
 		m_pSignalHandler = nullptr;
-		m_pAlertHandler = nullptr;
-
-		m_pPersistencyHandler = nullptr;
-		m_pLoginHandler = nullptr;
-		m_pBuildJobHandler = nullptr;
-		m_pStorage = nullptr;
+		m_pAlertHandler = nullptr;				
+		m_pLogger = nullptr;
 		m_pDataModel = nullptr;
 
-		m_pLogger = nullptr;
 	}
 
 	CLogger* CSystemState::logger()
@@ -237,24 +226,9 @@ namespace AMC {
 	}
 
 
-	LibMCData::PLoginHandler CSystemState::getLoginHandlerInstance()
+	LibMCData::PDataModel CSystemState::getDataModelInstance()
 	{
-		return m_pLoginHandler;
-	}
-
-	LibMCData::PStorage CSystemState::getStorageInstance()
-	{
-		return m_pStorage;
-	}
-
-	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()
-	{
-		return m_pBuildJobHandler;
-	}
-
-	LibMCData::PPersistencyHandler CSystemState::getPersistencyHandler()
-	{
-		return m_pPersistencyHandler;
+		return m_pDataModel;
 	}
 
 	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
@@ -262,27 +236,6 @@ namespace AMC {
 		return m_pGlobalChrono;
 	}
 
-	LibMCData::PAlertSession CSystemState::createAlertSession()
-	{
-		std::lock_guard<std::mutex> lockGuard(m_DataModelMutex);
-		return m_pDataModel->CreateAlertSession();
-	}
-
-
-	LibMCData::CStorage * CSystemState::storage()
-	{
-		return m_pStorage.get();
-	}
-
-	LibMCData::CBuildJobHandler* CSystemState::buildJobHandler()
-	{
-		return m_pBuildJobHandler.get();
-	}
-
-	LibMCData::CLoginHandler* CSystemState::loginHandler()
-	{
-		return m_pLoginHandler.get();
-	}
 
 	AMCCommon::CChrono* CSystemState::globalChrono()
 	{

@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CGRPCConnection
 #include "libmcdriver_grpc_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "libmcdriver_grpc_grpcrequest.hpp"
 
 
 using namespace LibMCDriver_GRPC::Impl;
@@ -43,3 +44,33 @@ using namespace LibMCDriver_GRPC::Impl;
  Class definition of CGRPCConnection 
 **************************************************************************************************************************/
 
+CGRPCConnection::CGRPCConnection(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PConnection pConnection)
+    : m_pWrapper (pWrapper), m_pConnection (pConnection)
+{
+    if (pWrapper.get() == nullptr)
+        throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+    if (pConnection.get() == nullptr)
+        throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+}
+
+CGRPCConnection::~CGRPCConnection()
+{
+    m_pConnection = nullptr;
+    m_pWrapper = nullptr;
+}
+
+std::string CGRPCConnection::GetEndPoint()
+{
+    return m_pConnection->GetEndPoint();
+}
+
+void CGRPCConnection::Close()
+{
+    return m_pConnection->Close();
+}
+
+IGRPCRequest* CGRPCConnection::CreateStaticRequest(const std::string& sRequestTypeIdentifier, const std::string& sResponseTypeIdentifier)
+{
+    auto pStaticRequest = m_pConnection->CreateStaticRequest(sRequestTypeIdentifier, sResponseTypeIdentifier);
+    return new CGRPCRequest(m_pWrapper, pStaticRequest);
+}

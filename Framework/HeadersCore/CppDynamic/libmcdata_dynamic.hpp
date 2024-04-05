@@ -63,18 +63,26 @@ class CBase;
 class CIterator;
 class CLogEntryList;
 class CLogSession;
+class CAlert;
+class CAlertIterator;
 class CAlertSession;
 class CJournalSession;
 class CStorageStream;
 class CStorage;
+class CCustomDataStream;
 class CBuildJobData;
 class CBuildJobDataIterator;
+class CBuildJobExecutionData;
+class CBuildJobExecutionDataIterator;
+class CBuildJobExecution;
+class CBuildJobExecutionIterator;
 class CBuildJob;
 class CBuildJobIterator;
 class CBuildJobHandler;
 class CUserList;
 class CLoginHandler;
 class CPersistencyHandler;
+class CInstallationInformation;
 class CDataModel;
 
 /*************************************************************************************************************************
@@ -85,18 +93,26 @@ typedef CBase CLibMCDataBase;
 typedef CIterator CLibMCDataIterator;
 typedef CLogEntryList CLibMCDataLogEntryList;
 typedef CLogSession CLibMCDataLogSession;
+typedef CAlert CLibMCDataAlert;
+typedef CAlertIterator CLibMCDataAlertIterator;
 typedef CAlertSession CLibMCDataAlertSession;
 typedef CJournalSession CLibMCDataJournalSession;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorage CLibMCDataStorage;
+typedef CCustomDataStream CLibMCDataCustomDataStream;
 typedef CBuildJobData CLibMCDataBuildJobData;
 typedef CBuildJobDataIterator CLibMCDataBuildJobDataIterator;
+typedef CBuildJobExecutionData CLibMCDataBuildJobExecutionData;
+typedef CBuildJobExecutionDataIterator CLibMCDataBuildJobExecutionDataIterator;
+typedef CBuildJobExecution CLibMCDataBuildJobExecution;
+typedef CBuildJobExecutionIterator CLibMCDataBuildJobExecutionIterator;
 typedef CBuildJob CLibMCDataBuildJob;
 typedef CBuildJobIterator CLibMCDataBuildJobIterator;
 typedef CBuildJobHandler CLibMCDataBuildJobHandler;
 typedef CUserList CLibMCDataUserList;
 typedef CLoginHandler CLibMCDataLoginHandler;
 typedef CPersistencyHandler CLibMCDataPersistencyHandler;
+typedef CInstallationInformation CLibMCDataInstallationInformation;
 typedef CDataModel CLibMCDataDataModel;
 
 /*************************************************************************************************************************
@@ -107,18 +123,26 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CLogSession> PLogSession;
+typedef std::shared_ptr<CAlert> PAlert;
+typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CAlertSession> PAlertSession;
 typedef std::shared_ptr<CJournalSession> PJournalSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorage> PStorage;
+typedef std::shared_ptr<CCustomDataStream> PCustomDataStream;
 typedef std::shared_ptr<CBuildJobData> PBuildJobData;
 typedef std::shared_ptr<CBuildJobDataIterator> PBuildJobDataIterator;
+typedef std::shared_ptr<CBuildJobExecutionData> PBuildJobExecutionData;
+typedef std::shared_ptr<CBuildJobExecutionDataIterator> PBuildJobExecutionDataIterator;
+typedef std::shared_ptr<CBuildJobExecution> PBuildJobExecution;
+typedef std::shared_ptr<CBuildJobExecutionIterator> PBuildJobExecutionIterator;
 typedef std::shared_ptr<CBuildJob> PBuildJob;
 typedef std::shared_ptr<CBuildJobIterator> PBuildJobIterator;
 typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
 typedef std::shared_ptr<CUserList> PUserList;
 typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
+typedef std::shared_ptr<CInstallationInformation> PInstallationInformation;
 typedef std::shared_ptr<CDataModel> PDataModel;
 
 /*************************************************************************************************************************
@@ -129,18 +153,26 @@ typedef PBase PLibMCDataBase;
 typedef PIterator PLibMCDataIterator;
 typedef PLogEntryList PLibMCDataLogEntryList;
 typedef PLogSession PLibMCDataLogSession;
+typedef PAlert PLibMCDataAlert;
+typedef PAlertIterator PLibMCDataAlertIterator;
 typedef PAlertSession PLibMCDataAlertSession;
 typedef PJournalSession PLibMCDataJournalSession;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorage PLibMCDataStorage;
+typedef PCustomDataStream PLibMCDataCustomDataStream;
 typedef PBuildJobData PLibMCDataBuildJobData;
 typedef PBuildJobDataIterator PLibMCDataBuildJobDataIterator;
+typedef PBuildJobExecutionData PLibMCDataBuildJobExecutionData;
+typedef PBuildJobExecutionDataIterator PLibMCDataBuildJobExecutionDataIterator;
+typedef PBuildJobExecution PLibMCDataBuildJobExecution;
+typedef PBuildJobExecutionIterator PLibMCDataBuildJobExecutionIterator;
 typedef PBuildJob PLibMCDataBuildJob;
 typedef PBuildJobIterator PLibMCDataBuildJobIterator;
 typedef PBuildJobHandler PLibMCDataBuildJobHandler;
 typedef PUserList PLibMCDataUserList;
 typedef PLoginHandler PLibMCDataLoginHandler;
 typedef PPersistencyHandler PLibMCDataPersistencyHandler;
+typedef PInstallationInformation PLibMCDataInstallationInformation;
 typedef PDataModel PLibMCDataDataModel;
 
 
@@ -506,6 +538,33 @@ public:
 			case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "INVALIDALERTLEVEL";
 			case LIBMCDATA_ERROR_ALERTNOTFOUND: return "ALERTNOTFOUND";
 			case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "ALERTNOTACKNOWLEDGED";
+			case LIBMCDATA_ERROR_INVALIDSTORAGESTATE: return "INVALIDSTORAGESTATE";
+			case LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS: return "STORAGEWRITERALREADYEXISTS";
+			case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "STORAGEWRITERDOESNOTEXIST";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "STORAGESTREAMNOTPARTIAL";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "STORAGESTREAMNOTRANDOMACCESS";
+			case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "DOWNLOADTICKETNOTFOUND";
+			case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "EMPTYCLIENTFILENAME";
+			case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "INVALIDCLIENTFILENAME";
+			case LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION: return "CANNOTCHANGESTATUSOFBUILDJOBEXECUTION";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY: return "BUILDJOBMETADATAKEYEMPTY";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID: return "BUILDJOBMETADATAKEYINVALID";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE: return "BUILDJOBMETADATAKEYDUPLICATE";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "BUILDJOBMETADATAKEYNOTFOUND";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "INVALIDBUILDJOBEXECUTIONSTATUS";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "BUILDJOBEXECUTIONNOTFOUND";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS: return "BUILDJOBEXECUTIONISNOTINPROCESS";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE: return "BUILDJOBEXECUTIONENDNOTAVAILABLE";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART: return "INVALIDBUILDJOBEXECUTIONSTART";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND: return "INVALIDBUILDJOBEXECUTIONEND";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART: return "BUILDJOBEXECUTIONENDISBEFORESTART";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL: return "BUILDJOBEXECUTIONISFROMPASTJOURNAL";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE: return "BUILDJOBEXECUTIONSTARTISINTHEFUTURE";
+			case LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE: return "BUILDJOBDURATIONNOTAVAILABLE";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY: return "BUILDJOBEXECUTIONMETADATAKEYEMPTY";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "BUILDJOBEXECUTIONMETADATAKEYINVALID";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "BUILDJOBEXECUTIONMETADATAKEYNOTFOUND";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "BUILDJOBEXECUTIONMETADATAKEYDUPLICATE";
 		}
 		return "UNKNOWN";
 	}
@@ -799,6 +858,33 @@ public:
 			case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
 			case LIBMCDATA_ERROR_ALERTNOTFOUND: return "Alert not found";
 			case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "Alert has not been acknowledged.";
+			case LIBMCDATA_ERROR_INVALIDSTORAGESTATE: return "Invalid storage state.";
+			case LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS: return "Storage writer already exists.";
+			case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "Storage writer does not exist.";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "Storage stream is not partial.";
+			case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "Storage stream is not random access.";
+			case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "Download ticket not found.";
+			case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "Empty client file name.";
+			case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "Invalid client file name.";
+			case LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION: return "Can not change status of build job execution.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY: return "Build job metadata key empty.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID: return "Build job metadata key is invalid.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE: return "Build job metadata key is not unique.";
+			case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "Build job metadata key not found.";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "Invalid build job execution status.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "Build job execution not found.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS: return "Build job execution is not in process.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE: return "Build job execution end is not available.";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART: return "Invalid build job execution start.";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND: return "Invalid build job execution end.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART: return "Build job execution end is before start.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL: return "Build job execution is from past journal.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE: return "Build job execution start is in the future.";
+			case LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE: return "Build job duration is not available.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY: return "Build job execution metadata key is empty.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "Build job execution metadata key is invalid.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "Build job execution metadata key not found.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "Build job execution metadata key is duplicate.";
 		}
 		return "unknown error";
 	}
@@ -920,18 +1006,26 @@ private:
 	friend class CIterator;
 	friend class CLogEntryList;
 	friend class CLogSession;
+	friend class CAlert;
+	friend class CAlertIterator;
 	friend class CAlertSession;
 	friend class CJournalSession;
 	friend class CStorageStream;
 	friend class CStorage;
+	friend class CCustomDataStream;
 	friend class CBuildJobData;
 	friend class CBuildJobDataIterator;
+	friend class CBuildJobExecutionData;
+	friend class CBuildJobExecutionDataIterator;
+	friend class CBuildJobExecution;
+	friend class CBuildJobExecutionIterator;
 	friend class CBuildJob;
 	friend class CBuildJobIterator;
 	friend class CBuildJobHandler;
 	friend class CUserList;
 	friend class CLoginHandler;
 	friend class CPersistencyHandler;
+	friend class CInstallationInformation;
 	friend class CDataModel;
 
 };
@@ -1048,9 +1142,57 @@ public:
 	{
 	}
 	
+	inline std::string GetSessionUUID();
 	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestampUTC);
 	inline LibMCData_uint32 GetMaxLogEntryID();
 	inline PLogEntryList RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const eLogLevel eMinLogLevel);
+};
+	
+/*************************************************************************************************************************
+ Class CAlert 
+**************************************************************************************************************************/
+class CAlert : public CBase {
+public:
+	
+	/**
+	* CAlert::CAlert - Constructor for Alert class.
+	*/
+	CAlert(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline std::string GetIdentifier();
+	inline bool IsActive();
+	inline eAlertLevel GetLevel();
+	inline std::string GetLevelString();
+	inline std::string GetDescription();
+	inline std::string GetDescriptionIdentifier();
+	inline std::string GetReadableContextInformation();
+	inline bool GetNeedsAcknowledgement();
+	inline std::string GetTimestampUTC();
+	inline bool HasBeenAcknowledged();
+	inline void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime);
+	inline void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC);
+	inline void DeactivateAlert();
+};
+	
+/*************************************************************************************************************************
+ Class CAlertIterator 
+**************************************************************************************************************************/
+class CAlertIterator : public CIterator {
+public:
+	
+	/**
+	* CAlertIterator::CAlertIterator - Constructor for AlertIterator class.
+	*/
+	CAlertIterator(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PAlert GetCurrentAlert();
 };
 	
 /*************************************************************************************************************************
@@ -1067,12 +1209,11 @@ public:
 	{
 	}
 	
-	inline void AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC);
+	inline PAlert AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC);
 	inline bool HasAlert(const std::string & sUUID);
-	inline void GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC);
-	inline void AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC);
-	inline bool AlertHasBeenAcknowledged(const std::string & sUUID);
-	inline void GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC);
+	inline PAlert GetAlertByUUID(const std::string & sUUID);
+	inline PAlertIterator RetrieveAlerts(const bool bOnlyActive);
+	inline PAlertIterator RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive);
 };
 	
 /*************************************************************************************************************************
@@ -1089,6 +1230,7 @@ public:
 	{
 	}
 	
+	inline std::string GetSessionUUID();
 	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<sJournalChunkIntegerEntry> & EntryDataBuffer);
 	inline LibMCData_uint32 GetChunkCapacity();
 	inline LibMCData_uint32 GetFlushInterval();
@@ -1140,36 +1282,61 @@ public:
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
 	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
+	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID);
+	inline void StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
+	inline LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID);
+	inline void FinishRandomWriteStream(const std::string & sUUID);
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
+	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID);
+	inline void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID);
+	inline void AttachStreamToJournal(const std::string & sStreamUUID, const std::string & sJournalUUID);
+};
+	
+/*************************************************************************************************************************
+ Class CCustomDataStream 
+**************************************************************************************************************************/
+class CCustomDataStream : public CBase {
+public:
+	
+	/**
+	* CCustomDataStream::CCustomDataStream - Constructor for CustomDataStream class.
+	*/
+	CCustomDataStream(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetDataUUID();
+	inline std::string GetIdentifier();
+	inline std::string GetName();
+	inline std::string GetTimeStamp();
+	inline PStorageStream GetStorageStream();
+	inline std::string GetStorageStreamUUID();
+	inline std::string GetStorageStreamSHA2();
+	inline LibMCData_uint64 GetStorageStreamSize();
+	inline std::string GetUserUUID();
+	inline eCustomDataType GetDataType();
+	inline std::string GetDataTypeAsString();
+	inline std::string GetMIMEType();
 };
 	
 /*************************************************************************************************************************
  Class CBuildJobData 
 **************************************************************************************************************************/
-class CBuildJobData : public CBase {
+class CBuildJobData : public CCustomDataStream {
 public:
 	
 	/**
 	* CBuildJobData::CBuildJobData - Constructor for BuildJobData class.
 	*/
 	CBuildJobData(CWrapper* pWrapper, LibMCDataHandle pHandle)
-		: CBase(pWrapper, pHandle)
+		: CCustomDataStream(pWrapper, pHandle)
 	{
 	}
 	
-	inline std::string GetDataUUID();
 	inline std::string GetJobUUID();
-	inline std::string GetName();
-	inline std::string GetContextIdentifier();
-	inline std::string GetTimeStamp();
-	inline PStorageStream GetStorageStream();
-	inline std::string GetStorageStreamSHA2();
-	inline LibMCData_uint64 GetStorageStreamSize();
-	inline eBuildJobDataType GetDataType();
-	inline std::string GetDataTypeAsString();
-	inline std::string GetMIMEType();
 };
 	
 /*************************************************************************************************************************
@@ -1187,6 +1354,87 @@ public:
 	}
 	
 	inline PBuildJobData GetCurrentJobData();
+};
+	
+/*************************************************************************************************************************
+ Class CBuildJobExecutionData 
+**************************************************************************************************************************/
+class CBuildJobExecutionData : public CCustomDataStream {
+public:
+	
+	/**
+	* CBuildJobExecutionData::CBuildJobExecutionData - Constructor for BuildJobExecutionData class.
+	*/
+	CBuildJobExecutionData(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CCustomDataStream(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetExecutionUUID();
+};
+	
+/*************************************************************************************************************************
+ Class CBuildJobExecutionDataIterator 
+**************************************************************************************************************************/
+class CBuildJobExecutionDataIterator : public CIterator {
+public:
+	
+	/**
+	* CBuildJobExecutionDataIterator::CBuildJobExecutionDataIterator - Constructor for BuildJobExecutionDataIterator class.
+	*/
+	CBuildJobExecutionDataIterator(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PBuildJobExecutionData GetCurrentJobExecutionData();
+};
+	
+/*************************************************************************************************************************
+ Class CBuildJobExecution 
+**************************************************************************************************************************/
+class CBuildJobExecution : public CBase {
+public:
+	
+	/**
+	* CBuildJobExecution::CBuildJobExecution - Constructor for BuildJobExecution class.
+	*/
+	CBuildJobExecution(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetExecutionUUID();
+	inline std::string GetJobUUID();
+	inline eBuildJobExecutionStatus GetStatus();
+	inline void ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus);
+	inline std::string GetDescription();
+	inline void SetDescription(const std::string & sNewDescription);
+	inline std::string GetJournalUUID();
+	inline std::string GetUserUUID();
+	inline LibMCData_uint64 GetStartTimeStampInMicroseconds();
+	inline LibMCData_uint64 GetEndTimeStampInMicroseconds();
+	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline bool HasMetaDataString(const std::string & sKey);
+	inline std::string GetMetaDataString(const std::string & sKey);
+};
+	
+/*************************************************************************************************************************
+ Class CBuildJobExecutionIterator 
+**************************************************************************************************************************/
+class CBuildJobExecutionIterator : public CIterator {
+public:
+	
+	/**
+	* CBuildJobExecutionIterator::CBuildJobExecutionIterator - Constructor for BuildJobExecutionIterator class.
+	*/
+	CBuildJobExecutionIterator(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PBuildJobExecution GetCurrentJobData();
 };
 	
 /*************************************************************************************************************************
@@ -1216,10 +1464,17 @@ public:
 	inline void UnArchiveJob();
 	inline void DeleteJob();
 	inline bool JobCanBeArchived();
-	inline void AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID);
-	inline PBuildJobDataIterator ListJobDataByType(const eBuildJobDataType eDataType);
+	inline void AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID);
+	inline PBuildJobDataIterator ListJobDataByType(const eCustomDataType eDataType);
 	inline PBuildJobDataIterator ListJobData();
 	inline PBuildJobData RetrieveJobData(const std::string & sDataUUID);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline bool HasMetaDataString(const std::string & sKey);
+	inline std::string GetMetaDataString(const std::string & sKey);
+	inline PBuildJobExecution CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds);
+	inline PBuildJobExecution RetrieveBuildJobExecution(const std::string & sExecutionUUID);
+	inline PBuildJobExecutionIterator RetrieveBuildJobExecutions(const std::string & sJournalUUIDFilter);
+	inline PBuildJobExecutionIterator RetrieveBuildJobExecutionsByStatus(const eBuildJobExecutionStatus eStatusFilter, const std::string & sJournalUUIDFilter);
 };
 	
 /*************************************************************************************************************************
@@ -1294,6 +1549,7 @@ public:
 	}
 	
 	inline bool UserExists(const std::string & sUsername);
+	inline bool UserUUIDExists(const std::string & sUUID);
 	inline void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword);
 	inline void GetUserProperties(const std::string & sUsername, std::string & sUUID, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
 	inline void GetUserPropertiesByUUID(const std::string & sUUID, std::string & sUsername, std::string & sDescription, std::string & sRole, std::string & sLanguageIdentifier);
@@ -1348,6 +1604,25 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CInstallationInformation 
+**************************************************************************************************************************/
+class CInstallationInformation : public CBase {
+public:
+	
+	/**
+	* CInstallationInformation::CInstallationInformation - Constructor for InstallationInformation class.
+	*/
+	CInstallationInformation(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetInstallationUUID();
+	inline std::string GetInstallationSecret();
+	inline std::string GetBaseTempDirectory();
+};
+	
+/*************************************************************************************************************************
  Class CDataModel 
 **************************************************************************************************************************/
 class CDataModel : public CBase {
@@ -1363,7 +1638,8 @@ public:
 	
 	inline void InitialiseDatabase(const std::string & sDataDirectory, const eDataBaseType eDataBaseType, const std::string & sConnectionString);
 	inline LibMCData_uint32 GetDataModelVersion();
-	inline void GetInstallationInformation(std::string & sInstallationUUID, std::string & sInstallationSecret);
+	inline void GetInstallationInformation(std::string & sDEPRECIATEDInstallationUUID, std::string & sDEPRECIATEDInstallationSecret);
+	inline PInstallationInformation GetInstallationInformationObject();
 	inline PStorage CreateStorage();
 	inline PBuildJobHandler CreateBuildJobHandler();
 	inline PLogSession CreateNewLogSession();
@@ -1484,15 +1760,31 @@ public:
 		pWrapperTable->m_LogEntryList_GetEntryByIndex = nullptr;
 		pWrapperTable->m_LogEntryList_GetEntryByID = nullptr;
 		pWrapperTable->m_LogEntryList_HasEntry = nullptr;
+		pWrapperTable->m_LogSession_GetSessionUUID = nullptr;
 		pWrapperTable->m_LogSession_AddEntry = nullptr;
 		pWrapperTable->m_LogSession_GetMaxLogEntryID = nullptr;
 		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = nullptr;
+		pWrapperTable->m_Alert_GetUUID = nullptr;
+		pWrapperTable->m_Alert_GetIdentifier = nullptr;
+		pWrapperTable->m_Alert_IsActive = nullptr;
+		pWrapperTable->m_Alert_GetLevel = nullptr;
+		pWrapperTable->m_Alert_GetLevelString = nullptr;
+		pWrapperTable->m_Alert_GetDescription = nullptr;
+		pWrapperTable->m_Alert_GetDescriptionIdentifier = nullptr;
+		pWrapperTable->m_Alert_GetReadableContextInformation = nullptr;
+		pWrapperTable->m_Alert_GetNeedsAcknowledgement = nullptr;
+		pWrapperTable->m_Alert_GetTimestampUTC = nullptr;
+		pWrapperTable->m_Alert_HasBeenAcknowledged = nullptr;
+		pWrapperTable->m_Alert_GetAcknowledgementInformation = nullptr;
+		pWrapperTable->m_Alert_AcknowledgeForUser = nullptr;
+		pWrapperTable->m_Alert_DeactivateAlert = nullptr;
+		pWrapperTable->m_AlertIterator_GetCurrentAlert = nullptr;
 		pWrapperTable->m_AlertSession_AddAlert = nullptr;
 		pWrapperTable->m_AlertSession_HasAlert = nullptr;
-		pWrapperTable->m_AlertSession_GetAlertInformation = nullptr;
-		pWrapperTable->m_AlertSession_AcknowledgeAlert = nullptr;
-		pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged = nullptr;
-		pWrapperTable->m_AlertSession_GetAcknowledgementInformation = nullptr;
+		pWrapperTable->m_AlertSession_GetAlertByUUID = nullptr;
+		pWrapperTable->m_AlertSession_RetrieveAlerts = nullptr;
+		pWrapperTable->m_AlertSession_RetrieveAlertsByType = nullptr;
+		pWrapperTable->m_JournalSession_GetSessionUUID = nullptr;
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkCapacity = nullptr;
 		pWrapperTable->m_JournalSession_GetFlushInterval = nullptr;
@@ -1512,21 +1804,47 @@ public:
 		pWrapperTable->m_Storage_StorePartialStream = nullptr;
 		pWrapperTable->m_Storage_FinishPartialStream = nullptr;
 		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = nullptr;
+		pWrapperTable->m_Storage_BeginRandomWriteStream = nullptr;
+		pWrapperTable->m_Storage_StoreRandomWriteStream = nullptr;
+		pWrapperTable->m_Storage_GetRandomWriteStreamSize = nullptr;
+		pWrapperTable->m_Storage_FinishRandomWriteStream = nullptr;
 		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
 		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
 		pWrapperTable->m_Storage_StreamIsImage = nullptr;
-		pWrapperTable->m_BuildJobData_GetDataUUID = nullptr;
+		pWrapperTable->m_Storage_CreateDownloadTicket = nullptr;
+		pWrapperTable->m_Storage_RequestDownloadTicket = nullptr;
+		pWrapperTable->m_Storage_AttachStreamToJournal = nullptr;
+		pWrapperTable->m_CustomDataStream_GetDataUUID = nullptr;
+		pWrapperTable->m_CustomDataStream_GetIdentifier = nullptr;
+		pWrapperTable->m_CustomDataStream_GetName = nullptr;
+		pWrapperTable->m_CustomDataStream_GetTimeStamp = nullptr;
+		pWrapperTable->m_CustomDataStream_GetStorageStream = nullptr;
+		pWrapperTable->m_CustomDataStream_GetStorageStreamUUID = nullptr;
+		pWrapperTable->m_CustomDataStream_GetStorageStreamSHA2 = nullptr;
+		pWrapperTable->m_CustomDataStream_GetStorageStreamSize = nullptr;
+		pWrapperTable->m_CustomDataStream_GetUserUUID = nullptr;
+		pWrapperTable->m_CustomDataStream_GetDataType = nullptr;
+		pWrapperTable->m_CustomDataStream_GetDataTypeAsString = nullptr;
+		pWrapperTable->m_CustomDataStream_GetMIMEType = nullptr;
 		pWrapperTable->m_BuildJobData_GetJobUUID = nullptr;
-		pWrapperTable->m_BuildJobData_GetName = nullptr;
-		pWrapperTable->m_BuildJobData_GetContextIdentifier = nullptr;
-		pWrapperTable->m_BuildJobData_GetTimeStamp = nullptr;
-		pWrapperTable->m_BuildJobData_GetStorageStream = nullptr;
-		pWrapperTable->m_BuildJobData_GetStorageStreamSHA2 = nullptr;
-		pWrapperTable->m_BuildJobData_GetStorageStreamSize = nullptr;
-		pWrapperTable->m_BuildJobData_GetDataType = nullptr;
-		pWrapperTable->m_BuildJobData_GetDataTypeAsString = nullptr;
-		pWrapperTable->m_BuildJobData_GetMIMEType = nullptr;
 		pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = nullptr;
+		pWrapperTable->m_BuildJobExecutionData_GetExecutionUUID = nullptr;
+		pWrapperTable->m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetExecutionUUID = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetJobUUID = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetStatus = nullptr;
+		pWrapperTable->m_BuildJobExecution_ChangeStatus = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetDescription = nullptr;
+		pWrapperTable->m_BuildJobExecution_SetDescription = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetJournalUUID = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetUserUUID = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds = nullptr;
+		pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds = nullptr;
+		pWrapperTable->m_BuildJobExecution_AddMetaDataString = nullptr;
+		pWrapperTable->m_BuildJobExecution_HasMetaDataString = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetMetaDataString = nullptr;
+		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData = nullptr;
 		pWrapperTable->m_BuildJob_GetUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetName = nullptr;
 		pWrapperTable->m_BuildJob_GetStatus = nullptr;
@@ -1544,6 +1862,13 @@ public:
 		pWrapperTable->m_BuildJob_ListJobDataByType = nullptr;
 		pWrapperTable->m_BuildJob_ListJobData = nullptr;
 		pWrapperTable->m_BuildJob_RetrieveJobData = nullptr;
+		pWrapperTable->m_BuildJob_AddMetaDataString = nullptr;
+		pWrapperTable->m_BuildJob_HasMetaDataString = nullptr;
+		pWrapperTable->m_BuildJob_GetMetaDataString = nullptr;
+		pWrapperTable->m_BuildJob_CreateBuildJobExecution = nullptr;
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecution = nullptr;
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecutions = nullptr;
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecutionsByStatus = nullptr;
 		pWrapperTable->m_BuildJobIterator_GetCurrentJob = nullptr;
 		pWrapperTable->m_BuildJobHandler_CreateJob = nullptr;
 		pWrapperTable->m_BuildJobHandler_RetrieveJob = nullptr;
@@ -1554,6 +1879,7 @@ public:
 		pWrapperTable->m_UserList_Count = nullptr;
 		pWrapperTable->m_UserList_GetUserProperties = nullptr;
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
+		pWrapperTable->m_LoginHandler_UserUUIDExists = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDetails = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserProperties = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserPropertiesByUUID = nullptr;
@@ -1589,9 +1915,13 @@ public:
 		pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter = nullptr;
+		pWrapperTable->m_InstallationInformation_GetInstallationUUID = nullptr;
+		pWrapperTable->m_InstallationInformation_GetInstallationSecret = nullptr;
+		pWrapperTable->m_InstallationInformation_GetBaseTempDirectory = nullptr;
 		pWrapperTable->m_DataModel_InitialiseDatabase = nullptr;
 		pWrapperTable->m_DataModel_GetDataModelVersion = nullptr;
 		pWrapperTable->m_DataModel_GetInstallationInformation = nullptr;
+		pWrapperTable->m_DataModel_GetInstallationInformationObject = nullptr;
 		pWrapperTable->m_DataModel_CreateStorage = nullptr;
 		pWrapperTable->m_DataModel_CreateBuildJobHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
@@ -1743,6 +2073,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LogSession_GetSessionUUID = (PLibMCDataLogSession_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_logsession_getsessionuuid");
+		#else // _WIN32
+		pWrapperTable->m_LogSession_GetSessionUUID = (PLibMCDataLogSession_GetSessionUUIDPtr) dlsym(hLibrary, "libmcdata_logsession_getsessionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogSession_GetSessionUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_LogSession_AddEntry = (PLibMCDataLogSession_AddEntryPtr) GetProcAddress(hLibrary, "libmcdata_logsession_addentry");
 		#else // _WIN32
 		pWrapperTable->m_LogSession_AddEntry = (PLibMCDataLogSession_AddEntryPtr) dlsym(hLibrary, "libmcdata_logsession_addentry");
@@ -1770,6 +2109,141 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetUUID = (PLibMCDataAlert_GetUUIDPtr) GetProcAddress(hLibrary, "libmcdata_alert_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetUUID = (PLibMCDataAlert_GetUUIDPtr) dlsym(hLibrary, "libmcdata_alert_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetIdentifier = (PLibMCDataAlert_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_alert_getidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetIdentifier = (PLibMCDataAlert_GetIdentifierPtr) dlsym(hLibrary, "libmcdata_alert_getidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_IsActive = (PLibMCDataAlert_IsActivePtr) GetProcAddress(hLibrary, "libmcdata_alert_isactive");
+		#else // _WIN32
+		pWrapperTable->m_Alert_IsActive = (PLibMCDataAlert_IsActivePtr) dlsym(hLibrary, "libmcdata_alert_isactive");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_IsActive == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetLevel = (PLibMCDataAlert_GetLevelPtr) GetProcAddress(hLibrary, "libmcdata_alert_getlevel");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetLevel = (PLibMCDataAlert_GetLevelPtr) dlsym(hLibrary, "libmcdata_alert_getlevel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetLevel == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetLevelString = (PLibMCDataAlert_GetLevelStringPtr) GetProcAddress(hLibrary, "libmcdata_alert_getlevelstring");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetLevelString = (PLibMCDataAlert_GetLevelStringPtr) dlsym(hLibrary, "libmcdata_alert_getlevelstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetLevelString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetDescription = (PLibMCDataAlert_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcdata_alert_getdescription");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetDescription = (PLibMCDataAlert_GetDescriptionPtr) dlsym(hLibrary, "libmcdata_alert_getdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetDescription == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetDescriptionIdentifier = (PLibMCDataAlert_GetDescriptionIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_alert_getdescriptionidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetDescriptionIdentifier = (PLibMCDataAlert_GetDescriptionIdentifierPtr) dlsym(hLibrary, "libmcdata_alert_getdescriptionidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetDescriptionIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetReadableContextInformation = (PLibMCDataAlert_GetReadableContextInformationPtr) GetProcAddress(hLibrary, "libmcdata_alert_getreadablecontextinformation");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetReadableContextInformation = (PLibMCDataAlert_GetReadableContextInformationPtr) dlsym(hLibrary, "libmcdata_alert_getreadablecontextinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetReadableContextInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetNeedsAcknowledgement = (PLibMCDataAlert_GetNeedsAcknowledgementPtr) GetProcAddress(hLibrary, "libmcdata_alert_getneedsacknowledgement");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetNeedsAcknowledgement = (PLibMCDataAlert_GetNeedsAcknowledgementPtr) dlsym(hLibrary, "libmcdata_alert_getneedsacknowledgement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetNeedsAcknowledgement == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetTimestampUTC = (PLibMCDataAlert_GetTimestampUTCPtr) GetProcAddress(hLibrary, "libmcdata_alert_gettimestamputc");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetTimestampUTC = (PLibMCDataAlert_GetTimestampUTCPtr) dlsym(hLibrary, "libmcdata_alert_gettimestamputc");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetTimestampUTC == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_HasBeenAcknowledged = (PLibMCDataAlert_HasBeenAcknowledgedPtr) GetProcAddress(hLibrary, "libmcdata_alert_hasbeenacknowledged");
+		#else // _WIN32
+		pWrapperTable->m_Alert_HasBeenAcknowledged = (PLibMCDataAlert_HasBeenAcknowledgedPtr) dlsym(hLibrary, "libmcdata_alert_hasbeenacknowledged");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_HasBeenAcknowledged == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementInformation = (PLibMCDataAlert_GetAcknowledgementInformationPtr) GetProcAddress(hLibrary, "libmcdata_alert_getacknowledgementinformation");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementInformation = (PLibMCDataAlert_GetAcknowledgementInformationPtr) dlsym(hLibrary, "libmcdata_alert_getacknowledgementinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetAcknowledgementInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_AcknowledgeForUser = (PLibMCDataAlert_AcknowledgeForUserPtr) GetProcAddress(hLibrary, "libmcdata_alert_acknowledgeforuser");
+		#else // _WIN32
+		pWrapperTable->m_Alert_AcknowledgeForUser = (PLibMCDataAlert_AcknowledgeForUserPtr) dlsym(hLibrary, "libmcdata_alert_acknowledgeforuser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_AcknowledgeForUser == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Alert_DeactivateAlert = (PLibMCDataAlert_DeactivateAlertPtr) GetProcAddress(hLibrary, "libmcdata_alert_deactivatealert");
+		#else // _WIN32
+		pWrapperTable->m_Alert_DeactivateAlert = (PLibMCDataAlert_DeactivateAlertPtr) dlsym(hLibrary, "libmcdata_alert_deactivatealert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_DeactivateAlert == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_AlertIterator_GetCurrentAlert = (PLibMCDataAlertIterator_GetCurrentAlertPtr) GetProcAddress(hLibrary, "libmcdata_alertiterator_getcurrentalert");
+		#else // _WIN32
+		pWrapperTable->m_AlertIterator_GetCurrentAlert = (PLibMCDataAlertIterator_GetCurrentAlertPtr) dlsym(hLibrary, "libmcdata_alertiterator_getcurrentalert");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_AlertIterator_GetCurrentAlert == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_AlertSession_AddAlert = (PLibMCDataAlertSession_AddAlertPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_addalert");
 		#else // _WIN32
 		pWrapperTable->m_AlertSession_AddAlert = (PLibMCDataAlertSession_AddAlertPtr) dlsym(hLibrary, "libmcdata_alertsession_addalert");
@@ -1788,39 +2262,39 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_AlertSession_GetAlertInformation = (PLibMCDataAlertSession_GetAlertInformationPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_getalertinformation");
+		pWrapperTable->m_AlertSession_GetAlertByUUID = (PLibMCDataAlertSession_GetAlertByUUIDPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_getalertbyuuid");
 		#else // _WIN32
-		pWrapperTable->m_AlertSession_GetAlertInformation = (PLibMCDataAlertSession_GetAlertInformationPtr) dlsym(hLibrary, "libmcdata_alertsession_getalertinformation");
+		pWrapperTable->m_AlertSession_GetAlertByUUID = (PLibMCDataAlertSession_GetAlertByUUIDPtr) dlsym(hLibrary, "libmcdata_alertsession_getalertbyuuid");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_AlertSession_GetAlertInformation == nullptr)
+		if (pWrapperTable->m_AlertSession_GetAlertByUUID == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_AlertSession_AcknowledgeAlert = (PLibMCDataAlertSession_AcknowledgeAlertPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_acknowledgealert");
+		pWrapperTable->m_AlertSession_RetrieveAlerts = (PLibMCDataAlertSession_RetrieveAlertsPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_retrievealerts");
 		#else // _WIN32
-		pWrapperTable->m_AlertSession_AcknowledgeAlert = (PLibMCDataAlertSession_AcknowledgeAlertPtr) dlsym(hLibrary, "libmcdata_alertsession_acknowledgealert");
+		pWrapperTable->m_AlertSession_RetrieveAlerts = (PLibMCDataAlertSession_RetrieveAlertsPtr) dlsym(hLibrary, "libmcdata_alertsession_retrievealerts");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_AlertSession_AcknowledgeAlert == nullptr)
+		if (pWrapperTable->m_AlertSession_RetrieveAlerts == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged = (PLibMCDataAlertSession_AlertHasBeenAcknowledgedPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_alerthasbeenacknowledged");
+		pWrapperTable->m_AlertSession_RetrieveAlertsByType = (PLibMCDataAlertSession_RetrieveAlertsByTypePtr) GetProcAddress(hLibrary, "libmcdata_alertsession_retrievealertsbytype");
 		#else // _WIN32
-		pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged = (PLibMCDataAlertSession_AlertHasBeenAcknowledgedPtr) dlsym(hLibrary, "libmcdata_alertsession_alerthasbeenacknowledged");
+		pWrapperTable->m_AlertSession_RetrieveAlertsByType = (PLibMCDataAlertSession_RetrieveAlertsByTypePtr) dlsym(hLibrary, "libmcdata_alertsession_retrievealertsbytype");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged == nullptr)
+		if (pWrapperTable->m_AlertSession_RetrieveAlertsByType == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_AlertSession_GetAcknowledgementInformation = (PLibMCDataAlertSession_GetAcknowledgementInformationPtr) GetProcAddress(hLibrary, "libmcdata_alertsession_getacknowledgementinformation");
+		pWrapperTable->m_JournalSession_GetSessionUUID = (PLibMCDataJournalSession_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getsessionuuid");
 		#else // _WIN32
-		pWrapperTable->m_AlertSession_GetAcknowledgementInformation = (PLibMCDataAlertSession_GetAcknowledgementInformationPtr) dlsym(hLibrary, "libmcdata_alertsession_getacknowledgementinformation");
+		pWrapperTable->m_JournalSession_GetSessionUUID = (PLibMCDataJournalSession_GetSessionUUIDPtr) dlsym(hLibrary, "libmcdata_journalsession_getsessionuuid");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_AlertSession_GetAcknowledgementInformation == nullptr)
+		if (pWrapperTable->m_JournalSession_GetSessionUUID == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1995,6 +2469,42 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Storage_BeginRandomWriteStream = (PLibMCDataStorage_BeginRandomWriteStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_beginrandomwritestream");
+		#else // _WIN32
+		pWrapperTable->m_Storage_BeginRandomWriteStream = (PLibMCDataStorage_BeginRandomWriteStreamPtr) dlsym(hLibrary, "libmcdata_storage_beginrandomwritestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_BeginRandomWriteStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_StoreRandomWriteStream = (PLibMCDataStorage_StoreRandomWriteStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_storerandomwritestream");
+		#else // _WIN32
+		pWrapperTable->m_Storage_StoreRandomWriteStream = (PLibMCDataStorage_StoreRandomWriteStreamPtr) dlsym(hLibrary, "libmcdata_storage_storerandomwritestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_StoreRandomWriteStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_GetRandomWriteStreamSize = (PLibMCDataStorage_GetRandomWriteStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_storage_getrandomwritestreamsize");
+		#else // _WIN32
+		pWrapperTable->m_Storage_GetRandomWriteStreamSize = (PLibMCDataStorage_GetRandomWriteStreamSizePtr) dlsym(hLibrary, "libmcdata_storage_getrandomwritestreamsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_GetRandomWriteStreamSize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_FinishRandomWriteStream = (PLibMCDataStorage_FinishRandomWriteStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_finishrandomwritestream");
+		#else // _WIN32
+		pWrapperTable->m_Storage_FinishRandomWriteStream = (PLibMCDataStorage_FinishRandomWriteStreamPtr) dlsym(hLibrary, "libmcdata_storage_finishrandomwritestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_FinishRandomWriteStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Storage_GetMaxStreamSize = (PLibMCDataStorage_GetMaxStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_storage_getmaxstreamsize");
 		#else // _WIN32
 		pWrapperTable->m_Storage_GetMaxStreamSize = (PLibMCDataStorage_GetMaxStreamSizePtr) dlsym(hLibrary, "libmcdata_storage_getmaxstreamsize");
@@ -2022,12 +2532,138 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetDataUUID = (PLibMCDataBuildJobData_GetDataUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getdatauuid");
+		pWrapperTable->m_Storage_CreateDownloadTicket = (PLibMCDataStorage_CreateDownloadTicketPtr) GetProcAddress(hLibrary, "libmcdata_storage_createdownloadticket");
 		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetDataUUID = (PLibMCDataBuildJobData_GetDataUUIDPtr) dlsym(hLibrary, "libmcdata_buildjobdata_getdatauuid");
+		pWrapperTable->m_Storage_CreateDownloadTicket = (PLibMCDataStorage_CreateDownloadTicketPtr) dlsym(hLibrary, "libmcdata_storage_createdownloadticket");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetDataUUID == nullptr)
+		if (pWrapperTable->m_Storage_CreateDownloadTicket == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_RequestDownloadTicket = (PLibMCDataStorage_RequestDownloadTicketPtr) GetProcAddress(hLibrary, "libmcdata_storage_requestdownloadticket");
+		#else // _WIN32
+		pWrapperTable->m_Storage_RequestDownloadTicket = (PLibMCDataStorage_RequestDownloadTicketPtr) dlsym(hLibrary, "libmcdata_storage_requestdownloadticket");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_RequestDownloadTicket == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_AttachStreamToJournal = (PLibMCDataStorage_AttachStreamToJournalPtr) GetProcAddress(hLibrary, "libmcdata_storage_attachstreamtojournal");
+		#else // _WIN32
+		pWrapperTable->m_Storage_AttachStreamToJournal = (PLibMCDataStorage_AttachStreamToJournalPtr) dlsym(hLibrary, "libmcdata_storage_attachstreamtojournal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_AttachStreamToJournal == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetDataUUID = (PLibMCDataCustomDataStream_GetDataUUIDPtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getdatauuid");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetDataUUID = (PLibMCDataCustomDataStream_GetDataUUIDPtr) dlsym(hLibrary, "libmcdata_customdatastream_getdatauuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetDataUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetIdentifier = (PLibMCDataCustomDataStream_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getidentifier");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetIdentifier = (PLibMCDataCustomDataStream_GetIdentifierPtr) dlsym(hLibrary, "libmcdata_customdatastream_getidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetName = (PLibMCDataCustomDataStream_GetNamePtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getname");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetName = (PLibMCDataCustomDataStream_GetNamePtr) dlsym(hLibrary, "libmcdata_customdatastream_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetName == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetTimeStamp = (PLibMCDataCustomDataStream_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_gettimestamp");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetTimeStamp = (PLibMCDataCustomDataStream_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_customdatastream_gettimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStream = (PLibMCDataCustomDataStream_GetStorageStreamPtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getstoragestream");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStream = (PLibMCDataCustomDataStream_GetStorageStreamPtr) dlsym(hLibrary, "libmcdata_customdatastream_getstoragestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetStorageStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStreamUUID = (PLibMCDataCustomDataStream_GetStorageStreamUUIDPtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getstoragestreamuuid");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStreamUUID = (PLibMCDataCustomDataStream_GetStorageStreamUUIDPtr) dlsym(hLibrary, "libmcdata_customdatastream_getstoragestreamuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetStorageStreamUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStreamSHA2 = (PLibMCDataCustomDataStream_GetStorageStreamSHA2Ptr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getstoragestreamsha2");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStreamSHA2 = (PLibMCDataCustomDataStream_GetStorageStreamSHA2Ptr) dlsym(hLibrary, "libmcdata_customdatastream_getstoragestreamsha2");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetStorageStreamSHA2 == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStreamSize = (PLibMCDataCustomDataStream_GetStorageStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getstoragestreamsize");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetStorageStreamSize = (PLibMCDataCustomDataStream_GetStorageStreamSizePtr) dlsym(hLibrary, "libmcdata_customdatastream_getstoragestreamsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetStorageStreamSize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetUserUUID = (PLibMCDataCustomDataStream_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetUserUUID = (PLibMCDataCustomDataStream_GetUserUUIDPtr) dlsym(hLibrary, "libmcdata_customdatastream_getuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetUserUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetDataType = (PLibMCDataCustomDataStream_GetDataTypePtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getdatatype");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetDataType = (PLibMCDataCustomDataStream_GetDataTypePtr) dlsym(hLibrary, "libmcdata_customdatastream_getdatatype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetDataType == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetDataTypeAsString = (PLibMCDataCustomDataStream_GetDataTypeAsStringPtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getdatatypeasstring");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetDataTypeAsString = (PLibMCDataCustomDataStream_GetDataTypeAsStringPtr) dlsym(hLibrary, "libmcdata_customdatastream_getdatatypeasstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetDataTypeAsString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CustomDataStream_GetMIMEType = (PLibMCDataCustomDataStream_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcdata_customdatastream_getmimetype");
+		#else // _WIN32
+		pWrapperTable->m_CustomDataStream_GetMIMEType = (PLibMCDataCustomDataStream_GetMIMETypePtr) dlsym(hLibrary, "libmcdata_customdatastream_getmimetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CustomDataStream_GetMIMEType == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2040,93 +2676,165 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetName = (PLibMCDataBuildJobData_GetNamePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getname");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetName = (PLibMCDataBuildJobData_GetNamePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getname");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetName == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetContextIdentifier = (PLibMCDataBuildJobData_GetContextIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getcontextidentifier");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetContextIdentifier = (PLibMCDataBuildJobData_GetContextIdentifierPtr) dlsym(hLibrary, "libmcdata_buildjobdata_getcontextidentifier");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetContextIdentifier == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_gettimestamp");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_buildjobdata_gettimestamp");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetTimeStamp == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetStorageStream = (PLibMCDataBuildJobData_GetStorageStreamPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getstoragestream");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetStorageStream = (PLibMCDataBuildJobData_GetStorageStreamPtr) dlsym(hLibrary, "libmcdata_buildjobdata_getstoragestream");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetStorageStream == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetStorageStreamSHA2 = (PLibMCDataBuildJobData_GetStorageStreamSHA2Ptr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getstoragestreamsha2");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetStorageStreamSHA2 = (PLibMCDataBuildJobData_GetStorageStreamSHA2Ptr) dlsym(hLibrary, "libmcdata_buildjobdata_getstoragestreamsha2");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetStorageStreamSHA2 == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetStorageStreamSize = (PLibMCDataBuildJobData_GetStorageStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getstoragestreamsize");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetStorageStreamSize = (PLibMCDataBuildJobData_GetStorageStreamSizePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getstoragestreamsize");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetStorageStreamSize == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetDataType = (PLibMCDataBuildJobData_GetDataTypePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getdatatype");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetDataType = (PLibMCDataBuildJobData_GetDataTypePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getdatatype");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetDataType == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetDataTypeAsString = (PLibMCDataBuildJobData_GetDataTypeAsStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getdatatypeasstring");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetDataTypeAsString = (PLibMCDataBuildJobData_GetDataTypeAsStringPtr) dlsym(hLibrary, "libmcdata_buildjobdata_getdatatypeasstring");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetDataTypeAsString == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_BuildJobData_GetMIMEType = (PLibMCDataBuildJobData_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getmimetype");
-		#else // _WIN32
-		pWrapperTable->m_BuildJobData_GetMIMEType = (PLibMCDataBuildJobData_GetMIMETypePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getmimetype");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobData_GetMIMEType == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = (PLibMCDataBuildJobDataIterator_GetCurrentJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdataiterator_getcurrentjobdata");
 		#else // _WIN32
 		pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = (PLibMCDataBuildJobDataIterator_GetCurrentJobDataPtr) dlsym(hLibrary, "libmcdata_buildjobdataiterator_getcurrentjobdata");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecutionData_GetExecutionUUID = (PLibMCDataBuildJobExecutionData_GetExecutionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecutiondata_getexecutionuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecutionData_GetExecutionUUID = (PLibMCDataBuildJobExecutionData_GetExecutionUUIDPtr) dlsym(hLibrary, "libmcdata_buildjobexecutiondata_getexecutionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecutionData_GetExecutionUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData = (PLibMCDataBuildJobExecutionDataIterator_GetCurrentJobExecutionDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecutiondataiterator_getcurrentjobexecutiondata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData = (PLibMCDataBuildJobExecutionDataIterator_GetCurrentJobExecutionDataPtr) dlsym(hLibrary, "libmcdata_buildjobexecutiondataiterator_getcurrentjobexecutiondata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetExecutionUUID = (PLibMCDataBuildJobExecution_GetExecutionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getexecutionuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetExecutionUUID = (PLibMCDataBuildJobExecution_GetExecutionUUIDPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getexecutionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetExecutionUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobUUID = (PLibMCDataBuildJobExecution_GetJobUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getjobuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobUUID = (PLibMCDataBuildJobExecution_GetJobUUIDPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getjobuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetJobUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetStatus = (PLibMCDataBuildJobExecution_GetStatusPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getstatus");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetStatus = (PLibMCDataBuildJobExecution_GetStatusPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetStatus == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_ChangeStatus = (PLibMCDataBuildJobExecution_ChangeStatusPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_changestatus");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_ChangeStatus = (PLibMCDataBuildJobExecution_ChangeStatusPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_changestatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_ChangeStatus == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetDescription = (PLibMCDataBuildJobExecution_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getdescription");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetDescription = (PLibMCDataBuildJobExecution_GetDescriptionPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetDescription == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_SetDescription = (PLibMCDataBuildJobExecution_SetDescriptionPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_setdescription");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_SetDescription = (PLibMCDataBuildJobExecution_SetDescriptionPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_setdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_SetDescription == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJournalUUID = (PLibMCDataBuildJobExecution_GetJournalUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getjournaluuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJournalUUID = (PLibMCDataBuildJobExecution_GetJournalUUIDPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getjournaluuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetJournalUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetUserUUID = (PLibMCDataBuildJobExecution_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetUserUUID = (PLibMCDataBuildJobExecution_GetUserUUIDPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetUserUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds = (PLibMCDataBuildJobExecution_GetStartTimeStampInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getstarttimestampinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds = (PLibMCDataBuildJobExecution_GetStartTimeStampInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getstarttimestampinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds = (PLibMCDataBuildJobExecution_GetEndTimeStampInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getendtimestampinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds = (PLibMCDataBuildJobExecution_GetEndTimeStampInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getendtimestampinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds = (PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds = (PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_AddMetaDataString = (PLibMCDataBuildJobExecution_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_addmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_AddMetaDataString = (PLibMCDataBuildJobExecution_AddMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_addmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_AddMetaDataString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_HasMetaDataString = (PLibMCDataBuildJobExecution_HasMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_hasmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_HasMetaDataString = (PLibMCDataBuildJobExecution_HasMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_hasmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_HasMetaDataString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetMetaDataString = (PLibMCDataBuildJobExecution_GetMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetMetaDataString = (PLibMCDataBuildJobExecution_GetMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetMetaDataString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData = (PLibMCDataBuildJobExecutionIterator_GetCurrentJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecutioniterator_getcurrentjobdata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData = (PLibMCDataBuildJobExecutionIterator_GetCurrentJobDataPtr) dlsym(hLibrary, "libmcdata_buildjobexecutioniterator_getcurrentjobdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2283,6 +2991,69 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_AddMetaDataString = (PLibMCDataBuildJob_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_addmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_AddMetaDataString = (PLibMCDataBuildJob_AddMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjob_addmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_AddMetaDataString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_HasMetaDataString = (PLibMCDataBuildJob_HasMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_hasmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_HasMetaDataString = (PLibMCDataBuildJob_HasMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjob_hasmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_HasMetaDataString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_GetMetaDataString = (PLibMCDataBuildJob_GetMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_GetMetaDataString = (PLibMCDataBuildJob_GetMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjob_getmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_GetMetaDataString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_CreateBuildJobExecution = (PLibMCDataBuildJob_CreateBuildJobExecutionPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_createbuildjobexecution");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_CreateBuildJobExecution = (PLibMCDataBuildJob_CreateBuildJobExecutionPtr) dlsym(hLibrary, "libmcdata_buildjob_createbuildjobexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_CreateBuildJobExecution == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecution = (PLibMCDataBuildJob_RetrieveBuildJobExecutionPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_retrievebuildjobexecution");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecution = (PLibMCDataBuildJob_RetrieveBuildJobExecutionPtr) dlsym(hLibrary, "libmcdata_buildjob_retrievebuildjobexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_RetrieveBuildJobExecution == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecutions = (PLibMCDataBuildJob_RetrieveBuildJobExecutionsPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_retrievebuildjobexecutions");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecutions = (PLibMCDataBuildJob_RetrieveBuildJobExecutionsPtr) dlsym(hLibrary, "libmcdata_buildjob_retrievebuildjobexecutions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_RetrieveBuildJobExecutions == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecutionsByStatus = (PLibMCDataBuildJob_RetrieveBuildJobExecutionsByStatusPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_retrievebuildjobexecutionsbystatus");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_RetrieveBuildJobExecutionsByStatus = (PLibMCDataBuildJob_RetrieveBuildJobExecutionsByStatusPtr) dlsym(hLibrary, "libmcdata_buildjob_retrievebuildjobexecutionsbystatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_RetrieveBuildJobExecutionsByStatus == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJobIterator_GetCurrentJob = (PLibMCDataBuildJobIterator_GetCurrentJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjobiterator_getcurrentjob");
 		#else // _WIN32
 		pWrapperTable->m_BuildJobIterator_GetCurrentJob = (PLibMCDataBuildJobIterator_GetCurrentJobPtr) dlsym(hLibrary, "libmcdata_buildjobiterator_getcurrentjob");
@@ -2370,6 +3141,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LoginHandler_UserExists == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_UserUUIDExists = (PLibMCDataLoginHandler_UserUUIDExistsPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_useruuidexists");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_UserUUIDExists = (PLibMCDataLoginHandler_UserUUIDExistsPtr) dlsym(hLibrary, "libmcdata_loginhandler_useruuidexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_UserUUIDExists == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2688,6 +3468,33 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationUUID = (PLibMCDataInstallationInformation_GetInstallationUUIDPtr) GetProcAddress(hLibrary, "libmcdata_installationinformation_getinstallationuuid");
+		#else // _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationUUID = (PLibMCDataInstallationInformation_GetInstallationUUIDPtr) dlsym(hLibrary, "libmcdata_installationinformation_getinstallationuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_InstallationInformation_GetInstallationUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationSecret = (PLibMCDataInstallationInformation_GetInstallationSecretPtr) GetProcAddress(hLibrary, "libmcdata_installationinformation_getinstallationsecret");
+		#else // _WIN32
+		pWrapperTable->m_InstallationInformation_GetInstallationSecret = (PLibMCDataInstallationInformation_GetInstallationSecretPtr) dlsym(hLibrary, "libmcdata_installationinformation_getinstallationsecret");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_InstallationInformation_GetInstallationSecret == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_InstallationInformation_GetBaseTempDirectory = (PLibMCDataInstallationInformation_GetBaseTempDirectoryPtr) GetProcAddress(hLibrary, "libmcdata_installationinformation_getbasetempdirectory");
+		#else // _WIN32
+		pWrapperTable->m_InstallationInformation_GetBaseTempDirectory = (PLibMCDataInstallationInformation_GetBaseTempDirectoryPtr) dlsym(hLibrary, "libmcdata_installationinformation_getbasetempdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_InstallationInformation_GetBaseTempDirectory == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataModel_InitialiseDatabase = (PLibMCDataDataModel_InitialiseDatabasePtr) GetProcAddress(hLibrary, "libmcdata_datamodel_initialisedatabase");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_InitialiseDatabase = (PLibMCDataDataModel_InitialiseDatabasePtr) dlsym(hLibrary, "libmcdata_datamodel_initialisedatabase");
@@ -2712,6 +3519,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataModel_GetInstallationInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_GetInstallationInformationObject = (PLibMCDataDataModel_GetInstallationInformationObjectPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_getinstallationinformationobject");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_GetInstallationInformationObject = (PLibMCDataDataModel_GetInstallationInformationObjectPtr) dlsym(hLibrary, "libmcdata_datamodel_getinstallationinformationobject");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_GetInstallationInformationObject == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2937,6 +3753,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_HasEntry == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_logsession_getsessionuuid", (void**)&(pWrapperTable->m_LogSession_GetSessionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_GetSessionUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_logsession_addentry", (void**)&(pWrapperTable->m_LogSession_AddEntry));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_AddEntry == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2949,6 +3769,66 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_alert_getuuid", (void**)&(pWrapperTable->m_Alert_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getidentifier", (void**)&(pWrapperTable->m_Alert_GetIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_isactive", (void**)&(pWrapperTable->m_Alert_IsActive));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_IsActive == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getlevel", (void**)&(pWrapperTable->m_Alert_GetLevel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetLevel == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getlevelstring", (void**)&(pWrapperTable->m_Alert_GetLevelString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetLevelString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getdescription", (void**)&(pWrapperTable->m_Alert_GetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetDescription == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getdescriptionidentifier", (void**)&(pWrapperTable->m_Alert_GetDescriptionIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetDescriptionIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getreadablecontextinformation", (void**)&(pWrapperTable->m_Alert_GetReadableContextInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetReadableContextInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getneedsacknowledgement", (void**)&(pWrapperTable->m_Alert_GetNeedsAcknowledgement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetNeedsAcknowledgement == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_gettimestamputc", (void**)&(pWrapperTable->m_Alert_GetTimestampUTC));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetTimestampUTC == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_hasbeenacknowledged", (void**)&(pWrapperTable->m_Alert_HasBeenAcknowledged));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_HasBeenAcknowledged == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_getacknowledgementinformation", (void**)&(pWrapperTable->m_Alert_GetAcknowledgementInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetAcknowledgementInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_acknowledgeforuser", (void**)&(pWrapperTable->m_Alert_AcknowledgeForUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_AcknowledgeForUser == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alert_deactivatealert", (void**)&(pWrapperTable->m_Alert_DeactivateAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_DeactivateAlert == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_alertiterator_getcurrentalert", (void**)&(pWrapperTable->m_AlertIterator_GetCurrentAlert));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertIterator_GetCurrentAlert == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_alertsession_addalert", (void**)&(pWrapperTable->m_AlertSession_AddAlert));
 		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_AddAlert == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2957,20 +3837,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_HasAlert == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_alertsession_getalertinformation", (void**)&(pWrapperTable->m_AlertSession_GetAlertInformation));
-		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_GetAlertInformation == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_alertsession_getalertbyuuid", (void**)&(pWrapperTable->m_AlertSession_GetAlertByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_GetAlertByUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_alertsession_acknowledgealert", (void**)&(pWrapperTable->m_AlertSession_AcknowledgeAlert));
-		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_AcknowledgeAlert == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_alertsession_retrievealerts", (void**)&(pWrapperTable->m_AlertSession_RetrieveAlerts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_RetrieveAlerts == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_alertsession_alerthasbeenacknowledged", (void**)&(pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged));
-		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_AlertHasBeenAcknowledged == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_alertsession_retrievealertsbytype", (void**)&(pWrapperTable->m_AlertSession_RetrieveAlertsByType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_RetrieveAlertsByType == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_alertsession_getacknowledgementinformation", (void**)&(pWrapperTable->m_AlertSession_GetAcknowledgementInformation));
-		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_GetAcknowledgementInformation == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_journalsession_getsessionuuid", (void**)&(pWrapperTable->m_JournalSession_GetSessionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetSessionUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkintegerdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData));
@@ -3049,6 +3929,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_storage_beginrandomwritestream", (void**)&(pWrapperTable->m_Storage_BeginRandomWriteStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_BeginRandomWriteStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_storerandomwritestream", (void**)&(pWrapperTable->m_Storage_StoreRandomWriteStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_StoreRandomWriteStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_getrandomwritestreamsize", (void**)&(pWrapperTable->m_Storage_GetRandomWriteStreamSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_GetRandomWriteStreamSize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_finishrandomwritestream", (void**)&(pWrapperTable->m_Storage_FinishRandomWriteStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishRandomWriteStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storage_getmaxstreamsize", (void**)&(pWrapperTable->m_Storage_GetMaxStreamSize));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_GetMaxStreamSize == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3061,52 +3957,140 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_StreamIsImage == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getdatauuid", (void**)&(pWrapperTable->m_BuildJobData_GetDataUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetDataUUID == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_storage_createdownloadticket", (void**)&(pWrapperTable->m_Storage_CreateDownloadTicket));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_CreateDownloadTicket == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_requestdownloadticket", (void**)&(pWrapperTable->m_Storage_RequestDownloadTicket));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_RequestDownloadTicket == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_attachstreamtojournal", (void**)&(pWrapperTable->m_Storage_AttachStreamToJournal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_AttachStreamToJournal == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getdatauuid", (void**)&(pWrapperTable->m_CustomDataStream_GetDataUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetDataUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getidentifier", (void**)&(pWrapperTable->m_CustomDataStream_GetIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getname", (void**)&(pWrapperTable->m_CustomDataStream_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetName == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_gettimestamp", (void**)&(pWrapperTable->m_CustomDataStream_GetTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetTimeStamp == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getstoragestream", (void**)&(pWrapperTable->m_CustomDataStream_GetStorageStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetStorageStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getstoragestreamuuid", (void**)&(pWrapperTable->m_CustomDataStream_GetStorageStreamUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetStorageStreamUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getstoragestreamsha2", (void**)&(pWrapperTable->m_CustomDataStream_GetStorageStreamSHA2));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetStorageStreamSHA2 == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getstoragestreamsize", (void**)&(pWrapperTable->m_CustomDataStream_GetStorageStreamSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetStorageStreamSize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getuseruuid", (void**)&(pWrapperTable->m_CustomDataStream_GetUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetUserUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getdatatype", (void**)&(pWrapperTable->m_CustomDataStream_GetDataType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetDataType == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getdatatypeasstring", (void**)&(pWrapperTable->m_CustomDataStream_GetDataTypeAsString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetDataTypeAsString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_customdatastream_getmimetype", (void**)&(pWrapperTable->m_CustomDataStream_GetMIMEType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CustomDataStream_GetMIMEType == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobdata_getjobuuid", (void**)&(pWrapperTable->m_BuildJobData_GetJobUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetJobUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getname", (void**)&(pWrapperTable->m_BuildJobData_GetName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetName == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getcontextidentifier", (void**)&(pWrapperTable->m_BuildJobData_GetContextIdentifier));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetContextIdentifier == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_gettimestamp", (void**)&(pWrapperTable->m_BuildJobData_GetTimeStamp));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetTimeStamp == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getstoragestream", (void**)&(pWrapperTable->m_BuildJobData_GetStorageStream));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetStorageStream == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getstoragestreamsha2", (void**)&(pWrapperTable->m_BuildJobData_GetStorageStreamSHA2));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetStorageStreamSHA2 == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getstoragestreamsize", (void**)&(pWrapperTable->m_BuildJobData_GetStorageStreamSize));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetStorageStreamSize == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getdatatype", (void**)&(pWrapperTable->m_BuildJobData_GetDataType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetDataType == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getdatatypeasstring", (void**)&(pWrapperTable->m_BuildJobData_GetDataTypeAsString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetDataTypeAsString == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_buildjobdata_getmimetype", (void**)&(pWrapperTable->m_BuildJobData_GetMIMEType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetMIMEType == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdata_buildjobdataiterator_getcurrentjobdata", (void**)&(pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecutiondata_getexecutionuuid", (void**)&(pWrapperTable->m_BuildJobExecutionData_GetExecutionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecutionData_GetExecutionUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecutiondataiterator_getcurrentjobexecutiondata", (void**)&(pWrapperTable->m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getexecutionuuid", (void**)&(pWrapperTable->m_BuildJobExecution_GetExecutionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetExecutionUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getjobuuid", (void**)&(pWrapperTable->m_BuildJobExecution_GetJobUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetJobUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getstatus", (void**)&(pWrapperTable->m_BuildJobExecution_GetStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetStatus == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_changestatus", (void**)&(pWrapperTable->m_BuildJobExecution_ChangeStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_ChangeStatus == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getdescription", (void**)&(pWrapperTable->m_BuildJobExecution_GetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetDescription == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_setdescription", (void**)&(pWrapperTable->m_BuildJobExecution_SetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_SetDescription == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getjournaluuid", (void**)&(pWrapperTable->m_BuildJobExecution_GetJournalUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetJournalUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getuseruuid", (void**)&(pWrapperTable->m_BuildJobExecution_GetUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetUserUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getstarttimestampinmicroseconds", (void**)&(pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getendtimestampinmicroseconds", (void**)&(pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds", (void**)&(pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_addmetadatastring", (void**)&(pWrapperTable->m_BuildJobExecution_AddMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_AddMetaDataString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_hasmetadatastring", (void**)&(pWrapperTable->m_BuildJobExecution_HasMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_HasMetaDataString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getmetadatastring", (void**)&(pWrapperTable->m_BuildJobExecution_GetMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetMetaDataString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecutioniterator_getcurrentjobdata", (void**)&(pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getuuid", (void**)&(pWrapperTable->m_BuildJob_GetUUID));
@@ -3177,6 +4161,34 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_RetrieveJobData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjob_addmetadatastring", (void**)&(pWrapperTable->m_BuildJob_AddMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_AddMetaDataString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_hasmetadatastring", (void**)&(pWrapperTable->m_BuildJob_HasMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_HasMetaDataString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_getmetadatastring", (void**)&(pWrapperTable->m_BuildJob_GetMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetMetaDataString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_createbuildjobexecution", (void**)&(pWrapperTable->m_BuildJob_CreateBuildJobExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_CreateBuildJobExecution == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_retrievebuildjobexecution", (void**)&(pWrapperTable->m_BuildJob_RetrieveBuildJobExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_RetrieveBuildJobExecution == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_retrievebuildjobexecutions", (void**)&(pWrapperTable->m_BuildJob_RetrieveBuildJobExecutions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_RetrieveBuildJobExecutions == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_retrievebuildjobexecutionsbystatus", (void**)&(pWrapperTable->m_BuildJob_RetrieveBuildJobExecutionsByStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_RetrieveBuildJobExecutionsByStatus == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjobiterator_getcurrentjob", (void**)&(pWrapperTable->m_BuildJobIterator_GetCurrentJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobIterator_GetCurrentJob == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3215,6 +4227,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_userexists", (void**)&(pWrapperTable->m_LoginHandler_UserExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UserExists == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_useruuidexists", (void**)&(pWrapperTable->m_LoginHandler_UserUUIDExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UserUUIDExists == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getuserdetails", (void**)&(pWrapperTable->m_LoginHandler_GetUserDetails));
@@ -3357,6 +4373,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_installationinformation_getinstallationuuid", (void**)&(pWrapperTable->m_InstallationInformation_GetInstallationUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_InstallationInformation_GetInstallationUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_installationinformation_getinstallationsecret", (void**)&(pWrapperTable->m_InstallationInformation_GetInstallationSecret));
+		if ( (eLookupError != 0) || (pWrapperTable->m_InstallationInformation_GetInstallationSecret == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_installationinformation_getbasetempdirectory", (void**)&(pWrapperTable->m_InstallationInformation_GetBaseTempDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_InstallationInformation_GetBaseTempDirectory == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_datamodel_initialisedatabase", (void**)&(pWrapperTable->m_DataModel_InitialiseDatabase));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_InitialiseDatabase == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3367,6 +4395,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_getinstallationinformation", (void**)&(pWrapperTable->m_DataModel_GetInstallationInformation));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_GetInstallationInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_getinstallationinformationobject", (void**)&(pWrapperTable->m_DataModel_GetInstallationInformationObject));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_GetInstallationInformationObject == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createstorage", (void**)&(pWrapperTable->m_DataModel_CreateStorage));
@@ -3611,6 +4643,21 @@ public:
 	 */
 	
 	/**
+	* CLogSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	std::string CLogSession::GetSessionUUID()
+	{
+		LibMCData_uint32 bytesNeededSessionUUID = 0;
+		LibMCData_uint32 bytesWrittenSessionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_GetSessionUUID(m_pHandle, 0, &bytesNeededSessionUUID, nullptr));
+		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_GetSessionUUID(m_pHandle, bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0]));
+		
+		return std::string(&bufferSessionUUID[0]);
+	}
+	
+	/**
 	* CLogSession::AddEntry - adds a new log entry.
 	* @param[in] sMessage - Log Message
 	* @param[in] sSubSystem - Sub System identifier
@@ -3653,6 +4700,225 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CAlert
+	 */
+	
+	/**
+	* CAlert::GetUUID - Returns the Alert UUID.
+	* @return Value.
+	*/
+	std::string CAlert::GetUUID()
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CAlert::GetIdentifier - Returns the Alert Identifier.
+	* @return Value.
+	*/
+	std::string CAlert::GetIdentifier()
+	{
+		LibMCData_uint32 bytesNeededIdentifier = 0;
+		LibMCData_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CAlert::IsActive - Returns if the alert is actuve.
+	* @return Returns if the alert is active.
+	*/
+	bool CAlert::IsActive()
+	{
+		bool resultActive = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_IsActive(m_pHandle, &resultActive));
+		
+		return resultActive;
+	}
+	
+	/**
+	* CAlert::GetLevel - Returns the Alert Level.
+	* @return Value.
+	*/
+	eAlertLevel CAlert::GetLevel()
+	{
+		eAlertLevel resultLevel = (eAlertLevel) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetLevel(m_pHandle, &resultLevel));
+		
+		return resultLevel;
+	}
+	
+	/**
+	* CAlert::GetLevelString - Returns the Alert Level string.
+	* @return Value.
+	*/
+	std::string CAlert::GetLevelString()
+	{
+		LibMCData_uint32 bytesNeededLevelString = 0;
+		LibMCData_uint32 bytesWrittenLevelString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetLevelString(m_pHandle, 0, &bytesNeededLevelString, nullptr));
+		std::vector<char> bufferLevelString(bytesNeededLevelString);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetLevelString(m_pHandle, bytesNeededLevelString, &bytesWrittenLevelString, &bufferLevelString[0]));
+		
+		return std::string(&bufferLevelString[0]);
+	}
+	
+	/**
+	* CAlert::GetDescription - Returns the Alert Description.
+	* @return Value.
+	*/
+	std::string CAlert::GetDescription()
+	{
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescription(m_pHandle, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescription(m_pHandle, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CAlert::GetDescriptionIdentifier - Returns the Alert DescriptionIdentifier.
+	* @return Value.
+	*/
+	std::string CAlert::GetDescriptionIdentifier()
+	{
+		LibMCData_uint32 bytesNeededDescriptionIdentifier = 0;
+		LibMCData_uint32 bytesWrittenDescriptionIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescriptionIdentifier(m_pHandle, 0, &bytesNeededDescriptionIdentifier, nullptr));
+		std::vector<char> bufferDescriptionIdentifier(bytesNeededDescriptionIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetDescriptionIdentifier(m_pHandle, bytesNeededDescriptionIdentifier, &bytesWrittenDescriptionIdentifier, &bufferDescriptionIdentifier[0]));
+		
+		return std::string(&bufferDescriptionIdentifier[0]);
+	}
+	
+	/**
+	* CAlert::GetReadableContextInformation - Returns the Alert ReadableContextInformation.
+	* @return Value.
+	*/
+	std::string CAlert::GetReadableContextInformation()
+	{
+		LibMCData_uint32 bytesNeededReadableContextInformation = 0;
+		LibMCData_uint32 bytesWrittenReadableContextInformation = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetReadableContextInformation(m_pHandle, 0, &bytesNeededReadableContextInformation, nullptr));
+		std::vector<char> bufferReadableContextInformation(bytesNeededReadableContextInformation);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetReadableContextInformation(m_pHandle, bytesNeededReadableContextInformation, &bytesWrittenReadableContextInformation, &bufferReadableContextInformation[0]));
+		
+		return std::string(&bufferReadableContextInformation[0]);
+	}
+	
+	/**
+	* CAlert::GetNeedsAcknowledgement - Returns if the Alert needs acknowledgement.
+	* @return Value.
+	*/
+	bool CAlert::GetNeedsAcknowledgement()
+	{
+		bool resultNeedsAcknowledgement = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetNeedsAcknowledgement(m_pHandle, &resultNeedsAcknowledgement));
+		
+		return resultNeedsAcknowledgement;
+	}
+	
+	/**
+	* CAlert::GetTimestampUTC - Returns the Alert Timestamp in UTC file format.
+	* @return Value.
+	*/
+	std::string CAlert::GetTimestampUTC()
+	{
+		LibMCData_uint32 bytesNeededTimestampUTC = 0;
+		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetTimestampUTC(m_pHandle, 0, &bytesNeededTimestampUTC, nullptr));
+		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetTimestampUTC(m_pHandle, bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
+		
+		return std::string(&bufferTimestampUTC[0]);
+	}
+	
+	/**
+	* CAlert::HasBeenAcknowledged - Checks if the alert has been acknowledged.
+	* @return Flag if the alert has been acknowledged.
+	*/
+	bool CAlert::HasBeenAcknowledged()
+	{
+		bool resultHasBeenAcknowledged = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_HasBeenAcknowledged(m_pHandle, &resultHasBeenAcknowledged));
+		
+		return resultHasBeenAcknowledged;
+	}
+	
+	/**
+	* CAlert::GetAcknowledgementInformation - Returns details about the acknowledgement. Fails if the alert is not acknowledged.
+	* @param[out] sUserUUID - User who acknowledged the alert.
+	* @param[out] sUserComment - Comment of the acknowledgement.
+	* @param[out] sAckTime - Timestamp in ISO8601 UTC format.
+	*/
+	void CAlert::GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime)
+	{
+		LibMCData_uint32 bytesNeededUserUUID = 0;
+		LibMCData_uint32 bytesWrittenUserUUID = 0;
+		LibMCData_uint32 bytesNeededUserComment = 0;
+		LibMCData_uint32 bytesWrittenUserComment = 0;
+		LibMCData_uint32 bytesNeededAckTime = 0;
+		LibMCData_uint32 bytesWrittenAckTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetAcknowledgementInformation(m_pHandle, 0, &bytesNeededUserUUID, nullptr, 0, &bytesNeededUserComment, nullptr, 0, &bytesNeededAckTime, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		std::vector<char> bufferUserComment(bytesNeededUserComment);
+		std::vector<char> bufferAckTime(bytesNeededAckTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetAcknowledgementInformation(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0], bytesNeededUserComment, &bytesWrittenUserComment, &bufferUserComment[0], bytesNeededAckTime, &bytesWrittenAckTime, &bufferAckTime[0]));
+		sUserUUID = std::string(&bufferUserUUID[0]);
+		sUserComment = std::string(&bufferUserComment[0]);
+		sAckTime = std::string(&bufferAckTime[0]);
+	}
+	
+	/**
+	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
+	* @param[in] sUserComment - User comment to store. May be empty.
+	* @param[in] sTimestampUTC - Timestamp in UTC format.
+	*/
+	void CAlert::AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimestampUTC)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_AcknowledgeForUser(m_pHandle, sUserUUID.c_str(), sUserComment.c_str(), sTimestampUTC.c_str()));
+	}
+	
+	/**
+	* CAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	*/
+	void CAlert::DeactivateAlert()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_DeactivateAlert(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CAlertIterator
+	 */
+	
+	/**
+	* CAlertIterator::GetCurrentAlert - Returns the alert the iterator points at.
+	* @return returns the Alert instance.
+	*/
+	PAlert CAlertIterator::GetCurrentAlert()
+	{
+		LibMCDataHandle hCurrentInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertIterator_GetCurrentAlert(m_pHandle, &hCurrentInstance));
+		
+		if (!hCurrentInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlert>(m_pWrapper, hCurrentInstance);
+	}
+	
+	/**
 	 * Method definitions for class CAlertSession
 	 */
 	
@@ -3666,10 +4932,17 @@ public:
 	* @param[in] sReadableContextInformation - Readable Context Information in default language
 	* @param[in] bNeedsAcknowledgement - Flag if acknowledgement is needed
 	* @param[in] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* @return Alert Instance
 	*/
-	void CAlertSession::AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC)
+	PAlert CAlertSession::AddAlert(const std::string & sUUID, const std::string & sIdentifier, const eAlertLevel eLevel, const std::string & sDescription, const std::string & sDescriptionIdentifier, const std::string & sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string & sTimestampUTC)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AddAlert(m_pHandle, sUUID.c_str(), sIdentifier.c_str(), eLevel, sDescription.c_str(), sDescriptionIdentifier.c_str(), sReadableContextInformation.c_str(), bNeedsAcknowledgement, sTimestampUTC.c_str()));
+		LibMCDataHandle hAlertInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AddAlert(m_pHandle, sUUID.c_str(), sIdentifier.c_str(), eLevel, sDescription.c_str(), sDescriptionIdentifier.c_str(), sReadableContextInformation.c_str(), bNeedsAcknowledgement, sTimestampUTC.c_str(), &hAlertInstance));
+		
+		if (!hAlertInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlert>(m_pWrapper, hAlertInstance);
 	}
 	
 	/**
@@ -3686,100 +4959,72 @@ public:
 	}
 	
 	/**
-	* CAlertSession::GetAlertInformation - Retrieves information of an alert. Fails if alert does not exist.
+	* CAlertSession::GetAlertByUUID - Retrieves the alert object. Fails if alert does not exist.
 	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @param[out] sIdentifier - Alert Identifier
-	* @param[out] eLevel - Alert level.
-	* @param[out] sDescription - Alert Description in default language
-	* @param[out] sDescriptionIdentifier - Alert Description Identifier for internationalization. May be empty.
-	* @param[out] sReadableContextInformation - Readable Context Information in default language
-	* @param[out] bNeedsAcknowledgement - Flag if acknowledgement is needed
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* @return Alert Instance
 	*/
-	void CAlertSession::GetAlertInformation(const std::string & sUUID, std::string & sIdentifier, eAlertLevel & eLevel, std::string & sDescription, std::string & sDescriptionIdentifier, std::string & sReadableContextInformation, bool & bNeedsAcknowledgement, std::string & sTimestampUTC)
+	PAlert CAlertSession::GetAlertByUUID(const std::string & sUUID)
 	{
-		LibMCData_uint32 bytesNeededIdentifier = 0;
-		LibMCData_uint32 bytesWrittenIdentifier = 0;
-		LibMCData_uint32 bytesNeededDescription = 0;
-		LibMCData_uint32 bytesWrittenDescription = 0;
-		LibMCData_uint32 bytesNeededDescriptionIdentifier = 0;
-		LibMCData_uint32 bytesWrittenDescriptionIdentifier = 0;
-		LibMCData_uint32 bytesNeededReadableContextInformation = 0;
-		LibMCData_uint32 bytesWrittenReadableContextInformation = 0;
-		LibMCData_uint32 bytesNeededTimestampUTC = 0;
-		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAlertInformation(m_pHandle, sUUID.c_str(), 0, &bytesNeededIdentifier, nullptr, &eLevel, 0, &bytesNeededDescription, nullptr, 0, &bytesNeededDescriptionIdentifier, nullptr, 0, &bytesNeededReadableContextInformation, nullptr, &bNeedsAcknowledgement, 0, &bytesNeededTimestampUTC, nullptr));
-		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
-		std::vector<char> bufferDescription(bytesNeededDescription);
-		std::vector<char> bufferDescriptionIdentifier(bytesNeededDescriptionIdentifier);
-		std::vector<char> bufferReadableContextInformation(bytesNeededReadableContextInformation);
-		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAlertInformation(m_pHandle, sUUID.c_str(), bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0], &eLevel, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], bytesNeededDescriptionIdentifier, &bytesWrittenDescriptionIdentifier, &bufferDescriptionIdentifier[0], bytesNeededReadableContextInformation, &bytesWrittenReadableContextInformation, &bufferReadableContextInformation[0], &bNeedsAcknowledgement, bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
-		sIdentifier = std::string(&bufferIdentifier[0]);
-		sDescription = std::string(&bufferDescription[0]);
-		sDescriptionIdentifier = std::string(&bufferDescriptionIdentifier[0]);
-		sReadableContextInformation = std::string(&bufferReadableContextInformation[0]);
-		sTimestampUTC = std::string(&bufferTimestampUTC[0]);
-	}
-	
-	/**
-	* CAlertSession::AcknowledgeAlert - Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.
-	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @param[in] sUserUUID - User UUID that acknowledged the alert.
-	* @param[in] sUserComment - Comment of the user.
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
-	*/
-	void CAlertSession::AcknowledgeAlert(const std::string & sUUID, const std::string & sUserUUID, const std::string & sUserComment, std::string & sTimestampUTC)
-	{
-		LibMCData_uint32 bytesNeededTimestampUTC = 0;
-		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str(), 0, &bytesNeededTimestampUTC, nullptr));
-		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AcknowledgeAlert(m_pHandle, sUUID.c_str(), sUserUUID.c_str(), sUserComment.c_str(), bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
-		sTimestampUTC = std::string(&bufferTimestampUTC[0]);
-	}
-	
-	/**
-	* CAlertSession::AlertHasBeenAcknowledged - Checks if an alert has been acknowledged. Fails if alert does not exist.
-	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @return Flag if the alert has been acknowledged.
-	*/
-	bool CAlertSession::AlertHasBeenAcknowledged(const std::string & sUUID)
-	{
-		bool resultHasBeenAcknowledged = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_AlertHasBeenAcknowledged(m_pHandle, sUUID.c_str(), &resultHasBeenAcknowledged));
+		LibMCDataHandle hAlertInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAlertByUUID(m_pHandle, sUUID.c_str(), &hAlertInstance));
 		
-		return resultHasBeenAcknowledged;
+		if (!hAlertInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlert>(m_pWrapper, hAlertInstance);
 	}
 	
 	/**
-	* CAlertSession::GetAcknowledgementInformation - Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.
-	* @param[in] sUUID - Alert UUID. Fails if not a valid UUID is given.
-	* @param[out] sUserUUID - User UUID that acknowledged the alert.
-	* @param[out] sUserComment - Comment of the user.
-	* @param[out] sTimestampUTC - Timestamp in ISO8601 UTC format
+	* CAlertSession::RetrieveAlerts - Retrieves all or all active alerts.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
 	*/
-	void CAlertSession::GetAcknowledgementInformation(const std::string & sUUID, std::string & sUserUUID, std::string & sUserComment, std::string & sTimestampUTC)
+	PAlertIterator CAlertSession::RetrieveAlerts(const bool bOnlyActive)
 	{
-		LibMCData_uint32 bytesNeededUserUUID = 0;
-		LibMCData_uint32 bytesWrittenUserUUID = 0;
-		LibMCData_uint32 bytesNeededUserComment = 0;
-		LibMCData_uint32 bytesWrittenUserComment = 0;
-		LibMCData_uint32 bytesNeededTimestampUTC = 0;
-		LibMCData_uint32 bytesWrittenTimestampUTC = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAcknowledgementInformation(m_pHandle, sUUID.c_str(), 0, &bytesNeededUserUUID, nullptr, 0, &bytesNeededUserComment, nullptr, 0, &bytesNeededTimestampUTC, nullptr));
-		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
-		std::vector<char> bufferUserComment(bytesNeededUserComment);
-		std::vector<char> bufferTimestampUTC(bytesNeededTimestampUTC);
-		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_GetAcknowledgementInformation(m_pHandle, sUUID.c_str(), bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0], bytesNeededUserComment, &bytesWrittenUserComment, &bufferUserComment[0], bytesNeededTimestampUTC, &bytesWrittenTimestampUTC, &bufferTimestampUTC[0]));
-		sUserUUID = std::string(&bufferUserUUID[0]);
-		sUserComment = std::string(&bufferUserComment[0]);
-		sTimestampUTC = std::string(&bufferTimestampUTC[0]);
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_RetrieveAlerts(m_pHandle, bOnlyActive, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CAlertSession::RetrieveAlertsByType - Retrieves alerts of a certain type identifier.
+	* @param[in] sIdentifier - Alert Identifier to look for. Fails if empty.
+	* @param[in] bOnlyActive - If true, only active alerts will be returned.
+	* @return AlertIterator Instance
+	*/
+	PAlertIterator CAlertSession::RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive)
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_AlertSession_RetrieveAlertsByType(m_pHandle, sIdentifier.c_str(), bOnlyActive, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
 	}
 	
 	/**
 	 * Method definitions for class CJournalSession
 	 */
+	
+	/**
+	* CJournalSession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	std::string CJournalSession::GetSessionUUID()
+	{
+		LibMCData_uint32 bytesNeededSessionUUID = 0;
+		LibMCData_uint32 bytesWrittenSessionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetSessionUUID(m_pHandle, 0, &bytesNeededSessionUUID, nullptr));
+		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetSessionUUID(m_pHandle, bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0]));
+		
+		return std::string(&bufferSessionUUID[0]);
+	}
 	
 	/**
 	* CJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
@@ -3984,7 +5229,7 @@ public:
 	/**
 	* CStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -3999,7 +5244,7 @@ public:
 	/**
 	* CStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - Context UUID of storage stream. Important for ownership and deletion.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
 	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
@@ -4043,6 +5288,53 @@ public:
 	}
 	
 	/**
+	* CStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
+	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
+	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
+	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
+	* @param[in] sName - Name of the stream.
+	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
+	* @param[in] sUserID - Currently authenticated user
+	*/
+	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), sUserID.c_str()));
+	}
+	
+	/**
+	* CStorage::StoreRandomWriteStream - stores data in a stream with random write access. Writing may be in arbitrary order.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @param[in] nOffset - Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size.
+	* @param[in] ContentBuffer - Data block to store in stream.
+	*/
+	void CStorage::StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreRandomWriteStream(m_pHandle, sUUID.c_str(), nOffset, (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data()));
+	}
+	
+	/**
+	* CStorage::GetRandomWriteStreamSize - Returns the size random write stream .
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginRandomWriteStream first.
+	* @return Current size in bytes.
+	*/
+	LibMCData_uint64 CStorage::GetRandomWriteStreamSize(const std::string & sUUID)
+	{
+		LibMCData_uint64 resultCurrentSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_GetRandomWriteStreamSize(m_pHandle, sUUID.c_str(), &resultCurrentSize));
+		
+		return resultCurrentSize;
+	}
+	
+	/**
+	* CStorage::FinishRandomWriteStream - Finishes storing a random write stream.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	*/
+	void CStorage::FinishRandomWriteStream(const std::string & sUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishRandomWriteStream(m_pHandle, sUUID.c_str()));
+	}
+	
+	/**
 	* CStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
 	* @return Maximum Stream Size in Bytes.
 	*/
@@ -4081,23 +5373,240 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CBuildJobData
+	* CStorage::CreateDownloadTicket - Creates a new download ticket for a stream and a user.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sStreamUUID - UUID of storage stream.
+	* @param[in] sClientFileName - ClientFileName of the ticket. MUST NOT be empty.
+	* @param[in] sSessionUUID - UUID of user session.
+	* @param[in] sUserUUID - UUID of user that created the ticket.
+	*/
+	void CStorage::CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_CreateDownloadTicket(m_pHandle, sTicketUUID.c_str(), sStreamUUID.c_str(), sClientFileName.c_str(), sSessionUUID.c_str(), sUserUUID.c_str()));
+	}
+	
+	/**
+	* CStorage::RequestDownloadTicket - Returns the details of a download ticket and creates an entry in an access log with time stamp.
+	* @param[in] sTicketUUID - UUID of download ticket.
+	* @param[in] sIPAddress - IP Address where the request came from.
+	* @param[out] sStreamUUID - UUID of storage stream.
+	* @param[out] sClientFileName - ClientFileName of the ticket.
+	* @param[out] sSessionUUID - UUID of user session.
+	* @param[out] sUserUUID - UUID of user that created the ticket.
+	*/
+	void CStorage::RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID)
+	{
+		LibMCData_uint32 bytesNeededStreamUUID = 0;
+		LibMCData_uint32 bytesWrittenStreamUUID = 0;
+		LibMCData_uint32 bytesNeededClientFileName = 0;
+		LibMCData_uint32 bytesWrittenClientFileName = 0;
+		LibMCData_uint32 bytesNeededSessionUUID = 0;
+		LibMCData_uint32 bytesWrittenSessionUUID = 0;
+		LibMCData_uint32 bytesNeededUserUUID = 0;
+		LibMCData_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), 0, &bytesNeededStreamUUID, nullptr, 0, &bytesNeededClientFileName, nullptr, 0, &bytesNeededSessionUUID, nullptr, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferStreamUUID(bytesNeededStreamUUID);
+		std::vector<char> bufferClientFileName(bytesNeededClientFileName);
+		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0], bytesNeededClientFileName, &bytesWrittenClientFileName, &bufferClientFileName[0], bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0], bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		sStreamUUID = std::string(&bufferStreamUUID[0]);
+		sClientFileName = std::string(&bufferClientFileName[0]);
+		sSessionUUID = std::string(&bufferSessionUUID[0]);
+		sUserUUID = std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CStorage::AttachStreamToJournal - Attaches a stream to a journal as temporary stream.
+	* @param[in] sStreamUUID - UUID of stream. Call fails if stream does not exist.
+	* @param[in] sJournalUUID - UUID of journal. Call fails if journal does not exist.
+	*/
+	void CStorage::AttachStreamToJournal(const std::string & sStreamUUID, const std::string & sJournalUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_AttachStreamToJournal(m_pHandle, sStreamUUID.c_str(), sJournalUUID.c_str()));
+	}
+	
+	/**
+	 * Method definitions for class CCustomDataStream
 	 */
 	
 	/**
-	* CBuildJobData::GetDataUUID - returns the uuid of a build job data.
+	* CCustomDataStream::GetDataUUID - returns the uuid of the custom data.
 	* @return UUID String
 	*/
-	std::string CBuildJobData::GetDataUUID()
+	std::string CCustomDataStream::GetDataUUID()
 	{
 		LibMCData_uint32 bytesNeededUUID = 0;
 		LibMCData_uint32 bytesWrittenUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetDataUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetDataUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
 		std::vector<char> bufferUUID(bytesNeededUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetDataUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetDataUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
 		
 		return std::string(&bufferUUID[0]);
 	}
+	
+	/**
+	* CCustomDataStream::GetIdentifier - returns the identifier of the custom data.
+	* @return Name String
+	*/
+	std::string CCustomDataStream::GetIdentifier()
+	{
+		LibMCData_uint32 bytesNeededIdentifier = 0;
+		LibMCData_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CCustomDataStream::GetName - returns the name of the custom data.
+	* @return Name String
+	*/
+	std::string CCustomDataStream::GetName()
+	{
+		LibMCData_uint32 bytesNeededName = 0;
+		LibMCData_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CCustomDataStream::GetTimeStamp - returns the timestamp when the custom data was created.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	std::string CCustomDataStream::GetTimeStamp()
+	{
+		LibMCData_uint32 bytesNeededTimestamp = 0;
+		LibMCData_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetTimeStamp(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetTimeStamp(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CCustomDataStream::GetStorageStream - returns the storage stream.
+	* @return Stream Instance.
+	*/
+	PStorageStream CCustomDataStream::GetStorageStream()
+	{
+		LibMCDataHandle hStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetStorageStream(m_pHandle, &hStreamInstance));
+		
+		if (!hStreamInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStorageStream>(m_pWrapper, hStreamInstance);
+	}
+	
+	/**
+	* CCustomDataStream::GetStorageStreamUUID - returns the UUID of the storage stream.
+	* @return UUID of the storage stream.
+	*/
+	std::string CCustomDataStream::GetStorageStreamUUID()
+	{
+		LibMCData_uint32 bytesNeededSHA2 = 0;
+		LibMCData_uint32 bytesWrittenSHA2 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetStorageStreamUUID(m_pHandle, 0, &bytesNeededSHA2, nullptr));
+		std::vector<char> bufferSHA2(bytesNeededSHA2);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetStorageStreamUUID(m_pHandle, bytesNeededSHA2, &bytesWrittenSHA2, &bufferSHA2[0]));
+		
+		return std::string(&bufferSHA2[0]);
+	}
+	
+	/**
+	* CCustomDataStream::GetStorageStreamSHA2 - returns the checksum of the storage stream.
+	* @return SHA256 of the storage stream.
+	*/
+	std::string CCustomDataStream::GetStorageStreamSHA2()
+	{
+		LibMCData_uint32 bytesNeededSHA2 = 0;
+		LibMCData_uint32 bytesWrittenSHA2 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetStorageStreamSHA2(m_pHandle, 0, &bytesNeededSHA2, nullptr));
+		std::vector<char> bufferSHA2(bytesNeededSHA2);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetStorageStreamSHA2(m_pHandle, bytesNeededSHA2, &bytesWrittenSHA2, &bufferSHA2[0]));
+		
+		return std::string(&bufferSHA2[0]);
+	}
+	
+	/**
+	* CCustomDataStream::GetStorageStreamSize - returns the size of the storage stream of the build.
+	* @return size of the storage stream in bytes.
+	*/
+	LibMCData_uint64 CCustomDataStream::GetStorageStreamSize()
+	{
+		LibMCData_uint64 resultSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetStorageStreamSize(m_pHandle, &resultSize));
+		
+		return resultSize;
+	}
+	
+	/**
+	* CCustomDataStream::GetUserUUID - returns the UUID of the user who created the stream.
+	* @return UUID of the user who create the stream.
+	*/
+	std::string CCustomDataStream::GetUserUUID()
+	{
+		LibMCData_uint32 bytesNeededUserUUID = 0;
+		LibMCData_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetUserUUID(m_pHandle, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetUserUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CCustomDataStream::GetDataType - returns the data type of the custom data.
+	* @return Data type of the custom data
+	*/
+	eCustomDataType CCustomDataStream::GetDataType()
+	{
+		eCustomDataType resultDataType = (eCustomDataType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetDataType(m_pHandle, &resultDataType));
+		
+		return resultDataType;
+	}
+	
+	/**
+	* CCustomDataStream::GetDataTypeAsString - returns the data type of the custom data as string.
+	* @return Data type of the job data
+	*/
+	std::string CCustomDataStream::GetDataTypeAsString()
+	{
+		LibMCData_uint32 bytesNeededDataType = 0;
+		LibMCData_uint32 bytesWrittenDataType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetDataTypeAsString(m_pHandle, 0, &bytesNeededDataType, nullptr));
+		std::vector<char> bufferDataType(bytesNeededDataType);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetDataTypeAsString(m_pHandle, bytesNeededDataType, &bytesWrittenDataType, &bufferDataType[0]));
+		
+		return std::string(&bufferDataType[0]);
+	}
+	
+	/**
+	* CCustomDataStream::GetMIMEType - returns the mime type of a storage stream.
+	* @return Mime Type String
+	*/
+	std::string CCustomDataStream::GetMIMEType()
+	{
+		LibMCData_uint32 bytesNeededMimeType = 0;
+		LibMCData_uint32 bytesWrittenMimeType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetMIMEType(m_pHandle, 0, &bytesNeededMimeType, nullptr));
+		std::vector<char> bufferMimeType(bytesNeededMimeType);
+		CheckError(m_pWrapper->m_WrapperTable.m_CustomDataStream_GetMIMEType(m_pHandle, bytesNeededMimeType, &bytesWrittenMimeType, &bufferMimeType[0]));
+		
+		return std::string(&bufferMimeType[0]);
+	}
+	
+	/**
+	 * Method definitions for class CBuildJobData
+	 */
 	
 	/**
 	* CBuildJobData::GetJobUUID - returns the uuid of the parent build job.
@@ -4112,135 +5621,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetJobUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
 		
 		return std::string(&bufferUUID[0]);
-	}
-	
-	/**
-	* CBuildJobData::GetName - returns the name of the job data.
-	* @return Name String
-	*/
-	std::string CBuildJobData::GetName()
-	{
-		LibMCData_uint32 bytesNeededName = 0;
-		LibMCData_uint32 bytesWrittenName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
-		std::vector<char> bufferName(bytesNeededName);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
-		
-		return std::string(&bufferName[0]);
-	}
-	
-	/**
-	* CBuildJobData::GetContextIdentifier - returns the unique context identifier of the job data.
-	* @return Context Identifier String
-	*/
-	std::string CBuildJobData::GetContextIdentifier()
-	{
-		LibMCData_uint32 bytesNeededContextIdentifier = 0;
-		LibMCData_uint32 bytesWrittenContextIdentifier = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetContextIdentifier(m_pHandle, 0, &bytesNeededContextIdentifier, nullptr));
-		std::vector<char> bufferContextIdentifier(bytesNeededContextIdentifier);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetContextIdentifier(m_pHandle, bytesNeededContextIdentifier, &bytesWrittenContextIdentifier, &bufferContextIdentifier[0]));
-		
-		return std::string(&bufferContextIdentifier[0]);
-	}
-	
-	/**
-	* CBuildJobData::GetTimeStamp - returns the timestamp when the job data was created.
-	* @return Timestamp in ISO8601 UTC format
-	*/
-	std::string CBuildJobData::GetTimeStamp()
-	{
-		LibMCData_uint32 bytesNeededTimestamp = 0;
-		LibMCData_uint32 bytesWrittenTimestamp = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetTimeStamp(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
-		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetTimeStamp(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
-		
-		return std::string(&bufferTimestamp[0]);
-	}
-	
-	/**
-	* CBuildJobData::GetStorageStream - returns the storage stream of the build.
-	* @return Stream Instance.
-	*/
-	PStorageStream CBuildJobData::GetStorageStream()
-	{
-		LibMCDataHandle hStreamInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetStorageStream(m_pHandle, &hStreamInstance));
-		
-		if (!hStreamInstance) {
-			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CStorageStream>(m_pWrapper, hStreamInstance);
-	}
-	
-	/**
-	* CBuildJobData::GetStorageStreamSHA2 - returns the checksum of the storage stream of the build.
-	* @return SHA256 of the storage stream.
-	*/
-	std::string CBuildJobData::GetStorageStreamSHA2()
-	{
-		LibMCData_uint32 bytesNeededSHA2 = 0;
-		LibMCData_uint32 bytesWrittenSHA2 = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetStorageStreamSHA2(m_pHandle, 0, &bytesNeededSHA2, nullptr));
-		std::vector<char> bufferSHA2(bytesNeededSHA2);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetStorageStreamSHA2(m_pHandle, bytesNeededSHA2, &bytesWrittenSHA2, &bufferSHA2[0]));
-		
-		return std::string(&bufferSHA2[0]);
-	}
-	
-	/**
-	* CBuildJobData::GetStorageStreamSize - returns the size of the storage stream of the build.
-	* @return size of the storage stream in bytes.
-	*/
-	LibMCData_uint64 CBuildJobData::GetStorageStreamSize()
-	{
-		LibMCData_uint64 resultSize = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetStorageStreamSize(m_pHandle, &resultSize));
-		
-		return resultSize;
-	}
-	
-	/**
-	* CBuildJobData::GetDataType - returns the data type of the job data.
-	* @return Data type of the job data
-	*/
-	eBuildJobDataType CBuildJobData::GetDataType()
-	{
-		eBuildJobDataType resultDataType = (eBuildJobDataType) 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetDataType(m_pHandle, &resultDataType));
-		
-		return resultDataType;
-	}
-	
-	/**
-	* CBuildJobData::GetDataTypeAsString - returns the data type of the job data as string.
-	* @return Data type of the job data
-	*/
-	std::string CBuildJobData::GetDataTypeAsString()
-	{
-		LibMCData_uint32 bytesNeededDataType = 0;
-		LibMCData_uint32 bytesWrittenDataType = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetDataTypeAsString(m_pHandle, 0, &bytesNeededDataType, nullptr));
-		std::vector<char> bufferDataType(bytesNeededDataType);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetDataTypeAsString(m_pHandle, bytesNeededDataType, &bytesWrittenDataType, &bufferDataType[0]));
-		
-		return std::string(&bufferDataType[0]);
-	}
-	
-	/**
-	* CBuildJobData::GetMIMEType - returns the mime type of a storage stream.
-	* @return Mime Type String
-	*/
-	std::string CBuildJobData::GetMIMEType()
-	{
-		LibMCData_uint32 bytesNeededMimeType = 0;
-		LibMCData_uint32 bytesWrittenMimeType = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetMIMEType(m_pHandle, 0, &bytesNeededMimeType, nullptr));
-		std::vector<char> bufferMimeType(bytesNeededMimeType);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetMIMEType(m_pHandle, bytesNeededMimeType, &bytesWrittenMimeType, &bufferMimeType[0]));
-		
-		return std::string(&bufferMimeType[0]);
 	}
 	
 	/**
@@ -4260,6 +5640,248 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuildJobData>(m_pWrapper, hCurrentInstance);
+	}
+	
+	/**
+	 * Method definitions for class CBuildJobExecutionData
+	 */
+	
+	/**
+	* CBuildJobExecutionData::GetExecutionUUID - returns the uuid of the parent build job execution.
+	* @return UUID String
+	*/
+	std::string CBuildJobExecutionData::GetExecutionUUID()
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecutionData_GetExecutionUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecutionData_GetExecutionUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	 * Method definitions for class CBuildJobExecutionDataIterator
+	 */
+	
+	/**
+	* CBuildJobExecutionDataIterator::GetCurrentJobExecutionData - Returns the build job execution data the iterator points at.
+	* @return returns the build job execution instance.
+	*/
+	PBuildJobExecutionData CBuildJobExecutionDataIterator::GetCurrentJobExecutionData()
+	{
+		LibMCDataHandle hCurrentInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData(m_pHandle, &hCurrentInstance));
+		
+		if (!hCurrentInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionData>(m_pWrapper, hCurrentInstance);
+	}
+	
+	/**
+	 * Method definitions for class CBuildJobExecution
+	 */
+	
+	/**
+	* CBuildJobExecution::GetExecutionUUID - returns the uuid of a build job execution.
+	* @return UUID String
+	*/
+	std::string CBuildJobExecution::GetExecutionUUID()
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetExecutionUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetExecutionUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CBuildJobExecution::GetJobUUID - returns the uuid of the parent build job.
+	* @return UUID String
+	*/
+	std::string CBuildJobExecution::GetJobUUID()
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CBuildJobExecution::GetStatus - returns the build job execution status.
+	* @return Status Value
+	*/
+	eBuildJobExecutionStatus CBuildJobExecution::GetStatus()
+	{
+		eBuildJobExecutionStatus resultExecutionStatus = (eBuildJobExecutionStatus) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetStatus(m_pHandle, &resultExecutionStatus));
+		
+		return resultExecutionStatus;
+	}
+	
+	/**
+	* CBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
+	* @param[in] eNewExecutionStatus - Status Value
+	*/
+	void CBuildJobExecution::ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ChangeStatus(m_pHandle, eNewExecutionStatus));
+	}
+	
+	/**
+	* CBuildJobExecution::GetDescription - returns the build job description.
+	* @return Current Description.
+	*/
+	std::string CBuildJobExecution::GetDescription()
+	{
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetDescription(m_pHandle, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetDescription(m_pHandle, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CBuildJobExecution::SetDescription - sets the build job description. Should not be an empty string.
+	* @param[in] sNewDescription - New Description.
+	*/
+	void CBuildJobExecution::SetDescription(const std::string & sNewDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_SetDescription(m_pHandle, sNewDescription.c_str()));
+	}
+	
+	/**
+	* CBuildJobExecution::GetJournalUUID - returns the uuid of the execution journal.
+	* @return UUID String
+	*/
+	std::string CBuildJobExecution::GetJournalUUID()
+	{
+		LibMCData_uint32 bytesNeededJournalUUID = 0;
+		LibMCData_uint32 bytesWrittenJournalUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJournalUUID(m_pHandle, 0, &bytesNeededJournalUUID, nullptr));
+		std::vector<char> bufferJournalUUID(bytesNeededJournalUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJournalUUID(m_pHandle, bytesNeededJournalUUID, &bytesWrittenJournalUUID, &bufferJournalUUID[0]));
+		
+		return std::string(&bufferJournalUUID[0]);
+	}
+	
+	/**
+	* CBuildJobExecution::GetUserUUID - returns the uuid of the user that created the build job.
+	* @return UUID String or 00000000-0000-0000-0000-000000000000 if no user is attached.
+	*/
+	std::string CBuildJobExecution::GetUserUUID()
+	{
+		LibMCData_uint32 bytesNeededUserUUID = 0;
+		LibMCData_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetUserUUID(m_pHandle, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetUserUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CBuildJobExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the machine journal.
+	* @return TimeStamp when the build started in Microseconds.
+	*/
+	LibMCData_uint64 CBuildJobExecution::GetStartTimeStampInMicroseconds()
+	{
+		LibMCData_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetStartTimeStampInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildJobExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Microseconds.
+	*/
+	LibMCData_uint64 CBuildJobExecution::GetEndTimeStampInMicroseconds()
+	{
+		LibMCData_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetEndTimeStampInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildJobExecution::ComputeElapsedTimeInMicroseconds - Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
+	* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
+	* @return Elapsed time in Microseconds.
+	*/
+	LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds)
+	{
+		LibMCData_uint64 resultElapsedTimeInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ComputeElapsedTimeInMicroseconds(m_pHandle, nGlobalTimerInMicroseconds, &resultElapsedTimeInMicroseconds));
+		
+		return resultElapsedTimeInMicroseconds;
+	}
+	
+	/**
+	* CBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	void CBuildJobExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CBuildJobExecution::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	bool CBuildJobExecution::HasMetaDataString(const std::string & sKey)
+	{
+		bool resultMetaDataStringExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_HasMetaDataString(m_pHandle, sKey.c_str(), &resultMetaDataStringExists));
+		
+		return resultMetaDataStringExists;
+	}
+	
+	/**
+	* CBuildJobExecution::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	std::string CBuildJobExecution::GetMetaDataString(const std::string & sKey)
+	{
+		LibMCData_uint32 bytesNeededValue = 0;
+		LibMCData_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetMetaDataString(m_pHandle, sKey.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetMetaDataString(m_pHandle, sKey.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	 * Method definitions for class CBuildJobExecutionIterator
+	 */
+	
+	/**
+	* CBuildJobExecutionIterator::GetCurrentJobData - Returns the build job data the iterator points at.
+	* @return returns the build job  execution instance.
+	*/
+	PBuildJobExecution CBuildJobExecutionIterator::GetCurrentJobData()
+	{
+		LibMCDataHandle hCurrentInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecutionIterator_GetCurrentJobData(m_pHandle, &hCurrentInstance));
+		
+		if (!hCurrentInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecution>(m_pWrapper, hCurrentInstance);
 	}
 	
 	/**
@@ -4426,7 +6048,7 @@ public:
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	void CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID)
+	void CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str()));
@@ -4437,7 +6059,7 @@ public:
 	* @param[in] eDataType - Datatype of Job data.
 	* @return Build Job Data Iterator Instance.
 	*/
-	PBuildJobDataIterator CBuildJob::ListJobDataByType(const eBuildJobDataType eDataType)
+	PBuildJobDataIterator CBuildJob::ListJobDataByType(const eCustomDataType eDataType)
 	{
 		LibMCDataHandle hIteratorInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_ListJobDataByType(m_pHandle, eDataType, &hIteratorInstance));
@@ -4477,6 +6099,113 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuildJobData>(m_pWrapper, hBuildJobData);
+	}
+	
+	/**
+	* CBuildJob::AddMetaDataString - Adds a Metadata String to the build job.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	void CBuildJob::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CBuildJob::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	bool CBuildJob::HasMetaDataString(const std::string & sKey)
+	{
+		bool resultMetaDataStringExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_HasMetaDataString(m_pHandle, sKey.c_str(), &resultMetaDataStringExists));
+		
+		return resultMetaDataStringExists;
+	}
+	
+	/**
+	* CBuildJob::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	std::string CBuildJob::GetMetaDataString(const std::string & sKey)
+	{
+		LibMCData_uint32 bytesNeededValue = 0;
+		LibMCData_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetMetaDataString(m_pHandle, sKey.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetMetaDataString(m_pHandle, sKey.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CBuildJob::CreateBuildJobExecution - Creates a new build job execution with state InProgress.
+	* @param[in] sDescription - Description of the execution.
+	* @param[in] sUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
+	* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
+	* @return Newly created execution instance.
+	*/
+	PBuildJobExecution CBuildJob::CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds)
+	{
+		LibMCDataHandle hExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_CreateBuildJobExecution(m_pHandle, sDescription.c_str(), sUserUUID.c_str(), nRelativeStartTimeStampInMicroseconds, &hExecutionInstance));
+		
+		if (!hExecutionInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecution>(m_pWrapper, hExecutionInstance);
+	}
+	
+	/**
+	* CBuildJob::RetrieveBuildJobExecution - Retrieves a new build job execution by uuid.
+	* @param[in] sExecutionUUID - UUID of the execution to retrieve.
+	* @return If UUID exists, returns execution instance. Otherwise, returns null.
+	*/
+	PBuildJobExecution CBuildJob::RetrieveBuildJobExecution(const std::string & sExecutionUUID)
+	{
+		LibMCDataHandle hExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_RetrieveBuildJobExecution(m_pHandle, sExecutionUUID.c_str(), &hExecutionInstance));
+		
+		if (hExecutionInstance) {
+			return std::make_shared<CBuildJobExecution>(m_pWrapper, hExecutionInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CBuildJob::RetrieveBuildJobExecutions - Retrieves multiple executions of the build job.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	PBuildJobExecutionIterator CBuildJob::RetrieveBuildJobExecutions(const std::string & sJournalUUIDFilter)
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_RetrieveBuildJobExecutions(m_pHandle, sJournalUUIDFilter.c_str(), &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuildJob::RetrieveBuildJobExecutionsByStatus - Retrieves multiple executions of the build job.
+	* @param[in] eStatusFilter - Status to filter the executions from.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	PBuildJobExecutionIterator CBuildJob::RetrieveBuildJobExecutionsByStatus(const eBuildJobExecutionStatus eStatusFilter, const std::string & sJournalUUIDFilter)
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_RetrieveBuildJobExecutionsByStatus(m_pHandle, eStatusFilter, sJournalUUIDFilter.c_str(), &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionIterator>(m_pWrapper, hIteratorInstance);
 	}
 	
 	/**
@@ -4662,6 +6391,19 @@ public:
 	{
 		bool resultUserExists = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_UserExists(m_pHandle, sUsername.c_str(), &resultUserExists));
+		
+		return resultUserExists;
+	}
+	
+	/**
+	* CLoginHandler::UserUUIDExists - Checks if a user UUID exist.
+	* @param[in] sUUID - UUID of the user.
+	* @return Flag if users exists
+	*/
+	bool CLoginHandler::UserUUIDExists(const std::string & sUUID)
+	{
+		bool resultUserExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_UserUUIDExists(m_pHandle, sUUID.c_str(), &resultUserExists));
 		
 		return resultUserExists;
 	}
@@ -5176,6 +6918,55 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CInstallationInformation
+	 */
+	
+	/**
+	* CInstallationInformation::GetInstallationUUID - Returns the installation UUID.
+	* @return Installation UUID. Public value to document which installation was used for something.
+	*/
+	std::string CInstallationInformation::GetInstallationUUID()
+	{
+		LibMCData_uint32 bytesNeededInstallationUUID = 0;
+		LibMCData_uint32 bytesWrittenInstallationUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationUUID(m_pHandle, 0, &bytesNeededInstallationUUID, nullptr));
+		std::vector<char> bufferInstallationUUID(bytesNeededInstallationUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationUUID(m_pHandle, bytesNeededInstallationUUID, &bytesWrittenInstallationUUID, &bufferInstallationUUID[0]));
+		
+		return std::string(&bufferInstallationUUID[0]);
+	}
+	
+	/**
+	* CInstallationInformation::GetInstallationSecret - Returns the installation Secret.
+	* @return Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	*/
+	std::string CInstallationInformation::GetInstallationSecret()
+	{
+		LibMCData_uint32 bytesNeededInstallationSecret = 0;
+		LibMCData_uint32 bytesWrittenInstallationSecret = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationSecret(m_pHandle, 0, &bytesNeededInstallationSecret, nullptr));
+		std::vector<char> bufferInstallationSecret(bytesNeededInstallationSecret);
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetInstallationSecret(m_pHandle, bytesNeededInstallationSecret, &bytesWrittenInstallationSecret, &bufferInstallationSecret[0]));
+		
+		return std::string(&bufferInstallationSecret[0]);
+	}
+	
+	/**
+	* CInstallationInformation::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* @return Temp directory path.
+	*/
+	std::string CInstallationInformation::GetBaseTempDirectory()
+	{
+		LibMCData_uint32 bytesNeededTempDirectory = 0;
+		LibMCData_uint32 bytesWrittenTempDirectory = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetBaseTempDirectory(m_pHandle, 0, &bytesNeededTempDirectory, nullptr));
+		std::vector<char> bufferTempDirectory(bytesNeededTempDirectory);
+		CheckError(m_pWrapper->m_WrapperTable.m_InstallationInformation_GetBaseTempDirectory(m_pHandle, bytesNeededTempDirectory, &bytesWrittenTempDirectory, &bufferTempDirectory[0]));
+		
+		return std::string(&bufferTempDirectory[0]);
+	}
+	
+	/**
 	 * Method definitions for class CDataModel
 	 */
 	
@@ -5203,22 +6994,37 @@ public:
 	}
 	
 	/**
-	* CDataModel::GetInstallationInformation - returns unique identifiers for the current installation.
-	* @param[out] sInstallationUUID - Installation UUID. Public value to document which installation was used for something.
-	* @param[out] sInstallationSecret - Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	* CDataModel::GetInstallationInformation - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.
+	* @param[out] sDEPRECIATEDInstallationUUID - DEPRECIATED Installation UUID. Public value to document which installation was used for something.
+	* @param[out] sDEPRECIATEDInstallationSecret - DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
 	*/
-	void CDataModel::GetInstallationInformation(std::string & sInstallationUUID, std::string & sInstallationSecret)
+	void CDataModel::GetInstallationInformation(std::string & sDEPRECIATEDInstallationUUID, std::string & sDEPRECIATEDInstallationSecret)
 	{
-		LibMCData_uint32 bytesNeededInstallationUUID = 0;
-		LibMCData_uint32 bytesWrittenInstallationUUID = 0;
-		LibMCData_uint32 bytesNeededInstallationSecret = 0;
-		LibMCData_uint32 bytesWrittenInstallationSecret = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, 0, &bytesNeededInstallationUUID, nullptr, 0, &bytesNeededInstallationSecret, nullptr));
-		std::vector<char> bufferInstallationUUID(bytesNeededInstallationUUID);
-		std::vector<char> bufferInstallationSecret(bytesNeededInstallationSecret);
-		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, bytesNeededInstallationUUID, &bytesWrittenInstallationUUID, &bufferInstallationUUID[0], bytesNeededInstallationSecret, &bytesWrittenInstallationSecret, &bufferInstallationSecret[0]));
-		sInstallationUUID = std::string(&bufferInstallationUUID[0]);
-		sInstallationSecret = std::string(&bufferInstallationSecret[0]);
+		LibMCData_uint32 bytesNeededDEPRECIATEDInstallationUUID = 0;
+		LibMCData_uint32 bytesWrittenDEPRECIATEDInstallationUUID = 0;
+		LibMCData_uint32 bytesNeededDEPRECIATEDInstallationSecret = 0;
+		LibMCData_uint32 bytesWrittenDEPRECIATEDInstallationSecret = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, 0, &bytesNeededDEPRECIATEDInstallationUUID, nullptr, 0, &bytesNeededDEPRECIATEDInstallationSecret, nullptr));
+		std::vector<char> bufferDEPRECIATEDInstallationUUID(bytesNeededDEPRECIATEDInstallationUUID);
+		std::vector<char> bufferDEPRECIATEDInstallationSecret(bytesNeededDEPRECIATEDInstallationSecret);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformation(m_pHandle, bytesNeededDEPRECIATEDInstallationUUID, &bytesWrittenDEPRECIATEDInstallationUUID, &bufferDEPRECIATEDInstallationUUID[0], bytesNeededDEPRECIATEDInstallationSecret, &bytesWrittenDEPRECIATEDInstallationSecret, &bufferDEPRECIATEDInstallationSecret[0]));
+		sDEPRECIATEDInstallationUUID = std::string(&bufferDEPRECIATEDInstallationUUID[0]);
+		sDEPRECIATEDInstallationSecret = std::string(&bufferDEPRECIATEDInstallationSecret[0]);
+	}
+	
+	/**
+	* CDataModel::GetInstallationInformationObject - returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.
+	* @return Installation information instance.
+	*/
+	PInstallationInformation CDataModel::GetInstallationInformationObject()
+	{
+		LibMCDataHandle hInstallationInformation = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetInstallationInformationObject(m_pHandle, &hInstallationInformation));
+		
+		if (!hInstallationInformation) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CInstallationInformation>(m_pWrapper, hInstallationInformation);
 	}
 	
 	/**
@@ -5336,7 +7142,7 @@ public:
 	}
 	
 	/**
-	* CDataModel::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* CDataModel::GetBaseTempDirectory - DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.
 	* @return Temp directory path.
 	*/
 	std::string CDataModel::GetBaseTempDirectory()

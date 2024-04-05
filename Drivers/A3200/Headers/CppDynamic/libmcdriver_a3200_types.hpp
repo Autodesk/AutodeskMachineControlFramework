@@ -111,6 +111,7 @@ typedef void * LibMCDriver_A3200_pvoid;
 #define LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1013 /** could not parse driver protocol */
 #define LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY 1015 /** No working directory */
 #define LIBMCDRIVER_A3200_ERROR_INVALIDTASKID 1016 /** Invalid task ID */
+#define LIBMCDRIVER_A3200_ERROR_INVALIDAXISID 1017 /** Invalid axis ID */
 #define LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH 1 /** An incompatible version was detected */
 #define LIBMCDRIVER_A3200_ERROR_FEATURELOCKED 2 /** A license error occurred */
 #define LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE 3 /** A connected hardware type is no longer supported */
@@ -195,6 +196,7 @@ inline const char * LIBMCDRIVER_A3200_GETERRORSTRING (LibMCDriver_A3200Result nE
     case LIBMCDRIVER_A3200_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
     case LIBMCDRIVER_A3200_ERROR_NOWORKINGDIRECTORY: return "No working directory";
     case LIBMCDRIVER_A3200_ERROR_INVALIDTASKID: return "Invalid task ID";
+    case LIBMCDRIVER_A3200_ERROR_INVALIDAXISID: return "Invalid axis ID";
     case LIBMCDRIVER_A3200_ERROR_VERSIONMISMATCH: return "An incompatible version was detected";
     case LIBMCDRIVER_A3200_ERROR_FEATURELOCKED: return "A license error occurred";
     case LIBMCDRIVER_A3200_ERROR_UNSUPPORTEDHARDWARE: return "A connected hardware type is no longer supported";

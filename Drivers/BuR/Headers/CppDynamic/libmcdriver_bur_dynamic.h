@@ -204,6 +204,14 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_PauseListPtr) (Li
 */
 typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_ResumeListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
 
+/**
+* Delete list. MUST not be in execution for this.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_DeleteListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
 /*************************************************************************************************************************
  Class definition for Driver_BuR
 **************************************************************************************************************************/
@@ -386,6 +394,7 @@ typedef struct {
 	PLibMCDriver_BuRPLCCommandList_WaitForListPtr m_PLCCommandList_WaitForList;
 	PLibMCDriver_BuRPLCCommandList_PauseListPtr m_PLCCommandList_PauseList;
 	PLibMCDriver_BuRPLCCommandList_ResumeListPtr m_PLCCommandList_ResumeList;
+	PLibMCDriver_BuRPLCCommandList_DeleteListPtr m_PLCCommandList_DeleteList;
 	PLibMCDriver_BuRDriver_BuR_SetToSimulationModePtr m_Driver_BuR_SetToSimulationMode;
 	PLibMCDriver_BuRDriver_BuR_IsSimulationModePtr m_Driver_BuR_IsSimulationMode;
 	PLibMCDriver_BuRDriver_BuR_ConnectPtr m_Driver_BuR_Connect;

@@ -50,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<ContentItem_Upload :key="moduleitem.uuid" v-if="(moduleitem.type=='upload')" :moduleitem="moduleitem" :Application="Application" />
 																
 					<ContentItem_BuildList :key="moduleitem.uuid" v-if="(moduleitem.type=='buildlist')" :moduleitem="moduleitem" :Application="Application" />										
+
+					<ContentItem_AlertList :key="moduleitem.uuid" v-if="(moduleitem.type=='alertlist')" :moduleitem="moduleitem" :Application="Application" />										
 																																			
 					<ContentItem_ParameterList :key="moduleitem.uuid" v-if="(moduleitem.type=='parameterlist')" :moduleitem="moduleitem" :Application="Application" />
 									
@@ -74,6 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	import ContentItem_Chart from '../modules/AMCModule_ContentItem_Chart.vue';
 	import ContentItem_Upload from '../modules/AMCModule_ContentItem_Upload.vue';
 	import ContentItem_BuildList from '../modules/AMCModule_ContentItem_BuildList.vue';
+	import ContentItem_AlertList from '../modules/AMCModule_ContentItem_AlertList.vue';
 	import ContentItem_ParameterList from '../modules/AMCModule_ContentItem_ParameterList.vue';
 	import ContentItem_ButtonGroup from '../modules/AMCModule_ContentItem_ButtonGroup.vue';
 	import ContentItem_Form from '../modules/AMCModule_ContentItem_Form.vue';
@@ -88,6 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			ContentItem_Chart,
 			ContentItem_Upload,
 			ContentItem_BuildList,
+			ContentItem_AlertList,
 			ContentItem_ParameterList,
 			ContentItem_ButtonGroup,
 			ContentItem_Form

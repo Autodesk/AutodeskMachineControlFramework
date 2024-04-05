@@ -40,16 +40,22 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_alert.hpp"
+#include "libmcenv_alertiterator.hpp"
+#include "libmcenv_cryptocontext.hpp"
+#include "libmcenv_tempstreamwriter.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
 #include "amc_meshhandler.hpp"
 #include "amc_dataserieshandler.hpp"
+#include "amc_alerthandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_journalvariable.hpp"
+#include "libmcenv_streamreader.hpp"
+#include "libmcenv_datatable.hpp"
 
 #include "amc_toolpathhandler.hpp"
 #include "amc_logger.hpp"
@@ -61,6 +67,8 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "common_utils.hpp"
 
 #include <cmath>
+
+#define DOWNLOADFILENAME_MAXLENGTH 256
 
 using namespace LibMCEnv::Impl;
 
@@ -92,20 +100,17 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string& sTestEnvironmentPath, AMC::PUserInformation pUserInformation)
+CUIEnvironment::CUIEnvironment(AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PAPIAuth pAPIAuth, const std::string& sTestEnvironmentPath)
     : 
       m_pUIHandler (pUIHandler),
       m_sLogSubSystem ("ui"),
       m_sSenderName (sSenderName),
-      m_pClientVariableHandler (pClientVariableHandler),
-      m_pUserInformation (pUserInformation)
+      m_pAPIAuth (pAPIAuth)
 {
 
-    if (pUserInformation.get () == nullptr)
+    if (pAPIAuth.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pUIHandler == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
     m_pUISystemState = pUIHandler->getUISystemState();
@@ -139,6 +144,34 @@ void CUIEnvironment::ActivatePage(const std::string& sPageName)
 {
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ActivatePage>(sPageName));
 }
+
+void CUIEnvironment::StartStreamDownload(const std::string& sUUID, const std::string& sFilename)
+{
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    auto pDataModel = m_pUISystemState->getDataModel ();
+    auto pStorage = pDataModel->CreateStorage ();
+
+    if (!pStorage->StreamIsReady(sNormalizedUUID))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST, "Download stream does not exist: " + sNormalizedUUID);
+
+    if (sFilename.empty ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME);
+
+    if (sFilename.size () > DOWNLOADFILENAME_MAXLENGTH)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME);
+
+    if (!m_pAPIAuth->userIsAuthorized ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_USERISNOTAUTHORIZED);
+
+    std::string sUserUUID = m_pAPIAuth->getUserUUID();
+
+    std::string sTicketUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
+    pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID);
+
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sTicketUUID, sFilename));
+}
+
+
 
 std::string CUIEnvironment::RetrieveEventSender()
 {
@@ -231,66 +264,72 @@ bool CUIEnvironment::GetMachineParameterAsBool(const std::string& sMachineInstan
 
 std::string CUIEnvironment::GetUIProperty(const std::string& sElementPath, const std::string& sPropertyName) 
 {   
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     return pGroup->getParameterValueByName(sPropertyName);
 }
 
 std::string CUIEnvironment::GetUIPropertyAsUUID(const std::string& sElementPath, const std::string& sPropertyName)
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     return pGroup->getParameterValueByName(sPropertyName);
 
 }
 
 LibMCEnv_double CUIEnvironment::GetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName)
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     return pGroup->getDoubleParameterValueByName(sPropertyName);
 }
 
 LibMCEnv_int64 CUIEnvironment::GetUIPropertyAsInteger(const std::string& sElementPath, const std::string& sPropertyName)
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     return pGroup->getIntParameterValueByName(sPropertyName);
 }
 
 bool CUIEnvironment::GetUIPropertyAsBool(const std::string& sElementPath, const std::string& sPropertyName)
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     return pGroup->getBoolParameterValueByName(sPropertyName);
 }
 
 void CUIEnvironment::SetUIProperty(const std::string& sElementPath, const std::string& sPropertyName, const std::string& sValue)
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     pGroup->setParameterValueByName(sPropertyName, sValue);
 }
 
 void CUIEnvironment::SetUIPropertyAsUUID(const std::string& sElementPath, const std::string& sPropertyName, const std::string& sValue)
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     if (!sValue.empty())
         pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::normalizeUUIDString (sValue));
     else
@@ -299,29 +338,32 @@ void CUIEnvironment::SetUIPropertyAsUUID(const std::string& sElementPath, const 
 
 void CUIEnvironment::SetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_double dValue) 
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     pGroup->setDoubleParameterValueByName(sPropertyName, dValue);
 
 }
 
 void CUIEnvironment::SetUIPropertyAsInteger(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_int64 nValue) 
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     pGroup->setIntParameterValueByName(sPropertyName, nValue);
 }
 
 void CUIEnvironment::SetUIPropertyAsBool(const std::string& sElementPath, const std::string& sPropertyName, const bool bValue)
 {
-    if (m_pClientVariableHandler.get() == nullptr)
+    auto pClientVariableHandler = m_pAPIAuth->getClientVariableHandler();
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    auto pGroup = pClientVariableHandler->findGroup(sElementPath, true);
     pGroup->setBoolParameterValueByName(sPropertyName, bValue);
 }
 
@@ -452,13 +494,21 @@ LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64
 }
 
 
+IDataTable* CUIEnvironment::CreateDataTable()
+{
+    return new CDataTable();
+}
+
 
 bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
 {
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
     try {
-        m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
+        auto pDataModel = m_pUISystemState->getDataModel();
+        auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+        auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+
         return true;
     }
     catch (std::exception) {
@@ -470,8 +520,10 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
     std::string sNormalizedBuildUUID = AMCCommon::CUtils::normalizeUUIDString(sBuildUUID);
 
-    auto pBuildJob = m_pUISystemState->getBuildJobHandler()->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pBuildJob, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getStorage(), m_pUISystemState->getSystemUserID());
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+    auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID(), m_pUISystemState->getGlobalChronoInstance ());
 }
 
 
@@ -509,40 +561,46 @@ IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2DFromImage(IImageData*
 
 bool CUIEnvironment::CheckPermission(const std::string& sPermissionIdentifier)
 {
-    return m_pUISystemState->getAccessControl()->checkPermissionInRole(m_pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return m_pUISystemState->getAccessControl()->checkPermissionInRole(pUserInformation->getRoleIdentifier(), sPermissionIdentifier);
 }
 
 std::string CUIEnvironment::GetCurrentUserLogin()
 {
-    return m_pUserInformation->getLogin();
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return pUserInformation->getLogin();
 }
 
 std::string CUIEnvironment::GetCurrentUserDescription()
 {
-    return m_pUserInformation->getDescription();
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return pUserInformation->getDescription();
 }
 
 std::string CUIEnvironment::GetCurrentUserRole()
 {
-    return m_pUserInformation->getRoleIdentifier();
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return pUserInformation->getRoleIdentifier();
 
 }
 
 std::string CUIEnvironment::GetCurrentUserLanguage()
 {
-    return m_pUserInformation->getLanguageIdentifier();
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return pUserInformation->getLanguageIdentifier();
 
 }
 
 std::string CUIEnvironment::GetCurrentUserUUID()
 {
-    return m_pUserInformation->getUUID();
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return pUserInformation->getUUID();
 
 }
 
 IUserManagementHandler* CUIEnvironment::CreateUserManagement()
 {
-    return new CUserManagementHandler(m_pUISystemState->getLoginHandler(), m_pUISystemState->getAccessControl(), m_pUISystemState->getLanguageHandler());
+    return new CUserManagementHandler(m_pUISystemState->getDataModel(), m_pUISystemState->getAccessControl(), m_pUISystemState->getLanguageHandler());
 }
 
 IJournalHandler* CUIEnvironment::GetCurrentJournal()
@@ -615,24 +673,168 @@ void CUIEnvironment::ReleaseDataSeries(const std::string& sDataSeriesUUID)
 
 }
 
-IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation)
+IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::string& sReadableContextInformation, const bool bAutomaticLogEntry)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-    //return new CAlert ();
+    if (sIdentifier.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYALERTIDENTIFIER);
+
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDALERTIDENTIFIER, "invalid alert identifier: " + sIdentifier);
+
+    auto sNewUUID = AMCCommon::CUtils::createUUID();
+
+    AMCCommon::CChrono chrono;
+    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+
+    auto pDefinition = m_pUISystemState->getAlertHandler()->findDefinition(sIdentifier, true);
+    auto alertDescription = pDefinition->getDescription();
+    auto alertLevel = pDefinition->getAlertLevel();
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+    auto pAlertData = pAlertSession->AddAlert(sNewUUID, pDefinition->getIdentifier(), alertLevel, alertDescription.getCustomValue(), alertDescription.getStringIdentifier(), sReadableContextInformation, pDefinition->needsAcknowledgement(), sTimeStamp);
+
+    if (bAutomaticLogEntry) {
+
+        std::string sLogString = "Created alert " + sNewUUID + ": " + pDefinition->getIdentifier() + " / " + alertDescription.getCustomValue();
+        AMC::eLogLevel logLevel;
+        switch (alertLevel) {
+        case LibMCData::eAlertLevel::FatalError:
+            logLevel = AMC::eLogLevel::FatalError;
+            break;
+        case LibMCData::eAlertLevel::CriticalError:
+            logLevel = AMC::eLogLevel::CriticalError;
+            break;
+        case LibMCData::eAlertLevel::Message:
+            logLevel = AMC::eLogLevel::Message;
+            break;
+        case LibMCData::eAlertLevel::Warning:
+            logLevel = AMC::eLogLevel::Warning;
+            break;
+        default:
+            logLevel = AMC::eLogLevel::Unknown;
+            break;
+
+        }
+
+        m_pLogger->logMessage(sLogString, m_sLogSubSystem, logLevel);
+    }
+
+
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return new CAlert(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem);
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
 {
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    if (!pAlertSession->HasAlert(sNormalizedUUID))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+
+    auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    return new CAlert(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem);
+
+}
+
+bool CUIEnvironment::AlertExists(const std::string& sUUID)
+{
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    return pAlertSession->HasAlert(sNormalizedUUID);
+
+}
+
+
+IAlertIterator* CUIEnvironment::RetrieveAlerts(const bool bOnlyActive)
+{
+    std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    auto pAlertIterator = pAlertSession->RetrieveAlerts(bOnlyActive);
+    while (pAlertIterator->MoveNext()) {
+        auto pAlertData = pAlertIterator->GetCurrentAlert();
+        auto pUserInformation = m_pAPIAuth->getUserInformation();
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem));
+    }
+
+    return returnIterator.release();
+
+}
+
+IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
+{
+    std::unique_ptr<LibMCEnv::Impl::CAlertIterator> returnIterator(new CAlertIterator());
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+    while (pAlertIterator->MoveNext()) {
+        auto pAlertData = pAlertIterator->GetCurrentAlert();
+        auto pUserInformation = m_pAPIAuth->getUserInformation();
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem));
+    }
+
+    return returnIterator.release();
+
+}
+
+bool CUIEnvironment::HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive)
+{
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pAlertSession = pDataModel->CreateAlertSession();
+
+    auto pAlertIterator = pAlertSession->RetrieveAlertsByType(sIdentifier, bOnlyActive);
+    return (pAlertIterator->MoveNext());
+
+}
+
+ICryptoContext* CUIEnvironment::CreateCryptoContext()
+{
+    return new CCryptoContext ();
+}
+
+
+ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType)
+{
+    if (sName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+    if (sMIMEType.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);
+
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    std::string sUserUUID = pUserInformation->getUUID();
+    
+    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sUserUUID);
+}
+
+IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+{
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pStorage = pDataModel->CreateStorage();
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    if (pStorage->StreamIsReady(sNormalizedUUID)) {
+
+        auto pStorageStream = pStorage->RetrieveStream(sNormalizedUUID);
+        return new CStreamReader (pStorage, pStorageStream);
+
+    }
+    else {
+        if (bMustExist)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_STORAGESTREAMNOTFOUND, "Storage Stream not found: " + sUUID);
+    }
+
     return nullptr;
 }
-
-void CUIEnvironment::AcknowledgeAlert(const std::string& sAlertUUID, const std::string& sUserComment)
-{
-
-}
-
-void CUIEnvironment::AcknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment)
-{
-
-}
-

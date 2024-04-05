@@ -87,6 +87,8 @@ namespace AMC {
 
 		bool hasParameter (const std::string & sName);
 
+		std::string getParameterPath(const std::string& sName);
+
 		void addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue);
 		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits);
 		void addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue);

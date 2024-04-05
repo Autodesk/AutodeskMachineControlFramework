@@ -607,6 +607,15 @@
 		<error name="INVALIDLANGUAGEIDENTIFIER" code="581" description="Invalid language identifier"/>		
 		<error name="INVALIDLANGUAGESTRINGIDENTIFIER" code="582" description="Invalid language string identifier"/>		
 		<error name="INVALIDLANGUAGEDEFINITION" code="583" description="Invalid language definition"/>		
+		<error name="MISSINGALERTIDENTIFIER" code="584" description="Missing alert identifier"/>		
+		<error name="MISSINGALERTLEVEL" code="585" description="Missing alert level"/>		
+		<error name="INVALIDALERTLEVEL" code="586" description="Invalid alert level"/>		
+		
+		<error name="ALERTLISTNAMEMISSING" code="587" description="Alert list name missing" />		
+		<error name="JOURNALVARIABLEISNOTNUMERIC" code="588" description="Journal variable is not numeric" />		
+		<error name="UNITSAREOUTOFRANGE" code="589" description="Units are out of range" />		
+		
+		
 		
 		
 	</errors>
@@ -631,6 +640,7 @@
 
 		
 	<class name="Base">
+	
 	</class>
 	
 	<class name="APIRequestHandler" parent="Base" description="API Request Handler">
@@ -673,7 +683,10 @@
 			<param name="Data" type="basicarray" class="uint8" pass="out" description="Binary stream data" />	
 		</method>
 		
-
+		<method name="GetContentDispositionName" description="returns the cached stream content disposition string of the resulting data. Call only after Handle().">
+			<param name="ContentDispositionName" type="string" pass="return" description="Returns non-empty string if content disposition header should be added." />	
+		</method>
+		
 	</class>
 
 

@@ -46,7 +46,7 @@ Abstract: This is the class declaration of CStorageStream
 
 // Include custom headers here.
 #include "common_importstream.hpp"
-#include "amcdata_storagepath.hpp"
+#include "amcdata_storagestate.hpp"
 #include "amcdata_sqlhandler.hpp"
 
 namespace LibMCData {
@@ -93,9 +93,9 @@ protected:
 public:
 
 	static CStorageStream* make (AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
-	static CStorageStream* makeFromDatabase (const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+	static CStorageStream* makeFromDatabase (const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 	static PStorageStream makeShared(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
-	static PStorageStream makeSharedFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+	static PStorageStream makeSharedFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
 	~CStorageStream();
 

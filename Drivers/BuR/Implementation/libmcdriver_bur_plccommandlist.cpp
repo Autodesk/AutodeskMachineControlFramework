@@ -183,3 +183,16 @@ void CPLCCommandList::FinishList()
 {
 
 }
+
+void CPLCCommandList::DeleteList()
+{
+    if (!m_bIsSimulationMode) {
+
+        if (m_pConnector != nullptr) {
+            m_pConnector->sendCommandToPLC(BUR_COMMAND_DIRECT_DELETELIST, m_ListIdentifier,
+                [](CDriver_BuRPacket* pPacket) {
+            });
+        }
+    }
+
+}

@@ -43,33 +43,3 @@ using namespace LibMCDriver_GRPC::Impl;
  Class definition of CDriver 
 **************************************************************************************************************************/
 
-void CDriver::Configure(const std::string & sConfigurationString)
-{
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
-}
-
-std::string CDriver::GetName()
-{
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
-}
-
-std::string CDriver::GetType()
-{
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::GetVersion(LibMCDriver_GRPC_uint32 & nMajor, LibMCDriver_GRPC_uint32 & nMinor, LibMCDriver_GRPC_uint32 & nMicro, std::string & sBuild)
-{
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::QueryParameters()
-{
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
-{
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
-}
-

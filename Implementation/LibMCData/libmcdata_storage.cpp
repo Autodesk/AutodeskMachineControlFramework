@@ -37,7 +37,7 @@ Abstract: This is a stub class definition of CStorage
 
 // Include custom headers here.
 #include "common_utils.hpp"
-#include "amcdata_storagepath.hpp"
+#include "amcdata_storagestate.hpp"
 
 #include "common_chrono.hpp"
 #include "PicoSHA2/picosha2.h"
@@ -48,33 +48,23 @@ using namespace LibMCData::Impl;
  Class definition of CStorage 
 **************************************************************************************************************************/
 
-CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath)
-    : m_pSQLHandler (pSQLHandler), m_pStoragePath(pStoragePath)
+CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+    : m_pSQLHandler (pSQLHandler), m_pStorageState(pStorageState)
 {
-    if (pStoragePath.get() == nullptr)
+    if (pStorageState.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
     if (pSQLHandler.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-    m_AcceptedContentTypes.insert("application/3mf");
-    m_AcceptedContentTypes.insert("text/csv");
-    m_AcceptedContentTypes.insert("image/png");
-    m_AcceptedContentTypes.insert("image/jpeg");
-    m_AcceptedContentTypes.insert("application/amcf-discretefield2d");
-
-    m_ImageContentTypes.insert("image/png");
-    m_ImageContentTypes.insert("image/jpeg");
-
 }
 
 
-void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID)
+void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID)
 {
 
     auto pTransaction = m_pSQLHandler->beginTransaction();
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-    std::string sParsedContextUUID = AMCCommon::CUtils::normalizeUUIDString(sContextUUID);
 
     AMCCommon::CChrono chrono;
     std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC ();
@@ -96,16 +86,9 @@ void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sConte
     pInsertStatement->setInt64(6, nSize);
     pInsertStatement->setString(7, sUserID);
     pInsertStatement->setString(8, sTimestamp);
-    pInsertStatement->setString(9, AMCData::CStoragePath::storageStreamStatusToString (AMCData::eStorageStreamStatus::sssNew));
+    pInsertStatement->setString(9, AMCData::CStorageState::storageStreamStatusToString (AMCData::eStorageStreamStatus::sssNew));
     pInsertStatement->execute();
     pInsertStatement = nullptr;
-
-    std::string sContextQuery = "INSERT INTO storage_context (streamuuid, contextuuid) VALUES (?, ?)";
-    auto pContextStatement = pTransaction->prepareStatement(sContextQuery);
-    pContextStatement->setString(1, sParsedUUID);
-    pContextStatement->setString(2, sParsedContextUUID);
-    pContextStatement->execute();
-    pContextStatement = nullptr;
 
     pTransaction->commit();
 }
@@ -118,13 +101,13 @@ bool CStorage::StreamIsReady(const std::string& sUUID)
     std::string sQuery = "SELECT uuid FROM storage_streams WHERE uuid=? AND status=?";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sParsedUUID);
-    pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
+    pStatement->setString(2, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
     return (pStatement->nextRow());
 }
 
 IStorageStream* CStorage::RetrieveStream(const std::string& sUUID)
 {
-    return CStorageStream::makeFromDatabase(sUUID, m_pSQLHandler, m_pStoragePath);
+    return CStorageStream::makeFromDatabase(sUUID, m_pSQLHandler, m_pStorageState);
 }
 
 void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID)
@@ -140,6 +123,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
     if (sUserID.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
+    // sContextUUID is depreciated and not used anymore!
 
     // Calculate SHA Hash (not under mutex lock)
     auto beginIter = static_cast<const unsigned char*>(pContentBuffer);
@@ -154,15 +138,14 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
     std::string sSHA256 = picosha2::get_hash_hex_string(hasher);
 	
     // From here, we lock storage database write access
-    {
-        std::lock_guard<std::mutex> lockGuard(m_StorageWriteMutex);
-        insertDBEntry(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, sSHA256, sUserID);        
+    {       
+        insertDBEntry(sUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, sSHA256, sUserID);        
     }
 
     std::string sCalculatedSHA256, sCalculatedBlockSHA256;
 
     // Store data asynchroniously on disk and finalize when writing has finished
-    auto pWriter = std::make_shared<AMCData::CStorageWriter>(sUUID, m_pStoragePath->getStreamPath (sUUID), nContentBufferSize);
+    auto pWriter = std::make_shared<AMCData::CStorageWriter_Partial>(sUUID, m_pStorageState->getStreamPath (sUUID), nContentBufferSize);
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, 0);
     pWriter->finalize(sSHA256, "", sCalculatedSHA256, sCalculatedBlockSHA256);
  
@@ -180,21 +163,20 @@ void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& s
     if (sUserID.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-    // From here, we lock storage database write access
-    {
-        std::lock_guard<std::mutex> lockGuard(m_StorageWriteMutex);    
-        std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-        insertDBEntry(sParsedUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, "", sUserID);
+    // sContextUUID is depreciated and not used anymore!
 
-        auto pWriter = std::make_shared<AMCData::CStorageWriter>(sParsedUUID, m_pStoragePath->getStreamPath(sUUID), nSize);
-        m_PartialWriters.insert(std::make_pair(sParsedUUID, pWriter));
+    {
+        std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, nSize, "", sUserID);
+
+        auto pWriter = std::make_shared<AMCData::CStorageWriter_Partial>(sParsedUUID, m_pStorageState->getStreamPath(sUUID), nSize);
+        m_pStorageState->addPartialWriter(pWriter);
     }
     
 }
 
 void CStorage::StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer)
 {
-    std::lock_guard<std::mutex> lockGuard(m_StorageWriteMutex);
 
     if (nContentBufferSize == 0)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUFFERSIZE);
@@ -202,12 +184,15 @@ void CStorage::StorePartialStream(const std::string & sUUID, const LibMCData_uin
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-    auto iIterator = m_PartialWriters.find(sParsedUUID);
+    auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, false);
+    if (pWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD, "invalid partial upload: " + sParsedUUID);
 
-    if (iIterator == m_PartialWriters.end())
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD);
+    auto pPartialWriter = dynamic_cast<AMCData::CStorageWriter_Partial*> (pWriter.get());
+    if (pPartialWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL, "storage stream not partial: " + sParsedUUID);
 
-    iIterator->second->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
+    pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
 }
 
 void CStorage::FinishPartialStream(const std::string& sUUID, const std::string& sSHA2)
@@ -223,10 +208,8 @@ void CStorage::FinishPartialStreamBlockwiseSHA256(const std::string& sUUID, cons
 
 void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string& sSHA2, const std::string& sBlockwiseSHA2)
 {
-    std::lock_guard<std::mutex> lockGuard(m_StorageWriteMutex);
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-    auto iIterator = m_PartialWriters.find(sParsedUUID);
 
     std::string sNormalizedSHA2;
     if (!sSHA2.empty ())
@@ -236,26 +219,113 @@ void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string
     if (!sBlockwiseSHA2.empty())
         sNormalizedBlockwiseSHA2 = AMCCommon::CUtils::normalizeSHA256String(sBlockwiseSHA2);
 
-    if (iIterator == m_PartialWriters.end())
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD);
+    auto pWriter = m_pStorageState->findPartialWriter (sParsedUUID, true);
+    auto pPartialWriter = dynamic_cast<AMCData::CStorageWriter_Partial*> (pWriter.get());
+    if (pPartialWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL, "storage stream not partial: " + sParsedUUID);
 
-    auto pWriter = iIterator->second;
-    m_PartialWriters.erase(iIterator);
+    m_pStorageState->deletePartialWriter (sParsedUUID);
 
     // Write data and calculate checksums
     std::string sCalculatedSHA256, sCalculatedBlockSHA256;
-    pWriter->finalize (sNormalizedSHA2, sNormalizedBlockwiseSHA2, sCalculatedSHA256, sCalculatedBlockSHA256);
+    pPartialWriter->finalize (sNormalizedSHA2, sNormalizedBlockwiseSHA2, sCalculatedSHA256, sCalculatedBlockSHA256);
 
     std::string sUpdateQuery = "UPDATE storage_streams SET status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
     auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
-    pUpdateStatement->setString(1, AMCData::CStoragePath::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
+    pUpdateStatement->setString(1, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
     pUpdateStatement->setString(2, sCalculatedSHA256);
     pUpdateStatement->setString(3, sCalculatedBlockSHA256);
     pUpdateStatement->setString(4, sUUID);
-    pUpdateStatement->setString(5, AMCData::CStoragePath::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
+    pUpdateStatement->setString(5, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
     pUpdateStatement->execute();
 
 }
+
+void CStorage::BeginRandomWriteStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const std::string& sUserID)
+{
+    if (sName.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+    if (sMimeType.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+    if (sUserID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    // sContextUUID is depreciated and not used anymore!
+
+    {
+        std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, 0, "", sUserID);
+
+        auto pWriter = std::make_shared<AMCData::CStorageWriter_RandomAccess>(sParsedUUID, m_pStorageState->getStreamPath(sUUID));
+        m_pStorageState->addPartialWriter(pWriter);
+    }
+
+}
+
+void CStorage::StoreRandomWriteStream(const std::string& sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer)
+{
+    if (nContentBufferSize == 0)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUFFERSIZE);
+    if (pContentBuffer == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, false);
+    if (pWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD, "invalid partial upload: " + sParsedUUID);
+
+    auto pRandomAccessWriter = dynamic_cast<AMCData::CStorageWriter_RandomAccess*> (pWriter.get());
+    if (pRandomAccessWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS, "storage stream is not random access: " + sParsedUUID);
+
+    pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
+
+}
+
+LibMCData_uint64 CStorage::GetRandomWriteStreamSize(const std::string& sUUID)
+{
+    std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, false);
+    if (pWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD, "invalid partial upload: " + sParsedUUID);
+
+    auto pRandomAccessWriter = dynamic_cast<AMCData::CStorageWriter_RandomAccess*> (pWriter.get());
+    if (pRandomAccessWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS, "storage stream is not random access: " + sParsedUUID);
+
+    return pRandomAccessWriter->getCurrentSize();
+
+}
+
+void CStorage::FinishRandomWriteStream(const std::string& sUUID)
+{
+    std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    auto pWriter = m_pStorageState->findPartialWriter(sParsedUUID, true);
+    auto pRandomAccessWriter = dynamic_cast<AMCData::CStorageWriter_RandomAccess*> (pWriter.get());
+    if (pRandomAccessWriter == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS, "storage stream is not random access: " + sParsedUUID);
+
+    m_pStorageState->deletePartialWriter(sParsedUUID);
+
+    // Write data and calculate checksums
+    std::string sCalculatedSHA256, sCalculatedBlockSHA256;
+    uint64_t nSize = pRandomAccessWriter->getCurrentSize();
+
+    pRandomAccessWriter->finalize(sCalculatedSHA256, sCalculatedBlockSHA256);
+
+    std::string sUpdateQuery = "UPDATE storage_streams SET size=?, status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
+    auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
+    pUpdateStatement->setString(1, std::to_string (nSize));
+    pUpdateStatement->setString(2, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
+    pUpdateStatement->setString(3, sCalculatedSHA256);
+    pUpdateStatement->setString(4, sCalculatedBlockSHA256);
+    pUpdateStatement->setString(5, sUUID);
+    pUpdateStatement->setString(6, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
+    pUpdateStatement->execute();
+
+}
+
 
 
 LibMCData_uint64 CStorage::GetMaxStreamSize()
@@ -267,8 +337,7 @@ bool CStorage::ContentTypeIsAccepted(const std::string& sContentType)
 {
     auto sLowerContentType = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(sContentType));
 
-    auto iIter = m_AcceptedContentTypes.find(sLowerContentType);
-    return (iIter != m_AcceptedContentTypes.end());
+    return m_pStorageState->isAcceptedContent(sLowerContentType);
 }
 
 bool CStorage::StreamIsImage(const std::string& sUUID) 
@@ -284,10 +353,138 @@ bool CStorage::StreamIsImage(const std::string& sUUID)
     auto sMimeType = pStatement->getColumnString(1);
     auto sLowerMimeType = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(sMimeType));
 
-    auto iIter = m_ImageContentTypes.find(sLowerMimeType);
-    return (iIter != m_ImageContentTypes.end());
+    return m_pStorageState->isImageContent(sLowerMimeType);
 
 }
 
 
+void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sClientFileName, const std::string& sSessionUUID, const std::string& sUserUUID) 
+{
+    std::string sNormalizedTicketUUID = AMCCommon::CUtils::normalizeUUIDString(sTicketUUID);
+    std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+    std::string sNormalizedSessionUUID = AMCCommon::CUtils::normalizeUUIDString(sSessionUUID);
+    std::string sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+
+    if (sClientFileName.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYCLIENTFILENAME);
+
+    // TODO: Check invalid file name?
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    AMCCommon::CChrono chrono;
+    std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC();
+
+    std::string sStreamQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
+    auto pStreamStatement = pTransaction->prepareStatement(sStreamQuery);
+    pStreamStatement->setString(1, sNormalizedStreamUUID);
+    if (!pStreamStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "storage stream not found for download: " + sNormalizedStreamUUID);
+    pStreamStatement = nullptr;
+
+    std::string sUserQuery = "SELECT uuid FROM users WHERE active=? AND uuid=?";
+    auto pUserStatement = pTransaction->prepareStatement(sUserQuery);
+    pUserStatement->setInt(1, 1);
+    pUserStatement->setString(2, sNormalizedUserUUID);
+    if (!pUserStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_USERNOTFOUND, "user not found for download: " + sNormalizedUserUUID);
+    pUserStatement = nullptr;
+
+    std::string sTicketQuery = "INSERT INTO storage_downloadtickets (ticketuuid, streamuuid, clientfilename, sessionuuid, useruuid, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
+    auto pTicketStatement = pTransaction->prepareStatement(sTicketQuery);
+    pTicketStatement->setString(1, sNormalizedTicketUUID);
+    pTicketStatement->setString(2, sNormalizedStreamUUID);
+    pTicketStatement->setString(3, sClientFileName);
+    pTicketStatement->setString(4, sNormalizedSessionUUID);
+    pTicketStatement->setString(5, sNormalizedUserUUID);
+    pTicketStatement->setString(6, sTimestamp);
+    pTicketStatement->execute();
+    pTicketStatement = nullptr;
+
+    pTransaction->commit();
+
+
+}
+
+
+void CStorage::RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID) 
+{
+    std::string sNormalizedTicketUUID = AMCCommon::CUtils::normalizeUUIDString(sTicketUUID);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+    AMCCommon::CChrono chrono;
+    std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC();
+
+    std::string sTicketQuery = "SELECT streamuuid, clientfilename, sessionuuid, useruuid FROM storage_downloadtickets WHERE ticketuuid=?";
+    auto pTicketStatement = pTransaction->prepareStatement(sTicketQuery);
+    pTicketStatement->setString(1, sNormalizedTicketUUID);
+    if (!pTicketStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND, "download ticket not found: " + sNormalizedTicketUUID);
+
+    sStreamUUID = pTicketStatement->getColumnString(1);
+    sClientFileName = pTicketStatement->getColumnString(2);
+    sSessionUUID = pTicketStatement->getColumnString(3);
+    sUserUUID = pTicketStatement->getColumnString(4);
+
+    pTicketStatement = nullptr;
+
+    std::string sDownloadUUID = AMCCommon::CUtils::createUUID();
+
+    std::string sDownloadQuery = "INSERT INTO storage_downloads (downloaduuid, ticketuuid, ipaddress, timestamp) VALUES (?, ?, ?, ?)";
+    auto pDownloadStatement = pTransaction->prepareStatement(sDownloadQuery);
+    pDownloadStatement->setString(1, sDownloadUUID);
+    pDownloadStatement->setString(2, sNormalizedTicketUUID);
+    pDownloadStatement->setString(3, sIPAddress);
+    pDownloadStatement->setString(4, sTimestamp);
+    pDownloadStatement->execute();
+    pDownloadStatement = nullptr;
+
+    pTransaction->commit();
+
+}
+
+
+void CStorage::AttachStreamToJournal(const std::string& sStreamUUID, const std::string& sJournalUUID)
+{
+    std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+    std::string sNormalizedJournalUUID = AMCCommon::CUtils::normalizeUUIDString(sJournalUUID);
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
+    std::string sStreamQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
+    auto pStreamStatement = pTransaction->prepareStatement(sStreamQuery);
+    pStreamStatement->setString(1, sNormalizedStreamUUID);
+    if (!pStreamStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "storage stream not found for journal attachment: " + sNormalizedStreamUUID);
+    pStreamStatement = nullptr;
+
+
+    std::string sJournalQuery = "SELECT uuid FROM journals WHERE uuid=?";
+    auto pJournalStatement = pTransaction->prepareStatement(sJournalQuery);
+    pJournalStatement->setString(1, sNormalizedJournalUUID);
+    if (!pJournalStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "journal not found for journal attachment: " + sNormalizedStreamUUID);
+    pJournalStatement = nullptr;
+
+
+    std::string sLinkQuery = "SELECT uuid FROM journal_tempstreams WHERE journaluuid=? AND streamuuid=?";
+    auto pLinkStatement = pTransaction->prepareStatement(sLinkQuery);
+    pLinkStatement->setString(1, sNormalizedJournalUUID);
+    pLinkStatement->setString(2, sNormalizedStreamUUID);
+    bool bLinkExists = pLinkStatement->nextRow();
+    pLinkStatement = nullptr;
+
+    if (!bLinkExists) {
+        std::string sInsertQuery = "INSERT INTO journal_tempstreams (uuid, journaluuid, streamuuid) VALUES (?, ?, ?)";
+        auto pInsertStatement = pTransaction->prepareStatement(sInsertQuery);
+        pInsertStatement->setString(1, AMCCommon::CUtils::createUUID ());
+        pInsertStatement->setString(2, sNormalizedJournalUUID);
+        pInsertStatement->setString(3, sNormalizedStreamUUID);
+        pInsertStatement->execute();
+        pInsertStatement = nullptr;
+
+    }
+
+    pTransaction->commit();
+}
 

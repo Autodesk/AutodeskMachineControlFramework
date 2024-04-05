@@ -35,12 +35,14 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_buildexecution.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
 #include "amc_toolpathhandler.hpp"
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 #include <iostream>
 
@@ -50,14 +52,18 @@ using namespace LibMCEnv::Impl;
  Class definition of CBuild 
 **************************************************************************************************************************/
 
-CBuild::CBuild(LibMCData::PBuildJob pBuildJob, AMC::PToolpathHandler pToolpathHandler, LibMCData::PStorage pStorage, const std::string& sSystemUserID)
-	: m_pBuildJob(pBuildJob), m_pToolpathHandler(pToolpathHandler), m_pStorage (pStorage), m_sSystemUserID (sSystemUserID)
+CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID, AMCCommon::PChrono pGlobalChrono)
+	: m_pDataModel(pDataModel),
+	m_sBuildJobUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildJobUUID)),
+	m_pToolpathHandler(pToolpathHandler),
+	m_sSystemUserID(sSystemUserID),
+	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-	if (pBuildJob.get() == nullptr)
+	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-	if (pStorage.get() == nullptr)
+	if (pGlobalChrono.get () == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
@@ -67,29 +73,40 @@ CBuild::~CBuild()
 
 std::string CBuild::GetName()
 {
-	return m_pBuildJob->GetName();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->GetName();
 }
 
 std::string CBuild::GetBuildUUID()
 {
-	return m_pBuildJob->GetUUID();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->GetUUID();
 }
 
 std::string CBuild::GetStorageUUID()
 {
-	return m_pBuildJob->GetStorageStreamUUID();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->GetStorageStreamUUID();
 }
 
 std::string CBuild::GetStorageSHA256()
 {
-	return m_pBuildJob->GetStorageStream()->GetSHA2 ();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->GetStorageStream()->GetSHA2 ();
 
 }
 
 
 LibMCEnv_double CBuild::GetBuildHeightInMM()
 {
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(pBuildJob->GetStorageStreamUUID(), false);
 	if (pToolpathEntity == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
 
@@ -102,7 +119,10 @@ LibMCEnv_double CBuild::GetBuildHeightInMM()
 
 LibMCEnv_double CBuild::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
 {
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(pBuildJob->GetStorageStreamUUID(), false);
 	if (pToolpathEntity == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
 
@@ -119,44 +139,63 @@ LibMCEnv_double CBuild::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
 
 LibMCEnv_uint32 CBuild::GetLayerCount()
 {
-	return m_pBuildJob->GetLayerCount();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	return pBuildJob->GetLayerCount();
 }
 
 IToolpathAccessor * CBuild::CreateToolpathAccessor()
 {
-	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
-	return new CToolpathAccessor(sStreamUUID, m_pBuildJob->GetUUID(), m_pToolpathHandler);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
+	return new CToolpathAccessor(sStreamUUID, pBuildJob->GetUUID(), m_pToolpathHandler);
 }
 
 
 void CBuild::LoadToolpath()
 {
-	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
 	m_pToolpathHandler->loadToolpathEntity(sStreamUUID);
 }
 
 
 void CBuild::UnloadToolpath()
 {
-	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
 	m_pToolpathHandler->unloadToolpathEntity(sStreamUUID);
 }
 
 bool CBuild::ToolpathIsLoaded()
 {
-	auto sStreamUUID = m_pBuildJob->GetStorageStreamUUID();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
 	return (m_pToolpathHandler->findToolpathEntity(sStreamUUID, false) != nullptr);
 }
 
 std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer)
 {
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	auto pStorage = m_pDataModel->CreateStorage();
+
 	auto sDataUUID = AMCCommon::CUtils::createUUID();
 	auto sSystemUserID = m_sSystemUserID;
 
-	m_pStorage->StoreNewStream(sDataUUID, m_pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
+	pStorage->StoreNewStream(sDataUUID, pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
 
-	auto pStorageStream = m_pStorage->RetrieveStream(sDataUUID);
-	m_pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eBuildJobDataType::CustomBinaryData, sSystemUserID);
+	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
+	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID);
 
 	return sDataUUID;
 
@@ -164,13 +203,15 @@ std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::str
 
 IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByIdentifier(const std::string& sContextIdentifier)
 {
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 
 	std::string sFoundUUID;
 
-	auto pJobDataIterator = m_pBuildJob->ListJobData();
+	auto pJobDataIterator = pBuildJob->ListJobData();
 	while (pJobDataIterator->MoveNext()) {
 		auto pJobData = pJobDataIterator->GetCurrentJobData();
-		std::string sJobDataIdentifier = pJobData->GetContextIdentifier();
+		std::string sJobDataIdentifier = pJobData->GetIdentifier();
 		if (sJobDataIdentifier == sContextIdentifier)
 			sFoundUUID = pJobData->GetDataUUID();
 	}
@@ -183,10 +224,12 @@ IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByIdentifier(const std::string&
 
 IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByUUID(const std::string& sDataUUID)
 {
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 
 	std::vector<uint8_t> Buffer;
 
-	auto pJobData = m_pBuildJob->RetrieveJobData(sDataUUID);
+	auto pJobData = pBuildJob->RetrieveJobData(sDataUUID);
 	auto pStorageStream = pJobData->GetStorageStream ();
 	pStorageStream->GetContent(Buffer);
 
@@ -254,6 +297,101 @@ std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const s
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM);
 
 	return AddBinaryData(sContextIdentifier, sName, "image/png", pngBuffer.size(), pngBuffer.data());
+
+}
+
+
+IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const std::string& sUserUUID)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUserUUID;
+
+	if (!sUserUUID.empty()) {
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+	}
+	else {
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	}
+
+	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+
+	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+
+}
+
+bool CBuild::HasExecution(const std::string& sExecutionUUID)
+{
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution (sNormalizedExecutionUUID);
+
+	return pExecutionData.get() != nullptr;
+
+}
+
+IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
+{
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution(sNormalizedExecutionUUID);
+
+	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+}
+
+IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	pBuildJob->AddMetaDataString(sKey, sValue);
+
+}
+
+bool CBuild::HasMetaDataString(const std::string& sKey)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	return pBuildJob->HasMetaDataString(sKey);
+
+}
+
+std::string CBuild::GetMetaDataString(const std::string& sKey)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	return pBuildJob->GetMetaDataString(sKey);
+
 
 }
 

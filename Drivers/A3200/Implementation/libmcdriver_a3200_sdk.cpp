@@ -129,6 +129,9 @@ CA3200SDK::CA3200SDK(const std::string& sDLLNameUTF8, const std::string& sDLLDir
 	this->A3200VariableGetValueByName = (PA3200VariableGetValueByName)_loadA3200Address(hLibrary, "A3200VariableGetValueByName", 0);
 	this->A3200VariableSetValueByName = (PA3200VariableSetValueByName)_loadA3200Address(hLibrary, "A3200VariableSetValueByName", 0);
 	this->A3200InformationGetLibraryVersion = (PA3200InformationGetLibraryVersion)_loadA3200Address(hLibrary, "A3200InformationGetLibraryVersion", 0);
+	
+	this->A3200StatusGetItems = (PA3200StatusGetItems)_loadA3200Address(hLibrary, "A3200StatusGetItems", 0);
+	this->A3200StatusGetItem = (PA3200StatusGetItem)_loadA3200Address(hLibrary, "A3200StatusGetItem", 0);
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -191,6 +194,9 @@ void CA3200SDK::resetFunctionPtrs()
 	A3200VariableGetValueByName = nullptr;
 	A3200VariableSetValueByName = nullptr;
 	A3200InformationGetLibraryVersion = nullptr;
+	A3200StatusGetItems = nullptr;
+	A3200StatusGetItem = nullptr;
+
 
 }
 

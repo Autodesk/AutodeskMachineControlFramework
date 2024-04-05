@@ -39,6 +39,7 @@ Interface version: 2.0.0
 #include "libmcdriver_grpc_abi.hpp"
 #include "libmcdriver_grpc_interfaces.hpp"
 #include "libmcdriver_grpc_interfaceexception.hpp"
+#include "libmcdriver_grpc_driver_grpc.hpp"
 
 using namespace LibMCDriver_GRPC;
 using namespace LibMCDriver_GRPC::Impl;
@@ -74,7 +75,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
+	if (sType == "libgrpc-1.0")
+		return new CDriver_GRPC(sName, pDriverEnvironment);
+
+	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_DRIVERTYPENOTSUPPORTED);
 }
 
 

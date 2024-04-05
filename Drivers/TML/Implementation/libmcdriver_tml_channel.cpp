@@ -44,8 +44,8 @@ using namespace LibMCDriver_TML::Impl;
  Class definition of CChannel 
 **************************************************************************************************************************/
 
-CChannel::CChannel(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier)
-    : m_pTMLInstance (pTMLInstance), m_sChannelIdentifier(sChannelIdentifier)
+CChannel::CChannel(PTMLInstance pTMLInstance, const std::string& sChannelIdentifier, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+    : m_pTMLInstance (pTMLInstance), m_sChannelIdentifier(sChannelIdentifier), m_pDriverEnvironment(pDriverEnvironment)
 {
     if (pTMLInstance.get () == nullptr)
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
@@ -68,7 +68,7 @@ std::string CChannel::GetIdentifier()
     return m_sChannelIdentifier;
 }
 
-IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer)
+IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML_uint32 nAxisID, const LibMCDriver_TML_uint64 nConfigurationBufferSize, const LibMCDriver_TML_uint8* pConfigurationBuffer, const LibMCDriver_TML_uint32 nCountsPerMM)
 {
     if (sIdentifier.empty())
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_EMPTYAXISIDENTIFIER);
@@ -79,9 +79,9 @@ IAxis* CChannel::SetupAxis(const std::string& sIdentifier, const LibMCDriver_TML
     if ((nConfigurationBufferSize == 0) || (pConfigurationBuffer == nullptr))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISCONFIGURATIONBUFFER);
 
-    m_pTMLInstance->setupAxis(sIdentifier, m_sChannelIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer);
-
-    return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier);
+    m_pTMLInstance->setupAxis(m_sChannelIdentifier, sIdentifier, nAxisID, nConfigurationBufferSize, pConfigurationBuffer, nCountsPerMM);
+    
+    return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier, m_pDriverEnvironment);
 
 }
 
@@ -96,7 +96,7 @@ IAxis* CChannel::FindAxis(const std::string& sIdentifier)
     if (!m_pTMLInstance->axisExistsInChannel (m_sChannelIdentifier, sIdentifier))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISDOESNOTEXIST, "axis does not exist: " + sIdentifier);
 
-    return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier);
+    return new CAxis(m_pTMLInstance, m_sChannelIdentifier, sIdentifier, m_pDriverEnvironment);
 }
 
 

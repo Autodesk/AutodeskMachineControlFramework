@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CJournalHandler
 #include "libmcenv_journalvariable.hpp"
 
 // Include custom headers here.
+#include "libmcenv_datetime.hpp"
 
 
 using namespace LibMCEnv::Impl;
@@ -57,39 +58,26 @@ CJournalHandler::~CJournalHandler()
 }
 
 
-IJournalVariable * CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+IJournalVariable * CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
 {
-	uint64_t nStartTimeStamp = 0;
-	uint64_t nEndTimeStamp = 0;
-
 	AMC::sStateJournalInterval interval;
-	m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMilliseconds, interval);
+	m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMicroseconds, interval);
 
 	return new CJournalVariable(m_pStateJournal, sVariableName, interval);
 }
 
-IJournalVariable * CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMilliseconds, const LibMCEnv_uint64 nEndTimeInMilliseconds)
+IJournalVariable* CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string& sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	AMC::sStateJournalInterval interval;
+	interval.m_nStartTimeInMicroSeconds = nStartTimeInMicroseconds;
+	interval.m_nEndTimeInMicroSeconds = nEndTimeInMicroseconds;
+
+	return new CJournalVariable(m_pStateJournal, sVariableName, interval);
 }
 
-LibMCEnv_uint64 CJournalHandler::StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
 
-bool CJournalHandler::HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName)
+IDateTime* CJournalHandler::GetStartTime()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
-
-LibMCEnv_uint64 CJournalHandler::RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
-
-void CJournalHandler::RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer)
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return CDateTime::makefromUTC(m_pStateJournal->getStartTimeAsUTC ());
 }
 

@@ -56,8 +56,6 @@ namespace AMCData {
 
 		void* m_pDBHandle;
 
-		std::mutex m_TransactionMutex;
-
 	public:
 
 		CSQLHandler_SQLite() = delete;
@@ -69,7 +67,7 @@ namespace AMCData {
 
 		PSQLStatement prepareStatement (const std::string & sSQLString) override;
 
-		static void checkSQLiteError (int nError);		
+		void checkSQLiteError (int nError);		
 
 	};
 

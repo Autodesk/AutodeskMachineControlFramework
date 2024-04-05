@@ -48,7 +48,7 @@ Abstract: This is the class declaration of CBuildJobHandler
 
 // Include custom headers here.
 #include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagepath.hpp"
+#include "amcdata_storagestate.hpp"
 
 #include <mutex>
 #include <thread>
@@ -66,7 +66,7 @@ class CBuildJobHandler : public virtual IBuildJobHandler, public virtual CBase {
 private:
 
 	AMCData::PSQLHandler m_pSQLHandler;
-    AMCData::PStoragePath m_pStoragePath;
+    AMCData::PStorageState m_pStorageState;
 
 protected:
 
@@ -76,7 +76,7 @@ protected:
 public:
 
 
-    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
     IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID) override;
 

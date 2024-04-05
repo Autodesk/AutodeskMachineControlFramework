@@ -45,11 +45,13 @@ typedef LibMCPlugin::ETranslator_StateFactory<ELibMCInterfaceException, LibMCRes
 namespace AMC {
 
 	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState, AMC::PStateJournal pStateJournal)
-		: m_sName(sName), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState), m_pStateJournal (pStateJournal)
+		: m_sName(sName), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState), m_pStateJournal (pStateJournal),
+		m_nEndTimeOfPreviousStateInMicroseconds (0)
 	{
 		LibMCAssertNotNull(pEnvironmentWrapper.get());
 		LibMCAssertNotNull(pSystemState.get());
 		LibMCAssertNotNull(pStateJournal.get());
+
 
 		m_ParameterHandler = std::make_shared<CParameterHandler>(sDescription);
 		m_pSystemState->stateMachineData()->registerParameterHandler (sName, m_ParameterHandler);
@@ -132,6 +134,8 @@ namespace AMC {
 
 		m_pInitState = iter->second;
 		setCurrentStateInternal(m_pInitState);
+
+		m_sPreviousState = m_pInitState->getName();
 	}
 
 	void CStateMachineInstance::setFailedState(std::string sStateName)
@@ -222,8 +226,11 @@ namespace AMC {
 		try {
 
 			std::string sCurrentState = m_pCurrentState->getName();
+			std::string sPreviousState = m_sPreviousState;
+			m_sPreviousState = sCurrentState;
+
 			std::string sNextState;
-			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler);
+			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler, m_nEndTimeOfPreviousStateInMicroseconds, sPreviousState);
 
 			if (sNextState.empty())
 				throw ELibMCCustomException(LIBMC_ERROR_NOOUTSTATEGIVEN, m_sName + ": " + sCurrentState);
@@ -235,6 +242,8 @@ namespace AMC {
 				m_pSystemState->logger()->logMessage("state change: " + sCurrentState + "->" + sNextState, m_sName, eLogLevel::Debug);
 
 			setCurrentStateInternal (findStateInternal (sNextState, true));
+
+			m_nEndTimeOfPreviousStateInMicroseconds = m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
 
 		}
 		catch (std::exception & E) {
@@ -322,6 +331,8 @@ namespace AMC {
 
 		// Wait for thread to finish
 		m_Thread.join();
+
+		m_pSystemState->logger()->logMessage("instance thread terminated", m_sName, eLogLevel::Message);
 
 		// Clean up signals
 		m_TerminateFuture = std::future<void>();

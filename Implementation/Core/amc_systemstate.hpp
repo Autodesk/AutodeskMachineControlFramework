@@ -39,18 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace LibMCData {
 	class CDataModel;
-	class CStorage;
-	class CBuildJobHandler;
-	class CLoginHandler;
-	class CPersistencyHandler;
-	class CAlertSession;
 
 	typedef std::shared_ptr<CDataModel> PDataModel;
-	typedef std::shared_ptr<CStorage> PStorage;
-	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
-	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
-	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
-	typedef std::shared_ptr<CAlertSession> PAlertSession;
 }
 
 
@@ -117,12 +107,7 @@ namespace AMC {
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
-		std::mutex m_DataModelMutex;
 		LibMCData::PDataModel m_pDataModel;
-		LibMCData::PStorage m_pStorage;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-		LibMCData::PLoginHandler m_pLoginHandler;
-		LibMCData::PPersistencyHandler m_pPersistencyHandler;
 
 		std::map <std::string, std::pair <std::string, std::string>> m_LibraryPathes;
 
@@ -147,10 +132,6 @@ namespace AMC {
 		CStringResourceHandler * stringResourceHandler ();
 		CAlertHandler* alertHandler();
 
-		LibMCData::CStorage * storage();
-		LibMCData::CBuildJobHandler * buildJobHandler();
-		LibMCData::CLoginHandler* loginHandler();
-
 		AMCCommon::CChrono * globalChrono();
 
 		PLogger getLoggerInstance();		
@@ -165,13 +146,9 @@ namespace AMC {
 		PDataSeriesHandler getDataSeriesHandlerInstance();
 		PAlertHandler getAlertHandlerInstance();
 
-		LibMCData::PStorage getStorageInstance();
-		LibMCData::PLoginHandler getLoginHandlerInstance();
-		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
-		LibMCData::PPersistencyHandler getPersistencyHandler();
-		AMCCommon::PChrono getGlobalChronoInstance();
+		LibMCData::PDataModel getDataModelInstance ();
 
-		LibMCData::PAlertSession createAlertSession();
+		AMCCommon::PChrono getGlobalChronoInstance();
 
 		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);
 		std::string getLibraryPath(const std::string& sLibraryName);

@@ -97,6 +97,8 @@ public:
 
 	void ResumeList() override;
 
+    void DeleteList() override;
+
     uint8_t receiveListStatus();
 
 };

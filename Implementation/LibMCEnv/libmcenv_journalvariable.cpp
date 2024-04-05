@@ -109,10 +109,22 @@ LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTim
 
 }
 
-IUniformJournalSampling * CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+LibMCEnv_double CJournalVariable::ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
+{
+    return m_pStateJournal->computeSample(m_sVariableName, nTimeInMicroSeconds);
+}
+
+
+IUniformJournalSampling * CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
+
+IUniformJournalSampling* CJournalVariable::ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
 
 
 void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry* pTimeStreamEntriesBuffer)

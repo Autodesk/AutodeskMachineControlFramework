@@ -53,17 +53,6 @@ namespace AMCData {
 				sStreamsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 				pTransaction->executeStatement(sStreamsQuery);
 
-				std::string sContextQuery = "CREATE TABLE `storage_context` (";
-				sContextQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
-				sContextQuery += "`contextuuid`  varchar ( 64 ) NOT NULL)";
-				pTransaction->executeStatement(sContextQuery);
-
-				std::string sAccessQuery = "CREATE TABLE `storage_access` (";
-				sAccessQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
-				sAccessQuery += "`userid`  varchar ( 64 ) NOT NULL,";
-				sAccessQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
-				pTransaction->executeStatement(sAccessQuery);
-
 				break;
 			}
 
@@ -79,6 +68,37 @@ namespace AMCData {
 				std::string sStreamsQuery = "ALTER TABLE `storage_streams` ";
 				sStreamsQuery += "ADD `identifier` varchar (256) DEFAULT `legacy`;";
 				pTransaction->executeStatement(sStreamsQuery);
+				break;
+			}
+
+
+			case 8: {
+				std::string sTicketsQuery = "CREATE TABLE `storage_downloadtickets` (";
+				sTicketsQuery += "`ticketuuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+				sTicketsQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`clientfilename`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`sessionuuid`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`useruuid`  varchar ( 64 ) NOT NULL,";
+				sTicketsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+				pTransaction->executeStatement(sTicketsQuery);
+
+				std::string sDownloadsQuery = "CREATE TABLE `storage_downloads` (";
+				sDownloadsQuery += "`downloaduuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+				sDownloadsQuery += "`ticketuuid`  varchar ( 64 ) NOT NULL,";
+				sDownloadsQuery += "`ipaddress`  varchar ( 128 ) NOT NULL,";
+				sDownloadsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+				pTransaction->executeStatement(sDownloadsQuery);
+
+				break;
+			}
+
+			case 9: {
+				std::string sDropAccessQuery = "DROP TABLE IF EXISTS `storage_access`";
+				pTransaction->executeStatement(sDropAccessQuery);
+
+				std::string sDropContextQuery = "DROP TABLE IF EXISTS `storage_context`";
+				pTransaction->executeStatement(sDropContextQuery);
+
 				break;
 			}
 

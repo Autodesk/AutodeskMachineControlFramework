@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <memory>
+#include <mutex>
 #include "common_exportstream.hpp"
 
 namespace AMCData {
@@ -44,21 +45,64 @@ namespace AMCData {
 **************************************************************************************************************************/
 
 class CStorageWriter {
+public:
+
+    CStorageWriter();
+
+    virtual ~CStorageWriter();
+
+    virtual std::string getUUID() = 0;
+
+    virtual void writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset) = 0;
+
+};
+
+
+class CStorageWriter_Partial : public CStorageWriter {
 private:
     std::string m_sUUID;
     std::string m_sPath;    
 	uint64_t m_nSize;
     AMCCommon::PExportStream m_pExportStream;
 
+    std::mutex m_WriteMutex;
+
 public:
 
-    CStorageWriter(const std::string & sUUID, const std::string & sPath, uint64_t nSize);
+    CStorageWriter_Partial(const std::string & sUUID, const std::string & sPath, uint64_t nSize);
 
-    ~CStorageWriter();
+    virtual ~CStorageWriter_Partial();
 	
-	void writeChunkAsync (const uint8_t * pChunkData, const uint64_t nChunkSize, const uint64_t nOffset);
+    std::string getUUID() override;
+
+    void writeChunkAsync (const uint8_t * pChunkData, const uint64_t nChunkSize, const uint64_t nOffset) override;
 
     void finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256);
+
+};
+
+
+class CStorageWriter_RandomAccess : public CStorageWriter {
+private:
+    std::string m_sUUID;
+    std::string m_sPath;
+    AMCCommon::PExportStream m_pExportStream;
+
+    std::mutex m_WriteMutex;
+
+public:
+
+    CStorageWriter_RandomAccess(const std::string& sUUID, const std::string& sPath);
+
+    virtual ~CStorageWriter_RandomAccess();
+
+    std::string getUUID() override;
+
+    void writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset) override;
+
+    void finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256);
+
+    uint64_t getCurrentSize();
 
 };
 

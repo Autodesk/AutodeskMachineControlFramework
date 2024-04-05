@@ -424,6 +424,13 @@ public:
 	virtual void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY) = 0;
 
 	/**
+	* IDataRecording::GetMeasurementTag - Returns the measurement tag of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @return Measurement Tag of the record.
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex) = 0;
+
+	/**
 	* IDataRecording::GetRTCSignalsOfRecord - Returns the RTC signals of a specific record.
 	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
 	* @param[in] nRTCSignalsBufferSize - Number of elements in buffer
@@ -470,6 +477,14 @@ public:
 	virtual void GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer) = 0;
 
 	/**
+	* IDataRecording::GetAllMeasurementTags - Returns an array of all measurement tags.
+	* @param[in] nMeasurementTagsBufferSize - Number of elements in buffer
+	* @param[out] pMeasurementTagsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pMeasurementTagsBuffer - uint32 buffer of Array of Measurement Tags of all records.
+	*/
+	virtual void GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTagsBuffer) = 0;
+
+	/**
 	* IDataRecording::GetAllRTCSignals - Returns an array of all RTC signals of a specific index.
 	* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
 	* @param[in] nSignalsBufferSize - Number of elements in buffer
@@ -497,12 +512,74 @@ public:
 	virtual void GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) = 0;
 
 	/**
-	* IDataRecording::StoreAsBuildData - Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.
-	* @param[in] sName - Name of the recording to be stored.
-	* @param[in] pBuild - Build that should store the data.
-	* @return Data UUID of the build data.
+	* IDataRecording::AddPacketNumbersToDataTable - Writes the packet numbers to a data table as uint32 columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
 	*/
-	virtual std::string StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild) = 0;
+	virtual void AddPacketNumbersToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddXCoordinatesToDataTable - Writes the X coordinates to a data table as double columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	virtual void AddXCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddYCoordinatesToDataTable - Writes the Y coordinates to a data table as double columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	virtual void AddYCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddMeasurementTagsToDataTable - Writes the measurement tags to a data table as uint32 columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	virtual void AddMeasurementTagsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddRTCSignalsToDataTable - Writes a certain RTC channel to a data table as int32 columns.
+	* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	virtual void AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddSensorSignalsToDataTable - Writes a certain sensor channel to a data table as int32 columns.
+	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	virtual void AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddScaledSensorSignalsToDataTable - Writes a certain sensor channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+	* @param[in] dOffset - Offset that the raw value is scaled with.
+	*/
+	virtual void AddScaledSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset) = 0;
+
+	/**
+	* IDataRecording::AddAdditionalSignalsToDataTable - Writes a certain RTC channel to a data table as int32 columns.
+	* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	virtual void AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
 
 };
 

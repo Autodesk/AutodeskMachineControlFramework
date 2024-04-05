@@ -353,13 +353,35 @@
 		<error name="INVALIDALERTDESCRIPTIONIDENTIFIER" code="353" description="Invalid alert description identifier" />
 		<error name="INVALIDALERTLEVEL" code="354" description="Invalid alert level" />
 		<error name="ALERTNOTFOUND" code="355" description="Alert not found" />
-		<error name="ALERTNOTACKNOWLEDGED" code="356" description="Alert has not been acknowledged." />
+		<error name="ALERTNOTACKNOWLEDGED" code="356" description="Alert has not been acknowledged." />		
+		<error name="INVALIDSTORAGESTATE" code="357" description="Invalid storage state." />		
+		<error name="STORAGEWRITERALREADYEXISTS" code="358" description="Storage writer already exists." />		
+		<error name="STORAGEWRITERDOESNOTEXIST" code="359" description="Storage writer does not exist." />		
+		<error name="STORAGESTREAMNOTPARTIAL" code="360" description="Storage stream is not partial." />		
+		<error name="STORAGESTREAMNOTRANDOMACCESS" code="361" description="Storage stream is not random access." />				
+		<error name="DOWNLOADTICKETNOTFOUND" code="362" description="Download ticket not found." />		
+		<error name="EMPTYCLIENTFILENAME" code="363" description="Empty client file name." />		
+		<error name="INVALIDCLIENTFILENAME" code="364" description="Invalid client file name." />		
+		<error name="CANNOTCHANGESTATUSOFBUILDJOBEXECUTION" code="365" description="Can not change status of build job execution." />		
+		<error name="BUILDJOBMETADATAKEYEMPTY" code="366" description="Build job metadata key empty." />		
+		<error name="BUILDJOBMETADATAKEYINVALID" code="367" description="Build job metadata key is invalid." />		
+		<error name="BUILDJOBMETADATAKEYDUPLICATE" code="368" description="Build job metadata key is not unique." />		
+		<error name="BUILDJOBMETADATAKEYNOTFOUND" code="369" description="Build job metadata key not found." />		
+		<error name="INVALIDBUILDJOBEXECUTIONSTATUS" code="370" description="Invalid build job execution status." />		
+		<error name="BUILDJOBEXECUTIONNOTFOUND" code="371" description="Build job execution not found." />			
+		<error name="BUILDJOBEXECUTIONISNOTINPROCESS" code="372" description="Build job execution is not in process." />		
+		<error name="BUILDJOBEXECUTIONENDNOTAVAILABLE" code="373" description="Build job execution end is not available." />		
+		<error name="INVALIDBUILDJOBEXECUTIONSTART" code="374" description="Invalid build job execution start." />		
+		<error name="INVALIDBUILDJOBEXECUTIONEND" code="375" description="Invalid build job execution end." />		
+		<error name="BUILDJOBEXECUTIONENDISBEFORESTART" code="376" description="Build job execution end is before start." />		
+		<error name="BUILDJOBEXECUTIONISFROMPASTJOURNAL" code="377" description="Build job execution is from past journal." />		
+		<error name="BUILDJOBEXECUTIONSTARTISINTHEFUTURE" code="378" description="Build job execution start is in the future." />		
+		<error name="BUILDJOBDURATIONNOTAVAILABLE" code="379" description="Build job duration is not available." />										
+		<error name="BUILDJOBEXECUTIONMETADATAKEYEMPTY" code="380" description="Build job execution metadata key is empty." />								
+		<error name="BUILDJOBEXECUTIONMETADATAKEYINVALID" code="381" description="Build job execution metadata key is invalid." />								
+		<error name="BUILDJOBEXECUTIONMETADATAKEYNOTFOUND" code="382" description="Build job execution metadata key not found." />								
+		<error name="BUILDJOBEXECUTIONMETADATAKEYDUPLICATE" code="383" description="Build job execution metadata key is duplicate." />										
 		
-		
-		
-		
-		
-										
 	</errors>
 	
 		
@@ -424,7 +446,7 @@
 		<option name="Deleted" value="400"/>
 	</enum>	
 
-	<enum name="BuildJobDataType">
+	<enum name="CustomDataType">
 		<option name="Unknown" value="0"/>
 		<option name="Toolpath" value="1"/>
 		<option name="PNGImage" value="2"/>
@@ -435,6 +457,13 @@
 		<option name="CustomBinaryData" value="100"/>
 	</enum>		
 	
+	<enum name="BuildJobExecutionStatus">
+		<option name="Unknown" value="0" />
+		<option name="InProcess" value="1" />
+		<option name="Finished" value="2" />
+		<option name="Failed" value="3" />
+	</enum>
+
 	<functiontype name="StreamReadCallback" description="Callback to call for reading a data chunk">
 		<param name="ByteData" type="pointer" pass="in" description="Pointer to a buffer to read data into"/>
 		<param name="NumBytes" type="uint64" pass="in" description="Number of bytes to read"/>
@@ -453,6 +482,8 @@
 	</class>
 
 
+    <!-- The Iterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+ 
 	<class name="Iterator" parent="Base">
 		<method name="MoveNext" description="Iterates to the next resource in the list.">
 			<param name="HasNext" type="bool" pass="return" description="Iterates to the next resource in the list."/>
@@ -471,6 +502,7 @@
 		</method>
 	</class>
 
+    <!-- The LogEntryList class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="LogEntryList" parent="Base" description="List of retrieved log entries">
 	
 		<method name="Count" description="Returns the number of log entries in the list.">
@@ -501,9 +533,13 @@
 
 	</class>
 
-
+    <!-- The LogSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="LogSession" parent="Base" description="Logging Instance">
-	
+
+		<method name="GetSessionUUID" description="retrieves the session UUID.">
+			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
+		</method>	
+
 		<method name="AddEntry" description="adds a new log entry.">
 			<param name="Message" type="string" pass="in" description="Log Message" />	
 			<param name="SubSystem" type="string" pass="in" description="Sub System identifier" />	
@@ -521,10 +557,84 @@
 			<param name="MinLogLevel" type="enum" class="LogLevel" pass="in" description="Minimum Log Level to return." />	
 			<param name="LogEntryList" type="class" class="LogEntryList" pass="return" description="Log Entry List." />
 		</method>	
-				
+						
+	</class>
+
+
+    <!-- The Alert class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="Alert" parent="Base" description="Alert Instance. Snapshot of an alert at a certain time.">
+
+		<method name="GetUUID" description="Returns the Alert UUID.">
+			<param name="UUID" type="string" pass="return" description="Value." />	
+		</method>	
+		
+		<method name="GetIdentifier" description="Returns the Alert Identifier.">
+			<param name="Identifier" type="string" pass="return" description="Value." />	
+		</method>	
+
+		<method name="IsActive" description="Returns if the alert is actuve.">
+			<param name="Active" type="bool" pass="return" description="Returns if the alert is active." />
+		</method>
+
+		<method name="GetLevel" description="Returns the Alert Level.">
+			<param name="Level" type="enum" class="AlertLevel" pass="return" description="Value." />
+		</method>	
+		
+		<method name="GetLevelString" description="Returns the Alert Level string.">
+			<param name="LevelString" type="string" pass="return" description="Value." />
+		</method>	
+		
+		<method name="GetDescription" description="Returns the Alert Description.">
+			<param name="Description" type="string" pass="return" description="Value." />	
+		</method>	
+		
+		<method name="GetDescriptionIdentifier" description="Returns the Alert DescriptionIdentifier.">
+			<param name="DescriptionIdentifier" type="string" pass="return" description="Value." />	
+		</method>	
+
+		<method name="GetReadableContextInformation" description="Returns the Alert ReadableContextInformation.">
+			<param name="ReadableContextInformation" type="string" pass="return" description="Value." />	
+		</method>	
+
+		<method name="GetNeedsAcknowledgement" description="Returns if the Alert needs acknowledgement.">
+			<param name="NeedsAcknowledgement" type="bool" pass="return" description="Value." />	
+		</method>	
+
+		<method name="GetTimestampUTC" description="Returns the Alert Timestamp in UTC file format.">
+			<param name="TimestampUTC" type="string" pass="return" description="Value." />	
+		</method>	
+		
+		<method name="HasBeenAcknowledged" description="Checks if the alert has been acknowledged.">
+			<param name="HasBeenAcknowledged" type="bool" pass="return" description="Flag if the alert has been acknowledged." />	
+		</method>			
+		
+		<method name="GetAcknowledgementInformation" description="Returns details about the acknowledgement. Fails if the alert is not acknowledged.">
+			<param name="UserUUID" type="string" pass="out" description="User who acknowledged the alert." />
+			<param name="UserComment" type="string" pass="out" description="Comment of the acknowledgement." />
+			<param name="AckTime" type="string" pass="out" description="Timestamp in ISO8601 UTC format." />
+		</method>
+
+		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
+			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
+			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in UTC format." />
+		</method>
+
+		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">
+		</method>
 		
 	</class>
 
+
+    <!-- The AlertIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="AlertIterator" parent="Iterator">
+		<method name="GetCurrentAlert" description="Returns the alert the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="Alert" pass="return" description="returns the Alert instance."/>
+		</method>
+	</class>
+
+
+    <!-- The AlertSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="AlertSession" parent="Base" description="Alert Session Instance">
 	
 		<method name="AddAlert" description="adds a new alert entry.">
@@ -536,6 +646,7 @@
 			<param name="ReadableContextInformation" type="string" pass="in" description="Readable Context Information in default language" />	
 			<param name="NeedsAcknowledgement" type="bool" pass="in" description="Flag if acknowledgement is needed" />	
 			<param name="TimestampUTC" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
+			<param name="AlertInstance" type="class" class="Alert" pass="return" description="Alert Instance" />	
 		</method>	
 		
 		<method name="HasAlert" description="Checks if an alert with a certain UUID exists.">
@@ -543,40 +654,31 @@
 			<param name="AlertExists" type="bool" pass="return" description="Flag if alert exists" />	
 		</method>	
 
-		<method name="GetAlertInformation" description="Retrieves information of an alert. Fails if alert does not exist.">
+		<method name="GetAlertByUUID" description="Retrieves the alert object. Fails if alert does not exist.">
 			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="Identifier" type="string" pass="out" description="Alert Identifier" />	
-			<param name="Level" type="enum" class="AlertLevel" pass="out" description="Alert level." />
-			<param name="Description" type="string" pass="out" description="Alert Description in default language" />	
-			<param name="DescriptionIdentifier" type="string" pass="out" description="Alert Description Identifier for internationalization. May be empty." />	
-			<param name="ReadableContextInformation" type="string" pass="out" description="Readable Context Information in default language" />	
-			<param name="NeedsAcknowledgement" type="bool" pass="out" description="Flag if acknowledgement is needed" />	
-			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+			<param name="AlertInstance" type="class" class="Alert" pass="return" description="Alert Instance" />	
 		</method>	
 
-		<method name="AcknowledgeAlert" description="Acknowledges an Alert. Fails if alert does not exist. Does nothing if the alert already has been acknowledged.">
-			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="UserUUID" type="string" pass="in" description="User UUID that acknowledged the alert." />	
-			<param name="UserComment" type="string" pass="in" description="Comment of the user." />	
-			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+		<method name="RetrieveAlerts" description="Retrieves all or all active alerts.">
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
 		</method>	
 
-		<method name="AlertHasBeenAcknowledged" description="Checks if an alert has been acknowledged. Fails if alert does not exist.">
-			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="HasBeenAcknowledged" type="bool" pass="return" description="Flag if the alert has been acknowledged." />	
-		</method>	
-		
-		<method name="GetAcknowledgementInformation" description="Checks if an alert has been acknowledged. Fails if alert does not exist or has not been acknowledged.">
-			<param name="UUID" type="string" pass="in" description="Alert UUID. Fails if not a valid UUID is given." />	
-			<param name="UserUUID" type="string" pass="out" description="User UUID that acknowledged the alert." />	
-			<param name="UserComment" type="string" pass="out" description="Comment of the user." />	
-			<param name="TimestampUTC" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
-		</method>	
+		<method name="RetrieveAlertsByType" description="Retrieves alerts of a certain type identifier.">
+			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
+			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
+		</method>				
 		
 	</class>
 
 
+    <!-- The JournalSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
+
+		<method name="GetSessionUUID" description="retrieves the session UUID.">
+			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
+		</method>	
 
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
@@ -596,6 +698,7 @@
 				
 	</class>
 
+    <!-- The StorageStream class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="StorageStream" parent="Base" description="Storage Stream Instance">
 
 		<method name="GetUUID" description="returns the uuid of a storage stream.">
@@ -639,6 +742,7 @@
 	</class>
 
 
+    <!-- The Storage class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="Storage" parent="Base" description="Storage Handler Instance">
 
 		<method name="StreamIsReady" description="checks if a stream exists and is written to disk.">
@@ -653,7 +757,7 @@
 
 		<method name="StoreNewStream" description="stores a new stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. Must be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
 			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name Description of the stream." />
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />
@@ -663,7 +767,7 @@
 
 		<method name="BeginPartialStream" description="starts storing a stream with partial uploads.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="Context UUID of storage stream. Important for ownership and deletion." />
+			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
 			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
@@ -687,6 +791,30 @@
 			<param name="BlockwiseSHA2" type="string" pass="in" description="64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical." />
 		</method>	
 		
+		<method name="BeginRandomWriteStream" description="starts storing a stream with random write access. Checksums are not required.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
+			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
+			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
+			<param name="Name" type="string" pass="in" description="Name of the stream." />	
+			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
+			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+		</method>	
+
+		<method name="StoreRandomWriteStream" description="stores data in a stream with random write access. Writing may be in arbitrary order.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginRandomWriteStream first." />	
+			<param name="Offset" type="uint64" pass="in" description="Offset in stream to store to. Can be an arbitrary position, but MUST be smaller or equal the current size." />	
+			<param name="Content" type="basicarray" class="uint8" pass="in" description="Data block to store in stream." />	
+		</method>	
+		
+		<method name="GetRandomWriteStreamSize" description="Returns the size random write stream .">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginRandomWriteStream first." />	
+			<param name="CurrentSize" type="uint64" pass="return" description="Current size in bytes." />	
+		</method>	
+
+		<method name="FinishRandomWriteStream" description="Finishes storing a random write stream.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
+		</method>	
+
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
 			<param name="MaxStreamSize" type="uint64" pass="return" description="Maximum Stream Size in Bytes." />	
 		</method>	
@@ -700,36 +828,60 @@
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream." />	
 			<param name="IsImage" type="bool" pass="return" description="Returns if the stream is an image." />
 		</method>	
+		
+		<method name="CreateDownloadTicket" description="Creates a new download ticket for a stream and a user.">
+			<param name="TicketUUID" type="string" pass="in" description="UUID of download ticket." />	
+			<param name="StreamUUID" type="string" pass="in" description="UUID of storage stream." />	
+			<param name="ClientFileName" type="string" pass="in" description="ClientFileName of the ticket. MUST NOT be empty." />	
+			<param name="SessionUUID" type="string" pass="in" description="UUID of user session." />	
+			<param name="UserUUID" type="string" pass="in" description="UUID of user that created the ticket." />	
+		</method>	
+		
+		<method name="RequestDownloadTicket" description="Returns the details of a download ticket and creates an entry in an access log with time stamp.">
+			<param name="TicketUUID" type="string" pass="in" description="UUID of download ticket." />	
+			<param name="IPAddress" type="string" pass="in" description="IP Address where the request came from." />	
+			<param name="StreamUUID" type="string" pass="out" description="UUID of storage stream." />	
+			<param name="ClientFileName" type="string" pass="out" description="ClientFileName of the ticket." />	
+			<param name="SessionUUID" type="string" pass="out" description="UUID of user session." />	
+			<param name="UserUUID" type="string" pass="out" description="UUID of user that created the ticket." />	
+		</method>	
+
+		<method name="AttachStreamToJournal" description="Attaches a stream to a journal as temporary stream.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of stream. Call fails if stream does not exist." />	
+			<param name="JournalUUID" type="string" pass="in" description="UUID of journal. Call fails if journal does not exist." />	
+		</method>	
+
 	</class>
 
 
-	<class name="BuildJobData" parent="Base" description="Build Job Data instance">
+    <!-- The CustomDataStream class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="CustomDataStream" parent="Base" description="Base class for an associated custom data stream.">
 
-		<method name="GetDataUUID" description="returns the uuid of a build job data.">
+		<method name="GetDataUUID" description="returns the uuid of the custom data.">
 			<param name="UUID" type="string" pass="return" description="UUID String" />	
 		</method>
 
-		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
-			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		<method name="GetIdentifier" description="returns the identifier of the custom data.">
+			<param name="Identifier" type="string" pass="return" description="Name String" />	
 		</method>
 
-		<method name="GetName" description="returns the name of the job data.">
+		<method name="GetName" description="returns the name of the custom data.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
-		<method name="GetContextIdentifier" description="returns the unique context identifier of the job data.">
-			<param name="ContextIdentifier" type="string" pass="return" description="Context Identifier String" />	
-		</method>
-
-		<method name="GetTimeStamp" description="returns the timestamp when the job data was created.">
+		<method name="GetTimeStamp" description="returns the timestamp when the custom data was created.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
 				
-		<method name="GetStorageStream" description="returns the storage stream of the build.">
+		<method name="GetStorageStream" description="returns the storage stream.">
 			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
 		</method>
 
-		<method name="GetStorageStreamSHA2" description="returns the checksum of the storage stream of the build.">
+		<method name="GetStorageStreamUUID" description="returns the UUID of the storage stream.">
+			<param name="SHA2" type="string" pass="return" description="UUID of the storage stream." />
+		</method>
+
+		<method name="GetStorageStreamSHA2" description="returns the checksum of the storage stream.">
 			<param name="SHA2" type="string" pass="return" description="SHA256 of the storage stream." />
 		</method>
 
@@ -737,11 +889,15 @@
 			<param name="Size" type="uint64" pass="return" description="size of the storage stream in bytes." />
 		</method>
 
-		<method name="GetDataType" description="returns the data type of the job data.">
-			<param name="DataType" type="enum" class="BuildJobDataType" pass="return" description="Data type of the job data" />	
+		<method name="GetUserUUID" description="returns the UUID of the user who created the stream.">
+			<param name="UserUUID" type="string" pass="return" description="UUID of the user who create the stream." />
 		</method>
 
-		<method name="GetDataTypeAsString" description="returns the data type of the job data as string.">
+		<method name="GetDataType" description="returns the data type of the custom data.">
+			<param name="DataType" type="enum" class="CustomDataType" pass="return" description="Data type of the custom data" />	
+		</method>
+
+		<method name="GetDataTypeAsString" description="returns the data type of the custom data as string.">
 			<param name="DataType" type="string" pass="return" description="Data type of the job data" />	
 		</method>
 
@@ -751,13 +907,111 @@
 
 	</class>
 
+
+    <!-- The BuildJobData class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobData" parent="CustomDataStream" description="Build Job Data instance">
+		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+				
+	</class>
+
+    <!-- The BuildJobDataIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobDataIterator" parent="Iterator">
 		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
 			<param name="CurrentInstance" type="handle" class="BuildJobData" pass="return" description="returns the build job instance."/>
 		</method>
 	</class>
 
+    <!-- The BuildJobExecutionData class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecutionData" parent="CustomDataStream" description="Build Job Data instance">
+		<method name="GetExecutionUUID" description="returns the uuid of the parent build job execution.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+				
+	</class>
 
+    <!-- The BuildJobDataIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecutionDataIterator" parent="Iterator">
+		<method name="GetCurrentJobExecutionData" description="Returns the build job execution data the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="BuildJobExecutionData" pass="return" description="returns the build job execution instance."/>
+		</method>
+	</class>
+
+
+    <!-- The BuildJobExecution class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecution" parent="Base" description="Build Job Execution instance, handling a specific execution of the build job.">
+
+		<method name="GetExecutionUUID" description="returns the uuid of a build job execution.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+
+		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+		
+		<method name="GetStatus" description="returns the build job execution status.">
+			<param name="ExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="return" description="Status Value" />	
+		</method>
+
+		<method name="ChangeStatus" description="sets the new build job execution status. Will fail if current status is not InProcess.">
+			<param name="NewExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="in" description="Status Value" />	
+		</method>
+
+		<method name="GetDescription" description="returns the build job description.">
+			<param name="Description" type="string" pass="return" description="Current Description." />	
+		</method>
+		
+		<method name="SetDescription" description="sets the build job description. Should not be an empty string.">
+			<param name="NewDescription" type="string" pass="in" description="New Description." />	
+		</method>
+
+		<method name="GetJournalUUID" description="returns the uuid of the execution journal.">
+			<param name="JournalUUID" type="string" pass="return" description="UUID String" />	
+		</method>
+		
+		<method name="GetUserUUID" description="returns the uuid of the user that created the build job.">
+			<param name="UserUUID" type="string" pass="return" description="UUID String or 00000000-0000-0000-0000-000000000000 if no user is attached." />	
+		</method>
+				
+		<method name="GetStartTimeStampInMicroseconds" description="Returns the start time stamp of the build execution in the machine journal.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build started in Microseconds." />
+		</method>
+		
+		<method name="GetEndTimeStampInMicroseconds" description="Returns the end time stamp of the build execution in the machine journal. Status MUST BE in Finished or Failed to retrieve this value.">
+			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="TimeStamp when the build ended in Microseconds." />
+		</method>
+			
+		<method name="ComputeElapsedTimeInMicroseconds" description="Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.">
+			<param name="GlobalTimerInMicroseconds" type="uint64" pass="in" description="The current session global timer." />
+			<param name="ElapsedTimeInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
+		</method>
+
+		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+	
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
+		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build execution. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+
+	</class>
+
+    <!-- The BuildJobExecutionIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="BuildJobExecutionIterator" parent="Iterator">
+		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="BuildJobExecution" pass="return" description="returns the build job  execution instance."/>
+		</method>
+	</class>
+
+    <!-- The BuildJob class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJob" parent="Base" description="Build Job instance">
 
 		<method name="GetUUID" description="returns the uuid of a build job.">
@@ -812,12 +1066,12 @@
 			<param name="Identifier" type="string" pass="in" description="Unique identifier for the job data." />
 			<param name="Name" type="string" pass="in" description="Name of the job data" />
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
-			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data" />
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job data" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
 		</method>
 
 		<method name="ListJobDataByType" description="Retrieves a list of build job data objects, filtered by type.">
-			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data." />	
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job data." />	
 			<param name="IteratorInstance" type="class" class="BuildJobDataIterator" pass="return" description="Build Job Data Iterator Instance." />
 		</method>
 
@@ -830,9 +1084,47 @@
 			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
 		</method>
 		
-									
+		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+		</method>
+	
+		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="MetaDataStringExists" type="bool" pass="return" description="Returns if metadata string exists." />
+		</method>
+		
+		<method name="GetMetaDataString" description="Gets a metadata string of a build execution. Fails if Meta Data does not exist.">
+			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
+			<param name="Value" type="string" pass="return" description="Return value." />
+		</method>
+
+		<method name="CreateBuildJobExecution" description="Creates a new build job execution with state InProgress.">
+			<param name="Description" type="string" pass="in" description="Description of the execution." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded." />
+			<param name="RelativeStartTimeStampInMicroseconds" type="uint64" pass="in" description="Start Time in Microseconds in relation to the start of the journal." />
+			<param name="ExecutionInstance" type="class" class="BuildJobExecution" pass="return" description="Newly created execution instance." />
+		</method>
+
+		<method name="RetrieveBuildJobExecution" description="Retrieves a new build job execution by uuid.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution to retrieve." />
+			<param name="ExecutionInstance" type="optionalclass" class="BuildJobExecution" pass="return" description="If UUID exists, returns execution instance. Otherwise, returns null." />
+		</method>
+
+		<method name="RetrieveBuildJobExecutions" description="Retrieves multiple executions of the build job.">
+			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
+		
+		<method name="RetrieveBuildJobExecutionsByStatus" description="Retrieves multiple executions of the build job.">
+			<param name="StatusFilter" type="enum" class="BuildJobExecutionStatus" pass="in" description="Status to filter the executions from." />
+			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
+		
 	</class>
 
+    <!-- The BuildJobIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobIterator" parent="Iterator">
 		<method name="GetCurrentJob" description="Returns the build job the iterator points at.">
 			<param name="CurrentInstance" type="handle" class="BuildJob" pass="return" description="returns the build job instance."/>
@@ -840,6 +1132,7 @@
 	</class>
 
 
+    <!-- The BuildJobHandler class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobHandler" parent="Base" description="Build Job handler">
 
 		<method name="CreateJob" description="Creates a new build job.">
@@ -880,6 +1173,7 @@
 
 
 
+    <!-- The UserList class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="UserList" parent="Base" description="List of users">
 	
 		<method name="Count" description="Result Number of Users in the list.">
@@ -898,13 +1192,19 @@
 	
 	</class>
 
-	<class name="LoginHandler" parent="Base" description="Login handler instance">
+    <!-- The LoginHandler class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="LoginHandler" parent="Base" description="Login handler instance" multithread="true">
 	
 		<method name="UserExists" description="Checks if a user exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
 		</method>
 	
+		<method name="UserUUIDExists" description="Checks if a user UUID exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the user." />
+			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
+		</method>
+
 		<method name="GetUserDetails" description="Retrieves login relevant users data. Fails if user does not exist.">
 			<param name="Username" type="string" pass="in" description="User name" />
 			<param name="Salt" type="string" pass="out" description="Salt of the user." />
@@ -1025,6 +1325,7 @@
 	</class>
 
 
+    <!-- The PersistencyHandler class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="PersistencyHandler" parent="Base" description="Persistent parameter handler instance">
 		
 		<method name="HasPersistentParameter" description="Retrieves if a persistent parameter has been stored.">
@@ -1109,7 +1410,25 @@
 
 	</class>
 
+    <!-- The InstallationInformation class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="InstallationInformation" parent="Base" description="Installation information instance. Gives a snapshot of the installation information at creation of the instance. Does not update in the unlikely event of them changing.">
+	
+		<method name="GetInstallationUUID" description="Returns the installation UUID.">
+			<param name="InstallationUUID" type="string" pass="return" description="Installation UUID. Public value to document which installation was used for something." />	
+		</method>
 
+		<method name="GetInstallationSecret" description="Returns the installation Secret.">
+			<param name="InstallationSecret" type="string" pass="return" description="Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application." />	
+		</method>
+
+		<method name="GetBaseTempDirectory" description="Returns a custom base temp directory. An empty string defaults to the system temp directory.">
+			<param name="TempDirectory" type="string" pass="return" description="Temp directory path." />	
+		</method>
+		
+	</class>
+
+
+    <!-- The DataModel class is supposed to be thread safe. A methode MUST NOT return or out a string or a basicarray ever. -->
 	<class name="DataModel" parent="Base" description="MC DataModel Instance">
 
 		<method name="InitialiseDatabase" description="initializes the database connection.">
@@ -1122,9 +1441,13 @@
 			<param name="Version" type="uint32" pass="return" description="Data model version." />	
 		</method>
 
-		<method name="GetInstallationInformation" description="returns unique identifiers for the current installation.">
-			<param name="InstallationUUID" type="string" pass="out" description="Installation UUID. Public value to document which installation was used for something." />	
-			<param name="InstallationSecret" type="string" pass="out" description="Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application." />	
+		<method name="GetInstallationInformation" description="DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.">
+			<param name="DEPRECIATEDInstallationUUID" type="string" pass="out" description="DEPRECIATED Installation UUID. Public value to document which installation was used for something." />	
+			<param name="DEPRECIATEDInstallationSecret" type="string" pass="out" description="DEPRECIATED Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application." />	
+		</method>
+
+		<method name="GetInstallationInformationObject" description="returns unique identifiers for the current installation. MUST be used instead of depreciated functionality.">
+			<param name="InstallationInformation" type="class" class="InstallationInformation" pass="return" description="Installation information instance." />	
 		</method>
 
 		<method name="CreateStorage" description="creates a storage access class.">
@@ -1159,7 +1482,7 @@
 			<param name="TempDirectory" type="string" pass="in" description="Temp directory path to use. SHOULD be an absolute path, if not empty. Directory MUST exist, if not empty." />	
 		</method>
 
-		<method name="GetBaseTempDirectory" description="Returns a custom base temp directory. An empty string defaults to the system temp directory.">
+		<method name="GetBaseTempDirectory" description="DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. USE GetInstallationInformationObject instead.">
 			<param name="TempDirectory" type="string" pass="return" description="Temp directory path." />	
 		</method>
 

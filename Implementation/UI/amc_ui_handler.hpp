@@ -72,6 +72,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUICustomPage, PUICustomPage);
 	amcDeclareDependingClass(CUIDialog, PUIDialog);
 	amcDeclareDependingClass(CLogger, PLogger);
+	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
 	amcDeclareDependingClass(CSystemState, PSystemState);
 	amcDeclareDependingClass(CStateJournal, PStateJournal);
 	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
@@ -163,7 +164,7 @@ namespace AMC {
 		void writeConfigurationToJSON (CJSONWriter & writer, CParameterHandler* pClientVariableHandler);
 		void writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler);
 
-		void loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
+		void loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath);
 
 		void setCoreResourcePackage(PResourcePackage pCoreResourcePackage);
 
@@ -173,7 +174,7 @@ namespace AMC {
 
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler, PUserInformation pUserInformation);
+		CUIHandleEventResponse handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sEventPayloadJSON, PAPIAuth pAPIAuth);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 

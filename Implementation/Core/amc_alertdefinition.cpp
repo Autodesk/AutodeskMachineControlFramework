@@ -74,7 +74,7 @@ namespace AMC {
 		return m_bNeedAcknowledgement;
 	}
 
-	void CAlertDefinition::setAckPermissionIdentifier(std::string& sAckPermissionIdentifier)
+	void CAlertDefinition::setAckPermissionIdentifier(const std::string& sAckPermissionIdentifier)
 	{
 		m_sAckPermissionIdentifier = sAckPermissionIdentifier;
 	}
@@ -84,6 +84,46 @@ namespace AMC {
 		return m_sAckPermissionIdentifier;
 	}
 
+	LibMCData::eAlertLevel CAlertDefinition::stringToAlertLevel(const std::string& sAlertLevelString, bool bFailIfUnknown)
+	{
+		if (sAlertLevelString == "fatalerror") {
+			return LibMCData::eAlertLevel::FatalError;
+		}
+
+		if (sAlertLevelString == "criticalerror") {
+			return LibMCData::eAlertLevel::CriticalError;
+		}
+
+		if (sAlertLevelString == "warning") {
+			return LibMCData::eAlertLevel::Warning;
+		}
+
+		if (sAlertLevelString == "message") {
+			return LibMCData::eAlertLevel::Message;
+		}
+
+		if (bFailIfUnknown)
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDALERTLEVEL, sAlertLevelString);
+
+		return LibMCData::eAlertLevel::Unknown;
+	}
+
+	std::string CAlertDefinition::alertLevelToString(LibMCData::eAlertLevel alertLevel)
+	{
+		switch (alertLevel) {
+			case LibMCData::eAlertLevel::FatalError:
+				return "fatalerror";
+			case LibMCData::eAlertLevel::CriticalError:
+				return "criticalerror";
+			case LibMCData::eAlertLevel::Warning:
+				return "warning";
+			case LibMCData::eAlertLevel::Message:
+				return "message";
+			default:
+				return "unknown";
+		}
+
+	}
 
 }
 

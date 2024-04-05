@@ -33,6 +33,10 @@ Abstract: This is a stub class definition of CAlertSession
 
 #include "libmcdata_alertsession.hpp"
 #include "libmcdata_interfaceexception.hpp"
+#include "libmcdata_alert.hpp"
+#include "libmcdata_alertiterator.hpp"
+
+#include "common_utils.hpp"
 
 // Include custom headers here.
 
@@ -56,9 +60,13 @@ CAlertSession::~CAlertSession()
 
 }
 
-void CAlertSession::AddAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC)
+IAlert* CAlertSession::AddAlert(const std::string& sUUID, const std::string& sIdentifier, const LibMCData::eAlertLevel eLevel, const std::string& sDescription, const std::string& sDescriptionIdentifier, const std::string& sReadableContextInformation, const bool bNeedsAcknowledgement, const std::string& sTimestampUTC)
 {
-    m_pJournal->addAlert(sUUID, sIdentifier, eLevel, sDescription, sDescriptionIdentifier, sReadableContextInformation, bNeedsAcknowledgement, sTimestampUTC);
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    m_pJournal->addAlert(sNormalizedUUID, sIdentifier, eLevel, sDescription, sDescriptionIdentifier, sReadableContextInformation, bNeedsAcknowledgement, sTimestampUTC);
+
+    return new CAlert(m_pJournal, sNormalizedUUID);
 }
 
 bool CAlertSession::HasAlert(const std::string& sUUID)
@@ -66,22 +74,52 @@ bool CAlertSession::HasAlert(const std::string& sUUID)
     return m_pJournal->hasAlert(sUUID);
 }
 
-void CAlertSession::GetAlertInformation(const std::string& sUUID, std::string& sIdentifier, LibMCData::eAlertLevel& eLevel, std::string& sDescription, std::string& sDescriptionIdentifier, std::string& sReadableContextInformation, bool& bNeedsAcknowledgement, std::string& sTimestampUTC)
+IAlert* CAlertSession::GetAlertByUUID(const std::string& sUUID)
 {
-    m_pJournal->getAlertInformation(sUUID, sIdentifier, eLevel, sDescription, sDescriptionIdentifier, sReadableContextInformation, bNeedsAcknowledgement, sTimestampUTC);
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+    if (!m_pJournal->hasAlert(sNormalizedUUID))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+
+    return new CAlert (m_pJournal, sUUID);
 }
 
-void CAlertSession::AcknowledgeAlert(const std::string& sUUID, const std::string& sUserUUID, const std::string& sUserComment, std::string& sTimestampUTC)
+IAlertIterator* CAlertSession::RetrieveAlerts(const bool bOnlyActive)
 {
-    m_pJournal->acknowledgeAlert(sUUID, sUserUUID, sUserComment, sTimestampUTC);
+    std::unique_ptr<CAlertIterator> pResultIterator (new CAlertIterator());
+    std::vector<std::string> alertUUIDs;
+
+    if (bOnlyActive) {
+        m_pJournal->retrieveActiveAlerts(alertUUIDs);
+    }
+    else {
+        m_pJournal->retrieveAlerts(alertUUIDs);
+    }
+
+    for (auto sUUID : alertUUIDs)
+        pResultIterator->AddAlert(std::make_shared<CAlert>(m_pJournal, sUUID));
+
+    return pResultIterator.release ();
 }
 
-bool CAlertSession::AlertHasBeenAcknowledged(const std::string& sUUID)
-{
-    return m_pJournal->alertHasBeenAcknowledged(sUUID);
-}
 
-void CAlertSession::GetAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC)
+IAlertIterator* CAlertSession::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
 {
-    m_pJournal->getAcknowledgementInformation(sUUID, sUserUUID, sUserComment, sTimestampUTC);
+    if (sIdentifier.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYALERTIDENTIFIER);
+
+    std::unique_ptr<CAlertIterator> pResultIterator(new CAlertIterator());
+    std::vector<std::string> alertUUIDs;
+
+    if (bOnlyActive) {
+        m_pJournal->retrieveActiveAlertsByType(alertUUIDs, sIdentifier);
+    }
+    else {
+        m_pJournal->retrieveAlertsByType(alertUUIDs, sIdentifier);
+    }
+
+    for (auto sUUID : alertUUIDs)
+        pResultIterator->AddAlert(std::make_shared<CAlert>(m_pJournal, sUUID));
+
+    return pResultIterator.release();
+
 }

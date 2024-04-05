@@ -71,6 +71,8 @@ public:
 
 	bool UserExists(const std::string & sUsername) override;
 
+	bool UserUUIDExists(const std::string& sUUID) override;
+
 	void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) override;
 
 	void GetUserProperties(const std::string& sUsername, std::string& sUUID, std::string& sDescription, std::string& sRole, std::string& sLanguageIdentifier) override;

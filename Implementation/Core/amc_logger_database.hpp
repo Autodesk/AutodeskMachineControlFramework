@@ -50,6 +50,8 @@ namespace AMC {
 	class CLogger_Database : public CLogger {
 	private:
 
+		// Attention! PLogSession is not thread safe, so always keep private in this class
+		// And always put a mutex around the instance!
 		LibMCData::PLogSession m_pLogSession;
 		std::mutex m_DBMutex;
 
@@ -57,7 +59,7 @@ namespace AMC {
 
 	public:
 
-		CLogger_Database(LibMCData::PLogSession pLogSession);
+		CLogger_Database(LibMCData::PDataModel pDataModel);
 		virtual ~CLogger_Database();
 
 		void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) override;

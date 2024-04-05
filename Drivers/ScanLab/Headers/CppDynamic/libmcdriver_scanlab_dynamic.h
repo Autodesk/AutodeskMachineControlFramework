@@ -115,6 +115,99 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_QueryParametersPt
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_QueryParametersExPtr) (LibMCDriver_ScanLab_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
+ Class definition for UARTConnection
+**************************************************************************************************************************/
+
+/**
+* Returns the actual baud rate of the RS232 Interface.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[out] pBaudRate - Baud rate.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_GetBaudRatePtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pBaudRate);
+
+/**
+* Returns the configured baud rate of the RS232 Interface.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[out] pBaudRate - Baud rate.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_GetConfiguredBaudRatePtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pBaudRate);
+
+/**
+* Clears the receive buffer.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ClearReceiveBufferPtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection);
+
+/**
+* Returns the number of currently received bytes.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[out] pByteCount - Number of currently received bytes.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_AvailableBytesPtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pByteCount);
+
+/**
+* Sends a string over the interface. The call is blocking.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] pValue - String to send.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_WriteStringPtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pValue);
+
+/**
+* Sends a data buffer over the interface. The call is blocking.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[in] pDataBuffer - uint8 buffer of Data to send.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_WriteDataPtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint64 nDataBufferSize, const LibMCDriver_ScanLab_uint8 * pDataBuffer);
+
+/**
+* Blocking call for reading a certain number of bytes. Will remove the bytes from the received buffer. Fails if not enough data is available after the timeout.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] nByteCount - Number of bytes to read.
+* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Receive buffer.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ReadDataPtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 nByteCount, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer);
+
+/**
+* Blocking call for reading until a line end signature is coming. Fails if timeout is hit or number of bytes have been reached.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] pSeparator - Line Separator to search for.
+* @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
+* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Receive buffer.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ReadLinePtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer);
+
+/**
+* Closes the connection. All subsequent calls will fail.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabUARTConnection_ClosePtr) (LibMCDriver_ScanLab_UARTConnection pUARTConnection);
+
+/*************************************************************************************************************************
  Class definition for RTCContext
 **************************************************************************************************************************/
 
@@ -806,6 +899,43 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPIDC
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
+* Clears all stored OIE Measurement tags of the context. New Tag Indices will start from 0 again.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Enables OIE Measurement tagging.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Disables OIE Measurement tagging.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Maps an OIE Measurement tag back to the original scan parameters.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nMeasurementTag - Measurement Tag that has been sent to the OIE.
+* @param[out] pPartID - ID of the part.
+* @param[out] pProfileID - ID of the profile.
+* @param[out] pSegmentID - ID of the segment.
+* @param[out] pVectorID - ID of the vector.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 * pPartID, LibMCDriver_ScanLab_uint32 * pProfileID, LibMCDriver_ScanLab_uint32 * pSegmentID, LibMCDriver_ScanLab_uint32 * pVectorID);
+
+/**
 * Disable skywriting.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1094,6 +1224,26 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableLineSub
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
+/**
+* Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nRegisterNo - Number of the register to read.
+* @param[out] pRegisterContent - Value of the register.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nRegisterNo, LibMCDriver_ScanLab_int32 * pRegisterContent);
+
+/**
+* Creates a new UART Connection. Closes any other one that might be active.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDesiredBaudRate - Desired baud rate. 160 Bd…12.8 MBd.  The other RS-232 interface parameters cannot be altered (data bits: 8, start bits: 1, stop bits: 1, parity: none).
+* @param[out] pConnection - UART Connection instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_CreateUARTConnectionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDesiredBaudRate, LibMCDriver_ScanLab_UARTConnection * pConnection);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -1211,6 +1361,14 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_LoadCusto
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_RTCSelector * pInstance);
+
+/**
+* Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_RTC6
@@ -1852,6 +2010,15 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_ScanLabDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_ScanLabDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
+	PLibMCDriver_ScanLabUARTConnection_GetBaudRatePtr m_UARTConnection_GetBaudRate;
+	PLibMCDriver_ScanLabUARTConnection_GetConfiguredBaudRatePtr m_UARTConnection_GetConfiguredBaudRate;
+	PLibMCDriver_ScanLabUARTConnection_ClearReceiveBufferPtr m_UARTConnection_ClearReceiveBuffer;
+	PLibMCDriver_ScanLabUARTConnection_AvailableBytesPtr m_UARTConnection_AvailableBytes;
+	PLibMCDriver_ScanLabUARTConnection_WriteStringPtr m_UARTConnection_WriteString;
+	PLibMCDriver_ScanLabUARTConnection_WriteDataPtr m_UARTConnection_WriteData;
+	PLibMCDriver_ScanLabUARTConnection_ReadDataPtr m_UARTConnection_ReadData;
+	PLibMCDriver_ScanLabUARTConnection_ReadLinePtr m_UARTConnection_ReadLine;
+	PLibMCDriver_ScanLabUARTConnection_ClosePtr m_UARTConnection_Close;
 	PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr m_RTCContext_LoadFirmware;
 	PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr m_RTCContext_LoadCorrectionFile;
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;
@@ -1919,6 +2086,10 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetOIEPIDModePtr m_RTCContext_SetOIEPIDMode;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPIDControlPtr m_RTCContext_EnableOIEPIDControl;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPIDControlPtr m_RTCContext_DisableOIEPIDControl;
+	PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr m_RTCContext_ClearOIEMeasurementTags;
+	PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr m_RTCContext_EnableOIEMeasurementTagging;
+	PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr m_RTCContext_DisableOIEMeasurementTagging;
+	PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr m_RTCContext_MapOIEMeasurementTag;
 	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode2Ptr m_RTCContext_EnableSkyWritingMode2;
@@ -1949,6 +2120,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr m_RTCContext_DisablePowerModulation;
 	PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr m_RTCContext_EnableLineSubdivision;
 	PLibMCDriver_ScanLabRTCContext_DisableLineSubdivisionPtr m_RTCContext_DisableLineSubdivision;
+	PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr m_RTCContext_ReadMultiMCBSP;
+	PLibMCDriver_ScanLabRTCContext_CreateUARTConnectionPtr m_RTCContext_CreateUARTConnection;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;
@@ -1960,6 +2133,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr m_Driver_ScanLab_LoadSDK;
 	PLibMCDriver_ScanLabDriver_ScanLab_LoadCustomSDKPtr m_Driver_ScanLab_LoadCustomSDK;
 	PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr m_Driver_ScanLab_CreateRTCSelector;
+	PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr m_Driver_ScanLab_EnableJournaling;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr m_Driver_ScanLab_RTC6_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr m_Driver_ScanLab_RTC6_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsInitializedPtr m_Driver_ScanLab_RTC6_IsInitialized;

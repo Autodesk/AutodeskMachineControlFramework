@@ -326,6 +326,54 @@ LibMCResult libmc_apirequesthandler_getresultdata(LibMC_APIRequestHandler pAPIRe
 	}
 }
 
+LibMCResult libmc_apirequesthandler_getcontentdispositionname(LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint32 nContentDispositionNameBufferSize, LibMC_uint32* pContentDispositionNameNeededChars, char * pContentDispositionNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
+
+	try {
+		if ( (!pContentDispositionNameBuffer) && !(pContentDispositionNameNeededChars) )
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sContentDispositionName("");
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pContentDispositionNameBuffer == nullptr);
+		if (isCacheCall) {
+			sContentDispositionName = pIAPIRequestHandler->GetContentDispositionName();
+
+			pIAPIRequestHandler->_setCache (new ParameterCache_1<std::string> (sContentDispositionName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAPIRequestHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+			cache->retrieveData (sContentDispositionName);
+			pIAPIRequestHandler->_setCache (nullptr);
+		}
+		
+		if (pContentDispositionNameNeededChars)
+			*pContentDispositionNameNeededChars = (LibMC_uint32) (sContentDispositionName.size()+1);
+		if (pContentDispositionNameBuffer) {
+			if (sContentDispositionName.size() >= nContentDispositionNameBufferSize)
+				throw ELibMCInterfaceException (LIBMC_ERROR_BUFFERTOOSMALL);
+			for (size_t iContentDispositionName = 0; iContentDispositionName < sContentDispositionName.size(); iContentDispositionName++)
+				pContentDispositionNameBuffer[iContentDispositionName] = sContentDispositionName[iContentDispositionName];
+			pContentDispositionNameBuffer[sContentDispositionName.size()] = 0;
+		}
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for MCContext
@@ -748,6 +796,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_apirequesthandler_handle;
 	if (sProcName == "libmc_apirequesthandler_getresultdata") 
 		*ppProcAddress = (void*) &libmc_apirequesthandler_getresultdata;
+	if (sProcName == "libmc_apirequesthandler_getcontentdispositionname") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_getcontentdispositionname;
 	if (sProcName == "libmc_mccontext_registerlibrarypath") 
 		*ppProcAddress = (void*) &libmc_mccontext_registerlibrarypath;
 	if (sProcName == "libmc_mccontext_settempbasepath") 

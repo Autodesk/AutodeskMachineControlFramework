@@ -76,8 +76,7 @@ protected:
 	AMC::PResourcePackage m_pDriverResourcePackage;
 	AMC::PResourcePackage m_pMachineResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
-	LibMCData::PBuildJobHandler m_pBuildJobHandler;
-	LibMCData::PStorage m_pStorage;
+	LibMCData::PDataModel m_pDataModel;
 	std::string m_sSystemUserID;
 	AMC::PLogger m_pLogger;
 
@@ -85,7 +84,7 @@ protected:
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PBuildJobHandler pBuildJobHandler, LibMCData::PStorage pStorage, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName);
 
 	virtual ~CDriverEnvironment();
 
@@ -118,6 +117,8 @@ public:
 	void RegisterUUIDParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue) override;
 
 	void RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue) override;
+
+	void RegisterDoubleParameterWithUnits(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits) override;
 
 	void RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_int64 nDefaultValue) override;
 
@@ -157,6 +158,8 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
+	IDataTable* CreateDataTable() override;
+
 	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
 
 	IDiscreteFieldData2D* CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) override;
@@ -164,6 +167,8 @@ public:
 	bool HasBuildJob(const std::string& sBuildUUID) override;
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
+
+	ICryptoContext* CreateCryptoContext() override;
 
 };
 

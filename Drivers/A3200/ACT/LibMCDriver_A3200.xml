@@ -55,6 +55,9 @@
 		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1013" description="could not parse driver protocol" />		
 		<error name="NOWORKINGDIRECTORY" code="1015" description="No working directory" />				
 		<error name="INVALIDTASKID" code="1016" description="Invalid task ID" />				
+		<error name="INVALIDAXISID" code="1017" description="Invalid axis ID" />
+		
+		
 		<error name="VERSIONMISMATCH" code="1" description="An incompatible version was detected" />
 		<error name="FEATURELOCKED" code="2" description="A license error occurred" />
 		<error name="UNSUPPORTEDHARDWARE" code="3" description="A connected hardware type is no longer supported" />
@@ -262,6 +265,36 @@ Custom implementation
 			<param name="TaskID" type="uint32" pass="in" description="TaskID. MUST be between 1 and 31." />
 			<param name="Name" type="string" pass="in" description="Variable to set" />				
 			<param name="Value" type="string" pass="in" description="Value of variable to set." />				
+		</method>
+
+		<method name="ReadAxisPosition" description="Reads out the position information of an axis.">
+			<param name="AxisID" type="uint32" pass="in" description="AxisID. MUST be between 0 and 31." />
+			<param name="Value" type="double" pass="return" description="Axis position value." />				
+		</method>
+
+		<method name="ReadAxisTargetPosition" description="Reads out the target position information of an axis.">
+			<param name="AxisID" type="uint32" pass="in" description="AxisID. MUST be between 0 and 31." />
+			<param name="Value" type="double" pass="return" description="Axis target position value." />				
+		</method>
+		
+		<method name="ReadAxisVelocity" description="Reads out the velocity information of an axis.">
+			<param name="AxisID" type="uint32" pass="in" description="AxisID. MUST be between 0 and 31." />
+			<param name="Value" type="double" pass="return" description="Axis velocity value." />				
+		</method>
+
+		<method name="ReadAxisTargetVelocity" description="Reads out the target velocity information of an axis.">
+			<param name="AxisID" type="uint32" pass="in" description="AxisID. MUST be between 0 and 31." />
+			<param name="Value" type="double" pass="return" description="Axis target velocity value." />				
+		</method>		
+		
+		<method name="ReadAxisInformation" description="Reads out all information of an axis.">
+			<param name="AxisID" type="uint32" pass="in" description="AxisID. MUST be between 0 and 31." />
+			<param name="CurrentPositionValue" type="double" pass="out" description="Current Position." />				
+			<param name="TargetPositionValue" type="double" pass="out" description="Target Position." />				
+			<param name="PositionErrorValue" type="double" pass="out" description="Position Error Value." />				
+			<param name="CurrentVelocityValue" type="double" pass="out" description="Current Velocity." />				
+			<param name="TargetVelocityValue" type="double" pass="out" description="Target Velocity." />				
+			<param name="VelocityErrorValue" type="double" pass="out" description="Velocity Error Value." />				
 		</method>
 
 	</class>

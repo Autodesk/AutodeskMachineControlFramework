@@ -48,6 +48,9 @@ namespace AMC {
 		std::string m_sContentType;
 
 		uint32_t m_nHTTPCode;
+
+		// If not empty, return a content disposition
+		std::string m_sContentDispositionName;
 			
 	public:
 
@@ -60,6 +63,11 @@ namespace AMC {
 		std::string getContentType () const;
 
 		uint32_t getHTTPCode() const;
+
+		std::string getContentDispositionName () const;
+
+		void setContentDispositionName(const std::string & sContentDispositionName);
+
 
 	};
 

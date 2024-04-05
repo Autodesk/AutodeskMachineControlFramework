@@ -40,6 +40,16 @@ Abstract: This is the class declaration of CChannel
 
 #include <map>
 
+#define TML_REG_MCR 0UL
+#define TML_REG_MSR 1UL
+#define TML_REG_ISR 2UL
+#define TML_REG_SRL 3UL
+#define TML_REG_SRH 4UL
+#define TML_REG_MER 5UL
+#define TML_REG_SRL_POWERBIT (1UL<<15)
+#define TML_REG_SRL_MOTIONCOMPLETE (1UL<<10)
+#define TML_REG_SRH_TARGETREACHED (1UL<<9)
+
 namespace LibMCDriver_TML {
 namespace Impl {
 
@@ -54,10 +64,12 @@ private:
     std::string m_sAxisIdentifier;
     std::string m_sChannelIdentifier;
     uint8_t m_nHardwareID;
+    uint32_t m_nCountsPerMM;
+
 
 public:
 
-    CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID);
+    CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID, uint32_t nCountsPerMM);
 
     virtual ~CTMLAxisInstance();
 
@@ -67,6 +79,11 @@ public:
 
     uint8_t getHardwareID ();
 
+    uint32_t getCountsPerMM();
+
+    double convertMMToCounts(double nInputValue, uint8_t distance_scaller = 1, uint8_t time_scaler = 0);
+    double convertCountsToMM(double nInputValue, uint8_t distance_scaller = 1, uint8_t time_scaler = 0);
+
 };
 
 class CTMLInstance {
@@ -75,19 +92,27 @@ private:
 
     LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
     std::map<std::string, int32_t> m_ChannelFileDescriptorMap;
 
     std::map<std::string, CTMLAxisInstance> m_AxisMap;
 
+    uint8_t m_nActiveDrive;
+
+    void ensureAxisExistsInChannel(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+
 public:
 
-    CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory);
+    CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     virtual ~CTMLInstance();
 
     void openChannel(const std::string& sIdentifier, const std::string& sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate);
 
     void closeChannel(const std::string& sIdentifier);
+
+    void closeAllChannels();
 
     bool channelExists(const std::string& sIdentifier);
 
@@ -97,9 +122,33 @@ public:
 
     bool axisExists(const std::string& sAxisIdentifier);
 
-    void setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer);
+    void setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer, uint32_t nCountsPerMM);
 
-    void selectAxisInternal(const std::string& sAxisIdentifier);
+    void selectAxisInternal(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+
+    void setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable);
+
+    void moveAxisRelative(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nDistance, double nSpeed, double nAcceleration);
+
+    void moveAxisAbsolute(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nLocation, double nSpeed, double nAcceleration);
+
+    tmlShort readIntVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlLong readLongVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlLong readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlLong readFixedVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlLong readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    void pollDrive(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier);
+
+    void callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label);
+
+    tmlWord readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister);
+
+    void CTMLInstance::resetAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const bool bForceFull);
 
 };
 

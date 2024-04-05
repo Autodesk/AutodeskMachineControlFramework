@@ -109,7 +109,7 @@ CDataRecordingInstance::~CDataRecordingInstance()
 
 }
 
-void CDataRecordingInstance::startRecord(uint32_t nPacketNumber, double dX, double dY)
+void CDataRecordingInstance::startRecord (uint32_t nPacketNumber, uint32_t nMeasurementTag, double dX, double dY)
 {
     if (m_pCurrentBuffer.get() == nullptr) {
         m_pCurrentBuffer = std::make_shared<CDataRecordingBuffer>(m_nValueCountPerBuffer);
@@ -119,6 +119,7 @@ void CDataRecordingInstance::startRecord(uint32_t nPacketNumber, double dX, doub
     m_CurrentEntry.m_dX = dX;
     m_CurrentEntry.m_dY = dY;
     m_CurrentEntry.m_nPacketNumber = nPacketNumber;
+    m_CurrentEntry.m_nMeasurementTag = nMeasurementTag;
     m_CurrentEntry.m_pData = m_pCurrentBuffer->allocData (m_nValuesPerRecord);
     m_nCurrentEntryDataIndex = 0;
 
@@ -279,6 +280,7 @@ void CDataRecordingInstance::copySensorSignals(size_t nRecordIndex, int32_t* pSe
 
 }
 
+
 void CDataRecordingInstance::copyAdditionalSignals(size_t nRecordIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize)
 {
     uint32_t nAdditionalValuesPerRecord = getAdditionalValuesPerRecord();
@@ -292,7 +294,7 @@ void CDataRecordingInstance::copyAdditionalSignals(size_t nRecordIndex, int32_t*
 
 }
 
-void CDataRecordingInstance::copyXCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
+void CDataRecordingInstance::copyAllXCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
 {
     size_t nRecordCount = getRecordCount();
     if (nRecordCount == 0)
@@ -313,7 +315,7 @@ void CDataRecordingInstance::copyXCoordinates(double* pCoordinateBuffer, size_t 
 
 }
 
-void CDataRecordingInstance::copyYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
+void CDataRecordingInstance::copyAllYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
 {
     size_t nRecordCount = getRecordCount();
     if (nRecordCount == 0)
@@ -334,7 +336,28 @@ void CDataRecordingInstance::copyYCoordinates(double* pCoordinateBuffer, size_t 
 
 }
 
-void CDataRecordingInstance::copyPacketNumbers(uint32_t * pPacketNumberBuffer, size_t nPacketNumberBufferSize)
+void CDataRecordingInstance::copyAllMeasurementTags(uint32_t* pMeasurementTagBuffer, size_t nMeasurementTagBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (pMeasurementTagBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nMeasurementTagBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    uint32_t* pTarget = pMeasurementTagBuffer;
+    for (size_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+        auto pRecord = m_Entries.getData(nIndex);
+        *pTarget = pRecord->m_nMeasurementTag;
+        pTarget++;
+    }
+
+}
+
+void CDataRecordingInstance::copyAllPacketNumbers(uint32_t * pPacketNumberBuffer, size_t nPacketNumberBufferSize)
 {
     size_t nRecordCount = getRecordCount();
     if (nRecordCount == 0)
@@ -398,6 +421,31 @@ void CDataRecordingInstance::copyAllSensorSignalsByIndex(uint32_t nSensorIndex, 
     for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
         int32_t* pSensorData = getSensorData(nRecordIndex);
         *pTarget = pSensorData[nSensorIndex];
+        pTarget++;
+    }
+
+}
+
+
+void CDataRecordingInstance::copyAllScaledSensorSignalsByIndex(uint32_t nSensorIndex, double* pSensorSignalBuffer, size_t nSensorSignalBufferSize, double dScaleFactor, double dOffset)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (nSensorIndex >= getSensorValuesPerRecord ())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX);
+
+    if (pSensorSignalBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nSensorSignalBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    double* pTarget = pSensorSignalBuffer;
+    for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+        int32_t* pSensorData = getSensorData(nRecordIndex);
+        *pTarget = pSensorData[nSensorIndex] * dScaleFactor + dOffset;
         pTarget++;
     }
 

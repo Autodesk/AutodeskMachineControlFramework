@@ -117,6 +117,8 @@
 		<error name="INVALIDMODULATIONCALLBACK" code="1065" description="Invalid modulation callback." />		
 		<error name="INVALIDSUBDIVISIONTHRESHOLD" code="1066" description="Invalid subdivision threshold." />		
 		<error name="MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID" code="1067" description="Multiple laser ports are not compatible with PID control." />		
+		<error name="INVALIDOIEMEASUREMENTTAG" code="1068" description="Invalid OIE measurement tag." />		
+		
 		
 		
 					
@@ -240,7 +242,48 @@ End Interface
 Custom implementation
 
 -->
+	<class name="UARTConnection" parent="Base" description="A UART Connection Class. Will receive data into a buffer as long as the instance exists.">
+	
+		<method name="GetBaudRate" description="Returns the actual baud rate of the RS232 Interface.">
+			<param name="BaudRate" type="uint32" pass="return" description="Baud rate." />
+		</method>
+	
+		<method name="GetConfiguredBaudRate" description="Returns the configured baud rate of the RS232 Interface.">
+			<param name="BaudRate" type="uint32" pass="return" description="Baud rate." />
+		</method>
 
+		<method name="ClearReceiveBuffer" description="Clears the receive buffer.">
+		</method>
+		
+		<method name="AvailableBytes" description="Returns the number of currently received bytes.">
+			<param name="ByteCount" type="uint32" pass="return" description="Number of currently received bytes." />
+		</method>
+
+		<method name="WriteString" description="Sends a string over the interface. The call is blocking.">
+			<param name="Value" type="string" pass="in" description="String to send." />
+		</method>
+
+		<method name="WriteData" description="Sends a data buffer over the interface. The call is blocking.">
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to send." />
+		</method>
+
+		<method name="ReadData" description="Blocking call for reading a certain number of bytes. Will remove the bytes from the received buffer. Fails if not enough data is available after the timeout.">
+			<param name="ByteCount" type="uint32" pass="in" description="Number of bytes to read." />
+			<param name="TimeOutInMS" type="uint32" pass="in" description="Timeout in Milliseconds." />
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Receive buffer." />
+		</method>
+
+		<method name="ReadLine" description="Blocking call for reading until a line end signature is coming. Fails if timeout is hit or number of bytes have been reached.">
+			<param name="Separator" type="string" pass="in" description="Line Separator to search for." />
+			<param name="MaxLineLength" type="uint32" pass="in" description="Maximum line length to receive, excluding line separator." />
+			<param name="TimeOutInMS" type="uint32" pass="in" description="Timeout in Milliseconds." />
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Receive buffer." />
+		</method>
+		
+		<method name="Close" description="Closes the connection. All subsequent calls will fail.">
+		</method>
+		
+	</class>
 
 
 	<class name="RTCContext" parent="Base" description="Selector of the RTC Controller Card">
@@ -586,6 +629,23 @@ Custom implementation
 		<method name="DisableOIEPIDControl" description="Disables OIE PID Control.">
 		</method>
 
+		<method name="ClearOIEMeasurementTags" description="Clears all stored OIE Measurement tags of the context. New Tag Indices will start from 0 again.">
+		</method>
+
+		<method name="EnableOIEMeasurementTagging" description="Enables OIE Measurement tagging.">
+		</method>
+
+		<method name="DisableOIEMeasurementTagging" description="Disables OIE Measurement tagging.">
+		</method>
+
+		<method name="MapOIEMeasurementTag" description="Maps an OIE Measurement tag back to the original scan parameters.">
+			<param name="MeasurementTag" type="uint32" pass="in" description="Measurement Tag that has been sent to the OIE." />
+			<param name="PartID" type="uint32" pass="out" description="ID of the part." />
+			<param name="ProfileID" type="uint32" pass="out" description="ID of the profile." />
+			<param name="SegmentID" type="uint32" pass="out" description="ID of the segment." />
+			<param name="VectorID" type="uint32" pass="out" description="ID of the vector." />
+		</method>
+
 		<method name="DisableSkyWriting" description="Disable skywriting.">
 		</method>
 
@@ -722,6 +782,16 @@ Custom implementation
 		<method name="DisableLineSubdivision" description="Disables the subdivision of mark lines.">
 		</method>
 		
+		<method name="ReadMultiMCBSP" description="Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.">
+			<param name="RegisterNo" type="uint32" pass="in" description="Number of the register to read." />
+			<param name="RegisterContent" type="int32" pass="return" description="Value of the register." />
+		</method>
+		
+		<method name="CreateUARTConnection" description="Creates a new UART Connection. Closes any other one that might be active.">
+			<param name="DesiredBaudRate" type="uint32" pass="in" description="Desired baud rate. 160 Bd…12.8 MBd.  The other RS-232 interface parameters cannot be altered (data bits: 8, start bits: 1, stop bits: 1, parity: none)." />
+			<param name="Connection" type="class" class="UARTConnection" pass="return" description="UART Connection instance." />
+		</method>
+		
 	</class>
 
 	
@@ -787,6 +857,9 @@ Custom implementation
 		
 		<method name="CreateRTCSelector" description="Creates and initializes a new RTC selector singleton. Should only be called once per Process.">
 			<param name="Instance" type="class" class="RTCSelector" pass="return" description="New Selector instance" />
+		</method>
+
+		<method name="EnableJournaling" description="Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.">
 		</method>
 
 	</class>

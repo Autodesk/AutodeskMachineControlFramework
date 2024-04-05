@@ -62,8 +62,8 @@ Abstract: This is a stub class definition of CChannel
 using namespace LibMCDriver_TML::Impl;
 
 
-CTMLAxisInstance::CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID)
-    :  m_sChannelIdentifier (sChannelIdentifier), m_sAxisIdentifier(sAxisIdentifier), m_nHardwareID (nHardwareID)
+CTMLAxisInstance::CTMLAxisInstance(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint8_t nHardwareID, uint32_t nCountsPerMM)
+    :  m_sChannelIdentifier (sChannelIdentifier), m_sAxisIdentifier(sAxisIdentifier), m_nHardwareID (nHardwareID), m_nCountsPerMM (nCountsPerMM)
 {
 
 }
@@ -88,9 +88,32 @@ uint8_t CTMLAxisInstance::getHardwareID()
     return m_nHardwareID;
 }
 
+uint32_t CTMLAxisInstance::getCountsPerMM()
+{
+    return m_nCountsPerMM;
+}
 
-CTMLInstance::CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory)
-    : m_pTMLSDK (pTMLSDK), m_pWorkingDirectory (pWorkingDirectory)
+double CTMLAxisInstance::convertCountsToMM(double nInputValue, uint8_t distance_scaller, uint8_t time_scaler)
+{
+    //Time scaler has never not be found to be 1000
+    double distanceScaler = pow(m_nCountsPerMM, distance_scaller);
+    double timeScaler = pow(1000, time_scaler);
+
+    return (double)(nInputValue * timeScaler / distanceScaler);
+}
+
+double CTMLAxisInstance::convertMMToCounts(double nInputValue, uint8_t distance_scaller, uint8_t time_scaler)
+{
+    //Time scaler has never not be found to be 1000
+    double distanceScaler = pow(m_nCountsPerMM, distance_scaller);
+    double timeScaler = pow(1000, time_scaler);
+
+    return (double)(nInputValue * distanceScaler / timeScaler);
+}
+
+
+CTMLInstance::CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorkingDirectory, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+    : m_pTMLSDK (pTMLSDK), m_pWorkingDirectory (pWorkingDirectory), m_pDriverEnvironment(pDriverEnvironment)
 {
     if (pTMLSDK.get() == nullptr)
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDPARAM);
@@ -100,7 +123,7 @@ CTMLInstance::CTMLInstance(PTMLSDK pTMLSDK, LibMCEnv::PWorkingDirectory pWorking
 
 CTMLInstance::~CTMLInstance()
 {
-
+    closeAllChannels();
 }
 
 void CTMLInstance::openChannel(const std::string& sIdentifier, const std::string& sDeviceName, const LibMCDriver_TML::eChannelType eChannelTypeToUse, const LibMCDriver_TML::eProtocolType eProtocolTypeToUse, const LibMCDriver_TML_uint32 nHostID, const LibMCDriver_TML_uint32 nBaudrate)
@@ -166,9 +189,30 @@ void CTMLInstance::closeChannel(const std::string& sIdentifier)
     if (!checkIdentifierString(sIdentifier))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sIdentifier);
 
+    auto iChannelIter = m_ChannelFileDescriptorMap.find(sIdentifier);
+    if (iChannelIter != m_ChannelFileDescriptorMap.end ()) {
+        m_pTMLSDK->TS_CloseChannel(iChannelIter->second);
+    }
+
     m_ChannelFileDescriptorMap.erase(sIdentifier);
 
+    // TODO: Delete all axes...
+
 }
+
+void CTMLInstance::closeAllChannels()
+{
+    if (m_pTMLSDK.get() != nullptr) {
+        if (m_pTMLSDK->TS_CloseChannel != nullptr) {
+            for (auto iChannel : m_ChannelFileDescriptorMap)
+                m_pTMLSDK->TS_CloseChannel(iChannel.second);
+        }
+    }
+
+    m_AxisMap.clear();
+    m_ChannelFileDescriptorMap.clear();
+}
+
 
 bool CTMLInstance::channelExists(const std::string& sIdentifier)
 {
@@ -218,7 +262,8 @@ bool CTMLInstance::axisExists(const std::string& sAxisIdentifier)
 }
 
 
-void CTMLInstance::setupAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer)
+void CTMLInstance::setupAxis(   const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, 
+                                uint32_t nAxisID, size_t nConfigurationBufferSize, const uint8_t* pConfigurationBuffer, uint32_t nCountsPerMM)
 {
     if (!checkIdentifierString(sChannelIdentifier))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sChannelIdentifier);
@@ -244,16 +289,15 @@ void CTMLInstance::setupAxis(const std::string& sChannelIdentifier, const std::s
 
     m_pTMLSDK->checkError(m_pTMLSDK->TS_SetupAxis((uint8_t)nAxisID, nSetupID));
 
-    m_AxisMap.insert(std::make_pair(sAxisIdentifier, CTMLAxisInstance(sChannelIdentifier, sAxisIdentifier, (uint8_t)nAxisID)));
+    m_AxisMap.insert(std::make_pair(sAxisIdentifier, CTMLAxisInstance(sChannelIdentifier, sAxisIdentifier, (uint8_t)nAxisID, nCountsPerMM)));
 
-    selectAxisInternal(sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
 
     m_pTMLSDK->checkError(m_pTMLSDK->TS_DriveInitialisation());
 
-
 }
 
-void CTMLInstance::selectAxisInternal(const std::string& sAxisIdentifier)
+void CTMLInstance::selectAxisInternal(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
 {
     if (!checkIdentifierString(sAxisIdentifier))
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER, "invalid axis identifier: " + sAxisIdentifier);
@@ -262,8 +306,174 @@ void CTMLInstance::selectAxisInternal(const std::string& sAxisIdentifier)
     if (iIter == m_AxisMap.end())
         throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISNOTFOUND, "axis not found: " + sAxisIdentifier);
 
-    m_pTMLSDK->checkError(m_pTMLSDK->TS_SelectAxis(iIter->second.getHardwareID ()));
+    if (m_nActiveDrive != iIter->second.getHardwareID())
+    {
+        m_pTMLSDK->checkError(m_pTMLSDK->TS_SelectAxis(iIter->second.getHardwareID ()));
+        m_nActiveDrive = iIter->second.getHardwareID();
+        CTMLInstance::pollDrive(sChannelIdentifier, sAxisIdentifier);
+    }
+    
+}
+
+void CTMLInstance::ensureAxisExistsInChannel(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+{
+    if (!checkIdentifierString(sChannelIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDCHANNELIDENTIFIER, "invalid channel identifier: " + sChannelIdentifier);
+    if (!checkIdentifierString(sAxisIdentifier))
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_INVALIDAXISIDENTIFIER, "invalid axis identifier: " + sAxisIdentifier);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+    if (iIter == m_AxisMap.end()) {
+        throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISNOTFOUND, "axis not found: " + sAxisIdentifier);
+    } else {
+        if (iIter->second.getChannelIdentifier() != sChannelIdentifier) {
+            throw ELibMCDriver_TMLInterfaceException(LIBMCDRIVER_TML_ERROR_AXISNOTINCHANNEL, "axis " + sAxisIdentifier + " is not in channel " + sChannelIdentifier);
+        }
+    }
+
 }
 
 
+void CTMLInstance::moveAxisRelative(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nDistance, double nSpeed, double nAcceleration)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
 
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    auto nCountsDistance = iIter->second.convertMMToCounts(nDistance, 1, 0);
+    auto nCountsSpeed = iIter->second.convertMMToCounts(nSpeed, 1, 1);
+    auto nCountsAcceleration = iIter->second.convertMMToCounts(nAcceleration, 1, 2);
+
+#define FROM_MEASURE 0
+#define FROM_REFERENCE 1
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_MoveRelative(nCountsDistance, nCountsSpeed, nCountsAcceleration, true, (tmlShort)1, FROM_REFERENCE));
+}
+
+
+void CTMLInstance::moveAxisAbsolute(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, double nLocation, double nSpeed, double nAcceleration)
+{
+
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    auto nCountsDistance = iIter->second.convertMMToCounts(nLocation, 1, 0);
+    auto nCountsSpeed = iIter->second.convertMMToCounts(nSpeed, 1, 1);
+    auto nCountsAcceleration = iIter->second.convertMMToCounts(nAcceleration, 1, 2);
+
+#define FROM_MEASURE 0
+#define FROM_REFERENCE 1
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_MoveAbsolute(nCountsDistance, nCountsSpeed, nCountsAcceleration, (tmlShort)1, FROM_REFERENCE));
+
+}
+
+void CTMLInstance::setAxisPower(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, bool bEnable)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_Power(bEnable));
+}
+
+
+tmlWord CTMLInstance::readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+
+    tmlWord pStatus = 0;
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_ReadStatus(sReadRegister, pStatus));
+
+    return pStatus;
+}
+
+tmlShort CTMLInstance::readIntVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+    tmlShort sRetInt;
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_GetIntVariable(label.c_str(), sRetInt));
+    return sRetInt;
+}
+
+tmlLong CTMLInstance::readLongVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+    tmlLong sRetInt;
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_GetLongVariable(label.c_str(), sRetInt));
+    return sRetInt;
+}
+
+tmlLong CTMLInstance::readFixedVariable(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+    double sRetInt;
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_GetFixedVariable(label.c_str(), sRetInt));
+    return sRetInt;
+}
+
+tmlLong CTMLInstance::readPosition(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    //APOS_LD APOS_MT TPOS POSERR
+    tmlLong lPosition = readLongVariable(sChannelIdentifier, sAxisIdentifier, label);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    return iIter->second.convertCountsToMM(lPosition, 1, 0);
+
+}
+
+tmlLong CTMLInstance::readSpeed(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    //ASPD_LD ASPD_MT TSPD SPDERR
+    tmlLong lSpeed = readFixedVariable(sChannelIdentifier, sAxisIdentifier, label);
+
+    auto iIter = m_AxisMap.find(sAxisIdentifier);
+
+    return iIter->second.convertCountsToMM(lSpeed, 1, 1);
+
+}
+
+void CTMLInstance::pollDrive(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier)
+{
+    //APOS_LD APOS_MT TPOS POSERR
+    //ASPD_LD ASPD_MT TSPD SPDERR
+    /*
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionmotor", readPosition(sChannelIdentifier, sAxisIdentifier, "APOS_MT"));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualpositionload", readPosition(sChannelIdentifier, sAxisIdentifier, "APOS_LD"));
+
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedload", readSpeed(sChannelIdentifier, sAxisIdentifier, "ASPD_LD"));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "actualspeedmotor", readSpeed(sChannelIdentifier, sAxisIdentifier, "ASPD_MT"));
+    */
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetposition", readPosition(sChannelIdentifier, sAxisIdentifier, "TPOS"));
+    m_pDriverEnvironment->SetDoubleParameter(sAxisIdentifier + "targetspeed", readSpeed(sChannelIdentifier, sAxisIdentifier, "TSPD"));
+
+}
+
+void CTMLInstance::callSubroutine(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const std::string& label)
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+
+    m_pTMLSDK->checkError(m_pTMLSDK->TS_CALL_Label(label.c_str()));
+
+}
+
+void CTMLInstance::resetAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const bool bForceFull = false) 
+{
+    ensureAxisExistsInChannel(sChannelIdentifier, sAxisIdentifier);
+    selectAxisInternal(sChannelIdentifier, sAxisIdentifier);
+
+    if(bForceFull)
+        m_pTMLSDK->checkError(m_pTMLSDK->TS_Reset());
+    else
+        m_pTMLSDK->checkError(m_pTMLSDK->TS_ResetFault());
+
+}

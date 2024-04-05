@@ -91,6 +91,30 @@ void CUIClientAction_ActivatePage::writeToJSON(CJSONWriter& writer, CJSONWriterO
 
 }
 
+CUIClientAction_StreamDownload::CUIClientAction_StreamDownload(const std::string& sDownloadTicketUUID, const std::string& sDownloadFileName)
+	: m_sDownloadTicketUUID (AMCCommon::CUtils::normalizeUUIDString (sDownloadTicketUUID)), m_sDownloadFileName (sDownloadFileName)
+{
+
+}
+
+CUIClientAction_StreamDownload::~CUIClientAction_StreamDownload()
+{
+}
+
+std::string CUIClientAction_StreamDownload::getDownloadTicketUUID()
+{
+	return m_sDownloadTicketUUID;
+}
+
+void CUIClientAction_StreamDownload::writeToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString("action", "streamdownload");
+	object.addString("downloadfilename", m_sDownloadFileName);
+	object.addString("downloadticket", m_sDownloadTicketUUID);
+
+}
+
+
 CUIClientAction_CloseModalDialog::CUIClientAction_CloseModalDialog()
 	: CUIClientAction ()
 {

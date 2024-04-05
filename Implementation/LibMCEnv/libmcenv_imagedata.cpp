@@ -462,9 +462,11 @@ void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 	if (nYMin > nYMax)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATERANGE);
 
-	uint32_t nSizeX = nXMax - nXMin;
-	uint32_t nSizeY = nYMax - nYMin;
-	size_t nNeededSize = (size_t)nSizeX * (size_t)nSizeY;
+	size_t nSizeFactor = getBytesPerPixel();
+
+	uint32_t nSizeX = (nXMax - nXMin) + 1;
+	uint32_t nSizeY = (nYMax - nYMin) + 1;
+	size_t nNeededSize = (size_t)nSizeX * (size_t)nSizeY * nSizeFactor;
 
 	if (pValueNeededCount != nullptr)
 		*pValueNeededCount = nNeededSize;
@@ -477,9 +479,11 @@ void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 
 		uint8_t* pTargetData = pValueBuffer;
 		for (uint32_t nY = 0; nY < nSizeY; nY++) {
-			const uint8_t* pSrcData = &pPixelData[((uint64_t)nY + (uint64_t)nYMin) * m_nPixelCountX + nXMin];
+			const uint8_t* pSrcData = &pPixelData[(((uint64_t)nY + (uint64_t)nYMin) * m_nPixelCountX + nXMin) * nSizeFactor];
 
-			for (uint32_t nX = 0; nX < nSizeX; nX++) {
+			size_t nCopyCount = nSizeX * nSizeFactor;
+
+			for (uint32_t nX = 0; nX < nCopyCount; nX++) {
 				*pTargetData = *pSrcData;
 				pTargetData++;
 				pSrcData++;
@@ -518,9 +522,9 @@ void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
 	if (nYMin >= m_nPixelCountY)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
-	if (nXMax > m_nPixelCountX)
+	if (nXMax >= m_nPixelCountX)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELCOUNT);
-	if (nYMax > m_nPixelCountY)
+	if (nYMax >= m_nPixelCountY)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELCOUNT);
 	if (nXMin > nXMax)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATERANGE);
@@ -529,8 +533,8 @@ void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 	
 	size_t nSizeFactor = getBytesPerPixel ();
 
-	uint32_t nSizeX = nXMax - nXMin;
-	uint32_t nSizeY = nYMax - nYMin;
+	uint32_t nSizeX = (nXMax - nXMin) + 1;
+	uint32_t nSizeY = (nYMax - nYMin) + 1;
 	size_t nNeededSize = (size_t)nSizeX * (size_t)nSizeY * nSizeFactor;
 	if (nValueBufferSize != nNeededSize)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELDATACOUNT);

@@ -72,9 +72,7 @@
 		<error name="INVALIDAXISHARDWAREID" code="1020" description="Invalid Axis Hardware ID" />
 		<error name="AXISALREADYEXISTS" code="1021" description="Axis already exists" />
 		<error name="AXISNOTFOUND" code="1022" description="Axis not found" />
-		
-		
-		
+		<error name="AXISNOTINCHANNEL" code="1023" description="Axis not in channel" />
 			
 	</errors>
 
@@ -87,11 +85,38 @@
 		<option name="PEAK_SYS_PCAN_PCI" value="1004" description="PEAK_SYS_PCAN_PCI Canbus Channel"/>
 		<option name="CHANNEL_ESD_CAN" value="1005" description="CHANNEL_ESD_CAN Canbus Channel"/>
 	</enum>
+	
+	<enum name="ReferenceType">
+		<option name="Unknown" value="0" description="Unknown Reference"/>
+		<option name="Target" value="1000" description="Use the target reference (no feedback)."/>
+		<option name="Actual_Motor" value="1001" description="Use the motor reference."/>
+		<option name="Actual_Load" value="1002" description="Use the load reference."/>
+		<option name="Error" value="1003" description="Get the error."/>
+	</enum>
 
 	<enum name="ProtocolType">
 		<option name="Unknown" value="0" description="Unknown Protocol"/>
 		<option name="TMLCAN" value="1" description="TMLCAN Protocol"/>
 		<option name="TechnoCAN" value="2" description="TechnoCAN Protocol"/>
+ 	</enum>
+	
+	<enum name="MERType">
+		<option name="CANBER" value="0" description="CANBus"/>
+		<option name="SCER" value="1" description="short-circuit protection"/>
+		<option name="STPLTBL" value="2" description="setup table"/>
+		<option name="CTRER" value="3" description="control"/>
+		<option name="SCIER" value="4" description="communication"/>
+		<option name="WRPSER" value="5" description="feedback"/>
+		<option name="LSPST" value="6" description="positive limit"/>
+		<option name="LSNST" value="7" description="negative limit"/>
+		<option name="OCER" value="8" description="over-current"/>
+		<option name="I2TER" value="9" description="I2T protection"/>
+		<option name="OTERM" value="10" description="motor temperature"/>
+		<option name="OTERD" value="11" description="drive temperature"/>
+		<option name="OVER" value="12" description="over voltage"/>
+		<option name="UVER" value="13" description="under voltage"/>
+		<option name="CMDER" value="14" description="command"/>
+		<option name="ENST" value="15" description="enable status"/>
  	</enum>
 	
 <!--
@@ -148,6 +173,45 @@ Custom implementation
 -->
 
 	<class name="Axis" parent="Base" description="An axis of a TML Channel.">
+	
+		<method name="MoveRelative" description="Moves the selected drive a relative distance.">		
+			<param name="Distance" type="double" pass="in" description="Distance (mm)" />
+			<param name="Speed" type="double" pass="in" description="Speed (mm/s)" />
+			<param name="Acceleration" type="double" pass="in" description="Acceleration (mm/s^2)" />
+		</method>	
+
+		<method name="MoveAbsolute" description="Moves the selected drive to an absolute location.">		
+			<param name="Distance" type="double" pass="in" description="Distance (mm)" />
+			<param name="Speed" type="double" pass="in" description="Speed (mm/s)" />
+			<param name="Acceleration" type="double" pass="in" description="Acceleration (mm/s^2)" />
+		</method>	
+		
+		<method name="CallSubroutine" description="Runs a subroutine on the selected drive.">		
+			<param name="Routine" type="string" pass="in" description="Label of routine" />
+		</method>	
+		
+		<method name="GetPosition" description="Retrieves the current position of the drive.">		
+			<param name="Reference" type="enum" class="ReferenceType" pass="in" description="Reference type to use for the position." />	
+			<param name="Position" type="double" pass="return" description="Position (mm)" />
+		</method>
+		
+		<method name="GetSpeed" description="Retrieves the current speed of the drive.">		
+			<param name="Reference" type="enum" class="ReferenceType" pass="in" description="Reference type to use for the speed." />	
+			<param name="Speed" type="double" pass="return" description="Speed (mm/s)" />
+		</method>	
+				
+		<method name="GetIntVariable" description="Retrieves the current position of the drive.">		
+			<param name="VariableName" type="string" pass="in" description="Variable name" />
+			<param name="Value" type="int32" pass="return" description="Value" />
+		</method>	
+		
+		<method name="MotionComplete" description="Checks to see if the  is currently moving.">		
+			<param name="MotionComplete" type="bool" pass="return" description="Boolean reflecting if the drive is in currently moving." />
+		</method>		
+		
+		<method name="TargetReached" description="Checks to see if the drive is in position.">		
+			<param name="TargetReached" type="bool" pass="return" description="Boolean reflecting if the drive is in position." />
+		</method>			
 
 		<method name="GetIdentifier" description="Returns the axis identifier.">		
 			<param name="Identifier" type="string" pass="return" description="Axis identifier." />
@@ -160,6 +224,25 @@ Custom implementation
 		<method name="SetPower" description="Sets the power for an axis.">		
 			<param name="Enable" type="bool" pass="in" description="Flag if the power is enabled or not enabled." />
 		</method>	
+		
+		<method name="ReadRegister" description="Reads the selected register of an axis.">		
+			<param name="Register" type="uint32" pass="in" description="Selected register." />
+			<param name="Data" type="uint32" pass="return" description="Value inside register." />
+		</method>	
+
+		<method name="CheckPower" description="Checks the power of the selected axis.">		
+			<param name="Data" type="bool" pass="return" description="True for power on." />
+		</method>	
+
+		<method name="CheckAxisError" description="Checks for any errors on the selected axis, ignores limits.">		
+			<param name="ErrorRegister" type="uint16" pass="out" description="Error register." />
+			<param name="Data" type="bool" pass="return" description="True for error." />
+		</method>	
+		
+		<method name="ResetAxis" description="Resets the selected axis, homing will be required.">		
+			<param name="ForceFull" type="bool" pass="in" description="To set if a full or just fault reset is run (false=faultreset, true=fullreset)." />
+		</method>	
+
 
 		
 	</class>
@@ -175,6 +258,7 @@ Custom implementation
 			<param name="Identifier" type="string" pass="in" description="Identifier for the axis. Fails if axis already exist." />
 			<param name="AxisID" type="uint32" pass="in" description="Hardware ID of the axis. MUST be unique in the channel." />
 			<param name="Configuration" type="basicarray" class="uint8" pass="in" description="Configuration ZIP file for the axis." />
+			<param name="CountsPerMM" type="uint32" pass="in" description="Sets the mm per count used for all moves and accelerations." />
 			<param name="AxisInstance" type="class" class="Axis" pass="return" description="Returns the axis instance." />
 		</method>	
 

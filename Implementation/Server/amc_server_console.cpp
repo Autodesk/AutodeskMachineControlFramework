@@ -54,12 +54,15 @@ int main ()
 	catch (std::exception& E)
 	{
 		std::cout << "Fatal error: " << E.what () << std::endl;
+		return -1;
 	}
 	catch (...)
 	{
 		std::cout << "Unhandled fatal exception!" << std::endl;
+		return -1;
 	}
 
+	return 0;
 
 	
 }

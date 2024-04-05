@@ -70,6 +70,8 @@ public:
 
 	virtual ~CLogSession();
 
+	std::string GetSessionUUID() override;
+
 	void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp) override;
 
 	LibMCData_uint32 GetMaxLogEntryID() override;

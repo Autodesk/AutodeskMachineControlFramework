@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdriver_scanlab_rtccontext.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
+#include "libmcdriver_scanlab_uartconnection.hpp"
 
 // Include custom headers here.
 #include <math.h>
@@ -132,6 +133,8 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_dLaserFieldMinY (0.0),
 	m_dLaserFieldMaxX (0.0),
 	m_dLaserFieldMaxY (0.0),
+	m_nCurrentScanPositionX (0),
+	m_nCurrentScanPositionY (0),
 	m_bHasLaserField (false),
 	m_b2DMarkOnTheFlyEnabled (false),
 	m_dScaleXInBitsPerEncoderStep (1.0),
@@ -141,6 +144,7 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_pModulationCallback (nullptr),
 	m_pModulationCallbackUserData (nullptr),
 	m_bEnableLineSubdivision (false),
+	m_bMeasurementTagging (false),
 	m_dLineSubdivisionThreshold (RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD)
 
 {
@@ -156,6 +160,11 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 	m_pScanLabSDK->n_reset_error(m_CardNo, 0xffffffff);
+
+	m_CurrentMeasurementTagInfo.m_nCurrentPartID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentProfileID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentVectorID = 0;
 
 }
 
@@ -375,6 +384,11 @@ void CRTCContext::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, cons
 {
 	m_pScanLabSDK->n_set_start_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+	m_CurrentMeasurementTagInfo.m_nCurrentPartID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentProfileID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = 0;
+	m_CurrentMeasurementTagInfo.m_nCurrentVectorID = 0;
 }
 
 void CRTCContext::SetEndOfList()
@@ -648,8 +662,18 @@ void CRTCContext::jumpAbsoluteEx(double dTargetXInMM, double dTargetYInMM)
 	double dTargetXInUnits = round((dTargetXInMM - m_dLaserOriginX) * m_dCorrectionFactor);
 	double dTargetYInUnits = round((dTargetYInMM - m_dLaserOriginY) * m_dCorrectionFactor);
 
-	m_pScanLabSDK->n_jump_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
-	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+	int nTargetX = (int32_t)dTargetXInUnits;
+	int nTargetY = (int32_t)dTargetYInUnits;
+
+	// Avoid Null Jumps!
+	if ((nTargetX != m_nCurrentScanPositionX) || (nTargetY != m_nCurrentScanPositionY)) {
+		m_pScanLabSDK->n_jump_abs(m_CardNo, nTargetX, nTargetY);
+		m_nCurrentScanPositionX = nTargetX;
+		m_nCurrentScanPositionY = nTargetY;
+	}
+
+	// Do not check error because that creates timing issues..
+	// m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 }
 
@@ -687,8 +711,13 @@ void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double 
 			writePower(dNewPowerInPercent, bOIEControlFlag);
 		}
 
-		m_pScanLabSDK->n_mark_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
-		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+		int32_t nTargetX = (int32_t)dTargetXInUnits;
+		int32_t nTargetY = (int32_t)dTargetYInUnits;
+		m_pScanLabSDK->n_mark_abs(m_CardNo, nTargetX, nTargetY);
+		m_nCurrentScanPositionX = nTargetX;
+		m_nCurrentScanPositionY = nTargetY;
+
+		//m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 		
 		dOldX = dMarkToX;
 		dOldY = dMarkToY;
@@ -727,10 +756,12 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 		SetOIEPIDMode(nOIEPIDControlIndex);
 
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
+		pPoint++;
+
+		sendOIEMeasurementTag((uint32_t)index);
 
 		markAbsoluteEx(pPrevPoint->m_X, pPrevPoint->m_Y, pPoint->m_X, pPoint->m_Y, fPower, bOIEControlFlag);
 		pPrevPoint = pPoint;
-		pPoint++;		
 
 	}
 
@@ -759,6 +790,9 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 
 	for (uint64_t index = 0; index < nHatchesBufferSize; index++) {
 		jumpAbsoluteEx(pHatch->m_X1, pHatch->m_Y1);
+
+		sendOIEMeasurementTag((uint32_t)index);
+
 		markAbsoluteEx(pHatch->m_X1, pHatch->m_Y1, pHatch->m_X2, pHatch->m_Y2, fPower, bOIEControlFlag);
 
 		pHatch++;
@@ -789,6 +823,8 @@ void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, con
 	m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+	m_nCurrentScanPositionX = intX;
+	m_nCurrentScanPositionY = intY;
 }
 
 void CRTCContext::AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue)
@@ -880,7 +916,7 @@ void CRTCContext::SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_Scan
 
 		// Make sure List is strictly ascending in Power!
 		int64_t nOldDiscretePower = -1;
-		for (auto point : m_LaserPowerCalibrationList) {
+		for (auto & point : m_LaserPowerCalibrationList) {
 			int64_t nDiscreteLaserPower = (int64_t) round (point.m_PowerSetPointInPercent / m_dLaserPowerCalibrationUnits);
 			if (nDiscreteLaserPower <= nOldDiscretePower)
 				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATELASERPOWERCALIBRATIONSETPOINT);
@@ -964,6 +1000,8 @@ void CRTCContext::AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX
 	m_pScanLabSDK->n_timed_mark_abs(m_CardNo, intX, intY, dDurationInMicroseconds);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+	m_nCurrentScanPositionX = intX;
+	m_nCurrentScanPositionY = intY;
 }
 
 
@@ -1155,6 +1193,22 @@ void CRTCContext::sendFreeVariable0(uint32_t nValue)
 	m_nCurrentFreeVariable0 = nValue;
 }
 
+void CRTCContext::sendOIEMeasurementTag(uint32_t nCurrentVectorID)
+{
+	if (m_bMeasurementTagging) {
+		m_CurrentMeasurementTagInfo.m_nCurrentVectorID = nCurrentVectorID;
+		m_MeasurementTags.push_back(m_CurrentMeasurementTagInfo);
+
+		uint32_t nMeasurementTag = (uint32_t)m_MeasurementTags.size() & ((1UL << 22) - 1);
+
+		m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, nMeasurementTag);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	}
+
+}
+
+
 void CRTCContext::EnableOIE()
 {
 	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
@@ -1163,6 +1217,9 @@ void CRTCContext::EnableOIE()
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	sendFreeVariable0(1);
+
+	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 20, 21, 1, 2);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
@@ -1180,6 +1237,9 @@ void CRTCContext::DisableOIE()
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	sendFreeVariable0(0);
+
+	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
 
@@ -1252,6 +1312,35 @@ void CRTCContext::SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex)
 
 
 }
+
+void CRTCContext::ClearOIEMeasurementTags()
+{
+	m_MeasurementTags.clear();
+}
+
+void CRTCContext::EnableOIEMeasurementTagging()
+{
+	m_bMeasurementTagging = true;
+}
+
+void CRTCContext::DisableOIEMeasurementTagging()
+{
+	m_bMeasurementTagging = false;
+}
+
+void CRTCContext::MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32& nPartID, LibMCDriver_ScanLab_uint32& nProfileID, LibMCDriver_ScanLab_uint32& nSegmentID, LibMCDriver_ScanLab_uint32& nVectorID)
+{
+	if ((nMeasurementTag >= 1) && (nMeasurementTag <= m_MeasurementTags.size())) {
+		auto & record = m_MeasurementTags.at (nMeasurementTag - 1);
+		nPartID = record.m_nCurrentPartID;
+		nSegmentID = record.m_nCurrentSegmentID;
+		nProfileID = record.m_nCurrentProfileID;
+		nVectorID = record.m_nCurrentVectorID;
+
+	} else
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIEMEASUREMENTTAG, "Invalid OIE Measurement Tag" + std::to_string (nMeasurementTag));
+}
+
 
 void CRTCContext::DisableSkyWriting()
 {
@@ -1428,7 +1517,7 @@ uint32_t CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t Data
 	uint32_t Error = 0;
 	uint32_t nDataLength = DataEnd - DataStart;
 
-	std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
+	//std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
 
 	if (nDataLength > 0) {
 
@@ -1472,7 +1561,7 @@ std::string return_current_time_and_date()
 
 void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
 {
-	std::cout << "Executing list position" << std::endl;
+	//std::cout << "Executing list position" << std::endl;
 
 	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
@@ -1688,6 +1777,8 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 
 	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	m_nCurrentScanPositionX = 0;
+	m_nCurrentScanPositionY = 0;
 
 	m_pScanLabSDK->n_init_fly_2d(m_CardNo, 0, 0, 0);
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep);
@@ -1709,6 +1800,8 @@ void CRTCContext::DisableMarkOnTheFly2D()
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
 
 	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
+	m_nCurrentScanPositionX = 0;
+	m_nCurrentScanPositionY = 0;
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
@@ -1784,10 +1877,13 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	uint32_t nSegmentCount = pLayer->GetSegmentCount();
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 
+		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = nSegmentIndex + 1;
+		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "measurementid", 0);
+
 		LibMCEnv::eToolpathSegmentType eSegmentType;
 		uint32_t nPointCount;
 		pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
-
+		
 		bool bDrawSegment = true;
 		if (nAttributeFilterID != 0) {
 			int64_t segmentAttributeValue = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nAttributeFilterID);
@@ -1826,7 +1922,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 					int64_t nSkywritingPost = pLayer->GetSegmentProfileIntegerValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "npost");
 
 					double dSkywritingLimit = 0.0;
-					if (nSkywritingMode == 3) {
+					if ((nSkywritingMode == 3) || (nSkywritingMode == 4)) {
 						dSkywritingLimit = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "limit");
 					}
 
@@ -2022,4 +2118,18 @@ LibMCDriver_ScanLab_uint32 CRTCContext::CheckOnTheFlyError(const bool bFailIfErr
 	}
 	else
 		return 0;
+}
+
+LibMCDriver_ScanLab_int32 CRTCContext::ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	int32_t nRegisterContent = m_pScanLabSDK->n_read_multi_mcbsp(m_CardNo, nRegisterNo);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	return nRegisterContent;
+}
+
+IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate)
+{
+	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate);
 }

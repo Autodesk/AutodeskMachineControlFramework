@@ -563,15 +563,24 @@ public:
 	inline LibMCDriver_ScanLabOIE_uint32 GetAdditionalSignalCount();
 	inline LibMCDriver_ScanLabOIE_uint64 GetRecordCount();
 	inline void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY);
+	inline LibMCDriver_ScanLabOIE_uint32 GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex);
 	inline void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & RTCSignalsBuffer);
 	inline void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SensorSignalsBuffer);
 	inline void GetAdditionalSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & AdditionalSignalsBuffer);
 	inline void GetAllCoordinates(std::vector<LibMCDriver_ScanLabOIE_double> & XArrayBuffer, std::vector<LibMCDriver_ScanLabOIE_double> & YArrayBuffer);
 	inline void GetAllPacketNumbers(std::vector<LibMCDriver_ScanLabOIE_uint32> & PacketNumersBuffer);
+	inline void GetAllMeasurementTags(std::vector<LibMCDriver_ScanLabOIE_uint32> & MeasurementTagsBuffer);
 	inline void GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
 	inline void GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
 	inline void GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
-	inline std::string StoreAsBuildData(const std::string & sName, classParam<LibMCEnv::CBuild> pBuild);
+	inline void AddPacketNumbersToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
+	inline void AddXCoordinatesToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
+	inline void AddYCoordinatesToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
+	inline void AddMeasurementTagsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
+	inline void AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
+	inline void AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
+	inline void AddScaledSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset);
+	inline void AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
 };
 	
 /*************************************************************************************************************************
@@ -788,15 +797,24 @@ public:
 		pWrapperTable->m_DataRecording_GetAdditionalSignalCount = nullptr;
 		pWrapperTable->m_DataRecording_GetRecordCount = nullptr;
 		pWrapperTable->m_DataRecording_GetRecordInformation = nullptr;
+		pWrapperTable->m_DataRecording_GetMeasurementTag = nullptr;
 		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetAdditionalSignalsOfRecord = nullptr;
 		pWrapperTable->m_DataRecording_GetAllCoordinates = nullptr;
 		pWrapperTable->m_DataRecording_GetAllPacketNumbers = nullptr;
+		pWrapperTable->m_DataRecording_GetAllMeasurementTags = nullptr;
 		pWrapperTable->m_DataRecording_GetAllRTCSignals = nullptr;
 		pWrapperTable->m_DataRecording_GetAllSensorSignals = nullptr;
 		pWrapperTable->m_DataRecording_GetAllAdditionalSignals = nullptr;
-		pWrapperTable->m_DataRecording_StoreAsBuildData = nullptr;
+		pWrapperTable->m_DataRecording_AddPacketNumbersToDataTable = nullptr;
+		pWrapperTable->m_DataRecording_AddXCoordinatesToDataTable = nullptr;
+		pWrapperTable->m_DataRecording_AddYCoordinatesToDataTable = nullptr;
+		pWrapperTable->m_DataRecording_AddMeasurementTagsToDataTable = nullptr;
+		pWrapperTable->m_DataRecording_AddRTCSignalsToDataTable = nullptr;
+		pWrapperTable->m_DataRecording_AddSensorSignalsToDataTable = nullptr;
+		pWrapperTable->m_DataRecording_AddScaledSensorSignalsToDataTable = nullptr;
+		pWrapperTable->m_DataRecording_AddAdditionalSignalsToDataTable = nullptr;
 		pWrapperTable->m_OIEDevice_GetDeviceName = nullptr;
 		pWrapperTable->m_OIEDevice_SetHostName = nullptr;
 		pWrapperTable->m_OIEDevice_GetHostName = nullptr;
@@ -1075,6 +1093,15 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetMeasurementTag = (PLibMCDriver_ScanLabOIEDataRecording_GetMeasurementTagPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getmeasurementtag");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetMeasurementTag = (PLibMCDriver_ScanLabOIEDataRecording_GetMeasurementTagPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getmeasurementtag");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetMeasurementTag == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalsOfRecordPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord");
 		#else // _WIN32
 		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalsOfRecordPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord");
@@ -1120,6 +1147,15 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAllMeasurementTags = (PLibMCDriver_ScanLabOIEDataRecording_GetAllMeasurementTagsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallmeasurementtags");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAllMeasurementTags = (PLibMCDriver_ScanLabOIEDataRecording_GetAllMeasurementTagsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallmeasurementtags");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAllMeasurementTags == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataRecording_GetAllRTCSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllRTCSignalsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallrtcsignals");
 		#else // _WIN32
 		pWrapperTable->m_DataRecording_GetAllRTCSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllRTCSignalsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallrtcsignals");
@@ -1147,12 +1183,75 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DataRecording_StoreAsBuildData = (PLibMCDriver_ScanLabOIEDataRecording_StoreAsBuildDataPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_storeasbuilddata");
+		pWrapperTable->m_DataRecording_AddPacketNumbersToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddPacketNumbersToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addpacketnumberstodatatable");
 		#else // _WIN32
-		pWrapperTable->m_DataRecording_StoreAsBuildData = (PLibMCDriver_ScanLabOIEDataRecording_StoreAsBuildDataPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_storeasbuilddata");
+		pWrapperTable->m_DataRecording_AddPacketNumbersToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddPacketNumbersToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addpacketnumberstodatatable");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DataRecording_StoreAsBuildData == nullptr)
+		if (pWrapperTable->m_DataRecording_AddPacketNumbersToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_AddXCoordinatesToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddXCoordinatesToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addxcoordinatestodatatable");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_AddXCoordinatesToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddXCoordinatesToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addxcoordinatestodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_AddXCoordinatesToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_AddYCoordinatesToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddYCoordinatesToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addycoordinatestodatatable");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_AddYCoordinatesToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddYCoordinatesToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addycoordinatestodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_AddYCoordinatesToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_AddMeasurementTagsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddMeasurementTagsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addmeasurementtagstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_AddMeasurementTagsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddMeasurementTagsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addmeasurementtagstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_AddMeasurementTagsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_AddRTCSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addrtcsignalstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_AddRTCSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addrtcsignalstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_AddRTCSignalsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_AddSensorSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddSensorSignalsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addsensorsignalstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_AddSensorSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddSensorSignalsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addsensorsignalstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_AddSensorSignalsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_AddScaledSensorSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddScaledSensorSignalsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addscaledsensorsignalstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_AddScaledSensorSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddScaledSensorSignalsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addscaledsensorsignalstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_AddScaledSensorSignalsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_AddAdditionalSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddAdditionalSignalsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_addadditionalsignalstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_AddAdditionalSignalsToDataTable = (PLibMCDriver_ScanLabOIEDataRecording_AddAdditionalSignalsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_addadditionalsignalstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_AddAdditionalSignalsToDataTable == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1674,6 +1773,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRecordInformation == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getmeasurementtag", (void**)&(pWrapperTable->m_DataRecording_GetMeasurementTag));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetMeasurementTag == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord", (void**)&(pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1694,6 +1797,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllPacketNumbers == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallmeasurementtags", (void**)&(pWrapperTable->m_DataRecording_GetAllMeasurementTags));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllMeasurementTags == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallrtcsignals", (void**)&(pWrapperTable->m_DataRecording_GetAllRTCSignals));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllRTCSignals == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1706,8 +1813,36 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllAdditionalSignals == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_storeasbuilddata", (void**)&(pWrapperTable->m_DataRecording_StoreAsBuildData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_StoreAsBuildData == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addpacketnumberstodatatable", (void**)&(pWrapperTable->m_DataRecording_AddPacketNumbersToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddPacketNumbersToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addxcoordinatestodatatable", (void**)&(pWrapperTable->m_DataRecording_AddXCoordinatesToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddXCoordinatesToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addycoordinatestodatatable", (void**)&(pWrapperTable->m_DataRecording_AddYCoordinatesToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddYCoordinatesToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addmeasurementtagstodatatable", (void**)&(pWrapperTable->m_DataRecording_AddMeasurementTagsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddMeasurementTagsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addrtcsignalstodatatable", (void**)&(pWrapperTable->m_DataRecording_AddRTCSignalsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddRTCSignalsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addsensorsignalstodatatable", (void**)&(pWrapperTable->m_DataRecording_AddSensorSignalsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddSensorSignalsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addscaledsensorsignalstodatatable", (void**)&(pWrapperTable->m_DataRecording_AddScaledSensorSignalsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddScaledSensorSignalsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_addadditionalsignalstodatatable", (void**)&(pWrapperTable->m_DataRecording_AddAdditionalSignalsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_AddAdditionalSignalsToDataTable == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_getdevicename", (void**)&(pWrapperTable->m_OIEDevice_GetDeviceName));
@@ -2172,6 +2307,19 @@ public:
 	}
 	
 	/**
+	* CDataRecording::GetMeasurementTag - Returns the measurement tag of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @return Measurement Tag of the record.
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetMeasurementTag(const LibMCDriver_ScanLabOIE_uint32 nIndex)
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultMeasurementTag = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetMeasurementTag(m_pHandle, nIndex, &resultMeasurementTag));
+		
+		return resultMeasurementTag;
+	}
+	
+	/**
 	* CDataRecording::GetRTCSignalsOfRecord - Returns the RTC signals of a specific record.
 	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
 	* @param[out] RTCSignalsBuffer - Recorded RTC Signals
@@ -2244,6 +2392,19 @@ public:
 	}
 	
 	/**
+	* CDataRecording::GetAllMeasurementTags - Returns an array of all measurement tags.
+	* @param[out] MeasurementTagsBuffer - Array of Measurement Tags of all records.
+	*/
+	void CDataRecording::GetAllMeasurementTags(std::vector<LibMCDriver_ScanLabOIE_uint32> & MeasurementTagsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededMeasurementTags = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenMeasurementTags = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllMeasurementTags(m_pHandle, 0, &elementsNeededMeasurementTags, nullptr));
+		MeasurementTagsBuffer.resize((size_t) elementsNeededMeasurementTags);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllMeasurementTags(m_pHandle, elementsNeededMeasurementTags, &elementsWrittenMeasurementTags, MeasurementTagsBuffer.data()));
+	}
+	
+	/**
 	* CDataRecording::GetAllRTCSignals - Returns an array of all RTC signals of a specific index.
 	* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
 	* @param[out] SignalsBuffer - Array of the Indexed Sensor Signal of all records.
@@ -2286,21 +2447,105 @@ public:
 	}
 	
 	/**
-	* CDataRecording::StoreAsBuildData - Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.
-	* @param[in] sName - Name of the recording to be stored.
-	* @param[in] pBuild - Build that should store the data.
-	* @return Data UUID of the build data.
+	* CDataRecording::AddPacketNumbersToDataTable - Writes the packet numbers to a data table as uint32 columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
 	*/
-	std::string CDataRecording::StoreAsBuildData(const std::string & sName, classParam<LibMCEnv::CBuild> pBuild)
+	void CDataRecording::AddPacketNumbersToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
 	{
-		LibMCEnvHandle hBuild = pBuild.GetHandle();
-		LibMCDriver_ScanLabOIE_uint32 bytesNeededDataUUID = 0;
-		LibMCDriver_ScanLabOIE_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_StoreAsBuildData(m_pHandle, sName.c_str(), hBuild, 0, &bytesNeededDataUUID, nullptr));
-		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_StoreAsBuildData(m_pHandle, sName.c_str(), hBuild, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
-		
-		return std::string(&bufferDataUUID[0]);
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddPacketNumbersToDataTable(m_pHandle, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
+	}
+	
+	/**
+	* CDataRecording::AddXCoordinatesToDataTable - Writes the X coordinates to a data table as double columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	void CDataRecording::AddXCoordinatesToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddXCoordinatesToDataTable(m_pHandle, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
+	}
+	
+	/**
+	* CDataRecording::AddYCoordinatesToDataTable - Writes the Y coordinates to a data table as double columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	void CDataRecording::AddYCoordinatesToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddYCoordinatesToDataTable(m_pHandle, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
+	}
+	
+	/**
+	* CDataRecording::AddMeasurementTagsToDataTable - Writes the measurement tags to a data table as uint32 columns.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	void CDataRecording::AddMeasurementTagsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddMeasurementTagsToDataTable(m_pHandle, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
+	}
+	
+	/**
+	* CDataRecording::AddRTCSignalsToDataTable - Writes a certain RTC channel to a data table as int32 columns.
+	* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	void CDataRecording::AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddRTCSignalsToDataTable(m_pHandle, nRTCIndex, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
+	}
+	
+	/**
+	* CDataRecording::AddSensorSignalsToDataTable - Writes a certain sensor channel to a data table as int32 columns.
+	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	void CDataRecording::AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddSensorSignalsToDataTable(m_pHandle, nSignalIndex, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
+	}
+	
+	/**
+	* CDataRecording::AddScaledSensorSignalsToDataTable - Writes a certain sensor channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+	* @param[in] dOffset - Offset that the raw value is scaled with.
+	*/
+	void CDataRecording::AddScaledSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddScaledSensorSignalsToDataTable(m_pHandle, nSignalIndex, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str(), dScaleFactor, dOffset));
+	}
+	
+	/**
+	* CDataRecording::AddAdditionalSignalsToDataTable - Writes a certain RTC channel to a data table as int32 columns.
+	* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	void CDataRecording::AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_AddAdditionalSignalsToDataTable(m_pHandle, nAdditionalIndex, hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
 	}
 	
 	/**

@@ -45,8 +45,8 @@ Abstract: This is the class declaration of CDriver_GRPC
 #endif
 
 // Include custom headers here.
-
-
+#include "libgrpcwrapper_dynamic.hpp"
+#include <map>
 namespace LibMCDriver_GRPC {
 namespace Impl {
 
@@ -58,34 +58,59 @@ namespace Impl {
 class CDriver_GRPC : public virtual IDriver_GRPC, public virtual CDriver {
 private:
 
-	/**
-	* Put private members here.
-	*/
+	std::string m_sName;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+	bool m_bSimulationMode;
 
-protected:
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 
-	/**
-	* Put protected members here.
-	*/
+	std::map<std::string, LibGRPCWrapper::PConnection> m_Connections;
+
+#ifdef _WIN32
+
+	std::wstring m_sDLLDirectoryW;
+
+	LibMCEnv::PWorkingFile m_pGRPCDLL_AbseilDLL;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_Cares;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_LibCrypto3;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_LibGRPCWrapper;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_LibProtobuf;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_LibProtobufLite;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_LibSSL;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_Re2;
+	LibMCEnv::PWorkingFile m_pGRPCDLL_ZLib;
+#endif
+
+	LibGRPCWrapper::PWrapper m_pGRPCWrapper;
+	LibGRPCWrapper::PConnection m_pGRPCConnection;
+
+	void loadGRPCSDK();
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CDriver_GRPC (const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
+	virtual ~CDriver_GRPC();
 
-	/**
-	* Public member functions to implement.
-	*/
+	void Configure(const std::string& sConfigurationString) override;
+
+	std::string GetName() override;
+
+	std::string GetType() override;
+
+	void GetVersion(LibMCDriver_GRPC_uint32& nMajor, LibMCDriver_GRPC_uint32& nMinor, LibMCDriver_GRPC_uint32& nMicro, std::string& sBuild) override;
+
+	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	void SetToSimulationMode() override;
 
 	bool IsSimulationMode() override;
 
-	void Connect() override;
+	IGRPCConnection* ConnectUnsecure(const std::string& sIdentifier, const std::string& sNetworkCredentials, const std::string& sProtobufDefinition);
 
-	void FindConnection() override;
+	IGRPCConnection* FindConnection(const std::string& sIdentifier, const bool bMustExist) override;
 
 };
 

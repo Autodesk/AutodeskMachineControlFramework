@@ -232,6 +232,45 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES 10135 /** Invalid number of samples */
 #define LIBMCENV_ERROR_EMPTYALERTIDENTIFIER 10136 /** Empty alert identifier */
 #define LIBMCENV_ERROR_INVALIDALERTIDENTIFIER 10137 /** Invalid alert identifier */
+#define LIBMCENV_ERROR_ALERTNOTFOUND 10138 /** Alert not found. */
+#define LIBMCENV_ERROR_USERDOESNOTEXIST 10139 /** User does not exist. */
+#define LIBMCENV_ERROR_EMPTYSHA256SOURCE 10140 /** Empty SHA256 Source. */
+#define LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT 10141 /** Alert has no user context. */
+#define LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME 10142 /** Empty journal stream name. */
+#define LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE 10143 /** Empty journal stream mime type. */
+#define LIBMCENV_ERROR_INVALIDSTREAMREADCALLBACK 10144 /** Invalid stream read callback. */
+#define LIBMCENV_ERROR_INVALIDSTREAMSEEKCALLBACK 10145 /** Invalid stream seek callback. */
+#define LIBMCENV_ERROR_INVALIDSTREAMCALLBACKUSERDATA 10146 /** Invalid stream callback user data. */
+#define LIBMCENV_ERROR_STREAMREADEXCEEDSSTREAMSIZE 10147 /** Stream read exceeds stream size. */
+#define LIBMCENV_ERROR_INVALIDSTREAMREADSIZE 10148 /** Invalid stream read size. */
+#define LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION 10149 /** Invalid stream seek position. */
+#define LIBMCENV_ERROR_STORAGESTREAMNOTFOUND 10150 /** Storage Stream not found. */
+#define LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST 10151 /** Download stream does not exist. */
+#define LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME 10152 /** Empty download stream filename. */
+#define LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME 10153 /** Invalid download stream filename. */
+#define LIBMCENV_ERROR_USERISNOTAUTHORIZED 10154 /** User is not authorized. */
+#define LIBMCENV_ERROR_INVALIDMETADATAKEY 10155 /** Invalid Metadata Key. */
+#define LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION 10156 /** Can not change status of build execution. */
+#define LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER 10157 /** Build execution has no attached user. */
+#define LIBMCENV_ERROR_UNITSAREOUTOFRANGE 10158 /** Units are out of range. */
+#define LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY 10159 /** Column identifier is empty. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER 10160 /** Invalid column identifier. */
+#define LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER 10161 /** Duplicate column identifier. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE 10162 /** Invalid column data type. */
+#define LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS 10163 /** Data table has too many columns. */
+#define LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND 10164 /** Column identifier not found. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNINDEX 10165 /** Invalid column index. */
+#define LIBMCENV_ERROR_COLUMNBUFFERISNULL 10166 /** Column buffer is null. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE 10167 /** Column is not of type double. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32 10168 /** Column is not of type uint32. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64 10169 /** Column is not of type uint64. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32 10170 /** Column is not of type int32. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64 10171 /** Column is not of type int64 */
+#define LIBMCENV_ERROR_INVALIDCSVSEPARATOR 10172 /** Invalid CSV Separator */
+#define LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW 10173 /** Data Table CSV buffer overflow */
+#define LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID 10174 /** Date Time difference is invalid */
+#define LIBMCENV_ERROR_DATETIMEISINVALID 10175 /** Date Time is invalid */
+#define LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS 10176 /** Date Time out of bounds */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -376,6 +415,45 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES: return "Invalid number of samples";
     case LIBMCENV_ERROR_EMPTYALERTIDENTIFIER: return "Empty alert identifier";
     case LIBMCENV_ERROR_INVALIDALERTIDENTIFIER: return "Invalid alert identifier";
+    case LIBMCENV_ERROR_ALERTNOTFOUND: return "Alert not found.";
+    case LIBMCENV_ERROR_USERDOESNOTEXIST: return "User does not exist.";
+    case LIBMCENV_ERROR_EMPTYSHA256SOURCE: return "Empty SHA256 Source.";
+    case LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT: return "Alert has no user context.";
+    case LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME: return "Empty journal stream name.";
+    case LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE: return "Empty journal stream mime type.";
+    case LIBMCENV_ERROR_INVALIDSTREAMREADCALLBACK: return "Invalid stream read callback.";
+    case LIBMCENV_ERROR_INVALIDSTREAMSEEKCALLBACK: return "Invalid stream seek callback.";
+    case LIBMCENV_ERROR_INVALIDSTREAMCALLBACKUSERDATA: return "Invalid stream callback user data.";
+    case LIBMCENV_ERROR_STREAMREADEXCEEDSSTREAMSIZE: return "Stream read exceeds stream size.";
+    case LIBMCENV_ERROR_INVALIDSTREAMREADSIZE: return "Invalid stream read size.";
+    case LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION: return "Invalid stream seek position.";
+    case LIBMCENV_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found.";
+    case LIBMCENV_ERROR_DOWNLOADSTREAMDOESNOTEXIST: return "Download stream does not exist.";
+    case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "Empty download stream filename.";
+    case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "Invalid download stream filename.";
+    case LIBMCENV_ERROR_USERISNOTAUTHORIZED: return "User is not authorized.";
+    case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "Invalid Metadata Key.";
+    case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "Can not change status of build execution.";
+    case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "Build execution has no attached user.";
+    case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range.";
+    case LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY: return "Column identifier is empty.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER: return "Invalid column identifier.";
+    case LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER: return "Duplicate column identifier.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE: return "Invalid column data type.";
+    case LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS: return "Data table has too many columns.";
+    case LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND: return "Column identifier not found.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNINDEX: return "Invalid column index.";
+    case LIBMCENV_ERROR_COLUMNBUFFERISNULL: return "Column buffer is null.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE: return "Column is not of type double.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32: return "Column is not of type uint32.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "Column is not of type uint64.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "Column is not of type int32.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
+    case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
+    case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "Data Table CSV buffer overflow";
+    case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
+    case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
+    case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
     default: return "unknown error";
   }
 }
@@ -387,16 +465,24 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
 typedef LibMCEnvHandle LibMCEnv_TestEnvironment;
+typedef LibMCEnvHandle LibMCEnv_CryptoContext;
 typedef LibMCEnvHandle LibMCEnv_PNGImageStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
+typedef LibMCEnvHandle LibMCEnv_DataTableWriteOptions;
+typedef LibMCEnvHandle LibMCEnv_DataTableCSVWriteOptions;
+typedef LibMCEnvHandle LibMCEnv_DataTable;
 typedef LibMCEnvHandle LibMCEnv_DataSeries;
+typedef LibMCEnvHandle LibMCEnv_DateTimeDifference;
+typedef LibMCEnvHandle LibMCEnv_DateTime;
 typedef LibMCEnvHandle LibMCEnv_MeshObject;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
+typedef LibMCEnvHandle LibMCEnv_BuildExecution;
+typedef LibMCEnvHandle LibMCEnv_BuildExecutionIterator;
 typedef LibMCEnvHandle LibMCEnv_Build;
 typedef LibMCEnvHandle LibMCEnv_WorkingFileExecution;
 typedef LibMCEnvHandle LibMCEnv_WorkingFile;
@@ -415,6 +501,8 @@ typedef LibMCEnvHandle LibMCEnv_DriverStatusUpdateSession;
 typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
+typedef LibMCEnvHandle LibMCEnv_TempStreamWriter;
+typedef LibMCEnvHandle LibMCEnv_StreamReader;
 typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;
 typedef LibMCEnvHandle LibMCEnv_Alert;
@@ -436,7 +524,8 @@ namespace LibMCEnv {
     FatalError = 1,
     CriticalError = 2,
     Warning = 3,
-    Message = 4
+    Message = 4,
+    Unknown = 7
   };
   
   enum class eImagePixelFormat : LibMCEnv_int32 {
@@ -490,6 +579,22 @@ namespace LibMCEnv {
     DialogOKCancel = 2,
     DialogYesNo = 3,
     DialogYesNoCancel = 4
+  };
+  
+  enum class eBuildExecutionStatus : LibMCEnv_int32 {
+    Unknown = 0,
+    InProcess = 1,
+    Finished = 2,
+    Failed = 3
+  };
+  
+  enum class eDataTableColumnType : LibMCEnv_int32 {
+    Unknown = 0,
+    DoubleColumn = 1,
+    Int32Column = 2,
+    Uint32Column = 3,
+    Int64Column = 4,
+    Uint64Column = 5
   };
   
   /*************************************************************************************************************************
@@ -558,6 +663,8 @@ typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
+typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
+typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;

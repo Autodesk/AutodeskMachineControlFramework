@@ -381,6 +381,33 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDALERTLEVEL 354 /** Invalid alert level */
 #define LIBMCDATA_ERROR_ALERTNOTFOUND 355 /** Alert not found */
 #define LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED 356 /** Alert has not been acknowledged. */
+#define LIBMCDATA_ERROR_INVALIDSTORAGESTATE 357 /** Invalid storage state. */
+#define LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS 358 /** Storage writer already exists. */
+#define LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST 359 /** Storage writer does not exist. */
+#define LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL 360 /** Storage stream is not partial. */
+#define LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS 361 /** Storage stream is not random access. */
+#define LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND 362 /** Download ticket not found. */
+#define LIBMCDATA_ERROR_EMPTYCLIENTFILENAME 363 /** Empty client file name. */
+#define LIBMCDATA_ERROR_INVALIDCLIENTFILENAME 364 /** Invalid client file name. */
+#define LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION 365 /** Can not change status of build job execution. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY 366 /** Build job metadata key empty. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID 367 /** Build job metadata key is invalid. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE 368 /** Build job metadata key is not unique. */
+#define LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND 369 /** Build job metadata key not found. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS 370 /** Invalid build job execution status. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND 371 /** Build job execution not found. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS 372 /** Build job execution is not in process. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE 373 /** Build job execution end is not available. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART 374 /** Invalid build job execution start. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND 375 /** Invalid build job execution end. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART 376 /** Build job execution end is before start. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL 377 /** Build job execution is from past journal. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE 378 /** Build job execution start is in the future. */
+#define LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE 379 /** Build job duration is not available. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY 380 /** Build job execution metadata key is empty. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID 381 /** Build job execution metadata key is invalid. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND 382 /** Build job execution metadata key not found. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE 383 /** Build job execution metadata key is duplicate. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -674,6 +701,33 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
     case LIBMCDATA_ERROR_ALERTNOTFOUND: return "Alert not found";
     case LIBMCDATA_ERROR_ALERTNOTACKNOWLEDGED: return "Alert has not been acknowledged.";
+    case LIBMCDATA_ERROR_INVALIDSTORAGESTATE: return "Invalid storage state.";
+    case LIBMCDATA_ERROR_STORAGEWRITERALREADYEXISTS: return "Storage writer already exists.";
+    case LIBMCDATA_ERROR_STORAGEWRITERDOESNOTEXIST: return "Storage writer does not exist.";
+    case LIBMCDATA_ERROR_STORAGESTREAMNOTPARTIAL: return "Storage stream is not partial.";
+    case LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS: return "Storage stream is not random access.";
+    case LIBMCDATA_ERROR_DOWNLOADTICKETNOTFOUND: return "Download ticket not found.";
+    case LIBMCDATA_ERROR_EMPTYCLIENTFILENAME: return "Empty client file name.";
+    case LIBMCDATA_ERROR_INVALIDCLIENTFILENAME: return "Invalid client file name.";
+    case LIBMCDATA_ERROR_CANNOTCHANGESTATUSOFBUILDJOBEXECUTION: return "Can not change status of build job execution.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY: return "Build job metadata key empty.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID: return "Build job metadata key is invalid.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYDUPLICATE: return "Build job metadata key is not unique.";
+    case LIBMCDATA_ERROR_BUILDJOBMETADATAKEYNOTFOUND: return "Build job metadata key not found.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTATUS: return "Invalid build job execution status.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND: return "Build job execution not found.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS: return "Build job execution is not in process.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE: return "Build job execution end is not available.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART: return "Invalid build job execution start.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND: return "Invalid build job execution end.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART: return "Build job execution end is before start.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL: return "Build job execution is from past journal.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE: return "Build job execution start is in the future.";
+    case LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE: return "Build job duration is not available.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY: return "Build job execution metadata key is empty.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "Build job execution metadata key is invalid.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "Build job execution metadata key not found.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "Build job execution metadata key is duplicate.";
     default: return "unknown error";
   }
 }
@@ -686,18 +740,26 @@ typedef LibMCDataHandle LibMCData_Base;
 typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogEntryList;
 typedef LibMCDataHandle LibMCData_LogSession;
+typedef LibMCDataHandle LibMCData_Alert;
+typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
+typedef LibMCDataHandle LibMCData_CustomDataStream;
 typedef LibMCDataHandle LibMCData_BuildJobData;
 typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
+typedef LibMCDataHandle LibMCData_BuildJobExecutionData;
+typedef LibMCDataHandle LibMCData_BuildJobExecutionDataIterator;
+typedef LibMCDataHandle LibMCData_BuildJobExecution;
+typedef LibMCDataHandle LibMCData_BuildJobExecutionIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
 typedef LibMCDataHandle LibMCData_UserList;
 typedef LibMCDataHandle LibMCData_LoginHandler;
 typedef LibMCDataHandle LibMCData_PersistencyHandler;
+typedef LibMCDataHandle LibMCData_InstallationInformation;
 typedef LibMCDataHandle LibMCData_DataModel;
 
 namespace LibMCData {
@@ -746,7 +808,7 @@ namespace LibMCData {
     Deleted = 400
   };
   
-  enum class eBuildJobDataType : LibMCData_int32 {
+  enum class eCustomDataType : LibMCData_int32 {
     Unknown = 0,
     Toolpath = 1,
     PNGImage = 2,
@@ -755,6 +817,13 @@ namespace LibMCData {
     Timeline = 5,
     SVGImage = 6,
     CustomBinaryData = 100
+  };
+  
+  enum class eBuildJobExecutionStatus : LibMCData_int32 {
+    Unknown = 0,
+    InProcess = 1,
+    Finished = 2,
+    Failed = 3
   };
   
   /*************************************************************************************************************************
@@ -819,7 +888,8 @@ typedef LibMCData::eLogLevel eLibMCDataLogLevel;
 typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
-typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
+typedef LibMCData::eCustomDataType eLibMCDataCustomDataType;
+typedef LibMCData::eBuildJobExecutionStatus eLibMCDataBuildJobExecutionStatus;
 typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
 typedef LibMCData::sJournalChunkIntegerEntry sLibMCDataJournalChunkIntegerEntry;
 typedef LibMCData::LogCallback LibMCDataLogCallback;
