@@ -160,9 +160,9 @@ void CDataRecording::GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBuff
 		*pYArrayNeededCount = nRecordCount;
 
 	if (pXArrayBuffer != nullptr)
-		m_pDataRecordingInstance->copyXCoordinates(pXArrayBuffer, nXArrayBufferSize);
+		m_pDataRecordingInstance->copyAllXCoordinates(pXArrayBuffer, nXArrayBufferSize);
 	if (pYArrayBuffer != nullptr)
-		m_pDataRecordingInstance->copyYCoordinates(pYArrayBuffer, nYArrayBufferSize);
+		m_pDataRecordingInstance->copyAllYCoordinates(pYArrayBuffer, nYArrayBufferSize);
 
 }
 
@@ -173,7 +173,7 @@ void CDataRecording::GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNu
 		*pPacketNumersNeededCount = nRecordCount;
 
 	if (pPacketNumersBuffer != nullptr)
-		m_pDataRecordingInstance->copyPacketNumbers(pPacketNumersBuffer, nPacketNumersBufferSize);
+		m_pDataRecordingInstance->copyAllPacketNumbers(pPacketNumersBuffer, nPacketNumersBufferSize);
 }
 
 void CDataRecording::GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasurementTagsBufferSize, LibMCDriver_ScanLabOIE_uint64* pMeasurementTagsNeededCount, LibMCDriver_ScanLabOIE_uint32* pMeasurementTagsBuffer)
@@ -183,7 +183,7 @@ void CDataRecording::GetAllMeasurementTags(LibMCDriver_ScanLabOIE_uint64 nMeasur
 		*pMeasurementTagsNeededCount = nRecordCount;
 
 	if (pMeasurementTagsBuffer != nullptr)
-		m_pDataRecordingInstance->copyMeasurementTags(pMeasurementTagsBuffer, nMeasurementTagsBufferSize);
+		m_pDataRecordingInstance->copyAllMeasurementTags(pMeasurementTagsBuffer, nMeasurementTagsBufferSize);
 
 }
 
@@ -218,8 +218,151 @@ void CDataRecording::GetAllAdditionalSignals(const LibMCDriver_ScanLabOIE_uint32
 
 }
 
-std::string CDataRecording::StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild)
+void CDataRecording::AddPacketNumbersToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::Uint32Column);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<uint32_t> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllPacketNumbers(buffer.data (), buffer.size ());
+		pDataTable->SetUint32ColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CDataRecording::AddXCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<double> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllXCoordinates(buffer.data(), buffer.size());
+		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CDataRecording::AddYCoordinatesToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<double> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllYCoordinates(buffer.data(), buffer.size());
+		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CDataRecording::AddMeasurementTagsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::Uint32Column);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<uint32_t> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllMeasurementTags(buffer.data(), buffer.size());
+		pDataTable->SetUint32ColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CDataRecording::AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	if (nRTCIndex >= GetRTCSignalCount ())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::Int32Column);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<int32_t> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllRTCSignalsByIndex(nRTCIndex, buffer.data(), buffer.size());
+		pDataTable->SetInt32ColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CDataRecording::AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	if (nSignalIndex >= GetSensorSignalCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::Int32Column);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<int32_t> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllSensorSignalsByIndex(nSignalIndex, buffer.data(), buffer.size());
+		pDataTable->SetInt32ColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CDataRecording::AddScaledSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	if (nSignalIndex >= GetSensorSignalCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<double> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllScaledSensorSignalsByIndex(nSignalIndex, buffer.data(), buffer.size(), dScaleFactor, dOffset);
+		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CDataRecording::AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	if (nAdditionalIndex >= GetAdditionalSignalCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::Int32Column);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<int32_t> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllAdditionalSignalsByIndex(nAdditionalIndex, buffer.data(), buffer.size());
+		pDataTable->SetInt32ColumnValues(sColumnIdentifier, buffer);
+	}
+
 }
 

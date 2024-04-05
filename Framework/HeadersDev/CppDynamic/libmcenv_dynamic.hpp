@@ -68,11 +68,18 @@ class CPNGImageData;
 class CImageData;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
+class CDataTableWriteOptions;
+class CDataTableCSVWriteOptions;
+class CDataTable;
 class CDataSeries;
+class CDateTimeDifference;
+class CDateTime;
 class CMeshObject;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
+class CBuildExecution;
+class CBuildExecutionIterator;
 class CBuild;
 class CWorkingFileExecution;
 class CWorkingFile;
@@ -117,11 +124,18 @@ typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CImageData CLibMCEnvImageData;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
+typedef CDataTableWriteOptions CLibMCEnvDataTableWriteOptions;
+typedef CDataTableCSVWriteOptions CLibMCEnvDataTableCSVWriteOptions;
+typedef CDataTable CLibMCEnvDataTable;
 typedef CDataSeries CLibMCEnvDataSeries;
+typedef CDateTimeDifference CLibMCEnvDateTimeDifference;
+typedef CDateTime CLibMCEnvDateTime;
 typedef CMeshObject CLibMCEnvMeshObject;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
+typedef CBuildExecution CLibMCEnvBuildExecution;
+typedef CBuildExecutionIterator CLibMCEnvBuildExecutionIterator;
 typedef CBuild CLibMCEnvBuild;
 typedef CWorkingFileExecution CLibMCEnvWorkingFileExecution;
 typedef CWorkingFile CLibMCEnvWorkingFile;
@@ -166,11 +180,18 @@ typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
+typedef std::shared_ptr<CDataTableWriteOptions> PDataTableWriteOptions;
+typedef std::shared_ptr<CDataTableCSVWriteOptions> PDataTableCSVWriteOptions;
+typedef std::shared_ptr<CDataTable> PDataTable;
 typedef std::shared_ptr<CDataSeries> PDataSeries;
+typedef std::shared_ptr<CDateTimeDifference> PDateTimeDifference;
+typedef std::shared_ptr<CDateTime> PDateTime;
 typedef std::shared_ptr<CMeshObject> PMeshObject;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
+typedef std::shared_ptr<CBuildExecution> PBuildExecution;
+typedef std::shared_ptr<CBuildExecutionIterator> PBuildExecutionIterator;
 typedef std::shared_ptr<CBuild> PBuild;
 typedef std::shared_ptr<CWorkingFileExecution> PWorkingFileExecution;
 typedef std::shared_ptr<CWorkingFile> PWorkingFile;
@@ -215,11 +236,18 @@ typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PImageData PLibMCEnvImageData;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
+typedef PDataTableWriteOptions PLibMCEnvDataTableWriteOptions;
+typedef PDataTableCSVWriteOptions PLibMCEnvDataTableCSVWriteOptions;
+typedef PDataTable PLibMCEnvDataTable;
 typedef PDataSeries PLibMCEnvDataSeries;
+typedef PDateTimeDifference PLibMCEnvDateTimeDifference;
+typedef PDateTime PLibMCEnvDateTime;
 typedef PMeshObject PLibMCEnvMeshObject;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
+typedef PBuildExecution PLibMCEnvBuildExecution;
+typedef PBuildExecutionIterator PLibMCEnvBuildExecutionIterator;
 typedef PBuild PLibMCEnvBuild;
 typedef PWorkingFileExecution PLibMCEnvWorkingFileExecution;
 typedef PWorkingFile PLibMCEnvWorkingFile;
@@ -482,6 +510,28 @@ public:
 			case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "EMPTYDOWNLOADSTREAMFILENAME";
 			case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "INVALIDDOWNLOADSTREAMFILENAME";
 			case LIBMCENV_ERROR_USERISNOTAUTHORIZED: return "USERISNOTAUTHORIZED";
+			case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "INVALIDMETADATAKEY";
+			case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "CANNOTCHANGESTATUSOFBUILDEXECUTION";
+			case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "BUILDEXECUTIONHASNOATTACHEDUSER";
+			case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "UNITSAREOUTOFRANGE";
+			case LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY: return "COLUMNIDENTIFIEREMPTY";
+			case LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER: return "INVALIDCOLUMNIDENTIFIER";
+			case LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER: return "DUPLICATECOLUMNIDENTIFIER";
+			case LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE: return "INVALIDCOLUMNDATATYPE";
+			case LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS: return "DATATABLEHASTOOMANYCOLUMS";
+			case LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND: return "COLUMNIDENTIFIERNOTFOUND";
+			case LIBMCENV_ERROR_INVALIDCOLUMNINDEX: return "INVALIDCOLUMNINDEX";
+			case LIBMCENV_ERROR_COLUMNBUFFERISNULL: return "COLUMNBUFFERISNULL";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE: return "COLUMNISNOTOFTYPEDOUBLE";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32: return "COLUMNISNOTOFTYPEUINT32";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "COLUMNISNOTOFTYPEUINT64";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "COLUMNISNOTOFTYPEINT32";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "COLUMNISNOTOFTYPEINT64";
+			case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "INVALIDCSVSEPARATOR";
+			case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "DATATABLECSVBUFFEROVERFLOW";
+			case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "DATETIMEDIFFERENCEISINVALID";
+			case LIBMCENV_ERROR_DATETIMEISINVALID: return "DATETIMEISINVALID";
+			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "DATETIMEOUTOFBOUNDS";
 		}
 		return "UNKNOWN";
 	}
@@ -643,6 +693,28 @@ public:
 			case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "Empty download stream filename.";
 			case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "Invalid download stream filename.";
 			case LIBMCENV_ERROR_USERISNOTAUTHORIZED: return "User is not authorized.";
+			case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "Invalid Metadata Key.";
+			case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "Can not change status of build execution.";
+			case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "Build execution has no attached user.";
+			case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range.";
+			case LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY: return "Column identifier is empty.";
+			case LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER: return "Invalid column identifier.";
+			case LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER: return "Duplicate column identifier.";
+			case LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE: return "Invalid column data type.";
+			case LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS: return "Data table has too many columns.";
+			case LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND: return "Column identifier not found.";
+			case LIBMCENV_ERROR_INVALIDCOLUMNINDEX: return "Invalid column index.";
+			case LIBMCENV_ERROR_COLUMNBUFFERISNULL: return "Column buffer is null.";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE: return "Column is not of type double.";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32: return "Column is not of type uint32.";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "Column is not of type uint64.";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "Column is not of type int32.";
+			case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
+			case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
+			case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "Data Table CSV buffer overflow";
+			case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
+			case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
+			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
 		}
 		return "unknown error";
 	}
@@ -768,11 +840,18 @@ private:
 	friend class CImageData;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
+	friend class CDataTableWriteOptions;
+	friend class CDataTableCSVWriteOptions;
+	friend class CDataTable;
 	friend class CDataSeries;
+	friend class CDateTimeDifference;
+	friend class CDateTime;
 	friend class CMeshObject;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
+	friend class CBuildExecution;
+	friend class CBuildExecutionIterator;
 	friend class CBuild;
 	friend class CWorkingFileExecution;
 	friend class CWorkingFile;
@@ -1047,6 +1126,77 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDataTableWriteOptions 
+**************************************************************************************************************************/
+class CDataTableWriteOptions : public CBase {
+public:
+	
+	/**
+	* CDataTableWriteOptions::CDataTableWriteOptions - Constructor for DataTableWriteOptions class.
+	*/
+	CDataTableWriteOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+};
+	
+/*************************************************************************************************************************
+ Class CDataTableCSVWriteOptions 
+**************************************************************************************************************************/
+class CDataTableCSVWriteOptions : public CBase {
+public:
+	
+	/**
+	* CDataTableCSVWriteOptions::CDataTableCSVWriteOptions - Constructor for DataTableCSVWriteOptions class.
+	*/
+	CDataTableCSVWriteOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetSeparator();
+	inline void SetSeparator(const std::string & sSeparator);
+};
+	
+/*************************************************************************************************************************
+ Class CDataTable 
+**************************************************************************************************************************/
+class CDataTable : public CBase {
+public:
+	
+	/**
+	* CDataTable::CDataTable - Constructor for DataTable class.
+	*/
+	CDataTable(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void AddColumn(const std::string & sIdentifier, const std::string & sDescription, const eDataTableColumnType eColumnType);
+	inline void RemoveColumn(const std::string & sIdentifier);
+	inline bool HasColumn(const std::string & sIdentifier);
+	inline LibMCEnv_uint32 GetRowCount();
+	inline LibMCEnv_uint32 GetColumnCount();
+	inline std::string GetColumnIdentifier(const LibMCEnv_uint32 nColumnIndex);
+	inline std::string GetColumnDescription(const LibMCEnv_uint32 nColumnIndex);
+	inline eDataTableColumnType GetColumnType(const LibMCEnv_uint32 nColumnIndex);
+	inline void GetColumnInformation(const std::string & sIdentifier, std::string & sDescription, eDataTableColumnType & eColumnType);
+	inline void GetDoubleColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_double> & ValuesBuffer);
+	inline void GetInt32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int32> & ValuesBuffer);
+	inline void GetInt64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int64> & ValuesBuffer);
+	inline void GetUint32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint32> & ValuesBuffer);
+	inline void GetUint64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint64> & ValuesBuffer);
+	inline void SetDoubleColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_double> & ValuesBuffer);
+	inline void SetInt32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int32> & ValuesBuffer);
+	inline void SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer);
+	inline void SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer);
+	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
+	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions);
+	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
+};
+	
+/*************************************************************************************************************************
  Class CDataSeries 
 **************************************************************************************************************************/
 class CDataSeries : public CBase {
@@ -1071,6 +1221,90 @@ public:
 	inline void SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta);
 	inline LibMCEnv_uint32 GetVersion();
 	inline void IncreaseVersion();
+};
+	
+/*************************************************************************************************************************
+ Class CDateTimeDifference 
+**************************************************************************************************************************/
+class CDateTimeDifference : public CBase {
+public:
+	
+	/**
+	* CDateTimeDifference::CDateTimeDifference - Constructor for DateTimeDifference class.
+	*/
+	CDateTimeDifference(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 ToMicroseconds();
+	inline LibMCEnv_uint64 ToMilliseconds();
+	inline LibMCEnv_uint64 ToSeconds();
+	inline LibMCEnv_uint64 ToMinutes();
+	inline LibMCEnv_uint64 ToHours();
+	inline LibMCEnv_uint64 ToDays();
+	inline void RoundDownToDay();
+	inline void RoundDownToHour();
+	inline void RoundDownToMinute();
+	inline void RoundDownToSeconds();
+	inline void RoundDownToMilliseconds();
+	inline void RoundUpToDay();
+	inline void RoundUpToHour();
+	inline void RoundUpToMinute();
+	inline void RoundUpToSeconds();
+	inline void RoundupToMilliseconds();
+};
+	
+/*************************************************************************************************************************
+ Class CDateTime 
+**************************************************************************************************************************/
+class CDateTime : public CBase {
+public:
+	
+	/**
+	* CDateTime::CDateTime - Constructor for DateTime class.
+	*/
+	CDateTime(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 ToMicrosecondsSince1970();
+	inline LibMCEnv_uint64 ToUnixTimestamp();
+	inline std::string ToUTCDateTime();
+	inline std::string ToUTCDateTimeInMilliseconds();
+	inline std::string ToUTCDateTimeInMicroseconds();
+	inline void GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay);
+	inline void GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond);
+	inline PDateTime Duplicate();
+	inline bool IsLeapYear();
+	inline bool IsLaterThan(classParam<CDateTime> pOtherTimeStamp);
+	inline bool IsEarlierThan(classParam<CDateTime> pOtherTimeStamp);
+	inline bool IsEqualTo(classParam<CDateTime> pOtherTimeStamp);
+	inline PDateTimeDifference GetTimeDifference(classParam<CDateTime> pOtherTimeStamp);
+	inline void AddDuration(classParam<CDateTimeDifference> pDuration);
+	inline void SubtractDuration(classParam<CDateTimeDifference> pDuration);
+	inline void ShiftByYears(const LibMCEnv_int64 nDeltaYears);
+	inline void ShiftByDays(const LibMCEnv_int64 nDeltaDays);
+	inline void ShiftByHours(const LibMCEnv_int64 nDeltaHours);
+	inline void ShiftByMinutes(const LibMCEnv_int64 nDeltaMinutes);
+	inline void ShiftBySeconds(const LibMCEnv_int64 nDeltaSeconds);
+	inline void ShiftByMilliseconds(const LibMCEnv_int64 nDeltaMilliseconds);
+	inline void ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds);
+	inline void RoundDownToYear();
+	inline void RoundDownToMonth();
+	inline void RoundDownToDay();
+	inline void RoundDownToHour();
+	inline void RoundDownToMinute();
+	inline void RoundDownToSeconds();
+	inline void RoundDownToMilliseconds();
+	inline void RoundUpToYear();
+	inline void RoundUpToMonth();
+	inline void RoundUpToDay();
+	inline void RoundUpToHour();
+	inline void RoundUpToMinute();
+	inline void RoundUpToSeconds();
+	inline void RoundUpToMilliseconds();
 };
 	
 /*************************************************************************************************************************
@@ -1206,6 +1440,69 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CBuildExecution 
+**************************************************************************************************************************/
+class CBuildExecution : public CBase {
+public:
+	
+	/**
+	* CBuildExecution::CBuildExecution - Constructor for BuildExecution class.
+	*/
+	CBuildExecution(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline std::string GetBuildUUID();
+	inline PBuild GetBuild();
+	inline eBuildExecutionStatus GetExecutionStatus();
+	inline bool IsInProcess();
+	inline bool IsFinished();
+	inline bool IsFailed();
+	inline void SetStatusToFinished();
+	inline void SetStatusToFailed();
+	inline std::string GetDescription();
+	inline void SetDescription(const std::string & sDescription);
+	inline std::string GetJournalUUID();
+	inline bool HasAttachedUser();
+	inline std::string GetUserUUID();
+	inline LibMCEnv_uint64 GetStartTimeStampInMilliseconds();
+	inline LibMCEnv_uint64 GetStartTimeStampInMicroseconds();
+	inline LibMCEnv_uint64 GetEndTimeStampInMilliseconds();
+	inline LibMCEnv_uint64 GetEndTimeStampInMicroseconds();
+	inline LibMCEnv_uint64 GetElapsedTimeInMilliseconds();
+	inline LibMCEnv_uint64 GetElapsedTimeInMicroseconds();
+	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
+	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
+	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
+	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline bool HasMetaDataString(const std::string & sKey);
+	inline std::string GetMetaDataString(const std::string & sKey);
+};
+	
+/*************************************************************************************************************************
+ Class CBuildExecutionIterator 
+**************************************************************************************************************************/
+class CBuildExecutionIterator : public CIterator {
+public:
+	
+	/**
+	* CBuildExecutionIterator::CBuildExecutionIterator - Constructor for BuildExecutionIterator class.
+	*/
+	CBuildExecutionIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PBuildExecution GetCurrentExecution();
+};
+	
+/*************************************************************************************************************************
  Class CBuild 
 **************************************************************************************************************************/
 class CBuild : public CBase {
@@ -1237,6 +1534,14 @@ public:
 	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
 	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline PBuildExecution StartExecution(const std::string & sDescription, const std::string & sUserUUID);
+	inline bool HasExecution(const std::string & sExecutionUUID);
+	inline PBuildExecution FindExecution(const std::string & sExecutionUUID);
+	inline PBuildExecutionIterator ListExecutions(const bool bOnlyCurrentJournalSession);
+	inline PBuildExecutionIterator ListExecutionsByStatus(const eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline bool HasMetaDataString(const std::string & sKey);
+	inline std::string GetMetaDataString(const std::string & sKey);
 };
 	
 /*************************************************************************************************************************
@@ -1620,6 +1925,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PDataTable CreateDataTable();
 	inline bool DriverHasResourceData(const std::string & sIdentifier);
 	inline bool MachineHasResourceData(const std::string & sIdentifier);
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
@@ -1630,6 +1936,7 @@ public:
 	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue);
+	inline void RegisterDoubleParameterWithUnits(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits);
 	inline void RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_int64 nDefaultValue);
 	inline void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue);
 	inline void SetStringParameter(const std::string & sParameterName, const std::string & sValue);
@@ -1806,7 +2113,9 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeStamp();
 	inline LibMCEnv_double ComputeFullAverage();
 	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval);
-	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+	inline LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
+	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
+	inline PUniformJournalSampling ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples);
 	inline void ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer);
 };
 	
@@ -1832,6 +2141,7 @@ public:
 	inline bool NeedsAcknowledgement();
 	inline bool HasBeenAcknowledged();
 	inline void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime);
+	inline PDateTime GetAcknowledgementTime();
 	inline void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment);
 	inline void AcknowledgeAlertForCurrentUser(const std::string & sUserComment);
 	inline void DeactivateAlert();
@@ -1868,12 +2178,9 @@ public:
 	{
 	}
 	
-	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds);
+	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
 	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
-	inline LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
-	inline bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName);
-	inline LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique);
-	inline void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, std::vector<LibMCEnv_uint64> & TimeStampsBuffer);
+	inline PDateTime GetStartTime();
 };
 	
 /*************************************************************************************************************************
@@ -1999,6 +2306,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PDataTable CreateDataTable();
 	inline bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier);
 	inline PUserManagementHandler CreateUserManagement();
 	inline PJournalHandler GetCurrentJournal();
@@ -2093,6 +2401,7 @@ public:
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
 	inline PXMLDocument ParseXMLData(const CInputVector<LibMCEnv_uint8> & XMLDataBuffer);
+	inline PDataTable CreateDataTable();
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
@@ -2259,6 +2568,29 @@ public:
 		pWrapperTable->m_DiscreteFieldData2D_TransformField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_AddField = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
+		pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator = nullptr;
+		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = nullptr;
+		pWrapperTable->m_DataTable_AddColumn = nullptr;
+		pWrapperTable->m_DataTable_RemoveColumn = nullptr;
+		pWrapperTable->m_DataTable_HasColumn = nullptr;
+		pWrapperTable->m_DataTable_GetRowCount = nullptr;
+		pWrapperTable->m_DataTable_GetColumnCount = nullptr;
+		pWrapperTable->m_DataTable_GetColumnIdentifier = nullptr;
+		pWrapperTable->m_DataTable_GetColumnDescription = nullptr;
+		pWrapperTable->m_DataTable_GetColumnType = nullptr;
+		pWrapperTable->m_DataTable_GetColumnInformation = nullptr;
+		pWrapperTable->m_DataTable_GetDoubleColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetInt32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetInt64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetUint32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_GetUint64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetDoubleColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetInt32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetInt64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetUint32ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_SetUint64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_WriteCSVToStream = nullptr;
+		pWrapperTable->m_DataTable_WriteDataToStream = nullptr;
 		pWrapperTable->m_DataSeries_GetName = nullptr;
 		pWrapperTable->m_DataSeries_GetUUID = nullptr;
 		pWrapperTable->m_DataSeries_Clear = nullptr;
@@ -2270,6 +2602,58 @@ public:
 		pWrapperTable->m_DataSeries_SampleJournalVariable = nullptr;
 		pWrapperTable->m_DataSeries_GetVersion = nullptr;
 		pWrapperTable->m_DataSeries_IncreaseVersion = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToMicroseconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToMilliseconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToSeconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToMinutes = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToHours = nullptr;
+		pWrapperTable->m_DateTimeDifference_ToDays = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToDay = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToHour = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToMinute = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToSeconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToDay = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToHour = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToMinute = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundUpToSeconds = nullptr;
+		pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1970 = nullptr;
+		pWrapperTable->m_DateTime_ToUnixTimestamp = nullptr;
+		pWrapperTable->m_DateTime_ToUTCDateTime = nullptr;
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds = nullptr;
+		pWrapperTable->m_DateTime_GetDate = nullptr;
+		pWrapperTable->m_DateTime_GetTime = nullptr;
+		pWrapperTable->m_DateTime_Duplicate = nullptr;
+		pWrapperTable->m_DateTime_IsLeapYear = nullptr;
+		pWrapperTable->m_DateTime_IsLaterThan = nullptr;
+		pWrapperTable->m_DateTime_IsEarlierThan = nullptr;
+		pWrapperTable->m_DateTime_IsEqualTo = nullptr;
+		pWrapperTable->m_DateTime_GetTimeDifference = nullptr;
+		pWrapperTable->m_DateTime_AddDuration = nullptr;
+		pWrapperTable->m_DateTime_SubtractDuration = nullptr;
+		pWrapperTable->m_DateTime_ShiftByYears = nullptr;
+		pWrapperTable->m_DateTime_ShiftByDays = nullptr;
+		pWrapperTable->m_DateTime_ShiftByHours = nullptr;
+		pWrapperTable->m_DateTime_ShiftByMinutes = nullptr;
+		pWrapperTable->m_DateTime_ShiftBySeconds = nullptr;
+		pWrapperTable->m_DateTime_ShiftByMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_ShiftByMicroseconds = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToYear = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToMonth = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToDay = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToHour = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToMinute = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToSeconds = nullptr;
+		pWrapperTable->m_DateTime_RoundDownToMilliseconds = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToYear = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToMonth = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToDay = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToHour = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToMinute = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToSeconds = nullptr;
+		pWrapperTable->m_DateTime_RoundUpToMilliseconds = nullptr;
 		pWrapperTable->m_MeshObject_GetName = nullptr;
 		pWrapperTable->m_MeshObject_GetUUID = nullptr;
 		pWrapperTable->m_MeshObject_GetTriangleCount = nullptr;
@@ -2338,6 +2722,37 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetMetaDataContent = nullptr;
 		pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData = nullptr;
+		pWrapperTable->m_BuildExecution_GetUUID = nullptr;
+		pWrapperTable->m_BuildExecution_GetBuildUUID = nullptr;
+		pWrapperTable->m_BuildExecution_GetBuild = nullptr;
+		pWrapperTable->m_BuildExecution_GetExecutionStatus = nullptr;
+		pWrapperTable->m_BuildExecution_IsInProcess = nullptr;
+		pWrapperTable->m_BuildExecution_IsFinished = nullptr;
+		pWrapperTable->m_BuildExecution_IsFailed = nullptr;
+		pWrapperTable->m_BuildExecution_SetStatusToFinished = nullptr;
+		pWrapperTable->m_BuildExecution_SetStatusToFailed = nullptr;
+		pWrapperTable->m_BuildExecution_GetDescription = nullptr;
+		pWrapperTable->m_BuildExecution_SetDescription = nullptr;
+		pWrapperTable->m_BuildExecution_GetJournalUUID = nullptr;
+		pWrapperTable->m_BuildExecution_HasAttachedUser = nullptr;
+		pWrapperTable->m_BuildExecution_GetUserUUID = nullptr;
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = nullptr;
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_AddBinaryData = nullptr;
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = nullptr;
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID = nullptr;
+		pWrapperTable->m_BuildExecution_StoreDiscreteField2D = nullptr;
+		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = nullptr;
+		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = nullptr;
+		pWrapperTable->m_BuildExecution_StorePNGImage = nullptr;
+		pWrapperTable->m_BuildExecution_AddMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecution_HasMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecution_GetMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
@@ -2356,6 +2771,14 @@ public:
 		pWrapperTable->m_Build_LoadPNGImageByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadPNGImageByUUID = nullptr;
 		pWrapperTable->m_Build_StorePNGImage = nullptr;
+		pWrapperTable->m_Build_StartExecution = nullptr;
+		pWrapperTable->m_Build_HasExecution = nullptr;
+		pWrapperTable->m_Build_FindExecution = nullptr;
+		pWrapperTable->m_Build_ListExecutions = nullptr;
+		pWrapperTable->m_Build_ListExecutionsByStatus = nullptr;
+		pWrapperTable->m_Build_AddMetaDataString = nullptr;
+		pWrapperTable->m_Build_HasMetaDataString = nullptr;
+		pWrapperTable->m_Build_GetMetaDataString = nullptr;
 		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
 		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = nullptr;
 		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = nullptr;
@@ -2499,6 +2922,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_DriverEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_DriverEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateDataTable = nullptr;
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
@@ -2509,6 +2933,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetStringParameter = nullptr;
@@ -2589,7 +3014,9 @@ public:
 		pWrapperTable->m_JournalVariable_GetEndTimeStamp = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeFullAverage = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeAverage = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeSample = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = nullptr;
 		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = nullptr;
 		pWrapperTable->m_Alert_GetUUID = nullptr;
 		pWrapperTable->m_Alert_IsActive = nullptr;
@@ -2599,16 +3026,14 @@ public:
 		pWrapperTable->m_Alert_NeedsAcknowledgement = nullptr;
 		pWrapperTable->m_Alert_HasBeenAcknowledged = nullptr;
 		pWrapperTable->m_Alert_GetAcknowledgementInformation = nullptr;
+		pWrapperTable->m_Alert_GetAcknowledgementTime = nullptr;
 		pWrapperTable->m_Alert_AcknowledgeForUser = nullptr;
 		pWrapperTable->m_Alert_AcknowledgeAlertForCurrentUser = nullptr;
 		pWrapperTable->m_Alert_DeactivateAlert = nullptr;
 		pWrapperTable->m_AlertIterator_GetCurrentAlert = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
-		pWrapperTable->m_JournalHandler_StoreJournalMarker = nullptr;
-		pWrapperTable->m_JournalHandler_HasJournalMarker = nullptr;
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = nullptr;
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = nullptr;
+		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
 		pWrapperTable->m_UserDetailList_Count = nullptr;
 		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
 		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
@@ -2686,6 +3111,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateDataTable = nullptr;
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateUserManagement = nullptr;
 		pWrapperTable->m_StateEnvironment_GetCurrentJournal = nullptr;
@@ -2748,6 +3174,7 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLString = nullptr;
 		pWrapperTable->m_UIEnvironment_ParseXMLData = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateDataTable = nullptr;
 		pWrapperTable->m_UIEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
@@ -3327,6 +3754,213 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator = (PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr) GetProcAddress(hLibrary, "libmcenv_datatablecsvwriteoptions_getseparator");
+		#else // _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator = (PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr) dlsym(hLibrary, "libmcenv_datatablecsvwriteoptions_getseparator");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = (PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr) GetProcAddress(hLibrary, "libmcenv_datatablecsvwriteoptions_setseparator");
+		#else // _WIN32
+		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = (PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr) dlsym(hLibrary, "libmcenv_datatablecsvwriteoptions_setseparator");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_AddColumn = (PLibMCEnvDataTable_AddColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_addcolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_AddColumn = (PLibMCEnvDataTable_AddColumnPtr) dlsym(hLibrary, "libmcenv_datatable_addcolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_AddColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_RemoveColumn = (PLibMCEnvDataTable_RemoveColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_removecolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_RemoveColumn = (PLibMCEnvDataTable_RemoveColumnPtr) dlsym(hLibrary, "libmcenv_datatable_removecolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_RemoveColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_hascolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) dlsym(hLibrary, "libmcenv_datatable_hascolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_HasColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetRowCount = (PLibMCEnvDataTable_GetRowCountPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getrowcount");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetRowCount = (PLibMCEnvDataTable_GetRowCountPtr) dlsym(hLibrary, "libmcenv_datatable_getrowcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetRowCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnCount = (PLibMCEnvDataTable_GetColumnCountPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumncount");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnCount = (PLibMCEnvDataTable_GetColumnCountPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumncount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnIdentifier = (PLibMCEnvDataTable_GetColumnIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumnidentifier");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnIdentifier = (PLibMCEnvDataTable_GetColumnIdentifierPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumnidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnDescription = (PLibMCEnvDataTable_GetColumnDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumndescription");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnDescription = (PLibMCEnvDataTable_GetColumnDescriptionPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumndescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnType = (PLibMCEnvDataTable_GetColumnTypePtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumntype");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnType = (PLibMCEnvDataTable_GetColumnTypePtr) dlsym(hLibrary, "libmcenv_datatable_getcolumntype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetColumnInformation = (PLibMCEnvDataTable_GetColumnInformationPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getcolumninformation");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetColumnInformation = (PLibMCEnvDataTable_GetColumnInformationPtr) dlsym(hLibrary, "libmcenv_datatable_getcolumninformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetColumnInformation == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetDoubleColumnValues = (PLibMCEnvDataTable_GetDoubleColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getdoublecolumnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetDoubleColumnValues = (PLibMCEnvDataTable_GetDoubleColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getdoublecolumnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetDoubleColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetInt32ColumnValues = (PLibMCEnvDataTable_GetInt32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetInt32ColumnValues = (PLibMCEnvDataTable_GetInt32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetInt32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetInt64ColumnValues = (PLibMCEnvDataTable_GetInt64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetInt64ColumnValues = (PLibMCEnvDataTable_GetInt64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetInt64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetUint32ColumnValues = (PLibMCEnvDataTable_GetUint32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getuint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetUint32ColumnValues = (PLibMCEnvDataTable_GetUint32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getuint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetUint32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_GetUint64ColumnValues = (PLibMCEnvDataTable_GetUint64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_getuint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_GetUint64ColumnValues = (PLibMCEnvDataTable_GetUint64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_getuint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_GetUint64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetDoubleColumnValues = (PLibMCEnvDataTable_SetDoubleColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setdoublecolumnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetDoubleColumnValues = (PLibMCEnvDataTable_SetDoubleColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setdoublecolumnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetDoubleColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetInt32ColumnValues = (PLibMCEnvDataTable_SetInt32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetInt32ColumnValues = (PLibMCEnvDataTable_SetInt32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetInt32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetInt64ColumnValues = (PLibMCEnvDataTable_SetInt64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetInt64ColumnValues = (PLibMCEnvDataTable_SetInt64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetInt64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetUint32ColumnValues = (PLibMCEnvDataTable_SetUint32ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setuint32columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetUint32ColumnValues = (PLibMCEnvDataTable_SetUint32ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setuint32columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetUint32ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_SetUint64ColumnValues = (PLibMCEnvDataTable_SetUint64ColumnValuesPtr) GetProcAddress(hLibrary, "libmcenv_datatable_setuint64columnvalues");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_SetUint64ColumnValues = (PLibMCEnvDataTable_SetUint64ColumnValuesPtr) dlsym(hLibrary, "libmcenv_datatable_setuint64columnvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_WriteCSVToStream = (PLibMCEnvDataTable_WriteCSVToStreamPtr) GetProcAddress(hLibrary, "libmcenv_datatable_writecsvtostream");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_WriteCSVToStream = (PLibMCEnvDataTable_WriteCSVToStreamPtr) dlsym(hLibrary, "libmcenv_datatable_writecsvtostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_WriteCSVToStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_WriteDataToStream = (PLibMCEnvDataTable_WriteDataToStreamPtr) GetProcAddress(hLibrary, "libmcenv_datatable_writedatatostream");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_WriteDataToStream = (PLibMCEnvDataTable_WriteDataToStreamPtr) dlsym(hLibrary, "libmcenv_datatable_writedatatostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_WriteDataToStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataSeries_GetName = (PLibMCEnvDataSeries_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_dataseries_getname");
 		#else // _WIN32
 		pWrapperTable->m_DataSeries_GetName = (PLibMCEnvDataSeries_GetNamePtr) dlsym(hLibrary, "libmcenv_dataseries_getname");
@@ -3423,6 +4057,474 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataSeries_IncreaseVersion == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMicroseconds = (PLibMCEnvDateTimeDifference_ToMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tomicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMicroseconds = (PLibMCEnvDateTimeDifference_ToMicrosecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tomicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMilliseconds = (PLibMCEnvDateTimeDifference_ToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMilliseconds = (PLibMCEnvDateTimeDifference_ToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToSeconds = (PLibMCEnvDateTimeDifference_ToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_toseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToSeconds = (PLibMCEnvDateTimeDifference_ToSecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_toseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMinutes = (PLibMCEnvDateTimeDifference_ToMinutesPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tominutes");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToMinutes = (PLibMCEnvDateTimeDifference_ToMinutesPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tominutes");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToMinutes == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToHours = (PLibMCEnvDateTimeDifference_ToHoursPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_tohours");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToHours = (PLibMCEnvDateTimeDifference_ToHoursPtr) dlsym(hLibrary, "libmcenv_datetimedifference_tohours");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToHours == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_ToDays = (PLibMCEnvDateTimeDifference_ToDaysPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_todays");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_ToDays = (PLibMCEnvDateTimeDifference_ToDaysPtr) dlsym(hLibrary, "libmcenv_datetimedifference_todays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_ToDays == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToDay = (PLibMCEnvDateTimeDifference_RoundDownToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToDay = (PLibMCEnvDateTimeDifference_RoundDownToDayPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToHour = (PLibMCEnvDateTimeDifference_RoundDownToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToHour = (PLibMCEnvDateTimeDifference_RoundDownToHourPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMinute = (PLibMCEnvDateTimeDifference_RoundDownToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMinute = (PLibMCEnvDateTimeDifference_RoundDownToMinutePtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToSeconds = (PLibMCEnvDateTimeDifference_RoundDownToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToSeconds = (PLibMCEnvDateTimeDifference_RoundDownToSecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds = (PLibMCEnvDateTimeDifference_RoundDownToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounddowntomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds = (PLibMCEnvDateTimeDifference_RoundDownToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounddowntomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToDay = (PLibMCEnvDateTimeDifference_RoundUpToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToDay = (PLibMCEnvDateTimeDifference_RoundUpToDayPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToHour = (PLibMCEnvDateTimeDifference_RoundUpToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToHour = (PLibMCEnvDateTimeDifference_RoundUpToHourPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToMinute = (PLibMCEnvDateTimeDifference_RoundUpToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToMinute = (PLibMCEnvDateTimeDifference_RoundUpToMinutePtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToSeconds = (PLibMCEnvDateTimeDifference_RoundUpToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundUpToSeconds = (PLibMCEnvDateTimeDifference_RoundUpToSecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundUpToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds = (PLibMCEnvDateTimeDifference_RoundupToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetimedifference_rounduptomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds = (PLibMCEnvDateTimeDifference_RoundupToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetimedifference_rounduptomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1970 = (PLibMCEnvDateTime_ToMicrosecondsSince1970Ptr) GetProcAddress(hLibrary, "libmcenv_datetime_tomicrosecondssince1970");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToMicrosecondsSince1970 = (PLibMCEnvDateTime_ToMicrosecondsSince1970Ptr) dlsym(hLibrary, "libmcenv_datetime_tomicrosecondssince1970");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToMicrosecondsSince1970 == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUnixTimestamp = (PLibMCEnvDateTime_ToUnixTimestampPtr) GetProcAddress(hLibrary, "libmcenv_datetime_tounixtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUnixTimestamp = (PLibMCEnvDateTime_ToUnixTimestampPtr) dlsym(hLibrary, "libmcenv_datetime_tounixtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUnixTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTime = (PLibMCEnvDateTime_ToUTCDateTimePtr) GetProcAddress(hLibrary, "libmcenv_datetime_toutcdatetime");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTime = (PLibMCEnvDateTime_ToUTCDateTimePtr) dlsym(hLibrary, "libmcenv_datetime_toutcdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUTCDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_toutcdatetimeinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_toutcdatetimeinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_toutcdatetimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds = (PLibMCEnvDateTime_ToUTCDateTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_datetime_toutcdatetimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_GetDate = (PLibMCEnvDateTime_GetDatePtr) GetProcAddress(hLibrary, "libmcenv_datetime_getdate");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_GetDate = (PLibMCEnvDateTime_GetDatePtr) dlsym(hLibrary, "libmcenv_datetime_getdate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_GetDate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_GetTime = (PLibMCEnvDateTime_GetTimePtr) GetProcAddress(hLibrary, "libmcenv_datetime_gettime");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_GetTime = (PLibMCEnvDateTime_GetTimePtr) dlsym(hLibrary, "libmcenv_datetime_gettime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_GetTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_Duplicate = (PLibMCEnvDateTime_DuplicatePtr) GetProcAddress(hLibrary, "libmcenv_datetime_duplicate");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_Duplicate = (PLibMCEnvDateTime_DuplicatePtr) dlsym(hLibrary, "libmcenv_datetime_duplicate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_Duplicate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsLeapYear = (PLibMCEnvDateTime_IsLeapYearPtr) GetProcAddress(hLibrary, "libmcenv_datetime_isleapyear");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsLeapYear = (PLibMCEnvDateTime_IsLeapYearPtr) dlsym(hLibrary, "libmcenv_datetime_isleapyear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsLeapYear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsLaterThan = (PLibMCEnvDateTime_IsLaterThanPtr) GetProcAddress(hLibrary, "libmcenv_datetime_islaterthan");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsLaterThan = (PLibMCEnvDateTime_IsLaterThanPtr) dlsym(hLibrary, "libmcenv_datetime_islaterthan");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsLaterThan == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsEarlierThan = (PLibMCEnvDateTime_IsEarlierThanPtr) GetProcAddress(hLibrary, "libmcenv_datetime_isearlierthan");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsEarlierThan = (PLibMCEnvDateTime_IsEarlierThanPtr) dlsym(hLibrary, "libmcenv_datetime_isearlierthan");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsEarlierThan == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_IsEqualTo = (PLibMCEnvDateTime_IsEqualToPtr) GetProcAddress(hLibrary, "libmcenv_datetime_isequalto");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_IsEqualTo = (PLibMCEnvDateTime_IsEqualToPtr) dlsym(hLibrary, "libmcenv_datetime_isequalto");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_IsEqualTo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_GetTimeDifference = (PLibMCEnvDateTime_GetTimeDifferencePtr) GetProcAddress(hLibrary, "libmcenv_datetime_gettimedifference");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_GetTimeDifference = (PLibMCEnvDateTime_GetTimeDifferencePtr) dlsym(hLibrary, "libmcenv_datetime_gettimedifference");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_GetTimeDifference == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_AddDuration = (PLibMCEnvDateTime_AddDurationPtr) GetProcAddress(hLibrary, "libmcenv_datetime_addduration");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_AddDuration = (PLibMCEnvDateTime_AddDurationPtr) dlsym(hLibrary, "libmcenv_datetime_addduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_AddDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_SubtractDuration = (PLibMCEnvDateTime_SubtractDurationPtr) GetProcAddress(hLibrary, "libmcenv_datetime_subtractduration");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_SubtractDuration = (PLibMCEnvDateTime_SubtractDurationPtr) dlsym(hLibrary, "libmcenv_datetime_subtractduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_SubtractDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByYears = (PLibMCEnvDateTime_ShiftByYearsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyyears");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByYears = (PLibMCEnvDateTime_ShiftByYearsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyyears");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByYears == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByDays = (PLibMCEnvDateTime_ShiftByDaysPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbydays");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByDays = (PLibMCEnvDateTime_ShiftByDaysPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbydays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByDays == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByHours = (PLibMCEnvDateTime_ShiftByHoursPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyhours");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByHours = (PLibMCEnvDateTime_ShiftByHoursPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyhours");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByHours == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByMinutes = (PLibMCEnvDateTime_ShiftByMinutesPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyminutes");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByMinutes = (PLibMCEnvDateTime_ShiftByMinutesPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyminutes");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByMinutes == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftBySeconds = (PLibMCEnvDateTime_ShiftBySecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbyseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftBySeconds = (PLibMCEnvDateTime_ShiftBySecondsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbyseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftBySeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByMilliseconds = (PLibMCEnvDateTime_ShiftByMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbymilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByMilliseconds = (PLibMCEnvDateTime_ShiftByMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbymilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_ShiftByMicroseconds = (PLibMCEnvDateTime_ShiftByMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_shiftbymicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_ShiftByMicroseconds = (PLibMCEnvDateTime_ShiftByMicrosecondsPtr) dlsym(hLibrary, "libmcenv_datetime_shiftbymicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_ShiftByMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToYear = (PLibMCEnvDateTime_RoundDownToYearPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntoyear");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToYear = (PLibMCEnvDateTime_RoundDownToYearPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntoyear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToYear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMonth = (PLibMCEnvDateTime_RoundDownToMonthPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntomonth");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMonth = (PLibMCEnvDateTime_RoundDownToMonthPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntomonth");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToMonth == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToDay = (PLibMCEnvDateTime_RoundDownToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToDay = (PLibMCEnvDateTime_RoundDownToDayPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToHour = (PLibMCEnvDateTime_RoundDownToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToHour = (PLibMCEnvDateTime_RoundDownToHourPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMinute = (PLibMCEnvDateTime_RoundDownToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMinute = (PLibMCEnvDateTime_RoundDownToMinutePtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToSeconds = (PLibMCEnvDateTime_RoundDownToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToSeconds = (PLibMCEnvDateTime_RoundDownToSecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMilliseconds = (PLibMCEnvDateTime_RoundDownToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounddowntomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundDownToMilliseconds = (PLibMCEnvDateTime_RoundDownToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounddowntomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundDownToMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToYear = (PLibMCEnvDateTime_RoundUpToYearPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptoyear");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToYear = (PLibMCEnvDateTime_RoundUpToYearPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptoyear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToYear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMonth = (PLibMCEnvDateTime_RoundUpToMonthPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptomonth");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMonth = (PLibMCEnvDateTime_RoundUpToMonthPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptomonth");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToMonth == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToDay = (PLibMCEnvDateTime_RoundUpToDayPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptoday");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToDay = (PLibMCEnvDateTime_RoundUpToDayPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptoday");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToDay == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToHour = (PLibMCEnvDateTime_RoundUpToHourPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptohour");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToHour = (PLibMCEnvDateTime_RoundUpToHourPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptohour");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToHour == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMinute = (PLibMCEnvDateTime_RoundUpToMinutePtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptominute");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMinute = (PLibMCEnvDateTime_RoundUpToMinutePtr) dlsym(hLibrary, "libmcenv_datetime_rounduptominute");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToMinute == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToSeconds = (PLibMCEnvDateTime_RoundUpToSecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptoseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToSeconds = (PLibMCEnvDateTime_RoundUpToSecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptoseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToSeconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMilliseconds = (PLibMCEnvDateTime_RoundUpToMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_datetime_rounduptomilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DateTime_RoundUpToMilliseconds = (PLibMCEnvDateTime_RoundUpToMillisecondsPtr) dlsym(hLibrary, "libmcenv_datetime_rounduptomilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DateTime_RoundUpToMilliseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4038,6 +5140,285 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetUUID = (PLibMCEnvBuildExecution_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetUUID = (PLibMCEnvBuildExecution_GetUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetBuildUUID = (PLibMCEnvBuildExecution_GetBuildUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getbuilduuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetBuildUUID = (PLibMCEnvBuildExecution_GetBuildUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getbuilduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetBuildUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetBuild = (PLibMCEnvBuildExecution_GetBuildPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getbuild");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetBuild = (PLibMCEnvBuildExecution_GetBuildPtr) dlsym(hLibrary, "libmcenv_buildexecution_getbuild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetBuild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetExecutionStatus = (PLibMCEnvBuildExecution_GetExecutionStatusPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getexecutionstatus");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetExecutionStatus = (PLibMCEnvBuildExecution_GetExecutionStatusPtr) dlsym(hLibrary, "libmcenv_buildexecution_getexecutionstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetExecutionStatus == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_IsInProcess = (PLibMCEnvBuildExecution_IsInProcessPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_isinprocess");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_IsInProcess = (PLibMCEnvBuildExecution_IsInProcessPtr) dlsym(hLibrary, "libmcenv_buildexecution_isinprocess");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_IsInProcess == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_IsFinished = (PLibMCEnvBuildExecution_IsFinishedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_isfinished");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_IsFinished = (PLibMCEnvBuildExecution_IsFinishedPtr) dlsym(hLibrary, "libmcenv_buildexecution_isfinished");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_IsFinished == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_IsFailed = (PLibMCEnvBuildExecution_IsFailedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_isfailed");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_IsFailed = (PLibMCEnvBuildExecution_IsFailedPtr) dlsym(hLibrary, "libmcenv_buildexecution_isfailed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_IsFailed == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFinished = (PLibMCEnvBuildExecution_SetStatusToFinishedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_setstatustofinished");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFinished = (PLibMCEnvBuildExecution_SetStatusToFinishedPtr) dlsym(hLibrary, "libmcenv_buildexecution_setstatustofinished");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_SetStatusToFinished == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFailed = (PLibMCEnvBuildExecution_SetStatusToFailedPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_setstatustofailed");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_SetStatusToFailed = (PLibMCEnvBuildExecution_SetStatusToFailedPtr) dlsym(hLibrary, "libmcenv_buildexecution_setstatustofailed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_SetStatusToFailed == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetDescription = (PLibMCEnvBuildExecution_GetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getdescription");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetDescription = (PLibMCEnvBuildExecution_GetDescriptionPtr) dlsym(hLibrary, "libmcenv_buildexecution_getdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_SetDescription = (PLibMCEnvBuildExecution_SetDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_setdescription");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_SetDescription = (PLibMCEnvBuildExecution_SetDescriptionPtr) dlsym(hLibrary, "libmcenv_buildexecution_setdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_SetDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetJournalUUID = (PLibMCEnvBuildExecution_GetJournalUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getjournaluuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetJournalUUID = (PLibMCEnvBuildExecution_GetJournalUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getjournaluuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetJournalUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachedUser = (PLibMCEnvBuildExecution_HasAttachedUserPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasattacheduser");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachedUser = (PLibMCEnvBuildExecution_HasAttachedUserPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasattacheduser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasAttachedUser == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetUserUUID = (PLibMCEnvBuildExecution_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getuseruuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetUserUUID = (PLibMCEnvBuildExecution_GetUserUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_getuseruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetUserUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getstarttimestampinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMillisecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getstarttimestampinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getstarttimestampinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetStartTimeStampInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getstarttimestampinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getendtimestampinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMillisecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getendtimestampinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getendtimestampinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = (PLibMCEnvBuildExecution_GetEndTimeStampInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getendtimestampinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = (PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_buildexecution_getelapsedtimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_addbinarydata");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) dlsym(hLibrary, "libmcenv_buildexecution_addbinarydata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_AddBinaryData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID = (PLibMCEnvBuildExecution_LoadDiscreteField2DByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID = (PLibMCEnvBuildExecution_LoadDiscreteField2DByUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_StoreDiscreteField2D = (PLibMCEnvBuildExecution_StoreDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_storediscretefield2d");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_StoreDiscreteField2D = (PLibMCEnvBuildExecution_StoreDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_buildexecution_storediscretefield2d");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_StoreDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = (PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loadpngimagebyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = (PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_loadpngimagebyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = (PLibMCEnvBuildExecution_LoadPNGImageByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loadpngimagebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = (PLibMCEnvBuildExecution_LoadPNGImageByUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_loadpngimagebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadPNGImageByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_StorePNGImage = (PLibMCEnvBuildExecution_StorePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_storepngimage");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_StorePNGImage = (PLibMCEnvBuildExecution_StorePNGImagePtr) dlsym(hLibrary, "libmcenv_buildexecution_storepngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_StorePNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_AddMetaDataString = (PLibMCEnvBuildExecution_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_addmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_AddMetaDataString = (PLibMCEnvBuildExecution_AddMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_addmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_AddMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasMetaDataString = (PLibMCEnvBuildExecution_HasMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasMetaDataString = (PLibMCEnvBuildExecution_HasMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_GetMetaDataString = (PLibMCEnvBuildExecution_GetMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_getmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_GetMetaDataString = (PLibMCEnvBuildExecution_GetMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_getmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_GetMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = (PLibMCEnvBuildExecutionIterator_GetCurrentExecutionPtr) GetProcAddress(hLibrary, "libmcenv_buildexecutioniterator_getcurrentexecution");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = (PLibMCEnvBuildExecutionIterator_GetCurrentExecutionPtr) dlsym(hLibrary, "libmcenv_buildexecutioniterator_getcurrentexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_build_getname");
 		#else // _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) dlsym(hLibrary, "libmcenv_build_getname");
@@ -4197,6 +5578,78 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_StorePNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_StartExecution = (PLibMCEnvBuild_StartExecutionPtr) GetProcAddress(hLibrary, "libmcenv_build_startexecution");
+		#else // _WIN32
+		pWrapperTable->m_Build_StartExecution = (PLibMCEnvBuild_StartExecutionPtr) dlsym(hLibrary, "libmcenv_build_startexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_StartExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasExecution = (PLibMCEnvBuild_HasExecutionPtr) GetProcAddress(hLibrary, "libmcenv_build_hasexecution");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasExecution = (PLibMCEnvBuild_HasExecutionPtr) dlsym(hLibrary, "libmcenv_build_hasexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_FindExecution = (PLibMCEnvBuild_FindExecutionPtr) GetProcAddress(hLibrary, "libmcenv_build_findexecution");
+		#else // _WIN32
+		pWrapperTable->m_Build_FindExecution = (PLibMCEnvBuild_FindExecutionPtr) dlsym(hLibrary, "libmcenv_build_findexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_FindExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_ListExecutions = (PLibMCEnvBuild_ListExecutionsPtr) GetProcAddress(hLibrary, "libmcenv_build_listexecutions");
+		#else // _WIN32
+		pWrapperTable->m_Build_ListExecutions = (PLibMCEnvBuild_ListExecutionsPtr) dlsym(hLibrary, "libmcenv_build_listexecutions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_ListExecutions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_ListExecutionsByStatus = (PLibMCEnvBuild_ListExecutionsByStatusPtr) GetProcAddress(hLibrary, "libmcenv_build_listexecutionsbystatus");
+		#else // _WIN32
+		pWrapperTable->m_Build_ListExecutionsByStatus = (PLibMCEnvBuild_ListExecutionsByStatusPtr) dlsym(hLibrary, "libmcenv_build_listexecutionsbystatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_ListExecutionsByStatus == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_AddMetaDataString = (PLibMCEnvBuild_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_addmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_Build_AddMetaDataString = (PLibMCEnvBuild_AddMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_addmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_AddMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasMetaDataString = (PLibMCEnvBuild_HasMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_hasmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasMetaDataString = (PLibMCEnvBuild_HasMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_hasmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetMetaDataString = (PLibMCEnvBuild_GetMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_getmetadatastring");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetMetaDataString = (PLibMCEnvBuild_GetMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_getmetadatastring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetMetaDataString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5487,6 +6940,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDataTable = (PLibMCEnvDriverEnvironment_CreateDataTablePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createdatatable");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateDataTable = (PLibMCEnvDriverEnvironment_CreateDataTablePtr) dlsym(hLibrary, "libmcenv_driverenvironment_createdatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateDataTable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
@@ -5574,6 +7036,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits = (PLibMCEnvDriverEnvironment_RegisterDoubleParameterWithUnitsPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registerdoubleparameterwithunits");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits = (PLibMCEnvDriverEnvironment_RegisterDoubleParameterWithUnitsPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registerdoubleparameterwithunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6297,12 +7768,30 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeSample = (PLibMCEnvJournalVariable_ComputeSamplePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computesample");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeSample = (PLibMCEnvJournalVariable_ComputeSamplePtr) dlsym(hLibrary, "libmcenv_journalvariable_computesample");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeSample == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
 		#else // _WIN32
 		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = (PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeequidistantsamples");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = (PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeequidistantsamples");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_ComputeEquidistantSamples == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -6387,6 +7876,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementTime = (PLibMCEnvAlert_GetAcknowledgementTimePtr) GetProcAddress(hLibrary, "libmcenv_alert_getacknowledgementtime");
+		#else // _WIN32
+		pWrapperTable->m_Alert_GetAcknowledgementTime = (PLibMCEnvAlert_GetAcknowledgementTimePtr) dlsym(hLibrary, "libmcenv_alert_getacknowledgementtime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Alert_GetAcknowledgementTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Alert_AcknowledgeForUser = (PLibMCEnvAlert_AcknowledgeForUserPtr) GetProcAddress(hLibrary, "libmcenv_alert_acknowledgeforuser");
 		#else // _WIN32
 		pWrapperTable->m_Alert_AcknowledgeForUser = (PLibMCEnvAlert_AcknowledgeForUserPtr) dlsym(hLibrary, "libmcenv_alert_acknowledgeforuser");
@@ -6441,39 +7939,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_StoreJournalMarker = (PLibMCEnvJournalHandler_StoreJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_storejournalmarker");
+		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getstarttime");
 		#else // _WIN32
-		pWrapperTable->m_JournalHandler_StoreJournalMarker = (PLibMCEnvJournalHandler_StoreJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_storejournalmarker");
+		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) dlsym(hLibrary, "libmcenv_journalhandler_getstarttime");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_StoreJournalMarker == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_HasJournalMarker = (PLibMCEnvJournalHandler_HasJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_hasjournalmarker");
-		#else // _WIN32
-		pWrapperTable->m_JournalHandler_HasJournalMarker = (PLibMCEnvJournalHandler_HasJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_hasjournalmarker");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_HasJournalMarker == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = (PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalmarker");
-		#else // _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarker = (PLibMCEnvJournalHandler_RetrieveJournalMarkerPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalmarker");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_RetrieveJournalMarker == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = (PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalmarkers");
-		#else // _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalMarkers = (PLibMCEnvJournalHandler_RetrieveJournalMarkersPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalmarkers");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_RetrieveJournalMarkers == nullptr)
+		if (pWrapperTable->m_JournalHandler_GetStartTime == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7170,6 +8641,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDataTable = (PLibMCEnvStateEnvironment_CreateDataTablePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createdatatable");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateDataTable = (PLibMCEnvStateEnvironment_CreateDataTablePtr) dlsym(hLibrary, "libmcenv_stateenvironment_createdatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateDataTable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = (PLibMCEnvStateEnvironment_CheckUserPermissionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_checkuserpermission");
@@ -7728,6 +9208,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDataTable = (PLibMCEnvUIEnvironment_CreateDataTablePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createdatatable");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateDataTable = (PLibMCEnvUIEnvironment_CreateDataTablePtr) dlsym(hLibrary, "libmcenv_uienvironment_createdatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateDataTable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasbuildjob");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_HasBuildJob = (PLibMCEnvUIEnvironment_HasBuildJobPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasbuildjob");
@@ -8260,6 +9749,98 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2D_Duplicate == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatablecsvwriteoptions_getseparator", (void**)&(pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablecsvwriteoptions_setseparator", (void**)&(pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_addcolumn", (void**)&(pWrapperTable->m_DataTable_AddColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_AddColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_removecolumn", (void**)&(pWrapperTable->m_DataTable_RemoveColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_RemoveColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_hascolumn", (void**)&(pWrapperTable->m_DataTable_HasColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_HasColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getrowcount", (void**)&(pWrapperTable->m_DataTable_GetRowCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetRowCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumncount", (void**)&(pWrapperTable->m_DataTable_GetColumnCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumnidentifier", (void**)&(pWrapperTable->m_DataTable_GetColumnIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumndescription", (void**)&(pWrapperTable->m_DataTable_GetColumnDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumntype", (void**)&(pWrapperTable->m_DataTable_GetColumnType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getcolumninformation", (void**)&(pWrapperTable->m_DataTable_GetColumnInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetColumnInformation == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getdoublecolumnvalues", (void**)&(pWrapperTable->m_DataTable_GetDoubleColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetDoubleColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getint32columnvalues", (void**)&(pWrapperTable->m_DataTable_GetInt32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetInt32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getint64columnvalues", (void**)&(pWrapperTable->m_DataTable_GetInt64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetInt64ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getuint32columnvalues", (void**)&(pWrapperTable->m_DataTable_GetUint32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetUint32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_getuint64columnvalues", (void**)&(pWrapperTable->m_DataTable_GetUint64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_GetUint64ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setdoublecolumnvalues", (void**)&(pWrapperTable->m_DataTable_SetDoubleColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetDoubleColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setint32columnvalues", (void**)&(pWrapperTable->m_DataTable_SetInt32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetInt32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setint64columnvalues", (void**)&(pWrapperTable->m_DataTable_SetInt64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetInt64ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setuint32columnvalues", (void**)&(pWrapperTable->m_DataTable_SetUint32ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetUint32ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_setuint64columnvalues", (void**)&(pWrapperTable->m_DataTable_SetUint64ColumnValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_writecsvtostream", (void**)&(pWrapperTable->m_DataTable_WriteCSVToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteCSVToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_writedatatostream", (void**)&(pWrapperTable->m_DataTable_WriteDataToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteDataToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_dataseries_getname", (void**)&(pWrapperTable->m_DataSeries_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataSeries_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8302,6 +9883,214 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_dataseries_increaseversion", (void**)&(pWrapperTable->m_DataSeries_IncreaseVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataSeries_IncreaseVersion == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tomicroseconds", (void**)&(pWrapperTable->m_DateTimeDifference_ToMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tomilliseconds", (void**)&(pWrapperTable->m_DateTimeDifference_ToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_toseconds", (void**)&(pWrapperTable->m_DateTimeDifference_ToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tominutes", (void**)&(pWrapperTable->m_DateTimeDifference_ToMinutes));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToMinutes == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_tohours", (void**)&(pWrapperTable->m_DateTimeDifference_ToHours));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToHours == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_todays", (void**)&(pWrapperTable->m_DateTimeDifference_ToDays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_ToDays == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntoday", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntohour", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntominute", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntoseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounddowntomilliseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundDownToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptoday", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptohour", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptominute", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptoseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundUpToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundUpToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetimedifference_rounduptomilliseconds", (void**)&(pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTimeDifference_RoundupToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_tomicrosecondssince1970", (void**)&(pWrapperTable->m_DateTime_ToMicrosecondsSince1970));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToMicrosecondsSince1970 == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_tounixtimestamp", (void**)&(pWrapperTable->m_DateTime_ToUnixTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUnixTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_toutcdatetime", (void**)&(pWrapperTable->m_DateTime_ToUTCDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUTCDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_toutcdatetimeinmilliseconds", (void**)&(pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUTCDateTimeInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_toutcdatetimeinmicroseconds", (void**)&(pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ToUTCDateTimeInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_getdate", (void**)&(pWrapperTable->m_DateTime_GetDate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_GetDate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_gettime", (void**)&(pWrapperTable->m_DateTime_GetTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_GetTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_duplicate", (void**)&(pWrapperTable->m_DateTime_Duplicate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_Duplicate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_isleapyear", (void**)&(pWrapperTable->m_DateTime_IsLeapYear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsLeapYear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_islaterthan", (void**)&(pWrapperTable->m_DateTime_IsLaterThan));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsLaterThan == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_isearlierthan", (void**)&(pWrapperTable->m_DateTime_IsEarlierThan));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsEarlierThan == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_isequalto", (void**)&(pWrapperTable->m_DateTime_IsEqualTo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_IsEqualTo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_gettimedifference", (void**)&(pWrapperTable->m_DateTime_GetTimeDifference));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_GetTimeDifference == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_addduration", (void**)&(pWrapperTable->m_DateTime_AddDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_AddDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_subtractduration", (void**)&(pWrapperTable->m_DateTime_SubtractDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_SubtractDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyyears", (void**)&(pWrapperTable->m_DateTime_ShiftByYears));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByYears == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbydays", (void**)&(pWrapperTable->m_DateTime_ShiftByDays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByDays == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyhours", (void**)&(pWrapperTable->m_DateTime_ShiftByHours));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByHours == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyminutes", (void**)&(pWrapperTable->m_DateTime_ShiftByMinutes));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByMinutes == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbyseconds", (void**)&(pWrapperTable->m_DateTime_ShiftBySeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftBySeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbymilliseconds", (void**)&(pWrapperTable->m_DateTime_ShiftByMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_shiftbymicroseconds", (void**)&(pWrapperTable->m_DateTime_ShiftByMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_ShiftByMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntoyear", (void**)&(pWrapperTable->m_DateTime_RoundDownToYear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToYear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntomonth", (void**)&(pWrapperTable->m_DateTime_RoundDownToMonth));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToMonth == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntoday", (void**)&(pWrapperTable->m_DateTime_RoundDownToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntohour", (void**)&(pWrapperTable->m_DateTime_RoundDownToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntominute", (void**)&(pWrapperTable->m_DateTime_RoundDownToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntoseconds", (void**)&(pWrapperTable->m_DateTime_RoundDownToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounddowntomilliseconds", (void**)&(pWrapperTable->m_DateTime_RoundDownToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundDownToMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptoyear", (void**)&(pWrapperTable->m_DateTime_RoundUpToYear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToYear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptomonth", (void**)&(pWrapperTable->m_DateTime_RoundUpToMonth));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToMonth == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptoday", (void**)&(pWrapperTable->m_DateTime_RoundUpToDay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToDay == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptohour", (void**)&(pWrapperTable->m_DateTime_RoundUpToHour));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToHour == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptominute", (void**)&(pWrapperTable->m_DateTime_RoundUpToMinute));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToMinute == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptoseconds", (void**)&(pWrapperTable->m_DateTime_RoundUpToSeconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToSeconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datetime_rounduptomilliseconds", (void**)&(pWrapperTable->m_DateTime_RoundUpToMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DateTime_RoundUpToMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_meshobject_getname", (void**)&(pWrapperTable->m_MeshObject_GetName));
@@ -8576,6 +10365,130 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getuuid", (void**)&(pWrapperTable->m_BuildExecution_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getbuilduuid", (void**)&(pWrapperTable->m_BuildExecution_GetBuildUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetBuildUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getbuild", (void**)&(pWrapperTable->m_BuildExecution_GetBuild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetBuild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getexecutionstatus", (void**)&(pWrapperTable->m_BuildExecution_GetExecutionStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetExecutionStatus == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_isinprocess", (void**)&(pWrapperTable->m_BuildExecution_IsInProcess));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_IsInProcess == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_isfinished", (void**)&(pWrapperTable->m_BuildExecution_IsFinished));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_IsFinished == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_isfailed", (void**)&(pWrapperTable->m_BuildExecution_IsFailed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_IsFailed == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_setstatustofinished", (void**)&(pWrapperTable->m_BuildExecution_SetStatusToFinished));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_SetStatusToFinished == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_setstatustofailed", (void**)&(pWrapperTable->m_BuildExecution_SetStatusToFailed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_SetStatusToFailed == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getdescription", (void**)&(pWrapperTable->m_BuildExecution_GetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_setdescription", (void**)&(pWrapperTable->m_BuildExecution_SetDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_SetDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getjournaluuid", (void**)&(pWrapperTable->m_BuildExecution_GetJournalUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetJournalUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasattacheduser", (void**)&(pWrapperTable->m_BuildExecution_HasAttachedUser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasAttachedUser == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getuseruuid", (void**)&(pWrapperTable->m_BuildExecution_GetUserUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetUserUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getstarttimestampinmilliseconds", (void**)&(pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetStartTimeStampInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getstarttimestampinmicroseconds", (void**)&(pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetStartTimeStampInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getendtimestampinmilliseconds", (void**)&(pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetEndTimeStampInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getendtimestampinmicroseconds", (void**)&(pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getelapsedtimeinmilliseconds", (void**)&(pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getelapsedtimeinmicroseconds", (void**)&(pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_addbinarydata", (void**)&(pWrapperTable->m_BuildExecution_AddBinaryData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddBinaryData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loaddiscretefield2dbyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loaddiscretefield2dbyuuid", (void**)&(pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_storediscretefield2d", (void**)&(pWrapperTable->m_BuildExecution_StoreDiscreteField2D));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StoreDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loadpngimagebyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loadpngimagebyuuid", (void**)&(pWrapperTable->m_BuildExecution_LoadPNGImageByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadPNGImageByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_storepngimage", (void**)&(pWrapperTable->m_BuildExecution_StorePNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StorePNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_addmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_AddMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_HasMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_getmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_GetMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecutioniterator_getcurrentexecution", (void**)&(pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -8646,6 +10559,38 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_storepngimage", (void**)&(pWrapperTable->m_Build_StorePNGImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StorePNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_startexecution", (void**)&(pWrapperTable->m_Build_StartExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StartExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasexecution", (void**)&(pWrapperTable->m_Build_HasExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_findexecution", (void**)&(pWrapperTable->m_Build_FindExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_FindExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_listexecutions", (void**)&(pWrapperTable->m_Build_ListExecutions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_ListExecutions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_listexecutionsbystatus", (void**)&(pWrapperTable->m_Build_ListExecutionsByStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_ListExecutionsByStatus == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_addmetadatastring", (void**)&(pWrapperTable->m_Build_AddMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasmetadatastring", (void**)&(pWrapperTable->m_Build_HasMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getmetadatastring", (void**)&(pWrapperTable->m_Build_GetMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetMetaDataString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingfileexecution_getstatus", (void**)&(pWrapperTable->m_WorkingFileExecution_GetStatus));
@@ -9220,6 +11165,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_ParseXMLData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createdatatable", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDataTable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_driverhasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_DriverHasResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_DriverHasResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9258,6 +11207,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerdoubleparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerdoubleparameterwithunits", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameterWithUnits == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerintegerparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter));
@@ -9580,8 +11533,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computesample", (void**)&(pWrapperTable->m_JournalVariable_ComputeSample));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeSample == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_computeuniformaveragesamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computeequidistantsamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeEquidistantSamples));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeEquidistantSamples == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_receiverawtimestream", (void**)&(pWrapperTable->m_JournalVariable_ReceiveRawTimeStream));
@@ -9620,6 +11581,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetAcknowledgementInformation == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_alert_getacknowledgementtime", (void**)&(pWrapperTable->m_Alert_GetAcknowledgementTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_GetAcknowledgementTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_alert_acknowledgeforuser", (void**)&(pWrapperTable->m_Alert_AcknowledgeForUser));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Alert_AcknowledgeForUser == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9644,20 +11609,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_storejournalmarker", (void**)&(pWrapperTable->m_JournalHandler_StoreJournalMarker));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_StoreJournalMarker == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_hasjournalmarker", (void**)&(pWrapperTable->m_JournalHandler_HasJournalMarker));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_HasJournalMarker == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalmarker", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalMarker));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalMarker == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalmarkers", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalMarkers));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalMarkers == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetStartTime == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
@@ -9968,6 +11921,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ParseXMLData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createdatatable", (void**)&(pWrapperTable->m_StateEnvironment_CreateDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDataTable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_checkuserpermission", (void**)&(pWrapperTable->m_StateEnvironment_CheckUserPermission));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckUserPermission == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10214,6 +12171,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_parsexmldata", (void**)&(pWrapperTable->m_UIEnvironment_ParseXMLData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ParseXMLData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createdatatable", (void**)&(pWrapperTable->m_UIEnvironment_CreateDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateDataTable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_hasbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_HasBuildJob));
@@ -11058,6 +13019,304 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CDataTableWriteOptions
+	 */
+	
+	/**
+	 * Method definitions for class CDataTableCSVWriteOptions
+	 */
+	
+	/**
+	* CDataTableCSVWriteOptions::GetSeparator - Returns the desired separator of the CSV file. Default is semicolon.
+	* @return Separator to use.
+	*/
+	std::string CDataTableCSVWriteOptions::GetSeparator()
+	{
+		LibMCEnv_uint32 bytesNeededSeparator = 0;
+		LibMCEnv_uint32 bytesWrittenSeparator = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableCSVWriteOptions_GetSeparator(m_pHandle, 0, &bytesNeededSeparator, nullptr));
+		std::vector<char> bufferSeparator(bytesNeededSeparator);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableCSVWriteOptions_GetSeparator(m_pHandle, bytesNeededSeparator, &bytesWrittenSeparator, &bufferSeparator[0]));
+		
+		return std::string(&bufferSeparator[0]);
+	}
+	
+	/**
+	* CDataTableCSVWriteOptions::SetSeparator - Sets the desired separator of the CSV file.
+	* @param[in] sSeparator - Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)
+	*/
+	void CDataTableCSVWriteOptions::SetSeparator(const std::string & sSeparator)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableCSVWriteOptions_SetSeparator(m_pHandle, sSeparator.c_str()));
+	}
+	
+	/**
+	 * Method definitions for class CDataTable
+	 */
+	
+	/**
+	* CDataTable::AddColumn - Adds a column to the data field.
+	* @param[in] sIdentifier - Identifier of the column. MUST be unique, alphanumeric and not empty.
+	* @param[in] sDescription - Description of the column.
+	* @param[in] eColumnType - Data type of the column.
+	*/
+	void CDataTable::AddColumn(const std::string & sIdentifier, const std::string & sDescription, const eDataTableColumnType eColumnType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_AddColumn(m_pHandle, sIdentifier.c_str(), sDescription.c_str(), eColumnType));
+	}
+	
+	/**
+	* CDataTable::RemoveColumn - Removes a column from the data field. Fails if Column does not exist.
+	* @param[in] sIdentifier - Identifier of the column.
+	*/
+	void CDataTable::RemoveColumn(const std::string & sIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_RemoveColumn(m_pHandle, sIdentifier.c_str()));
+	}
+	
+	/**
+	* CDataTable::HasColumn - Returns if a column exists in the data field.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @return Returns if the columns exist.
+	*/
+	bool CDataTable::HasColumn(const std::string & sIdentifier)
+	{
+		bool resultColumnExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_HasColumn(m_pHandle, sIdentifier.c_str(), &resultColumnExists));
+		
+		return resultColumnExists;
+	}
+	
+	/**
+	* CDataTable::GetRowCount - Returns the current row count.
+	* @return Number of rows.
+	*/
+	LibMCEnv_uint32 CDataTable::GetRowCount()
+	{
+		LibMCEnv_uint32 resultRowCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetRowCount(m_pHandle, &resultRowCount));
+		
+		return resultRowCount;
+	}
+	
+	/**
+	* CDataTable::GetColumnCount - Returns the current column count.
+	* @return Number of columns.
+	*/
+	LibMCEnv_uint32 CDataTable::GetColumnCount()
+	{
+		LibMCEnv_uint32 resultColumnCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnCount(m_pHandle, &resultColumnCount));
+		
+		return resultColumnCount;
+	}
+	
+	/**
+	* CDataTable::GetColumnIdentifier - Returns the identifier of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Identifier of the column.
+	*/
+	std::string CDataTable::GetColumnIdentifier(const LibMCEnv_uint32 nColumnIndex)
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnIdentifier(m_pHandle, nColumnIndex, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnIdentifier(m_pHandle, nColumnIndex, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CDataTable::GetColumnDescription - Returns the description of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Description of the column.
+	*/
+	std::string CDataTable::GetColumnDescription(const LibMCEnv_uint32 nColumnIndex)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnDescription(m_pHandle, nColumnIndex, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnDescription(m_pHandle, nColumnIndex, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CDataTable::GetColumnType - Returns the type of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Data type of the column.
+	*/
+	eDataTableColumnType CDataTable::GetColumnType(const LibMCEnv_uint32 nColumnIndex)
+	{
+		eDataTableColumnType resultColumnType = (eDataTableColumnType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnType(m_pHandle, nColumnIndex, &resultColumnType));
+		
+		return resultColumnType;
+	}
+	
+	/**
+	* CDataTable::GetColumnInformation - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] sDescription - Description of the column.
+	* @param[out] eColumnType - Data type of the column.
+	*/
+	void CDataTable::GetColumnInformation(const std::string & sIdentifier, std::string & sDescription, eDataTableColumnType & eColumnType)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnInformation(m_pHandle, sIdentifier.c_str(), 0, &bytesNeededDescription, nullptr, &eColumnType));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetColumnInformation(m_pHandle, sIdentifier.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0], &eColumnType));
+		sDescription = std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CDataTable::GetDoubleColumnValues - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetDoubleColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_double> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetDoubleColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetDoubleColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetInt32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetInt32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int32> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt32ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt32ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetInt64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetInt64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_int64> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt64ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetInt64ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetUint32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetUint32ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint32> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint32ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint32ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::GetUint64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] ValuesBuffer - Value array of a column.
+	*/
+	void CDataTable::GetUint64ColumnValues(const std::string & sIdentifier, std::vector<LibMCEnv_uint64> & ValuesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValues = 0;
+		LibMCEnv_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_GetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetDoubleColumnValues - Sets the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	void CDataTable::SetDoubleColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_double> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetDoubleColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetInt32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	void CDataTable::SetInt32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int32> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetInt32ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetInt64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	void CDataTable::SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetInt64ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetUint32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	void CDataTable::SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetUint32ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::SetUint64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] ValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	void CDataTable::SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
+	* @param[in] pWriter - Stream writer to use.
+	* @param[in] pOptions - Optional CSV writer options to use.
+	*/
+	void CDataTable::WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions)
+	{
+		LibMCEnvHandle hWriter = pWriter.GetHandle();
+		LibMCEnvHandle hOptions = pOptions.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteCSVToStream(m_pHandle, hWriter, hOptions));
+	}
+	
+	/**
+	* CDataTable::WriteDataToStream - Writes the data as binary to a temporary stream.
+	* @param[in] pWriter - Stream writer instance to use.
+	* @param[in] pOptions - Optional writer options to use.
+	*/
+	void CDataTable::WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions)
+	{
+		LibMCEnvHandle hWriter = pWriter.GetHandle();
+		LibMCEnvHandle hOptions = pOptions.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteDataToStream(m_pHandle, hWriter, hOptions));
+	}
+	
+	/**
 	 * Method definitions for class CDataSeries
 	 */
 	
@@ -11187,6 +13446,539 @@ public:
 	void CDataSeries::IncreaseVersion()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_IncreaseVersion(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CDateTimeDifference
+	 */
+	
+	/**
+	* CDateTimeDifference::ToMicroseconds - Returns the duration in Microseconds.
+	* @return The duration in Microseconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToMicroseconds()
+	{
+		LibMCEnv_uint64 resultMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToMicroseconds(m_pHandle, &resultMicroseconds));
+		
+		return resultMicroseconds;
+	}
+	
+	/**
+	* CDateTimeDifference::ToMilliseconds - Returns the duration in Milliseconds. Partial milliseconds are rounded down.
+	* @return The duration in Milliseconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToMilliseconds()
+	{
+		LibMCEnv_uint64 resultMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToMilliseconds(m_pHandle, &resultMilliseconds));
+		
+		return resultMilliseconds;
+	}
+	
+	/**
+	* CDateTimeDifference::ToSeconds - Returns the duration in Seconds. Partial seconds are rounded down.
+	* @return The duration in seconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToSeconds()
+	{
+		LibMCEnv_uint64 resultSeconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToSeconds(m_pHandle, &resultSeconds));
+		
+		return resultSeconds;
+	}
+	
+	/**
+	* CDateTimeDifference::ToMinutes - Returns the duration in Seconds. Partial minutes are rounded down.
+	* @return The duration in seconds.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToMinutes()
+	{
+		LibMCEnv_uint64 resultMinutes = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToMinutes(m_pHandle, &resultMinutes));
+		
+		return resultMinutes;
+	}
+	
+	/**
+	* CDateTimeDifference::ToHours - Returns the duration in Hours. Partial hours are rounded down.
+	* @return The duration in hours.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToHours()
+	{
+		LibMCEnv_uint64 resultHours = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToHours(m_pHandle, &resultHours));
+		
+		return resultHours;
+	}
+	
+	/**
+	* CDateTimeDifference::ToDays - Returns the duration in Days. Partial days are rounded down.
+	* @return The duration in days.
+	*/
+	LibMCEnv_uint64 CDateTimeDifference::ToDays()
+	{
+		LibMCEnv_uint64 resultDays = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_ToDays(m_pHandle, &resultDays));
+		
+		return resultDays;
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToDay - Rounds down the duration to the full day.
+	*/
+	void CDateTimeDifference::RoundDownToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToHour - Rounds down the duration to the full hour.
+	*/
+	void CDateTimeDifference::RoundDownToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToMinute - Rounds down the duration to the full minute.
+	*/
+	void CDateTimeDifference::RoundDownToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToSeconds - Rounds down the duration to the full second.
+	*/
+	void CDateTimeDifference::RoundDownToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundDownToMilliseconds - Rounds down the duration to the full millisecond.
+	*/
+	void CDateTimeDifference::RoundDownToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundDownToMilliseconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToDay - Rounds up the duration to the full day.
+	*/
+	void CDateTimeDifference::RoundUpToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToHour - Rounds up the duration to the full hour.
+	*/
+	void CDateTimeDifference::RoundUpToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToMinute - Rounds up the duration to the full minute.
+	*/
+	void CDateTimeDifference::RoundUpToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundUpToSeconds - Rounds up the duration to the full second.
+	*/
+	void CDateTimeDifference::RoundUpToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundUpToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTimeDifference::RoundupToMilliseconds - Rounds up the duration to the full millisecond.
+	*/
+	void CDateTimeDifference::RoundupToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTimeDifference_RoundupToMilliseconds(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CDateTime
+	 */
+	
+	/**
+	* CDateTime::ToMicrosecondsSince1970 - Returns the maximum accuracy date time.
+	* @return Returns the date in Microseconds since midnight first of January 1970.
+	*/
+	LibMCEnv_uint64 CDateTime::ToMicrosecondsSince1970()
+	{
+		LibMCEnv_uint64 resultMicrosecondsSince1970 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToMicrosecondsSince1970(m_pHandle, &resultMicrosecondsSince1970));
+		
+		return resultMicrosecondsSince1970;
+	}
+	
+	/**
+	* CDateTime::ToUnixTimestamp - Returns the unix time stamp of the date time
+	* @return Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present.
+	*/
+	LibMCEnv_uint64 CDateTime::ToUnixTimestamp()
+	{
+		LibMCEnv_uint64 resultSecondsSince1970 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUnixTimestamp(m_pHandle, &resultSecondsSince1970));
+		
+		return resultSecondsSince1970;
+	}
+	
+	/**
+	* CDateTime::ToUTCDateTime - Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC
+	*/
+	std::string CDateTime::ToUTCDateTime()
+	{
+		LibMCEnv_uint32 bytesNeededUTCDateTime = 0;
+		LibMCEnv_uint32 bytesWrittenUTCDateTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTime(m_pHandle, 0, &bytesNeededUTCDateTime, nullptr));
+		std::vector<char> bufferUTCDateTime(bytesNeededUTCDateTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTime(m_pHandle, bytesNeededUTCDateTime, &bytesWrittenUTCDateTime, &bufferUTCDateTime[0]));
+		
+		return std::string(&bufferUTCDateTime[0]);
+	}
+	
+	/**
+	* CDateTime::ToUTCDateTimeInMilliseconds - Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC
+	*/
+	std::string CDateTime::ToUTCDateTimeInMilliseconds()
+	{
+		LibMCEnv_uint32 bytesNeededUTCDateTime = 0;
+		LibMCEnv_uint32 bytesWrittenUTCDateTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMilliseconds(m_pHandle, 0, &bytesNeededUTCDateTime, nullptr));
+		std::vector<char> bufferUTCDateTime(bytesNeededUTCDateTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMilliseconds(m_pHandle, bytesNeededUTCDateTime, &bytesWrittenUTCDateTime, &bufferUTCDateTime[0]));
+		
+		return std::string(&bufferUTCDateTime[0]);
+	}
+	
+	/**
+	* CDateTime::ToUTCDateTimeInMicroseconds - Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.
+	* @return The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC
+	*/
+	std::string CDateTime::ToUTCDateTimeInMicroseconds()
+	{
+		LibMCEnv_uint32 bytesNeededUTCDateTime = 0;
+		LibMCEnv_uint32 bytesWrittenUTCDateTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMicroseconds(m_pHandle, 0, &bytesNeededUTCDateTime, nullptr));
+		std::vector<char> bufferUTCDateTime(bytesNeededUTCDateTime);
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ToUTCDateTimeInMicroseconds(m_pHandle, bytesNeededUTCDateTime, &bytesWrittenUTCDateTime, &bufferUTCDateTime[0]));
+		
+		return std::string(&bufferUTCDateTime[0]);
+	}
+	
+	/**
+	* CDateTime::GetDate - Returns the date information.
+	* @param[out] nYear - Year of the date.
+	* @param[out] nMonth - Month of the date.
+	* @param[out] nDay - Day of the date.
+	*/
+	void CDateTime::GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetDate(m_pHandle, &nYear, &nMonth, &nDay));
+	}
+	
+	/**
+	* CDateTime::GetTime - Returns the time information.
+	* @param[out] nHour - Hour of the time. Returns 0-23.
+	* @param[out] nMinute - Minute of the time. Returns 0-59.
+	* @param[out] nSecond - Seconds of the time. Returns 0-59.
+	* @param[out] nMicrosecond - Partial microseconds of the time. Returns 0-999999.
+	*/
+	void CDateTime::GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetTime(m_pHandle, &nHour, &nMinute, &nSecond, &nMicrosecond));
+	}
+	
+	/**
+	* CDateTime::Duplicate - Duplicates the date time instance.
+	* @return Returns a copied instance.
+	*/
+	PDateTime CDateTime::Duplicate()
+	{
+		LibMCEnvHandle hNewInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_Duplicate(m_pHandle, &hNewInstance));
+		
+		if (!hNewInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hNewInstance);
+	}
+	
+	/**
+	* CDateTime::IsLeapYear - Returns if the year is a leap year.
+	* @return Returns true if the year is a leap year.
+	*/
+	bool CDateTime::IsLeapYear()
+	{
+		bool resultIsLeapYear = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsLeapYear(m_pHandle, &resultIsLeapYear));
+		
+		return resultIsLeapYear;
+	}
+	
+	/**
+	* CDateTime::IsLaterThan - Checks if this timestamp is later than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is later than OtherTimeStamp.
+	*/
+	bool CDateTime::IsLaterThan(classParam<CDateTime> pOtherTimeStamp)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		bool resultIsLater = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsLaterThan(m_pHandle, hOtherTimeStamp, &resultIsLater));
+		
+		return resultIsLater;
+	}
+	
+	/**
+	* CDateTime::IsEarlierThan - Checks if this timestamp is earlier than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is earlier than OtherTimeStamp.
+	*/
+	bool CDateTime::IsEarlierThan(classParam<CDateTime> pOtherTimeStamp)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		bool resultIsEarlier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsEarlierThan(m_pHandle, hOtherTimeStamp, &resultIsEarlier));
+		
+		return resultIsEarlier;
+	}
+	
+	/**
+	* CDateTime::IsEqualTo - Checks if this timestamp is equal to another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is equal to the OtherTimeStamp.
+	*/
+	bool CDateTime::IsEqualTo(classParam<CDateTime> pOtherTimeStamp)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		bool resultIsEqual = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_IsEqualTo(m_pHandle, hOtherTimeStamp, &resultIsEqual));
+		
+		return resultIsEqual;
+	}
+	
+	/**
+	* CDateTime::GetTimeDifference - Returns the time difference to another time stamp as positive duration value.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering.
+	*/
+	PDateTimeDifference CDateTime::GetTimeDifference(classParam<CDateTime> pOtherTimeStamp)
+	{
+		LibMCEnvHandle hOtherTimeStamp = pOtherTimeStamp.GetHandle();
+		LibMCEnvHandle hDifference = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_GetTimeDifference(m_pHandle, hOtherTimeStamp, &hDifference));
+		
+		if (!hDifference) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTimeDifference>(m_pWrapper, hDifference);
+	}
+	
+	/**
+	* CDateTime::AddDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to add to the time stamp.
+	*/
+	void CDateTime::AddDuration(classParam<CDateTimeDifference> pDuration)
+	{
+		LibMCEnvHandle hDuration = pDuration.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_AddDuration(m_pHandle, hDuration));
+	}
+	
+	/**
+	* CDateTime::SubtractDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to subtract from the time stamp.
+	*/
+	void CDateTime::SubtractDuration(classParam<CDateTimeDifference> pDuration)
+	{
+		LibMCEnvHandle hDuration = pDuration.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_SubtractDuration(m_pHandle, hDuration));
+	}
+	
+	/**
+	* CDateTime::ShiftByYears - Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaYears - Years to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByYears(const LibMCEnv_int64 nDeltaYears)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByYears(m_pHandle, nDeltaYears));
+	}
+	
+	/**
+	* CDateTime::ShiftByDays - Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaDays - Days to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByDays(const LibMCEnv_int64 nDeltaDays)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByDays(m_pHandle, nDeltaDays));
+	}
+	
+	/**
+	* CDateTime::ShiftByHours - Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaHours - Hours to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByHours(const LibMCEnv_int64 nDeltaHours)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByHours(m_pHandle, nDeltaHours));
+	}
+	
+	/**
+	* CDateTime::ShiftByMinutes - Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMinutes - Minutes to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByMinutes(const LibMCEnv_int64 nDeltaMinutes)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByMinutes(m_pHandle, nDeltaMinutes));
+	}
+	
+	/**
+	* CDateTime::ShiftBySeconds - Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaSeconds - Seconds to shift the date time stamp.
+	*/
+	void CDateTime::ShiftBySeconds(const LibMCEnv_int64 nDeltaSeconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftBySeconds(m_pHandle, nDeltaSeconds));
+	}
+	
+	/**
+	* CDateTime::ShiftByMilliseconds - Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMilliseconds - Milliseconds to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByMilliseconds(const LibMCEnv_int64 nDeltaMilliseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByMilliseconds(m_pHandle, nDeltaMilliseconds));
+	}
+	
+	/**
+	* CDateTime::ShiftByMicroseconds - Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMicroseconds - Microseconds to shift the date time stamp.
+	*/
+	void CDateTime::ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_ShiftByMicroseconds(m_pHandle, nDeltaMicroseconds));
+	}
+	
+	/**
+	* CDateTime::RoundDownToYear - Rounds down the timestamp to the start of the year. Takes leap years into account.
+	*/
+	void CDateTime::RoundDownToYear()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToYear(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToMonth - Rounds down the timestamp to the start of the month. Takes leap years into account.
+	*/
+	void CDateTime::RoundDownToMonth()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToMonth(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToDay - Rounds down the timestamp to the full day.
+	*/
+	void CDateTime::RoundDownToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToHour - Rounds down the timestamp to the full hour.
+	*/
+	void CDateTime::RoundDownToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToMinute - Rounds down the timestamp to the full minute.
+	*/
+	void CDateTime::RoundDownToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToSeconds - Rounds down the timestamp to the full second.
+	*/
+	void CDateTime::RoundDownToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundDownToMilliseconds - Rounds down the timestamp to the full millisecond.
+	*/
+	void CDateTime::RoundDownToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundDownToMilliseconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToYear - Rounds up the timestamp to the start of the year. Takes leap years into account.
+	*/
+	void CDateTime::RoundUpToYear()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToYear(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToMonth - Rounds up the timestamp to the start of the month. Takes leap years into account.
+	*/
+	void CDateTime::RoundUpToMonth()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToMonth(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToDay - Rounds up the timestamp to the full day.
+	*/
+	void CDateTime::RoundUpToDay()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToDay(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToHour - Rounds up the timestamp to the full hour.
+	*/
+	void CDateTime::RoundUpToHour()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToHour(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToMinute - Rounds up the timestamp to the full minute.
+	*/
+	void CDateTime::RoundUpToMinute()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToMinute(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToSeconds - Rounds up the timestamp to the full second.
+	*/
+	void CDateTime::RoundUpToSeconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToSeconds(m_pHandle));
+	}
+	
+	/**
+	* CDateTime::RoundUpToMilliseconds - Rounds up the timestamp to the full millisecond.
+	*/
+	void CDateTime::RoundUpToMilliseconds()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DateTime_RoundUpToMilliseconds(m_pHandle));
 	}
 	
 	/**
@@ -12171,6 +14963,440 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CBuildExecution
+	 */
+	
+	/**
+	* CBuildExecution::GetUUID - Returns uuid of the build execution.
+	* @return UUID of the build execution.
+	*/
+	std::string CBuildExecution::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededExecutionUUID = 0;
+		LibMCEnv_uint32 bytesWrittenExecutionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUUID(m_pHandle, 0, &bytesNeededExecutionUUID, nullptr));
+		std::vector<char> bufferExecutionUUID(bytesNeededExecutionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUUID(m_pHandle, bytesNeededExecutionUUID, &bytesWrittenExecutionUUID, &bufferExecutionUUID[0]));
+		
+		return std::string(&bufferExecutionUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	std::string CBuildExecution::GetBuildUUID()
+	{
+		LibMCEnv_uint32 bytesNeededBuildUUID = 0;
+		LibMCEnv_uint32 bytesWrittenBuildUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetBuildUUID(m_pHandle, 0, &bytesNeededBuildUUID, nullptr));
+		std::vector<char> bufferBuildUUID(bytesNeededBuildUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetBuildUUID(m_pHandle, bytesNeededBuildUUID, &bytesWrittenBuildUUID, &bufferBuildUUID[0]));
+		
+		return std::string(&bufferBuildUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::GetBuild - Returns the instance of the build.
+	* @return Instance of the build.
+	*/
+	PBuild CBuildExecution::GetBuild()
+	{
+		LibMCEnvHandle hBuildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetBuild(m_pHandle, &hBuildInstance));
+		
+		if (!hBuildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
+	* CBuildExecution::GetExecutionStatus - Returns the status of the execution.
+	* @return Status of the build.
+	*/
+	eBuildExecutionStatus CBuildExecution::GetExecutionStatus()
+	{
+		eBuildExecutionStatus resultExecutionStatus = (eBuildExecutionStatus) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetExecutionStatus(m_pHandle, &resultExecutionStatus));
+		
+		return resultExecutionStatus;
+	}
+	
+	/**
+	* CBuildExecution::IsInProcess - Convenience function for checking the execution status.
+	* @return Returns true if the status is InProcess.
+	*/
+	bool CBuildExecution::IsInProcess()
+	{
+		bool resultIsInProcess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_IsInProcess(m_pHandle, &resultIsInProcess));
+		
+		return resultIsInProcess;
+	}
+	
+	/**
+	* CBuildExecution::IsFinished - Convenience function for checking the execution status.
+	* @return Returns true if the status is Finished.
+	*/
+	bool CBuildExecution::IsFinished()
+	{
+		bool resultIsInProcess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_IsFinished(m_pHandle, &resultIsInProcess));
+		
+		return resultIsInProcess;
+	}
+	
+	/**
+	* CBuildExecution::IsFailed - Convenience function for checking the execution status.
+	* @return Returns true if the status is Failed.
+	*/
+	bool CBuildExecution::IsFailed()
+	{
+		bool resultIsInProcess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_IsFailed(m_pHandle, &resultIsInProcess));
+		
+		return resultIsInProcess;
+	}
+	
+	/**
+	* CBuildExecution::SetStatusToFinished - Sets build execution status to finished. Fails if Build status is not InProcess 
+	*/
+	void CBuildExecution::SetStatusToFinished()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_SetStatusToFinished(m_pHandle));
+	}
+	
+	/**
+	* CBuildExecution::SetStatusToFailed - Sets build execution status to failed. Fails if Build status is not InProcess 
+	*/
+	void CBuildExecution::SetStatusToFailed()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_SetStatusToFailed(m_pHandle));
+	}
+	
+	/**
+	* CBuildExecution::GetDescription - Returns a human readable description of the build execution for display in the User Interface.
+	* @return Description.
+	*/
+	std::string CBuildExecution::GetDescription()
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetDescription(m_pHandle, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetDescription(m_pHandle, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CBuildExecution::SetDescription - Sets a human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sDescription - Description.
+	*/
+	void CBuildExecution::SetDescription(const std::string & sDescription)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_SetDescription(m_pHandle, sDescription.c_str()));
+	}
+	
+	/**
+	* CBuildExecution::GetJournalUUID - Returns the machine journal UUID that this job in executing in.
+	* @return Journal UUID of build execution.
+	*/
+	std::string CBuildExecution::GetJournalUUID()
+	{
+		LibMCEnv_uint32 bytesNeededJournalUUID = 0;
+		LibMCEnv_uint32 bytesWrittenJournalUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetJournalUUID(m_pHandle, 0, &bytesNeededJournalUUID, nullptr));
+		std::vector<char> bufferJournalUUID(bytesNeededJournalUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetJournalUUID(m_pHandle, bytesNeededJournalUUID, &bytesWrittenJournalUUID, &bufferJournalUUID[0]));
+		
+		return std::string(&bufferJournalUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::HasAttachedUser - Returns if a user is attached to the execution.
+	* @return Flag if a user is attached to the execution.
+	*/
+	bool CBuildExecution::HasAttachedUser()
+	{
+		bool resultUserIsAttached = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasAttachedUser(m_pHandle, &resultUserIsAttached));
+		
+		return resultUserIsAttached;
+	}
+	
+	/**
+	* CBuildExecution::GetUserUUID - Returns the user that started this job. Fails if no user is attached to the execution.
+	* @return User who started the job.
+	*/
+	std::string CBuildExecution::GetUserUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUserUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUserUUID(m_pHandle, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetUserUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::GetStartTimeStampInMilliseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Milliseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetStartTimeStampInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeStampInMilliseconds(m_pHandle, &resultTimeStampInMilliseconds));
+		
+		return resultTimeStampInMilliseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Microseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetStartTimeStampInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetStartTimeStampInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetEndTimeStampInMilliseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Milliseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetEndTimeStampInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetEndTimeStampInMilliseconds(m_pHandle, &resultTimeStampInMilliseconds));
+		
+		return resultTimeStampInMilliseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Microseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetEndTimeStampInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetEndTimeStampInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetElapsedTimeInMilliseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Milliseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetElapsedTimeInMilliseconds(m_pHandle, &resultTimeStampInMilliseconds));
+		
+		return resultTimeStampInMilliseconds;
+	}
+	
+	/**
+	* CBuildExecution::GetElapsedTimeInMicroseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Microseconds.
+	*/
+	LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
+	{
+		LibMCEnv_uint64 resultTimeStampInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetElapsedTimeInMicroseconds(m_pHandle, &resultTimeStampInMicroseconds));
+		
+		return resultTimeStampInMicroseconds;
+	}
+	
+	/**
+	* CBuildExecution::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] ContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
+	{
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDiscreteField2DByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	PDiscreteFieldData2D CBuildExecution::LoadDiscreteField2DByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hFieldDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDiscreteField2DByUUID(m_pHandle, sDataUUID.c_str(), &hFieldDataInstance));
+		
+		if (!hFieldDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDiscreteFieldData2D>(m_pWrapper, hFieldDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuildExecution::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	PImageData CBuildExecution::LoadPNGImageByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CBuildExecution::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::AddMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	void CBuildExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CBuildExecution::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	bool CBuildExecution::HasMetaDataString(const std::string & sKey)
+	{
+		bool resultMetaDataStringExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasMetaDataString(m_pHandle, sKey.c_str(), &resultMetaDataStringExists));
+		
+		return resultMetaDataStringExists;
+	}
+	
+	/**
+	* CBuildExecution::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	std::string CBuildExecution::GetMetaDataString(const std::string & sKey)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetMetaDataString(m_pHandle, sKey.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetMetaDataString(m_pHandle, sKey.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	 * Method definitions for class CBuildExecutionIterator
+	 */
+	
+	/**
+	* CBuildExecutionIterator::GetCurrentExecution - Returns the execution the iterator points at.
+	* @return returns the BuildExecution instance.
+	*/
+	PBuildExecution CBuildExecutionIterator::GetCurrentExecution()
+	{
+		LibMCEnvHandle hBuildExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecutionIterator_GetCurrentExecution(m_pHandle, &hBuildExecutionInstance));
+		
+		if (!hBuildExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hBuildExecutionInstance);
+	}
+	
+	/**
 	 * Method definitions for class CBuild
 	 */
 	
@@ -12205,7 +15431,7 @@ public:
 	}
 	
 	/**
-	* CBuild::GetStorageUUID - Returns storage uuid of the build.
+	* CBuild::GetStorageUUID - Returns storage uuid of the build stream.
 	* @return Storage UUID of the build.
 	*/
 	std::string CBuild::GetStorageUUID()
@@ -12420,7 +15646,7 @@ public:
 	
 	/**
 	* CBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
@@ -12437,6 +15663,124 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::StartExecution - Starts a build execution. This function does not work in a UIEnvironment context!
+	* @param[in] sDescription - A human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sUserUUID - User who started the execution. MUST exist. If empty, no user is attached.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	PBuildExecution CBuild::StartExecution(const std::string & sDescription, const std::string & sUserUUID)
+	{
+		LibMCEnvHandle hBuildExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StartExecution(m_pHandle, sDescription.c_str(), sUserUUID.c_str(), &hBuildExecutionInstance));
+		
+		if (!hBuildExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hBuildExecutionInstance);
+	}
+	
+	/**
+	* CBuild::HasExecution - Checks if a build execution exists for this build.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Returns true if the execution exists.
+	*/
+	bool CBuild::HasExecution(const std::string & sExecutionUUID)
+	{
+		bool resultExecutionExist = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasExecution(m_pHandle, sExecutionUUID.c_str(), &resultExecutionExist));
+		
+		return resultExecutionExist;
+	}
+	
+	/**
+	* CBuild::FindExecution - Finds a build execution. Fails if execution does not exist.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	PBuildExecution CBuild::FindExecution(const std::string & sExecutionUUID)
+	{
+		LibMCEnvHandle hBuildExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_FindExecution(m_pHandle, sExecutionUUID.c_str(), &hBuildExecutionInstance));
+		
+		if (!hBuildExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hBuildExecutionInstance);
+	}
+	
+	/**
+	* CBuild::ListExecutions - Lists all Executions of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	PBuildExecutionIterator CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_ListExecutions(m_pHandle, bOnlyCurrentJournalSession, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecutionIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuild::ListExecutionsByStatus - Lists all Executions of the build by status.
+	* @param[in] eExecutionStatus - Status of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	PBuildExecutionIterator CBuild::ListExecutionsByStatus(const eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_ListExecutionsByStatus(m_pHandle, eExecutionStatus, bOnlyCurrentJournalSession, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecutionIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuild::AddMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	void CBuild::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CBuild::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	bool CBuild::HasMetaDataString(const std::string & sKey)
+	{
+		bool resultMetaDataStringExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasMetaDataString(m_pHandle, sKey.c_str(), &resultMetaDataStringExists));
+		
+		return resultMetaDataStringExists;
+	}
+	
+	/**
+	* CBuild::GetMetaDataString - Gets a metadata string of a build. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	std::string CBuild::GetMetaDataString(const std::string & sKey)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetMetaDataString(m_pHandle, sKey.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetMetaDataString(m_pHandle, sKey.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
 	}
 	
 	/**
@@ -14420,6 +17764,21 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	PDataTable CDriverEnvironment::CreateDataTable()
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateDataTable(m_pHandle, &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
 	* CDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -14539,7 +17898,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* CDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation. The default units are 0.001.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sDescription - Parameter Description
 	* @param[in] dDefaultValue - default value to set
@@ -14547,6 +17906,18 @@ public:
 	void CDriverEnvironment::RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterDoubleParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), dDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterDoubleParameterWithUnits - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	* @param[in] dUnits - unit factor to use
+	*/
+	void CDriverEnvironment::RegisterDoubleParameterWithUnits(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterDoubleParameterWithUnits(m_pHandle, sParameterName.c_str(), sDescription.c_str(), dDefaultValue, dUnits));
 	}
 	
 	/**
@@ -15576,18 +18947,49 @@ public:
 	}
 	
 	/**
+	* CJournalVariable::ComputeSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* @param[in] nTimeInMicroSeconds - Timestamp to check.
+	* @return Value of the variable at the time step.
+	*/
+	LibMCEnv_double CJournalVariable::ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
+	{
+		LibMCEnv_double resultSampleValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeSample(m_pHandle, nTimeInMicroSeconds, &resultSampleValue));
+		
+		return resultSampleValue;
+	}
+	
+	/**
 	* CJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
 	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
-	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
+	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
+	* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
 	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
 	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 	* @return Returns an instance with the sampling results.
 	*/
-	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
 	{
 		LibMCEnvHandle hJournalSampling = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		
+		if (!hJournalSampling) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hJournalSampling);
+	}
+	
+	/**
+	* CJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
+	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
+	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
+	* @return Returns an instance with the sampling results.
+	*/
+	PUniformJournalSampling CJournalVariable::ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples)
+	{
+		LibMCEnvHandle hJournalSampling = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeEquidistantSamples(m_pHandle, nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples, &hJournalSampling));
 		
 		if (!hJournalSampling) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15730,6 +19132,21 @@ public:
 	}
 	
 	/**
+	* CAlert::GetAcknowledgementTime - Returns the time stamp of the the acknowledgement. Fails if the alert is not acknowledged.
+	* @return Timestamp Instance.
+	*/
+	PDateTime CAlert::GetAcknowledgementTime()
+	{
+		LibMCEnvHandle hAckTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Alert_GetAcknowledgementTime(m_pHandle, &hAckTime));
+		
+		if (!hAckTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hAckTime);
+	}
+	
+	/**
 	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
@@ -15782,13 +19199,13 @@ public:
 	/**
 	* CJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
 	* @return Journal Instance.
 	*/
-	PJournalVariable CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds)
+	PJournalVariable CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
 	{
 		LibMCEnvHandle hJournalVariable = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMilliseconds, &hJournalVariable));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMicroseconds, &hJournalVariable));
 		
 		if (!hJournalVariable) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15815,62 +19232,18 @@ public:
 	}
 	
 	/**
-	* CJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-	* @return Returns the stored time stamp in microseconds.
+	* CJournalHandler::GetStartTime - Retrieves the reference start time of the journal.
+	* @return DateTime Instance
 	*/
-	LibMCEnv_uint64 CJournalHandler::StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
+	PDateTime CJournalHandler::GetStartTime()
 	{
-		LibMCEnv_uint64 resultTimeStamp = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_StoreJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStamp));
+		LibMCEnvHandle hDateTimeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetStartTime(m_pHandle, &hDateTimeInstance));
 		
-		return resultTimeStamp;
-	}
-	
-	/**
-	* CJournalHandler::HasJournalMarker - Checks if a journal marker tag exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @return Returns true if the marker exists.
-	*/
-	bool CJournalHandler::HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName)
-	{
-		bool resultMarkerExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_HasJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), &resultMarkerExists));
-		
-		return resultMarkerExists;
-	}
-	
-	/**
-	* CJournalHandler::RetrieveJournalMarker - Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-	* @return Returns the time stamp in microseconds.
-	*/
-	LibMCEnv_uint64 CJournalHandler::RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique)
-	{
-		LibMCEnv_uint64 resultTimeStampInMicroSeconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarker(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), bMustBeUnique, &resultTimeStampInMicroSeconds));
-		
-		return resultTimeStampInMicroSeconds;
-	}
-	
-	/**
-	* CJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[out] TimeStampsBuffer - Returns an array of time stamps in microseconds.
-	*/
-	void CJournalHandler::RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, std::vector<LibMCEnv_uint64> & TimeStampsBuffer)
-	{
-		LibMCEnv_uint64 elementsNeededTimeStamps = 0;
-		LibMCEnv_uint64 elementsWrittenTimeStamps = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarkers(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), 0, &elementsNeededTimeStamps, nullptr));
-		TimeStampsBuffer.resize((size_t) elementsNeededTimeStamps);
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalMarkers(m_pHandle, sMarkerType.c_str(), sMarkerName.c_str(), elementsNeededTimeStamps, &elementsWrittenTimeStamps, TimeStampsBuffer.data()));
+		if (!hDateTimeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
 	}
 	
 	/**
@@ -17007,6 +20380,21 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	PDataTable CStateEnvironment::CreateDataTable()
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateDataTable(m_pHandle, &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
 	* CStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 	* @param[in] sUserLogin - Login of user to check
 	* @param[in] sPermissionIdentifier - Permission identifier
@@ -17883,6 +21271,21 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLDocument);
+	}
+	
+	/**
+	* CUIEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	PDataTable CUIEnvironment::CreateDataTable()
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateDataTable(m_pHandle, &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
 	}
 	
 	/**

@@ -67,7 +67,7 @@ namespace AMCData {
 
 		PSQLStatement prepareStatement (const std::string & sSQLString) override;
 
-		static void checkSQLiteError (int nError);		
+		void checkSQLiteError (int nError);		
 
 	};
 

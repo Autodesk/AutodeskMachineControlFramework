@@ -63,11 +63,18 @@ class IPNGImageData;
 class IImageData;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
+class IDataTableWriteOptions;
+class IDataTableCSVWriteOptions;
+class IDataTable;
 class IDataSeries;
+class IDateTimeDifference;
+class IDateTime;
 class IMeshObject;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
+class IBuildExecution;
+class IBuildExecutionIterator;
 class IBuild;
 class IWorkingFileExecution;
 class IWorkingFile;
@@ -817,6 +824,212 @@ typedef IBaseSharedPtr<IDiscreteFieldData2D> PIDiscreteFieldData2D;
 
 
 /*************************************************************************************************************************
+ Class interface for DataTableWriteOptions 
+**************************************************************************************************************************/
+
+class IDataTableWriteOptions : public virtual IBase {
+public:
+};
+
+typedef IBaseSharedPtr<IDataTableWriteOptions> PIDataTableWriteOptions;
+
+
+/*************************************************************************************************************************
+ Class interface for DataTableCSVWriteOptions 
+**************************************************************************************************************************/
+
+class IDataTableCSVWriteOptions : public virtual IBase {
+public:
+	/**
+	* IDataTableCSVWriteOptions::GetSeparator - Returns the desired separator of the CSV file. Default is semicolon.
+	* @return Separator to use.
+	*/
+	virtual std::string GetSeparator() = 0;
+
+	/**
+	* IDataTableCSVWriteOptions::SetSeparator - Sets the desired separator of the CSV file.
+	* @param[in] sSeparator - Separator to use. MUST be a single character ASCII string. (ASCII Code 32-127)
+	*/
+	virtual void SetSeparator(const std::string & sSeparator) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataTableCSVWriteOptions> PIDataTableCSVWriteOptions;
+
+
+/*************************************************************************************************************************
+ Class interface for DataTable 
+**************************************************************************************************************************/
+
+class IDataTable : public virtual IBase {
+public:
+	/**
+	* IDataTable::AddColumn - Adds a column to the data field.
+	* @param[in] sIdentifier - Identifier of the column. MUST be unique, alphanumeric and not empty.
+	* @param[in] sDescription - Description of the column.
+	* @param[in] eColumnType - Data type of the column.
+	*/
+	virtual void AddColumn(const std::string & sIdentifier, const std::string & sDescription, const LibMCEnv::eDataTableColumnType eColumnType) = 0;
+
+	/**
+	* IDataTable::RemoveColumn - Removes a column from the data field. Fails if Column does not exist.
+	* @param[in] sIdentifier - Identifier of the column.
+	*/
+	virtual void RemoveColumn(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDataTable::HasColumn - Returns if a column exists in the data field.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @return Returns if the columns exist.
+	*/
+	virtual bool HasColumn(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDataTable::GetRowCount - Returns the current row count.
+	* @return Number of rows.
+	*/
+	virtual LibMCEnv_uint32 GetRowCount() = 0;
+
+	/**
+	* IDataTable::GetColumnCount - Returns the current column count.
+	* @return Number of columns.
+	*/
+	virtual LibMCEnv_uint32 GetColumnCount() = 0;
+
+	/**
+	* IDataTable::GetColumnIdentifier - Returns the identifier of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Identifier of the column.
+	*/
+	virtual std::string GetColumnIdentifier(const LibMCEnv_uint32 nColumnIndex) = 0;
+
+	/**
+	* IDataTable::GetColumnDescription - Returns the description of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Description of the column.
+	*/
+	virtual std::string GetColumnDescription(const LibMCEnv_uint32 nColumnIndex) = 0;
+
+	/**
+	* IDataTable::GetColumnType - Returns the type of a column. Will fail if Index is out of bounds.
+	* @param[in] nColumnIndex - Index of column. 0-based.
+	* @return Data type of the column.
+	*/
+	virtual LibMCEnv::eDataTableColumnType GetColumnType(const LibMCEnv_uint32 nColumnIndex) = 0;
+
+	/**
+	* IDataTable::GetColumnInformation - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[out] sDescription - Description of the column.
+	* @param[out] eColumnType - Data type of the column.
+	*/
+	virtual void GetColumnInformation(const std::string & sIdentifier, std::string & sDescription, LibMCEnv::eDataTableColumnType & eColumnType) = 0;
+
+	/**
+	* IDataTable::GetDoubleColumnValues - Returns the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - double buffer of Value array of a column.
+	*/
+	virtual void GetDoubleColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_double * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetInt32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - int32 buffer of Value array of a column.
+	*/
+	virtual void GetInt32ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetInt64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - int64 buffer of Value array of a column.
+	*/
+	virtual void GetInt64ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_int64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetUint32ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - uint32 buffer of Value array of a column.
+	*/
+	virtual void GetUint32ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::GetUint64ColumnValues - Returns the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - uint64 buffer of Value array of a column.
+	*/
+	virtual void GetUint64ColumnValues(const std::string & sIdentifier, LibMCEnv_uint64 nValuesBufferSize, LibMCEnv_uint64* pValuesNeededCount, LibMCEnv_uint64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetDoubleColumnValues - Sets the values of a double column. Will fail if column does not exist or type is not double.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	virtual void SetDoubleColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_double * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetInt32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	virtual void SetInt32ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetInt64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not int64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	virtual void SetInt64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_int64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetUint32ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint32.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	virtual void SetUint32ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint32 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::SetUint64ColumnValues - Sets the double columns. Will fail if column does not exist or type is not uint64.
+	* @param[in] sIdentifier - Identifier of the column.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[in] pValuesBuffer - New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount.
+	*/
+	virtual void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) = 0;
+
+	/**
+	* IDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
+	* @param[in] pWriter - Stream writer to use.
+	* @param[in] pOptions - Optional CSV writer options to use.
+	*/
+	virtual void WriteCSVToStream(ITempStreamWriter* pWriter, IDataTableCSVWriteOptions* pOptions) = 0;
+
+	/**
+	* IDataTable::WriteDataToStream - Writes the data as binary to a temporary stream.
+	* @param[in] pWriter - Stream writer instance to use.
+	* @param[in] pOptions - Optional writer options to use.
+	*/
+	virtual void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataTable> PIDataTable;
+
+
+/*************************************************************************************************************************
  Class interface for DataSeries 
 **************************************************************************************************************************/
 
@@ -894,6 +1107,325 @@ public:
 };
 
 typedef IBaseSharedPtr<IDataSeries> PIDataSeries;
+
+
+/*************************************************************************************************************************
+ Class interface for DateTimeDifference 
+**************************************************************************************************************************/
+
+class IDateTimeDifference : public virtual IBase {
+public:
+	/**
+	* IDateTimeDifference::ToMicroseconds - Returns the duration in Microseconds.
+	* @return The duration in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 ToMicroseconds() = 0;
+
+	/**
+	* IDateTimeDifference::ToMilliseconds - Returns the duration in Milliseconds. Partial milliseconds are rounded down.
+	* @return The duration in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 ToMilliseconds() = 0;
+
+	/**
+	* IDateTimeDifference::ToSeconds - Returns the duration in Seconds. Partial seconds are rounded down.
+	* @return The duration in seconds.
+	*/
+	virtual LibMCEnv_uint64 ToSeconds() = 0;
+
+	/**
+	* IDateTimeDifference::ToMinutes - Returns the duration in Seconds. Partial minutes are rounded down.
+	* @return The duration in seconds.
+	*/
+	virtual LibMCEnv_uint64 ToMinutes() = 0;
+
+	/**
+	* IDateTimeDifference::ToHours - Returns the duration in Hours. Partial hours are rounded down.
+	* @return The duration in hours.
+	*/
+	virtual LibMCEnv_uint64 ToHours() = 0;
+
+	/**
+	* IDateTimeDifference::ToDays - Returns the duration in Days. Partial days are rounded down.
+	* @return The duration in days.
+	*/
+	virtual LibMCEnv_uint64 ToDays() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToDay - Rounds down the duration to the full day.
+	*/
+	virtual void RoundDownToDay() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToHour - Rounds down the duration to the full hour.
+	*/
+	virtual void RoundDownToHour() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToMinute - Rounds down the duration to the full minute.
+	*/
+	virtual void RoundDownToMinute() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToSeconds - Rounds down the duration to the full second.
+	*/
+	virtual void RoundDownToSeconds() = 0;
+
+	/**
+	* IDateTimeDifference::RoundDownToMilliseconds - Rounds down the duration to the full millisecond.
+	*/
+	virtual void RoundDownToMilliseconds() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToDay - Rounds up the duration to the full day.
+	*/
+	virtual void RoundUpToDay() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToHour - Rounds up the duration to the full hour.
+	*/
+	virtual void RoundUpToHour() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToMinute - Rounds up the duration to the full minute.
+	*/
+	virtual void RoundUpToMinute() = 0;
+
+	/**
+	* IDateTimeDifference::RoundUpToSeconds - Rounds up the duration to the full second.
+	*/
+	virtual void RoundUpToSeconds() = 0;
+
+	/**
+	* IDateTimeDifference::RoundupToMilliseconds - Rounds up the duration to the full millisecond.
+	*/
+	virtual void RoundupToMilliseconds() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDateTimeDifference> PIDateTimeDifference;
+
+
+/*************************************************************************************************************************
+ Class interface for DateTime 
+**************************************************************************************************************************/
+
+class IDateTime : public virtual IBase {
+public:
+	/**
+	* IDateTime::ToMicrosecondsSince1970 - Returns the maximum accuracy date time.
+	* @return Returns the date in Microseconds since midnight first of January 1970.
+	*/
+	virtual LibMCEnv_uint64 ToMicrosecondsSince1970() = 0;
+
+	/**
+	* IDateTime::ToUnixTimestamp - Returns the unix time stamp of the date time
+	* @return Returns the date in seconds since midnight the first of January 1970. Rounds down the value if microseconds are present.
+	*/
+	virtual LibMCEnv_uint64 ToUnixTimestamp() = 0;
+
+	/**
+	* IDateTime::ToUTCDateTime - Returns the Timestamp in ISO8601 UTC format. Rounded down to Second Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46Z UTC
+	*/
+	virtual std::string ToUTCDateTime() = 0;
+
+	/**
+	* IDateTime::ToUTCDateTimeInMilliseconds - Returns the Timestamp in ISO8601 UTC format. Rounded down to Millisecond Accuracy.
+	* @return The time stamp in ISO8601 format. Rounds down the value if microseconds are present. One example is 2024-03-27T15:21:46.123Z UTC
+	*/
+	virtual std::string ToUTCDateTimeInMilliseconds() = 0;
+
+	/**
+	* IDateTime::ToUTCDateTimeInMicroseconds - Returns the Timestamp in ISO8601 UTC format. Returns the string in full microsecond accuracy.
+	* @return The time stamp in ISO8601 format. One example is 2024-03-27T15:21:46.123456Z UTC
+	*/
+	virtual std::string ToUTCDateTimeInMicroseconds() = 0;
+
+	/**
+	* IDateTime::GetDate - Returns the date information.
+	* @param[out] nYear - Year of the date.
+	* @param[out] nMonth - Month of the date.
+	* @param[out] nDay - Day of the date.
+	*/
+	virtual void GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay) = 0;
+
+	/**
+	* IDateTime::GetTime - Returns the time information.
+	* @param[out] nHour - Hour of the time. Returns 0-23.
+	* @param[out] nMinute - Minute of the time. Returns 0-59.
+	* @param[out] nSecond - Seconds of the time. Returns 0-59.
+	* @param[out] nMicrosecond - Partial microseconds of the time. Returns 0-999999.
+	*/
+	virtual void GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond) = 0;
+
+	/**
+	* IDateTime::Duplicate - Duplicates the date time instance.
+	* @return Returns a copied instance.
+	*/
+	virtual IDateTime * Duplicate() = 0;
+
+	/**
+	* IDateTime::IsLeapYear - Returns if the year is a leap year.
+	* @return Returns true if the year is a leap year.
+	*/
+	virtual bool IsLeapYear() = 0;
+
+	/**
+	* IDateTime::IsLaterThan - Checks if this timestamp is later than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is later than OtherTimeStamp.
+	*/
+	virtual bool IsLaterThan(IDateTime* pOtherTimeStamp) = 0;
+
+	/**
+	* IDateTime::IsEarlierThan - Checks if this timestamp is earlier than another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is earlier than OtherTimeStamp.
+	*/
+	virtual bool IsEarlierThan(IDateTime* pOtherTimeStamp) = 0;
+
+	/**
+	* IDateTime::IsEqualTo - Checks if this timestamp is equal to another timestamp.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Returns true if the instance is equal to the OtherTimeStamp.
+	*/
+	virtual bool IsEqualTo(IDateTime* pOtherTimeStamp) = 0;
+
+	/**
+	* IDateTime::GetTimeDifference - Returns the time difference to another time stamp as positive duration value.
+	* @param[in] pOtherTimeStamp - Instance to check against.
+	* @return Difference between the two time stamps. Value will always be positive. Use IsEarlierThan or IsLaterThan to figure out the time ordering.
+	*/
+	virtual IDateTimeDifference * GetTimeDifference(IDateTime* pOtherTimeStamp) = 0;
+
+	/**
+	* IDateTime::AddDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to add to the time stamp.
+	*/
+	virtual void AddDuration(IDateTimeDifference* pDuration) = 0;
+
+	/**
+	* IDateTime::SubtractDuration - Shifts the date time by a duration. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] pDuration - Duration to subtract from the time stamp.
+	*/
+	virtual void SubtractDuration(IDateTimeDifference* pDuration) = 0;
+
+	/**
+	* IDateTime::ShiftByYears - Shifts the date time by years. Takes leap years into account. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaYears - Years to shift the date time stamp.
+	*/
+	virtual void ShiftByYears(const LibMCEnv_int64 nDeltaYears) = 0;
+
+	/**
+	* IDateTime::ShiftByDays - Shifts the date time by days. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaDays - Days to shift the date time stamp.
+	*/
+	virtual void ShiftByDays(const LibMCEnv_int64 nDeltaDays) = 0;
+
+	/**
+	* IDateTime::ShiftByHours - Shifts the date time by hours. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaHours - Hours to shift the date time stamp.
+	*/
+	virtual void ShiftByHours(const LibMCEnv_int64 nDeltaHours) = 0;
+
+	/**
+	* IDateTime::ShiftByMinutes - Shifts the date time by minutes. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMinutes - Minutes to shift the date time stamp.
+	*/
+	virtual void ShiftByMinutes(const LibMCEnv_int64 nDeltaMinutes) = 0;
+
+	/**
+	* IDateTime::ShiftBySeconds - Shifts the date time by seconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaSeconds - Seconds to shift the date time stamp.
+	*/
+	virtual void ShiftBySeconds(const LibMCEnv_int64 nDeltaSeconds) = 0;
+
+	/**
+	* IDateTime::ShiftByMilliseconds - Shifts the date time by milliseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMilliseconds - Milliseconds to shift the date time stamp.
+	*/
+	virtual void ShiftByMilliseconds(const LibMCEnv_int64 nDeltaMilliseconds) = 0;
+
+	/**
+	* IDateTime::ShiftByMicroseconds - Shifts the date time by microseconds. Fails if the shift will make it move outside of the year 1900 or 1000000.
+	* @param[in] nDeltaMicroseconds - Microseconds to shift the date time stamp.
+	*/
+	virtual void ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds) = 0;
+
+	/**
+	* IDateTime::RoundDownToYear - Rounds down the timestamp to the start of the year. Takes leap years into account.
+	*/
+	virtual void RoundDownToYear() = 0;
+
+	/**
+	* IDateTime::RoundDownToMonth - Rounds down the timestamp to the start of the month. Takes leap years into account.
+	*/
+	virtual void RoundDownToMonth() = 0;
+
+	/**
+	* IDateTime::RoundDownToDay - Rounds down the timestamp to the full day.
+	*/
+	virtual void RoundDownToDay() = 0;
+
+	/**
+	* IDateTime::RoundDownToHour - Rounds down the timestamp to the full hour.
+	*/
+	virtual void RoundDownToHour() = 0;
+
+	/**
+	* IDateTime::RoundDownToMinute - Rounds down the timestamp to the full minute.
+	*/
+	virtual void RoundDownToMinute() = 0;
+
+	/**
+	* IDateTime::RoundDownToSeconds - Rounds down the timestamp to the full second.
+	*/
+	virtual void RoundDownToSeconds() = 0;
+
+	/**
+	* IDateTime::RoundDownToMilliseconds - Rounds down the timestamp to the full millisecond.
+	*/
+	virtual void RoundDownToMilliseconds() = 0;
+
+	/**
+	* IDateTime::RoundUpToYear - Rounds up the timestamp to the start of the year. Takes leap years into account.
+	*/
+	virtual void RoundUpToYear() = 0;
+
+	/**
+	* IDateTime::RoundUpToMonth - Rounds up the timestamp to the start of the month. Takes leap years into account.
+	*/
+	virtual void RoundUpToMonth() = 0;
+
+	/**
+	* IDateTime::RoundUpToDay - Rounds up the timestamp to the full day.
+	*/
+	virtual void RoundUpToDay() = 0;
+
+	/**
+	* IDateTime::RoundUpToHour - Rounds up the timestamp to the full hour.
+	*/
+	virtual void RoundUpToHour() = 0;
+
+	/**
+	* IDateTime::RoundUpToMinute - Rounds up the timestamp to the full minute.
+	*/
+	virtual void RoundUpToMinute() = 0;
+
+	/**
+	* IDateTime::RoundUpToSeconds - Rounds up the timestamp to the full second.
+	*/
+	virtual void RoundUpToSeconds() = 0;
+
+	/**
+	* IDateTime::RoundUpToMilliseconds - Rounds up the timestamp to the full millisecond.
+	*/
+	virtual void RoundUpToMilliseconds() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDateTime> PIDateTime;
 
 
 /*************************************************************************************************************************
@@ -1447,6 +1979,232 @@ typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
 
 
 /*************************************************************************************************************************
+ Class interface for BuildExecution 
+**************************************************************************************************************************/
+
+class IBuildExecution : public virtual IBase {
+public:
+	/**
+	* IBuildExecution::GetUUID - Returns uuid of the build execution.
+	* @return UUID of the build execution.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IBuildExecution::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	virtual std::string GetBuildUUID() = 0;
+
+	/**
+	* IBuildExecution::GetBuild - Returns the instance of the build.
+	* @return Instance of the build.
+	*/
+	virtual IBuild * GetBuild() = 0;
+
+	/**
+	* IBuildExecution::GetExecutionStatus - Returns the status of the execution.
+	* @return Status of the build.
+	*/
+	virtual LibMCEnv::eBuildExecutionStatus GetExecutionStatus() = 0;
+
+	/**
+	* IBuildExecution::IsInProcess - Convenience function for checking the execution status.
+	* @return Returns true if the status is InProcess.
+	*/
+	virtual bool IsInProcess() = 0;
+
+	/**
+	* IBuildExecution::IsFinished - Convenience function for checking the execution status.
+	* @return Returns true if the status is Finished.
+	*/
+	virtual bool IsFinished() = 0;
+
+	/**
+	* IBuildExecution::IsFailed - Convenience function for checking the execution status.
+	* @return Returns true if the status is Failed.
+	*/
+	virtual bool IsFailed() = 0;
+
+	/**
+	* IBuildExecution::SetStatusToFinished - Sets build execution status to finished. Fails if Build status is not InProcess 
+	*/
+	virtual void SetStatusToFinished() = 0;
+
+	/**
+	* IBuildExecution::SetStatusToFailed - Sets build execution status to failed. Fails if Build status is not InProcess 
+	*/
+	virtual void SetStatusToFailed() = 0;
+
+	/**
+	* IBuildExecution::GetDescription - Returns a human readable description of the build execution for display in the User Interface.
+	* @return Description.
+	*/
+	virtual std::string GetDescription() = 0;
+
+	/**
+	* IBuildExecution::SetDescription - Sets a human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sDescription - Description.
+	*/
+	virtual void SetDescription(const std::string & sDescription) = 0;
+
+	/**
+	* IBuildExecution::GetJournalUUID - Returns the machine journal UUID that this job in executing in.
+	* @return Journal UUID of build execution.
+	*/
+	virtual std::string GetJournalUUID() = 0;
+
+	/**
+	* IBuildExecution::HasAttachedUser - Returns if a user is attached to the execution.
+	* @return Flag if a user is attached to the execution.
+	*/
+	virtual bool HasAttachedUser() = 0;
+
+	/**
+	* IBuildExecution::GetUserUUID - Returns the user that started this job. Fails if no user is attached to the execution.
+	* @return User who started the job.
+	*/
+	virtual std::string GetUserUUID() = 0;
+
+	/**
+	* IBuildExecution::GetStartTimeStampInMilliseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStampInMilliseconds() = 0;
+
+	/**
+	* IBuildExecution::GetStartTimeStampInMicroseconds - Returns the start time stamp of the build execution in the current machine journal.
+	* @return TimeStamp when the build started in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildExecution::GetEndTimeStampInMilliseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStampInMilliseconds() = 0;
+
+	/**
+	* IBuildExecution::GetEndTimeStampInMicroseconds - Returns the end time stamp of the build execution in the current machine journal. Status MUST BE in Finished or Failed to retrieve this value.
+	* @return TimeStamp when the build ended in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetEndTimeStampInMicroseconds() = 0;
+
+	/**
+	* IBuildExecution::GetElapsedTimeInMilliseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Milliseconds.
+	*/
+	virtual LibMCEnv_uint64 GetElapsedTimeInMilliseconds() = 0;
+
+	/**
+	* IBuildExecution::GetElapsedTimeInMicroseconds - Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.
+	* @return Elapsed time in Microseconds.
+	*/
+	virtual LibMCEnv_uint64 GetElapsedTimeInMicroseconds() = 0;
+
+	/**
+	* IBuildExecution::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attache data
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] nContentBufferSize - Number of elements in buffer
+	* @param[in] pContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+
+	/**
+	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) = 0;
+
+	/**
+	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded field instance.
+	*/
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Field Data Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
+
+	/**
+	* IBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
+	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] pImageDataInstance - Image data instance.
+	* @param[in] pStoreOptions - PNG Store Options.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuildExecution::AddMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuildExecution::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildExecution::GetMetaDataString - Gets a metadata string of a build execution. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildExecution> PIBuildExecution;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildExecutionIterator 
+**************************************************************************************************************************/
+
+class IBuildExecutionIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildExecutionIterator::GetCurrentExecution - Returns the execution the iterator points at.
+	* @return returns the BuildExecution instance.
+	*/
+	virtual IBuildExecution * GetCurrentExecution() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildExecutionIterator> PIBuildExecutionIterator;
+
+
+/*************************************************************************************************************************
  Class interface for Build 
 **************************************************************************************************************************/
 
@@ -1465,7 +2223,7 @@ public:
 	virtual std::string GetBuildUUID() = 0;
 
 	/**
-	* IBuild::GetStorageUUID - Returns storage uuid of the build.
+	* IBuild::GetStorageUUID - Returns storage uuid of the build stream.
 	* @return Storage UUID of the build.
 	*/
 	virtual std::string GetStorageUUID() = 0;
@@ -1568,13 +2326,71 @@ public:
 
 	/**
 	* IBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
 	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
 	* @return Data UUID of the attachment.
 	*/
 	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+
+	/**
+	* IBuild::StartExecution - Starts a build execution. This function does not work in a UIEnvironment context!
+	* @param[in] sDescription - A human readable description of the build execution for display in the User Interface. Should not be empty.
+	* @param[in] sUserUUID - User who started the execution. MUST exist. If empty, no user is attached.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	virtual IBuildExecution * StartExecution(const std::string & sDescription, const std::string & sUserUUID) = 0;
+
+	/**
+	* IBuild::HasExecution - Checks if a build execution exists for this build.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Returns true if the execution exists.
+	*/
+	virtual bool HasExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IBuild::FindExecution - Finds a build execution. Fails if execution does not exist.
+	* @param[in] sExecutionUUID - The UUID of the exceution.
+	* @return Build execution instance. Will be newly created and has the status InProcess.
+	*/
+	virtual IBuildExecution * FindExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IBuild::ListExecutions - Lists all Executions of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	virtual IBuildExecutionIterator * ListExecutions(const bool bOnlyCurrentJournalSession) = 0;
+
+	/**
+	* IBuild::ListExecutionsByStatus - Lists all Executions of the build by status.
+	* @param[in] eExecutionStatus - Status of the build.
+	* @param[in] bOnlyCurrentJournalSession - If true, only the builds that have been created in the current machine session.
+	* @return Iterator instance.
+	*/
+	virtual IBuildExecutionIterator * ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession) = 0;
+
+	/**
+	* IBuild::AddMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
+	* @param[in] sValue - Value to store.
+	*/
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+
+	/**
+	* IBuild::HasMetaDataString - Checks if a metadata string exists.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Returns if metadata string exists.
+	*/
+	virtual bool HasMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuild::GetMetaDataString - Gets a metadata string of a build. Fails if Meta Data does not exist.
+	* @param[in] sKey - Unique key of value. Fails if Key already exists.
+	* @return Return value.
+	*/
+	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
 
 };
 
@@ -2743,6 +3559,12 @@ public:
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 	/**
+	* IDriverEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	virtual IDataTable * CreateDataTable() = 0;
+
+	/**
 	* IDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -2814,12 +3636,21 @@ public:
 	virtual void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue) = 0;
 
 	/**
-	* IDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* IDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation. The default units are 0.001.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sDescription - Parameter Description
 	* @param[in] dDefaultValue - default value to set
 	*/
 	virtual void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterDoubleParameterWithUnits - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	* @param[in] dUnits - unit factor to use
+	*/
+	virtual void RegisterDoubleParameterWithUnits(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits) = 0;
 
 	/**
 	* IDriverEnvironment::RegisterIntegerParameter - registers an int parameter. Must only be called during driver creation.
@@ -3432,15 +4263,31 @@ public:
 	virtual LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval) = 0;
 
 	/**
+	* IJournalVariable::ComputeSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* @param[in] nTimeInMicroSeconds - Timestamp to check.
+	* @return Value of the variable at the time step.
+	*/
+	virtual LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
+
+	/**
 	* IJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
 	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in microseconds.
-	* @param[in] nNumberOfSamples - End Timestamp of the interval in ms. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
+	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
+	* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
 	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
 	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
 	* @return Returns an instance with the sampling results.
 	*/
-	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
+	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
+
+	/**
+	* IJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
+	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
+	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
+	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
+	* @return Returns an instance with the sampling results.
+	*/
+	virtual IUniformJournalSampling * ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples) = 0;
 
 	/**
 	* IJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
@@ -3512,6 +4359,12 @@ public:
 	virtual void GetAcknowledgementInformation(std::string & sUserUUID, std::string & sUserComment, std::string & sAckTime) = 0;
 
 	/**
+	* IAlert::GetAcknowledgementTime - Returns the time stamp of the the acknowledgement. Fails if the alert is not acknowledged.
+	* @return Timestamp Instance.
+	*/
+	virtual IDateTime * GetAcknowledgementTime() = 0;
+
+	/**
 	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
@@ -3560,10 +4413,10 @@ public:
 	/**
 	* IJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMilliseconds - How many milliseconds the journal should be retrieved in the past.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
 	* @return Journal Instance.
 	*/
-	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMilliseconds) = 0;
+	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
 
 	/**
 	* IJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
@@ -3575,40 +4428,10 @@ public:
 	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
 	/**
-	* IJournalHandler::StoreJournalMarker - Stores a journal marker tag at the current time stamp.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal.
-	* @return Returns the stored time stamp in microseconds.
+	* IJournalHandler::GetStartTime - Retrieves the reference start time of the journal.
+	* @return DateTime Instance
 	*/
-	virtual LibMCEnv_uint64 StoreJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
-
-	/**
-	* IJournalHandler::HasJournalMarker - Checks if a journal marker tag exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @return Returns true if the marker exists.
-	*/
-	virtual bool HasJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName) = 0;
-
-	/**
-	* IJournalHandler::RetrieveJournalMarker - Retrieves the first existing journal marker time stamp. Fails if marker does not exist.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] bMustBeUnique - If true, it checks for uniqueness of the marker name/type in the current journal and fails if there are multiple.
-	* @return Returns the time stamp in microseconds.
-	*/
-	virtual LibMCEnv_uint64 RetrieveJournalMarker(const std::string & sMarkerType, const std::string & sMarkerName, const bool bMustBeUnique) = 0;
-
-	/**
-	* IJournalHandler::RetrieveJournalMarkers - Retrieves all existing journal marker time stamps. Fails if no marker exists.
-	* @param[in] sMarkerType - Marker type to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] sMarkerName - Marker name to store. MUST be an non-empty alphanumeric string (hypens and underscores are allowed.)
-	* @param[in] nTimeStampsBufferSize - Number of elements in buffer
-	* @param[out] pTimeStampsNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pTimeStampsBuffer - uint64 buffer of Returns an array of time stamps in microseconds.
-	*/
-	virtual void RetrieveJournalMarkers(const std::string & sMarkerType, const std::string & sMarkerName, LibMCEnv_uint64 nTimeStampsBufferSize, LibMCEnv_uint64* pTimeStampsNeededCount, LibMCEnv_uint64 * pTimeStampsBuffer) = 0;
+	virtual IDateTime * GetStartTime() = 0;
 
 };
 
@@ -4215,6 +5038,12 @@ public:
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
 
 	/**
+	* IStateEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	virtual IDataTable * CreateDataTable() = 0;
+
+	/**
 	* IStateEnvironment::CheckUserPermission - Returns if the a user has a certain permission. Fails if user or permission is not known to the system.
 	* @param[in] sUserLogin - Login of user to check
 	* @param[in] sPermissionIdentifier - Permission identifier
@@ -4690,6 +5519,12 @@ public:
 	* @return XML Document Instance.
 	*/
 	virtual IXMLDocument * ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8 * pXMLDataBuffer) = 0;
+
+	/**
+	* IUIEnvironment::CreateDataTable - creates an empty data table.
+	* @return Data Table Instance.
+	*/
+	virtual IDataTable * CreateDataTable() = 0;
 
 	/**
 	* IUIEnvironment::HasBuildJob - Returns if a build object exists. Fails if BuildUUID is not a valid UUID string.

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_chrono.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "amc_logger.hpp"
-
+#include "amc_constants.hpp"
 #include <map>
 #include <thread>
 #include <future>
@@ -44,10 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	#define STATEJOURNAL_MAXVARIABLECOUNT  (16 * 1024 * 1024)
 
-	#define STATEJOURNAL_VARIABLE_MINUNITS 1.0E-6
-	#define STATEJOURNAL_VARIABLE_MAXUNITS 1.0E6
 
 	class CStateJournalImplVariable {
 	protected:
@@ -79,6 +76,11 @@ namespace AMC {
 
 		virtual eStateJournalVariableType getType() = 0;
 
+		virtual double computeNumericSample(const uint64_t nTimeStampInMicroseconds)
+		{
+			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC, m_sName);
+		}
+
 	};
 
 
@@ -109,6 +111,19 @@ namespace AMC {
 		void setInitialValue(const bool bValue)
 		{
 			m_bCurrentValue = bValue;
+		}
+
+		void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
+		{
+			m_pStream->readRawIntegerData(m_nStorageIndex, interval, timeStream);
+		}
+
+		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
+		{
+			if (m_pStream->sampleBoolData(m_nStorageIndex, nTimeStampInMicroseconds))
+				return 1.0;
+
+			return 0.0;
 		}
 
 	};
@@ -147,25 +162,16 @@ namespace AMC {
 		void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
 		{
 
-
 			m_pStream->readRawIntegerData (m_nStorageIndex, interval, timeStream);
 
-
-			/*for (auto& timeStreamEntry : m_TimeStream) {
-				if (timeStreamEntry.first <= nStartTimeStamp) {
-					dStartValue = timeStreamEntry.second;
-				}
-				else {
-					if (timeStreamEntry.first <= nEndTimeStamp) {
-						sJournalTimeStreamInt64Entry entry;
-						entry.m_nTimeStamp = timeStreamEntry.first;
-						entry.m_nValue = timeStreamEntry.second;
-						timeStream.push_back(entry);
-					}
-				}
-			} */
-
 		}
+
+		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
+		{			
+
+			return (double)m_pStream->sampleIntegerData(m_nStorageIndex, nTimeStampInMicroseconds);
+		}
+
 
 
 	};
@@ -234,6 +240,10 @@ namespace AMC {
 
 		}
 
+		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) 
+		{
+			return m_pStream->sampleDoubleData (m_nStorageIndex, nTimeStampInMicroseconds, m_dUnits);
+		}
 
 	};
 
@@ -317,7 +327,12 @@ namespace AMC {
 
 		void readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
+		double computeSample(const std::string& sName, const uint64_t nTimeStampInMicroseconds);
+
 		void recordingThread();
+		
+		std::string getStartTimeAsUTC();
+
 	};
 
 
@@ -546,6 +561,18 @@ namespace AMC {
 
 	}
 
+	double CStateJournalImpl::computeSample(const std::string& sName, const uint64_t nTimeStampInMicroseconds)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		if (m_JournalMode != eStateJournalMode::sjmRecording)
+			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
+
+		auto pVariable = findVariable(sName);
+		return pVariable->computeNumericSample(nTimeStampInMicroseconds);
+
+	}
+
+
 	void CStateJournalImpl::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
@@ -576,11 +603,32 @@ namespace AMC {
 			return;
 		}
 
+		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (pVariable);
+		if (pBoolVariable.get() != nullptr) {
+			std::vector<sJournalTimeStreamInt64Entry> intTimeStream;
+			pBoolVariable->readTimeStream(interval, intTimeStream);
+
+			timeStream.resize(intTimeStream.size());
+			for (size_t nIndex = 0; nIndex < intTimeStream.size(); nIndex++) {
+				auto& srcEntry = intTimeStream.at(nIndex);
+				auto& targetEntry = timeStream.at(nIndex);
+				targetEntry.m_nTimeStampInMicroSeconds = srcEntry.m_nTimeStampInMicroSeconds;
+				targetEntry.m_dValue = (double)srcEntry.m_nValue;
+			}
+
+			return;
+		}
+
+
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + pVariable->getName() + " is not a numeric variable");
 
 
 	}
 
+	std::string CStateJournalImpl::getStartTimeAsUTC()
+	{
+		return m_Chrono.getStartTimeISO8601TimeUTC();
+	}
 
 	uint64_t CStateJournalImpl::retrieveTimeStamp_MicroSecond()
 	{
@@ -648,7 +696,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerDoubleValue(const std::string& sName, const double dInitialValue, double dUnits)
 	{
-		dUnits = 1.0;
+		
 		if ((dUnits < STATEJOURNAL_VARIABLE_MINUNITS) || (dUnits > STATEJOURNAL_VARIABLE_MAXUNITS))
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLEUNITS);
 
@@ -687,6 +735,12 @@ namespace AMC {
 	void CStateJournal::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
 		m_pImpl->readDoubleTimeStream(sName, interval, timeStream);
+	}
+
+
+	double CStateJournal::computeSample(const std::string& sName, const uint64_t nTimeStamp)
+	{
+		return m_pImpl->computeSample(sName, nTimeStamp);
 	}
 
 
@@ -766,9 +820,8 @@ namespace AMC {
 	}
 
 
-	void CStateJournal::retrieveRecentInterval(uint64_t nLastMilliSeconds, sStateJournalInterval& interval)
+	void CStateJournal::retrieveRecentInterval(uint64_t nLastMicroSeconds, sStateJournalInterval& interval)
 	{
-		uint64_t nLastMicroSeconds = nLastMilliSeconds * 1000;
 
 		interval.m_nEndTimeInMicroSeconds = m_pImpl->retrieveTimeStamp_MicroSecond();
 		if (nLastMicroSeconds < interval.m_nEndTimeInMicroSeconds)
@@ -783,6 +836,11 @@ namespace AMC {
 	void CStateJournal::registerAlias(const std::string& sName, const std::string& sSourceName)
 	{
 		m_pImpl->createAlias(sName, sSourceName);
+	}
+
+	std::string CStateJournal::getStartTimeAsUTC()
+	{
+		return m_pImpl->getStartTimeAsUTC();
 	}
 
 }

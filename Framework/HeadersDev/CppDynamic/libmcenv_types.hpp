@@ -249,6 +249,28 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME 10152 /** Empty download stream filename. */
 #define LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME 10153 /** Invalid download stream filename. */
 #define LIBMCENV_ERROR_USERISNOTAUTHORIZED 10154 /** User is not authorized. */
+#define LIBMCENV_ERROR_INVALIDMETADATAKEY 10155 /** Invalid Metadata Key. */
+#define LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION 10156 /** Can not change status of build execution. */
+#define LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER 10157 /** Build execution has no attached user. */
+#define LIBMCENV_ERROR_UNITSAREOUTOFRANGE 10158 /** Units are out of range. */
+#define LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY 10159 /** Column identifier is empty. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER 10160 /** Invalid column identifier. */
+#define LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER 10161 /** Duplicate column identifier. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE 10162 /** Invalid column data type. */
+#define LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS 10163 /** Data table has too many columns. */
+#define LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND 10164 /** Column identifier not found. */
+#define LIBMCENV_ERROR_INVALIDCOLUMNINDEX 10165 /** Invalid column index. */
+#define LIBMCENV_ERROR_COLUMNBUFFERISNULL 10166 /** Column buffer is null. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE 10167 /** Column is not of type double. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32 10168 /** Column is not of type uint32. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64 10169 /** Column is not of type uint64. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32 10170 /** Column is not of type int32. */
+#define LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64 10171 /** Column is not of type int64 */
+#define LIBMCENV_ERROR_INVALIDCSVSEPARATOR 10172 /** Invalid CSV Separator */
+#define LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW 10173 /** Data Table CSV buffer overflow */
+#define LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID 10174 /** Date Time difference is invalid */
+#define LIBMCENV_ERROR_DATETIMEISINVALID 10175 /** Date Time is invalid */
+#define LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS 10176 /** Date Time out of bounds */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -410,6 +432,28 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_EMPTYDOWNLOADSTREAMFILENAME: return "Empty download stream filename.";
     case LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME: return "Invalid download stream filename.";
     case LIBMCENV_ERROR_USERISNOTAUTHORIZED: return "User is not authorized.";
+    case LIBMCENV_ERROR_INVALIDMETADATAKEY: return "Invalid Metadata Key.";
+    case LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION: return "Can not change status of build execution.";
+    case LIBMCENV_ERROR_BUILDEXECUTIONHASNOATTACHEDUSER: return "Build execution has no attached user.";
+    case LIBMCENV_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range.";
+    case LIBMCENV_ERROR_COLUMNIDENTIFIEREMPTY: return "Column identifier is empty.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNIDENTIFIER: return "Invalid column identifier.";
+    case LIBMCENV_ERROR_DUPLICATECOLUMNIDENTIFIER: return "Duplicate column identifier.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNDATATYPE: return "Invalid column data type.";
+    case LIBMCENV_ERROR_DATATABLEHASTOOMANYCOLUMS: return "Data table has too many columns.";
+    case LIBMCENV_ERROR_COLUMNIDENTIFIERNOTFOUND: return "Column identifier not found.";
+    case LIBMCENV_ERROR_INVALIDCOLUMNINDEX: return "Invalid column index.";
+    case LIBMCENV_ERROR_COLUMNBUFFERISNULL: return "Column buffer is null.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEDOUBLE: return "Column is not of type double.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT32: return "Column is not of type uint32.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEUINT64: return "Column is not of type uint64.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT32: return "Column is not of type int32.";
+    case LIBMCENV_ERROR_COLUMNISNOTOFTYPEINT64: return "Column is not of type int64";
+    case LIBMCENV_ERROR_INVALIDCSVSEPARATOR: return "Invalid CSV Separator";
+    case LIBMCENV_ERROR_DATATABLECSVBUFFEROVERFLOW: return "Data Table CSV buffer overflow";
+    case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
+    case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
+    case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
     default: return "unknown error";
   }
 }
@@ -427,11 +471,18 @@ typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
+typedef LibMCEnvHandle LibMCEnv_DataTableWriteOptions;
+typedef LibMCEnvHandle LibMCEnv_DataTableCSVWriteOptions;
+typedef LibMCEnvHandle LibMCEnv_DataTable;
 typedef LibMCEnvHandle LibMCEnv_DataSeries;
+typedef LibMCEnvHandle LibMCEnv_DateTimeDifference;
+typedef LibMCEnvHandle LibMCEnv_DateTime;
 typedef LibMCEnvHandle LibMCEnv_MeshObject;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
+typedef LibMCEnvHandle LibMCEnv_BuildExecution;
+typedef LibMCEnvHandle LibMCEnv_BuildExecutionIterator;
 typedef LibMCEnvHandle LibMCEnv_Build;
 typedef LibMCEnvHandle LibMCEnv_WorkingFileExecution;
 typedef LibMCEnvHandle LibMCEnv_WorkingFile;
@@ -530,6 +581,22 @@ namespace LibMCEnv {
     DialogYesNoCancel = 4
   };
   
+  enum class eBuildExecutionStatus : LibMCEnv_int32 {
+    Unknown = 0,
+    InProcess = 1,
+    Finished = 2,
+    Failed = 3
+  };
+  
+  enum class eDataTableColumnType : LibMCEnv_int32 {
+    Unknown = 0,
+    DoubleColumn = 1,
+    Int32Column = 2,
+    Uint32Column = 3,
+    Int64Column = 4,
+    Uint64Column = 5
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -596,6 +663,8 @@ typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
+typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
+typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;

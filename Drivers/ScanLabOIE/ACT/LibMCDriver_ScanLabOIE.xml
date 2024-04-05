@@ -296,13 +296,60 @@ Custom implementation
 			<param name="AdditionalIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount." />
 			<param name="Signals" type="basicarray" class="int32" pass="out" description="Array of the Indexed RTC Signal of all records." />
 		</method>	
-
-		<method name="StoreAsBuildData" description="Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.">
-			<param name="Name" type="string" pass="in" description="Name of the recording to be stored." />
-			<param name="Build" type="class" class="LibMCEnv:Build" pass="in" description="Build that should store the data." />
-			<param name="DataUUID" type="string" pass="return" description="Data UUID of the build data." />
-		</method>	
 				
+		<method name="AddPacketNumbersToDataTable" description="Writes the packet numbers to a data table as uint32 columns.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+
+		<method name="AddXCoordinatesToDataTable" description="Writes the X coordinates to a data table as double columns.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+
+		<method name="AddYCoordinatesToDataTable" description="Writes the Y coordinates to a data table as double columns.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+
+		<method name="AddMeasurementTagsToDataTable" description="Writes the measurement tags to a data table as uint32 columns.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+
+		<method name="AddRTCSignalsToDataTable" description="Writes a certain RTC channel to a data table as int32 columns.">
+			<param name="RTCIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+
+		<method name="AddSensorSignalsToDataTable" description="Writes a certain sensor channel to a data table as int32 columns.">
+			<param name="SignalIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+		
+		<method name="AddScaledSensorSignalsToDataTable" description="Writes a certain sensor channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset">
+			<param name="SignalIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+			<param name="ScaleFactor" type="double" pass="in" description="Factor that the raw value is scaled with." />
+			<param name="Offset" type="double" pass="in" description="Offset that the raw value is scaled with." />
+		</method>	
+
+		<method name="AddAdditionalSignalsToDataTable" description="Writes a certain RTC channel to a data table as int32 columns.">
+			<param name="AdditionalIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
 
 	</class>
 

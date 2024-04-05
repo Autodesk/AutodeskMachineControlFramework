@@ -87,6 +87,9 @@ protected:
 	std::string m_sNetmask;
 	uint32_t m_nLaserIndex;
 
+	int32_t m_nCurrentScanPositionX;
+	int32_t m_nCurrentScanPositionY;
+
 	sMeasurementTagInfo m_CurrentMeasurementTagInfo;
 	std::vector<sMeasurementTagInfo> m_MeasurementTags;
 
@@ -361,6 +364,8 @@ public:
 	void DisableLineSubdivision() override;
 
 	LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) override;
+
+	IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) override;
 
 };
 

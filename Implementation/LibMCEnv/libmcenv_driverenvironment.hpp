@@ -118,6 +118,8 @@ public:
 
 	void RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue) override;
 
+	void RegisterDoubleParameterWithUnits(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits) override;
+
 	void RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_int64 nDefaultValue) override;
 
 	void RegisterBoolParameter(const std::string& sParameterName, const std::string& sDescription, const bool bDefaultValue) override;
@@ -155,6 +157,8 @@ public:
 	IXMLDocument* ParseXMLString(const std::string& sXMLString) override;
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
+
+	IDataTable* CreateDataTable() override;
 
 	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
 

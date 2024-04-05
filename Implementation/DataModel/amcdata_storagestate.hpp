@@ -57,6 +57,7 @@ typedef std::shared_ptr<CStorageWriter> PStorageWriter;
 class CStorageState {
 private:
     std::string m_sDataPath;
+    std::string m_sSessionUUID;
     
     std::mutex m_WriterMutex;
     std::map<std::string, AMCData::PStorageWriter> m_PartialWriters;
@@ -65,7 +66,7 @@ private:
 
 public:
 
-    CStorageState(const std::string & sDataPath);
+    CStorageState(const std::string & sDataPath, const std::string & sSessionUUID);
 
     virtual ~CStorageState();
 
@@ -74,6 +75,8 @@ public:
     std::string getJournalDataPath(const std::string& sTimeFileName);
     std::string getJournalFileName(const std::string& sTimeFileName);
     std::string getJournalDataFileName(const std::string& sTimeFileName);
+
+    std::string getSessionUUID();
 
     static std::string storageStreamStatusToString(eStorageStreamStatus eStatus);
     static eStorageStreamStatus stringToStorageStreamStatus(const std::string & sStatus);

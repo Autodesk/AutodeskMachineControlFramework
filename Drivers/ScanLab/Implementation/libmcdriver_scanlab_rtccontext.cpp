@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdriver_scanlab_rtccontext.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
+#include "libmcdriver_scanlab_uartconnection.hpp"
 
 // Include custom headers here.
 #include <math.h>
@@ -132,6 +133,8 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_dLaserFieldMinY (0.0),
 	m_dLaserFieldMaxX (0.0),
 	m_dLaserFieldMaxY (0.0),
+	m_nCurrentScanPositionX (0),
+	m_nCurrentScanPositionY (0),
 	m_bHasLaserField (false),
 	m_b2DMarkOnTheFlyEnabled (false),
 	m_dScaleXInBitsPerEncoderStep (1.0),
@@ -659,8 +662,18 @@ void CRTCContext::jumpAbsoluteEx(double dTargetXInMM, double dTargetYInMM)
 	double dTargetXInUnits = round((dTargetXInMM - m_dLaserOriginX) * m_dCorrectionFactor);
 	double dTargetYInUnits = round((dTargetYInMM - m_dLaserOriginY) * m_dCorrectionFactor);
 
-	m_pScanLabSDK->n_jump_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
-	//m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+	int nTargetX = (int32_t)dTargetXInUnits;
+	int nTargetY = (int32_t)dTargetYInUnits;
+
+	// Avoid Null Jumps!
+	if ((nTargetX != m_nCurrentScanPositionX) || (nTargetY != m_nCurrentScanPositionY)) {
+		m_pScanLabSDK->n_jump_abs(m_CardNo, nTargetX, nTargetY);
+		m_nCurrentScanPositionX = nTargetX;
+		m_nCurrentScanPositionY = nTargetY;
+	}
+
+	// Do not check error because that creates timing issues..
+	// m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 }
 
@@ -698,7 +711,12 @@ void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double 
 			writePower(dNewPowerInPercent, bOIEControlFlag);
 		}
 
-		m_pScanLabSDK->n_mark_abs(m_CardNo, (int32_t)dTargetXInUnits, (int32_t)dTargetYInUnits);
+		int32_t nTargetX = (int32_t)dTargetXInUnits;
+		int32_t nTargetY = (int32_t)dTargetYInUnits;
+		m_pScanLabSDK->n_mark_abs(m_CardNo, nTargetX, nTargetY);
+		m_nCurrentScanPositionX = nTargetX;
+		m_nCurrentScanPositionY = nTargetY;
+
 		//m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 		
 		dOldX = dMarkToX;
@@ -738,12 +756,12 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 		SetOIEPIDMode(nOIEPIDControlIndex);
 
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
+		pPoint++;
 
 		sendOIEMeasurementTag((uint32_t)index);
 
 		markAbsoluteEx(pPrevPoint->m_X, pPrevPoint->m_Y, pPoint->m_X, pPoint->m_Y, fPower, bOIEControlFlag);
 		pPrevPoint = pPoint;
-		pPoint++;		
 
 	}
 
@@ -805,6 +823,8 @@ void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, con
 	m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+	m_nCurrentScanPositionX = intX;
+	m_nCurrentScanPositionY = intY;
 }
 
 void CRTCContext::AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue)
@@ -980,6 +1000,8 @@ void CRTCContext::AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX
 	m_pScanLabSDK->n_timed_mark_abs(m_CardNo, intX, intY, dDurationInMicroseconds);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+	m_nCurrentScanPositionX = intX;
+	m_nCurrentScanPositionY = intY;
 }
 
 
@@ -1181,6 +1203,7 @@ void CRTCContext::sendOIEMeasurementTag(uint32_t nCurrentVectorID)
 
 		m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, nMeasurementTag);
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
 	}
 
 }
@@ -1754,6 +1777,8 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 
 	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	m_nCurrentScanPositionX = 0;
+	m_nCurrentScanPositionY = 0;
 
 	m_pScanLabSDK->n_init_fly_2d(m_CardNo, 0, 0, 0);
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, dScaleXInBitsPerEncoderStep, dScaleYInBitsPerEncoderStep);
@@ -1775,6 +1800,8 @@ void CRTCContext::DisableMarkOnTheFly2D()
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
 
 	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
+	m_nCurrentScanPositionX = 0;
+	m_nCurrentScanPositionY = 0;
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
@@ -2100,4 +2127,9 @@ LibMCDriver_ScanLab_int32 CRTCContext::ReadMultiMCBSP(const LibMCDriver_ScanLab_
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	return nRegisterContent;
+}
+
+IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate)
+{
+	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate);
 }

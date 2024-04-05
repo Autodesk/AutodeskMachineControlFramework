@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCData {
 		
-	CStorageState::CStorageState(const std::string& sDataPath)
-		: m_sDataPath (sDataPath)
+	CStorageState::CStorageState(const std::string& sDataPath, const std::string& sSessionUUID)
+		: m_sDataPath (sDataPath), m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
 	{
 		if (sDataPath.empty())
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -73,6 +73,12 @@ namespace AMCData {
 	{
 		return "journal_" + sTimeFileName + ".data";
 	}
+
+	std::string CStorageState::getSessionUUID()
+	{
+		return m_sSessionUUID;
+	}
+
 
 	std::string CStorageState::storageStreamStatusToString(eStorageStreamStatus eStatus)
 	{

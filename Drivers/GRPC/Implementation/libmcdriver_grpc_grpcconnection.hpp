@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CGRPCConnection
 #endif
 
 // Include custom headers here.
-
+#include "libgrpcwrapper_dynamic.hpp"
 
 namespace LibMCDriver_GRPC {
 namespace Impl {
@@ -57,27 +57,20 @@ namespace Impl {
 
 class CGRPCConnection : public virtual IGRPCConnection, public virtual CBase {
 private:
-
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+    LibGRPCWrapper::PConnection m_pConnection;
+    LibGRPCWrapper::PWrapper m_pWrapper;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    CGRPCConnection(LibGRPCWrapper::PWrapper pWrapper, LibGRPCWrapper::PConnection pConnection);
 
+    virtual ~CGRPCConnection();
 
-	/**
-	* Public member functions to implement.
-	*/
+	std::string GetEndPoint() override;
+
+	void Close() override;
+
+	IGRPCRequest* CreateStaticRequest(const std::string& sRequestTypeIdentifier, const std::string& sResponseTypeIdentifier) override;
 
 };
 

@@ -315,6 +315,244 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_queryparametersex(LibMCDriv
 
 
 /*************************************************************************************************************************
+ Class implementation for UARTConnection
+**************************************************************************************************************************/
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_getbaudrate(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pBaudRate)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		if (pBaudRate == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pBaudRate = pIUARTConnection->GetBaudRate();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_getconfiguredbaudrate(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pBaudRate)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		if (pBaudRate == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pBaudRate = pIUARTConnection->GetConfiguredBaudRate();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_clearreceivebuffer(LibMCDriver_ScanLab_UARTConnection pUARTConnection)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIUARTConnection->ClearReceiveBuffer();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_availablebytes(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pByteCount)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		if (pByteCount == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pByteCount = pIUARTConnection->AvailableBytes();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_writestring(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sValue(pValue);
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIUARTConnection->WriteString(sValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_writedata(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint64 nDataBufferSize, const LibMCDriver_ScanLab_uint8 * pDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		if ( (!pDataBuffer) && (nDataBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIUARTConnection->WriteData(nDataBufferSize, pDataBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readdata(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 nByteCount, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		if ((!pDataBuffer) && !(pDataNeededCount))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIUARTConnection->ReadData(nByteCount, nTimeOutInMS, nDataBufferSize, pDataNeededCount, pDataBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		if (pSeparator == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if ((!pDataBuffer) && !(pDataNeededCount))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sSeparator(pSeparator);
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIUARTConnection->ReadLine(sSeparator, nMaxLineLength, nTimeOutInMS, nDataBufferSize, pDataNeededCount, pDataBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_close(LibMCDriver_ScanLab_UARTConnection pUARTConnection)
+{
+	IBase* pIBaseClass = (IBase *)pUARTConnection;
+
+	try {
+		IUARTConnection* pIUARTConnection = dynamic_cast<IUARTConnection*>(pIBaseClass);
+		if (!pIUARTConnection)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIUARTConnection->Close();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for RTCContext
 **************************************************************************************************************************/
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadfirmware(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer)
@@ -2934,6 +3172,34 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readmultimcbsp(LibMCDri
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_createuartconnection(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDesiredBaudRate, LibMCDriver_ScanLab_UARTConnection * pConnection)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pConnection == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IBase* pBaseConnection(nullptr);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pBaseConnection = pIRTCContext->CreateUARTConnection(nDesiredBaudRate);
+
+		*pConnection = (IBase*)(pBaseConnection);
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for RTCSelector
@@ -4750,6 +5016,24 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_queryparameters;
 	if (sProcName == "libmcdriver_scanlab_driver_queryparametersex") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_queryparametersex;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_getbaudrate") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_getbaudrate;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_getconfiguredbaudrate") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_getconfiguredbaudrate;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_clearreceivebuffer") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_clearreceivebuffer;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_availablebytes") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_availablebytes;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_writestring") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_writestring;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_writedata") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_writedata;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_readdata") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_readdata;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_readline") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_readline;
+	if (sProcName == "libmcdriver_scanlab_uartconnection_close") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_close;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadfirmware") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadfirmware;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadcorrectionfile") 
@@ -4954,6 +5238,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disablelinesubdivision;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_readmultimcbsp") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_readmultimcbsp;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_createuartconnection") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_createuartconnection;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcards") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_searchcards;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcardsbyrange") 

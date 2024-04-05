@@ -33,10 +33,18 @@ cmake_minimum_required(VERSION 3.5)
 
 project(LibMC)
 
+option(INCLUDE_DRIVERS "Include the drivers in the build" ON)
+option(INCLUDE_TESTS "Include the test system in the build" OFF)
+
+if(INCLUDE_DRIVERS)
+message(STATUS "Including Drivers in build")
 add_subdirectory(Drivers)
+endif()
+
 add_subdirectory(Plugins)
 
 if(INCLUDE_TESTS)
+message(STATUS "Including Tests in build")
 add_subdirectory(Tests)
 endif()
 

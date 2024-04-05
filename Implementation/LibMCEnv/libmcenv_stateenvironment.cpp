@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_streamreader.hpp"
+#include "libmcenv_datatable.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -187,7 +188,7 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getSystemUserID ());
+	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getSystemUserID (), m_pSystemState->getGlobalChronoInstance ());
 }
 
 
@@ -527,6 +528,11 @@ LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLString(const std::strin
 
 	return new CXMLDocument(pDocument);
 
+}
+
+IDataTable* CStateEnvironment::CreateDataTable()
+{
+	return new CDataTable();
 }
 
 LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)

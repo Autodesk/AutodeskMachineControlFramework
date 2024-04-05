@@ -43,11 +43,13 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_cryptocontext.hpp"
+#include "libmcenv_datatable.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
 #include "amc_xmldocument.hpp"
 #include "amc_xmldocumentnode.hpp"
+#include "amc_constants.hpp"
 
 // Include custom headers here.
 
@@ -214,12 +216,22 @@ void CDriverEnvironment::RegisterUUIDParameter(const std::string& sParameterName
     m_pParameterGroup->addNewUUIDParameter(sParameterName, sDescription, AMCCommon::CUtils::normalizeUUIDString(sDefaultValue));
 }
 
-void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue)
+void CDriverEnvironment::RegisterDoubleParameterWithUnits(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue, const LibMCEnv_double dUnits)
 {
+    if ((dUnits < AMC_PARAMETERUNITS_MINIMUM) || (dUnits > AMC_PARAMETERUNITS_MAXIMUM))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_UNITSAREOUTOFRANGE, "units are out of range for " + sParameterName);
+
     if (!m_bIsInitializing)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DRIVERISNOTINITIALISING);
 
-    m_pParameterGroup->addNewDoubleParameter(sParameterName, sDescription, dDefaultValue, 1.0);
+    m_pParameterGroup->addNewDoubleParameter(sParameterName, sDescription, dDefaultValue, dUnits);
+
+}
+
+
+void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue)
+{
+    RegisterDoubleParameterWithUnits(sParameterName, sDescription, dDefaultValue, AMC_PARAMETERUNITS_DEFAULT);
 }
 
 void CDriverEnvironment::RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_int64 nDefaultValue)
@@ -351,6 +363,12 @@ LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::ParseXMLData(const LibMCEnv_ui
 
 }
 
+
+IDataTable* CDriverEnvironment::CreateDataTable()
+{
+    return new CDataTable ();
+}
+
 IDiscreteFieldData2D* CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
 {
     AMC::PDiscreteFieldData2DInstance pInstance = std::make_shared<AMC::CDiscreteFieldData2DInstance>(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, dOriginX, dOriginY, dDefaultValue, true);
@@ -403,7 +421,7 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
 }
 
 ICryptoContext* CDriverEnvironment::CreateCryptoContext()

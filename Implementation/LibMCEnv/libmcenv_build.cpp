@@ -35,12 +35,14 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_buildexecution.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
 #include "amc_toolpathhandler.hpp"
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 #include <iostream>
 
@@ -50,15 +52,18 @@ using namespace LibMCEnv::Impl;
  Class definition of CBuild 
 **************************************************************************************************************************/
 
-CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID)
+CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID, AMCCommon::PChrono pGlobalChrono)
 	: m_pDataModel(pDataModel),
 	m_sBuildJobUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildJobUUID)),
 	m_pToolpathHandler(pToolpathHandler),
-	m_sSystemUserID(sSystemUserID)
+	m_sSystemUserID(sSystemUserID),
+	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pDataModel.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get () == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
@@ -190,7 +195,7 @@ std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::str
 	pStorage->StoreNewStream(sDataUUID, pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
-	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eBuildJobDataType::CustomBinaryData, sSystemUserID);
+	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID);
 
 	return sDataUUID;
 
@@ -206,7 +211,7 @@ IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByIdentifier(const std::string&
 	auto pJobDataIterator = pBuildJob->ListJobData();
 	while (pJobDataIterator->MoveNext()) {
 		auto pJobData = pJobDataIterator->GetCurrentJobData();
-		std::string sJobDataIdentifier = pJobData->GetContextIdentifier();
+		std::string sJobDataIdentifier = pJobData->GetIdentifier();
 		if (sJobDataIdentifier == sContextIdentifier)
 			sFoundUUID = pJobData->GetDataUUID();
 	}
@@ -292,6 +297,101 @@ std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const s
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM);
 
 	return AddBinaryData(sContextIdentifier, sName, "image/png", pngBuffer.size(), pngBuffer.data());
+
+}
+
+
+IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const std::string& sUserUUID)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUserUUID;
+
+	if (!sUserUUID.empty()) {
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+	}
+	else {
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	}
+
+	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+
+	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+
+}
+
+bool CBuild::HasExecution(const std::string& sExecutionUUID)
+{
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution (sNormalizedExecutionUUID);
+
+	return pExecutionData.get() != nullptr;
+
+}
+
+IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
+{
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution(sNormalizedExecutionUUID);
+
+	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+}
+
+IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}
+
+void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	pBuildJob->AddMetaDataString(sKey, sValue);
+
+}
+
+bool CBuild::HasMetaDataString(const std::string& sKey)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	return pBuildJob->HasMetaDataString(sKey);
+
+}
+
+std::string CBuild::GetMetaDataString(const std::string& sKey)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
+
+	return pBuildJob->GetMetaDataString(sKey);
+
 
 }
 

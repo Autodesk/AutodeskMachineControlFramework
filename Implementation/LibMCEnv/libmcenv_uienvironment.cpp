@@ -55,6 +55,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_build.hpp"
 #include "libmcenv_journalvariable.hpp"
 #include "libmcenv_streamreader.hpp"
+#include "libmcenv_datatable.hpp"
 
 #include "amc_toolpathhandler.hpp"
 #include "amc_logger.hpp"
@@ -493,6 +494,11 @@ LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64
 }
 
 
+IDataTable* CUIEnvironment::CreateDataTable()
+{
+    return new CDataTable();
+}
+
 
 bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
 {
@@ -517,7 +523,7 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID());
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID(), m_pUISystemState->getGlobalChronoInstance ());
 }
 
 

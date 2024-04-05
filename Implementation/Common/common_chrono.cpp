@@ -272,6 +272,46 @@ namespace AMCCommon {
 #endif
 	}
 
+
+	// Checks if a timestamp is within a million years
+	bool CChrono::timeStampIsWithinAMillionYears(const uint64_t nMicroseconds)
+	{		
+		return (nMicroseconds < (1000000ULL * 3600ULL * 365ULL * 1000000ULL));
+	}
+
+
+	void CChrono::parseDateFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t& nDayOfTheWeek)
+	{
+#ifdef _WIN32
+
+		// Calculate the offset in 100-nanosecond intervals since FILETIME epoch (1601) to Unix epoch (1970)
+		constexpr long long unixTimeStartInFileTime = 116444736000000000LL; // 1970 - 1601
+
+		// Convert microseconds since 1970 epoch to 100-nanosecond intervals since 1601
+		long long filetime_intervals_since_1601 = nMicrosecondsSince1970 * 10 + unixTimeStartInFileTime;
+
+		// Convert to FILETIME
+		FILETIME ft;
+		ft.dwLowDateTime = static_cast<DWORD>(filetime_intervals_since_1601);
+		ft.dwHighDateTime = static_cast<DWORD>(filetime_intervals_since_1601 >> 32);
+
+		// Convert FILETIME to SYSTEMTIME
+		SYSTEMTIME st;
+		if (!FileTimeToSystemTime(&ft, &st)) {
+			throw std::runtime_error("could not convert date time stamp properly: " + std::to_string (nMicrosecondsSince1970));
+		}
+
+		// SYSTEMTIME structure contains the date broken down to year, month, day, etc.
+		nYear = st.wYear;
+		nMonth = st.wMonth;
+		nDay = st.wDay;
+		nDayOfTheWeek = st.wDayOfWeek;
+#else
+		throw std::runtime_error("date time support not implemented");
+#endif
+	}
+
+
 /*
 
 	std::string CUtils::getCurrentISO8601TimeUTC() {

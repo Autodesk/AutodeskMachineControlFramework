@@ -99,10 +99,14 @@ namespace AMC {
 		void readDoubleTimeStream (const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
 		sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
+
+		double computeSample(const std::string& sName, const uint64_t nTimeStamp);
 		
-		void retrieveRecentInterval (uint64_t nLastMilliSeconds, sStateJournalInterval& interval);
+		void retrieveRecentInterval (uint64_t nLastMicroSeconds, sStateJournalInterval& interval);
 
 		void registerAlias (const std::string& sName, const std::string& sSourceName);
+
+		std::string getStartTimeAsUTC();
 
 	};
 

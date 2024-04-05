@@ -997,49 +997,273 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getalladdition
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_storeasbuilddata(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, const char * pName, LibMCEnv_Build pBuild, const LibMCDriver_ScanLabOIE_uint32 nDataUUIDBufferSize, LibMCDriver_ScanLabOIE_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addpacketnumberstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
 {
 	IBase* pIBaseClass = (IBase *)pDataRecording;
 
 	try {
-		if (pName == nullptr)
+		if (pColumnIdentifier == nullptr)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
-		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
+		if (pColumnDescription == nullptr)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
-		std::string sName(pName);
-		LibMCEnv::PBuild pIBuild = std::make_shared<LibMCEnv::CBuild>(CWrapper::sPLibMCEnvWrapper.get(), pBuild);
-		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIBuild.get());
-		if (!pIBuild)
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		std::string sDataUUID("");
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
 		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
 		if (!pIDataRecording)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pDataUUIDBuffer == nullptr);
-		if (isCacheCall) {
-			sDataUUID = pIDataRecording->StoreAsBuildData(sName, pIBuild);
+		pIDataRecording->AddPacketNumbersToDataTable(pIDataTable, sColumnIdentifier, sColumnDescription);
 
-			pIDataRecording->_setCache (new ParameterCache_1<std::string> (sDataUUID));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataRecording->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
-			cache->retrieveData (sDataUUID);
-			pIDataRecording->_setCache (nullptr);
-		}
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addxcoordinatestodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		
-		if (pDataUUIDNeededChars)
-			*pDataUUIDNeededChars = (LibMCDriver_ScanLabOIE_uint32) (sDataUUID.size()+1);
-		if (pDataUUIDBuffer) {
-			if (sDataUUID.size() >= nDataUUIDBufferSize)
-				throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
-			for (size_t iDataUUID = 0; iDataUUID < sDataUUID.size(); iDataUUID++)
-				pDataUUIDBuffer[iDataUUID] = sDataUUID[iDataUUID];
-			pDataUUIDBuffer[sDataUUID.size()] = 0;
-		}
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->AddXCoordinatesToDataTable(pIDataTable, sColumnIdentifier, sColumnDescription);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addycoordinatestodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->AddYCoordinatesToDataTable(pIDataTable, sColumnIdentifier, sColumnDescription);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addmeasurementtagstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->AddMeasurementTagsToDataTable(pIDataTable, sColumnIdentifier, sColumnDescription);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addrtcsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->AddRTCSignalsToDataTable(nRTCIndex, pIDataTable, sColumnIdentifier, sColumnDescription);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addsensorsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->AddSensorSignalsToDataTable(nSignalIndex, pIDataTable, sColumnIdentifier, sColumnDescription);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addscaledsensorsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLabOIE_double dScaleFactor, LibMCDriver_ScanLabOIE_double dOffset)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->AddScaledSensorSignalsToDataTable(nSignalIndex, pIDataTable, sColumnIdentifier, sColumnDescription, dScaleFactor, dOffset);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_addadditionalsignalstodatatable(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
+{
+	IBase* pIBaseClass = (IBase *)pDataRecording;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IDataRecording* pIDataRecording = dynamic_cast<IDataRecording*>(pIBaseClass);
+		if (!pIDataRecording)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDataRecording->AddAdditionalSignalsToDataTable(nAdditionalIndex, pIDataTable, sColumnIdentifier, sColumnDescription);
+
 		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
@@ -2358,8 +2582,22 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getallsensorsignals;
 	if (sProcName == "libmcdriver_scanlaboie_datarecording_getalladditionalsignals") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_getalladditionalsignals;
-	if (sProcName == "libmcdriver_scanlaboie_datarecording_storeasbuilddata") 
-		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_storeasbuilddata;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addpacketnumberstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addpacketnumberstodatatable;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addxcoordinatestodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addxcoordinatestodatatable;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addycoordinatestodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addycoordinatestodatatable;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addmeasurementtagstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addmeasurementtagstodatatable;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addrtcsignalstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addrtcsignalstodatatable;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addsensorsignalstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addsensorsignalstodatatable;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addscaledsensorsignalstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addscaledsensorsignalstodatatable;
+	if (sProcName == "libmcdriver_scanlaboie_datarecording_addadditionalsignalstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_datarecording_addadditionalsignalstodatatable;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_getdevicename") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_getdevicename;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_sethostname") 

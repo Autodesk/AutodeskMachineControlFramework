@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CAlert
 
 #include "libmcenv_alert.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_datetime.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -124,6 +125,19 @@ void CAlert::GetAcknowledgementInformation(std::string & sUserUUID, std::string 
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
 	m_pAlertData->GetAcknowledgementInformation(sUserUUID, sUserComment, sAckTime);
 }
+
+IDateTime* CAlert::GetAcknowledgementTime()
+{
+	std::string sUserUUID;
+	std::string sUserComment;
+	std::string sAckTime;
+
+	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
+	m_pAlertData->GetAcknowledgementInformation(sUserUUID, sUserComment, sAckTime);
+
+	return CDateTime::makefromUTC (sAckTime);
+}
+
 
 CAlert* CAlert::makeFrom(CAlert* pAlert)
 {

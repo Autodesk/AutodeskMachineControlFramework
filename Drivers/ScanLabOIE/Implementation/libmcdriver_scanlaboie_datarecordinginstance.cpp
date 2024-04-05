@@ -280,6 +280,7 @@ void CDataRecordingInstance::copySensorSignals(size_t nRecordIndex, int32_t* pSe
 
 }
 
+
 void CDataRecordingInstance::copyAdditionalSignals(size_t nRecordIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize)
 {
     uint32_t nAdditionalValuesPerRecord = getAdditionalValuesPerRecord();
@@ -293,7 +294,7 @@ void CDataRecordingInstance::copyAdditionalSignals(size_t nRecordIndex, int32_t*
 
 }
 
-void CDataRecordingInstance::copyXCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
+void CDataRecordingInstance::copyAllXCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
 {
     size_t nRecordCount = getRecordCount();
     if (nRecordCount == 0)
@@ -314,7 +315,7 @@ void CDataRecordingInstance::copyXCoordinates(double* pCoordinateBuffer, size_t 
 
 }
 
-void CDataRecordingInstance::copyYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
+void CDataRecordingInstance::copyAllYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
 {
     size_t nRecordCount = getRecordCount();
     if (nRecordCount == 0)
@@ -335,7 +336,7 @@ void CDataRecordingInstance::copyYCoordinates(double* pCoordinateBuffer, size_t 
 
 }
 
-void CDataRecordingInstance::copyMeasurementTags(uint32_t* pMeasurementTagBuffer, size_t nMeasurementTagBufferSize)
+void CDataRecordingInstance::copyAllMeasurementTags(uint32_t* pMeasurementTagBuffer, size_t nMeasurementTagBufferSize)
 {
     size_t nRecordCount = getRecordCount();
     if (nRecordCount == 0)
@@ -356,7 +357,7 @@ void CDataRecordingInstance::copyMeasurementTags(uint32_t* pMeasurementTagBuffer
 
 }
 
-void CDataRecordingInstance::copyPacketNumbers(uint32_t * pPacketNumberBuffer, size_t nPacketNumberBufferSize)
+void CDataRecordingInstance::copyAllPacketNumbers(uint32_t * pPacketNumberBuffer, size_t nPacketNumberBufferSize)
 {
     size_t nRecordCount = getRecordCount();
     if (nRecordCount == 0)
@@ -420,6 +421,31 @@ void CDataRecordingInstance::copyAllSensorSignalsByIndex(uint32_t nSensorIndex, 
     for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
         int32_t* pSensorData = getSensorData(nRecordIndex);
         *pTarget = pSensorData[nSensorIndex];
+        pTarget++;
+    }
+
+}
+
+
+void CDataRecordingInstance::copyAllScaledSensorSignalsByIndex(uint32_t nSensorIndex, double* pSensorSignalBuffer, size_t nSensorSignalBufferSize, double dScaleFactor, double dOffset)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (nSensorIndex >= getSensorValuesPerRecord ())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX);
+
+    if (pSensorSignalBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nSensorSignalBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    double* pTarget = pSensorSignalBuffer;
+    for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+        int32_t* pSensorData = getSensorData(nRecordIndex);
+        *pTarget = pSensorData[nSensorIndex] * dScaleFactor + dOffset;
         pTarget++;
     }
 

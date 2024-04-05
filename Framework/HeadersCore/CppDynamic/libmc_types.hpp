@@ -602,6 +602,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGALERTLEVEL 585 /** Missing alert level */
 #define LIBMC_ERROR_INVALIDALERTLEVEL 586 /** Invalid alert level */
 #define LIBMC_ERROR_ALERTLISTNAMEMISSING 587 /** Alert list name missing */
+#define LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC 588 /** Journal variable is not numeric */
+#define LIBMC_ERROR_UNITSAREOUTOFRANGE 589 /** Units are out of range */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1116,6 +1118,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGALERTLEVEL: return "Missing alert level";
     case LIBMC_ERROR_INVALIDALERTLEVEL: return "Invalid alert level";
     case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "Alert list name missing";
+    case LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC: return "Journal variable is not numeric";
+    case LIBMC_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range";
     default: return "unknown error";
   }
 }

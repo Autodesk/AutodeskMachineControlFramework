@@ -175,6 +175,8 @@ public:
 
 	IXMLDocument* ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer) override;
 
+	IDataTable* CreateDataTable() override;
+
 	bool HasBuildJob(const std::string& sBuildUUID) override;
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;

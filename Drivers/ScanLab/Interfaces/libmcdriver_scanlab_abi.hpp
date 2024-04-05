@@ -128,6 +128,99 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_queryparametersex(LibMCDriver_ScanLab_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
+ Class definition for UARTConnection
+**************************************************************************************************************************/
+
+/**
+* Returns the actual baud rate of the RS232 Interface.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[out] pBaudRate - Baud rate.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_getbaudrate(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pBaudRate);
+
+/**
+* Returns the configured baud rate of the RS232 Interface.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[out] pBaudRate - Baud rate.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_getconfiguredbaudrate(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pBaudRate);
+
+/**
+* Clears the receive buffer.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_clearreceivebuffer(LibMCDriver_ScanLab_UARTConnection pUARTConnection);
+
+/**
+* Returns the number of currently received bytes.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[out] pByteCount - Number of currently received bytes.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_availablebytes(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 * pByteCount);
+
+/**
+* Sends a string over the interface. The call is blocking.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] pValue - String to send.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_writestring(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pValue);
+
+/**
+* Sends a data buffer over the interface. The call is blocking.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[in] pDataBuffer - uint8 buffer of Data to send.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_writedata(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint64 nDataBufferSize, const LibMCDriver_ScanLab_uint8 * pDataBuffer);
+
+/**
+* Blocking call for reading a certain number of bytes. Will remove the bytes from the received buffer. Fails if not enough data is available after the timeout.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] nByteCount - Number of bytes to read.
+* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Receive buffer.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readdata(LibMCDriver_ScanLab_UARTConnection pUARTConnection, LibMCDriver_ScanLab_uint32 nByteCount, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer);
+
+/**
+* Blocking call for reading until a line end signature is coming. Fails if timeout is hit or number of bytes have been reached.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @param[in] pSeparator - Line Separator to search for.
+* @param[in] nMaxLineLength - Maximum line length to receive, excluding line separator.
+* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Receive buffer.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer);
+
+/**
+* Closes the connection. All subsequent calls will fail.
+*
+* @param[in] pUARTConnection - UARTConnection instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_close(LibMCDriver_ScanLab_UARTConnection pUARTConnection);
+
+/*************************************************************************************************************************
  Class definition for RTCContext
 **************************************************************************************************************************/
 
@@ -1153,6 +1246,16 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readmultimcbsp(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nRegisterNo, LibMCDriver_ScanLab_int32 * pRegisterContent);
+
+/**
+* Creates a new UART Connection. Closes any other one that might be active.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDesiredBaudRate - Desired baud rate. 160 Bd…12.8 MBd.  The other RS-232 interface parameters cannot be altered (data bits: 8, start bits: 1, stop bits: 1, parity: none).
+* @param[out] pConnection - UART Connection instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_createuartconnection(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDesiredBaudRate, LibMCDriver_ScanLab_UARTConnection * pConnection);
 
 /*************************************************************************************************************************
  Class definition for RTCSelector

@@ -213,6 +213,115 @@ namespace AMC {
 
 		}
 	
+
+		int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) override
+		{
+			if ((nAbsoluteTimeStampInMicroseconds < m_nStartTimeStampInMicroSeconds) || (nAbsoluteTimeStampInMicroseconds > m_nEndTimeStampInMicroSeconds))
+				return 0;
+
+			uint64_t nTimeOffset = m_nStartTimeStampInMicroSeconds;
+			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - nTimeOffset;
+
+			if (nStorageIndex >= m_Entries.size())
+				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND);
+
+			auto& variable = m_Entries.at(nStorageIndex);
+			auto iIter = variable.begin();
+			if (iIter != variable.end()) {
+				auto pPrevEntry = &*iIter;
+				iIter++;
+
+				while (iIter != variable.end()) {
+					auto pCurrentEntry = &*iIter;
+					iIter++;
+
+					if ((nRelativeTime >= pPrevEntry->m_RelativeTimeStampInMicroseconds) &&
+						(nRelativeTime < pCurrentEntry->m_RelativeTimeStampInMicroseconds)) {
+						return pPrevEntry->m_IntegerValue;
+					}
+
+					pPrevEntry = pCurrentEntry;
+				}
+
+				return pPrevEntry->m_IntegerValue;
+			}
+
+			return 0;
+		}
+
+		double sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits) override
+		{
+			if ((nAbsoluteTimeStampInMicroseconds < m_nStartTimeStampInMicroSeconds) || (nAbsoluteTimeStampInMicroseconds > m_nEndTimeStampInMicroSeconds))
+				return 0.0;
+
+			uint64_t nTimeOffset = m_nStartTimeStampInMicroSeconds;
+			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - nTimeOffset;
+
+			if (nStorageIndex >= m_Entries.size())
+				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND);
+
+			auto& variable = m_Entries.at(nStorageIndex);
+			auto iIter = variable.begin();
+			if (iIter != variable.end()) {
+				auto pPrevEntry = &*iIter;
+				iIter++;
+
+				while (iIter != variable.end()) {
+					auto pCurrentEntry = &*iIter;
+					iIter++;
+
+					if ((nRelativeTime >= pPrevEntry->m_RelativeTimeStampInMicroseconds) &&
+						(nRelativeTime < pCurrentEntry->m_RelativeTimeStampInMicroseconds)) {
+						return pPrevEntry->m_IntegerValue * dUnits;
+					}
+
+					pPrevEntry = pCurrentEntry;
+				}
+
+				return pPrevEntry->m_IntegerValue * dUnits;
+
+			}
+
+
+			return 0.0;
+		}
+
+		bool sampleBoolData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds)
+		{
+			if ((nAbsoluteTimeStampInMicroseconds < m_nStartTimeStampInMicroSeconds) || (nAbsoluteTimeStampInMicroseconds > m_nEndTimeStampInMicroSeconds))
+				return false;
+
+			uint64_t nTimeOffset = m_nStartTimeStampInMicroSeconds;
+			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - nTimeOffset;
+
+			if (nStorageIndex >= m_Entries.size())
+				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND);
+
+			auto& variable = m_Entries.at(nStorageIndex);
+			auto iIter = variable.begin();
+			if (iIter != variable.end()) {
+				auto pPrevEntry = &*iIter;
+				iIter++;
+
+				while (iIter != variable.end()) {
+					auto pCurrentEntry = &*iIter;
+					iIter++;
+
+					if ((nRelativeTime >= pPrevEntry->m_RelativeTimeStampInMicroseconds) &&
+						(nRelativeTime < pCurrentEntry->m_RelativeTimeStampInMicroseconds)) {
+						return pPrevEntry->m_IntegerValue != 0;
+					}
+
+					pPrevEntry = pCurrentEntry;
+				}
+
+				return pPrevEntry->m_IntegerValue != 0;
+			}
+
+			return false;
+		}
+
+
 		void writeEntry (uint32_t nStorageIndex, uint64_t nAbsoluteTimeStamp, int64_t nValue)
 		{
 			if (nStorageIndex >= m_Entries.size())
@@ -311,6 +420,22 @@ namespace AMC {
 			pJournalSession->WriteJournalChunkIntegerData((uint32_t)m_nChunkIndex, m_nStartTimeStampInMicroSeconds, m_nEndTimeStampInMicroSeconds, m_VariableBuffer, m_EntryBuffer);
 		}
 
+		int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) override
+		{
+			return 0;
+		}
+
+		double sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits) override
+		{
+			return 0.0;
+		}
+
+		bool sampleBoolData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) override
+		{
+			return false;
+		}
+
+
 	};
 
 	class CStateJournalStreamChunk_OnDisk : public CStateJournalStreamChunk
@@ -357,6 +482,22 @@ namespace AMC {
 		{
 
 		}
+
+		int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) override
+		{
+			return 0;
+		}
+
+		double sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits) override
+		{
+			return 0.0;
+		}
+
+		bool sampleBoolData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) override
+		{
+			return false;
+		}
+
 
 	};
 
@@ -579,6 +720,59 @@ namespace AMC {
 
 
 	}
+
+	int64_t CStateJournalStream::sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds)
+	{
+		uint64_t nChunkIndex = nAbsoluteTimeStampInMicroseconds / m_nChunkSizeInMicroseconds;
+		uint64_t nChunkCount = m_ChunkTimeline.size();
+
+		PStateJournalStreamChunk pChunk;
+		if (nChunkIndex < nChunkCount) {
+			std::lock_guard<std::mutex> lockGuard(m_ChunkChangeMutex);
+			pChunk = m_ChunkTimeline.at(nChunkIndex);
+		}
+
+		if (pChunk.get() != nullptr)
+			return pChunk->sampleIntegerData(nStorageIndex, nAbsoluteTimeStampInMicroseconds);
+
+		return 0;
+	}
+
+	double CStateJournalStream::sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits)
+	{
+		uint64_t nChunkIndex = nAbsoluteTimeStampInMicroseconds / m_nChunkSizeInMicroseconds;
+		uint64_t nChunkCount = m_ChunkTimeline.size();
+
+		PStateJournalStreamChunk pChunk;
+		if (nChunkIndex < nChunkCount) {
+			std::lock_guard<std::mutex> lockGuard(m_ChunkChangeMutex);
+			pChunk = m_ChunkTimeline.at(nChunkIndex);
+		}
+
+		if (pChunk.get() != nullptr)
+			return pChunk->sampleDoubleData(nStorageIndex, nAbsoluteTimeStampInMicroseconds, dUnits);
+
+		return 0.0;
+	}
+
+	bool CStateJournalStream::sampleBoolData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds)
+	{
+		uint64_t nChunkIndex = nAbsoluteTimeStampInMicroseconds / m_nChunkSizeInMicroseconds;
+		uint64_t nChunkCount = m_ChunkTimeline.size();
+
+		PStateJournalStreamChunk pChunk;
+		if (nChunkIndex < nChunkCount) {
+			std::lock_guard<std::mutex> lockGuard(m_ChunkChangeMutex);
+			pChunk = m_ChunkTimeline.at(nChunkIndex);
+		}
+
+		if (pChunk.get() != nullptr)
+			return pChunk->sampleBoolData(nStorageIndex, nAbsoluteTimeStampInMicroseconds);
+
+		return false;
+
+	}
+
 
 
 	void CStateJournalStream::setVariableCount(size_t nVariableCount)
