@@ -35,7 +35,7 @@ Abstract: This is a stub class definition of CUARTConnection
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include <chrono>
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -52,6 +52,8 @@ CUARTConnection::CUARTConnection(PScanLabSDK pScanlabSDK, uint32_t nDesiredBaudR
 	m_pScanlabSDK->checkGlobalErrorOfCard(m_nCardNo);
 	m_nActualBaudRate = m_pScanlabSDK->n_uart_config (m_nCardNo, nDesiredBaudRate);
 	m_pScanlabSDK->checkLastErrorOfCard(m_nCardNo);
+
+	ClearReceiveBuffer();
 }
 
 CUARTConnection::~CUARTConnection()
@@ -72,11 +74,22 @@ LibMCDriver_ScanLab_uint32 CUARTConnection::GetConfiguredBaudRate()
 
 void CUARTConnection::ClearReceiveBuffer()
 {
+	m_ReceiveBuffer.clear();
+
+	for (uint32_t nReadIndex = 0; nReadIndex < 512; nReadIndex++) {
+		uint32_t nRawValue = m_pScanlabSDK->n_rs232_read_data(m_nCardNo);
+		uint32_t nNumberOfNotReadCharacters = (nRawValue >> 16) & 0xff;
+		uint32_t nNumberOfBufferOverruns = (nRawValue >> 24) & 0xff;
+		if ((nNumberOfBufferOverruns == 0) && (nNumberOfNotReadCharacters == 0))
+			break;
+	}
+
 }
 
 LibMCDriver_ScanLab_uint32 CUARTConnection::AvailableBytes()
 {
-	return 0;
+	pollRTCReceiveBuffer();
+	return (uint32_t) m_ReceiveBuffer.size ();
 }
 
 void CUARTConnection::WriteString(const std::string & sValue)
@@ -105,15 +118,117 @@ void CUARTConnection::WriteData(const LibMCDriver_ScanLab_uint64 nDataBufferSize
 
 void CUARTConnection::ReadData(const LibMCDriver_ScanLab_uint32 nByteCount, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer)
 {
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	if (pDataNeededCount != nullptr)
+		*pDataNeededCount = nByteCount;
+
+	if ((nByteCount > 0) && (pDataBuffer)) {
+		pollRTCReceiveBuffer();
+
+		auto startTime = std::chrono::high_resolution_clock::now();
+
+		while (m_ReceiveBuffer.size () < nByteCount) {
+			pollRTCReceiveBuffer();
+
+			auto duration = std::chrono::high_resolution_clock::now() - startTime;
+			auto millseconds = std::chrono::duration_cast<std::chrono::milliseconds> (duration);
+			if (millseconds.count() > nTimeOutInMS)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT);
+
+			if (m_ReceiveBuffer.size() < nByteCount)
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+
+		std::vector<uint8_t> newBuffer;
+		for (size_t nIndex = 0; nIndex < nByteCount; nIndex++)
+			pDataBuffer[nIndex] = m_ReceiveBuffer.at(nIndex);
+
+		newBuffer.reserve(m_ReceiveBuffer.size () - nByteCount);
+		for (size_t nIndex = nByteCount; nIndex < m_ReceiveBuffer.size(); nIndex++)
+			newBuffer.push_back(m_ReceiveBuffer.at(nIndex));
+
+		m_ReceiveBuffer = newBuffer;
+
+	}
+
 }
 
-void CUARTConnection::ReadLine(const std::string & sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS, LibMCDriver_ScanLab_uint64 nDataBufferSize, LibMCDriver_ScanLab_uint64* pDataNeededCount, LibMCDriver_ScanLab_uint8 * pDataBuffer)
+std::string CUARTConnection::ReadLine(const std::string& sSeparator, const LibMCDriver_ScanLab_uint32 nMaxLineLength, const LibMCDriver_ScanLab_uint32 nTimeOutInMS)
 {
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	std::string sLine;
+
+	if (sSeparator.empty ())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	auto startTime = std::chrono::high_resolution_clock::now();
+	size_t nMaxReceiveSize = nMaxLineLength + sSeparator.length();
+
+	bool bIsFinished = false;
+	while (!bIsFinished) {
+		pollRTCReceiveBuffer();
+
+		// Check for MaxLineLength!
+		if (m_ReceiveBuffer.size () > nMaxReceiveSize)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN);
+
+		// Check for separator
+		if (m_ReceiveBuffer.size() >= sSeparator.length()) {
+
+			bool bSeparatorMatches = true;
+			size_t nStartCharacter = m_ReceiveBuffer.size() - sSeparator.length();
+			for (size_t nIndex = 0; nIndex < sSeparator.length(); nIndex++) {
+				if (m_ReceiveBuffer.at(nStartCharacter + nIndex) != sSeparator.at(nIndex)) {
+					bSeparatorMatches = false;
+					break;
+				}
+			}
+
+			if (bSeparatorMatches) {
+				bIsFinished = true;
+				m_ReceiveBuffer.at(nStartCharacter) = 0;
+				sLine = (char*)m_ReceiveBuffer.data();
+			}
+		}
+
+		// Check for timeout!
+		auto duration = std::chrono::high_resolution_clock::now() - startTime;
+		auto millseconds = std::chrono::duration_cast<std::chrono::milliseconds> (duration);
+		if (millseconds.count() > nTimeOutInMS)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT);
+
+		if (!bIsFinished)
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+	}
+
+	m_ReceiveBuffer.clear();
+
+	return sLine;
 }
 
-void CUARTConnection::Close()
+
+void CUARTConnection::pollRTCReceiveBuffer()
 {
-}
+	m_pScanlabSDK->checkGlobalErrorOfCard(m_nCardNo);
 
+	for (uint32_t nReadIndex = 0; nReadIndex < 256; nReadIndex++) {
+
+		// See Scanlab SDK Documentation for details about RS232 Reading (Chapter 9.2.3)...
+		uint32_t nRawValue = m_pScanlabSDK->n_rs232_read_data(m_nCardNo);
+		uint8_t nDataValue = nRawValue & 0xff;
+		bool bIsNew = (nRawValue & 0x0100) != 0;
+		uint32_t nNumberOfNotReadCharacters = (nRawValue >> 16) & 0xff;
+
+		uint32_t nNumberOfBufferOverruns = (nRawValue >> 24) & 0xff;
+		if (nNumberOfBufferOverruns > 0)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN);
+
+		if (!bIsNew)
+			break;
+
+		m_ReceiveBuffer.push_back(nDataValue);
+
+		if (nNumberOfNotReadCharacters == 0)
+			break;
+	}
+
+}
