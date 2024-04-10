@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType (eDataType)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
+		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType (eDataType), m_sOriginalPath (sOriginalPath)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -50,8 +50,8 @@ namespace AMC {
 		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -59,8 +59,8 @@ namespace AMC {
 		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -68,8 +68,8 @@ namespace AMC {
 		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -158,10 +158,16 @@ namespace AMC {
 
 	PParameter CParameter_Valued::duplicate()
 	{
-		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue, m_DataType, m_pJournal, m_nJournalVariableID);
+		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue, m_DataType, m_pJournal, m_nJournalVariableID, m_sOriginalPath);
 		pParameter->m_sValue = m_sValue;
 		return pParameter;
+	} 
+
+	std::string CParameter_Valued::getOriginalPath()
+	{
+		return m_sOriginalPath;
 	}
+
 
 	void CParameter_Valued::enablePersistency(const std::string& sPersistentName, const std::string& sPersistentUUID)
 	{

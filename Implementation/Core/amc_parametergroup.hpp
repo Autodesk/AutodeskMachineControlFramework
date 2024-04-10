@@ -87,7 +87,11 @@ namespace AMC {
 
 		bool hasParameter (const std::string & sName);
 
-		std::string getParameterPath(const std::string& sName);
+		// Returns the original source parameter path of the parameter (resolving all derives)
+		std::string getOriginalParameterPath(const std::string& sName);
+
+		// Returns the local parameter path, like "statemachine.groupname.parametername"
+		std::string getLocalParameterPath(const std::string& sName);
 
 		void addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue);
 		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits);

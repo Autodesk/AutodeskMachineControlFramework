@@ -407,9 +407,20 @@ namespace AMC {
 
 	}
 
-	std::string CParameterGroup::getParameterPath (const std::string & sName)
+	std::string CParameterGroup::getLocalParameterPath(const std::string& sName)
 	{
 		return (m_sInstanceName + "." + m_sName + "." + sName);
+	}
+
+	std::string CParameterGroup::getOriginalParameterPath(const std::string & sName)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		auto iIter = m_Parameters.find(sName);
+
+		if (iIter == m_Parameters.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
+
+		return iIter->second->getOriginalPath();
 	}
 
 
@@ -417,55 +428,65 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
+		std::string sParameterPath = getLocalParameterPath(sName);
+
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerStringValue(getParameterPath (sName), sDefaultValue);
+			nVariableID = m_pStateJournal->registerStringValue(sParameterPath, sDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, eParameterDataType::String, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, eParameterDataType::String, m_pStateJournal, nVariableID, sParameterPath));
 	}
 
 	void CParameterGroup::addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
+		std::string sParameterPath = getLocalParameterPath(sName);
+
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerDoubleValue(getParameterPath (sName), dDefaultValue, dUnits);
+			nVariableID = m_pStateJournal->registerDoubleValue(sParameterPath, dDefaultValue, dUnits);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, eParameterDataType::Double, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, eParameterDataType::Double, m_pStateJournal, nVariableID, sParameterPath));
 	}
 
 	void CParameterGroup::addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
+		std::string sParameterPath = getLocalParameterPath(sName);
+
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerIntegerValue(getParameterPath (sName), nDefaultValue);
+			nVariableID = m_pStateJournal->registerIntegerValue(sParameterPath, nDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, eParameterDataType::Integer, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, eParameterDataType::Integer, m_pStateJournal, nVariableID, sParameterPath));
 	}
 
 	void CParameterGroup::addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
+		std::string sParameterPath = getLocalParameterPath(sName);
+
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerBooleanValue(getParameterPath (sName), bDefaultValue);
+			nVariableID = m_pStateJournal->registerBooleanValue(sParameterPath, bDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, eParameterDataType::Bool, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, eParameterDataType::Bool, m_pStateJournal, nVariableID, sParameterPath));
 	}
 
 	void CParameterGroup::addNewUUIDParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
+		std::string sParameterPath = getLocalParameterPath(sName);
+
 		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			nVariableID = m_pStateJournal->registerStringValue(getParameterPath(sName), sDefaultValue);
+			nVariableID = m_pStateJournal->registerStringValue(sParameterPath, sDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, AMCCommon::CUtils::normalizeUUIDString (sDefaultValue), eParameterDataType::UUID, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, AMCCommon::CUtils::normalizeUUIDString (sDefaultValue), eParameterDataType::UUID, m_pStateJournal, nVariableID, sParameterPath));
 	}
 
 
@@ -526,7 +547,7 @@ namespace AMC {
 
 		auto pDerivedParameter = std::make_shared<CParameter_Derived>(sName, pParameterGroup, sSourceParameterName);
 		if (m_pStateJournal.get () != nullptr) {
-			m_pStateJournal->registerAlias (getParameterPath (sName), pParameterGroup->getParameterPath (sSourceParameterName));
+			m_pStateJournal->registerAlias (getLocalParameterPath(sName), pDerivedParameter->getOriginalPath ());
 		}
 
 		addParameterInternal(pDerivedParameter);

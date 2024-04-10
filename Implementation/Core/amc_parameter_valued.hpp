@@ -58,6 +58,9 @@ namespace AMC {
 		std::string m_sDefaultValue;
 		
 		std::string m_sValue;
+
+		// The global original path of the parameter..
+		std::string m_sOriginalPath;
 		
 		// update value including persistency storage
 		void setValueEx(const std::string& sValue);
@@ -74,10 +77,10 @@ namespace AMC {
 
 	public:
 
-		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string & sOriginalPath);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath);
 
 		virtual ~CParameter_Valued();
 
@@ -102,6 +105,8 @@ namespace AMC {
 		void setBoolValue(const bool bValue) override;
 
 		virtual PParameter duplicate() override;
+
+		virtual std::string getOriginalPath() override;
 
 		void enablePersistency (const std::string& sPersistentName, const std::string& sPersistentUUID);
 		void disablePersistency();

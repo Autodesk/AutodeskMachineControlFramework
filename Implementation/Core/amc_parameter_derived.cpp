@@ -130,6 +130,10 @@ namespace AMC {
 		return std::make_shared<CParameter_Derived>(m_sName, m_pParameterGroup, m_sSourceParameterName);
 	}
 
+	std::string CParameter_Derived::getOriginalPath()
+	{
+		return m_pParameterGroup->getOriginalParameterPath(m_sSourceParameterName);
+	}
 
 
 

@@ -71,6 +71,8 @@ namespace AMC {
 		virtual void setBoolValue(const bool bValue) = 0;
 
 		virtual PParameter duplicate() = 0;
+
+		virtual std::string getOriginalPath() = 0;
 	};
 
 	

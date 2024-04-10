@@ -72,6 +72,8 @@ namespace AMC {
 
 		virtual eParameterDataType getDataType() const override;
 
+		virtual std::string getOriginalPath() override;
+
 		virtual PParameter duplicate() override;
 
 	};
