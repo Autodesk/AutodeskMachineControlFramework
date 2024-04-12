@@ -257,7 +257,7 @@ void CBuildJobExecution::AddMetaDataString(const std::string& sKey, const std::s
 
 	auto pTransaction = m_pSQLHandler->beginTransaction();
 
-	std::string sDuplicateQuery = "SELECT uuid FROM buildjobexecutionmetadata WHERE jobuuid=? AND metadatakey=? AND active=?";
+	std::string sDuplicateQuery = "SELECT uuid FROM buildjobexecutionmetadata WHERE executionuuid=? AND metadatakey=? AND active=?";
 	auto pDuplicateStatement = pTransaction->prepareStatement(sDuplicateQuery);
 	pDuplicateStatement->setString(1, m_sExecutionUUID);
 	pDuplicateStatement->setString(2, sKey);
@@ -267,7 +267,7 @@ void CBuildJobExecution::AddMetaDataString(const std::string& sKey, const std::s
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE, "build job execution meta data key is not unisque: " + sKey);
 	pDuplicateStatement = nullptr;
 
-	std::string sInsertQuery = "INSERT INTO buildjobexecutionmetadata (uuid, jobuuid, metadatakey, metadatavalue, active, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
+	std::string sInsertQuery = "INSERT INTO buildjobexecutionmetadata (uuid, executionuuid, metadatakey, metadatavalue, active, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
 	auto pInsertStatement = pTransaction->prepareStatement(sInsertQuery);
 	pInsertStatement->setString(1, sMetaDataUUID);
 	pInsertStatement->setString(2, m_sExecutionUUID);
@@ -290,7 +290,7 @@ bool CBuildJobExecution::HasMetaDataString(const std::string& sKey)
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID, "build job execution meta data key is invalid: " + sKey);
 
-	std::string sSelectQuery = "SELECT uuid FROM buildjobexecutionmetadata WHERE jobuuid=? AND metadatakey=? AND active=?";
+	std::string sSelectQuery = "SELECT uuid FROM buildjobexecutionmetadata WHERE executionuuid=? AND metadatakey=? AND active=?";
 	auto pSelectStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
 	pSelectStatement->setString(1, m_sExecutionUUID);
 	pSelectStatement->setString(2, sKey);
@@ -307,7 +307,7 @@ std::string CBuildJobExecution::GetMetaDataString(const std::string& sKey)
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID, "build job execution meta data key is invalid: " + sKey);
 
-	std::string sSelectQuery = "SELECT metadatavalue FROM buildjobexecutionmetadata WHERE jobuuid=? AND metadatakey=? AND active=?";
+	std::string sSelectQuery = "SELECT metadatavalue FROM buildjobexecutionmetadata WHERE executionuuid=? AND metadatakey=? AND active=?";
 	auto pSelectStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
 	pSelectStatement->setString(1, m_sExecutionUUID);
 	pSelectStatement->setString(2, sKey);

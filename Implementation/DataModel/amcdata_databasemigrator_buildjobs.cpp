@@ -114,8 +114,8 @@ namespace AMCData {
 			std::string sBuildJobExecutionMetaDataQuery = "CREATE TABLE `buildjobexecutionmetadata` (";
 			sBuildJobExecutionMetaDataQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
 			sBuildJobExecutionMetaDataQuery += "`executionuuid`  varchar ( 64 ) NOT NULL,";
-			sBuildJobExecutionMetaDataQuery += "`key`  varchar ( 256 ) NOT NULL,";
-			sBuildJobExecutionMetaDataQuery += "`value` TEXT NOT NULL,";
+			sBuildJobExecutionMetaDataQuery += "`metadatakey`  varchar ( 256 ) NOT NULL,";
+			sBuildJobExecutionMetaDataQuery += "`metadatavalue` TEXT NOT NULL,";
 			sBuildJobExecutionMetaDataQuery += "`active`  integer DEFAULT 0,";
 			sBuildJobExecutionMetaDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 			pTransaction->executeStatement(sBuildJobExecutionMetaDataQuery); 

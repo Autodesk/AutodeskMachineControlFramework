@@ -38,6 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCCommon {
 
+	enum class eUTCStringAccuracy : uint32_t {
+		Microseconds = 1,
+		Milliseconds = 2,
+		Seconds = 3
+	};
+
 	class CChrono_Impl;
 
 	class CChrono {
@@ -92,10 +98,41 @@ namespace AMCCommon {
 			// Checks if a timestamp is within a million years
 			static bool timeStampIsWithinAMillionYears(const uint64_t nMicroseconds); 
 
-			// Parses the date of a date time since 1970
-			// Returns the year, the month (1-12), the day of the month (1-31), and the day of the week (1-7, 1 = Monday)
-			static void parseDateFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t & nDayOfTheWeek);
+			// Parses a UTC String in ISO8601 format
+			static uint64_t parseISO8601TimeUTC(const std::string& sUTCString);
 
+			// Converts a time stamp into a UTC string with a defined accuracy
+			static std::string convertToISO8601TimeUTC(const uint64_t nMicrosecondsSince1970, eUTCStringAccuracy eAccuracy = AMCCommon::eUTCStringAccuracy::Microseconds);
+
+			// Parses the date of a date time since 1970, including the day of the week.
+			// Returns the year, the month (1-12), the day of the month (1-31), and the day of the week (1-7, 1 = Monday)
+			static void parseDateFromMicrosecondsSince1970WithWeekday(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t & nDayOfTheWeek);
+
+			// Parses the date of a date time since 1970
+			// Returns the year, the month (1-12), the day of the month (1-31)
+			static void parseDateFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay);
+
+			// Parses the full date time of a timestamp since 1970
+			// Returns the year, the month (1-12), the day of the month (1-31),
+			// the hour (0-23), the minute (0-59), the second (0-59) and the microsecond (0-999999)
+			static void parseDateTimeFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t & nHour, uint32_t & nMinute, uint32_t & nSecond, uint32_t nMicrosecond);
+
+			// Gets the timestamp of midnight of any given day.
+			// Inputs are the year, the month (1-12), the day of the month (1-31)
+			// Fails if the Year is before 1970, or the date is otherwise invalid.
+			static uint64_t getMicrosecondsSince1970FromDay (uint32_t nYear, uint32_t nMonth, uint32_t nDay);
+
+			// Gets the timestamp for a full date time.
+			// Inputs are the year, the month (1-12), the day of the month (1-31),
+			// the hour (0-23), the minute (0-59), the second (0-59) and the microsecond (0-999999).
+			// Fails if the Year is before 1970, or the date is otherwise invalid.
+			static uint64_t getMicrosecondsSince1970FromDateTime(uint32_t nYear, uint32_t nMonth, uint32_t nDay, uint32_t nHour, uint32_t nMinute, uint32_t nSecond, uint32_t nMicrosecond);
+
+			// Returns the current system time in UTC time zone, as microseconds since 1970
+			static uint64_t getCurrentUTCTime();
+
+			// Returns if a year is a leap year
+			static bool yearIsLeapYear(uint32_t nYear);
 	};
 
 	typedef std::shared_ptr<CChrono> PChrono;
