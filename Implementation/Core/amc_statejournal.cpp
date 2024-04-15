@@ -295,7 +295,8 @@ namespace AMC {
 		uint32_t m_nChunkWriteIntervalInSeconds;
 
 		eStateJournalMode m_JournalMode;
-		AMCCommon::CChrono m_Chrono;
+		AMCCommon::PChrono m_pGlobalChrono;
+		uint64_t m_nAbsoluteStartTimeInMicroseconds;
 
 		PStateJournalStream m_pStream;
 		PLogger m_pLogger;
@@ -309,7 +310,7 @@ namespace AMC {
 
 	public:
 
-		CStateJournalImpl(PStateJournalStream pStream);
+		CStateJournalImpl(PStateJournalStream pStream, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CStateJournalImpl();
 
 		PStateJournalImplVariable generateVariable(const eStateJournalVariableType eVariableType, const std::string& sName);
@@ -336,16 +337,22 @@ namespace AMC {
 	};
 
 
-	CStateJournalImpl::CStateJournalImpl(PStateJournalStream pStream)
-		: m_JournalMode(eStateJournalMode::sjmInitialising),
-	     m_Chrono (false),
+	CStateJournalImpl::CStateJournalImpl(PStateJournalStream pStream, AMCCommon::PChrono pGlobalChrono)
+		: m_JournalMode(eStateJournalMode::sjmInitialising),	     
 		m_pStream (pStream),
 		m_nChunkIntervalInMilliseconds(0),
 		m_nChunkWriteIntervalInSeconds (1),
-		m_ThreadStopFlag (false)
+		m_ThreadStopFlag (false),
+		m_pGlobalChrono (pGlobalChrono)
 
 	{
-		LibMCAssertNotNull(pStream.get());
+		if (pStream.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pGlobalChrono.get () == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		m_nAbsoluteStartTimeInMicroseconds = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
 		m_nChunkIntervalInMilliseconds = 60000;
 		m_nChunkWriteIntervalInSeconds = 10;
 	}
@@ -627,19 +634,23 @@ namespace AMC {
 
 	std::string CStateJournalImpl::getStartTimeAsUTC()
 	{
-		return m_Chrono.getStartTimeISO8601TimeUTC();
+		return m_pGlobalChrono->convertToISO8601TimeUTC (m_nAbsoluteStartTimeInMicroseconds);
 	}
 
 	uint64_t CStateJournalImpl::retrieveTimeStamp_MicroSecond()
 	{
-		return m_Chrono.getExistenceTimeInMicroseconds();
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+		if (nAbsoluteTimeStamp < m_nAbsoluteStartTimeInMicroseconds)
+			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALTIMESTAMPINVALID);
+
+		return nAbsoluteTimeStamp - m_nAbsoluteStartTimeInMicroseconds;
 	}
 
 
 
 	
-	CStateJournal::CStateJournal(PStateJournalStream pStream)
-		: m_pImpl(std::make_shared<CStateJournalImpl> (pStream))
+	CStateJournal::CStateJournal(PStateJournalStream pStream, AMCCommon::PChrono pGlobalChrono)
+		: m_pImpl(std::make_shared<CStateJournalImpl> (pStream, pGlobalChrono))
 	{
 	
 	}

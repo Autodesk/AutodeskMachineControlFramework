@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	CStateMachineState::CStateMachineState(const std::string& sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono)
-		: m_sInstanceName(sInstanceName), m_sName (sName), m_pEnvironmentWrapper (pEnvironmentWrapper), m_nRepeatDelay (nRepeatDelay), m_pGlobalChrono (pGlobalChrono), m_LastExecutionTimeInMilliseconds(0)
+		: m_sInstanceName(sInstanceName), m_sName (sName), m_pEnvironmentWrapper (pEnvironmentWrapper), m_nRepeatDelay (nRepeatDelay), m_pGlobalChrono (pGlobalChrono), m_LastExecutionTimeStampInMicroseconds(0)
 	{
 		LibMCAssertNotNull(pEnvironmentWrapper.get());
 		LibMCAssertNotNull(pGlobalChrono.get());
@@ -85,7 +85,7 @@ namespace AMC {
 
 	void CStateMachineState::updateExecutionTime()
 	{
-		m_LastExecutionTimeInMilliseconds = m_pGlobalChrono->getExistenceTimeInMilliseconds ();
+		m_LastExecutionTimeStampInMicroseconds = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ();
 	}
 
 
@@ -162,17 +162,24 @@ namespace AMC {
 		if (chunkInMilliseconds < AMC_MINREPEATDELAY_MS)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDREPEATDELAY, m_sInstanceName);
 		
-		auto deltaExecutionTime = m_pGlobalChrono->getDurationTimeInMilliseconds (m_LastExecutionTimeInMilliseconds);
+		uint64_t executionTimeInMicroSeconds = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+		if (m_LastExecutionTimeStampInMicroseconds > executionTimeInMicroSeconds)
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDEXECUTIONDELAY, std::to_string (m_LastExecutionTimeStampInMicroseconds));
 
-		while (deltaExecutionTime < m_nRepeatDelay) {		
+		auto deltaExecutionTimeInMicroSeconds = executionTimeInMicroSeconds - m_LastExecutionTimeStampInMicroseconds;
+
+		while (deltaExecutionTimeInMicroSeconds < (m_nRepeatDelay * 1000ULL)) {
 			m_pGlobalChrono->sleepMilliseconds(chunkInMilliseconds);
 
+			uint64_t newExecutionTimeInMicroSeconds = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+			if (m_LastExecutionTimeStampInMicroseconds > newExecutionTimeInMicroSeconds)
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDEXECUTIONDELAY, std::to_string(m_LastExecutionTimeStampInMicroseconds));
 
-			auto newDeltaExecutionTime = m_pGlobalChrono->getDurationTimeInMilliseconds(m_LastExecutionTimeInMilliseconds);
-			if (newDeltaExecutionTime <= deltaExecutionTime)
+			auto newDeltaExecutionTimeInMicroSeconds = newExecutionTimeInMicroSeconds - m_LastExecutionTimeStampInMicroseconds;
+			if (newDeltaExecutionTimeInMicroSeconds <= deltaExecutionTimeInMicroSeconds)
 				throw ELibMCCustomException(LIBMC_ERROR_INVALIDEXECUTIONDELAY, m_sInstanceName);
 
-			deltaExecutionTime = newDeltaExecutionTime;
+			deltaExecutionTimeInMicroSeconds = newDeltaExecutionTimeInMicroSeconds;
 		}
 
 	}

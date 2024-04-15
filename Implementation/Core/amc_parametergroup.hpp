@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_parametertype.hpp"
 
+#include "common_chrono.hpp"
+
 namespace LibMCData {
 
 	class CPersistencyHandler;
@@ -71,14 +73,16 @@ namespace AMC {
 		PStateJournal m_pStateJournal;
 		std::string m_sInstanceName;
 
+		AMCCommon::PChrono m_pGlobalChrono;
+
 		std::mutex m_GroupMutex;
 
 		void addParameterInternal(PParameter pParameter);
 
 	public:
 
-		CParameterGroup();
-		CParameterGroup(const std::string & sName, const std::string& sDescription);
+		CParameterGroup(AMCCommon::PChrono pGlobalChrono);
+		CParameterGroup(const std::string & sName, const std::string& sDescription, AMCCommon::PChrono pGlobalChrono);
 		
 		virtual ~CParameterGroup();		
 		
@@ -130,7 +134,7 @@ namespace AMC {
 		void removeValue(const std::string& sName);
 
 		std::string serializeToJSON();
-		void deserializeJSON(const std::string & sJSON);
+		void deserializeJSON(const std::string & sJSON, uint64_t nAbsoluteTimeStamp);
 
 		void copyToGroup (CParameterGroup * pParameterGroup);
 
@@ -140,7 +144,7 @@ namespace AMC {
 		void setJournal(PStateJournal pStateJournal, const std::string & sInstanceName);
 
 		void setParameterPersistentUUID (const std::string& sParameterName, const std::string& sPersistentUUID);
-		void updateParameterPersistencyHandler (LibMCData::PPersistencyHandler pPersistencyHandler);
+		void updateParameterPersistencyHandler (LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp);
 
 	};
 

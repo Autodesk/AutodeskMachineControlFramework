@@ -109,12 +109,12 @@ namespace AMC {
 		return std::string(m_sValue.c_str());
 	}
 
-	void CParameter_Valued::setStringValue(const std::string& sValue)
+	void CParameter_Valued::setStringValue(const std::string& sValue, uint64_t nAbsoluteTimeStamp)
 	{
 		if (m_pJournal.get () != nullptr)
 			m_pJournal->updateStringValue(m_nJournalVariableID, sValue);
 
-		setValueEx (sValue);
+		setValueEx (sValue, nAbsoluteTimeStamp);
 	}
 
 	double CParameter_Valued::getDoubleValue() const
@@ -122,11 +122,11 @@ namespace AMC {
 		return AMCCommon::CUtils::stringToDouble(m_sValue);
 	}
 
-	void CParameter_Valued::setDoubleValue(const double dValue)
+	void CParameter_Valued::setDoubleValue(const double dValue, uint64_t nAbsoluteTimeStamp)
 	{
 		if (m_pJournal.get() != nullptr)
 			m_pJournal->updateDoubleValue(m_nJournalVariableID, dValue);
-		setValueEx (std::to_string(dValue));
+		setValueEx (std::to_string(dValue), nAbsoluteTimeStamp);
 	}
 
 	int64_t CParameter_Valued::getIntValue() const
@@ -134,11 +134,11 @@ namespace AMC {
 		return AMCCommon::CUtils::stringToInteger(m_sValue);
 	}
 
-	void CParameter_Valued::setIntValue(const int64_t nValue)
+	void CParameter_Valued::setIntValue(const int64_t nValue, uint64_t nAbsoluteTimeStamp)
 	{
 		if (m_pJournal.get() != nullptr)
 			m_pJournal->updateIntegerValue(m_nJournalVariableID, nValue);
-		setValueEx (std::to_string(nValue));
+		setValueEx (std::to_string(nValue), nAbsoluteTimeStamp);
 	}
 
 	bool CParameter_Valued::getBoolValue() const
@@ -146,14 +146,14 @@ namespace AMC {
 		return getIntValue() != 0;
 	}
 
-	void CParameter_Valued::setBoolValue(const bool bValue)
+	void CParameter_Valued::setBoolValue(const bool bValue, uint64_t nAbsoluteTimeStamp)
 	{
 		if (m_pJournal.get() != nullptr)
 			m_pJournal->updateBoolValue(m_nJournalVariableID, bValue);
 		if (bValue)
-			setValueEx ("1");
+			setValueEx ("1", nAbsoluteTimeStamp);
 		else
-			setValueEx ("0");
+			setValueEx ("0", nAbsoluteTimeStamp);
 	}
 
 	PParameter CParameter_Valued::duplicate()
@@ -188,7 +188,7 @@ namespace AMC {
 		m_sPersistentUUID = "";
 	}
 
-	void CParameter_Valued::setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler)
+	void CParameter_Valued::setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp)
 	{
 		m_pPersistencyHandler = pPersistencyHandler;
 
@@ -199,19 +199,19 @@ namespace AMC {
 
 				switch (m_DataType) {
 				case eParameterDataType::String:
-					setStringValue(pPersistencyHandler->RetrievePersistentStringParameter(m_sPersistentUUID));
+					setStringValue(pPersistencyHandler->RetrievePersistentStringParameter(m_sPersistentUUID), nAbsoluteTimeStamp);
 					break;
 				case eParameterDataType::UUID:
-					setStringValue(pPersistencyHandler->RetrievePersistentUUIDParameter(m_sPersistentUUID));
+					setStringValue(pPersistencyHandler->RetrievePersistentUUIDParameter(m_sPersistentUUID), nAbsoluteTimeStamp);
 					break;
 				case eParameterDataType::Integer:
-					setIntValue(pPersistencyHandler->RetrievePersistentIntegerParameter(m_sPersistentUUID));
+					setIntValue(pPersistencyHandler->RetrievePersistentIntegerParameter(m_sPersistentUUID), nAbsoluteTimeStamp);
 					break;
 				case eParameterDataType::Bool:
-					setBoolValue(pPersistencyHandler->RetrievePersistentBoolParameter(m_sPersistentUUID));
+					setBoolValue(pPersistencyHandler->RetrievePersistentBoolParameter(m_sPersistentUUID), nAbsoluteTimeStamp);
 					break;
 				case eParameterDataType::Double:
-					setDoubleValue(pPersistencyHandler->RetrievePersistentDoubleParameter(m_sPersistentUUID));
+					setDoubleValue(pPersistencyHandler->RetrievePersistentDoubleParameter(m_sPersistentUUID), nAbsoluteTimeStamp);
 					break;
 
 				}
@@ -222,7 +222,7 @@ namespace AMC {
 
 
 	
-	void CParameter_Valued::setValueEx(const std::string& sValue)
+	void CParameter_Valued::setValueEx(const std::string& sValue, uint64_t nAbsoluteTimeStamp)
 	{
 		bool hasChanged = (sValue != m_sValue);
 		m_sValue = sValue;
@@ -250,7 +250,7 @@ namespace AMC {
 
 			}
 
-			m_pPersistencyHandler->StorePersistentParameter(m_sPersistentUUID, m_sPersistentName, eParameterType, sValue);
+			m_pPersistencyHandler->StorePersistentParameter(m_sPersistentUUID, m_sPersistentName, eParameterType, sValue, nAbsoluteTimeStamp);
 		}
 	}
 

@@ -117,7 +117,7 @@ namespace AMC {
 
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, AMCCommon::PChrono pGlobalChrono);
 
 		virtual ~CSystemState();
 
@@ -161,6 +161,8 @@ namespace AMC {
 		std::string getClientHash();
 
 		std::string getTestEnvironmentPath();
+
+		uint64_t getAbsoluteTimeStamp();
 
 
 

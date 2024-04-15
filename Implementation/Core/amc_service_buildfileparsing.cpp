@@ -42,11 +42,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 	
 	
-	CService_BuildFileParsing::CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sUserID)
-		: CService (pServiceHandler), m_pDataModel (pDataModel), m_p3MFWrapper (p3MFWrapper), m_sUserID (sUserID), m_sBuildJobUUID (AMCCommon::CUtils::normalizeUUIDString (sBuildJobUUID))
+	CService_BuildFileParsing::CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sUserID, AMCCommon::PChrono pGlobalChrono)
+		: CService (pServiceHandler), m_pDataModel (pDataModel), m_p3MFWrapper (p3MFWrapper), m_sUserID (sUserID), m_sBuildJobUUID (AMCCommon::CUtils::normalizeUUIDString (sBuildJobUUID)), m_pGlobalChrono (pGlobalChrono)
 	{
-		LibMCAssertNotNull(pDataModel.get());
-		LibMCAssertNotNull(p3MFWrapper.get());
+		if (pDataModel.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (p3MFWrapper.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pGlobalChrono.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	}
 	
@@ -67,7 +71,7 @@ namespace AMC {
 		// TODO: Check Toolpath Entity Integrity
 		CToolpathEntity toolpathEntity (m_pDataModel, pStorageStream->GetUUID(), m_p3MFWrapper, pBuildJob->GetName ());		
 		pBuildJob->FinishValidating (toolpathEntity.getLayerCount ());
-		pBuildJob->AddJobData(pStorageStream->GetContextIdentifier (),  pStorageStream->GetName(), pStorageStream, LibMCData::eCustomDataType::Toolpath, m_sUserID);
+		pBuildJob->AddJobData(pStorageStream->GetContextIdentifier (),  pStorageStream->GetName(), pStorageStream, LibMCData::eCustomDataType::Toolpath, m_sUserID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 		
 
 	}

@@ -59,16 +59,16 @@ namespace AMC {
 		virtual eParameterDataType getDataType() const = 0;
 
 		virtual std::string getStringValue() const = 0;
-		virtual void setStringValue(const std::string& sValue) = 0;
+		virtual void setStringValue(const std::string& sValue, uint64_t nAbsoluteTimeStamp) = 0;
 
 		virtual double getDoubleValue() const = 0;
-		virtual void setDoubleValue(const double dValue) = 0;
+		virtual void setDoubleValue(const double dValue, uint64_t nAbsoluteTimeStamp) = 0;
 
 		virtual int64_t getIntValue() const = 0;
-		virtual void setIntValue(const int64_t nValue) = 0;
+		virtual void setIntValue(const int64_t nValue, uint64_t nAbsoluteTimeStamp) = 0;
 
 		virtual bool getBoolValue() const = 0;
-		virtual void setBoolValue(const bool bValue) = 0;
+		virtual void setBoolValue(const bool bValue, uint64_t nAbsoluteTimeStamp) = 0;
 
 		virtual PParameter duplicate() = 0;
 

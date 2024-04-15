@@ -58,15 +58,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, AMC::PStateJournal pStateJournal, const std::string& sTestEnvironmentPath, AMCCommon::PChrono pGlobalChrono)
 		: m_sTestEnvironmentPath (sTestEnvironmentPath), m_pStateJournal (pStateJournal)
 	{
 		LibMCAssertNotNull(pLogger.get());
 		LibMCAssertNotNull(pDataModel.get());
 		LibMCAssertNotNull(pEnvWrapper.get());
 		LibMCAssertNotNull(pStateJournal.get());
-
-		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
+		LibMCAssertNotNull(pGlobalChrono.get());
+		
+		m_pGlobalChrono = pGlobalChrono;
 
 		m_pLogger = pLogger;
 		m_pDataModel = pDataModel;
@@ -90,15 +91,15 @@ namespace AMC {
 		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono, m_pAlertHandler, m_pDataModel);
 		m_pUIHandler = std::make_shared<CUIHandler>(pEnvWrapper, pUISystemState);
 
-		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System");
-		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information");
+		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System", m_pGlobalChrono);
+		auto pSystemInformationGroup = std::make_shared<CParameterGroup>("information", "Information", m_pGlobalChrono);
 		pSystemInformationGroup->addNewStringParameter("githash", "Git Hash", getGitHash ());
 		pSystemInformationGroup->addNewStringParameter("clienthash", "Client Hash", getClientHash());
 		pSystemInformationGroup->addNewStringParameter("compile_time", "Compile time", std::string (__DATE__) + " " + std::string (__TIME__));
 		pSystemInformationGroup->addNewStringParameter("installation_uuid", "Installation", getInstallationUUID ());
 		pSystemParameterHandler->addGroup(pSystemInformationGroup);
 
-		m_pStateMachineData->registerParameterHandler("system", pSystemParameterHandler);
+		m_pStateMachineData->registerParameterHandler("system", pSystemParameterHandler, m_pGlobalChrono);
 
 	}
 
@@ -298,4 +299,10 @@ namespace AMC {
 	{
 		return m_sTestEnvironmentPath;
 	}
+
+	uint64_t CSystemState::getAbsoluteTimeStamp()
+	{
+		return m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+	}
+
 }

@@ -50,14 +50,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 	
 
-	CParameterGroup::CParameterGroup()
-		: m_pStateJournal (nullptr)
+	CParameterGroup::CParameterGroup(AMCCommon::PChrono pGlobalChrono)
+		: m_pStateJournal (nullptr), m_pGlobalChrono (pGlobalChrono)
 	{
 
 	}
 
-	CParameterGroup::CParameterGroup(const std::string& sName, const std::string& sDescription)
-		: m_sName(sName), m_sDescription(sDescription), m_pStateJournal (nullptr)
+	CParameterGroup::CParameterGroup(const std::string& sName, const std::string& sDescription, AMCCommon::PChrono pGlobalChrono)
+		: m_sName(sName), m_sDescription(sDescription), m_pStateJournal (nullptr), m_pGlobalChrono(pGlobalChrono)
 	{
 	}
 
@@ -251,8 +251,10 @@ namespace AMC {
 		if (nIndex >= m_ParameterList.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
 		auto pParameter = m_ParameterList[nIndex];
-		pParameter->setStringValue(sValue);
+		pParameter->setStringValue(sValue, nAbsoluteTimeStamp);
 	}
 
 	void CParameterGroup::setParameterValueByName(const std::string& sName, const std::string& sValue)
@@ -263,7 +265,9 @@ namespace AMC {
 		if (iIter == m_Parameters.end())
 			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
-		iIter->second->setStringValue(sValue);
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+		iIter->second->setStringValue(sValue, nAbsoluteTimeStamp);
 	}
 
 	void CParameterGroup::setDoubleParameterValueByIndex(const uint32_t nIndex, const double dValue)
@@ -272,8 +276,10 @@ namespace AMC {
 		if (nIndex >= m_ParameterList.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
 		auto pParameter = m_ParameterList[nIndex];
-		pParameter->setDoubleValue(dValue);
+		pParameter->setDoubleValue(dValue, nAbsoluteTimeStamp);
 	}
 
 	void CParameterGroup::setDoubleParameterValueByName(const std::string& sName, const double dValue)
@@ -284,7 +290,9 @@ namespace AMC {
 		if (iIter == m_Parameters.end())
 			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
-		iIter->second->setDoubleValue(dValue);
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+		iIter->second->setDoubleValue(dValue, nAbsoluteTimeStamp);
 
 	}
 
@@ -294,8 +302,10 @@ namespace AMC {
 		if (nIndex >= m_ParameterList.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
 		auto pParameter = m_ParameterList[nIndex];
-		pParameter->setIntValue(nValue);
+		pParameter->setIntValue(nValue, nAbsoluteTimeStamp);
 
 	}
 
@@ -307,7 +317,9 @@ namespace AMC {
 		if (iIter == m_Parameters.end())
 			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
-		iIter->second->setIntValue(nValue);
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+		iIter->second->setIntValue(nValue, nAbsoluteTimeStamp);
 
 	}
 
@@ -317,8 +329,10 @@ namespace AMC {
 		if (nIndex >= m_ParameterList.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
 		auto pParameter = m_ParameterList[nIndex];
-		pParameter->setBoolValue(bValue);
+		pParameter->setBoolValue(bValue, nAbsoluteTimeStamp);
 	}
 
 	void CParameterGroup::setBoolParameterValueByName(const std::string& sName, const bool bValue)
@@ -329,7 +343,9 @@ namespace AMC {
 		if (iIter == m_Parameters.end())
 			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
-		iIter->second->setBoolValue(bValue);
+		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+		iIter->second->setBoolValue(bValue, nAbsoluteTimeStamp);
 
 	}
 
@@ -345,7 +361,7 @@ namespace AMC {
 		return writer.saveToString();
 	}
 
-	void CParameterGroup::deserializeJSON(const std::string& sJSON)
+	void CParameterGroup::deserializeJSON(const std::string& sJSON, uint64_t nAbsoluteTimeStamp)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
@@ -368,7 +384,7 @@ namespace AMC {
 			if (iIter == m_Parameters.end())
 				throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
-			iIter->second->setStringValue(sValue);
+			iIter->second->setStringValue(sValue, nAbsoluteTimeStamp);
 		}
 	}
 
@@ -600,13 +616,13 @@ namespace AMC {
 
 	}
 
-	void CParameterGroup::updateParameterPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler)
+	void CParameterGroup::updateParameterPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		for (auto pParameter : m_ParameterList) {
 			auto pValuedParameter = std::dynamic_pointer_cast<CParameter_Valued> (pParameter);
 			if (pValuedParameter.get() != nullptr)
-				pValuedParameter->setPersistencyHandler (pPersistencyHandler);
+				pValuedParameter->setPersistencyHandler (pPersistencyHandler, nAbsoluteTimeStamp);
 		}
 
 	}

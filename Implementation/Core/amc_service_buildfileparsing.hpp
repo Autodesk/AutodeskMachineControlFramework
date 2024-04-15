@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdata_dynamic.hpp"
 #include "lib3mf/lib3mf_dynamic.hpp"
+#include "common_chrono.hpp"
 
 #include <memory>
 
@@ -46,6 +47,7 @@ namespace AMC {
 	class CService_BuildFileParsing : public CService {
 	private:
 		LibMCData::PDataModel m_pDataModel;
+		AMCCommon::PChrono m_pGlobalChrono;
 		std::string m_sBuildJobUUID;
 		
 		Lib3MF::PWrapper m_p3MFWrapper;
@@ -55,7 +57,7 @@ namespace AMC {
 	protected:
 	public:
 
-		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserID);
+		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserID, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CService_BuildFileParsing();
 
 		virtual void executeBlocking() override;
