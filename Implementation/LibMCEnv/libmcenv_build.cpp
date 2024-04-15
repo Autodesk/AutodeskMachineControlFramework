@@ -191,11 +191,12 @@ std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::str
 
 	auto sDataUUID = AMCCommon::CUtils::createUUID();
 	auto sSystemUserID = m_sSystemUserID;
+	uint64_t nTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
-	pStorage->StoreNewStream(sDataUUID, pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
+	pStorage->StoreNewStream(sDataUUID, pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID, nTimeStamp);
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
-	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID);
+	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID, nTimeStamp);
 
 	return sDataUUID;
 
@@ -362,7 +363,7 @@ void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValu
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
 
-	pBuildJob->AddMetaDataString(sKey, sValue);
+	pBuildJob->AddMetaDataString(sKey, sValue, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 }
 

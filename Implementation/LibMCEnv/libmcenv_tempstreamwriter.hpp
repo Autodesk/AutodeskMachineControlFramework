@@ -47,7 +47,7 @@ Abstract: This is the class declaration of CTempStreamWriter
 // Include custom headers here.
 #include "libmcdata_dynamic.hpp"
 #include <mutex>
-
+#include "common_chrono.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -71,9 +71,11 @@ private:
 	std::string m_sMIMEType;
 	bool m_bIsFinished;
 
+	AMCCommon::PChrono m_pGlobalChrono;
+
 public:
 
-	CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string & sName, const std::string & sMIMEType, const std::string & sCurrentUserID);
+	CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string & sName, const std::string & sMIMEType, const std::string & sCurrentUserID, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CTempStreamWriter();
 

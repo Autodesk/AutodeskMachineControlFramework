@@ -40,14 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCEnv::Impl;
 
-CSignalTrigger::CSignalTrigger(AMC::PStateSignalHandler pSignalHandler, std::string sInstanceName, std::string sSignalName)
-	: m_pSignalHandler (pSignalHandler), m_sInstanceName (sInstanceName), m_sSignalName (sSignalName)
+CSignalTrigger::CSignalTrigger(AMC::PStateSignalHandler pSignalHandler, std::string sInstanceName, std::string sSignalName, AMCCommon::PChrono pGlobalChrono)
+	: m_pSignalHandler (pSignalHandler), m_sInstanceName (sInstanceName), m_sSignalName (sSignalName), m_pGlobalChrono (pGlobalChrono)
 {
 	if (pSignalHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	m_pParameterGroup = std::make_shared<AMC::CParameterGroup>();
-	m_pResultGroup = std::make_shared<AMC::CParameterGroup>();
+	m_pParameterGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
+	m_pResultGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
 
 	m_pSignalHandler->populateParameterGroup (m_sInstanceName, m_sSignalName, m_pParameterGroup.get());
 	m_pSignalHandler->populateResultGroup(m_sInstanceName, m_sSignalName, m_pResultGroup.get());
@@ -85,7 +87,7 @@ bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOut)
 
 		std::string sResultData;
 		if (m_pSignalHandler->signalHasBeenHandled (m_sTriggeredUUID, true, sResultData)) {
-			m_pResultGroup->deserializeJSON(sResultData);
+			m_pResultGroup->deserializeJSON(sResultData, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 			
 			return true;
 		}

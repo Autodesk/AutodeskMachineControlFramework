@@ -104,7 +104,7 @@ CDriverEnvironment::~CDriverEnvironment()
 
 IDriverStatusUpdateSession* CDriverEnvironment::CreateStatusUpdateSession()
 {
-    return new CDriverStatusUpdateSession(m_pParameterGroup, m_pLogger, m_sDriverName);
+    return new CDriverStatusUpdateSession(m_pParameterGroup, m_pLogger, m_sDriverName, m_pGlobalChrono);
 
 }
 

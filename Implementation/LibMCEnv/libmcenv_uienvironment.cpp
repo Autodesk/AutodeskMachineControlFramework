@@ -165,8 +165,10 @@ void CUIEnvironment::StartStreamDownload(const std::string& sUUID, const std::st
 
     std::string sUserUUID = m_pAPIAuth->getUserUUID();
 
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+
     std::string sTicketUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
-    pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID);
+    pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sTicketUUID, sFilename));
 }
@@ -201,7 +203,7 @@ ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInsta
     if (!m_pUISystemState->getSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
 
-    return new CSignalTrigger(m_pUISystemState->getSignalHandler(), sMachineInstance, sSignalName);
+    return new CSignalTrigger(m_pUISystemState->getSignalHandler(), sMachineInstance, sSignalName, m_pUISystemState->getGlobalChronoInstance ());
 }
 
 std::string CUIEnvironment::GetMachineState(const std::string & sMachineInstance)
@@ -683,8 +685,8 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
 
     auto sNewUUID = AMCCommon::CUtils::createUUID();
 
-    AMCCommon::CChrono chrono;
-    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    auto sTimeStamp = pGlobalChrono->getUTCTimeInISO8601 ();
 
     auto pDefinition = m_pUISystemState->getAlertHandler()->findDefinition(sIdentifier, true);
     auto alertDescription = pDefinition->getDescription();
@@ -722,7 +724,7 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
 
 
     auto pUserInformation = m_pAPIAuth->getUserInformation();
-    return new CAlert(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem);
+    return new CAlert(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ());
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
@@ -737,7 +739,7 @@ IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
 
     auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
     auto pUserInformation = m_pAPIAuth->getUserInformation();
-    return new CAlert(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem);
+    return new CAlert(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ());
 
 }
 
@@ -764,7 +766,7 @@ IAlertIterator* CUIEnvironment::RetrieveAlerts(const bool bOnlyActive)
     while (pAlertIterator->MoveNext()) {
         auto pAlertData = pAlertIterator->GetCurrentAlert();
         auto pUserInformation = m_pAPIAuth->getUserInformation();
-        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem));
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ()));
     }
 
     return returnIterator.release();
@@ -782,7 +784,7 @@ IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentif
     while (pAlertIterator->MoveNext()) {
         auto pAlertData = pAlertIterator->GetCurrentAlert();
         auto pUserInformation = m_pAPIAuth->getUserInformation();
-        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem));
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ()));
     }
 
     return returnIterator.release();
@@ -815,7 +817,7 @@ ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sNam
     auto pUserInformation = m_pAPIAuth->getUserInformation();
     std::string sUserUUID = pUserInformation->getUUID();
     
-    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sUserUUID);
+    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sUserUUID, m_pUISystemState->getGlobalChronoInstance ());
 }
 
 IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)

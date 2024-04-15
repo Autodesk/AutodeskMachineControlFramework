@@ -104,7 +104,7 @@ ISignalTrigger* CStateEnvironment::PrepareSignal(const std::string& sMachineInst
 	if (!m_pSystemState->stateSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
 
-	return new CSignalTrigger(m_pSystemState->getStateSignalHandlerInstance (), sMachineInstance, sSignalName);
+	return new CSignalTrigger(m_pSystemState->getStateSignalHandlerInstance (), sMachineInstance, sSignalName, m_pSystemState->getGlobalChronoInstance());
 
 }
 
@@ -119,7 +119,7 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 		std::string sCurrentSignalUUID;
 
 		if (m_pSystemState->stateSignalHandler()->checkSignal(m_sInstanceName, sSignalName, sCurrentSignalUUID)) {
-			pHandlerInstance = new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sCurrentSignalUUID);
+			pHandlerInstance = new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sCurrentSignalUUID, m_pSystemState->getGlobalChronoInstance());
 
 			return true;
 		}
@@ -143,7 +143,7 @@ ISignalHandler* CStateEnvironment::GetUnhandledSignal(const std::string& sSignal
 	std::string sCurrentSignalUUID;
 
 	if (m_pSystemState->stateSignalHandler()->checkSignal(m_sInstanceName, sSignalTypeName, sCurrentSignalUUID)) {
-		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sCurrentSignalUUID);
+		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sCurrentSignalUUID, m_pSystemState->getGlobalChronoInstance());
 	}
 
 	return nullptr;
@@ -154,7 +154,7 @@ ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& s
 	std::string sNormalizedSignalUUID = AMCCommon::CUtils::normalizeUUIDString (sUUID);
 
 	if (m_pSystemState->stateSignalHandler()->checkSignalUUID(m_sInstanceName, sNormalizedSignalUUID)) {
-		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sNormalizedSignalUUID);
+		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sNormalizedSignalUUID, m_pSystemState->getGlobalChronoInstance());
 	}
 	else {
 		if (bMustExist)
@@ -271,7 +271,7 @@ ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
 	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(m_sInstanceName);
 
 	std::string sSignalID = pGroup->getParameterValueByName(sName);
-	return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sSignalID);
+	return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sSignalID, m_pSystemState->getGlobalChronoInstance ());
 }
 
 
@@ -698,8 +698,7 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 	auto sNewUUID = AMCCommon::CUtils::createUUID();
 	
-	AMCCommon::CChrono chrono;
-	auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+	auto sTimeStamp = m_pSystemState->globalChrono ()->getUTCTimeInISO8601 ();
 
 	auto pDefinition = m_pSystemState->alertHandler()->findDefinition(sIdentifier, true);
 	auto alertDescription = pDefinition->getDescription();
@@ -738,7 +737,7 @@ IAlert* CStateEnvironment::CreateAlert(const std::string& sIdentifier, const std
 
 	// State Environments have no user context...
 	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
-	return new CAlert (pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName);
+	return new CAlert (pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName, m_pSystemState->getGlobalChronoInstance ());
 }
 
 IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
@@ -754,7 +753,7 @@ IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 	auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
 
 	std::string sCurrentUserUUID = AMCCommon::CUtils::createEmptyUUID();
-	return new CAlert(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName);
+	return new CAlert(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, m_pSystemState->getLoggerInstance (), m_sInstanceName, m_pSystemState->getGlobalChronoInstance ());
 
 }
 
@@ -786,7 +785,7 @@ IAlertIterator* CStateEnvironment::RetrieveAlerts(const bool bOnlyActive)
 		auto pAlertData = pAlertIterator->GetCurrentAlert();
 
 		// State Environments have no user context...
-		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, pLogger, m_sInstanceName));
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), sCurrentUserUUID, pLogger, m_sInstanceName, m_pSystemState->getGlobalChronoInstance ()));
 	}
 
 	return returnIterator.release();
@@ -807,7 +806,7 @@ IAlertIterator* CStateEnvironment::RetrieveAlertsByType(const std::string& sIden
 	while (pAlertIterator->MoveNext()) {
 		auto pAlertData = pAlertIterator->GetCurrentAlert();
 
-		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, pLogger, m_sInstanceName));
+		returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), sCurrentUserUUID, pLogger, m_sInstanceName, m_pSystemState->getGlobalChronoInstance ()));
 	}
 
 	return returnIterator.release();
@@ -842,7 +841,7 @@ ITempStreamWriter* CStateEnvironment::CreateTemporaryStream(const std::string& s
 
 
 	std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
-	return new CTempStreamWriter(m_pSystemState->getDataModelInstance(), sName, sMIMEType, sUserUUID);
+	return new CTempStreamWriter(m_pSystemState->getDataModelInstance(), sName, sMIMEType, sUserUUID, m_pSystemState->getGlobalChronoInstance());
 }
 
 

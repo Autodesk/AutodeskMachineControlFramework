@@ -43,10 +43,12 @@ using namespace LibMCEnv::Impl;
  Class definition of CTempStreamWriter 
 **************************************************************************************************************************/
 
-CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType, const std::string& sCurrentUserUUID)
-    : m_pDataModel(pDataModel), m_sName(sName), m_sMIMEType(sMIMEType), m_nWritePosition (0), m_bIsFinished (false)
+CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType, const std::string& sCurrentUserUUID, AMCCommon::PChrono pGlobalChrono)
+    : m_pDataModel(pDataModel), m_sName(sName), m_sMIMEType(sMIMEType), m_nWritePosition (0), m_bIsFinished (false), m_pGlobalChrono (pGlobalChrono)
 {
     if (pDataModel.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pGlobalChrono.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
     m_sUUID = AMCCommon::CUtils::createUUID();
@@ -56,7 +58,7 @@ CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std
     std::string sJournalUUID = pJournalSession->GetSessionUUID();
 
     m_pStorage = m_pDataModel->CreateStorage();
-    m_pStorage->BeginRandomWriteStream(m_sUUID, sJournalUUID, "journal", sName, sMIMEType, sCurrentUserUUID);
+    m_pStorage->BeginRandomWriteStream(m_sUUID, sJournalUUID, "journal", sName, sMIMEType, sCurrentUserUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
     m_pStorage->AttachStreamToJournal(m_sUUID, sJournalUUID);
 }
 
