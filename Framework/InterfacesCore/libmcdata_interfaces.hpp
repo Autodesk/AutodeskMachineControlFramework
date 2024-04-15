@@ -1041,8 +1041,9 @@ public:
 	/**
 	* IBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
 	* @param[in] eNewExecutionStatus - Status Value
+	* @param[in] nRelativeEndTimeStampInMicroseconds - New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp.
 	*/
-	virtual void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus) = 0;
+	virtual void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds) = 0;
 
 	/**
 	* IBuildJobExecution::GetDescription - returns the build job description.

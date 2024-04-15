@@ -1015,9 +1015,10 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetStatusPtr) (LibMCData_B
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
 * @param[in] eNewExecutionStatus - Status Value
+* @param[in] nRelativeEndTimeStampInMicroseconds - New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJobExecution_ChangeStatusPtr) (LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobExecutionStatus eNewExecutionStatus);
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_ChangeStatusPtr) (LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, LibMCData_uint64 nRelativeEndTimeStampInMicroseconds);
 
 /**
 * returns the build job description.

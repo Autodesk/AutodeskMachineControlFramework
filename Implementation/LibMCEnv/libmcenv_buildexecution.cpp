@@ -124,7 +124,7 @@ void CBuildExecution::SetStatusToFinished()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION, "can not change status of build execution" + m_sExecutionUUID);
 
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	m_pExecution->ChangeStatus (LibMCData::eBuildJobExecutionStatus::Finished);
+	m_pExecution->ChangeStatus (LibMCData::eBuildJobExecutionStatus::Finished, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
 }
 
 void CBuildExecution::SetStatusToFailed()
@@ -133,7 +133,7 @@ void CBuildExecution::SetStatusToFailed()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION, "can not change status of build execution" + m_sExecutionUUID);
 
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	m_pExecution->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed);
+	m_pExecution->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, m_pGlobalChrono->getExistenceTimeInMicroseconds());
 }
 
 std::string CBuildExecution::GetDescription()

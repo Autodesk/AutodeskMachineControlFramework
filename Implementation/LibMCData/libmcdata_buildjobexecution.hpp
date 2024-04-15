@@ -84,7 +84,7 @@ public:
 
 	LibMCData::eBuildJobExecutionStatus GetStatus() override;
 
-	void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus) override;
+	void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds) override;
 
 	std::string GetDescription() override;
 

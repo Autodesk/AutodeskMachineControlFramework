@@ -3261,7 +3261,7 @@ LibMCDataResult libmcdata_buildjobexecution_getstatus(LibMCData_BuildJobExecutio
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecution pBuildJobExecution, eLibMCDataBuildJobExecutionStatus eNewExecutionStatus)
+LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecution pBuildJobExecution, eLibMCDataBuildJobExecutionStatus eNewExecutionStatus, LibMCData_uint64 nRelativeEndTimeStampInMicroseconds)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
 
@@ -3270,7 +3270,7 @@ LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecu
 		if (!pIBuildJobExecution)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJobExecution->ChangeStatus(eNewExecutionStatus);
+		pIBuildJobExecution->ChangeStatus(eNewExecutionStatus, nRelativeEndTimeStampInMicroseconds);
 
 		return LIBMCDATA_SUCCESS;
 	}

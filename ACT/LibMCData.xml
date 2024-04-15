@@ -958,6 +958,7 @@
 
 		<method name="ChangeStatus" description="sets the new build job execution status. Will fail if current status is not InProcess.">
 			<param name="NewExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="in" description="Status Value" />	
+			<param name="RelativeEndTimeStampInMicroseconds" type="uint64" pass="in" description="New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp." />
 		</method>
 
 		<method name="GetDescription" description="returns the build job description.">

@@ -1409,7 +1409,7 @@ public:
 	inline std::string GetExecutionUUID();
 	inline std::string GetJobUUID();
 	inline eBuildJobExecutionStatus GetStatus();
-	inline void ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus);
+	inline void ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds);
 	inline std::string GetDescription();
 	inline void SetDescription(const std::string & sNewDescription);
 	inline std::string GetJournalUUID();
@@ -5881,10 +5881,11 @@ public:
 	/**
 	* CBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
 	* @param[in] eNewExecutionStatus - Status Value
+	* @param[in] nRelativeEndTimeStampInMicroseconds - New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp.
 	*/
-	void CBuildJobExecution::ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus)
+	void CBuildJobExecution::ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ChangeStatus(m_pHandle, eNewExecutionStatus));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ChangeStatus(m_pHandle, eNewExecutionStatus, nRelativeEndTimeStampInMicroseconds));
 	}
 	
 	/**

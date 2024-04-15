@@ -119,11 +119,15 @@ LibMCData::eBuildJobExecutionStatus CBuildJobExecution::GetStatus()
 	return CBuildJobExecution::convertStringToBuildJobExecutionStatus (pSelectStatement->getColumnString(1));
 }
 
-void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus)
+void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds)
 {
+
+	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nRelativeEndTimeStampInMicroseconds))
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Invalid build execution timestamp");
+
 	auto pTransaction = m_pSQLHandler->beginTransaction();
 
-	std::string sSelectQuery = "SELECT status FROM buildjobexecutions WHERE uuid=? AND active=1";
+	std::string sSelectQuery = "SELECT status, startjournaltimestamp FROM buildjobexecutions WHERE uuid=? AND active=1";
 	auto pSelectStatement = pTransaction->prepareStatement(sSelectQuery);
 	pSelectStatement->setString(1, m_sExecutionUUID);
 
@@ -131,16 +135,21 @@ void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus 
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND, "build job execution not found: " + m_sExecutionUUID);
 
 	auto eOldStatus = convertStringToBuildJobExecutionStatus(pSelectStatement->getColumnString(1));
+	int64_t nStartTimeStamp = pSelectStatement->getColumnInt64(2);
+
+	if (nStartTimeStamp < nRelativeEndTimeStampInMicroseconds)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Build execution end timestamp is before start timestamp!");
 
 	pSelectStatement = nullptr;
 
 	if (eOldStatus != eBuildJobExecutionStatus::InProcess)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONISNOTINPROCESS, "build job execution is not in process: " + m_sExecutionUUID);
 
-	std::string sUpdateQuery = "UPDATE buildjobexecutions SET status=? WHERE uuid=? AND active=1";
+	std::string sUpdateQuery = "UPDATE buildjobexecutions SET status=?, endjournaltimestamp=? WHERE uuid=? AND active=1";
 	auto pUpdateStatement = pTransaction->prepareStatement(sUpdateQuery);
 	pUpdateStatement->setString(1, convertBuildJobExecutionStatusToString (eNewExecutionStatus));
-	pUpdateStatement->setString(2, m_sExecutionUUID);
+	pUpdateStatement->setInt64(2, nRelativeEndTimeStampInMicroseconds);
+	pUpdateStatement->setString(3, m_sExecutionUUID);
 	pUpdateStatement->execute();
 
 	pTransaction->commit();
