@@ -72,19 +72,22 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 {
     LibMCAssertNotNull(pDataModel.get());
 
+    // Create Chrono Object
+    auto pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
+
     m_pEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
 
     // Create Log Multiplexer to StdOut and Database
-    auto pMultiLogger = std::make_shared<AMC::CLogger_Multi>();
-    pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel));
+    auto pMultiLogger = std::make_shared<AMC::CLogger_Multi>(pGlobalChrono);
+    pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel, pGlobalChrono));
     if (pDataModel->HasLogCallback())
-        pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel));
+        pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel, pGlobalChrono));
 
     // Create State Journal
-    m_pStateJournal = std::make_shared<CStateJournal>(std::make_shared<CStateJournalStream>(pDataModel->CreateJournalSession()));
+    m_pStateJournal = std::make_shared<CStateJournal>(std::make_shared<CStateJournalStream>(pDataModel->CreateJournalSession()), pGlobalChrono);
 
     // Create system state
-    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput");
+    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput", pGlobalChrono);
 
     // Create API Handlers for data model requests
     m_pAPI = std::make_shared<AMC::CAPI>();
@@ -241,7 +244,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         auto pDataModel = m_pSystemState->getDataModelInstance();
         auto pPersistencyHandler = pDataModel->CreatePersistencyHandler();
         for (auto pStateMachineInstance : m_InstanceList)
-            pStateMachineInstance->getParameterHandler()->loadPersistentParameters(pPersistencyHandler);
+            pStateMachineInstance->getParameterHandler()->loadPersistentParameters(pPersistencyHandler, m_pSystemState->getAbsoluteTimeStamp ());
 
         // Load User Interface
         auto userInterfaceNode = mainNode.child("userinterface");
@@ -944,12 +947,12 @@ IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI,
             throw ELibMCNoContextException(LIBMC_ERROR_INVALIDAUTHORIZATION);
 
         if (bCreateNewSession) {
-            pAuth = pSessionHandler->createNewAuthenticationSession();
+            pAuth = pSessionHandler->createNewAuthenticationSession(m_pSystemState->getGlobalChronoInstance ());
             LibMCAssertNotNull(pAuth);
             m_pSystemState->uiHandler()->populateClientVariables(pAuth->getClientVariableHandler().get());
         }
         else
-            pAuth = pSessionHandler->createEmptyAuthenticationSession();
+            pAuth = pSessionHandler->createEmptyAuthenticationSession(m_pSystemState->getGlobalChronoInstance());
 
     }
     else {
@@ -962,7 +965,7 @@ IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI,
         auto sAuthJSONString = AMCCommon::CUtils::decodeBase64ToASCIIString(sAuthorization.substr (7), AMCCommon::eBase64Type::URL);
 
 
-        pAuth = pSessionHandler->createAuthentication(sAuthJSONString);
+        pAuth = pSessionHandler->createAuthentication(sAuthJSONString, m_pSystemState->getGlobalChronoInstance ());
     }
 
      

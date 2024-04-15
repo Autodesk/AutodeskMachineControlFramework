@@ -84,7 +84,7 @@ public:
 
 	LibMCData::eBuildJobExecutionStatus GetStatus() override;
 
-	void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds) override;
+	void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970) override;
 
 	std::string GetDescription() override;
 
@@ -114,7 +114,7 @@ public:
 
 	bool HasJobExecutionDataIdentifier(const std::string& sIdentifier) override;
 
-	void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
+	void AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	bool HasMetaDataString(const std::string& sKey) override;
 

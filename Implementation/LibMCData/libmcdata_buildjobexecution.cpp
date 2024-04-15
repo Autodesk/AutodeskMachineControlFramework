@@ -119,10 +119,10 @@ LibMCData::eBuildJobExecutionStatus CBuildJobExecution::GetStatus()
 	return CBuildJobExecution::convertStringToBuildJobExecutionStatus (pSelectStatement->getColumnString(1));
 }
 
-void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds)
+void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970)
 {
 
-	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nRelativeEndTimeStampInMicroseconds))
+	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nAbsoluteEndTimeStampInMicrosecondsSince1970))
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Invalid build execution timestamp");
 
 	auto pTransaction = m_pSQLHandler->beginTransaction();
@@ -137,7 +137,7 @@ void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus 
 	auto eOldStatus = convertStringToBuildJobExecutionStatus(pSelectStatement->getColumnString(1));
 	int64_t nStartTimeStamp = pSelectStatement->getColumnInt64(2);
 
-	if (nStartTimeStamp < nRelativeEndTimeStampInMicroseconds)
+	if (nStartTimeStamp < (int64_t)nAbsoluteEndTimeStampInMicrosecondsSince1970)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Build execution end timestamp is before start timestamp!");
 
 	pSelectStatement = nullptr;
@@ -148,7 +148,7 @@ void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus 
 	std::string sUpdateQuery = "UPDATE buildjobexecutions SET status=?, endjournaltimestamp=? WHERE uuid=? AND active=1";
 	auto pUpdateStatement = pTransaction->prepareStatement(sUpdateQuery);
 	pUpdateStatement->setString(1, convertBuildJobExecutionStatusToString (eNewExecutionStatus));
-	pUpdateStatement->setInt64(2, nRelativeEndTimeStampInMicroseconds);
+	pUpdateStatement->setInt64(2, nAbsoluteEndTimeStampInMicrosecondsSince1970);
 	pUpdateStatement->setString(3, m_sExecutionUUID);
 	pUpdateStatement->execute();
 
@@ -302,16 +302,15 @@ bool CBuildJobExecution::HasJobExecutionDataIdentifier(const std::string& sIdent
 }
 
 
-void CBuildJobExecution::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+void CBuildJobExecution::AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	if (sKey.empty())
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY);
 
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID, "build job execution meta data key is invalid: " + sKey);
-
-	AMCCommon::CChrono chrono;
-	auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+	
+	auto sTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC(nAbsoluteTimeStamp);
 
 	std::string sMetaDataUUID = AMCCommon::CUtils::createUUID();
 

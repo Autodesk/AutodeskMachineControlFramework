@@ -59,15 +59,14 @@ CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pSto
 }
 
 
-void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID)
+void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID, uint64_t nAbsoluteTimeStamp)
 {
 
     auto pTransaction = m_pSQLHandler->beginTransaction();
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-    AMCCommon::CChrono chrono;
-    std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC ();
+    std::string sTimestamp = AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteTimeStamp);
 
     std::string sQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
     auto pStatement = pTransaction->prepareStatement(sQuery);
@@ -110,7 +109,7 @@ IStorageStream* CStorage::RetrieveStream(const std::string& sUUID)
     return CStorageStream::makeFromDatabase(sUUID, m_pSQLHandler, m_pStorageState);
 }
 
-void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID)
+void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     if (nContentBufferSize == 0)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUFFERSIZE);
@@ -139,7 +138,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
 	
     // From here, we lock storage database write access
     {       
-        insertDBEntry(sUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, sSHA256, sUserID);        
+        insertDBEntry(sUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, sSHA256, sUserID, nAbsoluteTimeStamp);        
     }
 
     std::string sCalculatedSHA256, sCalculatedBlockSHA256;
@@ -151,7 +150,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
  
 }
 
-void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserID)
+void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
 
     if (nSize == 0)
@@ -167,7 +166,7 @@ void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& s
 
     {
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, nSize, "", sUserID);
+        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, nSize, "", sUserID, nAbsoluteTimeStamp);
 
         auto pWriter = std::make_shared<AMCData::CStorageWriter_Partial>(sParsedUUID, m_pStorageState->getStreamPath(sUUID), nSize);
         m_pStorageState->addPartialWriter(pWriter);
@@ -241,7 +240,7 @@ void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string
 
 }
 
-void CStorage::BeginRandomWriteStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const std::string& sUserID)
+void CStorage::BeginRandomWriteStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     if (sName.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -254,7 +253,7 @@ void CStorage::BeginRandomWriteStream(const std::string& sUUID, const std::strin
 
     {
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, 0, "", sUserID);
+        insertDBEntry(sParsedUUID, sContextIdentifier, sName, sMimeType, 0, "", sUserID, nAbsoluteTimeStamp);
 
         auto pWriter = std::make_shared<AMCData::CStorageWriter_RandomAccess>(sParsedUUID, m_pStorageState->getStreamPath(sUUID));
         m_pStorageState->addPartialWriter(pWriter);
@@ -358,7 +357,7 @@ bool CStorage::StreamIsImage(const std::string& sUUID)
 }
 
 
-void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sClientFileName, const std::string& sSessionUUID, const std::string& sUserUUID) 
+void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sClientFileName, const std::string& sSessionUUID, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     std::string sNormalizedTicketUUID = AMCCommon::CUtils::normalizeUUIDString(sTicketUUID);
     std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
@@ -371,9 +370,8 @@ void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::s
     // TODO: Check invalid file name?
 
     auto pTransaction = m_pSQLHandler->beginTransaction();
-
-    AMCCommon::CChrono chrono;
-    std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC();
+    
+    std::string sTimestamp = AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteTimeStamp);
 
     std::string sStreamQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
     auto pStreamStatement = pTransaction->prepareStatement(sStreamQuery);
@@ -407,13 +405,13 @@ void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::s
 }
 
 
-void CStorage::RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID) 
+void CStorage::RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, const LibMCData_uint64 nAbsoluteTimeStamp, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID)
 {
     std::string sNormalizedTicketUUID = AMCCommon::CUtils::normalizeUUIDString(sTicketUUID);
 
     auto pTransaction = m_pSQLHandler->beginTransaction();
     AMCCommon::CChrono chrono;
-    std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC();
+    std::string sTimestamp = AMCCommon::CChrono::convertToISO8601TimeUTC(nAbsoluteTimeStamp);
 
     std::string sTicketQuery = "SELECT streamuuid, clientfilename, sessionuuid, useruuid FROM storage_downloadtickets WHERE ticketuuid=?";
     auto pTicketStatement = pTransaction->prepareStatement(sTicketQuery);

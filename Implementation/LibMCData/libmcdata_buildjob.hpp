@@ -121,7 +121,7 @@ public:
     
     bool JobCanBeArchived() override;
     
-    void AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID) override;
+    void AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
     
     IBuildJobDataIterator* ListJobDataByType(const LibMCData::eCustomDataType eDataType) override;
 
@@ -135,13 +135,13 @@ public:
 
     bool HasJobDataIdentifier(const std::string& sIdentifier) override;
 
-    void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
+    void AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
     bool HasMetaDataString(const std::string& sKey) override;
 
     std::string GetMetaDataString(const std::string& sKey) override;
 
-    IBuildJobExecution* CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds) override;
+    IBuildJobExecution* CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970) override;
 
     IBuildJobExecution* RetrieveBuildJobExecution(const std::string& sExecutionUUID) override;
 

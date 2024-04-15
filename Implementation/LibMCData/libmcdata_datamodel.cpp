@@ -53,6 +53,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 
+#include <sstream>
+#include <iomanip>
+
 using namespace LibMCData::Impl;
 
 /*************************************************************************************************************************
@@ -65,9 +68,28 @@ CDataModel::CDataModel()
     m_sSessionUUID = AMCCommon::CUtils::createUUID();
 
     AMCCommon::CChrono chrono;
-    m_sTimeFileName = chrono.getStartTimeFileName();
-    m_sStartTime = chrono.getStartTimeISO8601TimeUTC();
+    uint32_t nYear = 0;
+    uint32_t nMonth = 0;
+    uint32_t nDay = 0;
+    uint32_t nHour = 0;
+    uint32_t nMinute = 0;
+    uint32_t nSecond = 0;
+    uint32_t nMicrosecond = 0;
+    uint64_t nTimeStamp = chrono.getUTCTimeStampInMicrosecondsSince1970();
 
+    AMCCommon::CChrono::parseDateTimeFromMicrosecondsSince1970(nTimeStamp, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+    std::stringstream sstream;
+    sstream << std::setfill('0')
+        << std::setw(4) << nYear
+        << std::setw(2) << nMonth
+        << std::setw(2) << nDay << "_"
+        << std::setw(2) << nHour
+        << std::setw(2) << nMinute
+        << std::setw(2) << nSecond;
+
+    m_sTimeFileName = sstream.str();
+    m_sStartTime = AMCCommon::CChrono::convertToISO8601TimeUTC (nTimeStamp, AMCCommon::eUTCStringAccuracy::Seconds);
 
 }
 

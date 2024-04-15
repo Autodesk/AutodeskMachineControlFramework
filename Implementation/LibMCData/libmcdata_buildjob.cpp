@@ -268,7 +268,7 @@ bool CBuildJob::JobCanBeArchived()
 
 }
 
-void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID)
+void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     if (pStream == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -277,8 +277,7 @@ void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sN
     auto sStreamSHA2 = pStream->GetSHA2();
     auto nStreamSize = pStream->GetSize();
 
-    AMCCommon::CChrono chrono;
-    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+    auto sTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteTimeStamp);
     std::unique_ptr<CBuildJobData> buildJobData (CBuildJobData::createInDatabase (sIdentifier, sName, m_sUUID, eDataType, sTimeStamp, sStreamUUID, sUserID, sStreamSHA2, nStreamSize, m_pSQLHandler, m_pStorageState));
 }
 
@@ -409,7 +408,7 @@ bool CBuildJob::HasJobDataIdentifier(const std::string& sIdentifier)
 }
 
 
-void CBuildJob::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+void CBuildJob::AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     if (sKey.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY);
@@ -417,8 +416,8 @@ void CBuildJob::AddMetaDataString(const std::string& sKey, const std::string& sV
     if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYINVALID, "build job meta data key is invalid: " + sKey);
 
-    AMCCommon::CChrono chrono;
-    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+    
+    auto sTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC(nAbsoluteTimeStamp);
 
     std::string sMetaDataUUID = AMCCommon::CUtils::createUUID();
 
@@ -486,16 +485,15 @@ std::string CBuildJob::GetMetaDataString(const std::string& sKey)
     return pSelectStatement->getColumnString(1);
 }
 
-IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds)
+IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescription, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970)
 {
-    if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears (nRelativeStartTimeStampInMicroseconds))
+    if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears (nAbsoluteStartTimeStampInMicrosecondsSince1970))
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Invalid build execution timestamp");
 
     std::string sExecutionUUID = AMCCommon::CUtils::createUUID();
     std::string sJournalUUID = m_pStorageState->getSessionUUID();
 
-    AMCCommon::CChrono chrono;
-    auto sAbsoluteCreationTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+    auto sAbsoluteCreationTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteStartTimeStampInMicrosecondsSince1970);
 
     std::string sNormalizedUserUUID;
     if (!sUserUUID.empty())
@@ -508,7 +506,7 @@ IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescr
     pInsertStatement->setString(1, sExecutionUUID);
     pInsertStatement->setString(2, m_sUUID);
     pInsertStatement->setString(3, sJournalUUID);
-    pInsertStatement->setInt64(4, (int64_t)nRelativeStartTimeStampInMicroseconds);
+    pInsertStatement->setInt64(4, (int64_t)nAbsoluteStartTimeStampInMicrosecondsSince1970);
     pInsertStatement->setInt64(5, 0);
     pInsertStatement->setString(6, sUserUUID);
     pInsertStatement->setString(7, CBuildJobExecution::convertBuildJobExecutionStatusToString (LibMCData::eBuildJobExecutionStatus::InProcess));

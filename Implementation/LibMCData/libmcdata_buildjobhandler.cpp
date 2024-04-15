@@ -58,7 +58,7 @@ CBuildJobHandler::CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PS
 
 }
 
-IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID)
+IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     auto sParsedJobUUID = AMCCommon::CUtils::normalizeUUIDString(sJobUUID);
 
@@ -74,8 +74,7 @@ IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::s
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_DUPLICATEJOBUUID);
     pStatement = nullptr;
 
-    AMCCommon::CChrono chrono;
-    std::string sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+    std::string sTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC(nAbsoluteTimeStamp); 
     LibMCData::eBuildJobStatus eJobStatus = LibMCData::eBuildJobStatus::Created;
 
     std::string sInsertQuery = "INSERT INTO buildjobs (uuid, name, status, timestamp, storagestreamuuid, userid) VALUES (?, ?, ?, ?, ?, ?)";
