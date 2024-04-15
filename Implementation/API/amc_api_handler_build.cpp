@@ -151,7 +151,7 @@ void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8
 	auto pServiceHandler = m_pSystemState->serviceHandler();
 	auto pLib3MFWrapper = m_pSystemState->toolpathHandler()->getLib3MFWrapper();
 
-	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pDataModel, pBuildJob->GetUUID(), pLib3MFWrapper, pAuth->getUserName()));
+	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pDataModel, pBuildJob->GetUUID(), pLib3MFWrapper, pAuth->getUserName(), m_pSystemState->getGlobalChronoInstance ()));
 
 	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName());
 
