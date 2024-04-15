@@ -77,6 +77,12 @@ CLogger* CUIModuleEnvironment::getLogger()
 	return m_pUISystemState->getLogger().get();
 }
 
+uint64_t CUIModuleEnvironment::getAbsoluteTimeStamp()
+{
+	return m_pUISystemState->getAbsoluteTimeStamp();
+}
+
+
 PMeshHandler CUIModuleEnvironment::meshHandler()
 {
 	return m_pUISystemState->getMeshHandler ();

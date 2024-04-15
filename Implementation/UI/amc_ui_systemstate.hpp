@@ -113,6 +113,8 @@ namespace AMC {
 
 		std::string getTestOutputPath();
 		std::string getSystemUserID();
+
+		uint64_t getAbsoluteTimeStamp();
 	};
 
 }

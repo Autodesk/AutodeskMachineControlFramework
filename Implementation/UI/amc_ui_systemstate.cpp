@@ -157,6 +157,10 @@ AMCCommon::PChrono CUISystemState::getGlobalChronoInstance()
     return m_pGlobalChronoInstance;
 }
 
+uint64_t CUISystemState::getAbsoluteTimeStamp()
+{
+    return m_pGlobalChronoInstance->getUTCTimeStampInMicrosecondsSince1970();
+}
 
 
 

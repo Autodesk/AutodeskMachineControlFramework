@@ -81,6 +81,8 @@ namespace AMC {
 		CUIModule_ContentRegistry* contentRegistry ();
 		CLogger* getLogger();
 
+		uint64_t getAbsoluteTimeStamp();
+
 	};
 
 	class CUIModule {
