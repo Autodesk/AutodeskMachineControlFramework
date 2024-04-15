@@ -1088,6 +1088,57 @@ public:
 	virtual LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) = 0;
 
 	/**
+	* IBuildJobExecution::AddJobExecutionData - Adds additional data to the Job Execution.
+	* @param[in] sIdentifier - Unique identifier for the job data.
+	* @param[in] sName - Name of the job data
+	* @param[in] pStream - Storage Stream Instance
+	* @param[in] eDataType - Datatype of Job Execution data
+	* @param[in] sUserUUID - UUID of Currently authenticated user
+	*/
+	virtual void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID) = 0;
+
+	/**
+	* IBuildJobExecution::ListJobExecutionDataByType - Retrieves a list of build job execution data objects, filtered by type.
+	* @param[in] eDataType - Datatype of Job Execution data.
+	* @return Build Job Execution Data Iterator Instance.
+	*/
+	virtual IBuildJobExecutionDataIterator * ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType) = 0;
+
+	/**
+	* IBuildJobExecution::ListJobExecutionData - Retrieves a list of build job execution data objects.
+	* @return Build Job Execution Data Iterator Instance.
+	*/
+	virtual IBuildJobExecutionDataIterator * ListJobExecutionData() = 0;
+
+	/**
+	* IBuildJobExecution::RetrieveJobExecutionData - Retrieves a build job execution data instance by its uuid.
+	* @param[in] sDataUUID - Job Data UUID.
+	* @return Build Job ExecutionData Instance.
+	*/
+	virtual IBuildJobExecutionData * RetrieveJobExecutionData(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildJobExecution::RetrieveJobExecutionDataByIdentifier - Retrieves a build job execution data instance by its identifier.
+	* @param[in] sIdentifier - Job Execution Data Identifier. Fails if identifier does not exist.
+	* @return Build Job Execution Data Instance.
+	*/
+	virtual IBuildJobExecutionData * RetrieveJobExecutionDataByIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
+	* IBuildJobExecution::HasJobExecutionDataUUID - Retrieves if a build job execution data instance with a specific UUID exists in this job execution.
+	* @param[in] sUUID - Job Execution Data UUID. Fails if UUID does not exist.
+	* @return Returns true, if the job execution data exists.
+	*/
+	virtual bool HasJobExecutionDataUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IBuildJobExecution::HasJobExecutionDataIdentifier - Retrieves if a build job execution data instance with a specific identifier exists.
+	* @param[in] sIdentifier - Job Execution Data Identifier. Fails if identifier does not exist.
+	* @return Returns true, if the job execution data exists.
+	*/
+	virtual bool HasJobExecutionDataIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
 	* IBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
@@ -1120,10 +1171,10 @@ typedef IBaseSharedPtr<IBuildJobExecution> PIBuildJobExecution;
 class IBuildJobExecutionIterator : public virtual IIterator {
 public:
 	/**
-	* IBuildJobExecutionIterator::GetCurrentJobData - Returns the build job data the iterator points at.
+	* IBuildJobExecutionIterator::GetCurrentJobExecution - Returns the build job execution the iterator points at.
 	* @return returns the build job  execution instance.
 	*/
-	virtual IBuildJobExecution * GetCurrentJobData() = 0;
+	virtual IBuildJobExecution * GetCurrentJobExecution() = 0;
 
 };
 
@@ -1239,6 +1290,27 @@ public:
 	* @return Build Job Data Instance.
 	*/
 	virtual IBuildJobData * RetrieveJobData(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildJob::RetrieveJobDataByIdentifier - Retrieves a build job data instance by its identifier.
+	* @param[in] sIdentifier - Job Data Identifier. Fails if identifier does not exist.
+	* @return Build Job Data Instance.
+	*/
+	virtual IBuildJobData * RetrieveJobDataByIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
+	* IBuildJob::HasJobDataUUID - Retrieves if a build job data instance with a specific UUID exists.
+	* @param[in] sUUID - Job Data UUID. Fails if UUID does not exist.
+	* @return Returns true, if the job data exists.
+	*/
+	virtual bool HasJobDataUUID(const std::string & sUUID) = 0;
+
+	/**
+	* IBuildJob::HasJobDataIdentifier - Retrieves if a build job data instance with a specific identifier exists.
+	* @param[in] sIdentifier - Job Data Identifier. Fails if identifier does not exist.
+	* @return Returns true, if the job data exists.
+	*/
+	virtual bool HasJobDataIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
 	* IBuildJob::AddMetaDataString - Adds a Metadata String to the build job.

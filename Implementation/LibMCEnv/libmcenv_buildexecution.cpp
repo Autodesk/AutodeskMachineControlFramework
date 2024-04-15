@@ -36,6 +36,8 @@ Abstract: This is a stub class definition of CBuildExecution
 
 // Include custom headers here.
 #include "libmcenv_build.hpp"
+#include "libmcenv_discretefielddata2d.hpp"
+
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 
@@ -215,22 +217,65 @@ LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
 
 std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pStorage = m_pDataModel->CreateStorage();
+
+	auto sDataUUID = AMCCommon::CUtils::createUUID();
+	auto sSystemUserID = m_sSystemUserID;
+
+	pStorage->StoreNewStream(sDataUUID, m_pExecution->GetExecutionUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
+
+	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
+	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID);
+
+	return sDataUUID;
 }
 
 IDiscreteFieldData2D * CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = m_pExecution->RetrieveJobExecutionDataByIdentifier(sContextIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	auto pFieldData2D = AMC::CDiscreteFieldData2DInstance::createFromBuffer(Buffer);
+	return new CDiscreteFieldData2D(pFieldData2D);
 }
 
 IDiscreteFieldData2D * CBuildExecution::LoadDiscreteField2DByUUID(const std::string & sDataUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = m_pExecution->RetrieveJobExecutionData(AMCCommon::CUtils::normalizeUUIDString (sDataUUID));
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	auto pFieldData2D = AMC::CDiscreteFieldData2DInstance::createFromBuffer(Buffer);
+	return new CDiscreteFieldData2D(pFieldData2D);
+
 }
 
 std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	if (pFieldDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto pFieldDataImplInstance = dynamic_cast<CDiscreteFieldData2D*> (pFieldDataInstance);
+	if (pFieldDataImplInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+	auto pFieldData2D = pFieldDataImplInstance->getInstance();
+
+	std::vector<uint8_t> Buffer;
+	pFieldData2D->saveToBuffer(Buffer);
+
+	if (Buffer.size() == 0)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA);
+
+	return AddBinaryData(sContextIdentifier, sName, "application/amcf-discretefield2d", Buffer.size(), Buffer.data());
+
 }
 
 IImageData * CBuildExecution::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
@@ -245,7 +290,27 @@ IImageData * CBuildExecution::LoadPNGImageByUUID(const std::string & sDataUUID)
 
 std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pImageDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	uint64_t nNeededCount = 0;
+	std::unique_ptr<LibMCEnv::Impl::IPNGImageData> pPNGImage(pImageDataInstance->CreatePNGImage(pStoreOptions));
+	pPNGImage->GetPNGDataStream(0, &nNeededCount, nullptr); 
+
+	if (nNeededCount == 0)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE);
+
+	std::vector<uint8_t> pngBuffer;
+	pngBuffer.resize(nNeededCount);
+
+	uint64_t nWrittenCount = 0;
+	pPNGImage->GetPNGDataStream(pngBuffer.size (), &nWrittenCount, pngBuffer.data ());
+
+	if (nWrittenCount != pngBuffer.size())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM);
+
+	return AddBinaryData(sContextIdentifier, sName, "image/png", pngBuffer.size(), pngBuffer.data());
+
 }
 
 void CBuildExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)

@@ -70,6 +70,10 @@ private:
 
 public:
 
+	static CBuildJobExecution* makeFrom(CBuildJobExecution * pBuildJobExecution);
+
+	static std::shared_ptr<CBuildJobExecution> makeSharedFrom(CBuildJobExecution* pBuildJobExecution);
+
 	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string & sExecutionUUID, AMCData::PStorageState pStorageState);
 
 	virtual ~CBuildJobExecution();
@@ -95,6 +99,20 @@ public:
 	LibMCData_uint64 GetEndTimeStampInMicroseconds() override;
 
 	LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) override;
+
+	void AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID) override;
+
+	IBuildJobExecutionDataIterator* ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType) override;
+
+	IBuildJobExecutionDataIterator* ListJobExecutionData() override;
+
+	IBuildJobExecutionData* RetrieveJobExecutionData(const std::string& sDataUUID) override;
+
+	IBuildJobExecutionData* RetrieveJobExecutionDataByIdentifier(const std::string& sIdentifier) override;
+
+	bool HasJobExecutionDataUUID(const std::string& sUUID) override;
+
+	bool HasJobExecutionDataIdentifier(const std::string& sIdentifier) override;
 
 	void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
 

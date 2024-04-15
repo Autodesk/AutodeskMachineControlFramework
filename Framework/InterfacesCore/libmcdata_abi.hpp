@@ -1103,6 +1103,78 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getendtimestampin
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, LibMCData_uint64 * pElapsedTimeInMicroseconds);
 
 /**
+* Adds additional data to the Job Execution.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pIdentifier - Unique identifier for the job data.
+* @param[in] pName - Name of the job data
+* @param[in] pStream - Storage Stream Instance
+* @param[in] eDataType - Datatype of Job Execution data
+* @param[in] pUserUUID - UUID of Currently authenticated user
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID);
+
+/**
+* Retrieves a list of build job execution data objects, filtered by type.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] eDataType - Datatype of Job Execution data.
+* @param[out] pIteratorInstance - Build Job Execution Data Iterator Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_listjobexecutiondatabytype(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eCustomDataType eDataType, LibMCData_BuildJobExecutionDataIterator * pIteratorInstance);
+
+/**
+* Retrieves a list of build job execution data objects.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[out] pIteratorInstance - Build Job Execution Data Iterator Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_listjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_BuildJobExecutionDataIterator * pIteratorInstance);
+
+/**
+* Retrieves a build job execution data instance by its uuid.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pDataUUID - Job Data UUID.
+* @param[out] pBuildJobExecutionData - Build Job ExecutionData Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_retrievejobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pDataUUID, LibMCData_BuildJobExecutionData * pBuildJobExecutionData);
+
+/**
+* Retrieves a build job execution data instance by its identifier.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pIdentifier - Job Execution Data Identifier. Fails if identifier does not exist.
+* @param[out] pBuildJobExecutionData - Build Job Execution Data Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_retrievejobexecutiondatabyidentifier(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, LibMCData_BuildJobExecutionData * pBuildJobExecutionData);
+
+/**
+* Retrieves if a build job execution data instance with a specific UUID exists in this job execution.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pUUID - Job Execution Data UUID. Fails if UUID does not exist.
+* @param[out] pHasJobExecutionData - Returns true, if the job execution data exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_hasjobexecutiondatauuid(LibMCData_BuildJobExecution pBuildJobExecution, const char * pUUID, bool * pHasJobExecutionData);
+
+/**
+* Retrieves if a build job execution data instance with a specific identifier exists.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] pIdentifier - Job Execution Data Identifier. Fails if identifier does not exist.
+* @param[out] pHasJobExecutionData - Returns true, if the job execution data exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_hasjobexecutiondataidentifier(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, bool * pHasJobExecutionData);
+
+/**
 * Adds a Metadata String to the build job.
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
@@ -1139,13 +1211,13 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getmetadatastring
 **************************************************************************************************************************/
 
 /**
-* Returns the build job data the iterator points at.
+* Returns the build job execution the iterator points at.
 *
 * @param[in] pBuildJobExecutionIterator - BuildJobExecutionIterator instance.
 * @param[out] pCurrentInstance - returns the build job  execution instance.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecutioniterator_getcurrentjobdata(LibMCData_BuildJobExecutionIterator pBuildJobExecutionIterator, LibMCData_BuildJobExecution * pCurrentInstance);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecutioniterator_getcurrentjobexecution(LibMCData_BuildJobExecutionIterator pBuildJobExecutionIterator, LibMCData_BuildJobExecution * pCurrentInstance);
 
 /*************************************************************************************************************************
  Class definition for BuildJob
@@ -1313,6 +1385,36 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdata(LibMCData_Buil
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievejobdata(LibMCData_BuildJob pBuildJob, const char * pDataUUID, LibMCData_BuildJobData * pBuildJobData);
+
+/**
+* Retrieves a build job data instance by its identifier.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pIdentifier - Job Data Identifier. Fails if identifier does not exist.
+* @param[out] pBuildJobData - Build Job Data Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievejobdatabyidentifier(LibMCData_BuildJob pBuildJob, const char * pIdentifier, LibMCData_BuildJobData * pBuildJobData);
+
+/**
+* Retrieves if a build job data instance with a specific UUID exists.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pUUID - Job Data UUID. Fails if UUID does not exist.
+* @param[out] pHasJobData - Returns true, if the job data exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_hasjobdatauuid(LibMCData_BuildJob pBuildJob, const char * pUUID, bool * pHasJobData);
+
+/**
+* Retrieves if a build job data instance with a specific identifier exists.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pIdentifier - Job Data Identifier. Fails if identifier does not exist.
+* @param[out] pHasJobData - Returns true, if the job data exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_hasjobdataidentifier(LibMCData_BuildJob pBuildJob, const char * pIdentifier, bool * pHasJobData);
 
 /**
 * Adds a Metadata String to the build job.

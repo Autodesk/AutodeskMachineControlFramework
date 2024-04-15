@@ -27,16 +27,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildJobIterator
+Abstract: This is the class declaration of CBuildJobExecutionDataIterator
 
 */
 
 
-#ifndef __LIBMCDATA_BUILDJOBITERATOR
-#define __LIBMCDATA_BUILDJOBITERATOR
+#ifndef __LIBMCDATA_BUILDJOBEXECUTIONDATAITERATOR
+#define __LIBMCDATA_BUILDJOBEXECUTIONDATAITERATOR
 
 #include "libmcdata_interfaces.hpp"
-#include "libmcdata_buildjob.hpp"
 
 // Parent classes
 #include "libmcdata_iterator.hpp"
@@ -53,27 +52,34 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildJobIterator 
+ Class declaration of CBuildJobExecutionDataIterator 
 **************************************************************************************************************************/
 
-class CBuildJobIterator : public virtual IBuildJobIterator, public virtual CIterator {
+class CBuildJobExecutionDataIterator : public virtual IBuildJobExecutionDataIterator, public virtual CIterator {
 private:
+
+	/**
+	* Put private members here.
+	*/
 
 protected:
 
+	/**
+	* Put protected members here.
+	*/
+
 public:
 
-    CBuildJobIterator();
+	/**
+	* Put additional public members here. They will not be visible in the external API.
+	*/
 
-    virtual ~CBuildJobIterator();
 
-    IBase* GetCurrent() override;
+	/**
+	* Public member functions to implement.
+	*/
 
-    IBuildJob * GetCurrentJob() override;
-
-    IIterator* Clone() override;
-
-    void AddJob(std::shared_ptr<CBuildJob> pBuildJob);
+	IBuildJobExecutionData * GetCurrentJobExecutionData() override;
 
 };
 
@@ -83,4 +89,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_BUILDJOBITERATOR
+#endif // __LIBMCDATA_BUILDJOBEXECUTIONDATAITERATOR

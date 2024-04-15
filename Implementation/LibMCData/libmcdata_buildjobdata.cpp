@@ -101,13 +101,13 @@ CBuildJobData* CBuildJobData::createInDatabase(const std::string& sIdentifier, c
     std::string sInsertQuery = "INSERT INTO buildjobdata (uuid, jobuuid, identifier, name, datatype, timestamp, storagestreamuuid, userid, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)";
     auto pInsertStatement = pSQLHandler->prepareStatement(sInsertQuery);
     pInsertStatement->setString(1, sUUID);
-    pInsertStatement->setString(2, sJobUUID);
+    pInsertStatement->setString(2, AMCCommon::CUtils::normalizeUUIDString (sJobUUID));
     pInsertStatement->setString(3, sIdentifier);
     pInsertStatement->setString(4, sName);
     pInsertStatement->setString(5, convertCustomDataTypeToString(eDataType));
     pInsertStatement->setString(6, sTimeStamp);
-    pInsertStatement->setString(7, sStorageStreamUUID);
-    pInsertStatement->setString(8, sUserID);
+    pInsertStatement->setString(7, AMCCommon::CUtils::normalizeUUIDString (sStorageStreamUUID));
+    pInsertStatement->setString(8, AMCCommon::CUtils::normalizeUUIDString (sUserID));
     pInsertStatement->execute();
 
     return make(sUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, pSQLHandler, pStorageState);

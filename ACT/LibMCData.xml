@@ -380,7 +380,9 @@
 		<error name="BUILDJOBEXECUTIONMETADATAKEYEMPTY" code="380" description="Build job execution metadata key is empty." />								
 		<error name="BUILDJOBEXECUTIONMETADATAKEYINVALID" code="381" description="Build job execution metadata key is invalid." />								
 		<error name="BUILDJOBEXECUTIONMETADATAKEYNOTFOUND" code="382" description="Build job execution metadata key not found." />								
-		<error name="BUILDJOBEXECUTIONMETADATAKEYDUPLICATE" code="383" description="Build job execution metadata key is duplicate." />										
+		<error name="BUILDJOBEXECUTIONMETADATAKEYDUPLICATE" code="383" description="Build job execution metadata key is duplicate." />												
+		<error name="EMPTYJOBDATAIDENTIFIER" code="384" description="Empty job data identifier." />								
+		
 		
 	</errors>
 	
@@ -987,6 +989,43 @@
 			<param name="ElapsedTimeInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
 		</method>
 
+		<method name="AddJobExecutionData" description="Adds additional data to the Job Execution.">
+			<param name="Identifier" type="string" pass="in" description="Unique identifier for the job data." />
+			<param name="Name" type="string" pass="in" description="Name of the job data" />
+			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job Execution data" />
+			<param name="UserUUID" type="string" pass="in" description="UUID of Currently authenticated user" />
+		</method>
+
+		<method name="ListJobExecutionDataByType" description="Retrieves a list of build job execution data objects, filtered by type.">
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job Execution data." />	
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionDataIterator" pass="return" description="Build Job Execution Data Iterator Instance." />
+		</method>
+
+		<method name="ListJobExecutionData" description="Retrieves a list of build job execution data objects.">
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionDataIterator" pass="return" description="Build Job Execution Data Iterator Instance." />
+		</method>
+		
+		<method name="RetrieveJobExecutionData" description="Retrieves a build job execution data instance by its uuid.">
+			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
+			<param name="BuildJobExecutionData" type="class" class="BuildJobExecutionData" pass="return" description="Build Job ExecutionData Instance." />
+		</method>
+
+		<method name="RetrieveJobExecutionDataByIdentifier" description="Retrieves a build job execution data instance by its identifier.">
+			<param name="Identifier" type="string" pass="in" description="Job Execution Data Identifier. Fails if identifier does not exist." />	
+			<param name="BuildJobExecutionData" type="class" class="BuildJobExecutionData" pass="return" description="Build Job Execution Data Instance." />
+		</method>
+
+		<method name="HasJobExecutionDataUUID" description="Retrieves if a build job execution data instance with a specific UUID exists in this job execution.">
+			<param name="UUID" type="string" pass="in" description="Job Execution Data UUID. Fails if UUID does not exist." />	
+			<param name="HasJobExecutionData" type="bool" pass="return" description="Returns true, if the job execution data exists." />
+		</method>
+		
+		<method name="HasJobExecutionDataIdentifier" description="Retrieves if a build job execution data instance with a specific identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Job Execution Data Identifier. Fails if identifier does not exist." />	
+			<param name="HasJobExecutionData" type="bool" pass="return" description="Returns true, if the job execution data exists." />
+		</method>
+
 		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
@@ -1006,7 +1045,7 @@
 
     <!-- The BuildJobExecutionIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobExecutionIterator" parent="Iterator">
-		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
+		<method name="GetCurrentJobExecution" description="Returns the build job execution the iterator points at.">
 			<param name="CurrentInstance" type="handle" class="BuildJobExecution" pass="return" description="returns the build job  execution instance."/>
 		</method>
 	</class>
@@ -1083,7 +1122,22 @@
 			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
 			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
 		</method>
+
+		<method name="RetrieveJobDataByIdentifier" description="Retrieves a build job data instance by its identifier.">
+			<param name="Identifier" type="string" pass="in" description="Job Data Identifier. Fails if identifier does not exist." />	
+			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
+		</method>
+
+		<method name="HasJobDataUUID" description="Retrieves if a build job data instance with a specific UUID exists.">
+			<param name="UUID" type="string" pass="in" description="Job Data UUID. Fails if UUID does not exist." />	
+			<param name="HasJobData" type="bool" pass="return" description="Returns true, if the job data exists." />
+		</method>
 		
+		<method name="HasJobDataIdentifier" description="Retrieves if a build job data instance with a specific identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Job Data Identifier. Fails if identifier does not exist." />	
+			<param name="HasJobData" type="bool" pass="return" description="Returns true, if the job data exists." />
+		</method>
+
 		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />

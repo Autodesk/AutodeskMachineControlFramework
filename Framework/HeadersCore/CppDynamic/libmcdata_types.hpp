@@ -408,6 +408,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID 381 /** Build job execution metadata key is invalid. */
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND 382 /** Build job execution metadata key not found. */
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE 383 /** Build job execution metadata key is duplicate. */
+#define LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER 384 /** Empty job data identifier. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -728,6 +729,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "Build job execution metadata key is invalid.";
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "Build job execution metadata key not found.";
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "Build job execution metadata key is duplicate.";
+    case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "Empty job data identifier.";
     default: return "unknown error";
   }
 }

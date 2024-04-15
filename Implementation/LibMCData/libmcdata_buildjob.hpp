@@ -129,6 +129,12 @@ public:
 
     IBuildJobData* RetrieveJobData(const std::string& sDataUUID) override;
 
+    IBuildJobData* RetrieveJobDataByIdentifier(const std::string& sIdentifier) override;
+
+    bool HasJobDataUUID(const std::string& sUUID) override;
+
+    bool HasJobDataIdentifier(const std::string& sIdentifier) override;
+
     void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
 
     bool HasMetaDataString(const std::string& sKey) override;
@@ -142,7 +148,6 @@ public:
     IBuildJobExecutionIterator* RetrieveBuildJobExecutions(const std::string& sJournalUUIDFilter) override;
 
     IBuildJobExecutionIterator* RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string& sJournalUUIDFilter) override;
-
 
     static std::string convertBuildJobStatusToString(const LibMCData::eBuildJobStatus eStatus);
     static LibMCData::eBuildJobStatus convertStringToBuildJobStatus(const std::string& sValue);

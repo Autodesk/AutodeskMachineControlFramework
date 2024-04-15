@@ -277,11 +277,8 @@ std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const s
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 	uint64_t nNeededCount = 0;
-	/*std::unique_ptr<LibMCEnv::Impl::IPNGImageData> pPNGImage(pImageDataInstance->CreatePNGImage(pStoreOptions));
-	pPNGImage->GetPNGDataStream(0, &nNeededCount, nullptr); */
-
-	pImageDataInstance->EncodePNG();
-	pImageDataInstance->GetEncodedPNGData(0, &nNeededCount, nullptr);
+	std::unique_ptr<LibMCEnv::Impl::IPNGImageData> pPNGImage(pImageDataInstance->CreatePNGImage(pStoreOptions));
+	pPNGImage->GetPNGDataStream(0, &nNeededCount, nullptr); 
 
 	if (nNeededCount == 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE);
@@ -290,8 +287,7 @@ std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const s
 	pngBuffer.resize(nNeededCount);
 
 	uint64_t nWrittenCount = 0;
-	pImageDataInstance->GetEncodedPNGData(pngBuffer.size(), &nWrittenCount, pngBuffer.data());
-	//pPNGImage->GetPNGDataStream(pngBuffer.size (), &nWrittenCount, pngBuffer.data ());
+	pPNGImage->GetPNGDataStream(pngBuffer.size (), &nWrittenCount, pngBuffer.data ());
 
 	if (nWrittenCount != pngBuffer.size())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM);

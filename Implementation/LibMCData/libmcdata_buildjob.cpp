@@ -342,20 +342,70 @@ IBuildJobDataIterator* CBuildJob::ListJobData()
     return listJobDataEx(pStatement.get());
 }
 
+
 IBuildJobData* CBuildJob::RetrieveJobData(const std::string& sDataUUID)
 {
+    std::string sNormalizedDataUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+
     std::unique_ptr<CBuildJobDataIterator> buildJobIterator(new CBuildJobDataIterator());
 
     std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobdata.uuid=? AND active=?";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, m_sUUID);
-    pStatement->setString(2, sDataUUID);
+    pStatement->setString(2, sNormalizedDataUUID);
     pStatement->setInt(3, 1);
 
     if (!pStatement->nextRow())
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBDATANOTFOUND);
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBDATANOTFOUND, "build job data not found: " + sNormalizedDataUUID);
     
     return makeJobDataEx(pStatement.get());
+}
+
+IBuildJobData* CBuildJob::RetrieveJobDataByIdentifier(const std::string& sIdentifier)
+{
+    if (sIdentifier.empty ())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER, "empty job data identifier");
+
+    std::unique_ptr<CBuildJobDataIterator> buildJobIterator(new CBuildJobDataIterator());
+
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobdata.identifier=? AND active=?";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, m_sUUID);
+    pStatement->setString(2, sIdentifier);
+    pStatement->setInt(3, 1);
+
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBDATANOTFOUND, "build job data not found: " + sIdentifier);
+
+    return makeJobDataEx(pStatement.get());
+
+}
+
+bool CBuildJob::HasJobDataUUID(const std::string& sUUID)
+{
+    std::string sNormalizedDataUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    std::string sQuery = "SELECT buildjobdata.uuid FROM buildjobdata WHERE jobuuid=? AND buildjobdata.uuid=? AND active=?";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, m_sUUID);
+    pStatement->setString(2, sNormalizedDataUUID);
+    pStatement->setInt(3, 1);
+
+    return (pStatement->nextRow());
+}
+
+bool CBuildJob::HasJobDataIdentifier(const std::string& sIdentifier)
+{
+    if (sIdentifier.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER, "empty job data identifier");
+
+    std::string sQuery = "SELECT buildjobdata.uuid FROM buildjobdata WHERE jobuuid=? AND buildjobdata.identifier=? AND active=?";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, m_sUUID);
+    pStatement->setString(2, sIdentifier);
+    pStatement->setInt(3, 1);
+
+    return (pStatement->nextRow());
 }
 
 

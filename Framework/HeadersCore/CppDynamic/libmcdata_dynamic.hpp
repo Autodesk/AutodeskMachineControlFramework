@@ -565,6 +565,7 @@ public:
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "BUILDJOBEXECUTIONMETADATAKEYINVALID";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "BUILDJOBEXECUTIONMETADATAKEYNOTFOUND";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "BUILDJOBEXECUTIONMETADATAKEYDUPLICATE";
+			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "EMPTYJOBDATAIDENTIFIER";
 		}
 		return "UNKNOWN";
 	}
@@ -885,6 +886,7 @@ public:
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "Build job execution metadata key is invalid.";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "Build job execution metadata key not found.";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "Build job execution metadata key is duplicate.";
+			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "Empty job data identifier.";
 		}
 		return "unknown error";
 	}
@@ -1415,6 +1417,13 @@ public:
 	inline LibMCData_uint64 GetStartTimeStampInMicroseconds();
 	inline LibMCData_uint64 GetEndTimeStampInMicroseconds();
 	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds);
+	inline void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID);
+	inline PBuildJobExecutionDataIterator ListJobExecutionDataByType(const eCustomDataType eDataType);
+	inline PBuildJobExecutionDataIterator ListJobExecutionData();
+	inline PBuildJobExecutionData RetrieveJobExecutionData(const std::string & sDataUUID);
+	inline PBuildJobExecutionData RetrieveJobExecutionDataByIdentifier(const std::string & sIdentifier);
+	inline bool HasJobExecutionDataUUID(const std::string & sUUID);
+	inline bool HasJobExecutionDataIdentifier(const std::string & sIdentifier);
 	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
@@ -1434,7 +1443,7 @@ public:
 	{
 	}
 	
-	inline PBuildJobExecution GetCurrentJobData();
+	inline PBuildJobExecution GetCurrentJobExecution();
 };
 	
 /*************************************************************************************************************************
@@ -1468,6 +1477,9 @@ public:
 	inline PBuildJobDataIterator ListJobDataByType(const eCustomDataType eDataType);
 	inline PBuildJobDataIterator ListJobData();
 	inline PBuildJobData RetrieveJobData(const std::string & sDataUUID);
+	inline PBuildJobData RetrieveJobDataByIdentifier(const std::string & sIdentifier);
+	inline bool HasJobDataUUID(const std::string & sUUID);
+	inline bool HasJobDataIdentifier(const std::string & sIdentifier);
 	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
@@ -1841,10 +1853,17 @@ public:
 		pWrapperTable->m_BuildJobExecution_GetStartTimeStampInMicroseconds = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetEndTimeStampInMicroseconds = nullptr;
 		pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds = nullptr;
+		pWrapperTable->m_BuildJobExecution_AddJobExecutionData = nullptr;
+		pWrapperTable->m_BuildJobExecution_ListJobExecutionDataByType = nullptr;
+		pWrapperTable->m_BuildJobExecution_ListJobExecutionData = nullptr;
+		pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionData = nullptr;
+		pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier = nullptr;
+		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataUUID = nullptr;
+		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier = nullptr;
 		pWrapperTable->m_BuildJobExecution_AddMetaDataString = nullptr;
 		pWrapperTable->m_BuildJobExecution_HasMetaDataString = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetMetaDataString = nullptr;
-		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData = nullptr;
+		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobExecution = nullptr;
 		pWrapperTable->m_BuildJob_GetUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetName = nullptr;
 		pWrapperTable->m_BuildJob_GetStatus = nullptr;
@@ -1862,6 +1881,9 @@ public:
 		pWrapperTable->m_BuildJob_ListJobDataByType = nullptr;
 		pWrapperTable->m_BuildJob_ListJobData = nullptr;
 		pWrapperTable->m_BuildJob_RetrieveJobData = nullptr;
+		pWrapperTable->m_BuildJob_RetrieveJobDataByIdentifier = nullptr;
+		pWrapperTable->m_BuildJob_HasJobDataUUID = nullptr;
+		pWrapperTable->m_BuildJob_HasJobDataIdentifier = nullptr;
 		pWrapperTable->m_BuildJob_AddMetaDataString = nullptr;
 		pWrapperTable->m_BuildJob_HasMetaDataString = nullptr;
 		pWrapperTable->m_BuildJob_GetMetaDataString = nullptr;
@@ -2802,6 +2824,69 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_AddJobExecutionData = (PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_addjobexecutiondata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_AddJobExecutionData = (PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_addjobexecutiondata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_AddJobExecutionData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_ListJobExecutionDataByType = (PLibMCDataBuildJobExecution_ListJobExecutionDataByTypePtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_listjobexecutiondatabytype");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_ListJobExecutionDataByType = (PLibMCDataBuildJobExecution_ListJobExecutionDataByTypePtr) dlsym(hLibrary, "libmcdata_buildjobexecution_listjobexecutiondatabytype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_ListJobExecutionDataByType == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_ListJobExecutionData = (PLibMCDataBuildJobExecution_ListJobExecutionDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_listjobexecutiondata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_ListJobExecutionData = (PLibMCDataBuildJobExecution_ListJobExecutionDataPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_listjobexecutiondata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_ListJobExecutionData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionData = (PLibMCDataBuildJobExecution_RetrieveJobExecutionDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_retrievejobexecutiondata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionData = (PLibMCDataBuildJobExecution_RetrieveJobExecutionDataPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_retrievejobexecutiondata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier = (PLibMCDataBuildJobExecution_RetrieveJobExecutionDataByIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_retrievejobexecutiondatabyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier = (PLibMCDataBuildJobExecution_RetrieveJobExecutionDataByIdentifierPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_retrievejobexecutiondatabyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataUUID = (PLibMCDataBuildJobExecution_HasJobExecutionDataUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_hasjobexecutiondatauuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataUUID = (PLibMCDataBuildJobExecution_HasJobExecutionDataUUIDPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_hasjobexecutiondatauuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_HasJobExecutionDataUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier = (PLibMCDataBuildJobExecution_HasJobExecutionDataIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_hasjobexecutiondataidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier = (PLibMCDataBuildJobExecution_HasJobExecutionDataIdentifierPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_hasjobexecutiondataidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJobExecution_AddMetaDataString = (PLibMCDataBuildJobExecution_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_addmetadatastring");
 		#else // _WIN32
 		pWrapperTable->m_BuildJobExecution_AddMetaDataString = (PLibMCDataBuildJobExecution_AddMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_addmetadatastring");
@@ -2829,12 +2914,12 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData = (PLibMCDataBuildJobExecutionIterator_GetCurrentJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecutioniterator_getcurrentjobdata");
+		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobExecution = (PLibMCDataBuildJobExecutionIterator_GetCurrentJobExecutionPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecutioniterator_getcurrentjobexecution");
 		#else // _WIN32
-		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData = (PLibMCDataBuildJobExecutionIterator_GetCurrentJobDataPtr) dlsym(hLibrary, "libmcdata_buildjobexecutioniterator_getcurrentjobdata");
+		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobExecution = (PLibMCDataBuildJobExecutionIterator_GetCurrentJobExecutionPtr) dlsym(hLibrary, "libmcdata_buildjobexecutioniterator_getcurrentjobexecution");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData == nullptr)
+		if (pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobExecution == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2988,6 +3073,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJob_RetrieveJobData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_RetrieveJobDataByIdentifier = (PLibMCDataBuildJob_RetrieveJobDataByIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_retrievejobdatabyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_RetrieveJobDataByIdentifier = (PLibMCDataBuildJob_RetrieveJobDataByIdentifierPtr) dlsym(hLibrary, "libmcdata_buildjob_retrievejobdatabyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_RetrieveJobDataByIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_HasJobDataUUID = (PLibMCDataBuildJob_HasJobDataUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_hasjobdatauuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_HasJobDataUUID = (PLibMCDataBuildJob_HasJobDataUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_hasjobdatauuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_HasJobDataUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_HasJobDataIdentifier = (PLibMCDataBuildJob_HasJobDataIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_hasjobdataidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_HasJobDataIdentifier = (PLibMCDataBuildJob_HasJobDataIdentifierPtr) dlsym(hLibrary, "libmcdata_buildjob_hasjobdataidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_HasJobDataIdentifier == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4077,6 +4189,34 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_ComputeElapsedTimeInMicroseconds == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_addjobexecutiondata", (void**)&(pWrapperTable->m_BuildJobExecution_AddJobExecutionData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_AddJobExecutionData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_listjobexecutiondatabytype", (void**)&(pWrapperTable->m_BuildJobExecution_ListJobExecutionDataByType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_ListJobExecutionDataByType == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_listjobexecutiondata", (void**)&(pWrapperTable->m_BuildJobExecution_ListJobExecutionData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_ListJobExecutionData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_retrievejobexecutiondata", (void**)&(pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_retrievejobexecutiondatabyidentifier", (void**)&(pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_hasjobexecutiondatauuid", (void**)&(pWrapperTable->m_BuildJobExecution_HasJobExecutionDataUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_HasJobExecutionDataUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_hasjobexecutiondataidentifier", (void**)&(pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjobexecution_addmetadatastring", (void**)&(pWrapperTable->m_BuildJobExecution_AddMetaDataString));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_AddMetaDataString == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4089,8 +4229,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetMetaDataString == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_buildjobexecutioniterator_getcurrentjobdata", (void**)&(pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobData == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_buildjobexecutioniterator_getcurrentjobexecution", (void**)&(pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobExecution == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getuuid", (void**)&(pWrapperTable->m_BuildJob_GetUUID));
@@ -4159,6 +4299,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_retrievejobdata", (void**)&(pWrapperTable->m_BuildJob_RetrieveJobData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_RetrieveJobData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_retrievejobdatabyidentifier", (void**)&(pWrapperTable->m_BuildJob_RetrieveJobDataByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_RetrieveJobDataByIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_hasjobdatauuid", (void**)&(pWrapperTable->m_BuildJob_HasJobDataUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_HasJobDataUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_hasjobdataidentifier", (void**)&(pWrapperTable->m_BuildJob_HasJobDataIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_HasJobDataIdentifier == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_addmetadatastring", (void**)&(pWrapperTable->m_BuildJob_AddMetaDataString));
@@ -5827,6 +5979,109 @@ public:
 	}
 	
 	/**
+	* CBuildJobExecution::AddJobExecutionData - Adds additional data to the Job Execution.
+	* @param[in] sIdentifier - Unique identifier for the job data.
+	* @param[in] sName - Name of the job data
+	* @param[in] pStream - Storage Stream Instance
+	* @param[in] eDataType - Datatype of Job Execution data
+	* @param[in] sUserUUID - UUID of Currently authenticated user
+	*/
+	void CBuildJobExecution::AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID)
+	{
+		LibMCDataHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str()));
+	}
+	
+	/**
+	* CBuildJobExecution::ListJobExecutionDataByType - Retrieves a list of build job execution data objects, filtered by type.
+	* @param[in] eDataType - Datatype of Job Execution data.
+	* @return Build Job Execution Data Iterator Instance.
+	*/
+	PBuildJobExecutionDataIterator CBuildJobExecution::ListJobExecutionDataByType(const eCustomDataType eDataType)
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ListJobExecutionDataByType(m_pHandle, eDataType, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionDataIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuildJobExecution::ListJobExecutionData - Retrieves a list of build job execution data objects.
+	* @return Build Job Execution Data Iterator Instance.
+	*/
+	PBuildJobExecutionDataIterator CBuildJobExecution::ListJobExecutionData()
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ListJobExecutionData(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionDataIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuildJobExecution::RetrieveJobExecutionData - Retrieves a build job execution data instance by its uuid.
+	* @param[in] sDataUUID - Job Data UUID.
+	* @return Build Job ExecutionData Instance.
+	*/
+	PBuildJobExecutionData CBuildJobExecution::RetrieveJobExecutionData(const std::string & sDataUUID)
+	{
+		LibMCDataHandle hBuildJobExecutionData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_RetrieveJobExecutionData(m_pHandle, sDataUUID.c_str(), &hBuildJobExecutionData));
+		
+		if (!hBuildJobExecutionData) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionData>(m_pWrapper, hBuildJobExecutionData);
+	}
+	
+	/**
+	* CBuildJobExecution::RetrieveJobExecutionDataByIdentifier - Retrieves a build job execution data instance by its identifier.
+	* @param[in] sIdentifier - Job Execution Data Identifier. Fails if identifier does not exist.
+	* @return Build Job Execution Data Instance.
+	*/
+	PBuildJobExecutionData CBuildJobExecution::RetrieveJobExecutionDataByIdentifier(const std::string & sIdentifier)
+	{
+		LibMCDataHandle hBuildJobExecutionData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier(m_pHandle, sIdentifier.c_str(), &hBuildJobExecutionData));
+		
+		if (!hBuildJobExecutionData) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionData>(m_pWrapper, hBuildJobExecutionData);
+	}
+	
+	/**
+	* CBuildJobExecution::HasJobExecutionDataUUID - Retrieves if a build job execution data instance with a specific UUID exists in this job execution.
+	* @param[in] sUUID - Job Execution Data UUID. Fails if UUID does not exist.
+	* @return Returns true, if the job execution data exists.
+	*/
+	bool CBuildJobExecution::HasJobExecutionDataUUID(const std::string & sUUID)
+	{
+		bool resultHasJobExecutionData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_HasJobExecutionDataUUID(m_pHandle, sUUID.c_str(), &resultHasJobExecutionData));
+		
+		return resultHasJobExecutionData;
+	}
+	
+	/**
+	* CBuildJobExecution::HasJobExecutionDataIdentifier - Retrieves if a build job execution data instance with a specific identifier exists.
+	* @param[in] sIdentifier - Job Execution Data Identifier. Fails if identifier does not exist.
+	* @return Returns true, if the job execution data exists.
+	*/
+	bool CBuildJobExecution::HasJobExecutionDataIdentifier(const std::string & sIdentifier)
+	{
+		bool resultHasJobExecutionData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_HasJobExecutionDataIdentifier(m_pHandle, sIdentifier.c_str(), &resultHasJobExecutionData));
+		
+		return resultHasJobExecutionData;
+	}
+	
+	/**
 	* CBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
@@ -5870,13 +6125,13 @@ public:
 	 */
 	
 	/**
-	* CBuildJobExecutionIterator::GetCurrentJobData - Returns the build job data the iterator points at.
+	* CBuildJobExecutionIterator::GetCurrentJobExecution - Returns the build job execution the iterator points at.
 	* @return returns the build job  execution instance.
 	*/
-	PBuildJobExecution CBuildJobExecutionIterator::GetCurrentJobData()
+	PBuildJobExecution CBuildJobExecutionIterator::GetCurrentJobExecution()
 	{
 		LibMCDataHandle hCurrentInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecutionIterator_GetCurrentJobData(m_pHandle, &hCurrentInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecutionIterator_GetCurrentJobExecution(m_pHandle, &hCurrentInstance));
 		
 		if (!hCurrentInstance) {
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -6099,6 +6354,48 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuildJobData>(m_pWrapper, hBuildJobData);
+	}
+	
+	/**
+	* CBuildJob::RetrieveJobDataByIdentifier - Retrieves a build job data instance by its identifier.
+	* @param[in] sIdentifier - Job Data Identifier. Fails if identifier does not exist.
+	* @return Build Job Data Instance.
+	*/
+	PBuildJobData CBuildJob::RetrieveJobDataByIdentifier(const std::string & sIdentifier)
+	{
+		LibMCDataHandle hBuildJobData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_RetrieveJobDataByIdentifier(m_pHandle, sIdentifier.c_str(), &hBuildJobData));
+		
+		if (!hBuildJobData) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobData>(m_pWrapper, hBuildJobData);
+	}
+	
+	/**
+	* CBuildJob::HasJobDataUUID - Retrieves if a build job data instance with a specific UUID exists.
+	* @param[in] sUUID - Job Data UUID. Fails if UUID does not exist.
+	* @return Returns true, if the job data exists.
+	*/
+	bool CBuildJob::HasJobDataUUID(const std::string & sUUID)
+	{
+		bool resultHasJobData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_HasJobDataUUID(m_pHandle, sUUID.c_str(), &resultHasJobData));
+		
+		return resultHasJobData;
+	}
+	
+	/**
+	* CBuildJob::HasJobDataIdentifier - Retrieves if a build job data instance with a specific identifier exists.
+	* @param[in] sIdentifier - Job Data Identifier. Fails if identifier does not exist.
+	* @return Returns true, if the job data exists.
+	*/
+	bool CBuildJob::HasJobDataIdentifier(const std::string & sIdentifier)
+	{
+		bool resultHasJobData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_HasJobDataIdentifier(m_pHandle, sIdentifier.c_str(), &resultHasJobData));
+		
+		return resultHasJobData;
 	}
 	
 	/**

@@ -82,6 +82,21 @@ CBuildJobExecution::~CBuildJobExecution()
 
 }
 
+
+CBuildJobExecution* CBuildJobExecution::makeFrom(CBuildJobExecution* pBuildJobExecution)
+{
+	if (pBuildJobExecution == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+	return new CBuildJobExecution(pBuildJobExecution->m_pSQLHandler, pBuildJobExecution->m_sExecutionUUID, pBuildJobExecution->m_pStorageState);
+}
+
+std::shared_ptr<CBuildJobExecution> CBuildJobExecution::makeSharedFrom(CBuildJobExecution* pBuildJobExecution)
+{
+	return std::shared_ptr<CBuildJobExecution>(makeFrom (pBuildJobExecution));
+}
+
+
 std::string CBuildJobExecution::GetExecutionUUID()
 {
 	return m_sExecutionUUID;
@@ -241,6 +256,42 @@ LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibM
 
 	}
 }
+
+void CBuildJobExecution::AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID)
+{
+	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType)
+{
+	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionData()
+{
+	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionData(const std::string& sDataUUID)
+{
+	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionDataByIdentifier(const std::string& sIdentifier)
+{
+	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+bool CBuildJobExecution::HasJobExecutionDataUUID(const std::string& sUUID)
+{
+	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+bool CBuildJobExecution::HasJobExecutionDataIdentifier(const std::string& sIdentifier)
+{
+	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
 
 void CBuildJobExecution::AddMetaDataString(const std::string& sKey, const std::string& sValue)
 {
