@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_logger.hpp"
 #include "amc_loggerentry.hpp"
+#include "common_chrono.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -55,11 +56,13 @@ namespace AMC {
 		LibMCData::PLogSession m_pLogSession;
 		std::mutex m_DBMutex;
 
+		LibMCData::PDataModel m_pDataModel;
+
 		uint32_t m_MaxLogMessageRequestCount;
 
 	public:
 
-		CLogger_Database(LibMCData::PDataModel pDataModel);
+		CLogger_Database(LibMCData::PDataModel pDataModel, AMCCommon::PChrono m_pGlobalChrono);
 		virtual ~CLogger_Database();
 
 		void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) override;

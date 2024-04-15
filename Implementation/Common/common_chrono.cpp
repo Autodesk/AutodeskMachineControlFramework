@@ -143,59 +143,21 @@ namespace AMCCommon {
 #endif
 		}
 
-		std::string getStartTimeISO8601TimeUTC()
+		uint64_t getAbsoluteMicroseconds()
 		{
-			return CChrono::convertToISO8601TimeUTC(m_nStartTimeStampUTC);
+			return m_nStartTimeStampUTC + getElapsedMicroseconds();
 		}
 
-		std::string getStartTimeFileName()
-		{
-
-			uint32_t nYear = 0;
-			uint32_t nMonth = 0;
-			uint32_t nDay = 0;
-			CChrono::parseDateFromMicrosecondsSince1970(m_nStartTimeStampUTC, nYear, nMonth, nDay);
-
-			uint32_t nSecond = (uint32_t)((m_nStartTimeStampUTC / 1000000ULL) % 60ULL);
-			uint32_t nMinute = (uint32_t)((m_nStartTimeStampUTC / (1000000ULL * 60ULL)) % 60ULL);
-			uint32_t nHour = (uint32_t)((m_nStartTimeStampUTC / (1000000ULL * 3600ULL)) % 24ULL);
-
-			std::stringstream sstream;
-			sstream << std::setfill('0')
-				<< std::setw(4) << nYear
-				<< std::setw(2) << nMonth
-				<< std::setw(2) << nDay << "_"
-				<< std::setw(2) << nHour
-				<< std::setw(2) << nMinute
-				<< std::setw(2) << nSecond;
-
-			return sstream.str();
-		}
 
 	};
 
-	CChrono::CChrono(bool bHighResolution)
-		: m_pChronoImpl(std::make_unique <CChrono_Impl>(bHighResolution, getCurrentUTCTime ()))
+	CChrono::CChrono()
+		: m_pChronoImpl(std::make_unique <CChrono_Impl>(true, getCurrentUTCTimeInternal()))
 	{
 	}
 
 	CChrono::~CChrono()
 	{
-	}
-
-	std::string CChrono::getStartTimeISO8601TimeUTC()
-	{
-		return m_pChronoImpl->getStartTimeISO8601TimeUTC();
-	}
-
-	std::string CChrono::getStartTimeFileName()
-	{
-		return m_pChronoImpl->getStartTimeFileName();
-	}
-
-	uint64_t CChrono::getExistenceTimeInSeconds()
-	{
-		return getExistenceTimeInMicroseconds() / 1000000ULL;
 	}
 
 	uint64_t CChrono::getExistenceTimeInMilliseconds()
@@ -208,35 +170,15 @@ namespace AMCCommon {
 		return m_pChronoImpl->getElapsedMicroseconds();
 	}
 
-	uint64_t CChrono::getDurationTimeInSeconds(const uint64_t nStartTimeInSeconds)
+	uint64_t CChrono::getUTCTimeStampInMicrosecondsSince1970()
 	{
-		uint64_t nCurrentTimeInSeconds = getExistenceTimeInSeconds();
-		if (nCurrentTimeInSeconds < nStartTimeInSeconds)
-			throw std::runtime_error("timing error");
-
-		return nCurrentTimeInSeconds - nStartTimeInSeconds;
+		return m_pChronoImpl->getAbsoluteMicroseconds();
 	}
 
-	uint64_t CChrono::getDurationTimeInMilliseconds(const uint64_t nStartTimeInMilliseconds)
+	std::string CChrono::getUTCTimeInISO8601()
 	{
-		uint64_t nCurrentTimeInMilliseconds = getExistenceTimeInMilliseconds();
-		if (nCurrentTimeInMilliseconds < nStartTimeInMilliseconds)
-			throw std::runtime_error("timing error");
-
-		return nCurrentTimeInMilliseconds - nStartTimeInMilliseconds;
-
+		return convertToISO8601TimeUTC(getUTCTimeStampInMicrosecondsSince1970());
 	}
-
-	uint64_t CChrono::getDurationTimeInMicroseconds(const uint64_t nStartTimeInMicroseconds)
-	{
-		uint64_t nCurrentTimeInMicroseconds = getExistenceTimeInMicroseconds();
-		if (nCurrentTimeInMicroseconds < nStartTimeInMicroseconds)
-			throw std::runtime_error("timing error");
-
-		return nCurrentTimeInMicroseconds - nStartTimeInMicroseconds;
-
-	}
-
 
 	void CChrono::sleepSeconds(const uint64_t seconds)
 	{
@@ -389,8 +331,10 @@ namespace AMCCommon {
 		uint32_t nSecond = 0;
 		uint32_t nMicrosecond = 0;
 
-		parseDateTimeFromMicrosecondsSince1970(nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+		if (!timeStampIsWithinAMillionYears(nMicrosecondsSince1970))
+			throw std::runtime_error("timestamp is invalid: " + std::to_string (nMicrosecondsSince1970));
 
+		parseDateTimeFromMicrosecondsSince1970(nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
 
 		std::stringstream sstream;
 		sstream << std::setfill('0')
@@ -503,7 +447,7 @@ namespace AMCCommon {
 		parseDateFromMicrosecondsSince1970WithWeekday(nMicrosecondsSince1970, nYear, nMonth, nDay, nWeekday);
 	}
 
-	void CChrono::parseDateTimeFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t& nHour, uint32_t& nMinute, uint32_t& nSecond, uint32_t nMicrosecond)
+	void CChrono::parseDateTimeFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t& nHour, uint32_t& nMinute, uint32_t& nSecond, uint32_t & nMicrosecond)
 	{
 		parseDateFromMicrosecondsSince1970(nMicrosecondsSince1970, nYear, nMonth, nDay);
 		nMicrosecond = (uint32_t)(nMicrosecondsSince1970 % 1000000ULL);
@@ -527,7 +471,7 @@ namespace AMCCommon {
 	}
 
 
-	uint64_t CChrono::getCurrentUTCTime() {
+	uint64_t CChrono::getCurrentUTCTimeInternal() {
 
 #ifdef _WIN32
 		SYSTEMTIME utcTime;

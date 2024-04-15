@@ -42,8 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 		
-	CLogger_StdErr::CLogger_StdErr()
+	CLogger_StdErr::CLogger_StdErr(AMCCommon::PChrono pGlobalChrono)
+		: CLogger (pGlobalChrono)
 	{
+		if (pGlobalChrono.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	}
 	
 	CLogger_StdErr::~CLogger_StdErr()

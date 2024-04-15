@@ -49,21 +49,16 @@ namespace AMCCommon {
 	class CChrono {
 		private:
 			std::unique_ptr<CChrono_Impl> m_pChronoImpl;
-		
+
+			// Returns the current system time in UTC time zone, as microseconds since 1970
+			// The accuracy might be lower than what CChrono offers!
+			static uint64_t getCurrentUTCTimeInternal();
+
 		public:
 		
-			CChrono (bool bHighResolution = false);
+			CChrono ();
 			~CChrono ();
-			
-			// Returns instance creation time in ISO8601 time format
-			std::string getStartTimeISO8601TimeUTC ();			
-			
-			// Returns instance creation time in a filename compatible format
-			std::string getStartTimeFileName();
-
-			// Returns Duration in seconds since instance creation
-			// Subsequent calls of this method will never decrease.
-			uint64_t getExistenceTimeInSeconds ();
+		
 
 			// Returns Duration in milliseconds since instance creation
 			// Subsequent calls of this method will never decrease.
@@ -73,32 +68,25 @@ namespace AMCCommon {
 			// Subsequent calls of this method will never decrease.
 			uint64_t getExistenceTimeInMicroseconds ();
 
-			// Returns Duration in seconds since the time passed
-			// Passed timestamp MUST have been created with getExistenceTimeInSeconds
-			uint64_t getDurationTimeInSeconds(const uint64_t nStartTimeInSeconds);
+			// Returns Absolute UTC Time Stamp microseconds since 1970
+			uint64_t getUTCTimeStampInMicrosecondsSince1970();
 
-			// Returns Duration in seconds since the time passed
-			// Passed timestamp MUST have been created with getExistenceTimeInSeconds
-			uint64_t getDurationTimeInMilliseconds(const uint64_t nStartTimeInMilliseconds);
-
-			// Returns Duration in seconds since the time passed
-			// Passed timestamp MUST have been created with getExistenceTimeInSeconds
-			uint64_t getDurationTimeInMicroseconds(const uint64_t nStartTimeInMicroseconds);
-
+			// Returns Absolute UTC Time Stamp in ISO8601 formatting
+			std::string getUTCTimeInISO8601();
 
 			// Sleeps for some seconds
-			void sleepSeconds(const uint64_t seconds);
+			static void sleepSeconds(const uint64_t seconds);
 
 			// Sleeps for some milliseconds
-			void sleepMilliseconds(const uint64_t milliseconds);
+			static void sleepMilliseconds(const uint64_t milliseconds);
 
 			// Sleeps for some microseconds
-			void sleepMicroseconds(const uint64_t microseconds);
+			static void sleepMicroseconds(const uint64_t microseconds);
 
 			// Checks if a timestamp is within a million years
 			static bool timeStampIsWithinAMillionYears(const uint64_t nMicroseconds); 
 
-			// Parses a UTC String in ISO8601 format
+			// Parses a UTC String in ISO8601 format, returns microseconds since 1970
 			static uint64_t parseISO8601TimeUTC(const std::string& sUTCString);
 
 			// Converts a time stamp into a UTC string with a defined accuracy
@@ -115,7 +103,7 @@ namespace AMCCommon {
 			// Parses the full date time of a timestamp since 1970
 			// Returns the year, the month (1-12), the day of the month (1-31),
 			// the hour (0-23), the minute (0-59), the second (0-59) and the microsecond (0-999999)
-			static void parseDateTimeFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t & nHour, uint32_t & nMinute, uint32_t & nSecond, uint32_t nMicrosecond);
+			static void parseDateTimeFromMicrosecondsSince1970(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t & nHour, uint32_t & nMinute, uint32_t & nSecond, uint32_t & nMicrosecond);
 
 			// Gets the timestamp of midnight of any given day.
 			// Inputs are the year, the month (1-12), the day of the month (1-31)
@@ -127,9 +115,6 @@ namespace AMCCommon {
 			// the hour (0-23), the minute (0-59), the second (0-59) and the microsecond (0-999999).
 			// Fails if the Year is before 1970, or the date is otherwise invalid.
 			static uint64_t getMicrosecondsSince1970FromDateTime(uint32_t nYear, uint32_t nMonth, uint32_t nDay, uint32_t nHour, uint32_t nMinute, uint32_t nSecond, uint32_t nMicrosecond);
-
-			// Returns the current system time in UTC time zone, as microseconds since 1970
-			static uint64_t getCurrentUTCTime();
 
 			// Returns if a year is a leap year
 			static bool yearIsLeapYear(uint32_t nYear);
