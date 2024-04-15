@@ -674,6 +674,7 @@ public:
 			case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "ALERTLISTNAMEMISSING";
 			case LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC: return "JOURNALVARIABLEISNOTNUMERIC";
 			case LIBMC_ERROR_UNITSAREOUTOFRANGE: return "UNITSAREOUTOFRANGE";
+			case LIBMC_ERROR_JOURNALTIMESTAMPINVALID: return "JOURNALTIMESTAMPINVALID";
 		}
 		return "UNKNOWN";
 	}
@@ -1190,6 +1191,7 @@ public:
 			case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "Alert list name missing";
 			case LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC: return "Journal variable is not numeric";
 			case LIBMC_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range";
+			case LIBMC_ERROR_JOURNALTIMESTAMPINVALID: return "Journal time stamp is invalid";
 		}
 		return "unknown error";
 	}

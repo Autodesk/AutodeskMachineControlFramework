@@ -1906,7 +1906,7 @@ LibMCDataResult libmcdata_storage_retrievestream(LibMCData_Storage pStorage, con
 	}
 }
 
-LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID)
+LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -1935,7 +1935,7 @@ LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, con
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->StoreNewStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, pContentBuffer, sUserID);
+		pIStorage->StoreNewStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, pContentBuffer, sUserID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -1950,7 +1950,7 @@ LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, con
 	}
 }
 
-LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID)
+LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -1977,7 +1977,7 @@ LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage,
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->BeginPartialStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, sUserID);
+		pIStorage->BeginPartialStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, sUserID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -2081,7 +2081,7 @@ LibMCDataResult libmcdata_storage_finishpartialstreamblockwisesha256(LibMCData_S
 	}
 }
 
-LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID)
+LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -2108,7 +2108,7 @@ LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStor
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->BeginRandomWriteStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, sUserID);
+		pIStorage->BeginRandomWriteStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, sUserID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -2292,7 +2292,7 @@ LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Storage pStorage, cons
 	}
 }
 
-LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pClientFileName, const char * pSessionUUID, const char * pUserUUID)
+LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pClientFileName, const char * pSessionUUID, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -2316,7 +2316,7 @@ LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorag
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->CreateDownloadTicket(sTicketUUID, sStreamUUID, sClientFileName, sSessionUUID, sUserUUID);
+		pIStorage->CreateDownloadTicket(sTicketUUID, sStreamUUID, sClientFileName, sSessionUUID, sUserUUID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -2331,7 +2331,7 @@ LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorag
 	}
 }
 
-LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer)
+LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -2360,7 +2360,7 @@ LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStora
 		
 		bool isCacheCall = (pStreamUUIDBuffer == nullptr) || (pClientFileNameBuffer == nullptr) || (pSessionUUIDBuffer == nullptr) || (pUserUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			pIStorage->RequestDownloadTicket(sTicketUUID, sIPAddress, sStreamUUID, sClientFileName, sSessionUUID, sUserUUID);
+			pIStorage->RequestDownloadTicket(sTicketUUID, sIPAddress, nAbsoluteTimeStamp, sStreamUUID, sClientFileName, sSessionUUID, sUserUUID);
 
 			pIStorage->_setCache (new ParameterCache_4<std::string, std::string, std::string, std::string> (sStreamUUID, sClientFileName, sSessionUUID, sUserUUID));
 		}
@@ -3261,7 +3261,7 @@ LibMCDataResult libmcdata_buildjobexecution_getstatus(LibMCData_BuildJobExecutio
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecution pBuildJobExecution, eLibMCDataBuildJobExecutionStatus eNewExecutionStatus, LibMCData_uint64 nRelativeEndTimeStampInMicroseconds)
+LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecution pBuildJobExecution, eLibMCDataBuildJobExecutionStatus eNewExecutionStatus, LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
 
@@ -3270,7 +3270,7 @@ LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecu
 		if (!pIBuildJobExecution)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJobExecution->ChangeStatus(eNewExecutionStatus, nRelativeEndTimeStampInMicroseconds);
+		pIBuildJobExecution->ChangeStatus(eNewExecutionStatus, nAbsoluteEndTimeStampInMicrosecondsSince1970);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -3748,7 +3748,7 @@ LibMCDataResult libmcdata_buildjobexecution_hasjobexecutiondataidentifier(LibMCD
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue)
+LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
 
@@ -3763,7 +3763,7 @@ LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJob
 		if (!pIBuildJobExecution)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJobExecution->AddMetaDataString(sKey, sValue);
+		pIBuildJobExecution->AddMetaDataString(sKey, sValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -4312,7 +4312,7 @@ LibMCDataResult libmcdata_buildjob_jobcanbearchived(LibMCData_BuildJob pBuildJob
 	}
 }
 
-LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, eLibMCDataCustomDataType eDataType, const char * pUserID)
+LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, eLibMCDataCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJob;
 
@@ -4335,7 +4335,7 @@ LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, cons
 		if (!pIBuildJob)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJob->AddJobData(sIdentifier, sName, pIStream, eDataType, sUserID);
+		pIBuildJob->AddJobData(sIdentifier, sName, pIStream, eDataType, sUserID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -4526,7 +4526,7 @@ LibMCDataResult libmcdata_buildjob_hasjobdataidentifier(LibMCData_BuildJob pBuil
 	}
 }
 
-LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue)
+LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJob;
 
@@ -4541,7 +4541,7 @@ LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJo
 		if (!pIBuildJob)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJob->AddMetaDataString(sKey, sValue);
+		pIBuildJob->AddMetaDataString(sKey, sValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -4636,7 +4636,7 @@ LibMCDataResult libmcdata_buildjob_getmetadatastring(LibMCData_BuildJob pBuildJo
 	}
 }
 
-LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_uint64 nRelativeStartTimeStampInMicroseconds, LibMCData_BuildJobExecution * pExecutionInstance)
+LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970, LibMCData_BuildJobExecution * pExecutionInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJob;
 
@@ -4654,7 +4654,7 @@ LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pB
 		if (!pIBuildJob)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pBaseExecutionInstance = pIBuildJob->CreateBuildJobExecution(sDescription, sUserUUID, nRelativeStartTimeStampInMicroseconds);
+		pBaseExecutionInstance = pIBuildJob->CreateBuildJobExecution(sDescription, sUserUUID, nAbsoluteStartTimeStampInMicrosecondsSince1970);
 
 		*pExecutionInstance = (IBase*)(pBaseExecutionInstance);
 		return LIBMCDATA_SUCCESS;
@@ -4799,7 +4799,7 @@ LibMCDataResult libmcdata_buildjobiterator_getcurrentjob(LibMCData_BuildJobItera
 /*************************************************************************************************************************
  Class implementation for BuildJobHandler
 **************************************************************************************************************************/
-LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, const char * pStorageStreamUUID, LibMCData_BuildJob * pJobInstance)
+LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, const char * pStorageStreamUUID, LibMCData_uint64 nAbsoluteTimeStamp, LibMCData_BuildJob * pJobInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
 
@@ -4823,7 +4823,7 @@ LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pB
 		if (!pIBuildJobHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pBaseJobInstance = pIBuildJobHandler->CreateJob(sJobUUID, sName, sUserID, sStorageStreamUUID);
+		pBaseJobInstance = pIBuildJobHandler->CreateJob(sJobUUID, sName, sUserID, sStorageStreamUUID, nAbsoluteTimeStamp);
 
 		*pJobInstance = (IBase*)(pBaseJobInstance);
 		return LIBMCDATA_SUCCESS;
@@ -6291,7 +6291,7 @@ LibMCDataResult libmcdata_persistencyhandler_deletepersistentparameter(LibMCData
 	}
 }
 
-LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, eLibMCDataParameterDataType eDataType, const char * pValue)
+LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, eLibMCDataParameterDataType eDataType, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
 
@@ -6309,7 +6309,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_
 		if (!pIPersistencyHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIPersistencyHandler->StorePersistentParameter(sUUID, sName, eDataType, sValue);
+		pIPersistencyHandler->StorePersistentParameter(sUUID, sName, eDataType, sValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -6324,7 +6324,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_
 	}
 }
 
-LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue)
+LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
 
@@ -6342,7 +6342,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibM
 		if (!pIPersistencyHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIPersistencyHandler->StorePersistentStringParameter(sUUID, sName, sValue);
+		pIPersistencyHandler->StorePersistentStringParameter(sUUID, sName, sValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -6357,7 +6357,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibM
 	}
 }
 
-LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue)
+LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
 
@@ -6375,7 +6375,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCD
 		if (!pIPersistencyHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIPersistencyHandler->StorePersistentUUIDParameter(sUUID, sName, sValue);
+		pIPersistencyHandler->StorePersistentUUIDParameter(sUUID, sName, sValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -6390,7 +6390,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCD
 	}
 }
 
-LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_double dValue)
+LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_double dValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
 
@@ -6405,7 +6405,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibM
 		if (!pIPersistencyHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIPersistencyHandler->StorePersistentDoubleParameter(sUUID, sName, dValue);
+		pIPersistencyHandler->StorePersistentDoubleParameter(sUUID, sName, dValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -6420,7 +6420,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibM
 	}
 }
 
-LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_int64 nValue)
+LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_int64 nValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
 
@@ -6435,7 +6435,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(Lib
 		if (!pIPersistencyHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIPersistencyHandler->StorePersistentIntegerParameter(sUUID, sName, nValue);
+		pIPersistencyHandler->StorePersistentIntegerParameter(sUUID, sName, nValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -6450,7 +6450,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(Lib
 	}
 }
 
-LibMCDataResult libmcdata_persistencyhandler_storepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, bool bValue)
+LibMCDataResult libmcdata_persistencyhandler_storepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, bool bValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
 
@@ -6465,7 +6465,7 @@ LibMCDataResult libmcdata_persistencyhandler_storepersistentboolparameter(LibMCD
 		if (!pIPersistencyHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIPersistencyHandler->StorePersistentBoolParameter(sUUID, sName, bValue);
+		pIPersistencyHandler->StorePersistentBoolParameter(sUUID, sName, bValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}

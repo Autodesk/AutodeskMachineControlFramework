@@ -765,6 +765,7 @@
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Data of stream" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
 		<method name="BeginPartialStream" description="starts storing a stream with partial uploads.">
@@ -775,6 +776,7 @@
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
 		<method name="StorePartialStream" description="stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.">
@@ -800,6 +802,7 @@
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
 		<method name="StoreRandomWriteStream" description="stores data in a stream with random write access. Writing may be in arbitrary order.">
@@ -837,11 +840,13 @@
 			<param name="ClientFileName" type="string" pass="in" description="ClientFileName of the ticket. MUST NOT be empty." />	
 			<param name="SessionUUID" type="string" pass="in" description="UUID of user session." />	
 			<param name="UserUUID" type="string" pass="in" description="UUID of user that created the ticket." />	
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 		
 		<method name="RequestDownloadTicket" description="Returns the details of a download ticket and creates an entry in an access log with time stamp.">
 			<param name="TicketUUID" type="string" pass="in" description="UUID of download ticket." />	
 			<param name="IPAddress" type="string" pass="in" description="IP Address where the request came from." />	
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 			<param name="StreamUUID" type="string" pass="out" description="UUID of storage stream." />	
 			<param name="ClientFileName" type="string" pass="out" description="ClientFileName of the ticket." />	
 			<param name="SessionUUID" type="string" pass="out" description="UUID of user session." />	
@@ -958,7 +963,7 @@
 
 		<method name="ChangeStatus" description="sets the new build job execution status. Will fail if current status is not InProcess.">
 			<param name="NewExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="in" description="Status Value" />	
-			<param name="RelativeEndTimeStampInMicroseconds" type="uint64" pass="in" description="New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp." />
+			<param name="AbsoluteEndTimeStampInMicrosecondsSince1970" type="uint64" pass="in" description="New End Time of execution in Microseconds since 1970. MUST be larger or equal than start time stamp." />
 		</method>
 
 		<method name="GetDescription" description="returns the build job description.">
@@ -1030,6 +1035,7 @@
 		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 	
 		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
@@ -1108,6 +1114,7 @@
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
 			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job data" />
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970" />
 		</method>
 
 		<method name="ListJobDataByType" description="Retrieves a list of build job data objects, filtered by type.">
@@ -1142,6 +1149,7 @@
 		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 	
 		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
@@ -1157,7 +1165,7 @@
 		<method name="CreateBuildJobExecution" description="Creates a new build job execution with state InProgress.">
 			<param name="Description" type="string" pass="in" description="Description of the execution." />
 			<param name="UserUUID" type="string" pass="in" description="UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded." />
-			<param name="RelativeStartTimeStampInMicroseconds" type="uint64" pass="in" description="Start Time in Microseconds in relation to the start of the journal." />
+			<param name="AbsoluteStartTimeStampInMicrosecondsSince1970" type="uint64" pass="in" description="Absolute Start Time in Microseconds since 1970." />
 			<param name="ExecutionInstance" type="class" class="BuildJobExecution" pass="return" description="Newly created execution instance." />
 		</method>
 
@@ -1195,6 +1203,7 @@
 			<param name="Name" type="string" pass="in" description="Name String" />	
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
 			<param name="StorageStreamUUID" type="string" pass="in" description="Storage stream uuid for the job. Needs not exist yet." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
 		</method>
 
@@ -1404,36 +1413,42 @@
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="DataType" type="enum" class="ParameterDataType" pass="in" description="Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type." />
 			<param name="Value" type="string" pass="in" description="Value of the parameter. MUST be of appropriate type." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentStringParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="string" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentUUIDParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="string" pass="in" description="Value of the parameter. MUST be of appropriate type." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentDoubleParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="double" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentIntegerParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="int64" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentBoolParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="bool" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 

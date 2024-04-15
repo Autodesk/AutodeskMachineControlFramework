@@ -1279,20 +1279,20 @@ public:
 	
 	inline bool StreamIsReady(const std::string & sUUID);
 	inline PStorageStream RetrieveStream(const std::string & sUUID);
-	inline void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID);
-	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID);
+	inline void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
 	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
-	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID);
+	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline void StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID);
 	inline void FinishRandomWriteStream(const std::string & sUUID);
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
-	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID);
-	inline void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID);
+	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, const LibMCData_uint64 nAbsoluteTimeStamp, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID);
 	inline void AttachStreamToJournal(const std::string & sStreamUUID, const std::string & sJournalUUID);
 };
 	
@@ -1409,7 +1409,7 @@ public:
 	inline std::string GetExecutionUUID();
 	inline std::string GetJobUUID();
 	inline eBuildJobExecutionStatus GetStatus();
-	inline void ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds);
+	inline void ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970);
 	inline std::string GetDescription();
 	inline void SetDescription(const std::string & sNewDescription);
 	inline std::string GetJournalUUID();
@@ -1424,7 +1424,7 @@ public:
 	inline PBuildJobExecutionData RetrieveJobExecutionDataByIdentifier(const std::string & sIdentifier);
 	inline bool HasJobExecutionDataUUID(const std::string & sUUID);
 	inline bool HasJobExecutionDataIdentifier(const std::string & sIdentifier);
-	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
 };
@@ -1473,17 +1473,17 @@ public:
 	inline void UnArchiveJob();
 	inline void DeleteJob();
 	inline bool JobCanBeArchived();
-	inline void AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID);
+	inline void AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobDataIterator ListJobDataByType(const eCustomDataType eDataType);
 	inline PBuildJobDataIterator ListJobData();
 	inline PBuildJobData RetrieveJobData(const std::string & sDataUUID);
 	inline PBuildJobData RetrieveJobDataByIdentifier(const std::string & sIdentifier);
 	inline bool HasJobDataUUID(const std::string & sUUID);
 	inline bool HasJobDataIdentifier(const std::string & sIdentifier);
-	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
-	inline PBuildJobExecution CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds);
+	inline PBuildJobExecution CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970);
 	inline PBuildJobExecution RetrieveBuildJobExecution(const std::string & sExecutionUUID);
 	inline PBuildJobExecutionIterator RetrieveBuildJobExecutions(const std::string & sJournalUUIDFilter);
 	inline PBuildJobExecutionIterator RetrieveBuildJobExecutionsByStatus(const eBuildJobExecutionStatus eStatusFilter, const std::string & sJournalUUIDFilter);
@@ -1520,7 +1520,7 @@ public:
 	{
 	}
 	
-	inline PBuildJob CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID);
+	inline PBuildJob CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJob RetrieveJob(const std::string & sJobUUID);
 	inline PBuildJob FindJobOfData(const std::string & sDataUUID);
 	inline PBuildJobIterator ListJobsByStatus(const eBuildJobStatus eStatus);
@@ -1602,12 +1602,12 @@ public:
 	inline bool HasPersistentParameter(const std::string & sUUID);
 	inline void GetPersistentParameterDetails(const std::string & sUUID, std::string & sName, eParameterDataType & eDataType);
 	inline bool DeletePersistentParameter(const std::string & sUUID);
-	inline void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const eParameterDataType eDataType, const std::string & sValue);
-	inline void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue);
-	inline void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue);
-	inline void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue);
-	inline void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue);
-	inline void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue);
+	inline void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const eParameterDataType eDataType, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline std::string RetrievePersistentStringParameter(const std::string & sUUID);
 	inline std::string RetrievePersistentUUIDParameter(const std::string & sUUID);
 	inline LibMCData_double RetrievePersistentDoubleParameter(const std::string & sUUID);
@@ -5387,10 +5387,11 @@ public:
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] ContentBuffer - Data of stream
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID)
+	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -5402,10 +5403,11 @@ public:
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID)
+	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -5447,10 +5449,11 @@ public:
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID)
+	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), sUserID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -5531,22 +5534,24 @@ public:
 	* @param[in] sClientFileName - ClientFileName of the ticket. MUST NOT be empty.
 	* @param[in] sSessionUUID - UUID of user session.
 	* @param[in] sUserUUID - UUID of user that created the ticket.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID)
+	void CStorage::CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_CreateDownloadTicket(m_pHandle, sTicketUUID.c_str(), sStreamUUID.c_str(), sClientFileName.c_str(), sSessionUUID.c_str(), sUserUUID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_CreateDownloadTicket(m_pHandle, sTicketUUID.c_str(), sStreamUUID.c_str(), sClientFileName.c_str(), sSessionUUID.c_str(), sUserUUID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
 	* CStorage::RequestDownloadTicket - Returns the details of a download ticket and creates an entry in an access log with time stamp.
 	* @param[in] sTicketUUID - UUID of download ticket.
 	* @param[in] sIPAddress - IP Address where the request came from.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	* @param[out] sStreamUUID - UUID of storage stream.
 	* @param[out] sClientFileName - ClientFileName of the ticket.
 	* @param[out] sSessionUUID - UUID of user session.
 	* @param[out] sUserUUID - UUID of user that created the ticket.
 	*/
-	void CStorage::RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID)
+	void CStorage::RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, const LibMCData_uint64 nAbsoluteTimeStamp, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID)
 	{
 		LibMCData_uint32 bytesNeededStreamUUID = 0;
 		LibMCData_uint32 bytesWrittenStreamUUID = 0;
@@ -5556,12 +5561,12 @@ public:
 		LibMCData_uint32 bytesWrittenSessionUUID = 0;
 		LibMCData_uint32 bytesNeededUserUUID = 0;
 		LibMCData_uint32 bytesWrittenUserUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), 0, &bytesNeededStreamUUID, nullptr, 0, &bytesNeededClientFileName, nullptr, 0, &bytesNeededSessionUUID, nullptr, 0, &bytesNeededUserUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), nAbsoluteTimeStamp, 0, &bytesNeededStreamUUID, nullptr, 0, &bytesNeededClientFileName, nullptr, 0, &bytesNeededSessionUUID, nullptr, 0, &bytesNeededUserUUID, nullptr));
 		std::vector<char> bufferStreamUUID(bytesNeededStreamUUID);
 		std::vector<char> bufferClientFileName(bytesNeededClientFileName);
 		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
 		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0], bytesNeededClientFileName, &bytesWrittenClientFileName, &bufferClientFileName[0], bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0], bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_RequestDownloadTicket(m_pHandle, sTicketUUID.c_str(), sIPAddress.c_str(), nAbsoluteTimeStamp, bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0], bytesNeededClientFileName, &bytesWrittenClientFileName, &bufferClientFileName[0], bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0], bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
 		sStreamUUID = std::string(&bufferStreamUUID[0]);
 		sClientFileName = std::string(&bufferClientFileName[0]);
 		sSessionUUID = std::string(&bufferSessionUUID[0]);
@@ -5881,11 +5886,11 @@ public:
 	/**
 	* CBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
 	* @param[in] eNewExecutionStatus - Status Value
-	* @param[in] nRelativeEndTimeStampInMicroseconds - New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp.
+	* @param[in] nAbsoluteEndTimeStampInMicrosecondsSince1970 - New End Time of execution in Microseconds since 1970. MUST be larger or equal than start time stamp.
 	*/
-	void CBuildJobExecution::ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds)
+	void CBuildJobExecution::ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ChangeStatus(m_pHandle, eNewExecutionStatus, nRelativeEndTimeStampInMicroseconds));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ChangeStatus(m_pHandle, eNewExecutionStatus, nAbsoluteEndTimeStampInMicrosecondsSince1970));
 	}
 	
 	/**
@@ -6086,10 +6091,11 @@ public:
 	* CBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CBuildJobExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	void CBuildJobExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -6303,11 +6309,12 @@ public:
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
 	*/
-	void CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID)
+	void CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -6403,10 +6410,11 @@ public:
 	* CBuildJob::AddMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CBuildJob::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	void CBuildJob::AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -6442,13 +6450,13 @@ public:
 	* CBuildJob::CreateBuildJobExecution - Creates a new build job execution with state InProgress.
 	* @param[in] sDescription - Description of the execution.
 	* @param[in] sUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
-	* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
+	* @param[in] nAbsoluteStartTimeStampInMicrosecondsSince1970 - Absolute Start Time in Microseconds since 1970.
 	* @return Newly created execution instance.
 	*/
-	PBuildJobExecution CBuildJob::CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds)
+	PBuildJobExecution CBuildJob::CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970)
 	{
 		LibMCDataHandle hExecutionInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_CreateBuildJobExecution(m_pHandle, sDescription.c_str(), sUserUUID.c_str(), nRelativeStartTimeStampInMicroseconds, &hExecutionInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_CreateBuildJobExecution(m_pHandle, sDescription.c_str(), sUserUUID.c_str(), nAbsoluteStartTimeStampInMicrosecondsSince1970, &hExecutionInstance));
 		
 		if (!hExecutionInstance) {
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -6535,12 +6543,13 @@ public:
 	* @param[in] sName - Name String
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] sStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	* @return Build Job Instance.
 	*/
-	PBuildJob CBuildJobHandler::CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID)
+	PBuildJob CBuildJobHandler::CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hJobInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_CreateJob(m_pHandle, sJobUUID.c_str(), sName.c_str(), sUserID.c_str(), sStorageStreamUUID.c_str(), &hJobInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_CreateJob(m_pHandle, sJobUUID.c_str(), sName.c_str(), sUserID.c_str(), sStorageStreamUUID.c_str(), nAbsoluteTimeStamp, &hJobInstance));
 		
 		if (!hJobInstance) {
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -7083,10 +7092,11 @@ public:
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] eDataType - Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type.
 	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CPersistencyHandler::StorePersistentParameter(const std::string & sUUID, const std::string & sName, const eParameterDataType eDataType, const std::string & sValue)
+	void CPersistencyHandler::StorePersistentParameter(const std::string & sUUID, const std::string & sName, const eParameterDataType eDataType, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentParameter(m_pHandle, sUUID.c_str(), sName.c_str(), eDataType, sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentParameter(m_pHandle, sUUID.c_str(), sName.c_str(), eDataType, sValue.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -7094,10 +7104,11 @@ public:
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] sValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CPersistencyHandler::StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue)
+	void CPersistencyHandler::StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentStringParameter(m_pHandle, sUUID.c_str(), sName.c_str(), sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentStringParameter(m_pHandle, sUUID.c_str(), sName.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -7105,10 +7116,11 @@ public:
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CPersistencyHandler::StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue)
+	void CPersistencyHandler::StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentUUIDParameter(m_pHandle, sUUID.c_str(), sName.c_str(), sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentUUIDParameter(m_pHandle, sUUID.c_str(), sName.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -7116,10 +7128,11 @@ public:
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] dValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CPersistencyHandler::StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue)
+	void CPersistencyHandler::StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentDoubleParameter(m_pHandle, sUUID.c_str(), sName.c_str(), dValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentDoubleParameter(m_pHandle, sUUID.c_str(), sName.c_str(), dValue, nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -7127,10 +7140,11 @@ public:
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] nValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CPersistencyHandler::StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue)
+	void CPersistencyHandler::StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentIntegerParameter(m_pHandle, sUUID.c_str(), sName.c_str(), nValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentIntegerParameter(m_pHandle, sUUID.c_str(), sName.c_str(), nValue, nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -7138,10 +7152,11 @@ public:
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] bValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CPersistencyHandler::StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue)
+	void CPersistencyHandler::StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentBoolParameter(m_pHandle, sUUID.c_str(), sName.c_str(), bValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentBoolParameter(m_pHandle, sUUID.c_str(), sName.c_str(), bValue, nAbsoluteTimeStamp));
 	}
 	
 	/**

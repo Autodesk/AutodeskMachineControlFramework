@@ -604,6 +604,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_ALERTLISTNAMEMISSING 587 /** Alert list name missing */
 #define LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC 588 /** Journal variable is not numeric */
 #define LIBMC_ERROR_UNITSAREOUTOFRANGE 589 /** Units are out of range */
+#define LIBMC_ERROR_JOURNALTIMESTAMPINVALID 590 /** Journal time stamp is invalid */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1120,6 +1121,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_ALERTLISTNAMEMISSING: return "Alert list name missing";
     case LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC: return "Journal variable is not numeric";
     case LIBMC_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range";
+    case LIBMC_ERROR_JOURNALTIMESTAMPINVALID: return "Journal time stamp is invalid";
     default: return "unknown error";
   }
 }

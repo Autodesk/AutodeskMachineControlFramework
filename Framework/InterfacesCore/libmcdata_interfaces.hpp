@@ -739,8 +739,9 @@ public:
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Data of stream
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID) = 0;
+	virtual void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::BeginPartialStream - starts storing a stream with partial uploads.
@@ -751,8 +752,9 @@ public:
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID) = 0;
+	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::StorePartialStream - stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -785,8 +787,9 @@ public:
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID) = 0;
+	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::StoreRandomWriteStream - stores data in a stream with random write access. Writing may be in arbitrary order.
@@ -837,19 +840,21 @@ public:
 	* @param[in] sClientFileName - ClientFileName of the ticket. MUST NOT be empty.
 	* @param[in] sSessionUUID - UUID of user session.
 	* @param[in] sUserUUID - UUID of user that created the ticket.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID) = 0;
+	virtual void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::RequestDownloadTicket - Returns the details of a download ticket and creates an entry in an access log with time stamp.
 	* @param[in] sTicketUUID - UUID of download ticket.
 	* @param[in] sIPAddress - IP Address where the request came from.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	* @param[out] sStreamUUID - UUID of storage stream.
 	* @param[out] sClientFileName - ClientFileName of the ticket.
 	* @param[out] sSessionUUID - UUID of user session.
 	* @param[out] sUserUUID - UUID of user that created the ticket.
 	*/
-	virtual void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID) = 0;
+	virtual void RequestDownloadTicket(const std::string & sTicketUUID, const std::string & sIPAddress, const LibMCData_uint64 nAbsoluteTimeStamp, std::string & sStreamUUID, std::string & sClientFileName, std::string & sSessionUUID, std::string & sUserUUID) = 0;
 
 	/**
 	* IStorage::AttachStreamToJournal - Attaches a stream to a journal as temporary stream.
@@ -1041,9 +1046,9 @@ public:
 	/**
 	* IBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
 	* @param[in] eNewExecutionStatus - Status Value
-	* @param[in] nRelativeEndTimeStampInMicroseconds - New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp.
+	* @param[in] nAbsoluteEndTimeStampInMicrosecondsSince1970 - New End Time of execution in Microseconds since 1970. MUST be larger or equal than start time stamp.
 	*/
-	virtual void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nRelativeEndTimeStampInMicroseconds) = 0;
+	virtual void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970) = 0;
 
 	/**
 	* IBuildJobExecution::GetDescription - returns the build job description.
@@ -1143,8 +1148,9 @@ public:
 	* IBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJobExecution::HasMetaDataString - Checks if a metadata string exists.
@@ -1269,8 +1275,9 @@ public:
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
 	*/
-	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID) = 0;
+	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
@@ -1317,8 +1324,9 @@ public:
 	* IBuildJob::AddMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJob::HasMetaDataString - Checks if a metadata string exists.
@@ -1338,10 +1346,10 @@ public:
 	* IBuildJob::CreateBuildJobExecution - Creates a new build job execution with state InProgress.
 	* @param[in] sDescription - Description of the execution.
 	* @param[in] sUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
-	* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
+	* @param[in] nAbsoluteStartTimeStampInMicrosecondsSince1970 - Absolute Start Time in Microseconds since 1970.
 	* @return Newly created execution instance.
 	*/
-	virtual IBuildJobExecution * CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nRelativeStartTimeStampInMicroseconds) = 0;
+	virtual IBuildJobExecution * CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970) = 0;
 
 	/**
 	* IBuildJob::RetrieveBuildJobExecution - Retrieves a new build job execution by uuid.
@@ -1399,9 +1407,10 @@ public:
 	* @param[in] sName - Name String
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] sStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	* @return Build Job Instance.
 	*/
-	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID) = 0;
+	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJobHandler::RetrieveJob - Retrieves a job with a specific UUID.
@@ -1689,48 +1698,54 @@ public:
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] eDataType - Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type.
 	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const LibMCData::eParameterDataType eDataType, const std::string & sValue) = 0;
+	virtual void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const LibMCData::eParameterDataType eDataType, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IPersistencyHandler::StorePersistentStringParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] sValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue) = 0;
+	virtual void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IPersistencyHandler::StorePersistentUUIDParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue) = 0;
+	virtual void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IPersistencyHandler::StorePersistentDoubleParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] dValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue) = 0;
+	virtual void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IPersistencyHandler::StorePersistentIntegerParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] nValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue) = 0;
+	virtual void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IPersistencyHandler::StorePersistentBoolParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
 	* @param[in] sUUID - UUID of the parameter
 	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 	* @param[in] bValue - Value of the parameter.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue) = 0;
+	virtual void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IPersistencyHandler::RetrievePersistentStringParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.

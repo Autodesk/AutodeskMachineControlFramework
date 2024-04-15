@@ -609,11 +609,11 @@
 		<error name="INVALIDLANGUAGEDEFINITION" code="583" description="Invalid language definition"/>		
 		<error name="MISSINGALERTIDENTIFIER" code="584" description="Missing alert identifier"/>		
 		<error name="MISSINGALERTLEVEL" code="585" description="Missing alert level"/>		
-		<error name="INVALIDALERTLEVEL" code="586" description="Invalid alert level"/>		
-		
+		<error name="INVALIDALERTLEVEL" code="586" description="Invalid alert level"/>				
 		<error name="ALERTLISTNAMEMISSING" code="587" description="Alert list name missing" />		
 		<error name="JOURNALVARIABLEISNOTNUMERIC" code="588" description="Journal variable is not numeric" />		
-		<error name="UNITSAREOUTOFRANGE" code="589" description="Units are out of range" />		
+		<error name="UNITSAREOUTOFRANGE" code="589" description="Units are out of range" />				
+		<error name="JOURNALTIMESTAMPINVALID" code="590" description="Journal time stamp is invalid" />		
 		
 		
 		

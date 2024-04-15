@@ -632,9 +632,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_retrievestream(LibMCData_St
 * @param[in] nContentBufferSize - Number of elements in buffer
 * @param[in] pContentBuffer - uint8 buffer of Data of stream
 * @param[in] pUserID - Currently authenticated user
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * starts storing a stream with partial uploads.
@@ -647,9 +648,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_St
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nSize - Final size of the stream. MUST NOT be 0.
 * @param[in] pUserID - Currently authenticated user
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -693,9 +695,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstreamblockwis
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] pUserID - Currently authenticated user
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * stores data in a stream with random write access. Writing may be in arbitrary order.
@@ -766,9 +769,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Sto
 * @param[in] pClientFileName - ClientFileName of the ticket. MUST NOT be empty.
 * @param[in] pSessionUUID - UUID of user session.
 * @param[in] pUserUUID - UUID of user that created the ticket.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pClientFileName, const char * pSessionUUID, const char * pUserUUID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pStreamUUID, const char * pClientFileName, const char * pSessionUUID, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Returns the details of a download ticket and creates an entry in an access log with time stamp.
@@ -776,6 +780,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCD
 * @param[in] pStorage - Storage instance.
 * @param[in] pTicketUUID - UUID of download ticket.
 * @param[in] pIPAddress - IP Address where the request came from.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @param[in] nStreamUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pStreamUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pStreamUUIDBuffer -  buffer of UUID of storage stream., may be NULL
@@ -790,7 +795,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_createdownloadticket(LibMCD
 * @param[out] pUserUUIDBuffer -  buffer of UUID of user that created the ticket., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_requestdownloadticket(LibMCData_Storage pStorage, const char * pTicketUUID, const char * pIPAddress, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer, const LibMCData_uint32 nClientFileNameBufferSize, LibMCData_uint32* pClientFileNameNeededChars, char * pClientFileNameBuffer, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
 
 /**
 * Attaches a stream to a journal as temporary stream.
@@ -1028,10 +1033,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_getstatus(LibMCDa
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
 * @param[in] eNewExecutionStatus - Status Value
-* @param[in] nRelativeEndTimeStampInMicroseconds - New End Time of execution in Microseconds in relation to the start of the journal. MUST be larger or equal than start time stamp.
+* @param[in] nAbsoluteEndTimeStampInMicrosecondsSince1970 - New End Time of execution in Microseconds since 1970. MUST be larger or equal than start time stamp.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, LibMCData_uint64 nRelativeEndTimeStampInMicroseconds);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_changestatus(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970);
 
 /**
 * returns the build job description.
@@ -1181,9 +1186,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_hasjobexecutionda
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
 * @param[in] pKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 * @param[in] pValue - Value to store.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Checks if a metadata string exists.
@@ -1354,9 +1360,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_jobcanbearchived(LibMCData
 * @param[in] pStream - Storage Stream Instance
 * @param[in] eDataType - Datatype of Job data
 * @param[in] pUserID - Currently authenticated user
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Retrieves a list of build job data objects, filtered by type.
@@ -1423,9 +1430,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_hasjobdataidentifier(LibMC
 * @param[in] pBuildJob - BuildJob instance.
 * @param[in] pKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 * @param[in] pValue - Value to store.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Checks if a metadata string exists.
@@ -1455,11 +1463,11 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getmetadatastring(LibMCDat
 * @param[in] pBuildJob - BuildJob instance.
 * @param[in] pDescription - Description of the execution.
 * @param[in] pUserUUID - UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded.
-* @param[in] nRelativeStartTimeStampInMicroseconds - Start Time in Microseconds in relation to the start of the journal.
+* @param[in] nAbsoluteStartTimeStampInMicrosecondsSince1970 - Absolute Start Time in Microseconds since 1970.
 * @param[out] pExecutionInstance - Newly created execution instance.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_uint64 nRelativeStartTimeStampInMicroseconds, LibMCData_BuildJobExecution * pExecutionInstance);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_createbuildjobexecution(LibMCData_BuildJob pBuildJob, const char * pDescription, const char * pUserUUID, LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970, LibMCData_BuildJobExecution * pExecutionInstance);
 
 /**
 * Retrieves a new build job execution by uuid.
@@ -1517,10 +1525,11 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobiterator_getcurrentjob(LibM
 * @param[in] pName - Name String
 * @param[in] pUserID - Currently authenticated user
 * @param[in] pStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @param[out] pJobInstance - Build Job Instance.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, const char * pStorageStreamUUID, LibMCData_BuildJob * pJobInstance);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, const char * pStorageStreamUUID, LibMCData_uint64 nAbsoluteTimeStamp, LibMCData_BuildJob * pJobInstance);
 
 /**
 * Retrieves a job with a specific UUID.
@@ -1940,9 +1949,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_deletepersistent
 * @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 * @param[in] eDataType - Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type.
 * @param[in] pValue - Value of the parameter. MUST be of appropriate type.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData::eParameterDataType eDataType, const char * pValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData::eParameterDataType eDataType, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Stores a persistent parameter in the database. Creates a new parameter if not existing.
@@ -1951,9 +1961,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentp
 * @param[in] pUUID - UUID of the parameter
 * @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 * @param[in] pValue - Value of the parameter.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Stores a persistent parameter in the database. Creates a new parameter if not existing.
@@ -1962,9 +1973,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistents
 * @param[in] pUUID - UUID of the parameter
 * @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 * @param[in] pValue - Value of the parameter. MUST be of appropriate type.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Stores a persistent parameter in the database. Creates a new parameter if not existing.
@@ -1973,9 +1985,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentu
 * @param[in] pUUID - UUID of the parameter
 * @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 * @param[in] dValue - Value of the parameter.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_double dValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_double dValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Stores a persistent parameter in the database. Creates a new parameter if not existing.
@@ -1984,9 +1997,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentd
 * @param[in] pUUID - UUID of the parameter
 * @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 * @param[in] nValue - Value of the parameter.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_int64 nValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_int64 nValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Stores a persistent parameter in the database. Creates a new parameter if not existing.
@@ -1995,9 +2009,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistenti
 * @param[in] pUUID - UUID of the parameter
 * @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
 * @param[in] bValue - Value of the parameter.
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, bool bValue);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, bool bValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
