@@ -1117,9 +1117,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_computeelapsedtim
 * @param[in] pStream - Storage Stream Instance
 * @param[in] eDataType - Datatype of Job Execution data
 * @param[in] pUserUUID - UUID of Currently authenticated user
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Retrieves a list of build job execution data objects, filtered by type.
@@ -1189,7 +1190,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_hasjobexecutionda
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_storemetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Checks if a metadata string exists.
@@ -1433,7 +1434,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_hasjobdataidentifier(LibMC
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_storemetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Checks if a metadata string exists.

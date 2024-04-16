@@ -2162,11 +2162,11 @@ public:
 	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
 
 	/**
-	* IBuildExecution::AddMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* IBuildExecution::StoreMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+	virtual void StoreMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
 
 	/**
 	* IBuildExecution::HasMetaDataString - Checks if a metadata string exists.
@@ -2372,11 +2372,11 @@ public:
 	virtual IBuildExecutionIterator * ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession) = 0;
 
 	/**
-	* IBuild::AddMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* IBuild::StoreMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+	virtual void StoreMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
 
 	/**
 	* IBuild::HasMetaDataString - Checks if a metadata string exists.

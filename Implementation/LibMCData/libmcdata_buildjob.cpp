@@ -408,7 +408,7 @@ bool CBuildJob::HasJobDataIdentifier(const std::string& sIdentifier)
 }
 
 
-void CBuildJob::AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
+void CBuildJob::StoreMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     if (sKey.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBMETADATAKEYEMPTY);

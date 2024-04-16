@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CBuildJobExecution
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "libmcdata_buildjobexecutiondata.hpp"
+#include "libmcdata_buildjobexecutiondataiterator.hpp"
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 
@@ -266,43 +268,142 @@ LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibM
 	}
 }
 
-void CBuildJobExecution::AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID)
+void CBuildJobExecution::AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	if (pStream == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+	auto sStreamUUID = pStream->GetUUID();
+	auto sStreamSHA2 = pStream->GetSHA2();
+	auto nStreamSize = pStream->GetSize();
+
+	auto sTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC(nAbsoluteTimeStamp);
+	std::unique_ptr<CBuildJobExecutionData> buildJobData(CBuildJobExecutionData::createInDatabase(sIdentifier, sName, m_sExecutionUUID, eDataType, sTimeStamp, sStreamUUID, sUserUUID, sStreamSHA2, nStreamSize, m_pSQLHandler, m_pStorageState));
 }
+
+CBuildJobExecutionData* CBuildJobExecution::makeJobExecutionDataEx(AMCData::CSQLStatement* pStatement)
+{
+	if (pStatement == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+	std::string sDataUUID = pStatement->getColumnUUID(1);
+	std::string sExecutionUUID = pStatement->getColumnString(2);
+	std::string sIdentifier = pStatement->getColumnString(3);
+	std::string sName = pStatement->getColumnString(4);
+	LibMCData::eCustomDataType eDataType = CCustomDataStream::convertStringToCustomDataType(pStatement->getColumnString(5));
+	std::string sTimeStamp = pStatement->getColumnString(6);
+	std::string sStorageStreamUUID = pStatement->getColumnUUID(7);
+	std::string sUserID = pStatement->getColumnString(8);
+	std::string sSHA2 = pStatement->getColumnString(9);
+	uint64_t nStreamSize = pStatement->getColumnInt64(10);
+
+	return CBuildJobExecutionData::make(sDataUUID, sIdentifier, sName, sExecutionUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, m_pSQLHandler, m_pStorageState);
+}
+
+
+IBuildJobExecutionDataIterator* CBuildJobExecution::listJobExecutionDataEx(AMCData::CSQLStatement* pStatement)
+{
+	if (pStatement == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+	std::unique_ptr<CBuildJobExecutionDataIterator> buildJobIterator(new CBuildJobExecutionDataIterator());
+
+	while (pStatement->nextRow()) {
+		buildJobIterator->AddJobExecutionData(std::shared_ptr<CBuildJobExecutionData>(makeJobExecutionDataEx(pStatement)));
+	}
+
+	return buildJobIterator.release();
+}
+
+
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType)
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobexecutiondata.timestamp";
+	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	pStatement->setString(1, m_sExecutionUUID);
+	pStatement->setInt(2, 1);
+	pStatement->setString(3, CCustomDataStream::convertCustomDataTypeToString(eDataType));
+
+	return listJobExecutionDataEx(pStatement.get());
 }
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionData()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? ORDER BY buildjobexecutiondata.timestamp";
+	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	pStatement->setString(1, m_sExecutionUUID);
+	pStatement->setInt(2, 1);
+
+	return listJobExecutionDataEx(pStatement.get());
 }
 
 IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionData(const std::string& sDataUUID)
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedDataUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+
+	std::unique_ptr<CBuildJobExecutionDataIterator> buildJobIterator(new CBuildJobExecutionDataIterator());
+
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
+	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	pStatement->setString(1, m_sExecutionUUID);
+	pStatement->setString(2, sNormalizedDataUUID);
+	pStatement->setInt(3, 1);
+
+	if (!pStatement->nextRow())
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND, "build job execution data not found: " + sNormalizedDataUUID);
+
+	return makeJobExecutionDataEx(pStatement.get());
 }
 
 IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionDataByIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	if (sIdentifier.empty())
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER, "empty job execution data identifier");
+
+	std::unique_ptr<CBuildJobExecutionDataIterator> buildJobIterator(new CBuildJobExecutionDataIterator());
+
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
+	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	pStatement->setString(1, m_sExecutionUUID);
+	pStatement->setString(2, sIdentifier);
+	pStatement->setInt(3, 1);
+
+	if (!pStatement->nextRow())
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND, "build job execution data not found: " + sIdentifier);
+
+	return makeJobExecutionDataEx(pStatement.get());
 }
 
 bool CBuildJobExecution::HasJobExecutionDataUUID(const std::string& sUUID)
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedDataUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid FROM buildjobexecutiondata WHERE jobuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
+	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	pStatement->setString(1, m_sExecutionUUID);
+	pStatement->setString(2, sNormalizedDataUUID);
+	pStatement->setInt(3, 1);
+
+	return (pStatement->nextRow());
 }
 
 bool CBuildJobExecution::HasJobExecutionDataIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+	if (sIdentifier.empty())
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER, "empty job execution data identifier");
+
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid FROM buildjobexecutiondata WHERE jobuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
+	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	pStatement->setString(1, m_sExecutionUUID);
+	pStatement->setString(2, sIdentifier);
+	pStatement->setInt(3, 1);
+
+	return (pStatement->nextRow());
 }
 
 
-void CBuildJobExecution::AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
+void CBuildJobExecution::StoreMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	if (sKey.empty())
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYEMPTY);

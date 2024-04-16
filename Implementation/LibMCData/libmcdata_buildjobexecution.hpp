@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CBuildJobExecution
 #define __LIBMCDATA_BUILDJOBEXECUTION
 
 #include "libmcdata_interfaces.hpp"
+#include "libmcdata_buildjobexecutiondata.hpp"
 
 // Parent classes
 #include "libmcdata_base.hpp"
@@ -66,6 +67,9 @@ private:
 	std::string m_sJournalUUID;
 	uint64_t m_nStartJournalTimestamp;
 	AMCData::PStorageState m_pStorageState;
+
+	CBuildJobExecutionData* makeJobExecutionDataEx(AMCData::CSQLStatement* pStatement);
+	IBuildJobExecutionDataIterator* listJobExecutionDataEx(AMCData::CSQLStatement* pStatement);
 
 
 public:
@@ -100,7 +104,7 @@ public:
 
 	LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) override;
 
-	void AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID) override;
+	void AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	IBuildJobExecutionDataIterator* ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType) override;
 
@@ -114,7 +118,7 @@ public:
 
 	bool HasJobExecutionDataIdentifier(const std::string& sIdentifier) override;
 
-	void AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+	void StoreMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	bool HasMetaDataString(const std::string& sKey) override;
 

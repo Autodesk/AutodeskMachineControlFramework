@@ -2545,7 +2545,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StorePNGImagePtr) (LibMCEnv_Bui
 * @param[in] pValue - Value to store.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvBuildExecution_AddMetaDataStringPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const char * pValue);
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StoreMetaDataStringPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const char * pValue);
 
 /**
 * Checks if a metadata string exists.
@@ -2838,7 +2838,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_ListExecutionsByStatusPtr) (LibMCEnv_Bui
 * @param[in] pValue - Value to store.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvBuild_AddMetaDataStringPtr) (LibMCEnv_Build pBuild, const char * pKey, const char * pValue);
+typedef LibMCEnvResult (*PLibMCEnvBuild_StoreMetaDataStringPtr) (LibMCEnv_Build pBuild, const char * pKey, const char * pValue);
 
 /**
 * Checks if a metadata string exists.
@@ -7754,7 +7754,7 @@ typedef struct {
 	PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr m_BuildExecution_LoadPNGImageByIdentifier;
 	PLibMCEnvBuildExecution_LoadPNGImageByUUIDPtr m_BuildExecution_LoadPNGImageByUUID;
 	PLibMCEnvBuildExecution_StorePNGImagePtr m_BuildExecution_StorePNGImage;
-	PLibMCEnvBuildExecution_AddMetaDataStringPtr m_BuildExecution_AddMetaDataString;
+	PLibMCEnvBuildExecution_StoreMetaDataStringPtr m_BuildExecution_StoreMetaDataString;
 	PLibMCEnvBuildExecution_HasMetaDataStringPtr m_BuildExecution_HasMetaDataString;
 	PLibMCEnvBuildExecution_GetMetaDataStringPtr m_BuildExecution_GetMetaDataString;
 	PLibMCEnvBuildExecutionIterator_GetCurrentExecutionPtr m_BuildExecutionIterator_GetCurrentExecution;
@@ -7781,7 +7781,7 @@ typedef struct {
 	PLibMCEnvBuild_FindExecutionPtr m_Build_FindExecution;
 	PLibMCEnvBuild_ListExecutionsPtr m_Build_ListExecutions;
 	PLibMCEnvBuild_ListExecutionsByStatusPtr m_Build_ListExecutionsByStatus;
-	PLibMCEnvBuild_AddMetaDataStringPtr m_Build_AddMetaDataString;
+	PLibMCEnvBuild_StoreMetaDataStringPtr m_Build_StoreMetaDataString;
 	PLibMCEnvBuild_HasMetaDataStringPtr m_Build_HasMetaDataString;
 	PLibMCEnvBuild_GetMetaDataStringPtr m_Build_GetMetaDataString;
 	PLibMCEnvWorkingFileExecution_GetStatusPtr m_WorkingFileExecution_GetStatus;

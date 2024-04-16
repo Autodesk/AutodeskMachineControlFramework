@@ -3534,7 +3534,7 @@ LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(Lib
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, eLibMCDataCustomDataType eDataType, const char * pUserUUID)
+LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, eLibMCDataCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
 
@@ -3557,7 +3557,7 @@ LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJ
 		if (!pIBuildJobExecution)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJobExecution->AddJobExecutionData(sIdentifier, sName, pIStream, eDataType, sUserUUID);
+		pIBuildJobExecution->AddJobExecutionData(sIdentifier, sName, pIStream, eDataType, sUserUUID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -3748,7 +3748,7 @@ LibMCDataResult libmcdata_buildjobexecution_hasjobexecutiondataidentifier(LibMCD
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
+LibMCDataResult libmcdata_buildjobexecution_storemetadatastring(LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
 
@@ -3763,7 +3763,7 @@ LibMCDataResult libmcdata_buildjobexecution_addmetadatastring(LibMCData_BuildJob
 		if (!pIBuildJobExecution)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJobExecution->AddMetaDataString(sKey, sValue, nAbsoluteTimeStamp);
+		pIBuildJobExecution->StoreMetaDataString(sKey, sValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -4526,7 +4526,7 @@ LibMCDataResult libmcdata_buildjob_hasjobdataidentifier(LibMCData_BuildJob pBuil
 	}
 }
 
-LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
+LibMCDataResult libmcdata_buildjob_storemetadatastring(LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJob;
 
@@ -4541,7 +4541,7 @@ LibMCDataResult libmcdata_buildjob_addmetadatastring(LibMCData_BuildJob pBuildJo
 		if (!pIBuildJob)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIBuildJob->AddMetaDataString(sKey, sValue, nAbsoluteTimeStamp);
+		pIBuildJob->StoreMetaDataString(sKey, sValue, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -7552,8 +7552,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_buildjobexecution_hasjobexecutiondatauuid;
 	if (sProcName == "libmcdata_buildjobexecution_hasjobexecutiondataidentifier") 
 		*ppProcAddress = (void*) &libmcdata_buildjobexecution_hasjobexecutiondataidentifier;
-	if (sProcName == "libmcdata_buildjobexecution_addmetadatastring") 
-		*ppProcAddress = (void*) &libmcdata_buildjobexecution_addmetadatastring;
+	if (sProcName == "libmcdata_buildjobexecution_storemetadatastring") 
+		*ppProcAddress = (void*) &libmcdata_buildjobexecution_storemetadatastring;
 	if (sProcName == "libmcdata_buildjobexecution_hasmetadatastring") 
 		*ppProcAddress = (void*) &libmcdata_buildjobexecution_hasmetadatastring;
 	if (sProcName == "libmcdata_buildjobexecution_getmetadatastring") 
@@ -7600,8 +7600,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_buildjob_hasjobdatauuid;
 	if (sProcName == "libmcdata_buildjob_hasjobdataidentifier") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_hasjobdataidentifier;
-	if (sProcName == "libmcdata_buildjob_addmetadatastring") 
-		*ppProcAddress = (void*) &libmcdata_buildjob_addmetadatastring;
+	if (sProcName == "libmcdata_buildjob_storemetadatastring") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_storemetadatastring;
 	if (sProcName == "libmcdata_buildjob_hasmetadatastring") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_hasmetadatastring;
 	if (sProcName == "libmcdata_buildjob_getmetadatastring") 

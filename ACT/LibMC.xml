@@ -613,10 +613,10 @@
 		<error name="ALERTLISTNAMEMISSING" code="587" description="Alert list name missing" />		
 		<error name="JOURNALVARIABLEISNOTNUMERIC" code="588" description="Journal variable is not numeric" />		
 		<error name="UNITSAREOUTOFRANGE" code="589" description="Units are out of range" />				
-		<error name="JOURNALTIMESTAMPINVALID" code="590" description="Journal time stamp is invalid" />		
-		
-		
-		
+		<error name="JOURNALTIMESTAMPINVALID" code="590" description="Journal time stamp is invalid" />				
+		<error name="CALLBACKLOGGERDOESNOTSUPPORTRETRIEVAL" code="591" description="Callback logger does not support retrieval" />		
+		<error name="STDERRLOGGERDOESNOTSUPPORTRETRIEVAL" code="592" description="Stderr logger does not support retrieval" />		
+		<error name="STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL" code="593" description="Stdout logger does not support retrieval" />		
 		
 	</errors>
 	

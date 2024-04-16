@@ -118,7 +118,7 @@ public:
 
 	IBuildExecutionIterator* ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession) override;
 
-	void AddMetaDataString(const std::string& sKey, const std::string& sValue) override;
+	void StoreMetaDataString(const std::string& sKey, const std::string& sValue) override;
 
 	bool HasMetaDataString(const std::string& sKey) override;
 

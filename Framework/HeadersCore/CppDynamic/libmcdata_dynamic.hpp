@@ -566,6 +566,8 @@ public:
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "BUILDJOBEXECUTIONMETADATAKEYNOTFOUND";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "BUILDJOBEXECUTIONMETADATAKEYDUPLICATE";
 			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "EMPTYJOBDATAIDENTIFIER";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "BUILDJOBEXECUTIONDATANOTFOUND";
+			case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "EMPTYJOBEXECUTIONDATAIDENTIFIER";
 		}
 		return "UNKNOWN";
 	}
@@ -887,6 +889,8 @@ public:
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "Build job execution metadata key not found.";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "Build job execution metadata key is duplicate.";
 			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "Empty job data identifier.";
+			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "Build job execution data not found.";
+			case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "Empty job execution data identifier.";
 		}
 		return "unknown error";
 	}
@@ -1417,14 +1421,14 @@ public:
 	inline LibMCData_uint64 GetStartTimeStampInMicroseconds();
 	inline LibMCData_uint64 GetEndTimeStampInMicroseconds();
 	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds);
-	inline void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID);
+	inline void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobExecutionDataIterator ListJobExecutionDataByType(const eCustomDataType eDataType);
 	inline PBuildJobExecutionDataIterator ListJobExecutionData();
 	inline PBuildJobExecutionData RetrieveJobExecutionData(const std::string & sDataUUID);
 	inline PBuildJobExecutionData RetrieveJobExecutionDataByIdentifier(const std::string & sIdentifier);
 	inline bool HasJobExecutionDataUUID(const std::string & sUUID);
 	inline bool HasJobExecutionDataIdentifier(const std::string & sIdentifier);
-	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
 };
@@ -1480,7 +1484,7 @@ public:
 	inline PBuildJobData RetrieveJobDataByIdentifier(const std::string & sIdentifier);
 	inline bool HasJobDataUUID(const std::string & sUUID);
 	inline bool HasJobDataIdentifier(const std::string & sIdentifier);
-	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
 	inline PBuildJobExecution CreateBuildJobExecution(const std::string & sDescription, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteStartTimeStampInMicrosecondsSince1970);
@@ -1860,7 +1864,7 @@ public:
 		pWrapperTable->m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier = nullptr;
 		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataUUID = nullptr;
 		pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier = nullptr;
-		pWrapperTable->m_BuildJobExecution_AddMetaDataString = nullptr;
+		pWrapperTable->m_BuildJobExecution_StoreMetaDataString = nullptr;
 		pWrapperTable->m_BuildJobExecution_HasMetaDataString = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetMetaDataString = nullptr;
 		pWrapperTable->m_BuildJobExecutionIterator_GetCurrentJobExecution = nullptr;
@@ -1884,7 +1888,7 @@ public:
 		pWrapperTable->m_BuildJob_RetrieveJobDataByIdentifier = nullptr;
 		pWrapperTable->m_BuildJob_HasJobDataUUID = nullptr;
 		pWrapperTable->m_BuildJob_HasJobDataIdentifier = nullptr;
-		pWrapperTable->m_BuildJob_AddMetaDataString = nullptr;
+		pWrapperTable->m_BuildJob_StoreMetaDataString = nullptr;
 		pWrapperTable->m_BuildJob_HasMetaDataString = nullptr;
 		pWrapperTable->m_BuildJob_GetMetaDataString = nullptr;
 		pWrapperTable->m_BuildJob_CreateBuildJobExecution = nullptr;
@@ -2887,12 +2891,12 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildJobExecution_AddMetaDataString = (PLibMCDataBuildJobExecution_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_addmetadatastring");
+		pWrapperTable->m_BuildJobExecution_StoreMetaDataString = (PLibMCDataBuildJobExecution_StoreMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_storemetadatastring");
 		#else // _WIN32
-		pWrapperTable->m_BuildJobExecution_AddMetaDataString = (PLibMCDataBuildJobExecution_AddMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_addmetadatastring");
+		pWrapperTable->m_BuildJobExecution_StoreMetaDataString = (PLibMCDataBuildJobExecution_StoreMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_storemetadatastring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_BuildJobExecution_AddMetaDataString == nullptr)
+		if (pWrapperTable->m_BuildJobExecution_StoreMetaDataString == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3103,12 +3107,12 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildJob_AddMetaDataString = (PLibMCDataBuildJob_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_addmetadatastring");
+		pWrapperTable->m_BuildJob_StoreMetaDataString = (PLibMCDataBuildJob_StoreMetaDataStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_storemetadatastring");
 		#else // _WIN32
-		pWrapperTable->m_BuildJob_AddMetaDataString = (PLibMCDataBuildJob_AddMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjob_addmetadatastring");
+		pWrapperTable->m_BuildJob_StoreMetaDataString = (PLibMCDataBuildJob_StoreMetaDataStringPtr) dlsym(hLibrary, "libmcdata_buildjob_storemetadatastring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_BuildJob_AddMetaDataString == nullptr)
+		if (pWrapperTable->m_BuildJob_StoreMetaDataString == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4217,8 +4221,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_HasJobExecutionDataIdentifier == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_buildjobexecution_addmetadatastring", (void**)&(pWrapperTable->m_BuildJobExecution_AddMetaDataString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_AddMetaDataString == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_storemetadatastring", (void**)&(pWrapperTable->m_BuildJobExecution_StoreMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_StoreMetaDataString == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobexecution_hasmetadatastring", (void**)&(pWrapperTable->m_BuildJobExecution_HasMetaDataString));
@@ -4313,8 +4317,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_HasJobDataIdentifier == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_buildjob_addmetadatastring", (void**)&(pWrapperTable->m_BuildJob_AddMetaDataString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_AddMetaDataString == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_buildjob_storemetadatastring", (void**)&(pWrapperTable->m_BuildJob_StoreMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_StoreMetaDataString == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_hasmetadatastring", (void**)&(pWrapperTable->m_BuildJob_HasMetaDataString));
@@ -5991,11 +5995,12 @@ public:
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job Execution data
 	* @param[in] sUserUUID - UUID of Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CBuildJobExecution::AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID)
+	void CBuildJobExecution::AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -6088,14 +6093,14 @@ public:
 	}
 	
 	/**
-	* CBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
+	* CBuildJobExecution::StoreMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CBuildJobExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CBuildJobExecution::StoreMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_StoreMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -6407,14 +6412,14 @@ public:
 	}
 	
 	/**
-	* CBuildJob::AddMetaDataString - Adds a Metadata String to the build job.
+	* CBuildJob::StoreMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CBuildJob::AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CBuildJob::StoreMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_StoreMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**

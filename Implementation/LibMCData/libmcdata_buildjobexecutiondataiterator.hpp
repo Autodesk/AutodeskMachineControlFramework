@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CBuildJobExecutionDataIterator
 #endif
 
 // Include custom headers here.
+#include "libmcdata_buildjobexecutiondata.hpp"
 
 
 namespace LibMCData {
@@ -58,28 +59,19 @@ namespace Impl {
 class CBuildJobExecutionDataIterator : public virtual IBuildJobExecutionDataIterator, public virtual CIterator {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
-
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    CBuildJobExecutionDataIterator();
 
+    virtual ~CBuildJobExecutionDataIterator();
 
-	/**
-	* Public member functions to implement.
-	*/
+    IBase* GetCurrent() override;
 
-	IBuildJobExecutionData * GetCurrentJobExecutionData() override;
+    IBuildJobExecutionData* GetCurrentJobExecutionData() override;
+
+    IIterator* Clone() override;
+
+    void AddJobExecutionData(std::shared_ptr<CBuildJobExecutionData> pBuildJobExecutionData);
 
 };
 

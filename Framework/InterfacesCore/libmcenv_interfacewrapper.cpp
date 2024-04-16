@@ -7381,7 +7381,7 @@ LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBu
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_addmetadatastring(LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const char * pValue)
+LibMCEnvResult libmcenv_buildexecution_storemetadatastring(LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const char * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
@@ -7396,7 +7396,7 @@ LibMCEnvResult libmcenv_buildexecution_addmetadatastring(LibMCEnv_BuildExecution
 		if (!pIBuildExecution)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIBuildExecution->AddMetaDataString(sKey, sValue);
+		pIBuildExecution->StoreMetaDataString(sKey, sValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -8354,7 +8354,7 @@ LibMCEnvResult libmcenv_build_listexecutionsbystatus(LibMCEnv_Build pBuild, eLib
 	}
 }
 
-LibMCEnvResult libmcenv_build_addmetadatastring(LibMCEnv_Build pBuild, const char * pKey, const char * pValue)
+LibMCEnvResult libmcenv_build_storemetadatastring(LibMCEnv_Build pBuild, const char * pKey, const char * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
@@ -8369,7 +8369,7 @@ LibMCEnvResult libmcenv_build_addmetadatastring(LibMCEnv_Build pBuild, const cha
 		if (!pIBuild)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIBuild->AddMetaDataString(sKey, sValue);
+		pIBuild->StoreMetaDataString(sKey, sValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -23125,8 +23125,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_loadpngimagebyuuid;
 	if (sProcName == "libmcenv_buildexecution_storepngimage") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_storepngimage;
-	if (sProcName == "libmcenv_buildexecution_addmetadatastring") 
-		*ppProcAddress = (void*) &libmcenv_buildexecution_addmetadatastring;
+	if (sProcName == "libmcenv_buildexecution_storemetadatastring") 
+		*ppProcAddress = (void*) &libmcenv_buildexecution_storemetadatastring;
 	if (sProcName == "libmcenv_buildexecution_hasmetadatastring") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_hasmetadatastring;
 	if (sProcName == "libmcenv_buildexecution_getmetadatastring") 
@@ -23179,8 +23179,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_build_listexecutions;
 	if (sProcName == "libmcenv_build_listexecutionsbystatus") 
 		*ppProcAddress = (void*) &libmcenv_build_listexecutionsbystatus;
-	if (sProcName == "libmcenv_build_addmetadatastring") 
-		*ppProcAddress = (void*) &libmcenv_build_addmetadatastring;
+	if (sProcName == "libmcenv_build_storemetadatastring") 
+		*ppProcAddress = (void*) &libmcenv_build_storemetadatastring;
 	if (sProcName == "libmcenv_build_hasmetadatastring") 
 		*ppProcAddress = (void*) &libmcenv_build_hasmetadatastring;
 	if (sProcName == "libmcenv_build_getmetadatastring") 

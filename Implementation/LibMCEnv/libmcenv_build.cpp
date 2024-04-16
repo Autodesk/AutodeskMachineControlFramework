@@ -355,7 +355,7 @@ IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildEx
 
 }
 
-void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+void CBuild::StoreMetaDataString(const std::string& sKey, const std::string& sValue)
 {
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
@@ -363,7 +363,7 @@ void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValu
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
 
-	pBuildJob->AddMetaDataString(sKey, sValue, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
+	pBuildJob->StoreMetaDataString(sKey, sValue, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 }
 

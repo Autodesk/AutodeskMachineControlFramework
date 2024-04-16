@@ -129,7 +129,7 @@ public:
 
 	std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
 
-	void AddMetaDataString(const std::string & sKey, const std::string & sValue) override;
+	void StoreMetaDataString(const std::string & sKey, const std::string & sValue) override;
 
 	bool HasMetaDataString(const std::string & sKey) override;
 

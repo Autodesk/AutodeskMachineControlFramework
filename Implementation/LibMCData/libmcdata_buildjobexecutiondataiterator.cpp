@@ -43,8 +43,34 @@ using namespace LibMCData::Impl;
  Class definition of CBuildJobExecutionDataIterator 
 **************************************************************************************************************************/
 
-IBuildJobExecutionData * CBuildJobExecutionDataIterator::GetCurrentJobExecutionData()
+CBuildJobExecutionDataIterator::CBuildJobExecutionDataIterator()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+
+}
+
+CBuildJobExecutionDataIterator::~CBuildJobExecutionDataIterator()
+{
+
+}
+
+IBase* CBuildJobExecutionDataIterator::GetCurrent()
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionData* CBuildJobExecutionDataIterator::GetCurrentJobExecutionData()
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+
+IIterator* CBuildJobExecutionDataIterator::Clone()
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+void CBuildJobExecutionDataIterator::AddJobExecutionData(std::shared_ptr<CBuildJobExecutionData> pBuildJobExecutionData)
+{
+
 }
 

@@ -1100,8 +1100,9 @@ public:
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job Execution data
 	* @param[in] sUserUUID - UUID of Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID) = 0;
+	virtual void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJobExecution::ListJobExecutionDataByType - Retrieves a list of build job execution data objects, filtered by type.
@@ -1145,12 +1146,12 @@ public:
 	virtual bool HasJobExecutionDataIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildJobExecution::AddMetaDataString - Adds a Metadata String to the build job.
+	* IBuildJobExecution::StoreMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void StoreMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJobExecution::HasMetaDataString - Checks if a metadata string exists.
@@ -1321,12 +1322,12 @@ public:
 	virtual bool HasJobDataIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildJob::AddMetaDataString - Adds a Metadata String to the build job.
+	* IBuildJob::StoreMetaDataString - Adds a Metadata String to the build job.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void StoreMetaDataString(const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJob::HasMetaDataString - Checks if a metadata string exists.

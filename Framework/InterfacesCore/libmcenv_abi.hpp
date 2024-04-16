@@ -2558,7 +2558,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_
 * @param[in] pValue - Value to store.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_addmetadatastring(LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const char * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storemetadatastring(LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const char * pValue);
 
 /**
 * Checks if a metadata string exists.
@@ -2851,7 +2851,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_listexecutionsbystatus(LibMCEnv_
 * @param[in] pValue - Value to store.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addmetadatastring(LibMCEnv_Build pBuild, const char * pKey, const char * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storemetadatastring(LibMCEnv_Build pBuild, const char * pKey, const char * pValue);
 
 /**
 * Checks if a metadata string exists.

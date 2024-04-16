@@ -224,8 +224,10 @@ std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, cons
 
 	pStorage->StoreNewStream(sDataUUID, m_pExecution->GetExecutionUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 
+	auto nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
-	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID);
+	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID, nAbsoluteTimeStamp);
 
 	return sDataUUID;
 }
@@ -313,10 +315,10 @@ std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifie
 
 }
 
-void CBuildExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+void CBuildExecution::StoreMetaDataString(const std::string & sKey, const std::string & sValue)
 {
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	m_pExecution->AddMetaDataString(sKey, sValue, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
+	m_pExecution->StoreMetaDataString(sKey, sValue, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 }
 
 bool CBuildExecution::HasMetaDataString(const std::string & sKey)

@@ -1480,7 +1480,7 @@ public:
 	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
 	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
-	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
 };
@@ -1539,7 +1539,7 @@ public:
 	inline PBuildExecution FindExecution(const std::string & sExecutionUUID);
 	inline PBuildExecutionIterator ListExecutions(const bool bOnlyCurrentJournalSession);
 	inline PBuildExecutionIterator ListExecutionsByStatus(const eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession);
-	inline void AddMetaDataString(const std::string & sKey, const std::string & sValue);
+	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
 };
@@ -2749,7 +2749,7 @@ public:
 		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = nullptr;
 		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = nullptr;
 		pWrapperTable->m_BuildExecution_StorePNGImage = nullptr;
-		pWrapperTable->m_BuildExecution_AddMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecution_StoreMetaDataString = nullptr;
 		pWrapperTable->m_BuildExecution_HasMetaDataString = nullptr;
 		pWrapperTable->m_BuildExecution_GetMetaDataString = nullptr;
 		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = nullptr;
@@ -2776,7 +2776,7 @@ public:
 		pWrapperTable->m_Build_FindExecution = nullptr;
 		pWrapperTable->m_Build_ListExecutions = nullptr;
 		pWrapperTable->m_Build_ListExecutionsByStatus = nullptr;
-		pWrapperTable->m_Build_AddMetaDataString = nullptr;
+		pWrapperTable->m_Build_StoreMetaDataString = nullptr;
 		pWrapperTable->m_Build_HasMetaDataString = nullptr;
 		pWrapperTable->m_Build_GetMetaDataString = nullptr;
 		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
@@ -5383,12 +5383,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BuildExecution_AddMetaDataString = (PLibMCEnvBuildExecution_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_addmetadatastring");
+		pWrapperTable->m_BuildExecution_StoreMetaDataString = (PLibMCEnvBuildExecution_StoreMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_storemetadatastring");
 		#else // _WIN32
-		pWrapperTable->m_BuildExecution_AddMetaDataString = (PLibMCEnvBuildExecution_AddMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_addmetadatastring");
+		pWrapperTable->m_BuildExecution_StoreMetaDataString = (PLibMCEnvBuildExecution_StoreMetaDataStringPtr) dlsym(hLibrary, "libmcenv_buildexecution_storemetadatastring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_BuildExecution_AddMetaDataString == nullptr)
+		if (pWrapperTable->m_BuildExecution_StoreMetaDataString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5626,12 +5626,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Build_AddMetaDataString = (PLibMCEnvBuild_AddMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_addmetadatastring");
+		pWrapperTable->m_Build_StoreMetaDataString = (PLibMCEnvBuild_StoreMetaDataStringPtr) GetProcAddress(hLibrary, "libmcenv_build_storemetadatastring");
 		#else // _WIN32
-		pWrapperTable->m_Build_AddMetaDataString = (PLibMCEnvBuild_AddMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_addmetadatastring");
+		pWrapperTable->m_Build_StoreMetaDataString = (PLibMCEnvBuild_StoreMetaDataStringPtr) dlsym(hLibrary, "libmcenv_build_storemetadatastring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Build_AddMetaDataString == nullptr)
+		if (pWrapperTable->m_Build_StoreMetaDataString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10473,8 +10473,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StorePNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_buildexecution_addmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_AddMetaDataString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddMetaDataString == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_buildexecution_storemetadatastring", (void**)&(pWrapperTable->m_BuildExecution_StoreMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StoreMetaDataString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_hasmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_HasMetaDataString));
@@ -10581,8 +10581,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_ListExecutionsByStatus == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_build_addmetadatastring", (void**)&(pWrapperTable->m_Build_AddMetaDataString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddMetaDataString == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_build_storemetadatastring", (void**)&(pWrapperTable->m_Build_StoreMetaDataString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StoreMetaDataString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_hasmetadatastring", (void**)&(pWrapperTable->m_Build_HasMetaDataString));
@@ -15339,13 +15339,13 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::AddMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* CBuildExecution::StoreMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	*/
-	void CBuildExecution::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	void CBuildExecution::StoreMetaDataString(const std::string & sKey, const std::string & sValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
 	}
 	
 	/**
@@ -15745,13 +15745,13 @@ public:
 	}
 	
 	/**
-	* CBuild::AddMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* CBuild::StoreMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	*/
-	void CBuild::AddMetaDataString(const std::string & sKey, const std::string & sValue)
+	void CBuild::StoreMetaDataString(const std::string & sKey, const std::string & sValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreMetaDataString(m_pHandle, sKey.c_str(), sValue.c_str()));
 	}
 	
 	/**

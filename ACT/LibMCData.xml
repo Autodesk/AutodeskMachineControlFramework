@@ -382,6 +382,10 @@
 		<error name="BUILDJOBEXECUTIONMETADATAKEYNOTFOUND" code="382" description="Build job execution metadata key not found." />								
 		<error name="BUILDJOBEXECUTIONMETADATAKEYDUPLICATE" code="383" description="Build job execution metadata key is duplicate." />												
 		<error name="EMPTYJOBDATAIDENTIFIER" code="384" description="Empty job data identifier." />								
+		<error name="BUILDJOBEXECUTIONDATANOTFOUND" code="385" description="Build job execution data not found." />								
+		<error name="EMPTYJOBEXECUTIONDATAIDENTIFIER" code="386" description="Empty job execution data identifier." />								
+		
+		
 		
 		
 	</errors>
@@ -1001,6 +1005,7 @@
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
 			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job Execution data" />
 			<param name="UserUUID" type="string" pass="in" description="UUID of Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="ListJobExecutionDataByType" description="Retrieves a list of build job execution data objects, filtered by type.">
@@ -1032,7 +1037,7 @@
 			<param name="HasJobExecutionData" type="bool" pass="return" description="Returns true, if the job execution data exists." />
 		</method>
 
-		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+		<method name="StoreMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
 			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
@@ -1146,7 +1151,7 @@
 			<param name="HasJobData" type="bool" pass="return" description="Returns true, if the job data exists." />
 		</method>
 
-		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+		<method name="StoreMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
 			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />

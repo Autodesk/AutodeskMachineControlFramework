@@ -1104,9 +1104,10 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicros
 * @param[in] pStream - Storage Stream Instance
 * @param[in] eDataType - Datatype of Job Execution data
 * @param[in] pUserUUID - UUID of Currently authenticated user
+* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID);
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Retrieves a list of build job execution data objects, filtered by type.
@@ -1176,7 +1177,7 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_HasJobExecutionDataIdentif
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJobExecution_AddMetaDataStringPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_StoreMetaDataStringPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Checks if a metadata string exists.
@@ -1420,7 +1421,7 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_HasJobDataIdentifierPtr) (LibMCData
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJob_AddMetaDataStringPtr) (LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataBuildJob_StoreMetaDataStringPtr) (LibMCData_BuildJob pBuildJob, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * Checks if a metadata string exists.
@@ -2422,7 +2423,7 @@ typedef struct {
 	PLibMCDataBuildJobExecution_RetrieveJobExecutionDataByIdentifierPtr m_BuildJobExecution_RetrieveJobExecutionDataByIdentifier;
 	PLibMCDataBuildJobExecution_HasJobExecutionDataUUIDPtr m_BuildJobExecution_HasJobExecutionDataUUID;
 	PLibMCDataBuildJobExecution_HasJobExecutionDataIdentifierPtr m_BuildJobExecution_HasJobExecutionDataIdentifier;
-	PLibMCDataBuildJobExecution_AddMetaDataStringPtr m_BuildJobExecution_AddMetaDataString;
+	PLibMCDataBuildJobExecution_StoreMetaDataStringPtr m_BuildJobExecution_StoreMetaDataString;
 	PLibMCDataBuildJobExecution_HasMetaDataStringPtr m_BuildJobExecution_HasMetaDataString;
 	PLibMCDataBuildJobExecution_GetMetaDataStringPtr m_BuildJobExecution_GetMetaDataString;
 	PLibMCDataBuildJobExecutionIterator_GetCurrentJobExecutionPtr m_BuildJobExecutionIterator_GetCurrentJobExecution;
@@ -2446,7 +2447,7 @@ typedef struct {
 	PLibMCDataBuildJob_RetrieveJobDataByIdentifierPtr m_BuildJob_RetrieveJobDataByIdentifier;
 	PLibMCDataBuildJob_HasJobDataUUIDPtr m_BuildJob_HasJobDataUUID;
 	PLibMCDataBuildJob_HasJobDataIdentifierPtr m_BuildJob_HasJobDataIdentifier;
-	PLibMCDataBuildJob_AddMetaDataStringPtr m_BuildJob_AddMetaDataString;
+	PLibMCDataBuildJob_StoreMetaDataStringPtr m_BuildJob_StoreMetaDataString;
 	PLibMCDataBuildJob_HasMetaDataStringPtr m_BuildJob_HasMetaDataString;
 	PLibMCDataBuildJob_GetMetaDataStringPtr m_BuildJob_GetMetaDataString;
 	PLibMCDataBuildJob_CreateBuildJobExecutionPtr m_BuildJob_CreateBuildJobExecution;

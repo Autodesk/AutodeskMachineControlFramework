@@ -63,7 +63,7 @@ namespace AMC {
 
 	void CLogger_Callback::retrieveLogMessages(std::vector<CLoggerEntry>& entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+		throw ELibMCInterfaceException(LIBMC_ERROR_CALLBACKLOGGERDOESNOTSUPPORTRETRIEVAL);
 	}
 
 }

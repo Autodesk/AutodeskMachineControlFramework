@@ -1551,7 +1551,7 @@
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>			
 
-		<method name="AddMetaDataString" description="Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+		<method name="StoreMetaDataString" description="Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
 		</method>
@@ -1692,7 +1692,7 @@
 			<param name="IteratorInstance" type="class" class="BuildExecutionIterator" pass="return" description="Iterator instance." />
 		</method>
 		
-		<method name="AddMetaDataString" description="Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+		<method name="StoreMetaDataString" description="Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
 		</method>

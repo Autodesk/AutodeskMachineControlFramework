@@ -135,7 +135,7 @@ public:
 
     bool HasJobDataIdentifier(const std::string& sIdentifier) override;
 
-    void AddMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+    void StoreMetaDataString(const std::string& sKey, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
     bool HasMetaDataString(const std::string& sKey) override;
 

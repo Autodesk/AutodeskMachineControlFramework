@@ -605,6 +605,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC 588 /** Journal variable is not numeric */
 #define LIBMC_ERROR_UNITSAREOUTOFRANGE 589 /** Units are out of range */
 #define LIBMC_ERROR_JOURNALTIMESTAMPINVALID 590 /** Journal time stamp is invalid */
+#define LIBMC_ERROR_CALLBACKLOGGERDOESNOTSUPPORTRETRIEVAL 591 /** Callback logger does not support retrieval */
+#define LIBMC_ERROR_STDERRLOGGERDOESNOTSUPPORTRETRIEVAL 592 /** Stderr logger does not support retrieval */
+#define LIBMC_ERROR_STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL 593 /** Stdout logger does not support retrieval */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1122,6 +1125,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC: return "Journal variable is not numeric";
     case LIBMC_ERROR_UNITSAREOUTOFRANGE: return "Units are out of range";
     case LIBMC_ERROR_JOURNALTIMESTAMPINVALID: return "Journal time stamp is invalid";
+    case LIBMC_ERROR_CALLBACKLOGGERDOESNOTSUPPORTRETRIEVAL: return "Callback logger does not support retrieval";
+    case LIBMC_ERROR_STDERRLOGGERDOESNOTSUPPORTRETRIEVAL: return "Stderr logger does not support retrieval";
+    case LIBMC_ERROR_STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL: return "Stdout logger does not support retrieval";
     default: return "unknown error";
   }
 }
