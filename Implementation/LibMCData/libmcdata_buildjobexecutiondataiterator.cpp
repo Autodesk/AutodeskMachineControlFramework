@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CBuildJobExecutionDataIterator
 
 #include "libmcdata_buildjobexecutiondataiterator.hpp"
 #include "libmcdata_interfaceexception.hpp"
+#include "libmcdata_buildjobexecutiondata.hpp"
 
 // Include custom headers here.
 
@@ -44,6 +45,7 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 CBuildJobExecutionDataIterator::CBuildJobExecutionDataIterator()
+    : CIterator()
 {
 
 }
@@ -55,22 +57,41 @@ CBuildJobExecutionDataIterator::~CBuildJobExecutionDataIterator()
 
 IBase* CBuildJobExecutionDataIterator::GetCurrent()
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    return GetCurrentJobExecutionData();
 }
 
 IBuildJobExecutionData* CBuildJobExecutionDataIterator::GetCurrentJobExecutionData()
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if ((m_nCurrentIndex < 0) || (m_nCurrentIndex >= m_List.size()))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDITERATOR);
+
+    auto pBuildJobExecutionData = std::dynamic_pointer_cast<CBuildJobExecutionData> (m_List[m_nCurrentIndex]);
+    if (pBuildJobExecutionData.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+
+    return CBuildJobExecutionData::makeFrom(pBuildJobExecutionData.get());
 }
 
 
 IIterator* CBuildJobExecutionDataIterator::Clone()
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    std::unique_ptr<CBuildJobExecutionDataIterator> pNewIterator(new CBuildJobExecutionDataIterator());
+
+    for (auto pBase : m_List) {
+        auto pBuildJobExecutionData = std::dynamic_pointer_cast<CBuildJobExecutionData> (pBase);
+        if (pBuildJobExecutionData.get() == nullptr)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+        pNewIterator->AddJobExecutionData(CBuildJobExecutionData::makeSharedFrom(pBuildJobExecutionData.get()));
+    }
+
+    return pNewIterator.release();
 }
 
 void CBuildJobExecutionDataIterator::AddJobExecutionData(std::shared_ptr<CBuildJobExecutionData> pBuildJobExecutionData)
 {
+    if (pBuildJobExecutionData.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
+    m_List.push_back(pBuildJobExecutionData);
 }
 
