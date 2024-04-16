@@ -71,6 +71,20 @@ CBuildExecution::~CBuildExecution()
 	m_pToolpathHandler = nullptr;
 }
 
+CBuildExecution* CBuildExecution::makeFrom(CBuildExecution* pBuildExecution)
+{
+	if (pBuildExecution == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	return new CBuildExecution(pBuildExecution->m_pExecution, pBuildExecution->m_pDataModel, pBuildExecution->m_pToolpathHandler, pBuildExecution->m_sSystemUserID, pBuildExecution->m_pGlobalChrono);
+}
+
+std::shared_ptr<CBuildExecution> CBuildExecution::makeSharedFrom(CBuildExecution* pBuildExecution)
+{
+	return std::shared_ptr<CBuildExecution>(makeFrom (pBuildExecution));
+}
+
+
 std::string CBuildExecution::GetUUID()
 {
 	return m_sExecutionUUID;

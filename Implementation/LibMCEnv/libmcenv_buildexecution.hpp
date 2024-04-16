@@ -71,6 +71,10 @@ private:
 
 public:
 
+	static CBuildExecution* makeFrom (CBuildExecution * pBuildExecution);
+
+	static std::shared_ptr<CBuildExecution> makeSharedFrom(CBuildExecution* pBuildExecution);
+
 	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuildExecution();

@@ -27,25 +27,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildExecutionIterator
+Abstract: This is the class declaration of CPNGImageStoreOptions
 
 */
 
 
-#ifndef __LIBMCENV_BUILDEXECUTIONITERATOR
-#define __LIBMCENV_BUILDEXECUTIONITERATOR
+#ifndef __LIBMCENV_PNGIMAGESTOREOPTIONS
+#define __LIBMCENV_PNGIMAGESTOREOPTIONS
 
 #include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcenv_iterator.hpp"
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "libmcenv_buildexecution.hpp"
 
 
 namespace LibMCEnv {
@@ -53,23 +52,19 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildExecutionIterator 
+ Class declaration of CPNGImageStoreOptions 
 **************************************************************************************************************************/
 
-class CBuildExecutionIterator : public virtual IBuildExecutionIterator, public virtual CIterator {
+class CPNGImageStoreOptions : public virtual IPNGImageStoreOptions, public virtual CBase {
+private:
 
 public:
-    CBuildExecutionIterator();
 
-    virtual ~CBuildExecutionIterator();
+    CPNGImageStoreOptions();
 
-    IIterator* Clone() override;
+    virtual ~CPNGImageStoreOptions();
 
-    IBase* GetCurrent() override;
-
-    IBuildExecution* GetCurrentExecution() override;
-
-    void AddBuildExecution(std::shared_ptr<CBuildExecution> pBuildExecution);
+	void ResetToDefaults() override;
 
 };
 
@@ -79,4 +74,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_BUILDEXECUTIONITERATOR
+#endif // __LIBMCENV_PNGIMAGESTOREOPTIONS

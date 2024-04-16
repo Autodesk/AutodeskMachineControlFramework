@@ -69,7 +69,8 @@ private:
 
 	std::unique_ptr<std::vector <uint8_t>> m_PixelData;
 
-	std::vector<uint8_t> m_EncodedPNGData;
+	// Depreciated cache for encoding PNG images via EncodePNG ()
+	std::unique_ptr<IPNGImageData> m_EncodedPNGDataCache;
 
 	size_t getBytesPerPixel();
 

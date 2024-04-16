@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CBuildJob
 #include "libmcdata_interfaceexception.hpp"
 #include "libmcdata_storagestream.hpp"
 #include "libmcdata_buildjobexecution.hpp"
+#include "libmcdata_buildjobexecutioniterator.hpp"
 
 #include "libmcdata_buildjobdata.hpp"
 #include "libmcdata_buildjobdataiterator.hpp"
@@ -526,14 +527,53 @@ IBuildJobExecution* CBuildJob::RetrieveBuildJobExecution(const std::string& sExe
     return new CBuildJobExecution(m_pSQLHandler, sNormalizedUUID, m_pStorageState);
 }
 
+IBuildJobExecutionIterator* CBuildJob::listJobExecutionsEx(AMCData::CSQLStatement* pStatement)
+{
+    if (pStatement == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    std::unique_ptr<CBuildJobExecutionIterator> buildJobIterator(new CBuildJobExecutionIterator());
+
+    while (pStatement->nextRow()) {
+        std::string sExecutionUUID = pStatement->getColumnString(1);
+        buildJobIterator->AddJobExecution(std::make_shared<CBuildJobExecution>(m_pSQLHandler, sExecutionUUID, m_pStorageState));
+    }
+
+    return buildJobIterator.release();
+}
+
+
 IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutions(const std::string& sJournalUUIDFilter)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    std::string sJournalQuery;
+    if (!sJournalUUIDFilter.empty())
+        sJournalQuery = " AND journaluuid=?";
+
+    std::string sSelectQuery = "SELECT uuid FROM buildjobexecutions WHERE jobuuid=? AND active=?" + sJournalQuery + " ORDER BY timestamp";
+    auto pStatement = m_pSQLHandler->prepareStatement(sSelectQuery);    
+    pStatement->setString(1, m_sUUID);
+    pStatement->setInt(2, 1);
+    if (!sJournalUUIDFilter.empty())
+        pStatement->setString(3, AMCCommon::CUtils::normalizeUUIDString (sJournalUUIDFilter));
+
+    return listJobExecutionsEx(pStatement.get ());
 }
 
 IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string& sJournalUUIDFilter)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    std::string sJournalQuery;
+    if (!sJournalUUIDFilter.empty())
+        sJournalQuery = " AND journaluuid=?";
+
+    std::string sSelectQuery = "SELECT uuid FROM buildjobexecutions WHERE jobuuid=? AND active=? AND status=?" + sJournalQuery + " ORDER BY timestamp";
+    auto pStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
+    pStatement->setString(1, m_sUUID);
+    pStatement->setInt(2, 1);
+    pStatement->setString(3, CBuildJobExecution::convertBuildJobExecutionStatusToString(eStatusFilter));
+    if (!sJournalUUIDFilter.empty())
+        pStatement->setString(4, AMCCommon::CUtils::normalizeUUIDString(sJournalUUIDFilter));
+
+    return listJobExecutionsEx(pStatement.get());
 }
 
 

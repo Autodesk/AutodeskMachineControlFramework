@@ -27,72 +27,62 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CBuildExecutionIterator
+Abstract: This is a stub class definition of CPNGImageData
 
 */
 
-#include "libmcenv_buildexecutioniterator.hpp"
+#include "libmcenv_pngimagedata.hpp" 
 #include "libmcenv_interfaceexception.hpp"
-
-// Include custom headers here.
 
 
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class definition of CBuildExecutionIterator 
+ Class definition of CPNGImageData 
 **************************************************************************************************************************/
 
-CBuildExecutionIterator::CBuildExecutionIterator()
+CPNGImageData::CPNGImageData(uint32_t nPixelSizeX, uint32_t nPixelSizeY)
+    : m_nPixelSizeX (nPixelSizeX), m_nPixelSizeY (nPixelSizeY)
 {
 
 }
 
-CBuildExecutionIterator::~CBuildExecutionIterator()
+CPNGImageData::~CPNGImageData()
 {
 
 }
 
-
-IBase* CBuildExecutionIterator::GetCurrent()
+void CPNGImageData::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
 {
-    return GetCurrentExecution();
+    nPixelSizeX = m_nPixelSizeX;
+    nPixelSizeY = m_nPixelSizeY;
 }
 
-IBuildExecution* CBuildExecutionIterator::GetCurrentExecution()
+void CPNGImageData::GetPNGDataStream(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer)
 {
-    if ((m_nCurrentIndex < 0) || (m_nCurrentIndex >= m_List.size()))
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDITERATOR);
+    uint64_t nPNGStreamSize = m_PNGStream.size();
+    
+    if (pPNGDataNeededCount != nullptr)
+        *pPNGDataNeededCount = nPNGStreamSize;
 
-    auto pBuildExecution = std::dynamic_pointer_cast<CBuildExecution> (m_List[m_nCurrentIndex]);
-    if (pBuildExecution.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+    if (pPNGDataBuffer != nullptr) {
+        if (nPNGStreamSize > 0) {
+            if (nPNGDataBufferSize < nPNGStreamSize)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
 
-    return CBuildExecution::makeFrom(pBuildExecution.get());
-}
-
-
-IIterator* CBuildExecutionIterator::Clone()
-{
-    std::unique_ptr<CBuildExecutionIterator> pNewIterator(new CBuildExecutionIterator());
-
-    for (auto pBase : m_List) {
-        auto pBuildExecution = std::dynamic_pointer_cast<CBuildExecution> (pBase);
-        if (pBuildExecution.get() == nullptr)
-            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-        pNewIterator->AddBuildExecution(CBuildExecution::makeSharedFrom(pBuildExecution.get()));
+            uint8_t* pSource = m_PNGStream.data ();
+            uint8_t* pTarget = pPNGDataBuffer;
+            for (uint64_t nIndex = 0; nIndex < nPNGStreamSize; nIndex++) {
+                *pTarget = *pSource;
+                pSource++;
+                pTarget++;
+            }
+        }
     }
-
-    return pNewIterator.release();
 }
 
-void CBuildExecutionIterator::AddBuildExecution(std::shared_ptr<CBuildExecution> pBuildExecution)
+std::vector<uint8_t>& CPNGImageData::getPNGStreamBuffer()
 {
-    if (pBuildExecution.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-
-    m_List.push_back(pBuildExecution);
+    return m_PNGStream;
 }
-
-
 

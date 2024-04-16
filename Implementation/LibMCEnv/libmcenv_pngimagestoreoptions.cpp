@@ -27,11 +27,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CBuildExecutionIterator
+Abstract: This is a stub class definition of CPNGImageStoreOptions
 
 */
 
-#include "libmcenv_buildexecutioniterator.hpp"
+#include "libmcenv_pngimagestoreoptions.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -40,59 +40,21 @@ Abstract: This is a stub class definition of CBuildExecutionIterator
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class definition of CBuildExecutionIterator 
+ Class definition of CPNGImageStoreOptions 
 **************************************************************************************************************************/
 
-CBuildExecutionIterator::CBuildExecutionIterator()
+CPNGImageStoreOptions::CPNGImageStoreOptions()
 {
 
 }
 
-CBuildExecutionIterator::~CBuildExecutionIterator()
+CPNGImageStoreOptions::~CPNGImageStoreOptions()
 {
 
 }
 
 
-IBase* CBuildExecutionIterator::GetCurrent()
+void CPNGImageStoreOptions::ResetToDefaults()
 {
-    return GetCurrentExecution();
 }
-
-IBuildExecution* CBuildExecutionIterator::GetCurrentExecution()
-{
-    if ((m_nCurrentIndex < 0) || (m_nCurrentIndex >= m_List.size()))
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDITERATOR);
-
-    auto pBuildExecution = std::dynamic_pointer_cast<CBuildExecution> (m_List[m_nCurrentIndex]);
-    if (pBuildExecution.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-
-    return CBuildExecution::makeFrom(pBuildExecution.get());
-}
-
-
-IIterator* CBuildExecutionIterator::Clone()
-{
-    std::unique_ptr<CBuildExecutionIterator> pNewIterator(new CBuildExecutionIterator());
-
-    for (auto pBase : m_List) {
-        auto pBuildExecution = std::dynamic_pointer_cast<CBuildExecution> (pBase);
-        if (pBuildExecution.get() == nullptr)
-            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-        pNewIterator->AddBuildExecution(CBuildExecution::makeSharedFrom(pBuildExecution.get()));
-    }
-
-    return pNewIterator.release();
-}
-
-void CBuildExecutionIterator::AddBuildExecution(std::shared_ptr<CBuildExecution> pBuildExecution)
-{
-    if (pBuildExecution.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-
-    m_List.push_back(pBuildExecution);
-}
-
-
 

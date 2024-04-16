@@ -27,49 +27,53 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildExecutionIterator
+Abstract: This is the class declaration of CPNGImageData
 
 */
 
 
-#ifndef __LIBMCENV_BUILDEXECUTIONITERATOR
-#define __LIBMCENV_BUILDEXECUTIONITERATOR
+#ifndef __LIBMCENV_PNGIMAGEDATA
+#define __LIBMCENV_PNGIMAGEDATA
 
 #include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcenv_iterator.hpp"
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "libmcenv_buildexecution.hpp"
-
+#include <vector>
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildExecutionIterator 
+ Class declaration of CPNGImageData 
 **************************************************************************************************************************/
 
-class CBuildExecutionIterator : public virtual IBuildExecutionIterator, public virtual CIterator {
+class CPNGImageData : public virtual IPNGImageData, public virtual CBase {
+private:
+
+    uint32_t m_nPixelSizeX;
+    uint32_t m_nPixelSizeY;
+
+    std::vector<uint8_t> m_PNGStream;
 
 public:
-    CBuildExecutionIterator();
 
-    virtual ~CBuildExecutionIterator();
+    CPNGImageData(uint32_t nPixelSizeX, uint32_t nPixelSizeY);
 
-    IIterator* Clone() override;
+    virtual ~CPNGImageData();
 
-    IBase* GetCurrent() override;
+	void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) override;
 
-    IBuildExecution* GetCurrentExecution() override;
-
-    void AddBuildExecution(std::shared_ptr<CBuildExecution> pBuildExecution);
+	void GetPNGDataStream(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) override;
+    
+    std::vector<uint8_t> & getPNGStreamBuffer ();
 
 };
 
@@ -79,4 +83,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_BUILDEXECUTIONITERATOR
+#endif // __LIBMCENV_PNGIMAGEDATA

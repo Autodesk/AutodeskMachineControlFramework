@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_buildexecution.hpp"
+#include "libmcenv_buildexecutioniterator.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
@@ -345,14 +346,55 @@ IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
 
 IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 
+	std::string sJournalUUIDFilter;
+	if (bOnlyCurrentJournalSession) {
+		auto pJournalSession = m_pDataModel->CreateJournalSession();
+		sJournalUUIDFilter = pJournalSession->GetSessionUUID();
+	}
+
+	std::unique_ptr<CBuildExecutionIterator> pResult(new CBuildExecutionIterator ());
+		
+	auto pIterator = pBuildJob->RetrieveBuildJobExecutions (sJournalUUIDFilter);
+	while (pIterator->MoveNext()) {
+		auto pExecutionData = pIterator->GetCurrentJobExecution();
+		pResult->AddBuildExecution (std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono));
+	}
+
+	return pResult.release();
 }
 
 IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 
+	std::string sJournalUUIDFilter;
+	if (bOnlyCurrentJournalSession) {
+		auto pJournalSession = m_pDataModel->CreateJournalSession();
+		sJournalUUIDFilter = pJournalSession->GetSessionUUID();
+	}
+
+	LibMCData::eBuildJobExecutionStatus eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::Unknown;
+
+	switch (eExecutionStatus) {
+	case LibMCEnv::eBuildExecutionStatus::InProcess: eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::InProcess; break;
+	case LibMCEnv::eBuildExecutionStatus::Finished: eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::Finished; break;
+	case LibMCEnv::eBuildExecutionStatus::Failed: eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::Failed; break;
+	}
+
+
+	std::unique_ptr<CBuildExecutionIterator> pResult(new CBuildExecutionIterator());
+
+	auto pIterator = pBuildJob->RetrieveBuildJobExecutionsByStatus(eLibMCDataStatus, sJournalUUIDFilter);
+	while (pIterator->MoveNext()) {
+		auto pExecutionData = pIterator->GetCurrentJobExecution();
+		pResult->AddBuildExecution(std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono));
+	}
+
+	return pResult.release();
 }
 
 void CBuild::StoreMetaDataString(const std::string& sKey, const std::string& sValue)

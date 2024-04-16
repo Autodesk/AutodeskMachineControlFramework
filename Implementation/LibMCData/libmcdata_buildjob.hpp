@@ -81,6 +81,8 @@ private:
     CBuildJobData * makeJobDataEx(AMCData::CSQLStatement* pStatement);
     IBuildJobDataIterator* listJobDataEx(AMCData::CSQLStatement * pStatement);
 
+    IBuildJobExecutionIterator* listJobExecutionsEx(AMCData::CSQLStatement* pStatement);
+
 protected:
 
     CBuildJob(const std::string& sUUID, const std::string sName, LibMCData::eBuildJobStatus eJobStatus, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, uint32_t nLayerCount, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
