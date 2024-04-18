@@ -107,7 +107,7 @@ CBuildJobData* CBuildJobData::createInDatabase(const std::string& sIdentifier, c
     pInsertStatement->setString(5, convertCustomDataTypeToString(eDataType));
     pInsertStatement->setString(6, sTimeStamp);
     pInsertStatement->setString(7, AMCCommon::CUtils::normalizeUUIDString (sStorageStreamUUID));
-    pInsertStatement->setString(8, AMCCommon::CUtils::normalizeUUIDString (sUserID));
+    pInsertStatement->setString(8, sUserID);
     pInsertStatement->execute();
 
     return make(sUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, pSQLHandler, pStorageState);

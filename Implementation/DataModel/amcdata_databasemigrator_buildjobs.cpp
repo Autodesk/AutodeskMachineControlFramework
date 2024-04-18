@@ -89,8 +89,8 @@ namespace AMCData {
 			sBuildJobExecutionQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
 			sBuildJobExecutionQuery += "`jobuuid`  varchar ( 64 ) NOT NULL,";
 			sBuildJobExecutionQuery += "`journaluuid`  varchar ( 64 ) NOT NULL,";
-			sBuildJobExecutionQuery += "`startjournaltimestamp`  INTEGER NOT NULL,";
-			sBuildJobExecutionQuery += "`endjournaltimestamp`  INTEGER NOT NULL,";
+			sBuildJobExecutionQuery += "`startjournaltimestamp`  varchar (64) NOT NULL,";
+			sBuildJobExecutionQuery += "`endjournaltimestamp`  varchar (64) NOT NULL,";
 			sBuildJobExecutionQuery += "`useruuid`  varchar ( 64 ) NOT NULL,";
 			sBuildJobExecutionQuery += "`status`  varchar ( 64 ) NOT NULL,";
 			sBuildJobExecutionQuery += "`description`  TEXT NOT NULL,";
@@ -122,6 +122,12 @@ namespace AMCData {
 			
 			break;
 
+		}
+
+		case 10: {
+			std::string sIdentifierAddQuery = "ALTER TABLE `buildjobexecutiondata` ADD `identifier` varchar ( 256 ) DEFAULT ``";
+			pTransaction->executeStatement(sIdentifierAddQuery);
+			break;
 		}
 
 		}

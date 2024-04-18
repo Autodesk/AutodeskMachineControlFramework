@@ -68,7 +68,8 @@ CBuildJobExecution::CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const s
 	m_sJobUUID = AMCCommon::CUtils::normalizeUUIDString (pSelectStatement->getColumnString(1));
 	m_sJournalUUID = AMCCommon::CUtils::normalizeUUIDString(pSelectStatement->getColumnString(2));
 	m_sUserUUID = AMCCommon::CUtils::normalizeUUIDString(pSelectStatement->getColumnString(3));
-	int64_t nStartTimeStamp = pSelectStatement->getColumnInt64(4);
+
+	int64_t nStartTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC (pSelectStatement->getColumnString(4));
 	if (nStartTimeStamp < 0)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONSTART, "invalid build job execution start: " + m_sExecutionUUID);
 	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears ((uint64_t)nStartTimeStamp))
@@ -137,7 +138,7 @@ void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus 
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND, "build job execution not found: " + m_sExecutionUUID);
 
 	auto eOldStatus = convertStringToBuildJobExecutionStatus(pSelectStatement->getColumnString(1));
-	int64_t nStartTimeStamp = pSelectStatement->getColumnInt64(2);
+	int64_t nStartTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC (pSelectStatement->getColumnString(2));
 
 	if (nStartTimeStamp < (int64_t)nAbsoluteEndTimeStampInMicrosecondsSince1970)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Build execution end timestamp is before start timestamp!");
@@ -150,7 +151,7 @@ void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus 
 	std::string sUpdateQuery = "UPDATE buildjobexecutions SET status=?, endjournaltimestamp=? WHERE uuid=? AND active=1";
 	auto pUpdateStatement = pTransaction->prepareStatement(sUpdateQuery);
 	pUpdateStatement->setString(1, convertBuildJobExecutionStatusToString (eNewExecutionStatus));
-	pUpdateStatement->setInt64(2, nAbsoluteEndTimeStampInMicrosecondsSince1970);
+	pUpdateStatement->setString(2, AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteEndTimeStampInMicrosecondsSince1970));
 	pUpdateStatement->setString(3, m_sExecutionUUID);
 	pUpdateStatement->execute();
 
@@ -206,7 +207,7 @@ LibMCData_uint64 CBuildJobExecution::GetEndTimeStampInMicroseconds()
 	if ((eStatus != eBuildJobExecutionStatus::Finished) && (eStatus != eBuildJobExecutionStatus::Failed))
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDNOTAVAILABLE, "build job execution end is not available: " + m_sExecutionUUID);
 
-	int64_t nEndTimeStamp = pSelectStatement->getColumnInt64(4);
+	int64_t nEndTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC (pSelectStatement->getColumnString(2));
 	if (nEndTimeStamp < 0)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND, "invalid build job execution end: " + m_sExecutionUUID);
 	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears((uint64_t)nEndTimeStamp))
@@ -250,7 +251,7 @@ LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibM
 		case eBuildJobExecutionStatus::Finished:
 		case eBuildJobExecutionStatus::Failed:
 		{
-			int64_t nEndTimeStamp = pSelectStatement->getColumnInt64(4);
+			int64_t nEndTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC(pSelectStatement->getColumnString(2));
 			if (nEndTimeStamp < 0)
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND, "invalid build job execution end: " + m_sExecutionUUID);
 			if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears((uint64_t)nEndTimeStamp))

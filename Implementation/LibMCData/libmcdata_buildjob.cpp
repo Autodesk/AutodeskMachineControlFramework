@@ -507,7 +507,7 @@ IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescr
     pInsertStatement->setString(1, sExecutionUUID);
     pInsertStatement->setString(2, m_sUUID);
     pInsertStatement->setString(3, sJournalUUID);
-    pInsertStatement->setInt64(4, (int64_t)nAbsoluteStartTimeStampInMicrosecondsSince1970);
+    pInsertStatement->setString(4, AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteStartTimeStampInMicrosecondsSince1970));
     pInsertStatement->setInt64(5, 0);
     pInsertStatement->setString(6, sUserUUID);
     pInsertStatement->setString(7, CBuildJobExecution::convertBuildJobExecutionStatusToString (LibMCData::eBuildJobExecutionStatus::InProcess));
