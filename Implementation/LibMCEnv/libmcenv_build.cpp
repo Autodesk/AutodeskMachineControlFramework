@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_buildexecution.hpp"
 #include "libmcenv_buildexecutioniterator.hpp"
+#include "libmcenv_imagedata.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
@@ -263,14 +264,41 @@ std::string CBuild::StoreDiscreteField2D(const std::string& sContextIdentifier, 
 
 }
 
-IImageData* CBuild::LoadPNGImageByIdentifier(const std::string& sContext)
+
+
+IImageData* CBuild::LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = pBuildJob->RetrieveJobDataByIdentifier(sContextIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	if (Buffer.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGBUFFER);
+
+	return CImageData::createFromPNG(Buffer.data(), Buffer.size(), dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CBuild::LoadPNGImageByUUID(const std::string& sDataUUID)
+IImageData* CBuild::LoadPNGImageByUUID(const std::string& sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = pBuildJob->RetrieveJobData(AMCCommon::CUtils::normalizeUUIDString(sDataUUID));
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	if (Buffer.empty ())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGBUFFER);
+
+	return CImageData::createFromPNG (Buffer.data (), Buffer.size (), dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
 std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions)

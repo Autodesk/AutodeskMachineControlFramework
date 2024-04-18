@@ -94,6 +94,7 @@ class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
 class ITempStreamWriter;
+class IZIPStreamWriter;
 class IStreamReader;
 class IUniformJournalSampling;
 class IJournalVariable;
@@ -535,13 +536,6 @@ public:
 	* @param[out] nPixelSizeY - Number of pixels in Y
 	*/
 	virtual void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
-
-	/**
-	* IImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - PNG Data stream.
-	*/
-	virtual void LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer) = 0;
 
 	/**
 	* IImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
@@ -2140,16 +2134,22 @@ public:
 	/**
 	* IBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
 	* IBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
 	* IBuildExecution::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
@@ -2181,6 +2181,12 @@ public:
 	* @return Return value.
 	*/
 	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildExecution::LoadAttachedJournal - Loads the journal that is associated with the build execution and returns an accessor instance.
+	* @return Journal instance.
+	*/
+	virtual IJournalHandler * LoadAttachedJournal() = 0;
 
 };
 
@@ -2313,16 +2319,22 @@ public:
 	/**
 	* IBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
 	* IBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
 	* IBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
@@ -4069,7 +4081,7 @@ public:
 
 	/**
 	* ITempStreamWriter::Seek - Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.
-	* @param[in] nWritePosition - New write position of the stream.
+	* @param[in] nWritePosition - New write position of the stream. If Temp stream is living in a ZIP Writer, seeking is not possible.
 	*/
 	virtual void Seek(const LibMCEnv_uint64 nWritePosition) = 0;
 
@@ -4099,13 +4111,72 @@ public:
 	virtual void WriteLine(const std::string & sLine) = 0;
 
 	/**
-	* ITempStreamWriter::Finish - Finishes the stream writing. Fails if stream has been finished already.
+	* ITempStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
 	*/
 	virtual void Finish() = 0;
+
+	/**
+	* ITempStreamWriter::CopyFrom - Copies the full content of a StreamReader Instance.
+	* @param[in] pStreamReader - Stream to read from.
+	*/
+	virtual void CopyFrom(IStreamReader* pStreamReader) = 0;
 
 };
 
 typedef IBaseSharedPtr<ITempStreamWriter> PITempStreamWriter;
+
+
+/*************************************************************************************************************************
+ Class interface for ZIPStreamWriter 
+**************************************************************************************************************************/
+
+class IZIPStreamWriter : public virtual IBase {
+public:
+	/**
+	* IZIPStreamWriter::CreateZIPEntry - Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.
+	* @param[in] sFileName - File Name for the new entry in the ZIP file. Entry MUST not exist yet.
+	* @return Returns temp stream to write into.
+	*/
+	virtual ITempStreamWriter * CreateZIPEntry(const std::string & sFileName) = 0;
+
+	/**
+	* IZIPStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
+	*/
+	virtual void Finish() = 0;
+
+	/**
+	* IZIPStreamWriter::CopyFrom - Copies the full content of a StreamReader Instance.
+	* @param[in] pStreamReader - Stream to read from.
+	*/
+	virtual void CopyFrom(IStreamReader* pStreamReader) = 0;
+
+	/**
+	* IZIPStreamWriter::GetUUID - Returns the UUID of the stream.
+	* @return Returns stream uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IZIPStreamWriter::GetName - Returns the name of the stream.
+	* @return Returns stream name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IZIPStreamWriter::GetMIMEType - Returns the MIME type of the stream.
+	* @return Returns stream MIME Type.
+	*/
+	virtual std::string GetMIMEType() = 0;
+
+	/**
+	* IZIPStreamWriter::GetSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	virtual LibMCEnv_uint64 GetSize() = 0;
+
+};
+
+typedef IBaseSharedPtr<IZIPStreamWriter> PIZIPStreamWriter;
 
 
 /*************************************************************************************************************************
@@ -5172,6 +5243,13 @@ public:
 	virtual ITempStreamWriter * CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType) = 0;
 
 	/**
+	* IStateEnvironment::CreateZIPStream - Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+	* @param[in] sName - Name of the storage stream.
+	* @return ZIP stream writer instance
+	*/
+	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
+
+	/**
 	* IStateEnvironment::FindStream - Finds a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
@@ -5722,6 +5800,13 @@ public:
 	* @return Temp stream writer instance
 	*/
 	virtual ITempStreamWriter * CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType) = 0;
+
+	/**
+	* IUIEnvironment::CreateZIPStream - Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+	* @param[in] sName - Name of the storage stream.
+	* @return ZIP stream writer instance
+	*/
+	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
 
 	/**
 	* IUIEnvironment::FindStream - Finds a stream in the storage system.

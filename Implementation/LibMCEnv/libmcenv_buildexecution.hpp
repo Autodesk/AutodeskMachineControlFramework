@@ -127,9 +127,9 @@ public:
 
 	std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) override;
 
-	IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) override;
+	IImageData * LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-	IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) override;
+	IImageData * LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 	std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
 
@@ -138,6 +138,8 @@ public:
 	bool HasMetaDataString(const std::string & sKey) override;
 
 	std::string GetMetaDataString(const std::string & sKey) override;
+
+	IJournalHandler* LoadAttachedJournal() override;
 
 };
 

@@ -99,8 +99,6 @@ public:
 
 	void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) override;
 
-	void LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer) override;
-
 	IPNGImageData* CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) override;
 
 	void EncodePNG() override;

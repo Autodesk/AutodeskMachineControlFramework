@@ -56,6 +56,7 @@ CImageData* CImageData::createFromPNG(const uint8_t* pBuffer, uint64_t nBufferSi
 
 	std::unique_ptr <std::vector<uint8_t>> pixelBuffer(new std::vector<uint8_t>());
 	
+
 	unsigned int width = 0;
 	unsigned int height = 0;
 	lodepng::State state;
@@ -263,11 +264,6 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 	return pResult.release();
 }
 
-
-void CImageData::LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer) 
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
 
 void CImageData::EncodePNG()
 {

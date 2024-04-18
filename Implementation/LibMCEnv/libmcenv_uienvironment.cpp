@@ -820,6 +820,12 @@ ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sNam
     return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sUserUUID, m_pUISystemState->getGlobalChronoInstance ());
 }
 
+IZIPStreamWriter* CUIEnvironment::CreateZIPStream(const std::string& sName)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+
 IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
 {
     auto pDataModel = m_pUISystemState->getDataModel();

@@ -132,3 +132,7 @@ void CTempStreamWriter::Finish()
     m_bIsFinished = true;
 }
 
+void CTempStreamWriter::CopyFrom(IStreamReader* pStreamReader)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}

@@ -271,6 +271,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID 10174 /** Date Time difference is invalid */
 #define LIBMCENV_ERROR_DATETIMEISINVALID 10175 /** Date Time is invalid */
 #define LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS 10176 /** Date Time out of bounds */
+#define LIBMCENV_ERROR_EMPTYPNGBUFFER 10177 /** Empty PNG buffer */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -454,6 +455,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
     case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
     case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
+    case LIBMCENV_ERROR_EMPTYPNGBUFFER: return "Empty PNG buffer";
     default: return "unknown error";
   }
 }
@@ -502,6 +504,7 @@ typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_TempStreamWriter;
+typedef LibMCEnvHandle LibMCEnv_ZIPStreamWriter;
 typedef LibMCEnvHandle LibMCEnv_StreamReader;
 typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;

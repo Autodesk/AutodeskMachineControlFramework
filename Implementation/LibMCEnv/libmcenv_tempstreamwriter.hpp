@@ -101,6 +101,8 @@ public:
 
 	void Finish() override;
 
+	void CopyFrom(IStreamReader* pStreamReader) override;
+
 };
 
 } // namespace Impl

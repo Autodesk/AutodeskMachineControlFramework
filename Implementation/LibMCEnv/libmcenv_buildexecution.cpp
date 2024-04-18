@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CBuildExecution
 // Include custom headers here.
 #include "libmcenv_build.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
+#include "libmcenv_imagedata.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -294,14 +295,33 @@ std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextId
 
 }
 
-IImageData * CBuildExecution::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
+IImageData* CBuildExecution::LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = m_pExecution->RetrieveJobExecutionDataByIdentifier(sContextIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	if (Buffer.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGBUFFER);
+
+	return CImageData::createFromPNG(Buffer.data(), Buffer.size(), dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData * CBuildExecution::LoadPNGImageByUUID(const std::string & sDataUUID)
+
+IImageData* CBuildExecution::LoadPNGImageByUUID(const std::string& sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = m_pExecution->RetrieveJobExecutionData(AMCCommon::CUtils::normalizeUUIDString(sDataUUID));
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	if (Buffer.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGBUFFER);
+
+	return CImageData::createFromPNG(Buffer.data(), Buffer.size(), dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
 std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions)
@@ -347,3 +367,8 @@ std::string CBuildExecution::GetMetaDataString(const std::string & sKey)
 	return m_pExecution->GetMetaDataString(sKey);
 }
 
+IJournalHandler* CBuildExecution::LoadAttachedJournal()
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+}

@@ -309,16 +309,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_getsizeinpixels(LibMCEnv_Ima
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
 
 /**
-* Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
-*
-* @param[in] pImageData - ImageData instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[in] pPNGDataBuffer - uint8 buffer of PNG Data stream.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_loadpng(LibMCEnv_ImageData pImageData, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer);
-
-/**
 * Creates PNG Image out of the pixel data.
 *
 * @param[in] pImageData - ImageData instance.
@@ -2520,20 +2510,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(Li
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 * @param[out] pImageDataInstance - Image data instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
 * Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 * @param[out] pImageDataInstance - Image data instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
 * Stores a discrete field in the build job. MIME Type will be image/png
@@ -2581,6 +2577,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_hasmetadatastring(LibMC
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getmetadatastring(LibMCEnv_BuildExecution pBuildExecution, const char * pKey, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Loads the journal that is associated with the build execution and returns an accessor instance.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[out] pJournalHandler - Journal instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadattachedjournal(LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_JournalHandler * pJournalHandler);
 
 /*************************************************************************************************************************
  Class definition for BuildExecutionIterator
@@ -2761,20 +2766,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Bu
 *
 * @param[in] pBuild - Build instance.
 * @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 * @param[out] pImageDataInstance - Image data instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyidentifier(LibMCEnv_Build pBuild, const char * pContextIdentifier, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyidentifier(LibMCEnv_Build pBuild, const char * pContextIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
 * Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 *
 * @param[in] pBuild - Build instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 * @param[out] pImageDataInstance - Image data instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
 * Stores a discrete field in the build job. MIME Type will be image/png
@@ -5128,7 +5139,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getwriteposition(LibM
 * Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.
 *
 * @param[in] pTempStreamWriter - TempStreamWriter instance.
-* @param[in] nWritePosition - New write position of the stream.
+* @param[in] nWritePosition - New write position of the stream. If Temp stream is living in a ZIP Writer, seeking is not possible.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_seek(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_uint64 nWritePosition);
@@ -5171,12 +5182,94 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_writestring(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_writeline(LibMCEnv_TempStreamWriter pTempStreamWriter, const char * pLine);
 
 /**
-* Finishes the stream writing. Fails if stream has been finished already.
+* Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
 *
 * @param[in] pTempStreamWriter - TempStreamWriter instance.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_finish(LibMCEnv_TempStreamWriter pTempStreamWriter);
+
+/**
+* Copies the full content of a StreamReader Instance.
+*
+* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] pStreamReader - Stream to read from.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_copyfrom(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_StreamReader pStreamReader);
+
+/*************************************************************************************************************************
+ Class definition for ZIPStreamWriter
+**************************************************************************************************************************/
+
+/**
+* Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.
+*
+* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @param[in] pFileName - File Name for the new entry in the ZIP file. Entry MUST not exist yet.
+* @param[out] pTempStream - Returns temp stream to write into.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_createzipentry(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const char * pFileName, LibMCEnv_TempStreamWriter * pTempStream);
+
+/**
+* Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
+*
+* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_finish(LibMCEnv_ZIPStreamWriter pZIPStreamWriter);
+
+/**
+* Copies the full content of a StreamReader Instance.
+*
+* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @param[in] pStreamReader - Stream to read from.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_copyfrom(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, LibMCEnv_StreamReader pStreamReader);
+
+/**
+* Returns the UUID of the stream.
+*
+* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns stream uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getuuid(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the name of the stream.
+*
+* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns stream name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getname(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns the MIME type of the stream.
+*
+* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @param[in] nMIMETypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMIMETypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMIMETypeBuffer -  buffer of Returns stream MIME Type., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getmimetype(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const LibMCEnv_uint32 nMIMETypeBufferSize, LibMCEnv_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
+
+/**
+* Returns the current size of the stream.
+*
+* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @param[out] pSize - Current size of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getsize(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, LibMCEnv_uint64 * pSize);
 
 /*************************************************************************************************************************
  Class definition for StreamReader
@@ -6677,6 +6770,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createcryptocontext(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createtemporarystream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pMIMEType, LibMCEnv_TempStreamWriter * pTempStreamInstance);
 
 /**
+* Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name of the storage stream.
+* @param[out] pZIPStreamInstance - ZIP stream writer instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createzipstream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_ZIPStreamWriter * pZIPStreamInstance);
+
+/**
 * Finds a stream in the storage system.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -7463,6 +7566,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createcryptocontext(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createtemporarystream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pName, const char * pMIMEType, LibMCEnv_TempStreamWriter * pTempStreamInstance);
+
+/**
+* Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pName - Name of the storage stream.
+* @param[out] pZIPStreamInstance - ZIP stream writer instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createzipstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pName, LibMCEnv_ZIPStreamWriter * pZIPStreamInstance);
 
 /**
 * Finds a stream in the storage system.

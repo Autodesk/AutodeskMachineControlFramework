@@ -231,6 +231,8 @@ public:
 
 	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;
 
+	IZIPStreamWriter* CreateZIPStream(const std::string& sName) override;
+
 	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
 
 };

@@ -99,6 +99,7 @@ class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
 class CTempStreamWriter;
+class CZIPStreamWriter;
 class CStreamReader;
 class CUniformJournalSampling;
 class CJournalVariable;
@@ -155,6 +156,7 @@ typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
 typedef CTempStreamWriter CLibMCEnvTempStreamWriter;
+typedef CZIPStreamWriter CLibMCEnvZIPStreamWriter;
 typedef CStreamReader CLibMCEnvStreamReader;
 typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
 typedef CJournalVariable CLibMCEnvJournalVariable;
@@ -211,6 +213,7 @@ typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
 typedef std::shared_ptr<CTempStreamWriter> PTempStreamWriter;
+typedef std::shared_ptr<CZIPStreamWriter> PZIPStreamWriter;
 typedef std::shared_ptr<CStreamReader> PStreamReader;
 typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
 typedef std::shared_ptr<CJournalVariable> PJournalVariable;
@@ -267,6 +270,7 @@ typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
 typedef PTempStreamWriter PLibMCEnvTempStreamWriter;
+typedef PZIPStreamWriter PLibMCEnvZIPStreamWriter;
 typedef PStreamReader PLibMCEnvStreamReader;
 typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
 typedef PJournalVariable PLibMCEnvJournalVariable;
@@ -532,6 +536,7 @@ public:
 			case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "DATETIMEDIFFERENCEISINVALID";
 			case LIBMCENV_ERROR_DATETIMEISINVALID: return "DATETIMEISINVALID";
 			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "DATETIMEOUTOFBOUNDS";
+			case LIBMCENV_ERROR_EMPTYPNGBUFFER: return "EMPTYPNGBUFFER";
 		}
 		return "UNKNOWN";
 	}
@@ -715,6 +720,7 @@ public:
 			case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
 			case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
 			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
+			case LIBMCENV_ERROR_EMPTYPNGBUFFER: return "Empty PNG buffer";
 		}
 		return "unknown error";
 	}
@@ -871,6 +877,7 @@ private:
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
 	friend class CTempStreamWriter;
+	friend class CZIPStreamWriter;
 	friend class CStreamReader;
 	friend class CUniformJournalSampling;
 	friend class CJournalVariable;
@@ -1058,7 +1065,6 @@ public:
 	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
-	inline void LoadPNG(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer);
 	inline PPNGImageData CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions);
 	inline void EncodePNG();
 	inline void GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
@@ -1477,12 +1483,13 @@ public:
 	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
 	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
-	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
-	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
+	inline PJournalHandler LoadAttachedJournal();
 };
 	
 /*************************************************************************************************************************
@@ -1531,8 +1538,8 @@ public:
 	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
 	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
-	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier);
-	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 	inline PBuildExecution StartExecution(const std::string & sDescription, const std::string & sUserUUID);
 	inline bool HasExecution(const std::string & sExecutionUUID);
@@ -2046,6 +2053,30 @@ public:
 	inline void WriteString(const std::string & sData);
 	inline void WriteLine(const std::string & sLine);
 	inline void Finish();
+	inline void CopyFrom(classParam<CStreamReader> pStreamReader);
+};
+	
+/*************************************************************************************************************************
+ Class CZIPStreamWriter 
+**************************************************************************************************************************/
+class CZIPStreamWriter : public CBase {
+public:
+	
+	/**
+	* CZIPStreamWriter::CZIPStreamWriter - Constructor for ZIPStreamWriter class.
+	*/
+	CZIPStreamWriter(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PTempStreamWriter CreateZIPEntry(const std::string & sFileName);
+	inline void Finish();
+	inline void CopyFrom(classParam<CStreamReader> pStreamReader);
+	inline std::string GetUUID();
+	inline std::string GetName();
+	inline std::string GetMIMEType();
+	inline LibMCEnv_uint64 GetSize();
 };
 	
 /*************************************************************************************************************************
@@ -2325,6 +2356,7 @@ public:
 	inline bool HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive);
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
+	inline PZIPStreamWriter CreateZIPStream(const std::string & sName);
 	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
 };
 	
@@ -2429,6 +2461,7 @@ public:
 	inline bool HasAlertOfType(const std::string & sIdentifier, const bool bOnlyActive);
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
+	inline PZIPStreamWriter CreateZIPStream(const std::string & sName);
 	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
 };
 	
@@ -2535,7 +2568,6 @@ public:
 		pWrapperTable->m_ImageData_GetSizeInMM = nullptr;
 		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_ImageData_ResizeImage = nullptr;
-		pWrapperTable->m_ImageData_LoadPNG = nullptr;
 		pWrapperTable->m_ImageData_CreatePNGImage = nullptr;
 		pWrapperTable->m_ImageData_EncodePNG = nullptr;
 		pWrapperTable->m_ImageData_GetEncodedPNGData = nullptr;
@@ -2752,6 +2784,7 @@ public:
 		pWrapperTable->m_BuildExecution_StoreMetaDataString = nullptr;
 		pWrapperTable->m_BuildExecution_HasMetaDataString = nullptr;
 		pWrapperTable->m_BuildExecution_GetMetaDataString = nullptr;
+		pWrapperTable->m_BuildExecution_LoadAttachedJournal = nullptr;
 		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
@@ -2995,6 +3028,14 @@ public:
 		pWrapperTable->m_TempStreamWriter_WriteString = nullptr;
 		pWrapperTable->m_TempStreamWriter_WriteLine = nullptr;
 		pWrapperTable->m_TempStreamWriter_Finish = nullptr;
+		pWrapperTable->m_TempStreamWriter_CopyFrom = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_Finish = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_CopyFrom = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_GetUUID = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_GetName = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_GetMIMEType = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_GetSize = nullptr;
 		pWrapperTable->m_StreamReader_GetUUID = nullptr;
 		pWrapperTable->m_StreamReader_GetName = nullptr;
 		pWrapperTable->m_StreamReader_GetMIMEType = nullptr;
@@ -3130,6 +3171,7 @@ public:
 		pWrapperTable->m_StateEnvironment_HasAlertOfType = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateTemporaryStream = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateZIPStream = nullptr;
 		pWrapperTable->m_StateEnvironment_FindStream = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
@@ -3202,6 +3244,7 @@ public:
 		pWrapperTable->m_UIEnvironment_HasAlertOfType = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateZIPStream = nullptr;
 		pWrapperTable->m_UIEnvironment_FindStream = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -3454,15 +3497,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_ResizeImage == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageData_LoadPNG = (PLibMCEnvImageData_LoadPNGPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_loadpng");
-		#else // _WIN32
-		pWrapperTable->m_ImageData_LoadPNG = (PLibMCEnvImageData_LoadPNGPtr) dlsym(hLibrary, "libmcenv_imagedata_loadpng");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageData_LoadPNG == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5407,6 +5441,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildExecution_GetMetaDataString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadAttachedJournal = (PLibMCEnvBuildExecution_LoadAttachedJournalPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loadattachedjournal");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadAttachedJournal = (PLibMCEnvBuildExecution_LoadAttachedJournalPtr) dlsym(hLibrary, "libmcenv_buildexecution_loadattachedjournal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadAttachedJournal == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7597,6 +7640,78 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_TempStreamWriter_CopyFrom = (PLibMCEnvTempStreamWriter_CopyFromPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_copyfrom");
+		#else // _WIN32
+		pWrapperTable->m_TempStreamWriter_CopyFrom = (PLibMCEnvTempStreamWriter_CopyFromPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_copyfrom");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TempStreamWriter_CopyFrom == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry = (PLibMCEnvZIPStreamWriter_CreateZIPEntryPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_createzipentry");
+		#else // _WIN32
+		pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry = (PLibMCEnvZIPStreamWriter_CreateZIPEntryPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_createzipentry");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ZIPStreamWriter_Finish = (PLibMCEnvZIPStreamWriter_FinishPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_finish");
+		#else // _WIN32
+		pWrapperTable->m_ZIPStreamWriter_Finish = (PLibMCEnvZIPStreamWriter_FinishPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_finish");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ZIPStreamWriter_Finish == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ZIPStreamWriter_CopyFrom = (PLibMCEnvZIPStreamWriter_CopyFromPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_copyfrom");
+		#else // _WIN32
+		pWrapperTable->m_ZIPStreamWriter_CopyFrom = (PLibMCEnvZIPStreamWriter_CopyFromPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_copyfrom");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ZIPStreamWriter_CopyFrom == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetUUID = (PLibMCEnvZIPStreamWriter_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetUUID = (PLibMCEnvZIPStreamWriter_GetUUIDPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ZIPStreamWriter_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetName = (PLibMCEnvZIPStreamWriter_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getname");
+		#else // _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetName = (PLibMCEnvZIPStreamWriter_GetNamePtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ZIPStreamWriter_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetMIMEType = (PLibMCEnvZIPStreamWriter_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getmimetype");
+		#else // _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetMIMEType = (PLibMCEnvZIPStreamWriter_GetMIMETypePtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getmimetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ZIPStreamWriter_GetMIMEType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetSize = (PLibMCEnvZIPStreamWriter_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getsize");
+		#else // _WIN32
+		pWrapperTable->m_ZIPStreamWriter_GetSize = (PLibMCEnvZIPStreamWriter_GetSizePtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ZIPStreamWriter_GetSize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StreamReader_GetUUID = (PLibMCEnvStreamReader_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_streamreader_getuuid");
 		#else // _WIN32
 		pWrapperTable->m_StreamReader_GetUUID = (PLibMCEnvStreamReader_GetUUIDPtr) dlsym(hLibrary, "libmcenv_streamreader_getuuid");
@@ -8812,6 +8927,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateZIPStream = (PLibMCEnvStateEnvironment_CreateZIPStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createzipstream");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateZIPStream = (PLibMCEnvStateEnvironment_CreateZIPStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createzipstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateZIPStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findstream");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findstream");
@@ -9460,6 +9584,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateZIPStream = (PLibMCEnvUIEnvironment_CreateZIPStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createzipstream");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateZIPStream = (PLibMCEnvUIEnvironment_CreateZIPStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_createzipstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateZIPStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findstream");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_findstream");
@@ -9615,10 +9748,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_resizeimage", (void**)&(pWrapperTable->m_ImageData_ResizeImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ResizeImage == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_imagedata_loadpng", (void**)&(pWrapperTable->m_ImageData_LoadPNG));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_LoadPNG == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_createpngimage", (void**)&(pWrapperTable->m_ImageData_CreatePNGImage));
@@ -10483,6 +10612,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_getmetadatastring", (void**)&(pWrapperTable->m_BuildExecution_GetMetaDataString));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetMetaDataString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loadattachedjournal", (void**)&(pWrapperTable->m_BuildExecution_LoadAttachedJournal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadAttachedJournal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_buildexecutioniterator_getcurrentexecution", (void**)&(pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution));
@@ -11457,6 +11590,38 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_Finish == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_copyfrom", (void**)&(pWrapperTable->m_TempStreamWriter_CopyFrom));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_CopyFrom == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_createzipentry", (void**)&(pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_finish", (void**)&(pWrapperTable->m_ZIPStreamWriter_Finish));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_Finish == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_copyfrom", (void**)&(pWrapperTable->m_ZIPStreamWriter_CopyFrom));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_CopyFrom == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getuuid", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getname", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getmimetype", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetMIMEType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetMIMEType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getsize", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetSize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_streamreader_getuuid", (void**)&(pWrapperTable->m_StreamReader_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StreamReader_GetUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -11997,6 +12162,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateTemporaryStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createzipstream", (void**)&(pWrapperTable->m_StateEnvironment_CreateZIPStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateZIPStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_findstream", (void**)&(pWrapperTable->m_StateEnvironment_FindStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12283,6 +12452,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_createtemporarystream", (void**)&(pWrapperTable->m_UIEnvironment_CreateTemporaryStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateTemporaryStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createzipstream", (void**)&(pWrapperTable->m_UIEnvironment_CreateZIPStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateZIPStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_findstream", (void**)&(pWrapperTable->m_UIEnvironment_FindStream));
@@ -12612,15 +12785,6 @@ public:
 	void CImageData::ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ResizeImage(m_pHandle, &nPixelSizeX, &nPixelSizeY));
-	}
-	
-	/**
-	* CImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
-	* @param[in] PNGDataBuffer - PNG Data stream.
-	*/
-	void CImageData::LoadPNG(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data()));
 	}
 	
 	/**
@@ -15288,12 +15452,15 @@ public:
 	/**
 	* CBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	PImageData CBuildExecution::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
+	PImageData CBuildExecution::LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15304,12 +15471,15 @@ public:
 	/**
 	* CBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	PImageData CBuildExecution::LoadPNGImageByUUID(const std::string & sDataUUID)
+	PImageData CBuildExecution::LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15375,6 +15545,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_GetMetaDataString(m_pHandle, sKey.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CBuildExecution::LoadAttachedJournal - Loads the journal that is associated with the build execution and returns an accessor instance.
+	* @return Journal instance.
+	*/
+	PJournalHandler CBuildExecution::LoadAttachedJournal()
+	{
+		LibMCEnvHandle hJournalHandler = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadAttachedJournal(m_pHandle, &hJournalHandler));
+		
+		if (!hJournalHandler) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalHandler>(m_pWrapper, hJournalHandler);
 	}
 	
 	/**
@@ -15615,12 +15800,15 @@ public:
 	/**
 	* CBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	PImageData CBuild::LoadPNGImageByIdentifier(const std::string & sContextIdentifier)
+	PImageData CBuild::LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15631,12 +15819,15 @@ public:
 	/**
 	* CBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	PImageData CBuild::LoadPNGImageByUUID(const std::string & sDataUUID)
+	PImageData CBuild::LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByUUID(m_pHandle, sDataUUID.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -18634,7 +18825,7 @@ public:
 	
 	/**
 	* CTempStreamWriter::Seek - Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.
-	* @param[in] nWritePosition - New write position of the stream.
+	* @param[in] nWritePosition - New write position of the stream. If Temp stream is living in a ZIP Writer, seeking is not possible.
 	*/
 	void CTempStreamWriter::Seek(const LibMCEnv_uint64 nWritePosition)
 	{
@@ -18681,11 +18872,116 @@ public:
 	}
 	
 	/**
-	* CTempStreamWriter::Finish - Finishes the stream writing. Fails if stream has been finished already.
+	* CTempStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
 	*/
 	void CTempStreamWriter::Finish()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_Finish(m_pHandle));
+	}
+	
+	/**
+	* CTempStreamWriter::CopyFrom - Copies the full content of a StreamReader Instance.
+	* @param[in] pStreamReader - Stream to read from.
+	*/
+	void CTempStreamWriter::CopyFrom(classParam<CStreamReader> pStreamReader)
+	{
+		LibMCEnvHandle hStreamReader = pStreamReader.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_CopyFrom(m_pHandle, hStreamReader));
+	}
+	
+	/**
+	 * Method definitions for class CZIPStreamWriter
+	 */
+	
+	/**
+	* CZIPStreamWriter::CreateZIPEntry - Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.
+	* @param[in] sFileName - File Name for the new entry in the ZIP file. Entry MUST not exist yet.
+	* @return Returns temp stream to write into.
+	*/
+	PTempStreamWriter CZIPStreamWriter::CreateZIPEntry(const std::string & sFileName)
+	{
+		LibMCEnvHandle hTempStream = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_CreateZIPEntry(m_pHandle, sFileName.c_str(), &hTempStream));
+		
+		if (!hTempStream) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTempStreamWriter>(m_pWrapper, hTempStream);
+	}
+	
+	/**
+	* CZIPStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
+	*/
+	void CZIPStreamWriter::Finish()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_Finish(m_pHandle));
+	}
+	
+	/**
+	* CZIPStreamWriter::CopyFrom - Copies the full content of a StreamReader Instance.
+	* @param[in] pStreamReader - Stream to read from.
+	*/
+	void CZIPStreamWriter::CopyFrom(classParam<CStreamReader> pStreamReader)
+	{
+		LibMCEnvHandle hStreamReader = pStreamReader.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_CopyFrom(m_pHandle, hStreamReader));
+	}
+	
+	/**
+	* CZIPStreamWriter::GetUUID - Returns the UUID of the stream.
+	* @return Returns stream uuid.
+	*/
+	std::string CZIPStreamWriter::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CZIPStreamWriter::GetName - Returns the name of the stream.
+	* @return Returns stream name.
+	*/
+	std::string CZIPStreamWriter::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CZIPStreamWriter::GetMIMEType - Returns the MIME type of the stream.
+	* @return Returns stream MIME Type.
+	*/
+	std::string CZIPStreamWriter::GetMIMEType()
+	{
+		LibMCEnv_uint32 bytesNeededMIMEType = 0;
+		LibMCEnv_uint32 bytesWrittenMIMEType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetMIMEType(m_pHandle, 0, &bytesNeededMIMEType, nullptr));
+		std::vector<char> bufferMIMEType(bytesNeededMIMEType);
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetMIMEType(m_pHandle, bytesNeededMIMEType, &bytesWrittenMIMEType, &bufferMIMEType[0]));
+		
+		return std::string(&bufferMIMEType[0]);
+	}
+	
+	/**
+	* CZIPStreamWriter::GetSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	LibMCEnv_uint64 CZIPStreamWriter::GetSize()
+	{
+		LibMCEnv_uint64 resultSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetSize(m_pHandle, &resultSize));
+		
+		return resultSize;
 	}
 	
 	/**
@@ -20664,6 +20960,22 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateZIPStream - Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+	* @param[in] sName - Name of the storage stream.
+	* @return ZIP stream writer instance
+	*/
+	PZIPStreamWriter CStateEnvironment::CreateZIPStream(const std::string & sName)
+	{
+		LibMCEnvHandle hZIPStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateZIPStream(m_pHandle, sName.c_str(), &hZIPStreamInstance));
+		
+		if (!hZIPStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CZIPStreamWriter>(m_pWrapper, hZIPStreamInstance);
+	}
+	
+	/**
 	* CStateEnvironment::FindStream - Finds a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
@@ -21703,6 +22015,22 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CTempStreamWriter>(m_pWrapper, hTempStreamInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CreateZIPStream - Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+	* @param[in] sName - Name of the storage stream.
+	* @return ZIP stream writer instance
+	*/
+	PZIPStreamWriter CUIEnvironment::CreateZIPStream(const std::string & sName)
+	{
+		LibMCEnvHandle hZIPStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateZIPStream(m_pHandle, sName.c_str(), &hZIPStreamInstance));
+		
+		if (!hZIPStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CZIPStreamWriter>(m_pWrapper, hZIPStreamInstance);
 	}
 	
 	/**

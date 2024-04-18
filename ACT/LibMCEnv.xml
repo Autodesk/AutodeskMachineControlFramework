@@ -214,7 +214,7 @@
 		<error name="DATETIMEDIFFERENCEISINVALID" code="10174" description="Date Time difference is invalid" />		
 		<error name="DATETIMEISINVALID" code="10175" description="Date Time is invalid" />		
 		<error name="DATETIMEOUTOFBOUNDS" code="10176" description="Date Time out of bounds" />		
-		
+		<error name="EMPTYPNGBUFFER" code="10177" description="Empty PNG buffer" />						
 		
 	</errors>
 
@@ -469,10 +469,6 @@
 		<method name="ResizeImage" description="Resizes Image pixel data.">
 			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
 			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
-		</method>		
-
-		<method name="LoadPNG" description="Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="PNG Data stream." />
 		</method>		
 
 		<method name="CreatePNGImage" description="Creates PNG Image out of the pixel data.">		
@@ -1535,11 +1531,17 @@
 
 		<method name="LoadPNGImageByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.">
 			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 		
 		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 
@@ -1565,6 +1567,11 @@
 			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
 			<param name="Value" type="string" pass="return" description="Return value." />
 		</method>
+		
+		<method name="LoadAttachedJournal" description="Loads the journal that is associated with the build execution and returns an accessor instance.">
+			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
+		</method>	
+		
 
 	</class>
 	
@@ -1649,11 +1656,17 @@
 
 		<method name="LoadPNGImageByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.">
 			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 		
 		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 
@@ -2839,7 +2852,7 @@
 		</method>		
 
 		<method name="Seek" description="Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.">
-			<param name="WritePosition" type="uint64" pass="in" description="New write position of the stream." />
+			<param name="WritePosition" type="uint64" pass="in" description="New write position of the stream. If Temp stream is living in a ZIP Writer, seeking is not possible." />
 		</method>		
 
 		<method name="IsFinished" description="Returns if the stream writing has been finished.">
@@ -2858,11 +2871,46 @@
 			<param name="Line" type="string" pass="in" description="String to write into the stream" />
 		</method>
 
-		<method name="Finish" description="Finishes the stream writing. Fails if stream has been finished already.">
+		<method name="Finish" description="Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.">
 		</method>
 		
+		<method name="CopyFrom" description="Copies the full content of a StreamReader Instance.">
+			<param name="StreamReader" type="class" class="StreamReader" pass="in" description="Stream to read from." />
+		</method>
+
 	</class>
 	
+	<class name="ZIPStreamWriter" parent="Base" description="A writer that allows to create a ZIP file storage stream.">
+
+		<method name="CreateZIPEntry" description="Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.">
+			<param name="FileName" type="string" pass="in" description="File Name for the new entry in the ZIP file. Entry MUST not exist yet." />
+			<param name="TempStream" type="class" class="TempStreamWriter" pass="return" description="Returns temp stream to write into." />
+		</method>
+		
+		<method name="Finish" description="Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.">
+		</method>
+		
+		<method name="CopyFrom" description="Copies the full content of a StreamReader Instance.">
+			<param name="StreamReader" type="class" class="StreamReader" pass="in" description="Stream to read from." />
+		</method>
+		
+		<method name="GetUUID" description="Returns the UUID of the stream.">
+			<param name="UUID" type="string" pass="return" description="Returns stream uuid." />
+		</method>
+		
+		<method name="GetName" description="Returns the name of the stream.">
+			<param name="Name" type="string" pass="return" description="Returns stream name." />
+		</method>
+		
+		<method name="GetMIMEType" description="Returns the MIME type of the stream.">
+			<param name="MIMEType" type="string" pass="return" description="Returns stream MIME Type." />
+		</method>		
+		
+		<method name="GetSize" description="Returns the current size of the stream.">
+			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
+		</method>
+
+	</class>
 	
 	<class name="StreamReader" parent="Base" description="A reader class that allows to access a storage stream.">
 	
@@ -3593,6 +3641,11 @@
 			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
 		</method>
 		
+		<method name="CreateZIPStream" description="Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
+		</method>
+
 		<method name="FindStream" description="Finds a stream in the storage system.">
 			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
@@ -3989,6 +4042,11 @@
 			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
 			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
+		</method>
+
+		<method name="CreateZIPStream" description="Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
 		</method>
 
 		<method name="FindStream" description="Finds a stream in the storage system.">

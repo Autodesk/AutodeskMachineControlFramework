@@ -844,6 +844,11 @@ ITempStreamWriter* CStateEnvironment::CreateTemporaryStream(const std::string& s
 	return new CTempStreamWriter(m_pSystemState->getDataModelInstance(), sName, sMIMEType, sUserUUID, m_pSystemState->getGlobalChronoInstance());
 }
 
+IZIPStreamWriter* CStateEnvironment::CreateZIPStream(const std::string& sName)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
 
 IStreamReader* CStateEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
 {
