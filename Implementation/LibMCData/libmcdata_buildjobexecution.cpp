@@ -320,7 +320,7 @@ IBuildJobExecutionDataIterator* CBuildJobExecution::listJobExecutionDataEx(AMCDa
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType)
 {
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobexecutiondata.timestamp";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? AND datatype=? ORDER BY buildjobexecutiondata.timestamp";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setInt(2, 1);
@@ -331,7 +331,7 @@ IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(c
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionData()
 {
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? ORDER BY buildjobexecutiondata.timestamp";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? ORDER BY buildjobexecutiondata.timestamp";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setInt(2, 1);
@@ -345,7 +345,7 @@ IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionData(const std::
 
 	std::unique_ptr<CBuildJobExecutionDataIterator> buildJobIterator(new CBuildJobExecutionDataIterator());
 
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setString(2, sNormalizedDataUUID);
@@ -364,7 +364,7 @@ IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionDataByIdentifier
 
 	std::unique_ptr<CBuildJobExecutionDataIterator> buildJobIterator(new CBuildJobExecutionDataIterator());
 
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setString(2, sIdentifier);
@@ -380,7 +380,7 @@ bool CBuildJobExecution::HasJobExecutionDataUUID(const std::string& sUUID)
 {
 	std::string sNormalizedDataUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid FROM buildjobexecutiondata WHERE jobuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid FROM buildjobexecutiondata WHERE executionuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setString(2, sNormalizedDataUUID);
@@ -394,7 +394,7 @@ bool CBuildJobExecution::HasJobExecutionDataIdentifier(const std::string& sIdent
 	if (sIdentifier.empty())
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER, "empty job execution data identifier");
 
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid FROM buildjobexecutiondata WHERE jobuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid FROM buildjobexecutiondata WHERE executionuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setString(2, sIdentifier);
