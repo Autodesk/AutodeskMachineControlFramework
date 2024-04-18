@@ -102,7 +102,7 @@ CImageData* CImageData::createFromPNG(const uint8_t* pBuffer, uint64_t nBufferSi
 			pSource += 4; // Skip Alpha
 		}
 
-		return new CImageData(convertedPixelBuffer.release(), width, height, dDPIValueX, dDPIValueY, eImagePixelFormat::RGB24bit, false);
+		return new CImageData(convertedPixelBuffer.release(), width, height, dDPIValueX, dDPIValueY, eImagePixelFormat::GreyScale8bit, false);
 	}
 
 	default:
