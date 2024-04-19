@@ -735,6 +735,17 @@ namespace AMCCommon {
 		
 	}
 
+	std::string CUtils::removeLeadingPathDelimiter(const std::string& sPathName)
+	{
+		const char* pChar = sPathName.c_str();
+
+		while ((*pChar == '/') || (*pChar == '\\'))
+			pChar++;
+
+		return std::string(pChar);
+	}
+
+
 
 	bool CUtils::pathIsDirectory(const std::string& sPathName)
 	{

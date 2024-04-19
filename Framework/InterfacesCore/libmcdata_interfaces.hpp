@@ -63,6 +63,7 @@ class IAlertIterator;
 class IAlertSession;
 class IJournalSession;
 class IStorageStream;
+class IStorageZIPWriter;
 class IStorage;
 class ICustomDataStream;
 class IBuildJobData;
@@ -710,6 +711,62 @@ typedef IBaseSharedPtr<IStorageStream> PIStorageStream;
 
 
 /*************************************************************************************************************************
+ Class interface for StorageZIPWriter 
+**************************************************************************************************************************/
+
+class IStorageZIPWriter : public virtual IBase {
+public:
+	/**
+	* IStorageZIPWriter::StartNewEntry - Starts a new entry in the ZIP Stream. Finishes any unfinished entry. Fails if entry already exists. Fails if more than 1 billion entries exist in the ZIP file.
+	* @param[in] sFileName - Filename of the entry. MUST be a valid filename.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return Returns the current entry ID.
+	*/
+	virtual LibMCData_uint32 StartNewEntry(const std::string & sFileName, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+
+	/**
+	* IStorageZIPWriter::FinishCurrentEntry - Finishes the current entry in the ZIP stream. Writing is not possible, after an entry has been finished.
+	*/
+	virtual void FinishCurrentEntry() = 0;
+
+	/**
+	* IStorageZIPWriter::GetOpenEntryID - Returns the entry ID of the current open entry. Or 0, if no writing is possible.
+	* @return Returns the current entry ID.
+	*/
+	virtual LibMCData_uint32 GetOpenEntryID() = 0;
+
+	/**
+	* IStorageZIPWriter::WriteData - Writes data into the currently open entry.
+	* @param[in] nEntryID - Entry ID to write into. Checks again the current open entry ID and fails if there is a write attempt into any other entry ID.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[in] pDataBuffer - Data block to store in stream.
+	*/
+	virtual void WriteData(const LibMCData_uint32 nEntryID, const LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer) = 0;
+
+	/**
+	* IStorageZIPWriter::GetEntrySize - Returns the size of an Entry with the corresponding ID. Fails if entry ID does not exist.
+	* @param[in] nEntryID - Entry ID to check.
+	* @return Returns the current entry size of the ZIP entry in bytes.
+	*/
+	virtual LibMCData_uint64 GetEntrySize(const LibMCData_uint32 nEntryID) = 0;
+
+	/**
+	* IStorageZIPWriter::Finish - Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
+	*/
+	virtual void Finish() = 0;
+
+	/**
+	* IStorageZIPWriter::IsFinished - Returns if the stream writing has already been finished.
+	* @return If true, writing into the stream is not possible anymore.
+	*/
+	virtual bool IsFinished() = 0;
+
+};
+
+typedef IBaseSharedPtr<IStorageZIPWriter> PIStorageZIPWriter;
+
+
+/*************************************************************************************************************************
  Class interface for Storage 
 **************************************************************************************************************************/
 
@@ -812,6 +869,16 @@ public:
 	* @return Maximum Stream Size in Bytes.
 	*/
 	virtual LibMCData_uint64 GetMaxStreamSize() = 0;
+
+	/**
+	* IStorage::CreateZIPStream - starts storing a stream with a streaming ZIP writer. MIME type will be application/zip
+	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
+	* @param[in] sName - Name of the stream.
+	* @param[in] sUserUUID - UUID of Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return ZIP Writer instance
+	*/
+	virtual IStorageZIPWriter * CreateZIPStream(const std::string & sUUID, const std::string & sName, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::ContentTypeIsAccepted - Returns if the given content type is an acceptable value.

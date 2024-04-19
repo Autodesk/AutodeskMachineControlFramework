@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CStorage
 #include "libmcdata_storagestream.hpp"
 #include "libmcdata_interfaceexception.hpp"
 
+#include "libmcdata_storagezipwriter.hpp"
+
 // Include custom headers here.
 #include "common_utils.hpp"
 #include "amcdata_storagestate.hpp"
@@ -248,8 +250,6 @@ void CStorage::BeginRandomWriteStream(const std::string& sUUID, const std::strin
     if (sUserID.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-    // sContextUUID is depreciated and not used anymore!
-
     {
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
         insertDBEntry(sParsedUUID, sName, sMimeType, 0, "", sUserID, nAbsoluteTimeStamp);
@@ -277,6 +277,25 @@ void CStorage::StoreRandomWriteStream(const std::string& sUUID, const LibMCData_
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTRANDOMACCESS, "storage stream is not random access: " + sParsedUUID);
 
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
+
+}
+
+IStorageZIPWriter* CStorage::CreateZIPStream(const std::string& sUUID, const std::string& sName, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
+{
+    if (sName.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+    if (sUserUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    {
+        std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+        insertDBEntry(sParsedUUID, sName, "application/zip", 0, "", sUserUUID, nAbsoluteTimeStamp);
+
+        auto pWriter = std::make_shared<AMCData::CStorageWriter_ZIPStream>(sParsedUUID, m_pStorageState->getStreamPath(sUUID));
+        m_pStorageState->addPartialWriter(pWriter);
+
+        return new CStorageZIPWriter(pWriter);
+    }
 
 }
 

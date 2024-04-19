@@ -1844,6 +1844,191 @@ LibMCDataResult libmcdata_storagestream_getcallbacks(LibMCData_StorageStream pSt
 
 
 /*************************************************************************************************************************
+ Class implementation for StorageZIPWriter
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_storagezipwriter_startnewentry(LibMCData_StorageZIPWriter pStorageZIPWriter, const char * pFileName, LibMCData_uint64 nAbsoluteTimeStamp, LibMCData_uint32 * pEntryID)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		if (pFileName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pEntryID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sFileName(pFileName);
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pEntryID = pIStorageZIPWriter->StartNewEntry(sFileName, nAbsoluteTimeStamp);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storagezipwriter_finishcurrententry(LibMCData_StorageZIPWriter pStorageZIPWriter)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorageZIPWriter->FinishCurrentEntry();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storagezipwriter_getopenentryid(LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint32 * pEntryID)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		if (pEntryID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pEntryID = pIStorageZIPWriter->GetOpenEntryID();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storagezipwriter_writedata(LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint32 nEntryID, LibMCData_uint64 nDataBufferSize, const LibMCData_uint8 * pDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		if ( (!pDataBuffer) && (nDataBufferSize>0))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorageZIPWriter->WriteData(nEntryID, nDataBufferSize, pDataBuffer);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storagezipwriter_getentrysize(LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint32 nEntryID, LibMCData_uint64 * pEntrySize)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		if (pEntrySize == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pEntrySize = pIStorageZIPWriter->GetEntrySize(nEntryID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storagezipwriter_finish(LibMCData_StorageZIPWriter pStorageZIPWriter)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorageZIPWriter->Finish();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storagezipwriter_isfinished(LibMCData_StorageZIPWriter pStorageZIPWriter, bool * pFinished)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		if (pFinished == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pFinished = pIStorageZIPWriter->IsFinished();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for Storage
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_storage_streamisready(LibMCData_Storage pStorage, const char * pUUID, bool * pIsReady)
@@ -2203,6 +2388,43 @@ LibMCDataResult libmcdata_storage_getmaxstreamsize(LibMCData_Storage pStorage, L
 		
 		*pMaxStreamSize = pIStorage->GetMaxStreamSize();
 
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storage_createzipstream(LibMCData_Storage pStorage, const char * pUUID, const char * pName, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp, LibMCData_StorageZIPWriter * pZIPWriter)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pZIPWriter == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName(pName);
+		std::string sUserUUID(pUserUUID);
+		IBase* pBaseZIPWriter(nullptr);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseZIPWriter = pIStorage->CreateZIPStream(sUUID, sName, sUserUUID, nAbsoluteTimeStamp);
+
+		*pZIPWriter = (IBase*)(pBaseZIPWriter);
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -7432,6 +7654,20 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storagestream_getcontent;
 	if (sProcName == "libmcdata_storagestream_getcallbacks") 
 		*ppProcAddress = (void*) &libmcdata_storagestream_getcallbacks;
+	if (sProcName == "libmcdata_storagezipwriter_startnewentry") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_startnewentry;
+	if (sProcName == "libmcdata_storagezipwriter_finishcurrententry") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_finishcurrententry;
+	if (sProcName == "libmcdata_storagezipwriter_getopenentryid") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_getopenentryid;
+	if (sProcName == "libmcdata_storagezipwriter_writedata") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_writedata;
+	if (sProcName == "libmcdata_storagezipwriter_getentrysize") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_getentrysize;
+	if (sProcName == "libmcdata_storagezipwriter_finish") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_finish;
+	if (sProcName == "libmcdata_storagezipwriter_isfinished") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_isfinished;
 	if (sProcName == "libmcdata_storage_streamisready") 
 		*ppProcAddress = (void*) &libmcdata_storage_streamisready;
 	if (sProcName == "libmcdata_storage_retrievestream") 
@@ -7456,6 +7692,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storage_finishrandomwritestream;
 	if (sProcName == "libmcdata_storage_getmaxstreamsize") 
 		*ppProcAddress = (void*) &libmcdata_storage_getmaxstreamsize;
+	if (sProcName == "libmcdata_storage_createzipstream") 
+		*ppProcAddress = (void*) &libmcdata_storage_createzipstream;
 	if (sProcName == "libmcdata_storage_contenttypeisaccepted") 
 		*ppProcAddress = (void*) &libmcdata_storage_contenttypeisaccepted;
 	if (sProcName == "libmcdata_storage_streamisimage") 

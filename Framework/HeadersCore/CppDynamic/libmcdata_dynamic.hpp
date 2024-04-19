@@ -68,6 +68,7 @@ class CAlertIterator;
 class CAlertSession;
 class CJournalSession;
 class CStorageStream;
+class CStorageZIPWriter;
 class CStorage;
 class CCustomDataStream;
 class CBuildJobData;
@@ -98,6 +99,7 @@ typedef CAlertIterator CLibMCDataAlertIterator;
 typedef CAlertSession CLibMCDataAlertSession;
 typedef CJournalSession CLibMCDataJournalSession;
 typedef CStorageStream CLibMCDataStorageStream;
+typedef CStorageZIPWriter CLibMCDataStorageZIPWriter;
 typedef CStorage CLibMCDataStorage;
 typedef CCustomDataStream CLibMCDataCustomDataStream;
 typedef CBuildJobData CLibMCDataBuildJobData;
@@ -128,6 +130,7 @@ typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CAlertSession> PAlertSession;
 typedef std::shared_ptr<CJournalSession> PJournalSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
+typedef std::shared_ptr<CStorageZIPWriter> PStorageZIPWriter;
 typedef std::shared_ptr<CStorage> PStorage;
 typedef std::shared_ptr<CCustomDataStream> PCustomDataStream;
 typedef std::shared_ptr<CBuildJobData> PBuildJobData;
@@ -158,6 +161,7 @@ typedef PAlertIterator PLibMCDataAlertIterator;
 typedef PAlertSession PLibMCDataAlertSession;
 typedef PJournalSession PLibMCDataJournalSession;
 typedef PStorageStream PLibMCDataStorageStream;
+typedef PStorageZIPWriter PLibMCDataStorageZIPWriter;
 typedef PStorage PLibMCDataStorage;
 typedef PCustomDataStream PLibMCDataCustomDataStream;
 typedef PBuildJobData PLibMCDataBuildJobData;
@@ -1017,6 +1021,7 @@ private:
 	friend class CAlertSession;
 	friend class CJournalSession;
 	friend class CStorageStream;
+	friend class CStorageZIPWriter;
 	friend class CStorage;
 	friend class CCustomDataStream;
 	friend class CBuildJobData;
@@ -1268,6 +1273,29 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CStorageZIPWriter 
+**************************************************************************************************************************/
+class CStorageZIPWriter : public CBase {
+public:
+	
+	/**
+	* CStorageZIPWriter::CStorageZIPWriter - Constructor for StorageZIPWriter class.
+	*/
+	CStorageZIPWriter(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCData_uint32 StartNewEntry(const std::string & sFileName, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void FinishCurrentEntry();
+	inline LibMCData_uint32 GetOpenEntryID();
+	inline void WriteData(const LibMCData_uint32 nEntryID, const CInputVector<LibMCData_uint8> & DataBuffer);
+	inline LibMCData_uint64 GetEntrySize(const LibMCData_uint32 nEntryID);
+	inline void Finish();
+	inline bool IsFinished();
+};
+	
+/*************************************************************************************************************************
  Class CStorage 
 **************************************************************************************************************************/
 class CStorage : public CBase {
@@ -1293,6 +1321,7 @@ public:
 	inline LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID);
 	inline void FinishRandomWriteStream(const std::string & sUUID);
 	inline LibMCData_uint64 GetMaxStreamSize();
+	inline PStorageZIPWriter CreateZIPStream(const std::string & sUUID, const std::string & sName, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
 	inline void CreateDownloadTicket(const std::string & sTicketUUID, const std::string & sStreamUUID, const std::string & sClientFileName, const std::string & sSessionUUID, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
@@ -1813,6 +1842,13 @@ public:
 		pWrapperTable->m_StorageStream_GetSize = nullptr;
 		pWrapperTable->m_StorageStream_GetContent = nullptr;
 		pWrapperTable->m_StorageStream_GetCallbacks = nullptr;
+		pWrapperTable->m_StorageZIPWriter_StartNewEntry = nullptr;
+		pWrapperTable->m_StorageZIPWriter_FinishCurrentEntry = nullptr;
+		pWrapperTable->m_StorageZIPWriter_GetOpenEntryID = nullptr;
+		pWrapperTable->m_StorageZIPWriter_WriteData = nullptr;
+		pWrapperTable->m_StorageZIPWriter_GetEntrySize = nullptr;
+		pWrapperTable->m_StorageZIPWriter_Finish = nullptr;
+		pWrapperTable->m_StorageZIPWriter_IsFinished = nullptr;
 		pWrapperTable->m_Storage_StreamIsReady = nullptr;
 		pWrapperTable->m_Storage_RetrieveStream = nullptr;
 		pWrapperTable->m_Storage_StoreNewStream = nullptr;
@@ -1825,6 +1861,7 @@ public:
 		pWrapperTable->m_Storage_GetRandomWriteStreamSize = nullptr;
 		pWrapperTable->m_Storage_FinishRandomWriteStream = nullptr;
 		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
+		pWrapperTable->m_Storage_CreateZIPStream = nullptr;
 		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
 		pWrapperTable->m_Storage_StreamIsImage = nullptr;
 		pWrapperTable->m_Storage_CreateDownloadTicket = nullptr;
@@ -2432,6 +2469,69 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_StartNewEntry = (PLibMCDataStorageZIPWriter_StartNewEntryPtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_startnewentry");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_StartNewEntry = (PLibMCDataStorageZIPWriter_StartNewEntryPtr) dlsym(hLibrary, "libmcdata_storagezipwriter_startnewentry");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_StartNewEntry == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_FinishCurrentEntry = (PLibMCDataStorageZIPWriter_FinishCurrentEntryPtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_finishcurrententry");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_FinishCurrentEntry = (PLibMCDataStorageZIPWriter_FinishCurrentEntryPtr) dlsym(hLibrary, "libmcdata_storagezipwriter_finishcurrententry");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_FinishCurrentEntry == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetOpenEntryID = (PLibMCDataStorageZIPWriter_GetOpenEntryIDPtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_getopenentryid");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetOpenEntryID = (PLibMCDataStorageZIPWriter_GetOpenEntryIDPtr) dlsym(hLibrary, "libmcdata_storagezipwriter_getopenentryid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_GetOpenEntryID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_WriteData = (PLibMCDataStorageZIPWriter_WriteDataPtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_writedata");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_WriteData = (PLibMCDataStorageZIPWriter_WriteDataPtr) dlsym(hLibrary, "libmcdata_storagezipwriter_writedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_WriteData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetEntrySize = (PLibMCDataStorageZIPWriter_GetEntrySizePtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_getentrysize");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetEntrySize = (PLibMCDataStorageZIPWriter_GetEntrySizePtr) dlsym(hLibrary, "libmcdata_storagezipwriter_getentrysize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_GetEntrySize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_Finish = (PLibMCDataStorageZIPWriter_FinishPtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_finish");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_Finish = (PLibMCDataStorageZIPWriter_FinishPtr) dlsym(hLibrary, "libmcdata_storagezipwriter_finish");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_Finish == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_IsFinished = (PLibMCDataStorageZIPWriter_IsFinishedPtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_isfinished");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_IsFinished = (PLibMCDataStorageZIPWriter_IsFinishedPtr) dlsym(hLibrary, "libmcdata_storagezipwriter_isfinished");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_IsFinished == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Storage_StreamIsReady = (PLibMCDataStorage_StreamIsReadyPtr) GetProcAddress(hLibrary, "libmcdata_storage_streamisready");
 		#else // _WIN32
 		pWrapperTable->m_Storage_StreamIsReady = (PLibMCDataStorage_StreamIsReadyPtr) dlsym(hLibrary, "libmcdata_storage_streamisready");
@@ -2537,6 +2637,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Storage_GetMaxStreamSize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_CreateZIPStream = (PLibMCDataStorage_CreateZIPStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_createzipstream");
+		#else // _WIN32
+		pWrapperTable->m_Storage_CreateZIPStream = (PLibMCDataStorage_CreateZIPStreamPtr) dlsym(hLibrary, "libmcdata_storage_createzipstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_CreateZIPStream == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4017,6 +4126,34 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetCallbacks == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_startnewentry", (void**)&(pWrapperTable->m_StorageZIPWriter_StartNewEntry));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_StartNewEntry == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_finishcurrententry", (void**)&(pWrapperTable->m_StorageZIPWriter_FinishCurrentEntry));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_FinishCurrentEntry == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_getopenentryid", (void**)&(pWrapperTable->m_StorageZIPWriter_GetOpenEntryID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_GetOpenEntryID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_writedata", (void**)&(pWrapperTable->m_StorageZIPWriter_WriteData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_WriteData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_getentrysize", (void**)&(pWrapperTable->m_StorageZIPWriter_GetEntrySize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_GetEntrySize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_finish", (void**)&(pWrapperTable->m_StorageZIPWriter_Finish));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_Finish == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_isfinished", (void**)&(pWrapperTable->m_StorageZIPWriter_IsFinished));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_IsFinished == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storage_streamisready", (void**)&(pWrapperTable->m_Storage_StreamIsReady));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_StreamIsReady == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4063,6 +4200,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_storage_getmaxstreamsize", (void**)&(pWrapperTable->m_Storage_GetMaxStreamSize));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_GetMaxStreamSize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_createzipstream", (void**)&(pWrapperTable->m_Storage_CreateZIPStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_CreateZIPStream == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storage_contenttypeisaccepted", (void**)&(pWrapperTable->m_Storage_ContentTypeIsAccepted));
@@ -5350,6 +5491,87 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CStorageZIPWriter
+	 */
+	
+	/**
+	* CStorageZIPWriter::StartNewEntry - Starts a new entry in the ZIP Stream. Finishes any unfinished entry. Fails if entry already exists. Fails if more than 1 billion entries exist in the ZIP file.
+	* @param[in] sFileName - Filename of the entry. MUST be a valid filename.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return Returns the current entry ID.
+	*/
+	LibMCData_uint32 CStorageZIPWriter::StartNewEntry(const std::string & sFileName, const LibMCData_uint64 nAbsoluteTimeStamp)
+	{
+		LibMCData_uint32 resultEntryID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_StartNewEntry(m_pHandle, sFileName.c_str(), nAbsoluteTimeStamp, &resultEntryID));
+		
+		return resultEntryID;
+	}
+	
+	/**
+	* CStorageZIPWriter::FinishCurrentEntry - Finishes the current entry in the ZIP stream. Writing is not possible, after an entry has been finished.
+	*/
+	void CStorageZIPWriter::FinishCurrentEntry()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_FinishCurrentEntry(m_pHandle));
+	}
+	
+	/**
+	* CStorageZIPWriter::GetOpenEntryID - Returns the entry ID of the current open entry. Or 0, if no writing is possible.
+	* @return Returns the current entry ID.
+	*/
+	LibMCData_uint32 CStorageZIPWriter::GetOpenEntryID()
+	{
+		LibMCData_uint32 resultEntryID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_GetOpenEntryID(m_pHandle, &resultEntryID));
+		
+		return resultEntryID;
+	}
+	
+	/**
+	* CStorageZIPWriter::WriteData - Writes data into the currently open entry.
+	* @param[in] nEntryID - Entry ID to write into. Checks again the current open entry ID and fails if there is a write attempt into any other entry ID.
+	* @param[in] DataBuffer - Data block to store in stream.
+	*/
+	void CStorageZIPWriter::WriteData(const LibMCData_uint32 nEntryID, const CInputVector<LibMCData_uint8> & DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_WriteData(m_pHandle, nEntryID, (LibMCData_uint64)DataBuffer.size(), DataBuffer.data()));
+	}
+	
+	/**
+	* CStorageZIPWriter::GetEntrySize - Returns the size of an Entry with the corresponding ID. Fails if entry ID does not exist.
+	* @param[in] nEntryID - Entry ID to check.
+	* @return Returns the current entry size of the ZIP entry in bytes.
+	*/
+	LibMCData_uint64 CStorageZIPWriter::GetEntrySize(const LibMCData_uint32 nEntryID)
+	{
+		LibMCData_uint64 resultEntrySize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_GetEntrySize(m_pHandle, nEntryID, &resultEntrySize));
+		
+		return resultEntrySize;
+	}
+	
+	/**
+	* CStorageZIPWriter::Finish - Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
+	*/
+	void CStorageZIPWriter::Finish()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_Finish(m_pHandle));
+	}
+	
+	/**
+	* CStorageZIPWriter::IsFinished - Returns if the stream writing has already been finished.
+	* @return If true, writing into the stream is not possible anymore.
+	*/
+	bool CStorageZIPWriter::IsFinished()
+	{
+		bool resultFinished = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_IsFinished(m_pHandle, &resultFinished));
+		
+		return resultFinished;
+	}
+	
+	/**
 	 * Method definitions for class CStorage
 	 */
 	
@@ -5497,6 +5719,25 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Storage_GetMaxStreamSize(m_pHandle, &resultMaxStreamSize));
 		
 		return resultMaxStreamSize;
+	}
+	
+	/**
+	* CStorage::CreateZIPStream - starts storing a stream with a streaming ZIP writer. MIME type will be application/zip
+	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
+	* @param[in] sName - Name of the stream.
+	* @param[in] sUserUUID - UUID of Currently authenticated user
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return ZIP Writer instance
+	*/
+	PStorageZIPWriter CStorage::CreateZIPStream(const std::string & sUUID, const std::string & sName, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	{
+		LibMCDataHandle hZIPWriter = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_CreateZIPStream(m_pHandle, sUUID.c_str(), sName.c_str(), sUserUUID.c_str(), nAbsoluteTimeStamp, &hZIPWriter));
+		
+		if (!hZIPWriter) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStorageZIPWriter>(m_pWrapper, hZIPWriter);
 	}
 	
 	/**

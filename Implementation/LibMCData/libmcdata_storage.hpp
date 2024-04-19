@@ -100,6 +100,8 @@ public:
 
 	void FinishRandomWriteStream(const std::string& sUUID) override;
 
+    IStorageZIPWriter* CreateZIPStream(const std::string& sUUID, const std::string& sName, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+
     LibMCData_uint64 GetMaxStreamSize() override;
 
     bool ContentTypeIsAccepted(const std::string& sContentType) override;

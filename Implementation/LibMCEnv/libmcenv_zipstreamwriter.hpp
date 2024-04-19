@@ -49,6 +49,8 @@ Abstract: This is the class declaration of CZIPStreamWriter
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 
+#include <mutex>
+
 namespace LibMCEnv {
 namespace Impl {
 
@@ -56,6 +58,46 @@ namespace Impl {
 /*************************************************************************************************************************
  Class declaration of CZIPStreamWriter 
 **************************************************************************************************************************/
+
+
+	class CZIPEntryStreamWriter : public virtual ITempStreamWriter, public virtual CBase {
+	private:
+
+		std::string m_sEntryUUID;
+		PZIPWriterInstance m_pInstance;
+
+	public:
+
+		CZIPEntryStreamWriter(PZIPWriterInstance m_pInstance, const std::string & sEntryUUID, const std::string & sName);
+
+		virtual ~CZIPEntryStreamWriter();
+
+		std::string GetUUID() override;
+
+		std::string GetName() override;
+
+		std::string GetMIMEType() override;
+
+		LibMCEnv_uint64 GetSize() override;
+
+		LibMCEnv_uint64 GetWritePosition() override;
+
+		void Seek(const LibMCEnv_uint64 nWritePosition) override;
+
+		bool IsFinished() override;
+
+		void WriteData(const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8* pDataBuffer) override;
+
+		void WriteString(const std::string& sData) override;
+
+		void WriteLine(const std::string& sLine) override;
+
+		void Finish() override;
+
+		void CopyFrom(IStreamReader* pStreamReader) override;
+
+	};
+
 
 class CZIPStreamWriter : public virtual IZIPStreamWriter, public virtual CBase {
 protected:

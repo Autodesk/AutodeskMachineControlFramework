@@ -748,6 +748,41 @@
 	</class>
 
 
+    <!-- The StorageZIPWriter class is thread safe. -->
+	<class name="StorageZIPWriter" parent="Base" description="Storage ZIP Writer Instance">
+	
+		<method name="StartNewEntry" description="Starts a new entry in the ZIP Stream. Finishes any unfinished entry. Fails if entry already exists. Fails if more than 1 billion entries exist in the ZIP file.">
+			<param name="FileName" type="string" pass="in" description="Filename of the entry. MUST be a valid filename." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
+			<param name="EntryID" type="uint32" pass="return" description="Returns the current entry ID." />
+		</method>	
+	
+		<method name="FinishCurrentEntry" description="Finishes the current entry in the ZIP stream. Writing is not possible, after an entry has been finished.">
+		</method>
+		
+		<method name="GetOpenEntryID" description="Returns the entry ID of the current open entry. Or 0, if no writing is possible.">
+			<param name="EntryID" type="uint32" pass="return" description="Returns the current entry ID." />
+		</method>
+
+		<method name="WriteData" description="Writes data into the currently open entry.">
+			<param name="EntryID" type="uint32" pass="in" description="Entry ID to write into. Checks again the current open entry ID and fails if there is a write attempt into any other entry ID." />
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data block to store in stream." />	
+		</method>
+
+		<method name="GetEntrySize" description="Returns the size of an Entry with the corresponding ID. Fails if entry ID does not exist.">
+			<param name="EntryID" type="uint32" pass="in" description="Entry ID to check." />
+			<param name="EntrySize" type="uint64" pass="return" description="Returns the current entry size of the ZIP entry in bytes." />
+		</method>
+		
+		<method name="Finish" description="Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.">
+		</method>
+
+		<method name="IsFinished" description="Returns if the stream writing has already been finished.">
+			<param name="Finished" type="bool" pass="return" description="If true, writing into the stream is not possible anymore." />
+		</method>
+		
+	</class>
+
 
     <!-- The Storage class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="Storage" parent="Base" description="Storage Handler Instance">
@@ -821,7 +856,16 @@
 
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
 			<param name="MaxStreamSize" type="uint64" pass="return" description="Maximum Stream Size in Bytes." />	
+		</method>
+
+		<method name="CreateZIPStream" description="starts storing a stream with a streaming ZIP writer. MIME type will be application/zip">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
+			<param name="Name" type="string" pass="in" description="Name of the stream." />	
+			<param name="UserUUID" type="string" pass="in" description="UUID of Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
+			<param name="ZIPWriter" type="class" class="StorageZIPWriter" pass="return" description="ZIP Writer instance" />				
 		</method>	
+
 			
 		<method name="ContentTypeIsAccepted" description="Returns if the given content type is an acceptable value.">
 			<param name="ContentType" type="string" pass="in" description="Content type string (is taken case-insensitive)" />	

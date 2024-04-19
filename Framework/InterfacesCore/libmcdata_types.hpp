@@ -751,6 +751,7 @@ typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
+typedef LibMCDataHandle LibMCData_StorageZIPWriter;
 typedef LibMCDataHandle LibMCData_Storage;
 typedef LibMCDataHandle LibMCData_CustomDataStream;
 typedef LibMCDataHandle LibMCData_BuildJobData;

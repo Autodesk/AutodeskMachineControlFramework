@@ -219,6 +219,88 @@ namespace AMCData {
 
 	}
 
+
+
+	CStorageWriter_ZIPStream::CStorageWriter_ZIPStream(const std::string& sUUID, const std::string& sPath)
+		: CStorageWriter(), m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)), m_sPath(sPath)
+	{
+		m_pExportStream = std::make_shared<AMCCommon::CExportStream_Native>(sPath);
+	}
+
+	CStorageWriter_ZIPStream::~CStorageWriter_ZIPStream()
+	{
+		if (m_pExportStream.get() != nullptr) {
+			m_pExportStream = nullptr;
+			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
+		}
+	}
+
+	std::string CStorageWriter_ZIPStream::getUUID()
+	{
+		return m_sUUID;
+	}
+
+
+	void CStorageWriter_ZIPStream::writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset)
+	{
+		//throw ELibMCDataInterfaceException();
+	}
+
+
+	uint32_t CStorageWriter_ZIPStream::startNewEntry(const std::string& sFileName, uint64_t nAbsoluteTimeStamp)
+	{
+		return 0;
+	}
+
+	void CStorageWriter_ZIPStream::finishCurrentEntry()
+	{
+
+	}
+
+	uint32_t CStorageWriter_ZIPStream::getOpenEntryID()
+	{
+		return 0;
+	}
+
+	void CStorageWriter_ZIPStream::writeToCurrentEntry(uint32_t nEntryID, const uint8_t* pChunkData, const uint64_t nChunkSize)
+	{
+
+	}
+
+	uint64_t CStorageWriter_ZIPStream::getEntrySize(uint32_t nEntryID)
+	{
+		return 0;
+
+	}
+
+	void CStorageWriter_ZIPStream::finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (m_pExportStream.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+
+		try {
+
+			m_pExportStream->seekFromEnd(0, true);
+			auto nSize = m_pExportStream->getPosition();
+
+			// Free ExportStream and close file
+			m_pExportStream = nullptr;
+
+			sCalculatedSHA256 = AMCCommon::CUtils::calculateSHA256FromFile(m_sPath);
+			sCalculatedBlockSHA256 = AMCCommon::CUtils::calculateBlockwiseSHA256FromFile(m_sPath, 65536);
+
+		}
+		catch (...) {
+			m_pExportStream = nullptr;
+
+			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
+			throw;
+		}
+	}
+
+
 }
 
 

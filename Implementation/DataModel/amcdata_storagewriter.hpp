@@ -106,7 +106,41 @@ public:
 
 };
 
+
+class CStorageWriter_ZIPStream : public CStorageWriter {
+private:
+    std::string m_sUUID;
+    std::string m_sPath;
+    AMCCommon::PExportStream m_pExportStream;
+
+    std::mutex m_WriteMutex;
+
+public:
+
+    CStorageWriter_ZIPStream(const std::string& sUUID, const std::string& sPath);
+
+    virtual ~CStorageWriter_ZIPStream();
+
+    std::string getUUID() override;
+
+    void writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset) override;
+
+    uint32_t startNewEntry (const std::string & sFileName, uint64_t nAbsoluteTimeStamp);
+
+    void finishCurrentEntry();
+
+    uint32_t getOpenEntryID();
+
+    void writeToCurrentEntry (uint32_t nEntryID, const uint8_t* pChunkData, const uint64_t nChunkSize);
+
+    void finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256);
+
+    uint64_t getEntrySize(uint32_t nEntryID);
+
+};
+
 typedef std::shared_ptr <CStorageWriter> PStorageWriter;
+typedef std::shared_ptr <CStorageWriter_ZIPStream> PStorageWriter_ZIPStream;
 
 } // namespace AMCDATA
 
