@@ -455,6 +455,8 @@ public:
 	}
 	
 	inline bool HasField(const std::string & sFieldName);
+	inline bool HasMessageField(const std::string & sFieldName);
+	inline PGRPCMessage GetMessageField(const std::string & sFieldName);
 	inline bool HasStringField(const std::string & sFieldName);
 	inline void SetStringField(const std::string & sFieldName, const std::string & sValue);
 	inline std::string GetStringField(const std::string & sFieldName);
@@ -678,6 +680,8 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_GRPCMessage_HasField = nullptr;
+		pWrapperTable->m_GRPCMessage_HasMessageField = nullptr;
+		pWrapperTable->m_GRPCMessage_GetMessageField = nullptr;
 		pWrapperTable->m_GRPCMessage_HasStringField = nullptr;
 		pWrapperTable->m_GRPCMessage_SetStringField = nullptr;
 		pWrapperTable->m_GRPCMessage_GetStringField = nullptr;
@@ -824,6 +828,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_GRPCMessage_HasField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_HasMessageField = (PLibMCDriver_GRPCGRPCMessage_HasMessageFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_hasmessagefield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_HasMessageField = (PLibMCDriver_GRPCGRPCMessage_HasMessageFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_hasmessagefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_HasMessageField == nullptr)
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GRPCMessage_GetMessageField = (PLibMCDriver_GRPCGRPCMessage_GetMessageFieldPtr) GetProcAddress(hLibrary, "libmcdriver_grpc_grpcmessage_getmessagefield");
+		#else // _WIN32
+		pWrapperTable->m_GRPCMessage_GetMessageField = (PLibMCDriver_GRPCGRPCMessage_GetMessageFieldPtr) dlsym(hLibrary, "libmcdriver_grpc_grpcmessage_getmessagefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GRPCMessage_GetMessageField == nullptr)
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1185,6 +1207,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_HasField == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_hasmessagefield", (void**)&(pWrapperTable->m_GRPCMessage_HasMessageField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_HasMessageField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_getmessagefield", (void**)&(pWrapperTable->m_GRPCMessage_GetMessageField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_GetMessageField == nullptr) )
+			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_grpc_grpcmessage_hasstringfield", (void**)&(pWrapperTable->m_GRPCMessage_HasStringField));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GRPCMessage_HasStringField == nullptr) )
 			return LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1427,6 +1457,35 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_HasField(m_pHandle, sFieldName.c_str(), &resultFieldExists));
 		
 		return resultFieldExists;
+	}
+	
+	/**
+	* CGRPCMessage::HasMessageField - Returns if the message has a field of a certain name and this field is a submessage field.
+	* @param[in] sFieldName - Name of the field.
+	* @return True if field exists and is of type message.
+	*/
+	bool CGRPCMessage::HasMessageField(const std::string & sFieldName)
+	{
+		bool resultMessageFieldExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_HasMessageField(m_pHandle, sFieldName.c_str(), &resultMessageFieldExists));
+		
+		return resultMessageFieldExists;
+	}
+	
+	/**
+	* CGRPCMessage::GetMessageField - Returns the submessage of a field. Fails if the field does not exist or is not a submessage field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Sub message object
+	*/
+	PGRPCMessage CGRPCMessage::GetMessageField(const std::string & sFieldName)
+	{
+		LibMCDriver_GRPCHandle hMessageFieldInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_GRPCMessage_GetMessageField(m_pHandle, sFieldName.c_str(), &hMessageFieldInstance));
+		
+		if (!hMessageFieldInstance) {
+			CheckError(LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CGRPCMessage>(m_pWrapper, hMessageFieldInstance);
 	}
 	
 	/**
